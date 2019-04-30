@@ -1,21 +1,5 @@
 using Parameters
 
-@with_kw struct phys
-    grav = 9.80665;               # Gravitational acceleration (m/s2)
-    tfrz = 273.15;                # Freezing point of water (K)
-    σ = 5.67e-08;                 # Stefan-Boltzmann constant (W/m2/K4)
-    mmdry = 28.97 / 1000;         # Molecular mass of dry air (kg/mol)
-    mmh2o = 18.02 / 1000;         # Molecular mass of water (kg/mol)
-    Cpd = 1005;                   # Specific heat of dry air at constant pressure (J/kg/K)
-    Cpw = 1846;                   # Specific heat of water vapor at constant pressure (J/kg/K)
-    Rgas = 8.31446;               # Universal gas constant (J/K/mol)
-    visc_0 = 13.3e-06;            # Kinematic viscosity at 0C and 1013.25 hPa (m2/s)
-    Dh_0 = 18.9e-06;              # Molecular diffusivity (heat) at 0C and 1013.25 hPa (m2/s)
-    Dv_0 = 21.8e-06;              # Molecular diffusivity (H2O) at 0C and 1013.25 hPa (m2/s)
-    Dc_0 = 13.8e-06;              # Molecular diffusivity (CO2) at 0C and 1013.25 hPa (m2/s)
-end
-
-physcon = phys()
 
 # Scaling functions for Photosynthesis temperature response and inhibition
 ft(tl, ha) = exp(ha/(physcon.Rgas*(physcon.tfrz+25)) * (1-(physcon.tfrz+25)/tl));
@@ -24,9 +8,27 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
 # Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
 @with_kw mutable struct leaf_params
+    # Rate constants (arbitrary units here, only relative rates are important):
+    Kf = 0.05                           # Rate constant for fluorescence (might try to fit this eventually)
+    Kd = 0.85                           # Rate constant for thermal dissipation
+    Kp = 4.0                            # Rate constant for photochemistry (all reaction centers open)
+    maxPSII = Kp/(Kp+Kf+Kd)             # Max PSII yield (Kn=0, all RC open)
+
     #use_acclim = false
-    o2 = 0.209e3                         # Standard O2 in mmol/mol
+    o₂ = 0.209e3                         # Standard O2 in mmol/mol
     T = 298.15                           # standard temperature (25C)
+
+    # Curvature parameter:
+    θ_j = 0.90
+
+    # Conductances:
+    # Ball Berry model
+    go = 0.01
+    g1 = 9
+
+    # Add already here: Mesophyll conductance (high for now):
+    gm = 1.0e99                             # Mesophyll conductance (μmol/m2/s/Pa)
+
     #---------------------------------------------------------------------
     # kc, ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
     # Derive sco from cp with o2=0.209 mol/mol and re-calculate Γ to allow
@@ -36,7 +38,7 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     ko_25 = 278.4                         # Michaelis-Menten constant for O2 at 25C  mmol/mol
     Γ_25_ = 42.75                         # CO2 compensation point at 25C μmol/mol
     sco = 0.5 * 0.209 / (Γ_25_ * 1.e-06)  # Γ_25 (μmol/mol) -> (mol/mol)
-    Γ_25 = 0.5 * o2 / sco * 1000.         # ! O2 is mmol/mol. Multiply by 1000 for μmol/mol
+    Γ_25 = 0.5 * o₂ / sco * 1000.         # ! O2 is mmol/mol. Multiply by 1000 for μmol/mol
 
     #---------------------------------------------------------------------
     # Activation energy:
@@ -70,10 +72,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     rdc    = fth25(rdhd, rdse)          # Scaling factor for high temperature inhibition (25 C = 1.0)
 
     # Initialize at standard T:
-    kc = kc_25
-    ko = ko_25
-    Γ  = Γ_25
+    kc  = kc_25
+    ko  = ko_25
+    Γ⋆  = Γ_25
 
+    # Use some standard values first
     vcmax25 = 50                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
     jmax25  = 1.6*vcmax25               # C3 - maximum electron transport rate at 25C for canopy layer (μmol/m2/s)
     rd25    = 0.7605                    # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
@@ -83,11 +86,13 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 end
 
 # Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here:
-function setC3LeafRates!(l::leaf_params, vcmax25, jmax25, rd25, T)
-    l.vcmax25 = vcmax25
-    l.jmax25  = jmax25
-    l.rd25    = rd25
-    l.vcmax   = vcmax25 * ft(T, l.vcmaxha) * fth(T, l.vcmaxhd, l.vcmaxse, l.vcmaxc)
-    l.jmax    = jmax25  * ft(T, l.jmaxha)  * fth(T, l.jmaxhd, l.jmaxse, l.jmaxc)
-    l.rdleaf  = rd25    * ft(T, l.rdha)    * fth(T, l.rdhd, l.rdse, l.rdc)
+function setLeafT!(l::leaf_params,  T)
+    l.T = T
+    l.kc     = kc25          * ft(T, l.kcha)
+    l.ko     = ko25          * ft(T, l.koha)
+    l.Γ⋆     = cp25          * ft(T, l.cpha)
+    l.vcmax   = l.vcmax25 * ft(T, l.vcmaxha) * fth(T, l.vcmaxhd, l.vcmaxse, l.vcmaxc)
+    l.jmax    = l.jmax25  * ft(T, l.jmaxha)  * fth(T, l.jmaxhd, l.jmaxse, l.jmaxc)
+    l.rdleaf  = l.rd25    * ft(T, l.rdha)    * fth(T, l.rdhd, l.rdse, l.rdc)
+    # l.kd = max(0.8738,  0.0301*(T-273.15)+ 0.0773); # Can implement that later.
 end
