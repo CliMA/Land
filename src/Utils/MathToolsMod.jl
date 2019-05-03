@@ -1,5 +1,6 @@
 module MathToolsMod
-
+using LeafPhotosynthesisMod:fluxes
+using Leaf:leaf_params
 #-----------------------------------------------------------------------
 # !DESCRIPTION:
 # Math tools
@@ -60,7 +61,7 @@ function log_gamma_function(x)
   return tmp + log(stp*ser/x)
 end # function log_gamma_function
 
-function hybrid(flux::flux, func::Function, xa::Number, xb::Number, tol::Number)
+function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::Number, tol::Number)
     #
     # !DESCRIPTION:
     # Solve for the root of a function, given initial estimates xa and xb.
@@ -76,14 +77,14 @@ function hybrid(flux::flux, func::Function, xa::Number, xb::Number, tol::Number)
     itmax = 40
     x0 = x1 = f0 = f1 = 0.0
     x0 = xa
-    f0 = func(flux, x0)
+    f0 = func(x0,flux, leaf)
     if (f0 == 0.0)
        root = x0
        return
     end
 
     x1 = xb
-    f1 = func(flux, x1)
+    f1 = func(x1,flux, leaf)
     if (f1 == 0.0)
        return x1
     end
@@ -108,7 +109,7 @@ function hybrid(flux::flux, func::Function, xa::Number, xb::Number, tol::Number)
        x0 = x1
        f0 = f1
        x1 = x
-       f1 = func(flux, x1)
+       f1 = func(x1,flux, leaf)
        if (f1 < minf)
           minx = x1
           minf = f1
@@ -116,14 +117,14 @@ function hybrid(flux::flux, func::Function, xa::Number, xb::Number, tol::Number)
 
        # If a root zone is found, use the brent method for a robust backup strategy
        if (f1 * f0 < 0.0)
-          x = zbrent(flux, func, x0, x1, xtol=tol)
+          x = zbrent(flux,  leaf,func,x0, x1, xtol=tol)
           x0 = x
           break
        end
 
        # In case of failing to converge within itmax iterations stop at the minimum function
        if (iter > itmax)
-          f1 = func(flux, minx)
+          f1 = func(minx,flux, leaf)
           x0 = minx
           break
        end
@@ -132,12 +133,12 @@ function hybrid(flux::flux, func::Function, xa::Number, xb::Number, tol::Number)
 
     return x0
 end #function hybrid
-function zbrent(flux::flux,f::Function, x0::Number, x1::Number, args::Tuple=();
+function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Number, args::Tuple=();
                xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
                maxiter::Integer=50)
     EPS = eps(Float64)
-    y0 = f(flux,x0)
-    y1 = f(flux,x1)
+    y0 = f(x0,flux,leaf)
+    y1 = f(x1,flux,leaf)
     if abs(y0) < abs(y1)
         # Swap lower and upper bounds.
         x0, x1 = x1, x0
@@ -179,7 +180,7 @@ function zbrent(flux::flux,f::Function, x0::Number, x1::Number, args::Tuple=();
             bisection = false
         end
 
-        y = f(flux,x)
+        y = f(x,flux,leaf)
         # y-tolerance.
         if abs(y) < ytol
             return x

@@ -1,8 +1,10 @@
+module LeafPhotosynthesisMod
+
 
 """
     Calculates net assimilation rate A, fluorescence F using biochemical model
 """
-function biochem_out = biochemical(flux::fluxes, leaf::leaf_params,T,Cs)
+function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number,Cs::Number)
     # Adjust rates to leaf Temperature:
     setLeafT!(leaf, T)
 
@@ -17,10 +19,13 @@ function biochem_out = biochemical(flux::fluxes, leaf::leaf_params,T,Cs)
     # C3: RuBP regeneration-limited photosynthesis
     flux.aj = flux.je * max(ci_val - flux.cp, 0) / (4 * ci_val + 8 * flux.cp);
 
+end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
 
-# Compute Assimilation.
-function computeA!(Ci, leaf::leaf_params, bio::bioOut)
+# Compute Assimilation using fixed stomatal conductance gs.
+function CiFuncGs!(flux::fluxes, leaf::leaf_params, bio::bioOut)
+    # Compute overall conducatance (Boundary layer, stomata and mesophyll)
+    gleaf = 1.0/(1.0/flux.gbc + 1.6/leaf.gs + 1/leaf.gm)
     if leaf.C3
         wc = (leaf.Vcmax .* (Ci - Gamma_star))./(Ci + MM_const); % This is Rubisco Limiting Step
 
@@ -98,9 +103,10 @@ function computeA!(Ci, leaf::leaf_params, bio::bioOut)
 
         end
 
-struct flux
+struct fluxes
          APAR
          gbc
+         gs
          ac
          aj
          ap
@@ -115,3 +121,5 @@ struct atmos
          co2air             # Atmospheric CO2 (μmol/mol)
          eair               # Vapor pressure of air (Pa)
 end
+
+end #Module
