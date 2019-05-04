@@ -17,7 +17,13 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
     Kd::TT = 0.85;                           # Rate constant for thermal dissipation
     Kp::TT = 4.0;                            # Rate constant for photochemistry (all reaction centers open)
+    Kn::TT = 0;                              # NPQ rate constant (initially zero)
+    Kn_ss::TT = 0;                           # Kn in steady state
     maxPSII::TT = Kp/(Kp+Kf+Kd);             # Max PSII yield (Kn=0, all RC open)
+
+    effcon::TT = 1/5                       # [mol CO2/mol e-]  number of CO2 per electrons - typically 1/5 for C3 and 1/6 for C4, i.e. about 1/10 for both PSI and PSII!
+    CO2_per_electron::TT = 1/5             # Similar to above but accounting for Photorespiration as well (which "steals" electrons)
+    Ja::TT = 0                               # Actual electron transport rate (needed to compute fluorescence later on)
 
     C3::Bool = true                           # C3 (or C4) plant
     use_colim::Bool = true                    # Use co-limitation
@@ -102,7 +108,8 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 end
 
 # Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here:
-function setLeafT!(l::leaf_params,  T)
+# For some reason, this is slow and allocates a lot, can be improved!!
+function setLeafT!(l::leaf_params,  T::Number)
     l.T = T;
     l.kc     = l.kc_25          * ft(T, l.kcha);
     l.ko     = l.ko_25          * ft(T, l.koha);

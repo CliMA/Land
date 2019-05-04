@@ -78,16 +78,11 @@ function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::
     x0 = x1 = f0 = f1 = 0.0
     x0 = xa
     f0 = func(x0,flux, leaf)
-    if (f0 == 0.0)
-       root = x0
-       return
-    end
+    if (f0 == 0.0) return  x0 end
 
     x1 = xb
     f1 = func(x1,flux, leaf)
-    if (f1 == 0.0)
-       return x1
-    end
+    if (f1 == 0.0) return x1 end
 
     if (f1 < f0)
        minx = x1
