@@ -5,19 +5,18 @@ using Leaf
 
 
 export fluxes
-"""
-    Calculates net assimilation rate A, fluorescence F using biochemical model
-"""
+"Tolerance thhreshold for Ci iterations"
 tol = 0.1
 
+" Just a placeholder for now"
 @with_kw mutable struct fluxes{TT<:Number}
-         APAR::TT = 100
+         APAR::TT = 500
          gbc::TT = 100
          gbv::TT = 100
          cair::TT = 400
-         ceair::TT = 400
-         eair::TT = 400
-         je::TT = 100
+         ceair::TT = 1400
+         eair::TT = 1400
+         je::TT = 1100
          #gs::TT = 0.0
          ac::TT = 0
          aj::TT = 0
@@ -39,7 +38,9 @@ struct atmos
          co2air             # Atmospheric CO2 (μmol/mol)
          eair               # Vapor pressure of air (Pa)
 end
-
+"""
+    Calculates net assimilation rate A, fluorescence F using biochemical model
+"""
 function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
@@ -78,7 +79,8 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
     # Effective photochemical yield:
     flux.φ = leaf.maxPSII*flux.Ja./flux.Je_pot;
-
+    x   = max(0,  1-flux.φ/leaf.maxPSII);       # degree of light saturation: 'x' (van der Tol e.a. 2014)
+    Fluorescencemodel!(flux.φ,x,leaf)
     # ToDo: Add errors if gs is negative
 
     #rH = (flux.gbv*flux.ceair + leaf.gs*leaf.esat) / ((flux.gbv+leaf.gs)*leaf.esat);
@@ -86,7 +88,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
 end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
-# Compute Assimilation using Ci as input
+"Compute Assimilation using Ci as input"
 function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
 
     if leaf.C3
@@ -149,7 +151,7 @@ end
 
 
 
-# Compute Assimilation using fixed stomatal conductance gs (mostly from Bonan).
+"Compute Assimilation using fixed stomatal conductance gs (mostly from Bonan)."
 function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     # Compute overall conducatance (Boundary layer, stomata and mesophyll)
     gleaf = 1.0/(1.0/flux.gbc + 1.6/gs + 1.0/leaf.gm)
@@ -193,5 +195,27 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     ci_val = flux.cair - flux.an / gleaf
     leaf.CO2_per_electron = (ci_val-leaf.Γstar)./(ci_val+2.0*leaf.Γstar) .* leaf.effcon;
 end # Function CiFuncGs!
+
+"Compute Fluorescence yields, Kn and Kp"
+function Fluorescencemodel!(ps,x,leaf::leaf_params )
+    x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
+    #println(x_alpha)
+    leaf.Kn = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
+    Kf = leaf.Kf
+    Kp = leaf.Kp
+    Kn = leaf.Kn
+    Kd = leaf.Kd
+
+    leaf.Fo   = Kf/(Kf+Kp+Kd);
+    leaf.Fo′  = Kf/(Kf+Kp+Kd+Kn);
+    leaf.Fm   = Kf/(Kf   +Kd+Kn);
+    leaf.Fm′  = Kf/(Kf   +Kd);
+    leaf.ϕs   = leaf.Fm*(1-ps);
+    leaf.eta  = leaf.ϕs/leaf.Fo;
+    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
+    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
+    leaf.Kp   = -ps*(Kf+Kd+Kn)/(ps-1);
+
+end
 
 end #Module
