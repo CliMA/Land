@@ -1,3 +1,4 @@
 # CLIMA-LSM
-Caltech CLIMA SPA model
+This project is supposed to be a community effort, leveraging all the work that has been done in Land Surrface Modeling from various groups around the world. The ultimate goal here is to build a Soil-Plant-Atmosphere continuum (SPAC) bio-physical model that represents the state of the art, includes multi-layer soil and canopy properties and models "observables" that can be used as constraint, e.g. Solar Induced Chlorophyll Fluorescence (SIF) on the leaf-level, reflectance in various bands as measured from space, soil and vegetation moisture content. A specific focus will be on water-carbon feedbacks by testing recent developments in stomatal optimization theories as well as plant hydraulics.
+The entire model will be written in Julia (Julia: "Looks like Python, feels like Lisp, runs like Fortran", https://docs.julialang.org/en/v1/, https://www.youtube.com/watch?v=8h8rQyEpiZA&t=), which should make the barrier of entry lower for incoming students, PostDocs, etc). If you want to contribute, please contact us (cfranken@caltech.edu).
 ![Fluorescence from Space](pics/world_sif.jpg?raw=true "SIF from Space")
