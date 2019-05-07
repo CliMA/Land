@@ -7,6 +7,7 @@ using Leaf
 export fluxes
 "Tolerance thhreshold for Ci iterations"
 tol = 0.1
+vpd_min = 0.1
 
 " Just a placeholder for now"
 @with_kw mutable struct fluxes{TT<:Number}
@@ -38,13 +39,22 @@ struct atmos
          co2air             # Atmospheric CO2 (μmol/mol)
          eair               # Vapor pressure of air (Pa)
 end
+
 """
-    Calculates net assimilation rate A, fluorescence F using biochemical model
+    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
+
+Compute net assimilation rate A, fluorescence F using biochemical model
+
+# Arguments
+- `flux::fluxes`: fluxes structure.
+- `leaf::leaf_params`: leaf_params structure.
+- `T::Number`: Leaf Temperature
 """
 function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
-    # Compute PSII efficiency here (can later be used with a variable Kn!)
+    # Compute max PSII efficiency here (can later be used with a variable Kn!)
+    leaf.Kp = 4.0
     φ_PSII = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
 
     # Save leaf respiration
@@ -61,34 +71,50 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
     # Ci calculation
     # Medlyn or Ball-Berry:
+    if leaf.dynamic_state # Save actual gs
+        gs_actual = leaf.gs
+    end
+
     if (leaf.gstyp <= 1)
         Ci_0 = leaf.C3 ? 0.7*flux.cair : 0.4*flux.cair
         # Solve iterative loop:
         leaf.Ci = hybrid(flux,leaf, CiFunc!, Ci_0, 1.05*Ci_0, tol)
-    elseif leaf.gstyp == 2
+    elseif leaf.gstyp == 2 # Needed for Bonan Stomatal optimization model
         leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
     end
+    if leaf.dynamic_state
+        leaf.gs_ss = leaf.gs
+        leaf.gs = gs_actual
+        leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
+    end
+
     # Rate of actual CO2 per electron, incl. photorespiration
-    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2.0*leaf.Γstar) * leaf.effcon;
+    leaf.CO2_per_electron = (1-leaf.Γstar/leaf.Ci) * leaf.effcon;
 
     # Actual effective ETR:
-    flux.Ja = flux.ag / leaf.CO2_per_electron;
-    # Need to keep working here, need Kn so that Je_red is Ja (ignoring changes in Kp for now, can be introduced later)
-    leaf.Kn_ss = (flux.Ja/flux.Je_red)*(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)-(leaf.Kp+leaf.Kf+leaf.Kd)
-    # Compute difference to steady state
+    flux.Ja = max(0,flux.ag / leaf.CO2_per_electron);
+    flux.Ja = min(flux.Ja,flux.Je_pot )
 
     # Effective photochemical yield:
-    flux.φ = leaf.maxPSII*flux.Ja./flux.Je_pot;
+    flux.φ = leaf.maxPSII*flux.Ja/flux.Je_pot;
+    #println(flux.Ja, " ", flux.Je_pot)
+    flux.φ = min(1/leaf.maxPSII,flux.φ)
     x   = max(0,  1-flux.φ/leaf.maxPSII);       # degree of light saturation: 'x' (van der Tol e.a. 2014)
     Fluorescencemodel!(flux.φ,x,leaf)
-    # ToDo: Add errors if gs is negative
-
-    #rH = (flux.gbv*flux.ceair + leaf.gs*leaf.esat) / ((flux.gbv+leaf.gs)*leaf.esat);
 
 
 end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
-"Compute Assimilation using Ci as input"
+"""
+    CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
+
+Compute Assimilation using Ci as input
+
+# Arguments
+- `Ci::Number`: Ci.
+- `flux::fluxes`: fluxes structure.
+- `leaf::leaf_params`: leaf_params structure.
+"""
 function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
 
     if leaf.C3
@@ -116,6 +142,9 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
     end
     # Prevent photosynthesis from ever being negative
     flux.ag = max(0,flux.ag)
+    flux.ai = max(0,flux.ai)
+    flux.aj = max(0,flux.aj)
+    flux.ap = max(0,flux.ap)
 
     # Net photosynthesis
     flux.an = flux.ag - leaf.rdleaf
@@ -127,6 +156,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
     if (leaf.gstyp == 1) # Ball-Berry
         if flux.an >0.0
             leaf.gs = maximum(quadratic(flux.cs, flux.cs*(flux.gbv - leaf.g0) - leaf.g1*flux.an, -flux.gbv * (flux.cs*leaf.g0 + leaf.g1*flux.an*flux.ceair/leaf.esat)))
+            leaf.g1 * flux.an * flux.ceair/leaf.esat/flux.cs  + leaf.g0;
             # println(leaf.gs)
         else
             leaf.gs = leaf.g0
@@ -136,7 +166,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
             # Not sure how this all works, copied from Bonan's ML canopy model
             vpd_term = max((leaf.esat - flux.ceair), vpd_min) * 0.001
             term = 1.6 * flux.an / flux.cs
-            leaf.gs = maximum(quadratic(1.0, -(2.0 * (leaf.g0 + term) + (leaf.g1 * term)^2 / (flux.gbv * vpd_term), leaf.g0 * leaf.g0 + (2.0 * leaf.g0 + term * (1.0 - leaf.g1 * leaf.g1 / vpd_term)) * term)))
+            leaf.gs = maximum(quadratic(1.0, -(2.0 * (leaf.g0 + term) + (leaf.g1 * term)^2 / (flux.gbv * vpd_term)), leaf.g0 * leaf.g0 + (2.0 * leaf.g0 + term * (1.0 - leaf.g1 * leaf.g1 / vpd_term)) * term))
         else
             leaf.gs = leaf.g0
         end
@@ -146,15 +176,28 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
     cinew = flux.cair - flux.an / gleaf
 
     # CiFunc returns the difference between the current Ci and the new Ci
+    leaf.Ci = cinew
     return flux.an<0. ? 0.0 : cinew - Ci
 end
 
 
 
-"Compute Assimilation using fixed stomatal conductance gs (mostly from Bonan)."
+
+"""
+    CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
+
+Compute Assimilation using fixed stomatal conductance gs.
+
+# Arguments
+- `gs::Number`: Stomatal conductance.
+- `flux::fluxes`: fluxes structure.
+- `leaf::leaf_params`: leaf_params structure.
+"""
 function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
-    # Compute overall conducatance (Boundary layer, stomata and mesophyll)
+    # Compute overall conductance (Boundary layer, stomata and mesophyll)
     gleaf = 1.0/(1.0/flux.gbc + 1.6/gs + 1.0/leaf.gm)
+    if gleaf<eps() gleaf=eps() end
+
     if leaf.C3
         # C3 Rubisco Limited Photosynthesis co-limited by gs
         a0 = leaf.vcmax
@@ -185,7 +228,10 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     else
         flux.ag = min(flux.ac,flux.aj,flux.ap)
     end
-
+    flux.ag = max(0,flux.ag)
+    flux.ai = max(0,flux.ai)
+    flux.aj = max(0,flux.aj)
+    flux.ap = max(0,flux.ap)
     # Compute net Photosynthesis
     flux.an = flux.ag - leaf.rdleaf
     # Compute CO2 at leaf surface
@@ -193,29 +239,41 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
 
     # Compute Ci (included Mesophyll as well in principle)
     ci_val = flux.cair - flux.an / gleaf
-    leaf.CO2_per_electron = (ci_val-leaf.Γstar)./(ci_val+2.0*leaf.Γstar) .* leaf.effcon;
+    #leaf.CO2_per_electron = (ci_val-leaf.Γstar)./(ci_val+2.0*leaf.Γstar) .* leaf.effcon;
 end # Function CiFuncGs!
 
-"Compute Fluorescence yields, Kn and Kp"
-function Fluorescencemodel!(ps,x,leaf::leaf_params )
+
+"""
+    Fluorescencemodel!(ps,x,leaf::leaf_params )
+
+Compute Fluorescence yields, Kn and Kp.
+
+# Arguments
+- `ps::Number`: PSII yield.
+- `x::Number`: Degree of light saturation: [0-1] .
+- `leaf::leaf_params`: leaf_params structure.
+"""
+function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
     x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
     #println(x_alpha)
-    leaf.Kn = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
+    leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
     Kf = leaf.Kf
-    Kp = leaf.Kp
     Kn = leaf.Kn
     Kd = leaf.Kd
+    leaf.Kp   = max(0,-ps*(Kf+Kd+Kn)/(ps-1));
+    Kp = leaf.Kp
 
-    leaf.Fo   = Kf/(Kf+Kp+Kd);
-    leaf.Fo′  = Kf/(Kf+Kp+Kd+Kn);
+
+    leaf.Fo   = Kf/(Kf+4.0+Kd);
+    leaf.Fo′  = Kf/(Kf+4.0+Kd+Kn);
     leaf.Fm   = Kf/(Kf   +Kd+Kn);
     leaf.Fm′  = Kf/(Kf   +Kd);
     leaf.ϕs   = leaf.Fm*(1-ps);
     leaf.eta  = leaf.ϕs/leaf.Fo;
     leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
     leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
-    leaf.Kp   = -ps*(Kf+Kd+Kn)/(ps-1);
 
+    leaf.NPQ  = Kn/(Kf+Kd);
 end
 
 end #Module

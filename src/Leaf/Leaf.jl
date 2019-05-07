@@ -30,6 +30,9 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     eta::TT = 0;
     qQ::TT = 0;     # photochemical quenching
     qE::TT = 0;     # non-photochemical quenching
+    NPQ::TT = 0;
+    "Dynamic Steady state boolean"
+    dynamic_state::Bool = false
 
 
     effcon::TT = 1/5                       # [mol CO2/mol e-]  number of CO2 per electrons - typically 1/5 for C3 and 1/6 for C4, i.e. about 1/10 for both PSI and PSII!
@@ -55,6 +58,7 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     # Add already here: Mesophyll conductance (Inf for now):
     gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/Pa)
     gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s/Pa); just using some prior
+    gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s/Pa);
 
     #---------------------------------------------------------------------
     # kc, ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
