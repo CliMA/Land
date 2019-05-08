@@ -89,7 +89,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     end
 
     # Rate of actual CO2 per electron, incl. photorespiration
-    leaf.CO2_per_electron = (1-leaf.Γstar/leaf.Ci) * leaf.effcon;
+    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2leaf.Γstar) * leaf.effcon;
 
     # Actual effective ETR:
     flux.Ja = max(0,flux.ag / leaf.CO2_per_electron);
@@ -266,9 +266,9 @@ function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
 
     leaf.Fo   = Kf/(Kf+4.0+Kd);
     leaf.Fo′  = Kf/(Kf+4.0+Kd+Kn);
-    leaf.Fm   = Kf/(Kf   +Kd+Kn);
-    leaf.Fm′  = Kf/(Kf   +Kd);
-    leaf.ϕs   = leaf.Fm*(1-ps);
+    leaf.Fm   = Kf/(Kf   +Kd);
+    leaf.Fm′  = Kf/(Kf   +Kd+Kn);
+    leaf.ϕs   = leaf.Fm′*(1-ps);
     leaf.eta  = leaf.ϕs/leaf.Fo;
     leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
     leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
