@@ -89,10 +89,6 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     end
 
     # Rate of actual CO2 per electron, incl. photorespiration
-<<<<<<< HEAD
-    (Ci-Gamma_star)./(Ci+2*Gamma_star)
-=======
->>>>>>> 82ecc6bc6aa7e765c4d5cc7f7655ec35c65b099c
     leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2leaf.Γstar) * leaf.effcon;
 
     # Actual effective ETR:

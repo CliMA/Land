@@ -26,7 +26,7 @@ export quadratic,beta_function,log_gamma_function, hybrid, zbrent
 #-----------------------------------------------------------------------
 function quadratic(a, b, c)
   discr = b^2 - 4*a*c
-  discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : error("Only complex roots")
+  discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : 0.0 #error("Only complex roots")
 end # function
 
 
