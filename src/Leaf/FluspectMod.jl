@@ -6,7 +6,12 @@ using Statistics
 using MAT
 
 # This needs to be changed, more flexible instead of hard-coded:
-const file_Opti = "/home/cfranken/code/gitHub/LSM-SPAM/src/Leaf/Optipar2017_ProspectD.mat"
+if isdir("/home/cfranken/code/gitHub/LSM-SPAM/")
+    const file_Opti = "/home/cfranken/code/gitHub/LSM-SPAM/src/Leaf/Optipar2017_ProspectD.mat"
+else
+    const file_Opti = "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/Optipar2017_ProspectD.mat"
+end
+
 const minwle  = 400.; # PAR range
 const maxwle  = 700.;
 const minwlf  = 650.; # SIF range
@@ -242,7 +247,7 @@ fn = A .* f + B .* g;
 
 Mb  = gn;
 Mf  = fn;
-return  RT,Mf Mb
+return  RT,Mf,Mb
 end
 
 """
