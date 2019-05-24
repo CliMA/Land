@@ -54,7 +54,11 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
+    if !leaf.dynamic_state
+        leaf.Kn = 0.0
+    end
     leaf.Kp = 4.0
+
     φ_PSII = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
 
     # Save leaf respiration
@@ -67,7 +71,9 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
     # Electron transport rate for C3 plants
     # Actual colimited potential Je (curvature and Jmax)
-    flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_red + leaf.jmax), flux.Je_red * leaf.jmax))    # Bonan eq. 11.21
+    #flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_red + leaf.jmax), flux.Je_red * leaf.jmax))    # Bonan eq. 11.21
+    flux.je = min(flux.Je_red,leaf.jmax)
+    #flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_pot + leaf.jmax), flux.Je_pot * leaf.jmax))    # Bonan eq. 11.21
 
     # Ci calculation
     # Medlyn or Ball-Berry:
@@ -156,7 +162,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
     if (leaf.gstyp == 1) # Ball-Berry
         if flux.an >0.0
             leaf.gs = maximum(quadratic(flux.cs, flux.cs*(flux.gbv - leaf.g0) - leaf.g1*flux.an, -flux.gbv * (flux.cs*leaf.g0 + leaf.g1*flux.an*flux.ceair/leaf.esat)))
-            leaf.g1 * flux.an * flux.ceair/leaf.esat/flux.cs  + leaf.g0;
+            #leaf.g1 * flux.an * flux.ceair/leaf.esat/flux.cs  + leaf.g0;
             # println(leaf.gs)
         else
             leaf.gs = leaf.g0
@@ -198,18 +204,22 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     gleaf = 1.0/(1.0/flux.gbc + 1.6/gs + 1.0/leaf.gm)
     if gleaf<eps() gleaf=eps() end
 
+    #flux.ac = leaf.vcmax * max(Ci-leaf.Γstar, 0.0) / (Ci + leaf.kc*(1.0+leaf.o₂/leaf.ko)) # Bonan eq. 11.28
+    # C3: RuBP-limited photosynthesis (this is the NADPH requirement stochiometry)
+    #flux.aj = flux.je * max(Ci-leaf.Γstar, 0.0) / (4.0*Ci + 8.0*leaf.Γstar)               # Bonan eq. 11.29
+
     if leaf.C3
         # C3 Rubisco Limited Photosynthesis co-limited by gs
         a0 = leaf.vcmax
         e0 = 1.0
         d0 = leaf.kc*(1.0+leaf.o₂/leaf.ko)
-        flux.ac = minimum(quadratic(1.0/gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))
+        flux.ac = minimum(quadratic(1.0/gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))+leaf.rdleaf
 
         # C3: RuBP-limited photosynthesis
         a0 = flux.je
         e0 = 4.0
         d0 = 8.0*leaf.Γstar
-        flux.aj = minimum(quadratic(e0 / gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))
+        flux.aj = minimum(quadratic(e0 / gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))+leaf.rdleaf
 
         # C3: Product-limited photosynthesis
         flux.ap = Inf
@@ -257,10 +267,13 @@ function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
     x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
     #println(x_alpha)
     leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
+    if !leaf.dynamic_state
+        leaf.Kn = leaf.Kn_ss
+    end
     Kf = leaf.Kf
     Kn = leaf.Kn
     Kd = leaf.Kd
-    leaf.Kp   = max(0,-ps*(Kf+Kd+Kn)/(ps-1));
+    leaf.Kp   = min(max(0,-ps*(Kf+Kd+Kn)/(ps-1)),4);
     Kp = leaf.Kp
 
 
