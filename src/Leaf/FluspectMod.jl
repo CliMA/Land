@@ -4,13 +4,11 @@ using Polynomials
 using Statistics
 # Matlab reading
 using MAT
+# Numerical integration package (Simson rule)
+using QuadGK
 
-# This needs to be changed, more flexible instead of hard-coded:
-if isdir("/home/cfranken/code/gitHub/LSM-SPAM/")
-    const file_Opti = "/home/cfranken/code/gitHub/LSM-SPAM/src/Leaf/Optipar2017_ProspectD.mat"
-else
-    const file_Opti = "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/Optipar2017_ProspectD.mat"
-end
+# Is this OK?
+file_Opti = joinpath(dirname(pathof(FluspectMod)), "Optipar2017_ProspectD.mat")
 
 const minwle  = 400.; # PAR range
 const maxwle  = 700.;
@@ -20,19 +18,25 @@ const maxwlf  = 850.;
 # Doubling Adding layers
 const ndub = 10
 
+# Canopy Layers:
+const nl = 60
+const xl = collect(0:-1/nl:-1)
+const lazitab = collect(5:10:355)
+const dx = 1.0/nl
+
 # Read in all optical data:
 opti = matread(file_Opti)["optipar"]
-nr_     =  opti["nr"];nr = nr_
-Km_     =  opti["Kdm"];Km = Km_
-Kab_    =  opti["Kab"];Kab = Kab_
-Kant_   =  opti["Kant"];Kant =Kant_
-Kcar_   =  opti["Kca"];Kcar= Kcar_
-Kw_     =  opti["Kw"];Kw=Kw_
-KBrown_ =  opti["Ks"];KBrown=KBrown_
-phi_    =  opti["phi"];phi=phi_
-KcaV_   =  opti["KcaV"];KcaV=KcaV_
-KcaZ_   =  opti["KcaZ"];KcaZ =KcaZ_
-lambda_ =  opti["wl"];lambda = lambda_
+nr_     =  convert(Array{Float32}, opti["nr"]);nr = nr_
+Km_     =  convert(Array{Float32}, opti["Kdm"]);Km = Km_
+Kab_    =  convert(Array{Float32}, opti["Kab"]);Kab = Kab_
+Kant_   =  convert(Array{Float32}, opti["Kant"]);Kant =Kant_
+Kcar_   =  convert(Array{Float32}, opti["Kca"]);Kcar= Kcar_
+Kw_     =  convert(Array{Float32}, opti["Kw"]);Kw=Kw_
+KBrown_ =  convert(Array{Float32}, opti["Ks"]);KBrown=KBrown_
+phi_    =  convert(Array{Float32}, opti["phi"]);phi=phi_
+KcaV_   =  convert(Array{Float32}, opti["KcaV"]);KcaV=KcaV_
+KcaZ_   =  convert(Array{Float32}, opti["KcaZ"]);KcaZ =KcaZ_
+lambda_ =  convert(Array{Float32}, opti["wl"]);lambda = lambda_
 
 
 # Enable downsampling spectral resolution to arbitrary grid (specify array with boundaries here)
@@ -68,8 +72,9 @@ function init(swl)
     end
 end
 
-function fluspect(x::Vector;fqe::Number=0.01)
-    println(fqe)
+function fluspect(x::Vector; fqe::Number=0.0, Kab__=Kab, Kant__=Kant, KBrown__=KBrown, Kw__=Kw, Km__=Km, KcaV__=KcaV, KcaZ__=KcaZ)
+    #println(fqe)
+# , Kab__=Kab, Kant__=Kant, KBrown__=KBrown, Kw__=Kw, Km__=Km, KcaV__=KcaV, KcaZ__=KcaZ)
 # ***********************************************************************
 # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
 # properties spectra; Remote Sens. Environ.; 34:75-91.
@@ -90,9 +95,9 @@ Brown = x[5]
 Cw = x[6]
 Cm = x[7]
 Cx = x[8]
-Kcaro = (1.0-Cx).* KcaV + Cx .* KcaZ;
+Kcaro = (1.0-Cx).* KcaV__ + Cx .* KcaZ__;
 
-Kall    = (Cab*Kab.+Car*Kcaro.+Ant*Kant.+Brown*KBrown.+Cw*Kw.+Cm*Km)./N
+Kall    = (Cab*Kab__.+Car*Kcaro.+Ant*Kant__.+Brown*KBrown__.+Cw*Kw__.+Cm*Km__)./N
 # Relative absorption by Chlorophyll only (drives SIF and GPP eventually)
 kChlrel  = Cab*Kab./(Kall.*N.+eps());
 
@@ -166,6 +171,7 @@ end
 # takes place, that is, the part exclusive of the leaf-air interfaces. The
 # reflectance (rho) and transmittance (tau) of this part of the leaf are
 # now determined by "subtracting" the interfaces
+# CF Note: All of the below takes about 10 times more time than the RT above. Need to rething speed and accuracy. (10nm is bringing it down a lot!)
 
 Rb  = (refl.-ralf)./(talf.*t21+(refl.-ralf).*r21);  # Remove the top interface
 Z   = tran.*(1.0.-Rb.*r21)./(talf.*t21);            # Derive Z from the transmittance
@@ -229,7 +235,6 @@ end
 
 # Here we add the leaf-air interfaces again for obtaining the final
 # leaf level fluorescences.
-
 g = Mb; f = Mf;
 
 Rb = rho .+ tau.^2 .*r21./(1 .-rho.*r21);
@@ -248,6 +253,397 @@ fn = A .* f + B .* g;
 Mb  = gn;
 Mf  = fn;
 return  RT,Mf,Mb
+end
+
+function RTM_sail(x::Vector; TypeLidf=1)
+    # State Vector X includes (in that order):
+    #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,LIDFa,LIDFb,lai,q,tts,tto,psi,rsoil
+    LIDFa = x[9]
+    LIDFb = x[10]
+    LAI = x[11]
+    q = x[12]
+    tts = x[13]
+    tto = x[14]
+    psi = x[15]
+    iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
+
+    #rsoil = x[16] # will be handled later
+
+    LRT = fluspect(x[1:8], fqe=0.0)
+    ρ=LRT[:,1]
+    τ=LRT[:,2]
+    # Geometric quantities (need to check allocation cost!)
+    cts = cos(deg2rad(tts))
+    cto = cos(deg2rad(tto))
+    sin_tts  = sin(deg2rad(tts));             #           sin solar       angle
+    ctscto = cts*cto;
+    tants	= tan(deg2rad(tts));
+    tanto	= tan(deg2rad(tto));
+    cospsi	= cos(deg2rad(psi));
+
+
+    dso		= sqrt(tants*tants+tanto*tanto-2.0*tants*tanto*cospsi);
+
+    # Generate leaf angle distribution:
+    if TypeLidf==1
+        lidf,litab = dladgen(LIDFa,LIDFb);
+    elseif TypeLidf==2
+        lidf,litab = campbell(LIDFa);
+    end
+    #println(lidf)
+
+    cos_ttlo    = cos.(deg2rad.(lazitab));  #   cos leaf azimuth angles
+    cos_ttli    = cos.(deg2rad.(litab));    #   cosine of normal of upperside of leaf
+    sin_ttli    = sin.(deg2rad.(litab));    #   sine   of normal of upperside of leaf
+
+    # angular distance, compensation of shadow length
+    # Calculate geometric factors associated with extinction and scattering
+    #Initialise sums
+    ks	= 0.0;
+    ko	= 0.0;
+    bf	= 0.0;
+    sob	= 0.0;
+    sof	= 0.0;
+
+    #	Weighted sums over LIDF
+	for i=1:length(litab)
+		# ttl = litab[i];	% leaf inclination discrete values
+		ctl = cos(deg2rad(litab[i]));
+		#	SAIL volume scattering phase function gives interception and portions to be
+		#	multiplied by rho and tau
+		chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
+
+		#********************************************************************************
+		#*                   SUITS SYSTEM COEFFICIENTS
+		#*
+		#*	ks  : Extinction coefficient for direct solar flux
+		#*	ko  : Extinction coefficient for direct observed flux
+		#*	att : Attenuation coefficient for diffuse flux
+		#*	sigb : Backscattering coefficient of the diffuse downward flux
+		#*	sigf : Forwardscattering coefficient of the diffuse upward flux
+		#*	sf  : Scattering coefficient of the direct solar flux for downward diffuse flux
+		#*	sb  : Scattering coefficient of the direct solar flux for upward diffuse flux
+		#*	vf   : Scattering coefficient of upward diffuse flux in the observed direction
+		#*	vb   : Scattering coefficient of downward diffuse flux in the observed direction
+		#*	w   : Bidirectional scattering coefficient
+		#********************************************************************************
+
+		#	Extinction coefficients
+		ksli = chi_s./cts;
+		koli = chi_o./cto;
+
+		#	Area scattering coefficient fractions
+		sobli	= frho*pi/ctscto;
+		sofli	= ftau*pi/ctscto;
+		bfli	= ctl*ctl;
+		ks	= ks+ksli*lidf[i];
+		ko	= ko+koli*lidf[i];
+		bf	= bf+bfli*lidf[i];
+		sob	= sob+sobli*lidf[i];
+		sof	= sof+sofli*lidf[i];
+    end
+    #println(sob, " ", sof)
+    #	Geometric factors to be used later with rho and tau
+	sdb	= 0.5*(ks+bf);
+	sdf	= 0.5*(ks-bf);
+	dob	= 0.5*(ko+bf);
+	dof	= 0.5*(ko-bf);
+	ddb	= 0.5*(1 .+bf);
+	ddf	= 0.5*(1 .-bf);
+    # Skipped SCOPE lines 186-213 here (catch up later)
+    # 1.4 solar irradiance factor for all leaf orientations
+    Cs          = cos_ttli.*cts;             # [nli]     pag 305 modified by Joris
+    Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
+
+    cos_deltas  = Cs*ones(1,length(lazitab)) .+ Ss*cos_ttlo';   # [nli,nlazi]
+    fs          = abs.(cos_deltas./cts);         # [nli,nlazi] pag 305
+
+    # 1.5 probabilities Ps, Po, Pso
+    Ps          =   exp.(ks*xl*LAI);                                              # [nl+1]  p154{1} probability of viewing a leaf in solar dir
+    Po          =   exp.(ko*xl*LAI);                                              # [nl+1]  p154{1} probability of viewing a leaf in observation dir
+
+    Ps[1:nl]    =   Ps[1:nl] *(1 .-exp.(-ks*LAI*dx))/(ks*LAI*dx);   # Correct Ps/Po for finite dx
+    Po[1:nl]    =   Po[1:nl] *(1 .-exp.(-ko*LAI*dx))/(ko*LAI*dx);   # Correct Ps/Po for finite dx
+
+    # Not yet sure what this is q is (canopy.hot), need to read up later:
+    # canopy.hot  = canopy.leafwidth/canopy.hc;
+    q           =   0.05;
+    Pso         =   similar(Po);
+    for j=1:length(xl)
+        #println(size(a), " ", size(Pso), " ", size(Po))
+        Pso[j] = quadgk(x -> Psofunction(ko,ks,LAI,q,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
+        #Pso[j,:]=   quad(@(y)Psofunction(K,k,LAI,q,dso,y),xl(j)-dx,xl(j))/dx; %#ok<FREMO>
+    end
+
+    Pso[Pso.>Po]= minimum([Po[Pso.>Po] Ps[Pso.>Po]],dims=2);    #takes care of rounding error
+    Pso[Pso.>Ps]= minimum([Po[Pso.>Ps] Ps[Pso.>Ps]],dims=2);    #takes care of rounding error
+
+
+    # All with length of wavelengths:
+    sigb = ddb.*ρ.+ddf.*τ;
+	sigf = ddf.*ρ.+ddb.*τ;
+    sb   = sdb*ρ .+ sdf*τ;            # [nwl]     sb,     p305{1} diffuse     backscatter scattering coefficient for specular incidence
+    sf   = sdf*ρ .+ sdb*τ;            # [nwl]     sf,     p305{1} diffuse     forward     scattering coefficient for specular incidence
+    vb   = dob*ρ .+ dof*τ;            # [nwl]     vb,     p305{1} directional backscatter scattering coefficient for diffuse  incidence
+    vf   = dof*ρ .+ dob*τ;            # [nwl]     vf,     p305{1} directional forward     scattering coefficient for diffuse  incidence
+    w    = sob*ρ .+ sof*τ;            # [nwl]     w,      p309{1} bidirectional scattering coefficent (directional-directional)
+    a    = 1 .-sigf;                  # [nwl]     attenuation
+    m    = sqrt.(a.^2 .-sigb.^2);     # [nwl]
+    rinf = (a.-m)./sigb;              # [nwl]
+    rinf2= rinf.*rinf;                # [nwl]
+
+    # direct solar radiation
+    J1k        = calcJ1.(-1, m,ks,LAI);          # [nwl]
+    J2k        = calcJ2.( 0, m,ks,LAI);          # [nwl]
+    J1K        = calcJ1.(-1, m,ko,LAI);          # [nwl]   % added for calculation of rdo
+    J2K        = calcJ2.( 0, m,ko,LAI);          # [nwl]   % added for calculation of rdo
+    e1          = exp.(-m.*LAI);                 # [nwl]
+    e2          = e1.^2;                         # [nwl]
+    re          = rinf.*e1;                      # [nwl]
+
+    denom       = 1 .-rinf2.*e2;
+    s1          = sf .+rinf.*sb;
+    s2          = sf.*rinf+sb;
+    v1          = vf.+rinf.*vb;
+    v2          = vf.*rinf.+vb;
+
+    Pss         = s1.*J1k;          # [nwl]
+    Qss         = s2.*J2k;          # [nwl]
+
+    Poo         = v1.*J1K;          # (nwl)   % added for calculation of rdo
+    Qoo         = v2.*J2K;          # [nwl]   % added for calculation of rdo
+
+    tau_ss      = exp(-ks*LAI);                  # [1]
+    tau_oo      = exp(-ko*LAI);
+
+    Z           = (1 - tau_ss * tau_oo)/(ks + ko);  # needed for analytic rso
+
+    tau_dd      = (1 .-rinf2).*e1 ./denom;        # [nwl]
+    rho_dd      = rinf.*(1 .-e2)  ./denom;        # [nwl]
+    tau_sd      = (Pss.-re.*Qss) ./denom;         # [nwl]
+    tau_do      = (Poo.-re.*Qoo) ./denom;         # [nwl]
+    rho_sd      = (Qss.-re.*Pss) ./denom;         # [nwl]
+    rho_do      = (Qoo.-re.*Poo) ./denom;         # (nwl)
+
+    T1          = v2.*s1.*(Z.-J1k*tau_oo)./(ko.+m).+v1.*s2.*(Z.-J1K*tau_ss)./(ks.+m);
+    T2          = -(Qoo.*rho_sd+Poo.*tau_sd).*rinf;
+    rho_sod     = (T1+T2)./(1 .-rinf2);
+
+    #	Bidirectional reflectance
+    #	Single scattering contribution
+    rho_sos = w.*iLAI.*sum(Pso[1:nl]);
+    #	Total canopy contribution
+    rho_so=rho_sos.+rho_sod;
+    #println(rho_so[100:120])
+    #	Interaction with the soil
+    # Invent rsoil for now
+    rsoil = zeros(length(rho_dd)).+0.1
+    dn=1 .-rsoil.*rho_dd;
+    # Total canopy contribution
+    rso         = rho_so .+ rsoil .* Pso[nl+1] .+ ((tau_sd.+tau_ss*rsoil.*rho_dd).*tau_oo.+(tau_sd.+tau_ss).*tau_do).*rsoil./denom;
+    # SAIL analytical reflectances
+    # rsd: directional-hemispherical reflectance factor for solar incident flux
+    rsd     = rho_sd .+ (tau_ss .+ tau_sd).*rsoil.*tau_dd./denom;
+    # rdd: bi-hemispherical reflectance factor
+    rdd     = rho_dd .+ tau_dd.*rsoil.*tau_dd./denom;
+    # rdo: bi-directional reflectance factor
+    rdo     = rho_do .+ (tau_oo .+ tau_do).*rsoil.*tau_dd./denom;
+    return [rso rsd rdd rdo]
+
+end
+
+function calcJ1(x,m,k,LAI)
+    if abs(m-k)>1E-3;
+        J1 = (exp(m*LAI*x)-exp(k*LAI*x))./(k-m);
+    else
+        J1 = -.5*(exp(m*LAI*x)+exp(k*LAI*x))*LAI.*x.*(1.0-1.0/12.0*(k-m).^2LAI^2x.^2);
+    end
+    return J1
+end
+
+function calcJ2(x,m,k,LAI)
+    return (exp(k*LAI*x)-exp(-k*LAI)*exp(-m*LAI*(1+x)))./(k+m);
+end
+
+
+# APPENDIX IV function Pso from SCOPE v1.73
+function Psofunction(K,k,LAI,q,dso,xl)
+    if dso!=0.0
+        alf         =   (dso/q) *2/(k+K);
+        pso         =   exp((K+k)*LAI*xl + sqrt(K*k)*LAI/(alf  )*(1-exp(xl*(alf  ))));# [nl+1]  factor for correlation of Ps and Po
+    else
+        pso         =   exp((K+k)*LAI*xl - sqrt(K*k)*LAI*xl);# [nl+1]  factor for correlation of Ps and Po
+    end
+    return pso
+end
+
+# FROM SCOPE v1.73 APPENDIX II function volscat
+"""********************************************************************************
+!*	tts		= solar zenith
+!*	tto		= viewing zenith
+!*	psi		= azimuth
+!*	ttl		= leaf inclination angle
+!*	chi_s	= interception functions
+!*	chi_o	= interception functions
+!*	frho	= function to be multiplied by leaf reflectance rho
+!*	ftau	= functions to be multiplied by leaf transmittance tau
+!********************************************************************************
+
+!	Compute volume scattering functions and interception coefficients
+!	for given solar zenith, viewing zenith, azimuth and leaf inclination angle.
+
+!	chi_s and chi_o are the interception functions.
+!	frho and ftau are the functions to be multiplied by leaf reflectance rho and
+!	leaf transmittance tau, respectively, in order to obtain the volume scattering
+!	function.
+"""
+function volscatt(tts,tto,psi,ttli)
+    #Volscatt version 2.
+    #created by W. Verhoef
+    #edited by Joris Timmermans to matlab nomenclature.
+    # date: 11 February 2008
+    #tts    [1]         Sun            zenith angle in degrees
+    #tto    [1]         Observation    zenith angle in degrees
+    #psi    [1]         Difference of  azimuth angle between solar and viewing position
+    #ttli   [ttli]      leaf inclination array
+
+    nli     = length(ttli);
+
+    psi_rad         = deg2rad(psi);
+    cos_psi         = cos(deg2rad(psi));                #   cosine of relative azimuth angle
+    cos_ttli        = cos(deg2rad(ttli));               #   cosine of normal of upperside of leaf
+    sin_ttli        = sin(deg2rad(ttli));               #   sine   of normal of upperside of leaf
+    cos_tts         = cos(deg2rad(tts));                #   cosine of sun zenith angle
+    sin_tts         = sin(deg2rad(tts));                #   sine   of sun zenith angle
+    cos_tto         = cos(deg2rad(tto));                #   cosine of observer zenith angle
+    sin_tto         = sin(deg2rad(tto));                #   sine   of observer zenith angle
+    Cs              = cos_ttli*cos_tts;                 #   p305{1}
+    Ss              = sin_ttli*sin_tts;                 #   p305{1}
+    Co              = cos_ttli*cos_tto;                 #   p305{1}
+    So              = sin_ttli*sin_tto;                 #   p305{1}
+    As              = maximum([Ss,Cs]);
+    Ao              = maximum([So,Co]);
+    #println(-Cs./As, " ", Ss, " ", Cs)
+    bts             = acos.(-Cs./As);                    #   p305{1}
+    bto             = acos.(-Co./Ao);                    #   p305{2}
+    chi_o           = 2/pi*((bto-pi/2).*Co + sin(bto).*So);
+    chi_s           = 2/pi*((bts-pi/2).*Cs + sin(bts).*Ss);
+    delta1          = abs(bts-bto);                     #   p308{1}
+    delta2          = pi-abs(bts + bto - pi);           #   p308{1}
+
+    Tot             = psi_rad + delta1 + delta2;        #   pag 130{1}
+
+    bt1             = minimum([psi_rad,delta1]);
+    bt3             = maximum([psi_rad,delta2]);
+    bt2             = Tot - bt1 - bt3;
+
+    T1              = 2Cs.*Co + Ss.*So.*cos_psi;
+    T2              = sin(bt2).*(2As.*Ao + Ss.*So.*cos(bt1).*cos(bt3));
+
+    Jmin            = (   bt2).*T1 - T2;
+    Jplus           = (pi-bt2).*T1 + T2;
+
+    frho            =  Jplus/(2pi^2);
+    ftau            = -Jmin /(2pi^2);
+
+    # pag.309 wl-> pag 135{1}
+    frho            = maximum([0.0,frho]);
+    ftau            = maximum([0.0,ftau]);
+    #println(tts, " ",tto, " ",psi, " ",ttli)
+    #println(chi_s, " ", chi_o, " ",frho, " ",ftau)
+    return chi_s,chi_o,frho,ftau
+end
+
+function dladgen(a::Number,b::Number)
+    litab=[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+    freq = similar(litab)
+    for i1=1:8
+        t   = i1*10;
+        freq[i1]=dcum(a,b,t);
+    end
+    for i2=9:12
+        t   = 80.0+(i2-8)*2.;
+        freq[i2]=dcum(a,b,t);
+    end
+
+    freq[13]=1;
+    for i   = 13:-1:2
+        freq[i]=freq[i]-freq[i-1];
+    end
+    return freq,litab
+end
+
+function dcum(a::Number,b::Number,t::Number)
+    y = 0.0
+    if a>=1
+        f = 1-cos(deg2rad(t));
+    else
+        epsi=1e-8;
+        delx=1;
+        x=2*deg2rad(t);
+        p=x;
+    	while (delx >= epsi)
+            y = a*sin(x)+0.5*b*sin(2.0*x);
+            dx=0.5*(y-x+p);
+            x=x+dx;
+            delx=abs(dx);
+        end
+    	f = (2.0*y+p)/pi;
+    end
+    return f
+end
+
+"""
+From SCOPE v1.73:
+********************************************************************************
+*                          Campbell.f
+*
+*    Computation of the leaf angle distribution function value (freq)
+*    Ellipsoidal distribution function caracterised by the average leaf
+*    inclination angle in degree (ala)
+*    Campbell 1986
+*
+********************************************************************************
+ edit 2017 12 28: change sampling of angles to match with dladgen.m
+"""
+function campbell(ala)
+    tx1=[10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.,90.];
+    tx2=[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.];
+
+    litab   = (tx2.+tx1)./2.0;
+    n=length(litab);
+    tl1     = deg2rad(tx1)
+    tl2     = deg2rad(tx2)
+    excent  = exp(-1.6184e-5*ala^3+2.1145e-3*ala^2-1.2390e-1*ala+3.2491);
+    sum0    = 0;
+
+    freq=zeros(n);
+    for i=1:n
+        x1  = excent./(sqrt(1 .+excent^2 .*tan(tl1(i)).^2));
+        x2  = excent./(sqrt(1 .+excent^2 .*tan(tl2(i)).^2));
+        if (excent==1)
+            freq[i] = abs(cos(tl1(i))-cos(tl2(i)));
+        else
+            alpha  = excent./sqrt(abs(1-excent.^2));
+            alpha2 = alpha.^2;
+            x12 = x1.^2;
+            x22 = x2.^2;
+            if (excent>1)
+                alpx1 = sqrt(alpha2(excent>1)+x12(excent>1));
+                alpx2[excent>1] = sqrt(alpha2(excent>1)+x22(excent>1));
+                dum   = x1*alpx1+alpha2*log(x1+alpx1);
+                freq[i] = abs(dum-(x2.*alpx2+alpha2.*log(x2+alpx2)));
+            else
+                almx1 = sqrt(alpha2-x12);
+                almx2 = sqrt(alpha2-x22);
+                dum   = x1.*almx1+alpha2.*asin(x1./alpha);
+                freq[i] = abs(dum-(x2.*almx2+alpha2.*asin(x2./alpha)));
+            end
+        end
+    end
+    sum0 = sum(freq,dims=2);
+    freq0=freq./sum0;
+return freq0,litab
 end
 
 """
