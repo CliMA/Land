@@ -255,16 +255,16 @@ Mf  = fn;
 return  RT,Mf,Mb
 end
 
-function RTM_sail(x::Vector; TypeLidf=1)
+function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90,  TypeLidf=1)
     # State Vector X includes (in that order):
     #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,LIDFa,LIDFb,lai,q,tts,tto,psi,rsoil
-    LIDFa = x[9]
-    LIDFb = x[10]
-    LAI = x[11]
-    q = x[12]
-    tts = x[13]
-    tto = x[14]
-    psi = x[15]
+    #LIDFa = x[10]
+    #LIDFb = x[10]
+    LAI = x[9]
+    #q = x[12]
+    #tts = x[13]
+    #tto = x[14]
+    #psi = x[15]
     iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
 
     #rsoil = x[16] # will be handled later
@@ -391,7 +391,7 @@ function RTM_sail(x::Vector; TypeLidf=1)
     m    = sqrt.(a.^2 .-sigb.^2);     # [nwl]
     rinf = (a.-m)./sigb;              # [nwl]
     rinf2= rinf.*rinf;                # [nwl]
-
+    #println(minimum(m), " ", min(ks))
     # direct solar radiation
     J1k        = calcJ1.(-1, m,ks,LAI);          # [nwl]
     J2k        = calcJ2.( 0, m,ks,LAI);          # [nwl]
@@ -452,17 +452,19 @@ function RTM_sail(x::Vector; TypeLidf=1)
 
 end
 
+# Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
 function calcJ1(x,m,k,LAI)
-    if abs(m-k)>1E-3;
-        J1 = (exp(m*LAI*x)-exp(k*LAI*x))./(k-m);
+    del=(k-m)*LAI
+    if abs(del)>1E-3;
+        J1 = (exp(m*LAI*x)-exp(k*LAI*x))/(k-m);
     else
-        J1 = -.5*(exp(m*LAI*x)+exp(k*LAI*x))*LAI.*x.*(1.0-1.0/12.0*(k-m).^2LAI^2x.^2);
+        J1 = -0.5*LAI*x*(exp(m*LAI*x)+exp(k*LAI*x))*(1.0-del^2/12.0);
     end
     return J1
 end
 
 function calcJ2(x,m,k,LAI)
-    return (exp(k*LAI*x)-exp(-k*LAI)*exp(-m*LAI*(1+x)))./(k+m);
+    return (exp(k*LAI*x)-exp(-k*LAI)*exp(-m*LAI*(1+x)))/(k+m);
 end
 
 
@@ -583,6 +585,7 @@ function dcum(a::Number,b::Number,t::Number)
         x=2*deg2rad(t);
         p=x;
     	while (delx >= epsi)
+            #println(delx)
             y = a*sin(x)+0.5*b*sin(2.0*x);
             dx=0.5*(y-x+p);
             x=x+dx;
