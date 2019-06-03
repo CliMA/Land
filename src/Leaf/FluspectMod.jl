@@ -255,16 +255,16 @@ Mf  = fn;
 return  RT,Mf,Mb
 end
 
-function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90,  TypeLidf=1)
+function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90, wl=lambda, TypeLidf=1)
     # State Vector X includes (in that order):
-    #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,LIDFa,LIDFb,lai,q,tts,tto,psi,rsoil
-    #LIDFa = x[10]
-    #LIDFb = x[10]
+    #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,lai,rsoil
+
     LAI = x[9]
-    #q = x[12]
-    #tts = x[13]
-    #tto = x[14]
-    #psi = x[15]
+
+    # Define soil as polynomial (depends on state vector size):
+    pSoil =  Polynomials.Poly(x[10:end])
+    rsoil = Polynomials.polyval(pSoil,wl);
+
     iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
 
     #rsoil = x[16] # will be handled later
@@ -272,6 +272,7 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     LRT = fluspect(x[1:8], fqe=0.0)
     ρ=LRT[:,1]
     τ=LRT[:,2]
+
     # Geometric quantities (need to check allocation cost!)
     cts = cos(deg2rad(tts))
     cto = cos(deg2rad(tto))
@@ -352,6 +353,7 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
 	ddf	= 0.5*(1 .-bf);
     # Skipped SCOPE lines 186-213 here (catch up later)
     # 1.4 solar irradiance factor for all leaf orientations
+    # See eq 19 in vdT 2009
     Cs          = cos_ttli.*cts;             # [nli]     pag 305 modified by Joris
     Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
 
@@ -367,7 +369,9 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
 
     # Not yet sure what this is q is (canopy.hot), need to read up later:
     # canopy.hot  = canopy.leafwidth/canopy.hc;
-    q           =   0.05;
+    #q           =   0.05;
+
+    #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     Pso         =   similar(Po);
     for j=1:length(xl)
         #println(size(a), " ", size(Pso), " ", size(Po))
@@ -435,9 +439,7 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     #	Total canopy contribution
     rho_so=rho_sos.+rho_sod;
     #println(rho_so[100:120])
-    #	Interaction with the soil
-    # Invent rsoil for now
-    rsoil = zeros(length(rho_dd)).+0.1
+
     dn=1 .-rsoil.*rho_dd;
     # Total canopy contribution
     rso         = rho_so .+ rsoil .* Pso[nl+1] .+ ((tau_sd.+tau_ss*rsoil.*rho_dd).*tau_oo.+(tau_sd.+tau_ss).*tau_do).*rsoil./denom;
