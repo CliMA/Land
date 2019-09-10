@@ -84,7 +84,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     if (leaf.gstyp <= 1)
         Ci_0 = leaf.C3 ? 0.7*flux.cair : 0.4*flux.cair
         # Solve iterative loop:
-        leaf.Ci = hybrid(flux,leaf, CiFunc!, Ci_0, 1.05*Ci_0, tol)
+        leaf.Ci = hybrid(flux,leaf, CiFunc!, Ci_0, 0.7*Ci_0, tol)
     elseif leaf.gstyp == 2 # Needed for Bonan Stomatal optimization model
         leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
     end
@@ -94,8 +94,8 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
         leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
     end
 
-    # Rate of actual CO2 per electron, incl. photorespiration
-    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2leaf.Γstar) * leaf.effcon;
+    # Rate of actual CO2 per electron, incl. photorespiration (not using effcon here for now)
+    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(4leaf.Ci+8leaf.Γstar) #* leaf.effcon;
 
     # Actual effective ETR:
     flux.Ja = max(0,flux.ag / leaf.CO2_per_electron);
@@ -183,7 +183,8 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
 
     # CiFunc returns the difference between the current Ci and the new Ci
     leaf.Ci = cinew
-    return flux.an<0. ? 0.0 : cinew - Ci
+    #return flux.an<0. ? 0.0 : cinew - Ci
+    return cinew - Ci
 end
 
 
@@ -264,6 +265,7 @@ Compute Fluorescence yields, Kn and Kp.
 - `leaf::leaf_params`: leaf_params structure.
 """
 function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
+    const Kp_max = 4.0
     x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
     #println(x_alpha)
     leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
@@ -273,19 +275,18 @@ function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
     Kf = leaf.Kf
     Kn = leaf.Kn
     Kd = leaf.Kd
-    leaf.Kp   = min(max(0,-ps*(Kf+Kd+Kn)/(ps-1)),4);
+    leaf.Kp   = min(max(0,-ps*(Kf+Kd+Kn)/(ps-1)),Kp_max);
     Kp = leaf.Kp
 
 
-    leaf.Fo   = Kf/(Kf+4.0+Kd);
-    leaf.Fo′  = Kf/(Kf+4.0+Kd+Kn);
+    leaf.Fo   = Kf/(Kf+Kp_max+Kd);
+    leaf.Fo′  = Kf/(Kf+Kp_max+Kd+Kn);
     leaf.Fm   = Kf/(Kf   +Kd);
     leaf.Fm′  = Kf/(Kf   +Kd+Kn);
     leaf.ϕs   = leaf.Fm′*(1-ps);
     leaf.eta  = leaf.ϕs/leaf.Fo;
-    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
-    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
-
+    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm′-leaf.Fo′);
+    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm-leaf.Fo);
     leaf.NPQ  = Kn/(Kf+Kd);
 end
 
