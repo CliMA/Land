@@ -256,9 +256,9 @@ return  RT,Mf,Mb
 end
 
 function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90, wl=lambda, TypeLidf=1)
+
     # State Vector X includes (in that order):
     #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,lai,rsoil
-
     LAI = x[9]
 
     # Define soil as polynomial (depends on state vector size):
@@ -267,8 +267,10 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
 
     iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
 
-    #rsoil = x[16] # will be handled later
+    # Size of wavelength array:
+    nwl = length(wl)
 
+    # Call Fluspect for Leaf optical properties (can be done outside later if needed)
     LRT = fluspect(x[1:8], fqe=0.0)
     ρ=LRT[:,1]
     τ=LRT[:,2]
@@ -307,7 +309,7 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     sof	= 0.0;
 
     #	Weighted sums over LIDF
-	for i=1:length(litab)
+	@simd for i=1:length(litab)
 		# ttl = litab[i];	% leaf inclination discrete values
 		ctl = cos(deg2rad(litab[i]));
 		#	SAIL volume scattering phase function gives interception and portions to be
@@ -361,15 +363,13 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     fs          = abs.(cos_deltas./cts);         # [nli,nlazi] pag 305
 
     # 1.5 probabilities Ps, Po, Pso
-    Ps          =   exp.(ks*xl*LAI);                                              # [nl+1]  p154{1} probability of viewing a leaf in solar dir
-    Po          =   exp.(ko*xl*LAI);                                              # [nl+1]  p154{1} probability of viewing a leaf in observation dir
+    Ps          =   exp.(ks*xl*LAI);     # [nl+1]  p154{1} probability of viewing a leaf in solar dir
+    Po          =   exp.(ko*xl*LAI);     # [nl+1]  p154{1} probability of viewing a leaf in observation dir
 
     Ps[1:nl]    =   Ps[1:nl] *(1 .-exp.(-ks*LAI*dx))/(ks*LAI*dx);   # Correct Ps/Po for finite dx
     Po[1:nl]    =   Po[1:nl] *(1 .-exp.(-ko*LAI*dx))/(ko*LAI*dx);   # Correct Ps/Po for finite dx
 
-    # Not yet sure what this is q is (canopy.hot), need to read up later:
-    # canopy.hot  = canopy.leafwidth/canopy.hc;
-    #q           =   0.05;
+
 
     #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     Pso         =   similar(Po);
@@ -450,8 +450,34 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     rdd     = rho_dd .+ tau_dd.*rsoil.*tau_dd./denom;
     # rdo: bi-directional reflectance factor
     rdo     = rho_do .+ (tau_oo .+ tau_do).*rsoil.*tau_dd./denom;
-    return [rso rsd rdd rdo]
+    #return [rso rsd rdd rdo
 
+    # Dummy code here to track direct and diffuse light first, need to separate this into another function later
+    Esun_ = zeros(nwl).+100
+    Esky_ = zeros(nwl).+100
+    Emin_ = zeros(nl+1,nwl)
+    Eplu_ = zeros(nl+1,nwl)
+    Eplu_1      = rsoil.*((tau_ss.+tau_sd).*Esun_.+tau_dd.*Esky_)./denom;
+    Eplu0       = rho_sd.*Esun_ .+ rho_dd.*Esky_ .+ tau_dd.*Eplu_1;
+    Emin_1      = tau_sd.*Esun_ .+ tau_dd.*Esky_ .+ rho_dd.*Eplu_1;
+    delta1      = Esky_  .- rinf.*Eplu0;
+    delta2      = Eplu_1 .- rinf.*Emin_1;
+
+    # calculation of the fluxes in the canopy (this seems slow!)
+    t1 = sf.+rinf.*sb
+    t2 = sb+rinf.*sf
+    # The order here mattered, now doing the loop over nl, not nwl! (faster)
+    # This loop is time consuming, probably don't need high spectral resolution for the NIR part here, so it can be shortened a lot (say 100nm steps from 700-2500nm?)
+    # We just need it for net energy balance and PAR here.
+    @simd for i = 1:nl+1
+        J1kx  = calcJ1.(xl[i],m,ks,LAI);    #           [nl]
+        J2kx  = calcJ2.(xl[i],m,ks,LAI);    #           [nl]
+        F1    = Esun_.*J1kx.*t1 .+ delta1.*exp.( m.*LAI.*xl[i]);      #[nl]
+        F2    = Esun_.*J2kx.*t2 .+ delta2.*exp.(-m.*LAI.*(xl[i].+1));  #[nl]
+        Emin_[i,:]  = (F1.+rinf.*F2)./(1 .-rinf2);#        [nl,nwl]
+        Eplu_[i,:]  = (F2.+rinf.*F1)./(1 .-rinf2);#        [nl,nwl]
+    end
+    return [rso rsd rdd rdo]
 end
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
