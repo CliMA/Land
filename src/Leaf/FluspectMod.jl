@@ -263,7 +263,7 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
 
     # Define soil as polynomial (depends on state vector size):
     pSoil =  Polynomials.Poly(x[10:end])
-    rsoil = Polynomials.polyval(pSoil,wl);
+    rsoil = Polynomials.polyval(pSoil,wl.-mean(wl));
 
     iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
 
@@ -469,7 +469,8 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     # The order here mattered, now doing the loop over nl, not nwl! (faster)
     # This loop is time consuming, probably don't need high spectral resolution for the NIR part here, so it can be shortened a lot (say 100nm steps from 700-2500nm?)
     # We just need it for net energy balance and PAR here.
-    @simd for i = 1:nl+1
+    return [rso rsd rdd rdo]
+    for i = 1:nl+1
         J1kx  = calcJ1.(xl[i],m,ks,LAI);    #           [nl]
         J2kx  = calcJ2.(xl[i],m,ks,LAI);    #           [nl]
         F1    = Esun_.*J1kx.*t1 .+ delta1.*exp.( m.*LAI.*xl[i]);      #[nl]
@@ -477,7 +478,8 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
         Emin_[i,:]  = (F1.+rinf.*F2)./(1 .-rinf2);#        [nl,nwl]
         Eplu_[i,:]  = (F2.+rinf.*F1)./(1 .-rinf2);#        [nl,nwl]
     end
-    return [rso rsd rdd rdo]
+
+
 end
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
