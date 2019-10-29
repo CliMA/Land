@@ -9,8 +9,9 @@ export soil_struct, van_Genuchten,  matric_potential, root_uptake, predictor_cor
 # Number of soil layers
 @with_kw mutable struct soil_struct{}
    nsoi::UInt      # Number of soil layers
+   zsoil::Float64  # Soil depth
    z_bnds = zeros(nsoi+1)
-   dz              = ones(nsoi)       # Soil layer thickness (cm)
+   dz              = zsoil/Float64(nsoi)*ones(nsoi)       # Soil layer thickness (cm)
    z_plus_onehalf  = zeros(nsoi) # Soil depth [cm] at i+1/2 interface between layers i & i+1 [negative distance from surface]
    z               = zeros(nsoi) # Soil depth [cm] at center of layer i [negative distance from surface]
    dz_plus_onehalf = zeros(nsoi) # Thickness between between z[i] & z[i+1]
@@ -20,9 +21,10 @@ export soil_struct, van_Genuchten,  matric_potential, root_uptake, predictor_cor
    ψ_0            = 0.0  # initial matric potential
    K               = zeros(nsoi) # Hydraulic conductivity (cm H2O/s)
    cap             = zeros(nsoi) # Specific moisture capacity (/cm)
-   Q_0              = 0.0 # Infiltration flux (cm H2O/s)
+   Ts              = 300. * ones(nsoi)
+   Q_0             = 0.0 # Infiltration flux (cm H2O/s)
    QN              = 0.0 # Drainage flux (cm H2O/s)
-   dθ          = 0.0 # Change in soil moisture (cm H2O)
+   dθ              = 0.0 # Change in soil moisture (cm H2O)
    err             = 0.0 # Water balance error (cm H2O)
 end
 
