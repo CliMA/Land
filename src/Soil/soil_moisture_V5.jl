@@ -7,25 +7,37 @@ export soil_struct, van_Genuchten, Campbell, tridiagonal_solver, matric_potentia
 
 # Number of soil layers
 @with_kw mutable struct soil_struct{}
+   # state variables
    nsoi            # Number of soil layers
    zsoil           # soil depth (cm)
+   sand            # sand fraction per layer (vector)
+   clay            # clay fraction per layer (vector)
+   Ts              = 300*ones(nsoi)   # Soil temperature (K)
+   theta           = zeros(nsoi)      # Soil Moisture (m^3/m^3)
+   psi             = zeros(nsoi)      # Soil Matrix Potential (cm)
+   functions       = "van_Genuchten"  # default value
    dz              = zsoil/Float64(nsoi)*ones(nsoi)       # Soil layer thickness (cm)
    z_plus_onehalf  = zeros(nsoi) # Soil depth [cm] at i+1/2 interface between layers i & i+1 [negative distance from surface]
    z               = zeros(nsoi) # Soil depth [cm] at center of layer i [negative distance from surface]
    dz_plus_onehalf = zeros(nsoi) # Thickness between between z[i] & z[i+1]
-   functions       = "aa"
-   theta           = zeros(nsoi) # Soil Moisture
-   psi             = zeros(nsoi) # Matric potential
-   theta0          = 0.0  # Initial SM
-   psi0            = 0.0  # initial matric potential
    K               = zeros(nsoi) # Hydraulic conductivity (cm H2O/s)
    cap             = zeros(nsoi) # Specific moisture capacity (/cm)
+
+
+
+
    Q0              = 0.0 # Infiltration flux (cm H2O/s)
    QN              = 0.0 # Drainage flux (cm H2O/s)
    dtheta          = 0.0 # Change in soil moisture (cm H2O)
    err             = 0.0 # Water balance error (cm H2O)
-   Ts              = 300.  * ones(nsoi) # Soil Temperature (K)
    dTs             = zeros(nsoi) # Change in Soil Temperature tendencies (K)
+
+   # to be modified later - initial values
+   theta_sat       = 0.489 - 0.00126*sand (Farouki 1981)
+   lambda_s_min    = (8.8 * sand + 2.92 * clay) ./ (sand + clay)
+   lambda_sat      = lambda_s_min .^ (1-theta_sat) .* lambda_liquid .^ (theta_sat)
+
+   # lambda_liquid = 0.57 ! W/m/K
 
    # Some root distribution functions
    ssflag          = 1 # perform root uptake else do not
@@ -44,7 +56,11 @@ end
 
 
 
-
+function(soil)
+  # Initialize soil water content
+  soil.theta = theta_sat - 1.0e-03
+  soil.psi0  = matric_potential(soil.functions, params, soil.theta0)
+end
 
 
 # Van Genuchten Function
@@ -283,7 +299,7 @@ end # funnction
 
 
 # Predictor Corrector Function Soil Temperature
-function predictor_corrector_moisture(soil::soil_struct, params, G0::Float64, dt)
+function predictor_corrector_temperature(soil::soil_struct, params, G0::Float64, dt)
 
   # -------------------------------------------------------------
   # Use predictor-corrector method to solve the Richards equation
