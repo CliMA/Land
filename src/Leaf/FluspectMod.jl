@@ -4,11 +4,26 @@ using Polynomials
 using Statistics
 # Matlab reading
 using MAT
-# Numerical integration package (Simson rule)
+# Numerical integration package (Simpson rule)
 using QuadGK
+using MathToolsMod
 
 # Is this OK?
 file_Opti = joinpath(dirname(pathof(FluspectMod)), "Optipar2017_ProspectD.mat")
+
+# Struct for observation and solar angles
+mutable struct angles{TT<:Number}
+         tts::TT # Solar Zenith Angle in degrees
+         tto::TT # Viewing Zenith Angle in degrees
+         psi::TT # relatvie azimuth in degrees
+end
+
+# struct for canopy
+mutable struct canopy{TT<:Number}
+         nlayers::Integer # number of layers
+         LAI::TT # Leaf Area Index
+         hc::TT # relatie azimuth in degrees
+end
 
 const minwle  = 400.; # PAR range
 const maxwle  = 700.;
@@ -16,10 +31,10 @@ const minwlf  = 650.; # SIF range
 const maxwlf  = 850.;
 
 # Doubling Adding layers
-const ndub = 10
+const ndub = 15
 
 # Canopy Layers:
-const nl = 60
+const nl = 20
 const xl = collect(0:-1/nl:-1)
 const lazitab = collect(5:10:355)
 const dx = 1.0/nl
@@ -37,12 +52,13 @@ phi_    =  convert(Array{Float32}, opti["phi"]);phi=phi_
 KcaV_   =  convert(Array{Float32}, opti["KcaV"]);KcaV=KcaV_
 KcaZ_   =  convert(Array{Float32}, opti["KcaZ"]);KcaZ =KcaZ_
 lambda_ =  convert(Array{Float32}, opti["wl"]);lambda = lambda_
-
+kChlrel = similar(lambda)
 
 # Enable downsampling spectral resolution to arbitrary grid (specify array with boundaries here)
 # Don't like global arrays yet, need to make sure this is not creating performance issues.
 function init(swl)
     global WL = swl
+    #Ipar    = find(wl>=minPAR & wl<=maxPAR);
     # Stupid...
     global nr = zeros(length(swl)-1)
     global Km = zeros(length(swl)-1)
@@ -55,6 +71,7 @@ function init(swl)
     global KcaV = zeros(length(swl)-1)
     global KcaZ = zeros(length(swl)-1)
     global lambda = zeros(length(swl)-1)
+    global kChlrel = zeros(length(swl)-1)
     for i in 1:length(swl)-1
         wo = findall((lambda_.>=swl[i]).&(lambda_.<swl[i+1]) )
         #println(mean(nr_[wo]))
@@ -72,7 +89,7 @@ function init(swl)
     end
 end
 
-function fluspect(x::Vector; fqe::Number=0.0, Kab__=Kab, Kant__=Kant, KBrown__=KBrown, Kw__=Kw, Km__=Km, KcaV__=KcaV, KcaZ__=KcaZ)
+function fluspect!(x::Vector; fqe::Number=0.0, Kab__=Kab, Kant__=Kant, KBrown__=KBrown, Kw__=Kw, Km__=Km, KcaV__=KcaV, KcaZ__=KcaZ, kChlrel__ = kChlrel)
     #println(fqe)
 # , Kab__=Kab, Kant__=Kant, KBrown__=KBrown, Kw__=Kw, Km__=Km, KcaV__=KcaV, KcaZ__=KcaZ)
 # ***********************************************************************
@@ -99,7 +116,7 @@ Kcaro = (1.0-Cx).* KcaV__ + Cx .* KcaZ__;
 
 Kall    = (Cab*Kab__.+Car*Kcaro.+Ant*Kant__.+Brown*KBrown__.+Cw*Kw__.+Cm*Km__)./N
 # Relative absorption by Chlorophyll only (drives SIF and GPP eventually)
-kChlrel  = Cab*Kab./(Kall.*N.+eps());
+kChlrel__  = Cab*Kab./(Kall.*N.+eps());
 
 # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
 tau = real.((1.0.-Kall).*exp.(-Kall) .+ Kall.^2.0.*expint.(Kall.+eps()))
@@ -113,6 +130,8 @@ tau = real.((1.0.-Kall).*exp.(-Kall) .+ Kall.^2.0.*expint.(Kall.+eps()))
 # ***********************************************************************
 # reflectivity & transmissivity at the interface
 #-------------------------------------------------
+# From Prospect-D, uses 40 here instead of 59 from CVT)
+#talf    = calctav.(59.,nr)
 talf    = calctav.(40.,nr)
 ralf    = 1.0.-talf
 t12     = calctav.(90.,nr)
@@ -195,7 +214,7 @@ s[I_a]   =   2 .*a[I_a] ./ (a[I_a].^2 .- 1) .* log.(b[I_a]);
 
 k        =   log.(b);
 k[I_a]   =   (a[I_a].-1) ./ (a[I_a].+1) .* log.(b[I_a]);
-kChl     =   kChlrel .* k;
+kChl     =   kChlrel__ .* k;
 
 # indices of wle and wlf within wlp
 Iwle   = findall((lambda.>=minwle) .& (lambda.<=maxwle));
@@ -223,8 +242,10 @@ for i = 1:ndub
     xe = te./(1 .-re.*re);  ten = te.*xe;  ren = re.*(1 .+ten);
     xf = tf./(1 .-rf.*rf);  tfn = tf.*xf;  rfn = rf.*(1 .+tfn);
 
-    A11  = xf*Ih + Iv*xe';           A12 = (xf*xe').*(rf*Ih .+ Iv*re');
-    A21  = 1 .+(xf*xe').*(1 .+rf*re');   A22 = (xf.*rf)*Ih+Iv*(xe.*re)';
+    A11  = xf*Ih + Iv*xe';
+    A12 = (xf*xe').*(rf*Ih .+ Iv*re');
+    A21  = 1 .+(xf*xe').*(1 .+rf*re');
+    A22 = (xf.*rf)*Ih+Iv*(xe.*re)';
     #println(size(A11)," ", size(A12), " ", size(Mf)," ", size(Mb), " ")
     Mfn   = Mf  .* A11 .+ Mb  .* A12;
     Mbn   = Mb  .* A21 .+ Mf  .* A22;
@@ -255,8 +276,9 @@ Mf  = fn;
 return  RT,Mf,Mb
 end
 
-function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90, wl=lambda, TypeLidf=1)
-
+function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi=90, wl=lambda[:,1], TypeLidf=1)
+    # Index of PAR wavelengths
+    iPAR = findall((wl.>minwle) .& (wl.<=maxwle))
     # State Vector X includes (in that order):
     #N,Cab,Car,Ant,Cbrown,Cw,Cm,Cx,lai,rsoil
     LAI = x[9]
@@ -270,19 +292,19 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     # Size of wavelength array:
     nwl = length(wl)
 
-    # Call Fluspect for Leaf optical properties (can be done outside later if needed)
-    LRT = fluspect(x[1:8], fqe=0.0)
+    # Call Fluspect for Leaf optical properties (can be done outside later if needed, need to test timing)
+    LRT = fluspect!(x[1:8], fqe=0.0)
     ρ=LRT[:,1]
     τ=LRT[:,2]
-
+    leaf_emiss = 1.0.-ρ.-τ
     # Geometric quantities (need to check allocation cost!)
-    cts = cos(deg2rad(tts))
-    cto = cos(deg2rad(tto))
-    sin_tts  = sin(deg2rad(tts));             #           sin solar       angle
+    cts = cosd(tts)
+    cto = cosd(tto)
+    sin_tts  = sind(tts);             #           sin solar       angle
     ctscto = cts*cto;
-    tants	= tan(deg2rad(tts));
-    tanto	= tan(deg2rad(tto));
-    cospsi	= cos(deg2rad(psi));
+    tants	= tand(tts);
+    tanto	= tand(tto);
+    cospsi	= cosd(psi);
 
 
     dso		= sqrt(tants*tants+tanto*tanto-2.0*tants*tanto*cospsi);
@@ -295,9 +317,9 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     end
     #println(lidf)
 
-    cos_ttlo    = cos.(deg2rad.(lazitab));  #   cos leaf azimuth angles
-    cos_ttli    = cos.(deg2rad.(litab));    #   cosine of normal of upperside of leaf
-    sin_ttli    = sin.(deg2rad.(litab));    #   sine   of normal of upperside of leaf
+    cos_ttlo    = cosd.(lazitab);  #   cos leaf azimuth angles
+    cos_ttli    = cosd.(litab);    #   cosine of normal of upperside of leaf
+    sin_ttli    = sind.(litab);    #   sine   of normal of upperside of leaf
 
     # angular distance, compensation of shadow length
     # Calculate geometric factors associated with extinction and scattering
@@ -309,9 +331,9 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     sof	= 0.0;
 
     #	Weighted sums over LIDF
-	@simd for i=1:length(litab)
+	for i=1:length(litab)
 		# ttl = litab[i];	% leaf inclination discrete values
-		ctl = cos(deg2rad(litab[i]));
+		ctl = cosd(litab[i]);
 		#	SAIL volume scattering phase function gives interception and portions to be
 		#	multiplied by rho and tau
 		chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
@@ -450,27 +472,32 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
     rdd     = rho_dd .+ tau_dd.*rsoil.*tau_dd./denom;
     # rdo: bi-directional reflectance factor
     rdo     = rho_do .+ (tau_oo .+ tau_do).*rsoil.*tau_dd./denom;
-    #return [rso rsd rdd rdo
+    #return [rso rsd rdd rdo]
 
     # Dummy code here to track direct and diffuse light first, need to separate this into another function later
-    Esun_ = zeros(nwl).+100
+    Esun_ = zeros(nwl).+200
     Esky_ = zeros(nwl).+100
     Emin_ = zeros(nl+1,nwl)
     Eplu_ = zeros(nl+1,nwl)
+
     Eplu_1      = rsoil.*((tau_ss.+tau_sd).*Esun_.+tau_dd.*Esky_)./denom;
     Eplu0       = rho_sd.*Esun_ .+ rho_dd.*Esky_ .+ tau_dd.*Eplu_1;
     Emin_1      = tau_sd.*Esun_ .+ tau_dd.*Esky_ .+ rho_dd.*Eplu_1;
     delta1      = Esky_  .- rinf.*Eplu0;
     delta2      = Eplu_1 .- rinf.*Emin_1;
-
+    #println("Eplu1 ", Eplu_1[1:10])
+    #println("Eplu0 ", Eplu0[1:10])
+    #println("Emin_1 ", Emin_1[1:10])
+    #println("delta1 ", delta1[1:10])
+    #println("delta1 ", delta2[1:10])
     # calculation of the fluxes in the canopy (this seems slow!)
     t1 = sf.+rinf.*sb
     t2 = sb+rinf.*sf
+
     # The order here mattered, now doing the loop over nl, not nwl! (faster)
     # This loop is time consuming, probably don't need high spectral resolution for the NIR part here, so it can be shortened a lot (say 100nm steps from 700-2500nm?)
     # We just need it for net energy balance and PAR here.
-    return [rso rsd rdd rdo]
-    for i = 1:nl+1
+    @inbounds for i = 1:nl+1
         J1kx  = calcJ1.(xl[i],m,ks,LAI);    #           [nl]
         J2kx  = calcJ2.(xl[i],m,ks,LAI);    #           [nl]
         F1    = Esun_.*J1kx.*t1 .+ delta1.*exp.( m.*LAI.*xl[i]);      #[nl]
@@ -479,7 +506,75 @@ function RTM_sail(x::Vector; LIDFa=-0.35, LIDFb=-0.15,q=0.05, tts=30, tto=0, psi
         Eplu_[i,:]  = (F2.+rinf.*F1)./(1 .-rinf2);#        [nl,nwl]
     end
 
+    #println(length(wl[iPAR]))
+    Psun        = 0.001 * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,Esun_[iPAR]));
+    #Psky        = 0.001 * helpers.Sint(e2phot(wlPAR*1E-9,Esky_(Ipar)),wlPAR);
+    Asun        = 0.001 * simpson_nu(Esun_.*leaf_emiss,wl);                         # Total absorbed solar radiation
+    Pnsun       = 0.001 * simpson_nu(wl[iPAR],e2phot(wl[iPAR]*1E-9,Esun_[iPAR].*leaf_emiss[iPAR]));  # Absorbed solar radiation  in PAR range in moles m-2 s-1
+    Rnsun_PAR   = 0.001 * simpson_nu(wl[iPAR], Esun_[iPAR].*leaf_emiss[iPAR]);
+    Pnsun_Cab   = 0.001 * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,kChlrel[iPAR].*Esun_[iPAR].*leaf_emiss[iPAR]));
+    #println("Psun ", Psun)
 
+    # 3. outgoing fluxes, hemispherical and in viewing direction, spectrum
+    # hemispherical, spectral (Eout_)
+    Eout_   = Eplu_[1,:];                  #           [nwl]
+
+    # in viewing direction, spectral
+    piLoc_      = (vb.*(Emin_[1:nl,:]'*Po[1:nl]) + vf.*(Eplu_[1:nl,:]'*Po[1:nl]) + w.*Esun_*sum(Pso[1:nl]))*iLAI;
+    #println(size(rsoil)," ", size(Emin_[nl+1,:])," ", Po[nl+1], " ",Pso[nl+1])
+    piLos_      = rsoil.*Emin_[nl+1,:].*Po[nl+1] + rsoil.*Esun_.*Pso[nl+1];
+    piLo_       = piLoc_ + piLos_;              #           [nwl]
+    Lo_         = piLo_/pi;
+
+    # 4. net fluxes, spectral and total, and incoming fluxes
+    # incident PAR at the top of canopy, spectral and spectrally integrated
+    P_          = e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR]));
+    P           = .001 * simpson_nu(wl[iPAR], P_);
+
+
+    # total direct radiation (incident and net) per leaf area (W m-2 leaf)
+    Pdir        = fs * Psun;                        # [13 x 36]   incident
+    Rndir       = fs * Asun;                        # [13 x 36]   net
+    Pndir       = fs * Pnsun;                       # [13 x 36]   net PAR
+    Pndir_Cab   = fs * Pnsun_Cab;                   # [13 x 36]   net PAR Cab
+    Rndir_PAR   = fs * Rnsun_PAR;                   # [13 x 36]   net PAR energy units
+
+    # Allocate memory (should pre-allocate in update and provide in structure!)
+    Pdif = zeros(nl);
+    Rndif= zeros(nl);
+    Pndif= zeros(nl);
+    Pndif_Cab= zeros(nl);
+    Rndif_PAR= zeros(nl);
+    Rndif_ = zeros(nl,nwl);
+    Pndif_ = zeros(nl,length(iPAR));
+    Pndif_Cab_ = zeros(nl,length(iPAR));
+    Rndif_PAR_ = zeros(nl,length(iPAR));
+
+    # canopy layers, diffuse radiation
+    @inbounds for j = 1:nl
+        # diffuse incident radiation for the present layer 'j' (mW m-2 um-1)
+        E_         = .5*(Emin_[j,:] + Emin_[j+1,:]+ Eplu_[j,:]+ Eplu_[j+1,:]);
+
+        # incident PAR flux, integrated over all wavelengths (moles m-2 s-1)
+        Pdif[j]    = .001 * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,E_[iPAR]));  # [nl] , including conversion mW >> W
+
+        # net radiation (W m-2) and net PAR (moles m-2 s-1), integrated over all wavelengths
+        Rndif[j]           = .001 * simpson_nu(wl, Rndif_[j,:]);              # [nl]  Full spectrum net diffuse flux
+        Pndif[j]           =        simpson_nu(wl[iPAR],Pndif_[j,iPAR]);      # [nl]  Absorbed PAR
+        Pndif_Cab[j]       =        simpson_nu(wl[iPAR],Pndif_Cab_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
+        Rndif_PAR[j]       = .001 * simpson_nu(wl[iPAR],Rndif_PAR_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
+
+        # net radiation (mW m-2 um-1) and net PAR (moles m-2 s-1 um-1), per wavelength
+        Rndif_[j,:]         = E_.*leaf_emiss;                                                   # [nl,nwl]  Net (absorbed) radiation by leaves
+        Pndif_[j,:]         = .001 *(e2phot(wl[iPAR]*1E-9, Rndif_[j,iPAR]));             # [nl,nwlPAR]  Net (absorbed) as PAR photons
+        Pndif_Cab_[j,:]     = .001 *(e2phot(wl[iPAR]*1E-9, kChlrel[iPAR].*Rndif_[j,iPAR]));  # [nl,nwl]  Net (absorbed) as PAR photons by Cab
+        Rndif_PAR_[j,:]     = Rndif_[j,iPAR];  # [nl,nwlPAR]  Net (absorbed) as PAR energy
+    end
+    #Esunto  = 0.001 * simpson_nu(wl, Esun_) #Calculate optical sun fluxes (by Integration), including conversion mW >> W
+    #Eskyto  = 0.001 * simpson_nu(wl, Esky_) #Calculate optical sun fluxes (by Integration)
+    #println("Esunto ", Esunto)
+    #println("Eskyto ", Eskyto)
+    return Eplu_
 end
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
@@ -542,13 +637,13 @@ function volscatt(tts,tto,psi,ttli)
     nli     = length(ttli);
 
     psi_rad         = deg2rad(psi);
-    cos_psi         = cos(deg2rad(psi));                #   cosine of relative azimuth angle
-    cos_ttli        = cos(deg2rad(ttli));               #   cosine of normal of upperside of leaf
-    sin_ttli        = sin(deg2rad(ttli));               #   sine   of normal of upperside of leaf
-    cos_tts         = cos(deg2rad(tts));                #   cosine of sun zenith angle
-    sin_tts         = sin(deg2rad(tts));                #   sine   of sun zenith angle
-    cos_tto         = cos(deg2rad(tto));                #   cosine of observer zenith angle
-    sin_tto         = sin(deg2rad(tto));                #   sine   of observer zenith angle
+    cos_psi         = cosd(psi);                #   cosine of relative azimuth angle
+    cos_ttli        = cosd(ttli);               #   cosine of normal of upperside of leaf
+    sin_ttli        = sind(ttli);               #   sine   of normal of upperside of leaf
+    cos_tts         = cosd(tts);                #   cosine of sun zenith angle
+    sin_tts         = sind(tts);                #   sine   of sun zenith angle
+    cos_tto         = cosd(tto);                #   cosine of observer zenith angle
+    sin_tto         = sind(tto);                #   sine   of observer zenith angle
     Cs              = cos_ttli*cos_tts;                 #   p305{1}
     Ss              = sin_ttli*sin_tts;                 #   p305{1}
     Co              = cos_ttli*cos_tto;                 #   p305{1}
@@ -608,7 +703,7 @@ end
 function dcum(a::Number,b::Number,t::Number)
     y = 0.0
     if a>=1
-        f = 1-cos(deg2rad(t));
+        f = 1-cosd(t);
     else
         epsi=1e-8;
         delx=1;

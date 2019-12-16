@@ -1,21 +1,8 @@
 module MathToolsMod
 using LeafPhotosynthesisMod:fluxes
 using Leaf:leaf_params
-#-----------------------------------------------------------------------
-# !DESCRIPTION:
-# Math tools
-#
-# !USES:
-#use shr_kind_mod, only : r8 => shr_kind_r8
-#use clm_varctl, only : iulog
-#use abortutils, only : endrun
-#use CanopyFluxesMultilayerType, only : mlcanopy_type
-#!
-#! !PUBLIC TYPES:
-#implicit none
-#!
-#! !PUBLIC MEMBER FUNCTIONS:
-export quadratic,beta_function,log_gamma_function, hybrid, zbrent
+
+export quadratic,beta_function,log_gamma_function, hybrid, zbrent, simpson_nu, Avogadro, e2phot, ephoton
 # hybrid             ! Solve for the root of a function using secant and Brent's methods
 # zbrent             ! Use Brent's method to find the root of a function
 # quadratic          ! Solve a quadratic equation for its two roots
@@ -23,12 +10,28 @@ export quadratic,beta_function,log_gamma_function, hybrid, zbrent
 # beta_function      ! Evaluate the beta function at p and q: B(p,q)
 # log_gamma_function ! Evaluate the log natural of the gamma function at x: ln(G(x))
 
+const Avogadro = 6.022140857e23
+const h = 6.62607004e-34          # [J s]         Planck's constant
+const c = 299792458.0             #  [m s-1]       speed of light
 #-----------------------------------------------------------------------
 function quadratic(a, b, c)
   discr = b^2 - 4*a*c
   discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : 0.0 #error("Only complex roots")
 end # function
 
+function e2phot(lambda,E)
+    #molphotons = e2phot(lambda,E) calculates the number of moles of photons
+    #corresponding to E Joules of energy of wavelength lambda (m)
+    e           = ephoton(lambda);
+    photons     = E./e;
+    return photons./Avogadro;
+end
+
+function ephoton(lambda)
+    #E = phot2e(lambda) calculates the energy content (J) of 1 photon of
+    #wavelength lambda (m)
+    return (h*c)./lambda;           # [J]           energy of 1 photon
+end
 
 #-----------------------------------------------------------------------
 function beta_function(p, q)
@@ -128,6 +131,7 @@ function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::
 
     return x0
 end #function hybrid
+
 function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Number, args::Tuple=();
                xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
                maxiter::Integer=50)
@@ -197,4 +201,39 @@ function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Numb
     end
     error("Max iteration exceeded")
 end
+
+function simpson_nu(x::Vector, f::Vector)
+    """
+    Simpson rule for irregularly spaced data.
+
+        Parameters
+        ----------
+        x : list or np.array of floats
+                Sampling points for the function values
+        f : list or np.array of floats
+                Function values at the sampling points
+
+        Returns
+        -------
+        float : approximation for the integral
+    """
+    N = length(x)
+    h = diff(x)
+    #println(length(x)," ", length(f))
+    result = 0.0
+    for i=2:2:N-1
+        hph = h[i] + h[i - 1]
+        result += f[i] * ( h[i]^3 + h[i - 1]^3 + 3. * h[i] * h[i - 1] * hph )/ ( 6 * h[i] * h[i - 1] )
+        result += f[i - 1] * ( 2. * h[i - 1]^3 - h[i]^3+ 3. * h[i] * h[i - 1]^2) / ( 6 * h[i - 1] * hph)
+        result += f[i + 1] * ( 2. * h[i]^3 - h[i - 1]^3 + 3. * h[i - 1] * h[i]^2)/ ( 6 * h[i] * hph )
+    end
+
+    if N % 2 == 0
+        result += f[N] * ( 2 * h[N - 1]^2+ 3. * h[N - 2] * h[N - 1]) / ( 6 * ( h[N - 2] + h[N - 1] ) )
+        result += f[N - 1] * ( h[N - 1]^2+ 3*h[N - 1]* h[N - 2] ) / ( 6 * h[N - 2] )
+        result -= f[N - 2] * h[N - 1]^3/ ( 6 * h[N - 2] * ( h[N - 2] + h[N - 1] ) )
+    end
+    return result
+end
+
 end # module MathToolsMod
