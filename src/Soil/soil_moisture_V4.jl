@@ -99,6 +99,49 @@ return theta, K, cap
 
 end # function
 
+# Van Genuchten Function
+function vG(ψ, params=params)
+# ----------------------------------
+# van Genuchten [1980] relationships
+# ----------------------------------
+
+# --- Soil parameters
+θ_res = params[1];   # Residual water content
+θ_sat = params[2];   # Volumetric water content at saturation
+α = params[3];       # Inverse of the air entry potential
+n = params[4];           # Pore-size distribution index
+m = params[5];           # Exponent
+Ksat = params[6];        # Hydraulic conductivity at saturation
+
+# --- Effective saturation [Se] for specified matric potential [psi]
+if (ψ <= 0)
+   Se = (1 + (α * abs(ψ))^n)^-m
+else()
+   Se = 1
+end
+
+# --- Volumetric soil moisture [theta] for specified matric potential [psi]
+θ = θ_res + (θ_sat - θ_res) * Se
+
+# --- Hydraulic conductivity [K] for specified matric potential [psi]
+if Se <= 1
+   K = Ksat * sqrt(Se) * (1 - (1 - Se^(1/m))^m)^2
+else
+   K = Ksat
+end
+
+# --- Specific moisture capacity [cap] for specified matric potential [psi]
+if (ψ <= 0)
+   num = α * m * n * (θ_sat - θ_res) * (α * abs(ψ))^(n-1)
+   den =  (1 + (α * abs(ψ))^n)^(m+1)
+   cap = num / den
+else
+   cap = 0
+end
+
+return θ, K, cap
+end # function
+
 function Campbell(params, psi)
 
 # -----------------------------
@@ -137,7 +180,7 @@ else()
 end
 
 return theta, K, cap
- 
+
 end # Function
 
 # Other Functions
@@ -169,19 +212,19 @@ e = copy(a)*0.0;
 f = copy(a)*0.0;
 
 e[1] = c[1] / b[1]
-    
+
 
 for i = 2: 1: n-1
    e[i] = c[i] / (b[i] - a[i] * e[i-1])
 end
-    
+
 
 f[1] = d[1] / b[1]
 
 for i = 2: 1: n
    f[i] = (d[i] - a[i] * f[i-1]) / (b[i] - a[i] * e[i-1])
 end
-    
+
 
 # --- Backward substitution [N -> 1] to solve for U
 u = zeros(n);
@@ -395,7 +438,7 @@ a[i] = 0.0
 c[i] = -K_plus_onehalf[i] / (2.0 * soil.dz_plus_onehalf[i])
 b[i] = soil.cap[i] * soil.dz[i] / dt  + K_onehalf / (2.0 * dz_onehalf) - c[i]
 d[i] = soil.cap[i] * soil.dz[i] / dt * soil.psi[i] + K_onehalf / (2.0 * dz_onehalf) * soil.psi0 + K_onehalf / (2.0 * dz_onehalf) * (soil.psi0 - soil.psi[i]) + c[i] * (soil.psi[i] - soil.psi[i+1]) + K_onehalf - K_plus_onehalf[i] - soil.sink[i]
-    
+
 
 for i = 2:soil.nsoi-1
    a[i] = -K_plus_onehalf[i-1] / (2.0 * soil.dz_plus_onehalf[i-1])
@@ -411,7 +454,7 @@ b[i] = soil.cap[i] * soil.dz[i] / dt - a[i] - c[i]
 d[i] = soil.cap[i] * soil.dz[i] / dt * soil.psi[i] - a[i] * (soil.psi[i-1] - soil.psi[i]) + K_plus_onehalf[i-1] - soil.K[i] - soil.sink[i]
 
 # Solve for psi at n+1
-    
+
 
 soil.psi = tridiagonal_solver(a, b, c, d, soil.nsoi)
 # --- Check water balance()
@@ -466,7 +509,7 @@ function compute_grid_settings(soil::soil_struct)
 
 
 
-   return soil 
+   return soil
 end # Function
 
 

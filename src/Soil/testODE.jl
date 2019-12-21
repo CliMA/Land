@@ -24,7 +24,7 @@ m = params[5];           # Exponent
 Ksat = params[6];        # Hydraulic conductivity at saturation
 
 # --- Effective saturation [Se] for specified matric potential [psi]
-if (ψ <= 0)
+if (ψ < 0)
    Se = (1 + (α * abs(ψ))^n)^-m
 else()
    Se = 1
@@ -34,7 +34,7 @@ end
 θ = θ_res + (θ_sat - θ_res) * Se
 
 # --- Hydraulic conductivity [K] for specified matric potential [psi]
-if Se <= 1
+if Se < 1
    #K = Ksat * sqrt(Se) * (1 - (1 - Se^(1/m))^m)^2
    K = Ksat * 1.175e6 / (1.175e6 + abs(ψ)^4.74);
 else
@@ -42,13 +42,13 @@ else
 end
 
 # --- Specific moisture capacity [cap] for specified matric potential [psi]
-if (ψ < 0)
+#if (ψ < 0)
    num = α * m * n * (θ_sat - θ_res) * (α * abs(ψ))^(n-1)
    den =  (1 + (α * abs(ψ))^n)^(m+1)
-   cap = num / den
-else
-   cap = 0.0
-end
+   cap = num / den + 0.00001
+#else
+   cap = 0.000001
+#end
 
 return θ, K, cap
 end
@@ -75,9 +75,29 @@ end
 #Δx[1:10]=-1
 # Set prior Ψ
 Ψ_0 = zeros(N);
+θ_0 = zeros(N);
+θ_0[:] .= 0.1;
+
 Ψ_0[:] .= -100;
 #Ψ_0[50:end]=-
 #Ψ_0[50:end] .= -
+
+function matric_potential(θ::Number; params=params)
+# --- Calculate psi for a given theta
+   θ_res = params[1];    # Residual water content
+   θ_sat = params[2];    # Volumetric water content at saturation
+   α = params[3];        # Inverse of the air entry potential
+   n = params[4];            # Pore-size distribution index
+   m = params[5];            # Exponent
+   if θ<=θ_res
+      θ=max(θ_res,θ)+1e-10
+   elseif θ>=θ_sat
+      θ=min(θ_sat,θ)-1e-10
+   end
+
+   Se = (θ  - θ_res) / (θ_sat - θ_res);
+   psi = -((Se^(-1/m) - 1)^(1/n)) / α;
+end
 
 
 
@@ -120,7 +140,7 @@ end
 tspan = (0.0,2*3600.0)
 p = params
 prob = ODEProblem(soil_water,Ψ_0,tspan,p)
-alg = Rosenbrock23()
+alg = ImplicitMidpoint()
 # Save every 10min
 @time sol = solve(prob, alg,saveat=10*60);
 
