@@ -15,24 +15,37 @@ typ = Float32
 
 include("PhotoStructs.jl")
 
-const minwle  = 400.; # PAR range
-const maxwle  = 750.;
-const minwlf  = 650.; # SIF range
-const maxwlf  = 850.;
-const fac = typ(0.001) #(conversion factor)
+# Leaf inclination distribution
+const litab   = typ[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+
+const minwlPAR  = typ(400.); # PAR range
+const maxwlPAR  = typ(700.);
+
+const minwle  = typ(400.); # SIF excitation range
+const maxwle  = typ(750.);
+
+const minwlf  = typ(650.); # SIF emission range
+const maxwlf  = typ(850.);
+
+const fac     = typ(0.001) #(unit conversion factor mW >> W)
+
 # Doubling Adding layers
 const ndub = 15
 
 # Load some standard settings here (can be done differently later but not bad to be fixed here)
 swl = collect(typ(400):5:2401)
 
+# Load optical properties (these can be fixed globally!):
 optis = optipar{typ}(loadOpti(swl)...);
+
+# Load sun (will be coming from CLIMA in future, just file for now)
+sunRad = incomingRadiation{typ}(loadSun(swl)...)
 
 # Set wavelength here (will stay constant!!)
 const wl = optis.lambda
 const Iwle   = findall((wl.>=minwle) .& (wl.<=maxwle));
 const Iwlf   = findall((wl.>=minwlf) .& (wl.<=maxwlf));
-const iPAR   = findall((wl.>minwle) .& (wl.<=maxwle))
+const iPAR   = findall((wl.>=minwlPAR) .& (wl.<=maxwlPAR))
 const wle    = wl[Iwle];    # excitation wavelengths,  column
 const wlf    = wl[Iwlf];    # fluorescence wavelengths,  column
 
@@ -40,14 +53,7 @@ const wlf    = wl[Iwlf];    # fluorescence wavelengths,  column
 leaf   = leafbio{typ}(ρ_SW=similar(wl),τ_SW=similar(wl), kChlrel=similar(wl), Mb=zeros(typ,length(wle), length(wlf)), Mf=zeros(typ,length(wle), length(wlf)) )
 angle  = struct_angles{typ}()
 canopy = struct_canopy{typ}()
-
-# Canopy Layers (move into struct later):
-# const nl = 20
-
-#const lazitab = collect(5:10:355)
-
-
-
+canRad = getRadStruct(length(wl), canopy.nlayers, length(canopy.lazitab), length(litab),typ)
 
 function fluspect!(leaf::leafbio, opti::optipar)
     # ***********************************************************************
@@ -228,7 +234,7 @@ function fluspect!(leaf::leafbio, opti::optipar)
     return
 end
 
-function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
+function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::struct_canopyRadiation, sun::incomingRadiation)
     # Number of layers
     nl = can.nlayers
     # Leaf Area Index
@@ -241,8 +247,9 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
     lazitab = can.lazitab
 
     # Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
-    pSoil =  Polynomials.Poly(0.2)
+    pSoil =  Polynomials.Poly(typ(0.2))
     rsoil = Polynomials.polyval(pSoil,wl.-mean(wl));
+    soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
 
     iLAI    = LAI/nl;               # [1] LAI of elementary layer (guess we can change that)
 
@@ -266,10 +273,12 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
     if can.TypeLidf==1
         lidf,litab = dladgen(can.LIDFa,can.LIDFb);
     elseif can.TypeLidf==2
+        # TBD Still need to check how to fix litab here:
         lidf,litab = campbell(can.LIDFa);
     end
     #println(lidf)
 
+    # Precompute all of this before in a separate function?
     cos_ttlo    = cosd.(lazitab);  #   cos leaf azimuth angles
     cos_ttli    = cosd.(litab);    #   cosine of normal of upperside of leaf
     sin_ttli    = sind.(litab);    #   sine   of normal of upperside of leaf
@@ -417,23 +426,26 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
     rho_so=rho_sos.+rho_sod;
     #println(rho_so[100:120])
 
-    dn=1 .-rsoil.*rho_dd;
+    dn= 1 .-rsoil.*rho_dd;
     # Total canopy contribution
     rso         = rho_so .+ rsoil .* Pso[nl+1] .+ ((tau_sd.+tau_ss*rsoil.*rho_dd).*tau_oo.+(tau_sd.+tau_ss).*tau_do).*rsoil./denom;
     # SAIL analytical reflectances
     # rsd: directional-hemispherical reflectance factor for solar incident flux
     rsd     = rho_sd .+ (tau_ss .+ tau_sd).*rsoil.*tau_dd./denom;
-    # rdd: bi-hemispherical reflectance factor
+    cR.alb_direct = rsd
+    # rdd: bi-hemispherical reflectance factor for diffuse incident flux
     rdd     = rho_dd .+ tau_dd.*rsoil.*tau_dd./denom;
+    cR.alb_diffuse=rdd
     # rdo: bi-directional reflectance factor
     rdo     = rho_do .+ (tau_oo .+ tau_do).*rsoil.*tau_dd./denom;
     #return [rso rsd rdd rdo]
 
     # Dummy code here to track direct and diffuse light first, need to separate this into another function later
-    Esun_ = zeros(typ,nwl).+200
-    Esky_ = zeros(typ,nwl).+100
-    Emin_ = zeros(typ,nl+1,nwl)
-    Eplu_ = zeros(typ,nl+1,nwl)
+    Esun_ = sun.E_direct
+    Esky_ = sun.E_diffuse
+
+    #Emin_ = zeros(typ,nl+1,nwl)
+    #Eplu_ = zeros(typ,nl+1,nwl)
 
     Eplu_1      = rsoil.*((tau_ss.+tau_sd).*Esun_.+tau_dd.*Esky_)./denom;
     Eplu0       = rho_sd.*Esun_ .+ rho_dd.*Esky_ .+ tau_dd.*Eplu_1;
@@ -453,12 +465,12 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
     # This loop is time consuming, probably don't need high spectral resolution for the NIR part here, so it can be shortened a lot (say 100nm steps from 700-2500nm?)
     # We just need it for net energy balance and PAR here.
     @inbounds for i = 1:nl+1
-        J1kx  = calcJ1.(xl[i],m,ks,LAI);    #           [nl]
-        J2kx  = calcJ2.(xl[i],m,ks,LAI);    #           [nl]
-        F1    = Esun_.*J1kx.*t1 .+ delta1.*exp.( m.*LAI.*xl[i]);      #[nl]
-        F2    = Esun_.*J2kx.*t2 .+ delta2.*exp.(-m.*LAI.*(xl[i].+1));  #[nl]
-        Emin_[i,:]  = (F1.+rinf.*F2)./(1 .-rinf2);#        [nl,nwl]
-        Eplu_[i,:]  = (F2.+rinf.*F1)./(1 .-rinf2);#        [nl,nwl]
+        J1kx  = calcJ1.(xl[i],m,ks,LAI);
+        J2kx  = calcJ2.(xl[i],m,ks,LAI);
+        F1    = Esun_.*J1kx.*t1 .+ delta1.*exp.( m.*LAI.*xl[i]);
+        F2    = Esun_.*J2kx.*t2 .+ delta2.*exp.(-m.*LAI.*(xl[i].+1));
+        cR.E_down[i,:]  = (F1.+rinf.*F2)./(1 .-rinf2);#
+        cR.E_up[i,:]  = (F2.+rinf.*F1)./(1 .-rinf2);#
     end
 
     #println(length(wl[iPAR]))
@@ -473,20 +485,21 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
 
     # 3. outgoing fluxes, hemispherical and in viewing direction, spectrum
     # hemispherical, spectral (Eout_)
-    Eout_   = Eplu_[1,:];                  #           [nwl]
+    Eout_   = cR.E_up[1,:];                  #           [nwl]
 
     # in viewing direction, spectral
-    piLoc_      = (vb.*(Emin_[1:nl,:]'*Po[1:nl]) + vf.*(Eplu_[1:nl,:]'*Po[1:nl]) + w.*Esun_*sum(Pso[1:nl]))*iLAI;
+    piLoc_      = (vb.*(cR.E_down[1:nl,:]'*Po[1:nl]) + vf.*(cR.E_up[1:nl,:]'*Po[1:nl]) + w.*Esun_*sum(Pso[1:nl]))*iLAI;
     #println(size(rsoil)," ", size(Emin_[nl+1,:])," ", Po[nl+1], " ",Pso[nl+1])
-    piLos_      = rsoil.*Emin_[nl+1,:].*Po[nl+1] + rsoil.*Esun_.*Pso[nl+1];
+    piLos_      = rsoil.*cR.E_down[nl+1,:].*Po[nl+1] + rsoil.*Esun_.*Pso[nl+1];
     piLo_       = piLoc_ + piLos_;              #           [nwl]
     Lo_         = piLo_/pi;
 
     # 4. net fluxes, spectral and total, and incoming fluxes
     # incident PAR at the top of canopy, spectral and spectrally integrated
-    P_          = e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR]));
-    P           = fac * simpson_nu(wl[iPAR], P_);
-
+    #P_          = e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR]));
+    cR.PAR      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR])));
+    cR.PAR_direct      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR])));
+    cR.PAR_diffuse      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esky_[iPAR])));
 
     # total direct radiation (incident and net) per leaf area (W m-2 leaf)
     Pdir        = fs * Psun;                        # [13 x 36]   incident
@@ -496,41 +509,59 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles)
     Rndir_PAR   = fs * Rnsun_PAR;                   # [13 x 36]   net PAR energy units
 
     # Allocate memory (should pre-allocate in update and provide in structure!)
-    Pdif = zeros(nl);
-    Rndif= zeros(nl);
-    Pndif= zeros(nl);
-    Pndif_Cab= zeros(nl);
-    Rndif_PAR= zeros(nl);
-    Rndif_ = zeros(nl,nwl);
-    Pndif_ = zeros(nl,length(iPAR));
-    Pndif_Cab_ = zeros(nl,length(iPAR));
-    Rndif_PAR_ = zeros(nl,length(iPAR));
+    Pdif = zeros(typ,nl);
+    Rndif_ = zeros(typ,nl,nwl);
+    Pndif_ = zeros(typ,nl,length(iPAR));
+    Pndif_Cab_ = zeros(typ,nl,length(iPAR));
+    Rndif_PAR_ = zeros(typ,nl,length(iPAR));
 
     # canopy layers, diffuse radiation
-    @inbounds for j = 1:nl
-        # diffuse incident radiation for the present layer 'j' (mW m-2 um-1)
-        E_         = (Emin_[j,:] + Emin_[j+1,:]+ Eplu_[j,:]+ Eplu_[j+1,:])/2;
+    for j = 1:nl
+        # incident radiation for the present layer 'j' (mW m-2 um-1)
+        E_         = (cR.E_down[j,:] + cR.E_down[j+1,:]+ cR.E_up[j,:]+ cR.E_up[j+1,:])/2;
 
         # incident PAR flux, integrated over all wavelengths (moles m-2 s-1)
         Pdif[j]    = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,E_[iPAR]));  # [nl] , including conversion mW >> W
 
-        # net radiation (W m-2) and net PAR (moles m-2 s-1), integrated over all wavelengths
-        Rndif[j]           = fac * simpson_nu(wl, Rndif_[j,:]);              # [nl]  Full spectrum net diffuse flux
-        Pndif[j]           =        simpson_nu(wl[iPAR],Pndif_[j,iPAR]);      # [nl]  Absorbed PAR
-        Pndif_Cab[j]       =        simpson_nu(wl[iPAR],Pndif_Cab_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
-        Rndif_PAR[j]       = fac * simpson_nu(wl[iPAR],Rndif_PAR_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
-
         # net radiation (mW m-2 um-1) and net PAR (moles m-2 s-1 um-1), per wavelength
-        Rndif_[j,:]         = E_.*leaf_emiss;                                                   # [nl,nwl]  Net (absorbed) radiation by leaves
+        Rndif_[j,:]         = E_.*leaf_emiss;                                           # [nl,nwl]  Net (absorbed) radiation by leaves
         Pndif_[j,:]         = fac *(e2phot(wl[iPAR]*1E-9, Rndif_[j,iPAR]));             # [nl,nwlPAR]  Net (absorbed) as PAR photons
         Pndif_Cab_[j,:]     = fac *(e2phot(wl[iPAR]*1E-9, leaf.kChlrel[iPAR].*Rndif_[j,iPAR]));  # [nl,nwl]  Net (absorbed) as PAR photons by Cab
         Rndif_PAR_[j,:]     = Rndif_[j,iPAR];  # [nl,nwlPAR]  Net (absorbed) as PAR energy
+
+        # net radiation (W m-2) and net PAR (moles m-2 s-1), integrated over all wavelengths
+        cR.Rnhc[j]          = fac * simpson_nu(wl, Rndif_[j,:]);              # [nl]  Full spectrum net diffuse flux
+        cR.Pnh[j]           =       simpson_nu(wl[iPAR],Pndif_[j,iPAR]);      # [nl]  Absorbed PAR
+        cR.Pnh_Cab[j]       =       simpson_nu(wl[iPAR],Pndif_Cab_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
+        cR.Rnh_PAR[j]       = fac * simpson_nu(wl[iPAR],Rndif_PAR_[j,iPAR]);  # [nl]  Absorbed PAR by Cab integrated
+        #A=2.0;
     end
-    #Esunto  = 0.001 * simpson_nu(wl, Esun_) #Calculate optical sun fluxes (by Integration), including conversion mW >> W
-    #Eskyto  = 0.001 * simpson_nu(wl, Esky_) #Calculate optical sun fluxes (by Integration)
-    #println("Esunto ", Esunto)
-    #println("Eskyto ", Eskyto)
-    return Eplu_
+    #A = 2;
+    # soil layer, direct and diffuse radiation
+    Rndirsoil   = fac * simpson_nu(wl, Esun_.*soil_emissivity);               # Absorbed solar flux by the soil (direct)
+    Rndifsoil   = fac * simpson_nu(wl, cR.E_down[nl+1,:].*soil_emissivity);   # Absorbed diffuse downward flux by the soil (W m-2)
+
+    # net (n) radiation R and net PAR P per component: sunlit (u), shaded (h) soil(s) and canopy (c),
+    # [W m-2 leaf or soil surface um-1]
+    #cR.Rnhc       = Rndif;            # [nl] shaded leaves or needles
+    #cR.Pnh        = Pndif;            # [nl] shaded leaves or needles
+    #cR.Pnh_Cab    = Pndif_Cab;        # [nl] shaded leaves or needles
+    #cR.Rnh_PAR    = Rndif_PAR;        # [nl] shaded leaves or needles
+
+    @inbounds for j = 1:nl
+        #cR.Puc[:,:,j]  = Pdir      + Pdif[j];          # [13,36,nl] Total fluxes on sunlit leaves or needles
+        cR.Rnuc[:,:,j]     = Rndir     .+ cR.Rnhc[j];          # [13,36,nl] Total fluxes on sunlit leaves or needles
+        cR.Pnu[:,:,j]      = Pndir     .+ cR.Pnh[j];           # [13,36,nl] Total fluxes on sunlit leaves or needles
+        cR.Pnu_Cab[:,:,j]  = Pndir_Cab  .+ cR.Pnh_Cab[j]; # [13,36,nl] Total fluxes on sunlit leaves or needles
+        cR.Rnu_PAR[:,:,j]  = Rndir_PAR  .+ cR.Rnh_PAR[j]; # [13,36,nl] Total fluxes on sunlit leaves or needles
+    end
+
+    cR.Rnhs        = Rndifsoil;                  # [1] shaded soil
+    cR.Rnus        = Rndifsoil + Rndirsoil;      # [1] sunlit soil
+    cR.Ps = Ps
+    cR.Po = Po
+    cR.Pso = Pso
+
 end
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
@@ -638,7 +669,7 @@ function volscatt(tts,tto,psi,ttli)
 end
 
 function dladgen(a::Number,b::Number)
-    litab=[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+
     freq = similar(litab)
     for i1=1:8
         t   = i1*10;
@@ -653,7 +684,7 @@ function dladgen(a::Number,b::Number)
     for i   = 13:-1:2
         freq[i]=freq[i]-freq[i-1];
     end
-    return freq,litab
+    return freq, litab
 end
 
 function dcum(a::Number,b::Number,t::Number)
@@ -845,6 +876,4 @@ function expint(x::Number)
     end
     return y
 end
-
-
 end
