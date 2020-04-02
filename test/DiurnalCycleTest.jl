@@ -1,18 +1,17 @@
 
 # Add PATH
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Leaf"))
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Utils"))
+push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
+# push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Leaf"))
+# push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Utils"))
 
 #using PyPlot
 using Plots
-using Leaf
-using MathToolsMod
-using LeafPhotosynthesisMod
 using BenchmarkTools
-using SurfaceEnergyBalance
-using PhysCon
-using WaterVaporMod
 using DifferentialEquations
+
+using LSM.PhysCon
+using LSM.WaterVaporMod
+using LSM.LeafPhotosynthesisMod
 
 # function lorenz!(du,u,p,t)
 #  du[1] = 10.0*(u[2]-u[1]);
@@ -31,8 +30,8 @@ l = leaf_params{Float32}();
 # Create a Flux structure
 f = LeafPhotosynthesisMod.fluxes{Float32}();
 # Create a meteo structure
-met = SurfaceEnergyBalance.meteo{Float32}();
-#met = SurfaceEnergyBalance.meteo();
+met = meteo{Float32}();
+#met = meteo();
 
 # initialize some reasonable values
 f.je   = 100; f.gbc  = 100; f.gbv  = 100; f.ceair= 1500; f.eair = 1500; f.APAR = 500; # leaf should not have eair
@@ -77,7 +76,7 @@ tspan      =  (0.0,Deltat);
 N          =  length(Sdown_t);
 mutable struct parameters_ode
     l::leaf_params;
-    met::SurfaceEnergyBalance.meteo;
+    met::meteo;
     psi_s;
     U;
 end
@@ -89,7 +88,7 @@ psil_t = zeros(size(Sdown_t));
 
 
 function f_ode!(du,u,p::parameters_ode,t) # p are parameters
-    du = SurfaceEnergyBalance.LeafEnergyWaterBalance(u[1], u[2], p.met, p.l,  p.psi_s, p.U);
+    du = LeafEnergyWaterBalance(u[1], u[2], p.met, p.l,  p.psi_s, p.U);
     #print(typeof(du))
 end
 
@@ -135,10 +134,10 @@ let
         (l.T,l.psi_l) = sol[:,end];
         T_t[i] = l.T; psil_t[i]=l.psi_l;
         #print((l.T,l.psi_l) )
-        #dT_dt,dH2Ol_dt = SurfaceEnergyBalance.LeafEnergyWaterBalance(met, l, psi_s);
+        #dT_dt,dH2Ol_dt = LeafEnergyWaterBalance(met, l, psi_s);
         #l.T        = l.T + Deltat*dT_dt;
     end
 
 end
 
-SurfaceEnergyBalance.LeafEnergyWaterBalance(met, l, psi_s)
+LeafEnergyWaterBalance(met, l, psi_s)

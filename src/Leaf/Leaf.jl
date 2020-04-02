@@ -1,10 +1,5 @@
-module Leaf
-using PhysCon
-using WaterVaporMod
 
-using Parameters
-
-export leaf_params, setLeafT!, BallBerry
+export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setra!
 
 # Scaling functions for Photosynthesis temperature response and inhibition
 ft(tl, ha) = exp(ha/(physcon.Rgas*(physcon.tfrz+25)) * (1-(physcon.tfrz+25)/tl));
@@ -13,6 +8,18 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
 # Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
 @with_kw mutable struct leaf_params{TT<:Number}
+
+    # broadband albedo and emissivity
+    α::TT  = -999;                           # broadband shortwave albedo - absurd value to make sure we initialize correctly
+    ε::TT  = -999;                           # longwave emissivity
+
+    # thermal characteristics
+    LMA::TT         = -999;                  # leaf mass area - kg/m2 - density times thickness
+    c_leaf::TT      = -999;                  # leaf heat capacity - J/kg
+
+    # turbulence
+    ra::TT          = 20;                    # leaf aerodynamic resistance (s/m)
+
     # Rate constants (arbitrary units here, only relative rates are important):
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
     Kd::TT = 0.85;                           # Rate constant for thermal dissipation
@@ -116,16 +123,36 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     rdleaf::TT = rd25;
 
     #
-    Ci::TT = 0.0                               # CO2 concentration in mesophyll/internal
+    Ci::TT = 0.0;                               # CO2 concentration in mesophyll/internal
 
     # to be computed
-    je::TT = 0.0                               # electron transport rate
+    je::TT = 0.0 ;                              # electron transport rate
+
+
+
+
+
+    # tree/leaf traits
+    height      = 20.;                            # tree height (m)
+    dleaf       = 2e-3;                           # leaf thickness (m)
+    Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient
+
+    # plant hydraulics
+    kmax::TT    = 4e-8                            # maximum leaf-xylem conductivity (m/s)
+    kx::TT      = kmax                            # actual xylem conductivity (m/s)
+    psi_l::TT   = -1.5e6;                         # leaf water potential (Pa)
+    psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
+    ck::TT      = 2.95;                           # slope of Weibull curve
+    #ε_modulus::TT = 20e6;                        # elastic modulus - for later
+    Ctree::TT   = (79 + 8*height)*1e-6;           # tree capacitance (kg m−3 Pa−1)
+                                                  # -Scholz et al. 2011 Book, Hydraulic Capacitance: Biophysics and Functional Significance,
+                                                  # can also be related to P50 see same book
 end
 
 # Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here:
 # For some reason, this is slow and allocates a lot, can be improved!!
 "Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here"
-function setLeafT!(l::leaf_params,  T::Number)
+function setLeafT!(l::leaf_params,  T)
     l.T = T;
     l.kc     = l.kc_25          * ft(T, l.kcha);
     l.ko     = l.ko_25          * ft(T, l.koha);
@@ -138,15 +165,33 @@ function setLeafT!(l::leaf_params,  T::Number)
 end
 
 # Ball-Berry stomatal conductance model:
-function BallBerry(Cs, RH, A, l::leaf_params)
-#  Cs  : CO2 at leaf surface
-#  RH  : relative humidity
-#  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
-#  BallBerrySlope, BallBerry0,
-#  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
-#  Ci_input : will calculate gs if A is specified.
+function BallBerry!(Cs, RH, A, l::leaf_params)
+  #  Cs  : CO2 at leaf surface
+  #  RH  : relative humidity
+  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
+  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
+  #  Ci_input : will calculate gs if A is specified.
 
-gs = l.BB_g1 * A * RH/Cs  + l.BB_g0;
+  l.gs = l.g1 * A * RH/Cs  + l.g0;
 end # function
 
-end #Module
+# Medlyn stomatal conductance model:
+function Medlyn!(Cs, VPD, A, l::leaf_params)
+  #  Cs  : CO2 at leaf surface
+  #  VPD  : vapor pressure deficit - Medlyn model
+  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
+  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
+  #  Ci_input : will calculate gs if A is specified.
+
+  l.gs = (1+l.g1/sqrt(VPD)) * A /Cs  + l.g0;
+end # function
+
+function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
+    l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+end
+
+function setra!(l::leaf_params,U) # set leaf boundary layer
+    l.ra = 1/l.Cd / sqrt(U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+end
+
+

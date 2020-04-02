@@ -19,6 +19,10 @@ export physcon
     Dh_0::T = 18.9e-06;              # Molecular diffusivity (heat) at 0C and 1013.25 hPa (m2/s)
     Dv_0::T = 21.8e-06;              # Molecular diffusivity (H2O) at 0C and 1013.25 hPa (m2/s)
     Dc_0::T = 13.8e-06;              # Molecular diffusivity (CO2) at 0C and 1013.25 hPa (m2/s)
+    Rd::T   = Rgas/mmdry;            # ideal gas constant for dry air (J/kg/K)
+    ε::T    = mmh2o/mmdry            # ratio of Molecular mass of water over Molecular mass of dry air
+    ρw::T   = 1000;                  # density of liquid water
+    Wtoμmole_s::T = 4.57;            # converts Watts/m2 to μmole/s
 end
 
 physcon = phys{Float32}()

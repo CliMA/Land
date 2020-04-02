@@ -1,8 +1,12 @@
 module LeafPhotosynthesisMod
-using MathToolsMod
-using Parameters
-using Leaf
 
+using Parameters
+
+using ..PhysCon
+using ..WaterVaporMod
+
+include("Leaf.jl")
+include("surface_energy_balance.jl")
 
 export fluxes
 "Tolerance thhreshold for Ci iterations"
@@ -54,11 +58,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
-    if !leaf.dynamic_state
-        leaf.Kn = 0.0
-    end
     leaf.Kp = 4.0
-
     φ_PSII = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
 
     # Save leaf respiration
@@ -71,9 +71,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
     # Electron transport rate for C3 plants
     # Actual colimited potential Je (curvature and Jmax)
-    #flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_red + leaf.jmax), flux.Je_red * leaf.jmax))    # Bonan eq. 11.21
-    flux.je = min(flux.Je_red,leaf.jmax)
-    #flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_pot + leaf.jmax), flux.Je_pot * leaf.jmax))    # Bonan eq. 11.21
+    flux.je = minimum(quadratic(leaf.θ_j, -(flux.Je_red + leaf.jmax), flux.Je_red * leaf.jmax))    # Bonan eq. 11.21
 
     # Ci calculation
     # Medlyn or Ball-Berry:
@@ -84,7 +82,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     if (leaf.gstyp <= 1)
         Ci_0 = leaf.C3 ? 0.7*flux.cair : 0.4*flux.cair
         # Solve iterative loop:
-        leaf.Ci = hybrid(flux,leaf, CiFunc!, Ci_0, 0.7*Ci_0, tol)
+        leaf.Ci = hybrid(flux,leaf, CiFunc!, Ci_0, 1.05*Ci_0, tol)
     elseif leaf.gstyp == 2 # Needed for Bonan Stomatal optimization model
         leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
     end
@@ -94,8 +92,9 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
         leaf.Ci = CiFuncGs!(leaf.gs, flux,leaf)
     end
 
-    # Rate of actual CO2 per electron, incl. photorespiration (not using effcon here for now)
-    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(4leaf.Ci+8leaf.Γstar) #* leaf.effcon;
+    # Rate of actual CO2 per electron, incl. photorespiration
+    # (Ci-Gamma_star)./(Ci+2*Gamma_star)
+    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2leaf.Γstar) * leaf.effcon;
 
     # Actual effective ETR:
     flux.Ja = max(0,flux.ag / leaf.CO2_per_electron);
@@ -162,7 +161,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
     if (leaf.gstyp == 1) # Ball-Berry
         if flux.an >0.0
             leaf.gs = maximum(quadratic(flux.cs, flux.cs*(flux.gbv - leaf.g0) - leaf.g1*flux.an, -flux.gbv * (flux.cs*leaf.g0 + leaf.g1*flux.an*flux.ceair/leaf.esat)))
-            #leaf.g1 * flux.an * flux.ceair/leaf.esat/flux.cs  + leaf.g0;
+            leaf.g1 * flux.an * flux.ceair/leaf.esat/flux.cs  + leaf.g0;
             # println(leaf.gs)
         else
             leaf.gs = leaf.g0
@@ -183,8 +182,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
 
     # CiFunc returns the difference between the current Ci and the new Ci
     leaf.Ci = cinew
-    #return flux.an<0. ? 0.0 : cinew - Ci
-    return cinew - Ci
+    return flux.an<0. ? 0.0 : cinew - Ci
 end
 
 
@@ -205,22 +203,18 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     gleaf = 1.0/(1.0/flux.gbc + 1.6/gs + 1.0/leaf.gm)
     if gleaf<eps() gleaf=eps() end
 
-    #flux.ac = leaf.vcmax * max(Ci-leaf.Γstar, 0.0) / (Ci + leaf.kc*(1.0+leaf.o₂/leaf.ko)) # Bonan eq. 11.28
-    # C3: RuBP-limited photosynthesis (this is the NADPH requirement stochiometry)
-    #flux.aj = flux.je * max(Ci-leaf.Γstar, 0.0) / (4.0*Ci + 8.0*leaf.Γstar)               # Bonan eq. 11.29
-
     if leaf.C3
         # C3 Rubisco Limited Photosynthesis co-limited by gs
         a0 = leaf.vcmax
         e0 = 1.0
         d0 = leaf.kc*(1.0+leaf.o₂/leaf.ko)
-        flux.ac = minimum(quadratic(1.0/gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))+leaf.rdleaf
+        flux.ac = minimum(quadratic(1.0/gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))
 
         # C3: RuBP-limited photosynthesis
         a0 = flux.je
         e0 = 4.0
         d0 = 8.0*leaf.Γstar
-        flux.aj = minimum(quadratic(e0 / gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))+leaf.rdleaf
+        flux.aj = minimum(quadratic(e0 / gleaf, -(e0*flux.cair + d0) - (a0 - e0*leaf.rdleaf) / gleaf, a0 * (flux.cair - leaf.Γstar) - leaf.rdleaf * (e0*flux.cair + d0)))
 
         # C3: Product-limited photosynthesis
         flux.ap = Inf
@@ -265,29 +259,176 @@ Compute Fluorescence yields, Kn and Kp.
 - `leaf::leaf_params`: leaf_params structure.
 """
 function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
-    Kp_max = 4.0
     x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
     #println(x_alpha)
     leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
-    if !leaf.dynamic_state
-        leaf.Kn = leaf.Kn_ss
-    end
     Kf = leaf.Kf
     Kn = leaf.Kn
     Kd = leaf.Kd
-    leaf.Kp   = min(max(0,-ps*(Kf+Kd+Kn)/(ps-1)),Kp_max);
+    leaf.Kp   = max(0,-ps*(Kf+Kd+Kn)/(ps-1));
     Kp = leaf.Kp
 
 
-    leaf.Fo   = Kf/(Kf+Kp_max+Kd);
-    leaf.Fo′  = Kf/(Kf+Kp_max+Kd+Kn);
+    leaf.Fo   = Kf/(Kf+4.0+Kd);
+    leaf.Fo′  = Kf/(Kf+4.0+Kd+Kn);
     leaf.Fm   = Kf/(Kf   +Kd);
     leaf.Fm′  = Kf/(Kf   +Kd+Kn);
     leaf.ϕs   = leaf.Fm′*(1-ps);
     leaf.eta  = leaf.ϕs/leaf.Fo;
-    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm′-leaf.Fo′);
-    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm-leaf.Fo);
+    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
+    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
+
     leaf.NPQ  = Kn/(Kf+Kd);
 end
+
+
+
+
+
+
+
+
+
+# mathematical functions
+
+function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::Number, tol::Number)
+    #
+    # !DESCRIPTION:
+    # Solve for the root of a function, given initial estimates xa and xb.
+    # The root is updated until its accuracy is tol.
+    #
+    # !USES:
+    #
+    # !ARGUMENTS:
+    #procedure (xfunc) :: func         ! Function to solve
+    #real(r8), intent(in) :: xa, xb    ! Initial estimates of root
+    #real(r8), intent(in) :: tol       ! Error tolerance
+    #type(mlcanopy_type), intent(inout) :: mlcanopy_inst
+    itmax = 40
+    x0 = x1 = f0 = f1 = 0.0
+    x0 = xa
+    f0 = func(x0,flux, leaf)
+    if (f0 == 0.0) return  x0 end
+
+    x1 = xb
+    f1 = func(x1,flux, leaf)
+    if (f1 == 0.0) return x1 end
+
+    if (f1 < f0)
+       minx = x1
+       minf = f1
+    else
+       minx = x0
+       minf = f0
+    end
+
+    # First use the secant method, and then use the brent method as a backup
+    for iter = 0:itmax
+       iter = iter + 1
+       dx = -f1 * (x1 - x0) / (f1 - f0)
+       x = x1 + dx
+       if (abs(dx) < tol)
+          x0 = x
+          break
+       end
+       x0 = x1
+       f0 = f1
+       x1 = x
+       f1 = func(x1,flux, leaf)
+       if (f1 < minf)
+          minx = x1
+          minf = f1
+       end
+
+       # If a root zone is found, use the brent method for a robust backup strategy
+       if (f1 * f0 < 0.0)
+          x = zbrent(flux,  leaf,func,x0, x1, xtol=tol)
+          x0 = x
+          break
+       end
+
+       # In case of failing to converge within itmax iterations stop at the minimum function
+       if (iter > itmax)
+          f1 = func(minx,flux, leaf)
+          x0 = minx
+          break
+       end
+
+    end
+
+    return x0
+end #function hybrid
+function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Number, args::Tuple=();
+               xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
+               maxiter::Integer=50)
+    EPS = eps(Float64)
+    y0 = f(x0,flux,leaf)
+    y1 = f(x1,flux,leaf)
+    if abs(y0) < abs(y1)
+        # Swap lower and upper bounds.
+        x0, x1 = x1, x0
+        y0, y1 = y1, y0
+    end
+    x2 = x0
+    y2 = y0
+    x3 = x2
+    bisection = true
+    for _ in 1:maxiter
+        # x-tolerance.
+        if abs(x1-x0) < xtol
+            return x1
+        end
+
+        # Use inverse quadratic interpolation if f(x0)!=f(x1)!=f(x2)
+        # and linear interpolation (secant method) otherwise.
+        if abs(y0-y2) > ytol && abs(y1-y2) > ytol
+            x = x0*y1*y2/((y0-y1)*(y0-y2)) +
+                x1*y0*y2/((y1-y0)*(y1-y2)) +
+                x2*y0*y1/((y2-y0)*(y2-y1))
+        else
+            x = x1 - y1 * (x1-x0)/(y1-y0)
+        end
+
+        # Use bisection method if satisfies the conditions.
+        delta = abs(2EPS*abs(x1))
+        min1 = abs(x-x1)
+        min2 = abs(x1-x2)
+        min3 = abs(x2-x3)
+        if (x < (3x0+x1)/4 && x > x1) ||
+           (bisection && min1 >= min2/2) ||
+           (!bisection && min1 >= min3/2) ||
+           (bisection && min2 < delta) ||
+           (!bisection && min3 < delta)
+            x = (x0+x1)/2
+            bisection = true
+        else
+            bisection = false
+        end
+
+        y = f(x,flux,leaf)
+        # y-tolerance.
+        if abs(y) < ytol
+            return x
+        end
+        x3 = x2
+        x2 = x1
+        if sign(y0) != sign(y)
+            x1 = x
+            y1 = y
+        else
+            x0 = x
+            y0 = y
+        end
+        if abs(y0) < abs(y1)
+            # Swap lower and upper bounds.
+            x0, x1 = x1, x0
+            y0, y1 = y1, y0
+        end
+    end
+    error("Max iteration exceeded")
+end
+
+include("math_tools.jl")
+
 
 end #Module

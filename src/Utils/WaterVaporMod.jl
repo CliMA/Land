@@ -1,10 +1,21 @@
 module WaterVaporMod
-using PhysCon
+
+using ..PhysCon
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Calculate saturation vapor pressure and latent heat of vaporization
 #
+export Lv
 export SatVap
+
+function Lv(T)
+  # latent heat of vaporization as a function of temperature
+  # B. HENDERSON-SELLERS (1984) QJRMS
+  # A new formula for latent heat of vaporization of water as a function of temperature
+  Lv = 1.91846e6*(T/(T - 33.91))^2 #(J/kg)
+  return Lv
+  #es(T) = 2.1718e10 * exp(-4157/( T - 33.91))
+end # end latent heat of vaporization
 
 function SatVap(t)
     #
@@ -85,4 +96,6 @@ function SatVap(t)
     return es, desdt
 
 end # SatVap
+
+
 end # Module

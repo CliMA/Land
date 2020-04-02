@@ -1,6 +1,7 @@
-module MathToolsMod
-using LeafPhotosynthesisMod:fluxes
-using Leaf:leaf_params
+####
+#### Math tools
+####
+
 #-----------------------------------------------------------------------
 # !DESCRIPTION:
 # Math tools
@@ -23,12 +24,19 @@ export quadratic,beta_function,log_gamma_function, hybrid, zbrent
 # beta_function      ! Evaluate the beta function at p and q: B(p,q)
 # log_gamma_function ! Evaluate the log natural of the gamma function at x: ln(G(x))
 
+export quadratic, IntWeibull, beta_function, log_gamma_function
+
 #-----------------------------------------------------------------------
 function quadratic(a, b, c)
   discr = b^2 - 4*a*c
-  discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : 0.0 #error("Only complex roots")
+  discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : error("Only complex roots")
 end # function
 
+#-----------------------------------------------------------------------
+# integral of weibull function for conductances
+function IntWeibull(psis,psil,psil50,ck) # set hydraulic conductivity
+    return 2^(-(psis/psil50)^ck) - 2^(-(psil/psil50)^ck);
+end
 
 #-----------------------------------------------------------------------
 function beta_function(p, q)
@@ -197,4 +205,4 @@ function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Numb
     end
     error("Max iteration exceeded")
 end
-end # module MathToolsMod
+
