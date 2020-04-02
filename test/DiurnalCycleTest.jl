@@ -1,8 +1,6 @@
 
 # Add PATH
 push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
-# push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Leaf"))
-# push!(LOAD_PATH, joinpath(@__DIR__, "..", "src", "Utils"))
 
 #using PyPlot
 using Plots
