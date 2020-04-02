@@ -265,7 +265,7 @@ Compute Fluorescence yields, Kn and Kp.
 - `leaf::leaf_params`: leaf_params structure.
 """
 function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
-    const Kp_max = 4.0
+    Kp_max = 4.0
     x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
     #println(x_alpha)
     leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
