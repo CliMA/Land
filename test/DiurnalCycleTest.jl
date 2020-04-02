@@ -13,6 +13,9 @@ using LSM.PhysCon
 using LSM.WaterVaporMod
 using LSM.LeafPhotosynthesisMod
 
+output_dir = joinpath(@__DIR__,"..","output")
+mkpath(output_dir)
+
 # function lorenz!(du,u,p,t)
 #  du[1] = 10.0*(u[2]-u[1]);
 #  du[2] = u[1]*(28.0-u[3]) - u[2];
@@ -89,7 +92,7 @@ psil_t = zeros(size(Sdown_t));
 
 function f_ode!(du,u,p::parameters_ode,t) # p are parameters
     du = LeafEnergyWaterBalance(u[1], u[2], p.met, p.l,  p.psi_s, p.U);
-    #print(typeof(du))
+    println("du_inside = $(du), u_inside = $(u)")
 end
 
 let
@@ -103,19 +106,19 @@ let
         met.Cs     = 400.0; #ppm
         for j=1:trunc(Deltat/dt)
             u    = [l.T;l.psi_l];
-            print(typeof(u))
             p    = parameters_ode(l,met,psi_s,U);
             #(p.met, p.l,  p.psi_s, p.U)    = [l;met;psi_s;U];
             #prob = ODEProblem(f_ode!,u0,tspan,p);
             du   = zeros(size(u));
             f_ode!(du,u,p,t)
-            print(du)
+            println("du_outside = $(du), u_outside = $(u)")
             (l.T,l.psi_l) = du*dt+u;
             T_t[i] = l.T; psil_t[i]=l.psi_l;
         end
     end
 
     plot(T_t)
+    savefig(joinpath(output_dir, "T_t.png"))
 
 
     l.T        = Tair_t[1]; # initialize temperature of the leaf
@@ -137,6 +140,9 @@ let
         #dT_dt,dH2Ol_dt = LeafEnergyWaterBalance(met, l, psi_s);
         #l.T        = l.T + Deltat*dT_dt;
     end
+
+    plot(T_t)
+    savefig(joinpath(output_dir, "T_t_final.png"))
 
 end
 

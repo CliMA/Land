@@ -1,0 +1,16 @@
+*.DS_Store
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+*.DS_Store
+docs/build/
+docs/site/
+src/**/Manifest.toml
+*.vtk
+*.dat
+*.vtu
+*.pvtu
+*.swp
+*.png
+*.nc
+!docs/src/assets/*.png
