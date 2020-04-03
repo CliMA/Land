@@ -358,6 +358,7 @@ function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::
 
     return x0
 end #function hybrid
+
 function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Number, args::Tuple=();
                xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
                maxiter::Integer=50)
@@ -428,7 +429,7 @@ function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Numb
     error("Max iteration exceeded")
 end
 
-include("math_tools.jl")
+include("../Utils/math_tools.jl")
 
 
 end #Module
