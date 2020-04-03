@@ -89,7 +89,7 @@ psil_t = zeros(size(Sdown_t));
 
 
 function f_ode!(du,u,p::parameters_ode,t) # p are parameters
-    du = LeafEnergyWaterBalance(u[1], u[2], p.met, p.l,  p.psi_s, p.U);
+    du .= LeafEnergyWaterBalance(u[1], u[2], p.met, p.l,  p.psi_s, p.U);
     println("du_inside = $(du), u_inside = $(u)")
 end
 
