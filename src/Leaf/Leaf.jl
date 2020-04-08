@@ -138,10 +138,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient
 
     # plant hydraulics
+    psi_l::TT   = -1.5e6;                         # leaf water potential (Pa)
+
+    psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
     kmax::TT    = 4e-8                            # maximum leaf-xylem conductivity (m/s)
     kx::TT      = kmax                            # actual xylem conductivity (m/s)
-    psi_l::TT   = -1.5e6;                         # leaf water potential (Pa)
-    psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
     ck::TT      = 2.95;                           # slope of Weibull curve
     #ε_modulus::TT = 20e6;                        # elastic modulus - for later
     Ctree::TT   = (79 + 8*height)*1e-6;           # tree capacitance (kg m−3 Pa−1)
@@ -153,14 +154,14 @@ end
 # For some reason, this is slow and allocates a lot, can be improved!!
 "Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here"
 function setLeafT!(l::leaf_params,  T)
-    l.T = T;
+    l.T      = T;
     l.kc     = l.kc_25          * ft(T, l.kcha);
     l.ko     = l.ko_25          * ft(T, l.koha);
     l.Γstar  = l.Γ_25           * ft(T, l.cpha);
     l.vcmax   = l.vcmax25 * ft(T, l.vcmaxha) * fth(T, l.vcmaxhd, l.vcmaxse, l.vcmaxc);
     l.jmax    = l.jmax25  * ft(T, l.jmaxha)  * fth(T, l.jmaxhd, l.jmaxse, l.jmaxc);
     l.rdleaf  = l.rd25    * ft(T, l.rdha)    * fth(T, l.rdhd, l.rdse, l.rdc);
-    (l.esat, l.desat) = SatVap(T);
+    (l.esat, l.desat) .= SatVap(T);
     # l.kd = max(0.8738,  0.0301*(T-273.15)+ 0.0773); # Can implement that later.
 end
 
@@ -183,7 +184,9 @@ function Medlyn!(Cs, VPD, A, l::leaf_params)
   #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
   #  Ci_input : will calculate gs if A is specified.
 
+  #print(A,Cs,l.g0,l.g1,l.gs)
   l.gs = (1+l.g1/sqrt(VPD)) * A /Cs  + l.g0;
+  #print(l.gs)
 end # function
 
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
@@ -193,5 +196,3 @@ end
 function setra!(l::leaf_params,U) # set leaf boundary layer
     l.ra = 1/l.Cd / sqrt(U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end
-
-

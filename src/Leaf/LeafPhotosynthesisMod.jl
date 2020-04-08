@@ -15,27 +15,28 @@ vpd_min = 0.1
 
 " Just a placeholder for now"
 @with_kw mutable struct fluxes{TT<:Number}
-         APAR::TT = 500
-         gbc::TT = 100
-         gbv::TT = 100
-         cair::TT = 400
-         ceair::TT = 1400
-         eair::TT = 1400
-         je::TT = 1100
+         APAR::TT = 500.0
+         gbc::TT = 100.0
+         gbv::TT = 100.0
+         cair::TT = 400.0
+         ceair::TT = 1400.0
+         eair::TT = 1400.0
+         je::TT = 1100.0
          #gs::TT = 0.0
-         ac::TT = 0
-         aj::TT = 0
-         ai::TT = 0
-         ap::TT = 0
-         ag::TT = 0
-         an::TT = 0
-         cs::TT = 0
-         #ci::TT = 0
-         rd::TT = 0
-         Je_pot::TT = 0
-         Ja::TT = 0
-         Je_red::TT = 0
-         φ::TT = 0
+         ac::TT = 0.0
+         aj::TT = 0.0
+         ai::TT = 0.0
+         ap::TT = 0.0
+         ag::TT = 0.0
+         an::TT = 0.0
+         cs::TT = 0.0
+         #ci::TT = 0.0
+         rd::TT = 0.0
+         Je_pot::TT = 0.0
+         Ja::TT = 0.0
+         Je_red::TT = 0.0
+         φ::TT = 0.0
+         U::TT = 0.0
 end
 
 struct atmos
@@ -57,12 +58,15 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
+    # adjust aerodynamic resistance
+    setra!(leaf, flux.U )
+
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
     leaf.Kp = 4.0
-    φ_PSII = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
+    φ_PSII  = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
 
     # Save leaf respiration
-    flux.rd = leaf.rdleaf
+    flux.rd = leaf.rdleaf;
     # Calculate potential electron transport rate (assuming no upper bound, proportional to absorbed light!):
     flux.Je_pot = 0.5 * leaf.maxPSII * flux.APAR;                          # potential electron transport rate (important for later)
     flux.Je_red = 0.5 * φ_PSII * flux.APAR;                                # Includes Kn here
@@ -109,6 +113,14 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
 
 
 end # LeafPhotosynthesis (similar to biochem in SCOPE)
+
+
+
+
+
+
+
+
 
 """
     CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params)
