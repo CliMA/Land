@@ -11,35 +11,35 @@ using MathToolsMod
 export optipar, angles, leafbio, angle, leaf, optis
 
 # Floating point precision can be changed here
-typ = Float32
+FT = Float32
 
 include("PhotoStructs.jl")
 
 # Leaf inclination distribution
-const litab   = typ[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+const litab   = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
 
-const minwlPAR  = typ(400.); # PAR range
-const maxwlPAR  = typ(700.);
+const minwlPAR  = FT(400.); # PAR range
+const maxwlPAR  = FT(700.);
 
-const minwle  = typ(400.); # SIF excitation range
-const maxwle  = typ(750.);
+const minwle  = FT(400.); # SIF excitation range
+const maxwle  = FT(750.);
 
-const minwlf  = typ(650.); # SIF emission range
-const maxwlf  = typ(850.);
+const minwlf  = FT(650.); # SIF emission range
+const maxwlf  = FT(850.);
 
-const fac     = typ(0.001) #(unit conversion factor mW >> W)
+const fac     = FT(0.001) #(unit conversion factor mW >> W)
 
 # Doubling Adding layers
 const ndub = 15
 
 # Load some standard settings here (can be done differently later but not bad to be fixed here)
-swl = collect(typ(400):5:2401)
+swl = collect(FT(400):5:2401)
 
 # Load optical properties (these can be fixed globally!):
-optis = optipar{typ}(loadOpti(swl)...);
+optis = optipar{FT}(loadOpti(swl)...);
 
 # Load sun (will be coming from CLIMA in future, just file for now)
-sunRad = incomingRadiation{typ}(loadSun(swl)...)
+sunRad = incomingRadiation{FT}(loadSun(swl)...)
 
 # Set wavelength here (will stay constant!!)
 const wl = optis.lambda
@@ -50,10 +50,10 @@ const wle    = wl[Iwle];    # excitation wavelengths,  column
 const wlf    = wl[Iwlf];    # fluorescence wavelengths,  column
 
 # Later on, we can implement an array of these structs for global parallel calculations!
-leaf   = leafbio{typ}(ρ_SW=similar(wl),τ_SW=similar(wl), kChlrel=similar(wl), Mb=zeros(typ,length(wle), length(wlf)), Mf=zeros(typ,length(wle), length(wlf)) )
-angle  = struct_angles{typ}()
-canopy = struct_canopy{typ}()
-canRad = getRadStruct(length(wl), canopy.nlayers, length(canopy.lazitab), length(litab),typ)
+leaf   = leafbio{FT}(ρ_SW=similar(wl),τ_SW=similar(wl), kChlrel=similar(wl), Mb=zeros(FT,length(wle), length(wlf)), Mf=zeros(FT,length(wle), length(wlf)) )
+angle  = struct_angles{FT}()
+canopy = struct_canopy{FT}()
+canRad = getRadStruct(length(wl), canopy.nlayers, length(canopy.lazitab), length(litab),FT)
 
 function fluspect!(leaf::leafbio, opti::optipar)
     # ***********************************************************************
@@ -73,10 +73,10 @@ function fluspect!(leaf::leafbio, opti::optipar)
 
     Kall    = (leaf.Cab*opti.Kab.+leaf.Car*opti.Kcar.+leaf.Ant*opti.Kant.+leaf.Cs*opti.KBrown.+leaf.Cw*opti.Kw.+leaf.Cm*opti.Km)./leaf.N
     # Relative absorption by Chlorophyll only (drives SIF and GPP eventually)
-    leaf.kChlrel  = leaf.Cab*opti.Kab./(Kall.*leaf.N.+eps(typ));
+    leaf.kChlrel  = leaf.Cab*opti.Kab./(Kall.*leaf.N.+eps(FT));
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
-    tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(typ)))
+    tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
     #println(typeof(expint.(Kall)))
     #println(typeof(real.((1 .-Kall).*exp.(-Kall)) .+ Kall.^2), typeof(expint.(Kall)))
     # ***********************************************************************
@@ -165,8 +165,8 @@ function fluspect!(leaf::leafbio, opti::optipar)
     D[I_rt]  =   sqrt.((1 .+ r[I_rt] .+ t[I_rt]) .* (1 .+ r[I_rt] .- t[I_rt]) .* (1 .- r[I_rt] .+ t[I_rt]) .*  (1 .- r[I_rt] .- t[I_rt]));
     a[I_rt]  =   (1 .+ r[I_rt].^2 .- t[I_rt].^2 .+ D[I_rt]) ./ (2r[I_rt]);
     b[I_rt]  =   (1 .- r[I_rt].^2 + t[I_rt].^2 .+ D[I_rt]) ./ (2t[I_rt]);
-    a[(r.+t).>=1] .=   typ(1.0);
-    b[(r.+t).>=1] .=   typ(1.0);
+    a[(r.+t).>=1] .=   FT(1.0);
+    b[(r.+t).>=1] .=   FT(1.0);
 
     s        =   r./t;
     I_a      =   findall((a.>1).&(a.!=Inf));
@@ -178,7 +178,7 @@ function fluspect!(leaf::leafbio, opti::optipar)
 
     # indices of wle and wlf within wlp
 
-    epsi         = typ(2)^(-ndub);
+    epsi         = FT(2)^(-ndub);
 
     # initialisations
     te     = 1 .-(k[Iwle].+s[Iwle]) .* epsi;
@@ -189,11 +189,11 @@ function fluspect!(leaf::leafbio, opti::optipar)
     sigmoid     = 1 ./(1 .+exp.(-wlf./10).*exp.(wle'./10));  # matrix computed as an outproduct
     #println(size(sigmoid)," ", size(phi), " ", size(kChl)," ", size(Iwle), " ", size(Iwlf), " ", size(kChl[Iwle]))
 
-    Mf = Mb = leaf.fqe .* ((typ(0.5)*opti.phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
+    Mf = Mb = leaf.fqe .* ((FT(0.5)*opti.phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
 
-    Ih          = ones(typ,1,length(te));     # row of ones
-    Iv          = ones(typ,length(tf),1);     # column of ones
-    A11 = A12 = A21 = A22 = zeros(typ,length(tf),length(te));
+    Ih          = ones(FT,1,length(te));     # row of ones
+    Iv          = ones(FT,length(tf),1);     # column of ones
+    A11 = A12 = A21 = A22 = zeros(FT,length(tf),length(te));
     #println(length(tf),length(te))
     # Doubling routine
     for i = 1:ndub
@@ -239,15 +239,15 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::
     nl = can.nlayers
     # Leaf Area Index
     LAI = can.LAI
-    dx = typ(1/nl)
-    xl = collect(typ(0):-1/nl:-1)
+    dx = FT(1/nl)
+    xl = collect(FT(0):-1/nl:-1)
     tts = angle.tts
     tto = angle.tto
     psi = angle.psi
     lazitab = can.lazitab
 
     # Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
-    pSoil =  Polynomials.Poly(typ(0.2))
+    pSoil =  Polynomials.Poly(FT(0.2))
     rsoil = Polynomials.polyval(pSoil,wl.-mean(wl));
     soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
 
@@ -286,11 +286,11 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::
     # angular distance, compensation of shadow length
     # Calculate geometric factors associated with extinction and scattering
     #Initialise sums
-    ks	= typ(0);
-    ko	= typ(0);
-    bf	= typ(0);
-    sob	= typ(0);
-    sof	= typ(0);
+    ks	= FT(0);
+    ko	= FT(0);
+    bf	= FT(0);
+    sob	= FT(0);
+    sof	= FT(0);
 
     #	Weighted sums over LIDF
 	for i=1:length(litab)
@@ -345,7 +345,7 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::
     Cs          = cos_ttli.*cts;             # [nli]     pag 305 modified by Joris
     Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
 
-    cos_deltas  = Cs*ones(typ,1,length(lazitab)) .+ Ss*cos_ttlo';   # [nli,nlazi]
+    cos_deltas  = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo';   # [nli,nlazi]
     fs          = abs.(cos_deltas./cts);         # [nli,nlazi] pag 305
 
     # 1.5 probabilities Ps, Po, Pso
@@ -497,9 +497,9 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::
     # 4. net fluxes, spectral and total, and incoming fluxes
     # incident PAR at the top of canopy, spectral and spectrally integrated
     #P_          = e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR]));
-    cR.PAR      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR])));
-    cR.PAR_direct      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR])));
-    cR.PAR_diffuse      = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esky_[iPAR])));
+    cR.PAR          = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR]+Esky_[iPAR])));
+    cR.PAR_direct   = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esun_[iPAR])));
+    cR.PAR_diffuse  = fac * simpson_nu(wl[iPAR], e2phot(wl[iPAR]*1E-9,(Esky_[iPAR])));
 
     # total direct radiation (incident and net) per leaf area (W m-2 leaf)
     Pdir        = fs * Psun;                        # [13 x 36]   incident
@@ -509,11 +509,11 @@ function RTM_sail!(leaf::leafbio, can::struct_canopy, angle::struct_angles, cR::
     Rndir_PAR   = fs * Rnsun_PAR;                   # [13 x 36]   net PAR energy units
 
     # Allocate memory (should pre-allocate in update and provide in structure!)
-    Pdif = zeros(typ,nl);
-    Rndif_ = zeros(typ,nl,nwl);
-    Pndif_ = zeros(typ,nl,length(iPAR));
-    Pndif_Cab_ = zeros(typ,nl,length(iPAR));
-    Rndif_PAR_ = zeros(typ,nl,length(iPAR));
+    Pdif = zeros(FT,nl);
+    Rndif_ = zeros(FT,nl,nwl);
+    Pndif_ = zeros(FT,nl,length(iPAR));
+    Pndif_Cab_ = zeros(FT,nl,length(iPAR));
+    Rndif_PAR_ = zeros(FT,nl,length(iPAR));
 
     # canopy layers, diffuse radiation
     for j = 1:nl
@@ -811,8 +811,8 @@ end
 #    -GSL.sf_expint_Ei(-x)
 #end
 # From Matlab!
-p = Polynomials.Poly(convert(Array{typ},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
-const egamma=typ(0.57721566490153286061);
+p = Polynomials.Poly(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
+const egamma=FT(0.57721566490153286061);
 function expint(x::Number)
 
     polyv = Polynomials.polyval(p,real(x));
@@ -831,17 +831,17 @@ function expint(x::Number)
         end # end of the while loop
         y = yk;
     else
-        n = typ(1);
+        n = FT(1);
         xk = x;
-        am2 = typ(0)
-        bm2 = typ(1)
-        am1 = typ(1)
+        am2 = FT(0)
+        bm2 = FT(1)
+        am1 = FT(1)
         bm1 = xk
         f = am1 / bm1;
         oldf = Inf;
-        j = typ(2);
+        j = FT(2);
 
-        while abs(f-oldf) > (100*eps(typ)*abs(f))
+        while abs(f-oldf) > (100*eps(FT)*abs(f))
             alpha = n-1+(j/2); # note: beta= 1
             #calculate A(j), B(j), and f(j)
             a = am1 + alpha * am2;
@@ -852,7 +852,7 @@ function expint(x::Number)
             am2 = am1 / b;
             bm2 = bm1 / b;
             am1 = a / b;
-            bm1 = typ(1);
+            bm1 = FT(1);
 
             f = am1;
             j = j+1;
@@ -872,7 +872,7 @@ function expint(x::Number)
             j = j+1;
         end
 
-        y= exp(-xk) * f - 1im*typ(pi)*((real(xk)<0)&(imag(xk)==0));
+        y= exp(-xk) * f - 1im*FT(pi)*((real(xk)<0)&(imag(xk)==0));
     end
     return y
 end

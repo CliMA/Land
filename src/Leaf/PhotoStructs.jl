@@ -1,13 +1,14 @@
 using Parameters
 using DocStringExtensions
+using StaticArrays
 
 # Fixed path right now here
-file_Opti = joinpath(dirname(pathof(FluspectMod)), "Optipar2017_ProspectD.mat")
-file_Sun = joinpath(dirname(pathof(FluspectMod)), "sun.mat")
+file_Opti = joinpath(dirname(pathof(CanopyRTMod)), "Optipar2017_ProspectD.mat")
+file_Sun = joinpath(dirname(pathof(CanopyRTMod)), "sun.mat")
 
 # Struct for observation and solar angles
 """
-    Struct for observation and solar anglesn
+    Struct for observation and solar angles
 
 # Fields
 $(DocStringExtensions.FIELDS)
@@ -52,18 +53,18 @@ mutable struct incomingRadiation{FT<:Number}
 end
 
 """
-    struct_canopyRadiation
+    leafbio
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
 @with_kw mutable struct leafbio{FT<:Number}
     "Leaf structure parameter"
-    N::FT    = 1.5       # | -          | (1.0, 3.0)  | "Leaf structure parameter"
+    N::FT    = 1.4       # | -          | (1.0, 3.0)  | "Leaf structure parameter"
     "Chlorophyll a+b content"
-    Cab::FT  = 40.0      # | μg cm^-2   | (0.0, 110)  | "Chlorophyll a+b content"
+    Cab::FT  = 80.0      # | μg cm^-2   | (0.0, 110)  | "Chlorophyll a+b content"
     "Carotenoid content"
-    Car::FT  = 10.0      # | μg cm^-2   | (0.0, 40.0) | "Carotenoid content"
+    Car::FT  = 20.0      # | μg cm^-2   | (0.0, 40.0) | "Carotenoid content"
     "Anthocynanin content"
     Ant::FT  = 8.0       # | μg cm^-2   | (0.0, 40.0) | "Anthocynanin content"
     "Senescent material fraction"
@@ -94,7 +95,7 @@ $(DocStringExtensions.FIELDS)
 end
 
 """
-    struct_canopyRadiation
+    struct_soil
 
 # Fields
 $(DocStringExtensions.FIELDS)
@@ -132,11 +133,11 @@ mutable struct struct_canopyRadiation{FT<:Number}
     K::FT
 
     # Dim of nLayers+1
-    "gap fraction in the solar direction"
+    "Probability of directly viewing a leaf in solar direction"
     Ps::Array{FT,1}
-    "gap fraction in the viewing direction"
+    "Probability of directly viewing a leaf in viewing direction"
     Po::Array{FT,1}
-    "bi-derectional gap fraction (solar->canopy->viewing)"
+    "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
     Pso::Array{FT,1}
 
     # Dim of nLayers
@@ -163,12 +164,17 @@ mutable struct struct_canopyRadiation{FT<:Number}
     "Albedo for diffuse incoming radiation"
     alb_diffuse::Array{FT,1}          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
 
-
     # Dimension of nLayer+1 * nWavelengths
     "upwelling diffuse radiation within canopy"
     E_up::Array{FT,2}                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
     "downwelling diffuse radiation within canopy"
     E_down::Array{FT,2}               # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
+
+    # Dimension of nLayer * nWavelengths
+    "net absorbed direct radiation in each layer"
+    netSW_direct::Array{FT,2}                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
+    "net absorbed diffuse radiation in each layer"
+    netSW_diffuse::Array{FT,2}               # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
 
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
     "net radiation of sunlit leaves"
@@ -180,6 +186,78 @@ mutable struct struct_canopyRadiation{FT<:Number}
     "net PAR absorbed by sunlit leaves"
     Rnu_PAR::Array{FT,3}              # | W m^-2               | (0.0, 2500)  | "net PAR absorbed by sunlit leaves"
 end
+
+"""
+    struct_canopyRadiation
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+mutable struct struct_canopyOptProps{FT<:Number}
+    "Solar -> Diffuse backscatter weight"
+    sdb::FT;
+	"Solar -> Diffuse forward scatter weight"
+	sdf::FT;
+	"Diffuse -> Directional backscatter weight"
+	dob::FT;
+	"Diffuse -> Directional forward scatter weight"
+	dof::FT;
+	"Diffuse -> Diffuse backscatter weight"
+	ddb::FT;
+	"Diffuse -> Diffuse forward scatter weight"
+	ddf::FT;
+	"Solar beam extinction coefficient weight"
+	ks::FT;
+	"Outgoing beam extinction coefficient weight"
+	ko::FT;
+	""
+	bf::FT;
+	"weight of specular2directional backscatter coefficient"
+	sob::FT;
+	"weight of specular2directional forward coefficient"
+	sof::FT;
+
+	# now multi dimensional arrays:
+	"per leaf angles"
+	fs::Array{FT,2}
+	"Probability of directly viewing a leaf in solar direction"
+    Ps::Array{FT,1}
+    "Probability of directly viewing a leaf in viewing direction"
+    Po::Array{FT,1}
+    "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
+    Pso::Array{FT,1}
+
+	# The following also depend on leaf reflectance and transmission. Might go into a separate strcuture so that we can have it separately for thermal, SW and SIF?
+	"diffuse     backscatter scattering coefficient for diffuse  incidence"
+	sigb::Array{FT,2}
+	"diffuse     forward     scattering coefficient for diffuse  incidence"
+	sigf::Array{FT,2}
+	"diffuse     backscatter scattering coefficient for specular incidence"
+	sb::Array{FT,2}
+	"diffuse     forward     scattering coefficient for specular incidence"
+	sf::Array{FT,2}
+	"directional backscatter scattering coefficient for diffuse  incidence"
+	vb::Array{FT,2}
+	"directional forward     scattering coefficient for diffuse  incidence"
+	vf::Array{FT,2}
+	"bidirectional scattering coefficent (directional-directional)"
+	w::Array{FT,2}
+	"attenuation"
+	a::Array{FT,2}
+	"Effective layer transmittance (direct->diffuse)"
+	Xsd::Array{FT,2}
+	"Effective layer transmittance (diffuse->diffuse)"
+	Xdd::Array{FT,2}
+	"Effective layer reflectance (direct->diffuse)"
+	R_sd::Array{FT,2}
+	"Effective layer reflectance (diffuse->diffuse)"
+	R_dd::Array{FT,2}
+
+	"Solar direct radiation per layer)"
+	Es_::Array{FT,2}
+
+end
+
 
 """
     struct_canopy
@@ -207,12 +285,25 @@ $(DocStringExtensions.FIELDS)
 
     # Some more derived parameters:
     lazitab::Array{FT} = collect(5.0:10.0:355.0)
-    xl::Array{FT}      = collect(0.0:-1.0/nlayers:-1.0)
+    xl::Array{FT} = collect(0.0:-1.0/nlayers:-1.0)
     dx::FT             = 1.0/nlayers
 end
 
-function getRadStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
+# I really have to find a way around this stupid constructor in the future!
+function getCanOptStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
+    # First, get 11 scalars:
+    n1 = ntuple(i->FT(0), 11)
+    # get 1 Arrays (nIncl,nAzis):
+    n11 = ntuple(i->Array{Float32}(undef, nIncl, nAzi), 1)
+    # get 3 Arrays (nlayer+1)
+    n12 = ntuple(i->Array{Float32}(undef, nLayer+1), 3)
+    # get wl dimension variables:
+    n2 = ntuple(i->Array{Float32}(undef, nWL, nLayer), 10)
+	n3 = ntuple(i->Array{Float32}(undef, nWL, nLayer+1), 3)
+    return struct_canopyOptProps{FT}(n1...,n11...,n12..., n2...,n3...)
+end
 
+function getRadStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
     # First, get 8 scalars:
     n1 = ntuple(i->FT(0), 8)
     # get 3 Arrays (nlayer+1):
@@ -222,14 +313,16 @@ function getRadStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
     # get wl dimension variables:
     n2 = ntuple(i->Array{Float32}(undef, nWL), 6)
     # get wavelength and layers
-    n3 = ntuple(i->Array{Float32}(undef,nLayer+1, nWL), 2)
+    n3 = ntuple(i->Array{Float32}(undef, nWL,nLayer+1), 2)
+    n33 = ntuple(i->Array{Float32}(undef,nWL,nLayer), 2)
     # get full angles (3D)
     n4 = ntuple(i->Array{Float32}(undef, nIncl, nAzi, nLayer), 4)
-    return struct_canopyRadiation{FT}(n1...,n11...,n12..., n2..., n3..., n4...)
+    return struct_canopyRadiation{FT}(n1...,n11...,n12..., n2..., n3...,n33..., n4...)
 end
 
-function loadOpti(swl::Vector; file=file_Opti)
+function loadOpti(swl::AbstractArray; file=file_Opti)
     # Read in all optical data:
+    FT = typeof(swl)
     opti = matread(file_Opti)["optipar"]
     nr_     =  opti["nr"]
     Km_     =  opti["Kdm"]
@@ -243,18 +336,18 @@ function loadOpti(swl::Vector; file=file_Opti)
     KcaZ_   =  opti["KcaZ"]
     lambda_ =  opti["wl"]
 
-    nr = typeof(swl)(undef,length(swl)-1)
-    Km = typeof(swl)(undef,length(swl)-1)
-    Kab = typeof(swl)(undef,length(swl)-1)
-    Kant = typeof(swl)(undef,length(swl)-1)
-    Kcar = typeof(swl)(undef,length(swl)-1)
-    Kw = typeof(swl)(undef,length(swl)-1)
-    KBrown = typeof(swl)(undef,length(swl)-1)
-    phi = typeof(swl)(undef,length(swl)-1)
-    KcaV = typeof(swl)(undef,length(swl)-1)
-    KcaZ = typeof(swl)(undef,length(swl)-1)
-    lambda = typeof(swl)(undef,length(swl)-1)
-    kChlrel = typeof(swl)(undef,length(swl)-1)
+    nr = FT(undef,length(swl)-1)
+    Km = FT(undef,length(swl)-1)
+    Kab = FT(undef,length(swl)-1)
+    Kant = FT(undef,length(swl)-1)
+    Kcar = FT(undef,length(swl)-1)
+    Kw = FT(undef,length(swl)-1)
+    KBrown = FT(undef,length(swl)-1)
+    phi = FT(undef,length(swl)-1)
+    KcaV = FT(undef,length(swl)-1)
+    KcaZ = FT(undef,length(swl)-1)
+    lambda = FT(undef,length(swl)-1)
+    kChlrel = FT(undef,length(swl)-1)
     println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
     for i in 1:length(swl)-1
         wo = findall((lambda_.>=swl[i]).&(lambda_.<swl[i+1]) )
@@ -277,16 +370,17 @@ function loadOpti(swl::Vector; file=file_Opti)
 end
 
 
-function loadSun(swl::Vector; file=file_Sun)
+function loadSun(swl::AbstractArray, file=file_Sun)
+    FT = typeof(swl)
     # Read in all optical data:
     suni = matread(file_Sun)["sun"]
     wl   =  suni["wl"]
     Edir =  suni["Edirect"]
     Ediff =  suni["Ediffuse"]
 
-    wl_ = typeof(swl)(undef,length(swl)-1)
-    Edir_ = typeof(swl)(undef,length(swl)-1)
-    Ediff_ = typeof(swl)(undef,length(swl)-1)
+    wl_ = FT(undef,length(swl)-1)
+    Edir_ = FT(undef,length(swl)-1)
+    Ediff_ = FT(undef,length(swl)-1)
     #println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
     for i in 1:length(swl)-1
         wo = findall((wl.>=swl[i]).&(wl.<swl[i+1]) )
