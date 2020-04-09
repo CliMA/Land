@@ -156,16 +156,15 @@ end
 # Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here:
 # For some reason, this is slow and allocates a lot, can be improved!!
 "Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here"
-function setLeafT!(l::leaf_params,  T)
-    l.T      = T;
-    l.kc     = l.kc_25          * ft(T, l.kcha);
-    l.ko     = l.ko_25          * ft(T, l.koha);
-    l.Γstar  = l.Γ_25           * ft(T, l.cpha);
-    l.vcmax   = l.vcmax25 * ft(T, l.vcmaxha) * fth(T, l.vcmaxhd, l.vcmaxse, l.vcmaxc);
-    l.jmax    = l.jmax25  * ft(T, l.jmaxha)  * fth(T, l.jmaxhd, l.jmaxse, l.jmaxc);
-    l.rdleaf  = l.rd25    * ft(T, l.rdha)    * fth(T, l.rdhd, l.rdse, l.rdc);
-    (l.esat, l.desat) .= SatVap(T);
-    # l.kd = max(0.8738,  0.0301*(T-273.15)+ 0.0773); # Can implement that later.
+function setLeafT!(l::leaf_params)
+    l.kc     = l.kc_25          * ft(l.T, l.kcha);
+    l.ko     = l.ko_25          * ft(l.T, l.koha);
+    l.Γstar  = l.Γ_25           * ft(l.T, l.cpha);
+    l.vcmax   = l.vcmax25 * ft(l.T, l.vcmaxha) * fth(l.T, l.vcmaxhd, l.vcmaxse, l.vcmaxc);
+    l.jmax    = l.jmax25  * ft(l.T, l.jmaxha)  * fth(l.T, l.jmaxhd, l.jmaxse, l.jmaxc);
+    l.rdleaf  = l.rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
+    (l.esat, l.desat) .= SatVap(l.T);
+    # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end
 
 # Ball-Berry stomatal conductance model:

@@ -33,11 +33,10 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  psi
     flux.U         = met.U;
     l.T            = Tleaf;
     l.psi_l        = psileaf;
-    #LeafPhotosynthesis(flux, l);
+    LeafPhotosynthesis(flux, l); #TODO
 
     A              = met.PAR;
-    Cs             = met.Ca;
-    # !!!!! temporary
+    Cs             = met.Ca; # temporary for now
     VPD           = max(l.esat-met.ea_air,1.0); # can be negative at spin up
     #print(Cs, " ppm, ". VPD, " (PA)), ", A, " micoml/s/m2,-  ", l)
     Medlyn!(Cs, VPD, A, l); # adjust conductance
@@ -55,6 +54,6 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  psi
     Sap         =   (psi_s - l.psi_l)*l.kx # equal to int k(psi)dpsi;
     dT_dt       =   Rn/(l.LMA*l.c_leaf);  #(Rn-H-LE)/(l.LMA*l.c_leaf);
     dH2Ol_dt    =   (Sap-LE/lv)/l.Ctree;
-    println("Rn=",Rn,"W/m2, SEB=",Rn-H-LE,"W/m2, H= ",H, "W /m2, LE= ",LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), gs=",l.gs,",ra=",l.ra)
+    println("Sdown= " , met.Sdown, "W/m2, Rn=",Rn,"W/m2, SEB=",Rn-H-LE,"W/m2, H= ",H, "W /m2, LE= ",LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), gs=",l.gs,",ra=",l.ra)
     return dT_dt,dH2Ol_dt , Rn, H, LE
 end

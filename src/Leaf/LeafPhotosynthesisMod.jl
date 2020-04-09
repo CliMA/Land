@@ -46,7 +46,7 @@ struct atmos
 end
 
 """
-    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
+    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params)
 
 Compute net assimilation rate A, fluorescence F using biochemical model
 
@@ -55,9 +55,9 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 - `leaf::leaf_params`: leaf_params structure.
 - `T::Number`: Leaf Temperature
 """
-function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
+function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params)
     # Adjust rates to leaf Temperature (C3 only for now):
-    setLeafT!(leaf, T)
+    setLeafT!(leaf)
     # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     setra!(leaf, flux.U )
 
