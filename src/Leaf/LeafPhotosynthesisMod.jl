@@ -8,7 +8,7 @@ using ..WaterVaporMod
 include("Leaf.jl")
 include("surface_energy_balance.jl")
 
-export fluxes
+export fluxes, ψ_m, ψ_h, setra!
 "Tolerance thhreshold for Ci iterations"
 tol = 0.1
 vpd_min = 0.1
@@ -58,7 +58,7 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
-    # adjust aerodynamic resistance
+    # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     setra!(leaf, flux.U )
 
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
@@ -258,6 +258,93 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params)
     ci_val = flux.cair - flux.an / gleaf
     #leaf.CO2_per_electron = (ci_val-leaf.Γstar)./(ci_val+2.0*leaf.Γstar) .* leaf.effcon;
 end # Function CiFuncGs!
+
+
+
+
+
+
+function setra!(l::leaf_params, flux::fluxes, met::meteo) # set leaf boundary layer
+    ra_leaf = 1/l.Cd / sqrt(met.U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+    l.ra    = ra_leaf + setra_atmo(l,flux, met);
+end
+
+
+function setra_atmo!(l::leaf_params,flux::fluxes,met::meteo)
+    # based on Monin-Obukhov Similiarity theory -> to be changed for LES
+    # compute Obukhov length
+    flux.Hv_s = flux.H*(1+0.61*met.ea);
+    L = - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s);
+    ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/met.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(met.z0m/L) ) * ( log((met.zscreen - l.d)/met.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(met.z0h/L) ) ;# water aerodynamic resistance
+    return ra_w; # based on Monin-Obukhov Similarity theory -> to be changed for LES
+end
+
+function ψ_m(ζ) # momentum correction function
+    # stability corrections - Zeng et al., 1998
+    #if(ζ>1.0) # very stable - Grachev et al SHEBA 2007
+
+    if(ζ>=0.0) # stable - Grachev et al SHEBA 2007
+        x  = (1.0+ζ)^(1.0/3.0);
+        am = 5.0;
+        bm = am/6.5;
+        ah = bh = 5.0;
+        ch = 3.0;
+        Bm = ((1.0-bm)/bm)^(1.0/3.0);
+        Bh = sqrt(5);
+        ψ = -3.0*am/bm*(x-1.0) + am*Bm/(2.0*bm)*( 2.0*log((x+Bm)/(1.0+Bm))
+                                                 - log( (x*x-x*Bm+Bm*Bm)/(1.0-Bm+Bm*Bm) )
+                                                 +2*sqrt(3.0)*( atan((2.0*x-Bm)/(sqrt(3.0)*Bm)) -  atan((2.0-Bm)/(sqrt(3.0)*Bm)))  );
+    #elseif (ζ<=1.0 and ζ>=0)  # stable
+    #    ψ = -5.0*ζ;
+    #    ψ_h = -5.0*ζ;
+
+    elseif (ζ<0 && ζ>=-0.465) # unstable
+        x   = (1.0-16.0*ζ)^0.25;
+        ψ = 2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
+    elseif (ζ<-0.465) # very unstable
+        x   = (1.0-16.0*ζ)^0.25;
+        ψ = 2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
+    end
+    return ψ
+end
+
+function ψ_h(ζ) # momentum correction function
+    # stability corrections - Zeng et al., 1998
+    #if(ζ>1.0) # very stable - Grachev et al SHEBA 2007
+
+    if(ζ>=0.0) # stable - Grachev et al SHEBA 2007
+        x  = (1.0+ζ)^(1.0/3.0);
+        am = 5.0;
+        bm = am/6.5;
+        ah = bh = 5.0;
+        ch = 3.0;
+        Bm = ((1.0-bm)/bm)^(1.0/3.0);
+        Bh = sqrt(5);
+        ψ = -bh/2*log(1+ch*ζ+ζ*ζ) + (-ah/Bh + bh*ch/(2.0*Bh))*(log( (2.0*ζ+ch-Bh)/(2.0*ζ+ch+Bh) - log((ch-Bh)/(ch+Bh)) ));
+    #elseif (ζ<=1.0 and ζ>=0)  # stable
+    #    ψ_m = -5.0*ζ;
+    #    ψ = -5.0*ζ;
+
+    elseif (ζ<0 && ζ>=-0.465) # unstable
+        x   = (1.0-16.0*ζ)^0.25;
+        ψ = 2.0*log((1.0+x*x)/2.0);
+    elseif (ζ<-0.465) # very unstable
+        x   = (1.0-16.0*ζ)^0.25;
+        ψ = 2.0*log((1.0+x*x)/2.0);
+    end
+    return ψ
+end
+
+
+
+
+
+
+
+
+
+
+
 
 
 """

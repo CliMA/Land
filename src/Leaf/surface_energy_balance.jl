@@ -14,6 +14,7 @@ export meteo, LeafEnergyWaterBalance
      Ca::TT     =  400.;
      PAR::TT    = -999.;
      U::TT      = 1e-6;
+     zscreen::TT= 10; # measuement height
 end
 
 """
@@ -51,9 +52,9 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  psi
     lv  =  Lv(Tleaf);
     LE          =   physcon.ε/met.P_air*ρd*lv*VPD/(1/l.gs+l.ra);
     #dLE_dT      =   physcon.ε/met.P_air*ρd*lv*desat_dT/(1/l.gs+l.ra);
-    Sap         =   (psi_s - l.psi_l)*l.kx # equl toint k(psi)dpsi;
+    Sap         =   (psi_s - l.psi_l)*l.kx # equal to int k(psi)dpsi;
     dT_dt       =   Rn/(l.LMA*l.c_leaf);  #(Rn-H-LE)/(l.LMA*l.c_leaf);
     dH2Ol_dt    =   (Sap-LE/lv)/l.Ctree;
-    #println("Rn=",Rn,"W/m2, SEB=",Rn-H-LE,"W/m2, H= ",H, "W /m2, LE= ",LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), gs=",l.gs,",ra=",l.ra,", ea=",met.ea_air,", esat=",esat,", dH2Ol_dt=",dH2Ol_dt)
-    return dT_dt,dH2Ol_dt
+    println("Rn=",Rn,"W/m2, SEB=",Rn-H-LE,"W/m2, H= ",H, "W /m2, LE= ",LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), gs=",l.gs,",ra=",l.ra)
+    return dT_dt,dH2Ol_dt , Rn, H, LE
 end

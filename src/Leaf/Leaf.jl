@@ -1,5 +1,5 @@
 
-export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setra!
+export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setra!,ψ
 
 # Scaling functions for Photosynthesis temperature response and inhibition
 ft(tl, ha) = exp(ha/(physcon.Rgas*(physcon.tfrz+25)) * (1-(physcon.tfrz+25)/tl));
@@ -134,6 +134,9 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
+    z0m         = 0.1*height;                     # tree roughness (m)
+    d           = 2/3*height;                     # tree displacement height (m)
+
     dleaf       = 2e-3;                           # leaf thickness (m)
     Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient
 
@@ -191,8 +194,4 @@ end # function
 
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
-end
-
-function setra!(l::leaf_params,U) # set leaf boundary layer
-    l.ra = 1/l.Cd / sqrt(U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end
