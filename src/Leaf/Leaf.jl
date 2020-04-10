@@ -59,21 +59,23 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
     # Conductances:
     # Ball Berry or Medlyn model
-    g0::TT = 0.01;                          # Ball-Berry minimum leaf conductance, unstressed (mol H2O/m2/s)
-    g1::TT = 9;                             # Ball-Berry slope of conductance-photosynthesis relationship, unstressed
+    g0::TT = 0.01;                             # Ball-Berry minimum leaf conductance, unstressed (mol H2O/m2/s)
+    g1::TT = 9;                                # Ball-Berry slope of conductance-photosynthesis relationship, unstressed
     vpd_min = 100.0                            # Min VPD for Medlyn model (blows up otherwise?)
     # Add already here: Mesophyll conductance (Inf for now):
+
+    gleaf::TT = 0.1;                           # total leaf conductance (μmol/m2/s/Pa)
     gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/Pa)
     gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s/Pa); just using some prior
     gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s/Pa);
 
     #---------------------------------------------------------------------
-    # kc, ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
+    # Kc, Ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
     # Derive sco from cp with o2=0.209 mol/mol and re-calculate Γ to allow
     # variation in O2
     #---------------------------------------------------------------------
-    kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C μmol/mol
-    ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  mmol/mol
+    Kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C μmol/mol
+    Ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  mmol/mol
     Γ_25_::TT = 42.75;                         # CO2 compensation point at 25C μmol/mol
     sco::TT = 0.5 * 0.209 / (Γ_25_ * 1.e-06);  # Γ_25 (μmol/mol) -> (mol/mol)
     Γ_25::TT = 0.5 * o₂ / sco * 1000.;         # O2 is mmol/mol. Multiply by 1000 for μmol/mol
@@ -84,11 +86,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     # Bernacchi et al (2003) Plant, Cell Environment 26:1419-1430
     # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
     #---------------------------------------------------------------------
-    kcha::TT    = 79430.;                      # Activation energy for kc (J/mol)
-    koha::TT    = 36380.;                      # Activation energy for ko (J/mol)
+    Kcha::TT    = 79430.;                      # Activation energy for Kc (J/mol)
+    Koha::TT    = 36380.;                      # Activation energy for Ko (J/mol)
     cpha::TT    = 37830.;                      # Activation energy for cp (J/mol)
-    vcmaxha::TT = 65330.;                      # Activation energy for Vcmax (J/mol)
-    jmaxha::TT  = 43540.;                      # Activation energy for Jmax (J/mol)
+    Vcmaxha::TT = 65330.;                      # Activation energy for Vcmax (J/mol)
+    Jmaxha::TT  = 43540.;                      # Activation energy for Jmax (J/mol)
     rdha::TT    = 46390.;                      # Activation energy for Rd (J/mol)
 
     #---------------------------------------------------------------------
@@ -97,44 +99,42 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     # The factor "c" scales the deactivation to a value of 1.0 at 25C
     # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
     #---------------------------------------------------------------------
-    vcmaxhd::TT = 150000.;                    # Deactivation energy for Vcmax (J/mol)
-    jmaxhd::TT  = 150000.;                    # Deactivation energy for Jmax (J/mol)
+    Vcmaxhd::TT = 150000.;                    # Deactivation energy for Vcmax (J/mol)
+    Jmaxhd::TT  = 150000.;                    # Deactivation energy for Jmax (J/mol)
     rdhd::TT    = 150000.;                    # Deactivation energy for Rd (J/mol)
 
-    vcmaxse::TT = 490.;                       # Entropy term for Vcmax (J/mol/K)
-    jmaxse::TT  = 490.;                       # Entropy term for Jmax (J/mol/K)
+    Vcmaxse::TT = 490.;                       # Entropy term for Vcmax (J/mol/K)
+    Jmaxse::TT  = 490.;                       # Entropy term for Jmax (J/mol/K)
     rdse::TT    = 490.;                       # Entropy term for Rd (J/mol/K)
 
-    vcmaxc::TT = fth25(vcmaxhd, vcmaxse);    # Scaling factor for high temperature inhibition (25 C = 1.0)
-    jmaxc::TT  = fth25(jmaxhd, jmaxse);      # Scaling factor for high temperature inhibition (25 C = 1.0)
+    Vcmaxc::TT = fth25(Vcmaxhd, Vcmaxse);    # Scaling factor for high temperature inhibition (25 C = 1.0)
+    Jmaxc::TT  = fth25(Jmaxhd, Jmaxse);      # Scaling factor for high temperature inhibition (25 C = 1.0)
     rdc::TT    = fth25(rdhd, rdse);          # Scaling factor for high temperature inhibition (25 C = 1.0)
 
     # Initialize at standard T:
-    kc::TT  = kc_25;
-    ko::TT  = ko_25;
+    Kc::TT  = Kc_25;
+    Ko::TT  = Ko_25;
     Γstar::TT  = Γ_25;
 
     # Use some standard values first
-    vcmax25::TT = 80.0;                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
-    jmax25::TT  = 1.97*vcmax25;                # C3 - maximum electron transport rate at 25C for canopy layer (μmol/m2/s)
-    rd25::TT    = 0.7605;                      # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
-    vcmax::TT  = vcmax25;
-    jmax::TT   = jmax25;
-    rdleaf::TT = rd25;
+    Vcmax25::TT = 80.0;                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
+    Jmax25::TT  = 1.97*Vcmax25;                # C3 - maximum electron transport rate at 25C for canopy layer (μmol/m2/s)
+    Rd25::TT    = 0.7605;                      # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
+    Vcmax::TT  = Vcmax25;
+    Jmax::TT   = Jmax25;
+    Rdleaf::TT = Rd25;
 
     #
     Ci::TT = 0.0;                               # CO2 concentration in mesophyll/internal
+    RH::TT = 0.0;                               # relative humidity at the surface of the leaf
+    VPD::TT = 0.1;                              # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
 
     # to be computed
-    je::TT = 0.0 ;                              # electron transport rate
-
-
-
-
-
+    Je::TT = 0.0 ;                              # electron transport rate
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
     z0m         = 0.1*height;                     # tree roughness (m)
+    z0h         = 0.1*height;                     # tree roughness (m) - TODO should be changed later
     d           = 2/3*height;                     # tree displacement height (m)
 
     dleaf       = 2e-3;                           # leaf thickness (m)
@@ -153,43 +153,19 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
                                                   # can also be related to P50 see same book
 end
 
-# Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here:
+# Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here:
 # For some reason, this is slow and allocates a lot, can be improved!!
-"Set Leaf rates with vcmax, jmax and rd at 25C as well as actual T here"
+"Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here"
 function setLeafT!(l::leaf_params)
-    l.kc     = l.kc_25          * ft(l.T, l.kcha);
-    l.ko     = l.ko_25          * ft(l.T, l.koha);
+    l.Kc     = l.Kc_25          * ft(l.T, l.Kcha);
+    l.Ko     = l.Ko_25          * ft(l.T, l.Koha);
     l.Γstar  = l.Γ_25           * ft(l.T, l.cpha);
-    l.vcmax   = l.vcmax25 * ft(l.T, l.vcmaxha) * fth(l.T, l.vcmaxhd, l.vcmaxse, l.vcmaxc);
-    l.jmax    = l.jmax25  * ft(l.T, l.jmaxha)  * fth(l.T, l.jmaxhd, l.jmaxse, l.jmaxc);
-    l.rdleaf  = l.rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
-    (l.esat, l.desat) .= SatVap(l.T);
+    l.Vcmax   = l.Vcmax25 * ft(l.T, l.Vcmaxha) * fth(l.T, l.Vcmaxhd, l.Vcmaxse, l.Vcmaxc);
+    l.Jmax    = l.Jmax25  * ft(l.T, l.Jmaxha)  * fth(l.T, l.Jmaxhd, l.Jmaxse, l.Jmaxc);
+    l.Rdleaf  = l.Rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
+    (l.esat, l.desat) = SatVap(l.T);
     # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end
-
-# Ball-Berry stomatal conductance model:
-function BallBerry!(Cs, RH, A, l::leaf_params)
-  #  Cs  : CO2 at leaf surface
-  #  RH  : relative humidity
-  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
-  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
-  #  Ci_input : will calculate gs if A is specified.
-
-  l.gs = l.g1 * A * RH/Cs  + l.g0;
-end # function
-
-# Medlyn stomatal conductance model:
-function Medlyn!(Cs, VPD, A, l::leaf_params)
-  #  Cs  : CO2 at leaf surface
-  #  VPD  : vapor pressure deficit - Medlyn model
-  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
-  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
-  #  Ci_input : will calculate gs if A is specified.
-
-  #print(A,Cs,l.g0,l.g1,l.gs)
-  l.gs = (1+l.g1/sqrt(VPD)) * A /Cs  + l.g0;
-  #print(l.gs)
-end # function
 
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
