@@ -6,14 +6,29 @@ using ..PhysCon
 using ..WaterVaporMod
 
 include("Leaf.jl")
-include("surface_energy_balance.jl")
 
-export fluxes
+
+export fluxes, meteo
 "Tolerance thhreshold for Ci iterations"
 tol = 0.1
 vpd_min = 0.1
 
 " Just a placeholder for now"
+
+@with_kw mutable struct meteo{TT<:Number}
+     S_down::TT = -999.;
+     L_down::TT = -999.;
+     T_air::TT  = -999.;      # T in K
+     e_air::TT  = -999.;
+     P_air::TT  =  1e5 ;      # surface pressure (Pa)
+     #PAR:TT    = -999.;
+     Ca::TT     =  400.;
+     PAR::TT    = -999.;
+     U::TT      = 1e-6;
+     zscreen::TT= 10.0; # measurement height
+end
+
+
 @with_kw mutable struct fluxes{TT<:Number}
          APAR::TT = 500.0
          gbc::TT = 100.0
@@ -28,7 +43,7 @@ vpd_min = 0.1
          Ag::TT = 0.0
          Cs::TT = 0.0
          #ci::TT = 0.0
-         rd::TT = 0.0
+         Rd::TT = 0.0
          Je_pot::TT = 0.0
          Ja::TT = 0.0
          Je_red::TT = 0.0
@@ -90,6 +105,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf)
 
+    # conversion factor for conductance - T and P dependent
     flux.g_m_s_to_micromol_m2_s = 1.0e6/(44.6*273.15/met.T_air*met.P_air/1.013e5); # Körner, C., Scheel, J.A., Bauer, H., 1979. Maximum leaf diffusive conductance in vascular plants. Photosynthetica 13, 45–82.
 
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
@@ -97,7 +113,8 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
     φ_PSII  = leaf.Kp/(leaf.Kp+leaf.Kf+leaf.Kd+leaf.Kn)
 
     # Save leaf respiration
-    flux.rd = leaf.Rdleaf;
+    flux.Rd = leaf.Rdleaf;
+
     # Calculate potential electron transport rate (assuming no upper bound, proportional to absorbed light!):
     flux.Je_pot = 0.5 * leaf.maxPSII * flux.APAR;                          # potential electron transport rate (important for later)
     flux.Je_red = 0.5 * φ_PSII * flux.APAR;                                # Includes Kn here
@@ -388,7 +405,8 @@ end
 
 function setra!(l::leaf_params, flux::fluxes, met::meteo) # set leaf boundary layer
     ra_leaf = 1/l.Cd / sqrt(met.U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
-    l.ra    = ra_leaf + setra_atmo(l, flux, met);
+    l.ra    = max(ra_leaf + setra_atmo(l, flux, met),1.0);
+    println("ra=",l.ra," (s/m), H=", flux.H, " (W/m2)")
 end
 
 
