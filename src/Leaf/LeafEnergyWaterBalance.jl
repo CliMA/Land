@@ -2,10 +2,9 @@
 #### Surface energy balance
 ####
 
-export  LeafEnergyWaterBalance
+using LeafPhotosynthesisMod
 
-include("LeafPhotosynthesisMod.jl")
-
+export LeafEnergyWaterBalance
 
 """
 # compute surface energy balance of a leaf Rn-H-LE=0
