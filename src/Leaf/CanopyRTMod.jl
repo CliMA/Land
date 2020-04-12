@@ -8,7 +8,7 @@ using MAT
 using QuadGK
 using MathToolsMod
 
-export optipar, angles, leafbio, angle, leaf, optis
+export optipar, angles, leafbio, leaf, optis, canopy, canRad, canOpt, FT, sunRad
 
 # Floating point precision can be changed here
 FT = Float32
@@ -19,7 +19,7 @@ include("PhotoStructs.jl")
 const litab   = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
 
 const minwlPAR  = FT(400.); # PAR range
-const maxwlPAR  = FT(700.);
+const maxwlPAR  = FT(750.);
 
 const minwle  = FT(400.); # SIF excitation range
 const maxwle  = FT(750.);
@@ -31,9 +31,9 @@ const fac     = FT(0.001) #(unit conversion factor mW >> W)
 
 # Doubling Adding layers
 const ndub = 15
-const nLayers = 20
+
 # Load some standard settings here (can be done differently later but not bad to be fixed here)
-swl = collect(FT(400):10:2401)
+swl = collect(FT(400):FT(5):2401)
 
 # Load optical properties (these can be fixed globally!):
 optis = optipar{FT}(loadOpti(swl)...);
@@ -50,14 +50,254 @@ const wlf    = wl[Iwlf];    # fluorescence wavelengths,  column
 # Later on, we can implement an array of these structs for global parallel calculations!
 # Load sun (will be coming from CLIMA in future, just file for now)
 sunRad = incomingRadiation{FT}(loadSun(swl)...)
-leaf   = leafbio{FT}(ρ_SW=similar(wl),τ_SW=similar(wl), kChlrel=similar(wl), Mb=zeros(FT,length(wle), length(wlf)), Mf=zeros(FT,length(wle), length(wlf)) )
-angle  = struct_angles{FT}()
+
+# Lots of structures predefine here, in principle just placeholders, routines can be run with any!
+# Soil structure (can adapt later, just using a plain albedo here)
+soil = struct_soil{FT}(wl, 0.1*ones(FT, length(wl)), [0.05])
+# Leaf structure (need to define the dimensions as in the other structures soon, tbd)
+leaf   = leafbio{FT,nwl, length(wle), length(wlf)}()
+# Observation angles
+angles  = struct_angles{FT}()
+# Canopy Structure
 canopy = struct_canopy{FT}()
 # Canopy radiation:
-canRad = getRadStruct(length(wl), canopy.nlayers, length(canopy.lazitab), length(litab),FT)
+canRad = struct_canopyRadiation{FT,nwl,length(litab), length(canopy.lazitab), canopy.nlayers}()
 # Canopy Optical Properties:
-canOpt = getCanOptStruct(length(wl), canopy.nlayers, length(canopy.lazitab), length(litab),FT)
+canOpt = struct_canopyOptProps{FT,nwl,canopy.nlayers, length(canopy.lazitab), length(litab)}()
+
+
 const nlayers = canopy.nlayers
+
+function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil)
+    nl = can.nlayers
+    # Leaf Area Index
+    LAI = can.LAI
+    iLAI    = LAI/nl;
+	# Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
+	rsoil = so.albedo_SW;
+    soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
+
+    # 2.2. convert scattering and extinction coefficients into thin layer reflectances and transmittances
+    # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
+    τ_ss = FT(exp(-cO.ks*iLAI));
+    # Changed from mSCOPE paper here as well to exp. form but might be correct here.
+    τ_dd = exp.(-cO.a*iLAI);
+    τ_sd = cO.sf*iLAI;
+    ρ_sd = cO.sb*iLAI;
+    ρ_dd = cO.sigb*iLAI;
+
+    # 2.3. reflectance calculation
+    # Eq. 18 in mSCOPE paper
+	# Just a scalar here but better to write it out:
+    Xss  = τ_ss;
+
+    # Soil reflectance boundary condition (same for diffuse and direct)
+    cO.R_sd[:,end] = rsoil
+    cO.R_dd[:,end] = rsoil
+
+    # Eq. 18 in mSCOPE paper
+    @inbounds for j=nl:-1:1
+        dnorm       = 1 .-ρ_dd[:,j].*cO.R_dd[:,j+1];
+        cO.Xsd[:,j]    = (τ_sd[:,j]+Xss*cO.R_sd[:,j+1].*ρ_dd[:,j])./dnorm;
+        cO.Xdd[:,j]    = τ_dd[:,j]./dnorm;
+        cO.R_sd[:,j]   = ρ_sd[:,j]+τ_dd[:,j].*(cO.R_sd[:,j+1]*Xss+cO.R_dd[:,j+1].*cO.Xsd[:,j]);
+        cO.R_dd[:,j]   = ρ_dd[:,j]+τ_dd[:,j].*cO.R_dd[:,j+1].*cO.Xdd[:,j];
+    end
+
+    # 3.2 flux profile calculation
+    # Eq. 19 in mSCOPE paper
+    # Boundary condition at top: Incoming solar radiation
+	#sun.E_diffuse = sun.E_diffuse.+0.2# Add some here for checking, is almost 0 otherwise!
+    cO.Es_[:,1]    = sun.E_direct;
+    cR.E_down[:,1] = sun.E_diffuse;
+
+    @inbounds for j=1:nl # from top to bottom
+        cR.netSW_direct[:,j] = cO.Es_[:,j].*(1 .-(τ_ss.+τ_sd[:,j]+ρ_sd[:,j]));
+        cO.Es_[:,j+1]    =  Xss.*cO.Es_[:,j];
+        cR.E_down[:,j+1] =  cO.Xsd[:,j].*cO.Es_[:,j]+cO.Xdd[:,j].*cR.E_down[:,j];
+        cR.E_up[:,j]     =  cO.R_sd[:,j].*cO.Es_[:,j]+cO.R_dd[:,j].*cR.E_down[:,j];
+    end
+    # Boundary condition at the bottom, soil reflectance (Lambertian here)
+    cR.E_up[:,end] = cO.R_sd[:,end].*cO.Es_[:,end]+cO.R_dd[:,end].*cR.E_down[:,end];
+
+    # Hemispheric total outgoing (needs to go into stucture later):
+    cR.Eout[:] = cR.E_up[:,1]
+
+    # compute net diffuse radiation per layer:
+    @inbounds for j=1:nl
+        E_ = cR.E_down[:,j] +  cR.E_up[:,j+1];
+        cR.netSW_diffuse[:,j]= E_.*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
+    end
+
+	# outgoing in viewing direction
+	# From Canopy
+	piLoc_  = iLAI*sum(cO.vb.*cO.Po[1:nl]'.*cR.E_down[:,1:nl]+cO.vf.*cO.Po[1:nl]'.*cR.E_up[:,1:nl]+cO.w.*cO.Pso[1:nl]'.*sun.E_direct,dims=2)[:,1];
+	# From Soil
+	piLos_  = cR.E_up[:,end]*cO.Po[end];
+	piLo_   = piLoc_ + piLos_;
+	cR.Lo   = piLo_/pi;
+	# Save albedos (hemispheric direct and diffuse as well as directional (obs))
+	cR.alb_obs = piLo_./(sun.E_direct+sun.E_diffuse); # rso and rdo are not computed separately
+	cR.alb_direct  = cO.R_sd[:,1]
+	cR.alb_diffuse = cO.R_dd[:,1]
+
+end
+
+# Postprocessing, computing all within canopy fluxes from the primary RT output
+function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil)
+	#
+	nl = can.nlayers
+	iLAI    = can.LAI/nl;
+	rsoil = so.albedo_SW;
+    soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
+
+	# Compute some fluxes, can be done separately if needed (this is absolute fluxes now, for the entire soil):
+	cR.RnSoil_diffuse = fac * ∫(wl, cR.E_down[:,end].*soil_emissivity);
+	cR.RnSoil_direct  = fac *∫(wl, cO.Es_[:,end].*soil_emissivity);
+	cR.RnSoil = cR.RnSoil_direct + cR.RnSoil_diffuse
+
+	# Normalization factor for leaf direct PAR (weighted sum has to be 1 to conserve net SW direct)
+	normi = 1/mean(cO.fs'*can.lidf)
+	for j = 1:nl
+		PAR_diff = fac *(e2phot(wl[iPAR]*1E-9, cR.netSW_diffuse[iPAR,j]))/iLAI;
+		# Direct PAR is normalized by layer Ps value:
+		PAR_dir  = fac *(e2phot(wl[iPAR]*1E-9, cR.netSW_direct[iPAR,j]))/iLAI/(0.5*cO.Ps[j]+0.5*cO.Ps[j+1]);
+		PAR_diffCab = fac *(e2phot(wl[iPAR]*1E-9, leaf.kChlrel[iPAR].*cR.netSW_diffuse[iPAR,j]))/iLAI;
+		# Direct PAR is normalized by layer Ps value:
+		PAR_dirCab  = fac *(e2phot(wl[iPAR]*1E-9, leaf.kChlrel[iPAR].*cR.netSW_direct[iPAR,j]))/iLAI/(0.5*cO.Ps[j]+0.5*cO.Ps[j+1]);
+
+		cR.absPAR_shade[j] = ∫(wl[iPAR],PAR_diff);
+		cR.absPAR_sun[:,:,j]  .= normi*cO.fs*∫(wl[iPAR],PAR_dir);
+		cR.absPAR_shadeCab[j] = ∫(wl[iPAR],PAR_diffCab);
+		cR.absPAR_sunCab[:,:,j]  .= normi*cO.fs*∫(wl[iPAR],PAR_dirCab);
+		#println(PAR_dir[1], " ", cR.Pnh[j])
+	end
+	cR.incomingPAR_direct   = fac * ∫(wl[iPAR], e2phot(wl[iPAR]*1E-9,(sun.E_direct[iPAR])));
+	cR.incomingPAR_diffuse  = fac * ∫(wl[iPAR], e2phot(wl[iPAR]*1E-9,(sun.E_diffuse[iPAR])));
+	cR.incomingPAR          = cR.incomingPAR_diffuse*cR.incomingPAR_direct
+end
+
+
+
+function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps)
+    # 2. Calculation of reflectance
+    # 2.1  reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
+    @inbounds for i=1:nlayers
+        τ_SW = leaf[i].τ_SW
+        ρ_SW = leaf[i].ρ_SW
+        @inbounds for j=1:size(cO.sigb, 1)
+          cO.sigb[j,i] = cO.ddb[j]  * ρ_SW[j]   + cO.ddf[j] * τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for diffuse  incidence
+          cO.sigf[j,i] = cO.ddf[j]  * ρ_SW[j]   + cO.ddb[j] * τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for diffuse  incidence
+          cO.sb[j,i]   = cO.sdb[j]  * ρ_SW[j]   + cO.sdf[j] *  τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for specular incidence
+          cO.sf[j,i]   = cO.sdf[j]  * ρ_SW[j]   + cO.sdb[j] *  τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for specular incidence
+          cO.vb[j,i]   = cO.dob[j]  * ρ_SW[j]   + cO.dof[j] *  τ_SW[j]; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
+          cO.vf[j,i]   = cO.dof[j]  * ρ_SW[j]   + cO.dob[j] *  τ_SW[j]; # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
+          cO.w[j,i]    = cO.sob[j]  * ρ_SW[j]   + cO.sof[j] *  τ_SW[j]; # [nl,nwl]  bidirectional scattering coefficent (directional-directional)
+        end
+    end
+    cO.a    .= 1 .- cO.sigf;                  # [nl, nwl]     attenuation
+end
+
+# Compute optical properties of canopy
+function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::struct_canopyOptProps)
+    # Number of layers
+    nl = nlayers
+    # Leaf Area Index
+    LAI = can.LAI
+    dx = FT(1/nl)
+    xl = collect(FT(0):FT(-1/nl):-1)
+    tts = angle.tts
+    tto = angle.tto
+    psi = angle.psi
+    lazitab = can.lazitab
+
+    # Geometric quantities (ougoing direction first!)
+    cto = cosd(tto)
+    tanto	= tand(tto);
+    cospsi	= cosd(psi);
+
+    # Generate leaf angle distribution:
+    if can.TypeLidf==1
+        lidf,litab = dladgen(can.LIDFa,can.LIDFb);
+    elseif can.TypeLidf==2
+        # TBD Still need to check how to fix litab here:
+        lidf,litab = campbell(can.LIDFa);
+    end
+	can.lidf = lidf
+
+    #println(lidf)
+
+    # Precompute all of this before in a separate function?
+    cos_ttlo    = cosd.(lazitab);  #   cos leaf azimuth angles
+    cos_ttli    = cosd.(litab);    #   cosine of normal of upperside of leaf
+    sin_ttli    = sind.(litab);    #   sine   of normal of upperside of leaf
+
+    # Solar angle dependent ones:
+    cts = cosd(tts)
+    sin_tts  = sind(tts);
+    ctscto = cts*cto;
+    tants	= tand(tts);
+    dso		= sqrt(tants*tants+tanto*tanto-2tants*tanto*cospsi);
+
+    # angular distance, compensation of shadow length
+    # Calculate geometric factors associated with extinction and scattering
+    #Initialise sums
+    cO.ks	= FT(0);
+    cO.ko	= FT(0);
+    cO.bf	= FT(0);
+    cO.sob	= FT(0);
+    cO.sof	= FT(0);
+
+    #	Weighted sums over LIDF
+	@inbounds for i=1:length(litab)
+		# ttl = litab[i];	% leaf inclination discrete values
+		ctl = cosd(litab[i]);
+		#	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
+		chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
+		#	Extinction coefficients
+		ksli = chi_s./cts;
+		koli = chi_o./cto;
+        #	Area scattering coefficient fractions
+		sobli	= frho*pi/ctscto;
+		sofli	= ftau*pi/ctscto;
+		bfli	= ctl*ctl;
+		cO.ks	= cO.ks+ksli*lidf[i];
+		cO.ko	= cO.ko+koli*lidf[i];
+		cO.bf	= cO.bf+bfli*lidf[i];
+		cO.sob	= cO.sob+sobli*lidf[i];
+		cO.sof	= cO.sof+sofli*lidf[i];
+    end
+    #println(sob, " ", sof)
+
+    #	Geometric factors to be used later with rho and tau
+	cO.sdb	= (cO.ks+cO.bf)/2;
+	cO.sdf	= (cO.ks-cO.bf)/2;
+	cO.dob	= (cO.ko+cO.bf)/2;
+	cO.dof	= (cO.ko-cO.bf)/2;
+	cO.ddb	= (1 .+cO.bf)/2;
+	cO.ddf	= (1 .-cO.bf)/2;
+
+    # See eq 19 in vdT 2009
+    Cs          = cos_ttli.*cts;             # [nli]     pag 305 modified by Joris
+    Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
+    cos_deltas  = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo';   # [nli,nlazi]
+    cO.fs          = abs.(cos_deltas./cts);         # [nli,nlazi] pag 305
+
+    # 1.5 probabilities Ps, Po, Pso
+    cO.Ps[:]          =   exp.(cO.ks*xl*LAI);     # [nl+1]  probability of viewing a leaf in solar dir
+    cO.Po[:]          =   exp.(cO.ko*xl*LAI);     # [nl+1]  probability of viewing a leaf in observation dir
+
+    #cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*LAI*dx))/(cO.ks*LAI*dx);   # Correct Ps/Po for finite dx
+    #cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*LAI*dx))/(cO.ko*LAI*dx);   # Correct Ps/Po for finite dx
+
+    #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
+    @inbounds for j=1:length(xl)
+        cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
+    end
+
+    #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2);    #takes care of rounding error
+    #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2);    #takes care of rounding error
+end
 
 function fluspect!(leaf::leafbio, opti::optipar)
     # ***********************************************************************
@@ -76,8 +316,9 @@ function fluspect!(leaf::leafbio, opti::optipar)
     Kcaro = (1 -leaf.Cx).* opti.KcaV + leaf.Cx .* opti.KcaZ;
 
     Kall    = (leaf.Cab*opti.Kab.+leaf.Car*opti.Kcar.+leaf.Ant*opti.Kant.+leaf.Cs*opti.KBrown.+leaf.Cw*opti.Kw.+leaf.Cm*opti.Km)./leaf.N
-    # Relative absorption by Chlorophyll only (drives SIF and GPP eventually)
-    leaf.kChlrel  = leaf.Cab*opti.Kab./(Kall.*leaf.N.+eps(FT));
+    # Relative absorption by Chlorophyll and Carotenoids only (drives SIF and GPP eventually)
+    leaf.kChlrel  = (leaf.Cab*opti.Kab+leaf.Car*opti.Kcar)./(Kall.*leaf.N.+eps(FT));
+	leaf.kChlrel_old  = (leaf.Cab*opti.Kab)./(Kall.*leaf.N.+eps(FT));
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
     tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
@@ -237,191 +478,6 @@ function fluspect!(leaf::leafbio, opti::optipar)
     leaf.Mf  = fn;
     return
 end
-
-function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation)
-    nl = can.nlayers
-    # Leaf Area Index
-    LAI = can.LAI
-    iLAI    = LAI/nl;
-    # Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
-    pSoil =  Polynomials.Poly(FT(0.2))
-    rsoil = Polynomials.polyval(pSoil,wl.-mean(wl));
-    soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
-
-
-    # 2.2. convert scattering and extinction coefficients into thin layer reflectances and transmittances
-    # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
-    τ_ss = FT(exp(-cO.ks*iLAI));
-    # Changed from mSCOPE paper here as well to exp. form but might be correct here.
-    τ_dd = exp.(-cO.a.*iLAI);
-    τ_sd = cO.sf.*iLAI;
-    ρ_sd = cO.sb.*iLAI;
-    ρ_dd = cO.sigb.*iLAI;
-
-    # 2.3. reflectance calculation
-    # Eq. 18 in mSCOPE paper
-
-    Xss  = τ_ss;
-
-    #Es_    = zeros(FT,nl+1,nwl)
-
-    # Soil reflectance boundary condition (same for diffuse and direct)
-    cO.R_sd[:,end] = rsoil
-    cO.R_dd[:,end] = rsoil
-
-    # Eq. 18 in mSCOPE paper
-    @inbounds for j=nl:-1:1
-        dnorm       = 1 .-ρ_dd[:,j].*cO.R_dd[:,j+1];
-        cO.Xsd[:,j]    = (τ_sd[:,j]+τ_ss.*cO.R_sd[:,j+1].*ρ_dd[:,j])./dnorm;
-        cO.Xdd[:,j]    = τ_dd[:,j]./dnorm;
-        cO.R_sd[:,j]   = ρ_sd[:,j]+τ_dd[:,j].*(cO.R_sd[:,j+1].*Xss+cO.R_dd[:,j+1].*cO.Xsd[:,j]);
-        cO.R_dd[:,j]   = ρ_dd[:,j]+τ_dd[:,j].*cO.R_dd[:,j+1].*cO.Xdd[:,j];
-    end
-
-    # 3.2 flux profile calculation
-    # Eq. 19 in mSCOPE paper
-    # Boundary condition at top: Incoming solar radiation
-    cO.Es_[:,1]       = sun.E_direct;
-    cR.E_down[:,1] = sun.E_diffuse;
-
-    @inbounds for j=1:nl # from top to bottom
-        cR.netSW_direct[:,j] = cO.Es_[:,j].*(1 .-(τ_ss.+τ_sd[:,j]+ρ_sd[:,j]));
-        cO.Es_[:,j+1]    =   Xss.*cO.Es_[:,j];
-        cR.E_down[:,j+1]  =   cO.Xsd[:,j].*cO.Es_[:,j]+cO.Xdd[:,j].*cR.E_down[:,j];
-        cR.E_up[:,j]    =   cO.R_sd[:,j].*cO.Es_[:,j]+cO.R_dd[:,j].*cR.E_down[:,j];
-    end
-    # Boundary condition at the bottom, soil reflectance (Lambertian here)
-    cR.E_up[:,end] = cO.R_sd[:,end].*cO.Es_[:,end]+cO.R_dd[:,end].*cR.E_down[:,end];
-
-    # Hemispheric total outgoing (needs to go into stucture later):
-    cR.Eout[:] = cR.E_up[:,1]
-
-    # compute net diffuse radiation per layer:
-    @inbounds for j=1:nl
-        E_ = cR.E_down[:,j] +  cR.E_up[:,j+1];
-        cR.netSW_diffuse[:,j]= E_.*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
-    end
-end
-
-
-function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps)
-    # 2. Calculation of reflectance
-    # 2.1  reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
-    @inbounds for i=1:nlayers
-        τ_SW = leaf[i].τ_SW
-        ρ_SW = leaf[i].ρ_SW
-        @inbounds for j=1:size(cO.sigb, 1)
-          cO.sigb[j,i] = cO.ddb[j]  * ρ_SW[j]   + cO.ddf[j] * τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for diffuse  incidence
-          cO.sigf[j,i] = cO.ddf[j]  * ρ_SW[j]   + cO.ddb[j] * τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for diffuse  incidence
-          cO.sb[j,i]   = cO.sdb[j]  * ρ_SW[j]   + cO.sdf[j] *  τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for specular incidence
-          cO.sf[j,i]   = cO.sdf[j]  * ρ_SW[j]   + cO.sdb[j] *  τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for specular incidence
-          cO.vb[j,i]   = cO.dob[j]  * ρ_SW[j]   + cO.dof[j] *  τ_SW[j]; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
-          cO.vf[j,i]   = cO.dof[j]  * ρ_SW[j]   + cO.dob[j] *  τ_SW[j]; # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
-          cO.w[j,i]    = cO.sob[j]  * ρ_SW[j]   + cO.sof[j] *  τ_SW[j]; # [nl,nwl]  bidirectional scattering coefficent (directional-directional)
-        end
-    end
-    cO.a    .= 1 .- cO.sigf;                  # [nl, nwl]     attenuation
-end
-
-# Compute optical properties of canopy
-function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::struct_canopyOptProps)
-    # Number of layers
-    nl = nlayers
-    # Leaf Area Index
-    LAI = can.LAI
-    dx = FT(1/nl)
-    xl = collect(FT(0):FT(-1/nl):-1)
-    tts = angle.tts
-    tto = angle.tto
-    psi = angle.psi
-    lazitab = can.lazitab
-
-    # Geometric quantities (ougoing direction first!)
-    cto = cosd(tto)
-    tanto	= tand(tto);
-    cospsi	= cosd(psi);
-
-    # Generate leaf angle distribution:
-    if can.TypeLidf==1
-        lidf,litab = dladgen(can.LIDFa,can.LIDFb);
-    elseif can.TypeLidf==2
-        # TBD Still need to check how to fix litab here:
-        lidf,litab = campbell(can.LIDFa);
-    end
-    #println(lidf)
-
-    # Precompute all of this before in a separate function?
-    cos_ttlo    = cosd.(lazitab);  #   cos leaf azimuth angles
-    cos_ttli    = cosd.(litab);    #   cosine of normal of upperside of leaf
-    sin_ttli    = sind.(litab);    #   sine   of normal of upperside of leaf
-
-    # Solar angle dependent ones:
-    cts = cosd(tts)
-    sin_tts  = sind(tts);
-    ctscto = cts*cto;
-    tants	= tand(tts);
-    dso		= sqrt(tants*tants+tanto*tanto-2tants*tanto*cospsi);
-
-    # angular distance, compensation of shadow length
-    # Calculate geometric factors associated with extinction and scattering
-    #Initialise sums
-    cO.ks	= FT(0);
-    cO.ko	= FT(0);
-    cO.bf	= FT(0);
-    cO.sob	= FT(0);
-    cO.sof	= FT(0);
-
-    #	Weighted sums over LIDF
-	@inbounds for i=1:length(litab)
-		# ttl = litab[i];	% leaf inclination discrete values
-		ctl = cosd(litab[i]);
-		#	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
-		chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
-		#	Extinction coefficients
-		ksli = chi_s./cts;
-		koli = chi_o./cto;
-        #	Area scattering coefficient fractions
-		sobli	= frho*pi/ctscto;
-		sofli	= ftau*pi/ctscto;
-		bfli	= ctl*ctl;
-		cO.ks	= cO.ks+ksli*lidf[i];
-		cO.ko	= cO.ko+koli*lidf[i];
-		cO.bf	= cO.bf+bfli*lidf[i];
-		cO.sob	= cO.sob+sobli*lidf[i];
-		cO.sof	= cO.sof+sofli*lidf[i];
-    end
-    #println(sob, " ", sof)
-
-    #	Geometric factors to be used later with rho and tau
-	cO.sdb	= (cO.ks+cO.bf)/2;
-	cO.sdf	= (cO.ks-cO.bf)/2;
-	cO.dob	= (cO.ko+cO.bf)/2;
-	cO.dof	= (cO.ko-cO.bf)/2;
-	cO.ddb	= (1 .+cO.bf)/2;
-	cO.ddf	= (1 .-cO.bf)/2;
-
-    # See eq 19 in vdT 2009
-    Cs          = cos_ttli.*cts;             # [nli]     pag 305 modified by Joris
-    Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
-    cos_deltas  = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo';   # [nli,nlazi]
-    cO.fs          = abs.(cos_deltas./cts);         # [nli,nlazi] pag 305
-
-    # 1.5 probabilities Ps, Po, Pso
-    cO.Ps[:]          =   exp.(cO.ks*xl*LAI);     # [nl+1]  probability of viewing a leaf in solar dir
-    cO.Po[:]          =   exp.(cO.ko*xl*LAI);     # [nl+1]  probability of viewing a leaf in observation dir
-
-    cO.Ps[1:nl]    =   cO.Ps[1:nl] *(1 .-exp.(-cO.ks*LAI*dx))/(cO.ks*LAI*dx);   # Correct Ps/Po for finite dx
-    cO.Po[1:nl]    =   cO.Po[1:nl] *(1 .-exp.(-cO.ko*LAI*dx))/(cO.ko*LAI*dx);   # Correct Ps/Po for finite dx
-
-    #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
-    @inbounds for j=1:length(xl)
-        cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
-    end
-
-    #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2);    #takes care of rounding error
-    #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2);    #takes care of rounding error
-end
-
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
 function calcJ1(x,m,k,LAI)

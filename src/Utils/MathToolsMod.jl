@@ -2,7 +2,7 @@ module MathToolsMod
 using LeafPhotosynthesisMod:fluxes
 using Leaf:leaf_params
 
-export quadratic,beta_function,log_gamma_function, hybrid, zbrent, simpson_nu, Avogadro, e2phot, ephoton
+export quadratic,beta_function,log_gamma_function, hybrid, zbrent, ∫, Avogadro, e2phot, ephoton
 # hybrid             ! Solve for the root of a function using secant and Brent's methods
 # zbrent             ! Use Brent's method to find the root of a function
 # quadratic          ! Solve a quadratic equation for its two roots
@@ -202,7 +202,7 @@ function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Numb
     error("Max iteration exceeded")
 end
 
-function simpson_nu(x::Vector, f::Vector)
+function ∫(x::Vector, f::Vector)
     """
     Simpson rule for irregularly spaced data.
 

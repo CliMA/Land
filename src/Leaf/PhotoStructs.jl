@@ -15,7 +15,7 @@ $(DocStringExtensions.FIELDS)
 """
 @with_kw mutable struct struct_angles{FT<:Number}
     "Solar Zenith Angle in degrees"
-    tts::FT=45
+    tts::FT=30
     "Viewing Zenith Angle in degrees"
     tto::FT=0
     "relative azimuth in degrees"
@@ -58,7 +58,7 @@ end
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct leafbio{FT<:Number}
+@with_kw mutable struct leafbio{FT<:Number,nWl,nWle, nWlf}
     "Leaf structure parameter"
     N::FT    = 1.4       # | -          | (1.0, 3.0)  | "Leaf structure parameter"
     "Chlorophyll a+b content"
@@ -82,15 +82,17 @@ $(DocStringExtensions.FIELDS)
     "Leaf fluorescence efficiency"
     fqe::FT = 0.01       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
     "shortwave leaf reflectance"
-    ρ_SW::Array{FT,1}    # | -          | (0.0, 1.0)  | "shortwave reflectance"
+    ρ_SW::Array{FT,1} = zeros(nWl)    # | -          | (0.0, 1.0)  | "shortwave reflectance"
     "shortwave leaf transmission"
-    τ_SW::Array{FT,1}    # | -          | (0.0, 1.0)  | "shortwave transmission"
-    "relative absorbtion by Chlorophyll"
-    kChlrel::Array{FT,1} # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+    τ_SW::Array{FT,1} = zeros(nWl)    # | -          | (0.0, 1.0)  | "shortwave transmission"
+    "relative absorbtion by Chlorophyll+Car"
+    kChlrel::Array{FT,1} = zeros(nWl) # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+	"relative absorbtion by Chlorophyll"
+	kChlrel_old::Array{FT,1} = zeros(nWl) # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
     "Fluorescence excitation matrix backwards"
-    Mb::Array{FT,2}      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix backwards"
+    Mb::Array{FT,2}= zeros(nWle,nWlf)      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix backwards"
     "Fluorescence excitation matrix forwards"
-    Mf::Array{FT,2}      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix forwards"
+    Mf::Array{FT,2}= zeros(nWle,nWlf)      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix forwards"
 
 end
 
@@ -101,6 +103,8 @@ end
 $(DocStringExtensions.FIELDS)
 """
 mutable struct struct_soil{FT<:Number}
+	"Wavelength (nm)"
+	wl::Array{FT,1}
     "shortwave albedo"
     albedo_SW::Array{FT,1}    # | -          | (0.0, 1.0)  | "shortwave albedo"
     "longwave albedo"
@@ -113,78 +117,61 @@ end
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct struct_canopyRadiation{FT<:Number}
+@with_kw mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nIncl,nAzi,nLayers}
     # Scalars
-    "integrated TOC outgoing flux"
-    intEout::FT                       # | W m^-2               | (0.0, 2500)  | "integrated TOC outgoing flux"
-    "incident spectrally integrated total PAR"
-    PAR::FT                           # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated total PAR"
-    "incident spectrally integrated direct PAR"
-    PAR_direct::FT                    # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated direct PAR"
-    "incident spectrally integrated diffuse PAR"
-    PAR_diffuse::FT                   # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated diffuse PAR"
-    "net radiation of shaded soil"
-    Rnhs::FT                          # | W m^-2               | (0.0, 2500)  | "net radiation of shaded soil"
-    "net radiation of sunlit soil"
-    Rnus::FT                          # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit soil"
-    "extinction cofficient in the solar direction"
-    k::FT
-    "extinction cofficient in the viewing direction"
-    K::FT
-
-    # Dim of nLayers+1
-    "Probability of directly viewing a leaf in solar direction"
-    Ps::Array{FT,1}
-    "Probability of directly viewing a leaf in viewing direction"
-    Po::Array{FT,1}
-    "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
-    Pso::Array{FT,1}
-
+    "integrated TOC outgoing flux (W m^-2)"
+    intEout::FT = 0;                       # | W m^-2               | (0.0, 2500)  | "integrated TOC outgoing flux"
+    "incident spectrally integrated total PAR (moles m^-2 s^-1)"
+    incomingPAR::FT = 0;                           # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated total PAR"
+    "incident spectrally integrated direct PAR (moles m^-2 s^-1)"
+    incomingPAR_direct::FT = 0;                    # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated direct PAR"
+    "incident spectrally integrated diffuse PAR (moles m^-2 s^-1)"
+    incomingPAR_diffuse::FT = 0;                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated diffuse PAR"
+    "net radiation of shaded soil (W m^-2)"
+    RnSoil_diffuse::FT = 0 ;                         # | W m^-2               | (0.0, 2500)  | "net radiation of shaded soil"
+    "net radiation of sunlit soil (W m^-2)"
+    RnSoil_direct::FT = 0;
+	"net radiation of soil (shaded + sunlit) (W m^-2)"
+	RnSoil::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit soil"
     # Dim of nLayers
-    "net radiation of shaded leaves"
-    Rnhc::Array{FT,1}                 # | W m^-2               | (0.0, 2500)  | "net radiation of shaded leaves"
-    "net PAR of shaded leaves"
-    Pnh::Array{FT,1}                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of shaded leaves"
-    "net PAR absorbed by Cab of shaded leaves"
-    Pnh_Cab::Array{FT,1}              # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR absorbed by Cab of shaded leaves"
-    "net PAR absorbed by shaded leaves"
-    Rnh_PAR::Array{FT,1}              # | W m^-2               | (0.0, 2500)  | "net PAR absorbed by shaded leaves
+    "net PAR of shaded leaves (moles m^-2 s^-1)"
+    absPAR_shade::Array{FT,1} = zeros(nLayers)                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of shaded leaves"
+	"net PAR by Cab+Car of shaded leaves (moles m^-2 s^-1)"
+	absPAR_shadeCab::Array{FT,1} = zeros(nLayers)
 
     # Dimension of wavelength only:
-    "TOC outgoing radiance in observation direction"
-    Lo::Array{FT,1}                   # | mW m^-2 μm^-1 sr^-1  | (0.0, 2500)  | "TOC outgoing radiance in observation direction"
-    "TOC outgoing radiation"
-    Eout::Array{FT,1}                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "TOC outgoing radiation"
-    "incident direct radiation at top of canopy"
-    inc_SW_direct::Array{FT,1}        # | mW m^-2 μm^-1        | (0.0, 2500)  | "incident direct radiation at top of canopy"
-    "incident diffuse radiation at top of canopy"
-    inc_SW_diffuse::Array{FT,1}       # | mW m^-2 μm^-1        | (0.0, 2500)  | "incident diffuse radiation at top of canopy"
+    "TOC outgoing radiance in observation direction (mW m^-2 μm^-1 sr^-1)"
+    Lo::Array{FT,1} = zeros(nWl)                   # | mW m^-2 μm^-1 sr^-1  | (0.0, 2500)  | "TOC outgoing radiance in observation direction"
+    "TOC outgoing radiation (mW m^-2 μm^-1)"
+    Eout::Array{FT,1} = zeros(nWl)                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "TOC outgoing radiation
+    "Albedo in viewing direction"
+    alb_obs::Array{FT,1} = zeros(nWl)              # |                      | (0.0, 1.0)  |  "albedo in viewing direction"
     "Albedo for direct incoming radiation"
-    alb_direct::Array{FT,1}           # | -                    | (0.0, 1.0)   | "Albedo for direct incoming radiation"
+    alb_direct::Array{FT,1} = zeros(nWl)           # | -                    | (0.0, 1.0)   | "Albedo for direct incoming radiation"
     "Albedo for diffuse incoming radiation"
-    alb_diffuse::Array{FT,1}          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
+    alb_diffuse::Array{FT,1} = zeros(nWl)          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
 
     # Dimension of nLayer+1 * nWavelengths
-    "upwelling diffuse radiation within canopy"
-    E_up::Array{FT,2}                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
-    "downwelling diffuse radiation within canopy"
-    E_down::Array{FT,2}               # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
+    "upwelling diffuse radiation within canopy (mW m^-2 μm^-1)"
+    E_up::Array{FT,2} = zeros(nWl,nLayers+1)                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
+    "downwelling diffuse radiation within canopy (mW m^-2 μm^-1)"
+    E_down::Array{FT,2} = zeros(nWl,nLayers+1)               # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
 
     # Dimension of nLayer * nWavelengths
-    "net absorbed direct radiation in each layer"
-    netSW_direct::Array{FT,2}                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
-    "net absorbed diffuse radiation in each layer"
-    netSW_diffuse::Array{FT,2}               # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
+    "net absorbed direct radiation in each layer (mW m^-2 μm^-1)"
+    netSW_direct::Array{FT,2} = zeros(nWl,nLayers)                  # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
+    "net absorbed diffuse radiation in each layer (mW m^-2 μm^-1)"
+    netSW_diffuse::Array{FT,2} = zeros(nWl,nLayers)                # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
+	"spectrally integrated net absorbed direct radiation in each layer (W m^-2)"
+	intNetSW_direct::Array{FT,1} = zeros(nLayers)                  # | mW m^-2 μm^-1        | (0.0, 2500)  | "upwelling diffuse radiation within canopy"
+	"spectrally integrated net absorbed diffuse radiation in each layer (W m^-2)"
+	intNetSW_diffuse::Array{FT,1} = zeros(nLayers)                # | mW m^-2 μm^-1        | (0.0, 2500)  | "downwelling diffuse radiation within canopy"
 
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
-    "net radiation of sunlit leaves"
-    Rnuc::Array{FT,3}                 # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit leaves"
-    "net PAR of sunlit leaves"
-    Pnu::Array{FT,3}                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of sunlit leaves"
-    "net PAR absorbed by Cab of sunlit leaves"
-    Pnu_Cab::Array{FT,3}              # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR absorbed by Cab of sunlit leaves"
-    "net PAR absorbed by sunlit leaves"
-    Rnu_PAR::Array{FT,3}              # | W m^-2               | (0.0, 2500)  | "net PAR absorbed by sunlit leaves"
+    "net PAR of sunlit leaves moles m^-2 s^-1"
+    absPAR_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)                    # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of sunlit leaves"
+	"net PAR by Cab+Car of sunlit leaves moles m^-2 s^-1"
+    absPAR_sunCab::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
 end
 
 """
@@ -193,68 +180,68 @@ end
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct struct_canopyOptProps{FT<:Number}
+@with_kw mutable struct struct_canopyOptProps{FT<:AbstractFloat,nWL,nLayer,nAzi,nIncl}
     "Solar -> Diffuse backscatter weight"
-    sdb::FT;
+    sdb::FT = 0;
 	"Solar -> Diffuse forward scatter weight"
-	sdf::FT;
+	sdf::FT = 0;
 	"Diffuse -> Directional backscatter weight"
-	dob::FT;
+	dob::FT = 0;
 	"Diffuse -> Directional forward scatter weight"
-	dof::FT;
+	dof::FT = 0;
 	"Diffuse -> Diffuse backscatter weight"
-	ddb::FT;
+	ddb::FT = 0;
 	"Diffuse -> Diffuse forward scatter weight"
-	ddf::FT;
+	ddf::FT = 0;
 	"Solar beam extinction coefficient weight"
-	ks::FT;
+	ks::FT = 0;
 	"Outgoing beam extinction coefficient weight"
-	ko::FT;
+	ko::FT = 0;
 	""
-	bf::FT;
+	bf::FT = 0;
 	"weight of specular2directional backscatter coefficient"
-	sob::FT;
+	sob::FT = 0;
 	"weight of specular2directional forward coefficient"
-	sof::FT;
+	sof::FT = 0;
 
 	# now multi dimensional arrays:
 	"per leaf angles"
-	fs::Array{FT,2}
+	fs::Array{FT,2} = zeros(nIncl, nAzi);
 	"Probability of directly viewing a leaf in solar direction"
-    Ps::Array{FT,1}
+    Ps::Array{FT,1} = zeros(nLayer+1)
     "Probability of directly viewing a leaf in viewing direction"
-    Po::Array{FT,1}
+    Po::Array{FT,1} = zeros(nLayer+1)
     "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
-    Pso::Array{FT,1}
+    Pso::Array{FT,1} = zeros(nLayer+1)
 
 	# The following also depend on leaf reflectance and transmission. Might go into a separate strcuture so that we can have it separately for thermal, SW and SIF?
 	"diffuse     backscatter scattering coefficient for diffuse  incidence"
-	sigb::Array{FT,2}
+	sigb::Array{FT,2} = zeros(nWL, nLayer)
 	"diffuse     forward     scattering coefficient for diffuse  incidence"
-	sigf::Array{FT,2}
+	sigf::Array{FT,2} = zeros(nWL, nLayer)
 	"diffuse     backscatter scattering coefficient for specular incidence"
-	sb::Array{FT,2}
+	sb::Array{FT,2} = zeros(nWL, nLayer)
 	"diffuse     forward     scattering coefficient for specular incidence"
-	sf::Array{FT,2}
+	sf::Array{FT,2} = zeros(nWL, nLayer)
 	"directional backscatter scattering coefficient for diffuse  incidence"
-	vb::Array{FT,2}
+	vb::Array{FT,2} = zeros(nWL, nLayer)
 	"directional forward     scattering coefficient for diffuse  incidence"
-	vf::Array{FT,2}
+	vf::Array{FT,2} = zeros(nWL, nLayer)
 	"bidirectional scattering coefficent (directional-directional)"
-	w::Array{FT,2}
+	w::Array{FT,2} = zeros(nWL, nLayer)
 	"attenuation"
-	a::Array{FT,2}
+	a::Array{FT,2} = zeros(nWL, nLayer)
 	"Effective layer transmittance (direct->diffuse)"
-	Xsd::Array{FT,2}
+	Xsd::Array{FT,2} = zeros(nWL, nLayer)
 	"Effective layer transmittance (diffuse->diffuse)"
-	Xdd::Array{FT,2}
+	Xdd::Array{FT,2} = zeros(nWL, nLayer)
 	"Effective layer reflectance (direct->diffuse)"
-	R_sd::Array{FT,2}
+	R_sd::Array{FT,2} = zeros(nWL, nLayer+1)
 	"Effective layer reflectance (diffuse->diffuse)"
-	R_dd::Array{FT,2}
+	R_dd::Array{FT,2} = zeros(nWL, nLayer+1)
 
 	"Solar direct radiation per layer)"
-	Es_::Array{FT,2}
+	Es_::Array{FT,2} = zeros(nWL, nLayer+1)
 
 end
 
@@ -266,10 +253,10 @@ end
 $(DocStringExtensions.FIELDS)
 """
 @with_kw mutable struct struct_canopy{FT<:Number}
-    "number of canopy layers"
-    nlayers::Int64     = 20    # | -          | (2, 60)      | "number of canopy layers"
+    "number of canopy layers" # This needs to come globally though, can lead to errors right now as defined elsewhere as well!
+    nlayers::Int     = 20    # | -          | (2, 60)      | "number of canopy layers"
     "Leaf Area Index"
-    LAI::FT            = 3.0   # | -          | (0.0, 9.0)   | "Leaf Area Index"
+    LAI::FT            = 4.0   # | -          | (0.0, 9.0)   | "Leaf Area Index"
     "Leaf width"
     leafwidth::FT      = 0.1   # | m          | (0.0, 1.0)   | "Leaf width"
     "Vegetation height"
@@ -285,40 +272,11 @@ $(DocStringExtensions.FIELDS)
 
     # Some more derived parameters:
     lazitab::Array{FT} = collect(5.0:10.0:355.0)
+    lidf::Array{FT} = similar(collect(5.0:10.0:355.0))
     xl::Array{FT} = collect(0.0:-1.0/nlayers:-1.0)
     dx::FT             = 1.0/nlayers
 end
 
-# I really have to find a way around this stupid constructor in the future!
-function getCanOptStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
-    # First, get 11 scalars:
-    n1 = ntuple(i->FT(0), 11)
-    # get 1 Arrays (nIncl,nAzis):
-    n11 = ntuple(i->Array{Float32}(undef, nIncl, nAzi), 1)
-    # get 3 Arrays (nlayer+1)
-    n12 = ntuple(i->Array{Float32}(undef, nLayer+1), 3)
-    # get wl dimension variables:
-    n2 = ntuple(i->Array{Float32}(undef, nWL, nLayer), 10)
-	n3 = ntuple(i->Array{Float32}(undef, nWL, nLayer+1), 3)
-    return struct_canopyOptProps{FT}(n1...,n11...,n12..., n2...,n3...)
-end
-
-function getRadStruct(nWL::Int,nLayer::Int,nAzi::Int,nIncl::Int, FT)
-    # First, get 8 scalars:
-    n1 = ntuple(i->FT(0), 8)
-    # get 3 Arrays (nlayer+1):
-    n11 = ntuple(i->Array{Float32}(undef, nLayer+1), 3)
-    # get 4 Arrays (nlayer)
-    n12 = ntuple(i->Array{Float32}(undef, nLayer), 4)
-    # get wl dimension variables:
-    n2 = ntuple(i->Array{Float32}(undef, nWL), 6)
-    # get wavelength and layers
-    n3 = ntuple(i->Array{Float32}(undef, nWL,nLayer+1), 2)
-    n33 = ntuple(i->Array{Float32}(undef,nWL,nLayer), 2)
-    # get full angles (3D)
-    n4 = ntuple(i->Array{Float32}(undef, nIncl, nAzi, nLayer), 4)
-    return struct_canopyRadiation{FT}(n1...,n11...,n12..., n2..., n3...,n33..., n4...)
-end
 
 function loadOpti(swl::AbstractArray; file=file_Opti)
     # Read in all optical data:
