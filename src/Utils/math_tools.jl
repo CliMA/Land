@@ -16,7 +16,7 @@
 #implicit none
 #!
 #! !PUBLIC MEMBER FUNCTIONS:
-export quadratic,beta_function,log_gamma_function, hybrid, zbrent
+export quadratic,beta_function,IntWeibull,log_gamma_function
 # hybrid             ! Solve for the root of a function using secant and Brent's methods
 # zbrent             ! Use Brent's method to find the root of a function
 # quadratic          ! Solve a quadratic equation for its two roots

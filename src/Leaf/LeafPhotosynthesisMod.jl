@@ -1,4 +1,7 @@
-module LeafPhotosynthesisMod
+#module LeafPhotosynthesisMod
+
+export fluxes, meteo
+
 
 using Parameters
 
@@ -8,8 +11,8 @@ using ..WaterVaporMod
 include("Leaf.jl")
 
 
-export fluxes, meteo
-"Tolerance thhreshold for Ci iterations"
+
+"Tolerance threshold for Ci iterations"
 tol = 0.1
 vpd_min = 0.1
 
@@ -397,8 +400,10 @@ function setra_atmo(l::leaf_params,flux::fluxes,met::meteo)
     Hv_s  = flux.H*(1+0.61*met.e_air);
     Tv    = met.T_air*(1+0.61*met.e_air);
     L     = - flux.ustar^3*Tv/(physcon.grav*physcon.K*Hv_s);
-    ra_m = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# momentum aerodynamic resistance
-    ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# water aerodynamic resistance
+    ra_m = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m)  ) * ( log((met.zscreen - l.d)/l.z0m) ) ;# momentum aerodynamic resistance
+    ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m)  ) * ( log((met.zscreen - l.d)/l.z0h) ) ;# water aerodynamic resistance
+    #ra_m = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# momentum aerodynamic resistance
+    #ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# water aerodynamic resistance
     flux.ustar = sqrt(met.U/ra_m); # keep ustar estimate in memory
     return ra_w; # based on Monin-Obukhov Similarity theory -> to be changed for LES
 end
@@ -517,7 +522,7 @@ function hybrid(flux::fluxes,leaf::leaf_params, met::meteo, func::Function, xa::
 
        # If a root zone is found, use the brent method for a robust backup strategy
        if (f1 * f0 < 0.0)
-          x = zbrent(flux, leaf, met, func,x0, x1, xtol=tol)
+          x = zbrent(flux, leaf, met, func, x0, x1, xtol=tol)
           x0 = x
           break
        end
@@ -538,8 +543,8 @@ function zbrent(flux::fluxes,leaf::leaf_params,met::meteo,f::Function, x0::Numbe
                xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
                maxiter::Integer=50)
     EPS = eps(Float64)
-    y0 = f(x0,flux,leaf)
-    y1 = f(x1,flux,leaf)
+    y0 = f(x0,flux,leaf,met)
+    y1 = f(x1,flux,leaf,met)
     if abs(y0) < abs(y1)
         # Swap lower and upper bounds.
         x0, x1 = x1, x0
@@ -581,7 +586,7 @@ function zbrent(flux::fluxes,leaf::leaf_params,met::meteo,f::Function, x0::Numbe
             bisection = false
         end
 
-        y = f(x,flux,leaf)
+        y = f(x,flux,leaf,met)
         # y-tolerance.
         if abs(y) < ytol
             return x
@@ -607,4 +612,4 @@ end
 include("../Utils/math_tools.jl")
 
 
-end #Module
+#end #Module

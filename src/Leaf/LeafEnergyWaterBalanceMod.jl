@@ -1,10 +1,9 @@
+module LeafEnergyWaterBalanceMod
 ####
 #### Surface energy balance
 ####
 
-#include("LeafPhotosynthesisMod.jl")
-
-include ..LeafPhotosynthesisMod
+include("LeafPhotosynthesisMod.jl")
 
 export LeafEnergyWaterBalance
 
@@ -45,3 +44,5 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  flu
     println("Sdown= " , met.S_down, "W/m2, Rn=",flux.Rn,"W/m2, SEB=",flux.Rn-flux.H-flux.LE,"W/m2, H= ",flux.H, "W /m2, LE= ",flux.LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), rs=",rs_s_m, " (s/m) , ra=",l.ra, " (s/m) ")
     return dT_dt,dH2Ol_dt , flux.Rn, flux.H, flux.LE
 end
+
+end # end module
