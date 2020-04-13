@@ -2,7 +2,9 @@
 #### Surface energy balance
 ####
 
-using LeafPhotosynthesisMod
+#include("LeafPhotosynthesisMod.jl")
+
+include ..LeafPhotosynthesisMod
 
 export LeafEnergyWaterBalance
 
