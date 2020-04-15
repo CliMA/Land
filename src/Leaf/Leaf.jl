@@ -133,9 +133,9 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     Je::TT = 0.0 ;                              # electron transport rate
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
-    z0m         = 0.1*height;                     # tree roughness (m)
-    z0h         = 0.1*height;                     # tree roughness (m) - TODO should be changed later
-    d           = 2/3*height;                     # tree displacement height (m)
+    z0m         = -999.;                     # tree roughness (m)
+    z0h         = -999.;                     # tree roughness (m) - TODO should be changed later
+    d           = -999.;                     # tree displacement height (m)
 
     dleaf       = 2e-3;                           # leaf thickness (m)
     Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient

@@ -1,0 +1,3 @@
+*.ipynb
+test.jl
+.tags*

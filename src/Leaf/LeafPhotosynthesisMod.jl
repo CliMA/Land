@@ -1,6 +1,6 @@
 #module LeafPhotosynthesisMod
 
-export fluxes, meteo
+export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!
 
 
 using Parameters
@@ -10,11 +10,14 @@ using ..WaterVaporMod
 
 include("Leaf.jl")
 
-
+# parameter to define stability function for stable case
+stab_type_stable = 1;
 
 "Tolerance threshold for Ci iterations"
 tol = 0.1
 vpd_min = 0.1
+
+
 
 " Just a placeholder for now"
 
@@ -28,7 +31,8 @@ vpd_min = 0.1
      Ca::TT     =  400.;
      PAR::TT    = -999.;
      U::TT      = 1e-6;
-     zscreen::TT= 10.0; # measurement height
+     zscreen::TT= 10.0; # measurement height - default
+     L::TT      = 1e6;  # atmospheric Obukhov length
 end
 
 
@@ -169,7 +173,12 @@ end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
 
 
-
+function setRoughness!(leaf::leaf_params)
+    # adjust roughness coefficients
+    leaf.z0m         = 0.1*leaf.height;                     # tree roughness (m)
+    leaf.z0h         = 0.1*leaf.height;                     # tree roughness (m) - TODO should be changed later
+    leaf.d           = 2/3*leaf.height;                     # tree displacement height (m)
+end
 
 
 
@@ -270,7 +279,6 @@ end
 
 
 
-
 """
     CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
 
@@ -282,6 +290,7 @@ Compute Assimilation using fixed stomatal conductance gs.
 - `leaf::leaf_params`: leaf_params structure.
 """
 function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
+
     # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     setra!(leaf, flux, met)
 
@@ -338,40 +347,67 @@ end # Function CiFuncGs!
 
 
 
+
+
+
+
+
+
 function ψ_m(ζ) # momentum correction function
-    # stability corrections - Zeng et al., 1998
-    #if(ζ>1.0) # very stable - Grachev et al SHEBA 2007
 
-    if(ζ>=0.0) # stable - Grachev et al SHEBA 2007
-        x  = (1.0+ζ)^(1.0/3.0);
-        am = 5.0;
-        bm = am/6.5;
-        ah = bh = 5.0;
-        ch = 3.0;
-        Bm = ((1.0-bm)/bm)^(1.0/3.0);
-        Bh = sqrt(5);
-        ψ = -3.0*am/bm*(x-1.0) + am*Bm/(2.0*bm)*( 2.0*log((x+Bm)/(1.0+Bm))
-                                                 - log( (x*x-x*Bm+Bm*Bm)/(1.0-Bm+Bm*Bm) )
-                                                 +2*sqrt(3.0)*( atan((2.0*x-Bm)/(sqrt(3.0)*Bm)) -  atan((2.0-Bm)/(sqrt(3.0)*Bm)))  );
-    #elseif (ζ<=1.0 and ζ>=0)  # stable
-    #    ψ = -5.0*ζ;
-    #    ψ_h = -5.0*ζ;
+    if(ζ>=0.0) # stable conditions
+        if(stab_type_stable==1) # Grachev default value - Grachev et al SHEBA 2007
+          x  = (1.0+ζ)^(1.0/3.0);
+          am = 5.0;
+          bm = am/6.5;
+          ah = bh = 5.0;
+          ch = 3.0;
+          Bm = ((1.0-bm)/bm)^(1.0/3.0);
+          Bh = sqrt(5);
+          ψ = -3.0*am/bm*(x-1.0) + am*Bm/(2.0*bm)*( 2.0*log((x+Bm)/(1.0+Bm))
+                                                   - log( (x*x-x*Bm+Bm*Bm)/(1.0-Bm+Bm*Bm) )
+                                                   +2*sqrt(3.0)*( atan((2.0*x-Bm)/(sqrt(3.0)*Bm)) -  atan((2.0-Bm)/(sqrt(3.0)*Bm)))  );
+        elseif(stab_type_stable==2) # Webb correction as in NoahMP
+          alpha = 5.0;
+          if(ζ>=0.0 && ζ<=1)
+            ψ = -alpha * ζ;
+          else
+            ψ = (1 - alpha) * log(ζ) + ζ;
+          end
+        elseif(stab_type_stable==3) # Beljaars-Holtslag, 1991, Journal of Applied Meteorology
+          # Constants
+          a = 1.0;
+          b = 0.667;
+          c = 5;
+          d = 0.35;
+          # Stability correction for momentum
+          ψ = -(a * ζ
+                   + b * (ζ - c / d) * exp(-d * ζ)
+                   + b * c / d);
+        elseif(stab_type_stable==4) #Cheng and Brutsaert (2005) as described by Jimenez et al. (2012)
+          a = 6.1;
+          b = 2.5;
+          c = 5.3;
+          d = 1.1;
+          ψ = -a * log(ζ + (1 + ζ^b) ^ (1. / b));
+        end
 
-    elseif (ζ<0 && ζ>=-0.465) # unstable
-        x   = (1.0-16.0*ζ)^0.25;
-        ψ = 2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
-    elseif (ζ<-0.465) # very unstable
-        x   = (1.0-16.0*ζ)^0.25;
-        ψ = 2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
+    else #  (ζ<0) unstable
+        x   =   (1.0-16.0*ζ)^0.25;
+        ψ   =   2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
     end
+
     return ψ
 end
+
+
+
 
 function ψ_h(ζ) # momentum correction function
-    # stability corrections - Zeng et al., 1998
-    #if(ζ>1.0) # very stable - Grachev et al SHEBA 2007
 
-    if(ζ>=0.0) # stable - Grachev et al SHEBA 2007
+if(ζ>=0.0) # stable conditions
+      if(stab_type_stable==1) # Grachev default value - Grachev et al SHEBA 2007
+        # issue when x ~ 0
         x  = (1.0+ζ)^(1.0/3.0);
         am = 5.0;
         bm = am/6.5;
@@ -379,49 +415,104 @@ function ψ_h(ζ) # momentum correction function
         ch = 3.0;
         Bm = ((1.0-bm)/bm)^(1.0/3.0);
         Bh = sqrt(5);
-        ψ = -bh/2*log(1+ch*ζ+ζ*ζ) + (-ah/Bh + bh*ch/(2.0*Bh))*(log( (2.0*ζ+ch-Bh)/(2.0*ζ+ch+Bh) - log((ch-Bh)/(ch+Bh)) ));
-    #elseif (ζ<=1.0 and ζ>=0)  # stable
-    #    ψ_m = -5.0*ζ;
-    #    ψ = -5.0*ζ;
+        ψ = -bh/2*log(1+ch*ζ+ζ*ζ) + (-ah/Bh + bh*ch/(2.0*Bh))*(log((2.0*ζ+ch-Bh)/(2.0*ζ+ch+Bh)) - log((ch-Bh)/(ch+Bh)) );
+      elseif(stab_type_stable==2) # Webb correction as in NoahMP
+        alpha = 5.0;
+        if(ζ>=0.0 && ζ<=1)
+          ψ = -alpha * ζ;
+        else
+          ψ = (1 - alpha) * log(ζ) + ζ;
+        end
+      elseif(stab_type_stable==3) # Beljaars-Holtslag, 1991, Journal of Applied Meteorology
+        # Constants
+        a = 1.0;
+        b = 0.667;
+        c = 5;
+        d = 0.35;
+        # Stability correction for momentum
+        ψ = (- (1. + (2. / 3.) * a * ζ) ^ (3. / 2.)
+                  - b * (ζ - (c / d)) * exp(-d * ζ)
+                  - (b * c) / d + 1);
+      elseif(stab_type_stable==4) #Cheng and Brutsaert (2005) as described by Jimenez et al. (2012)
+        a = 6.1;
+        b = 2.5;
+        c = 5.3;
+        d = 1.1;
+        ψ =  -c * log(ζ + (1 + ζ^d) ^ (1. / d));
+      end
 
-    elseif (ζ<0 && ζ>=-0.465) # unstable
-        x   = (1.0-16.0*ζ)^0.25;
-        ψ = 2.0*log((1.0+x*x)/2.0);
-    elseif (ζ<-0.465) # very unstable
+    else # (ζ<0) unstable
         x   = (1.0-16.0*ζ)^0.25;
         ψ = 2.0*log((1.0+x*x)/2.0);
     end
     return ψ
 end
 
-function setra_atmo(l::leaf_params,flux::fluxes,met::meteo)
+function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resistance
     # based on Monin-Obukhov Similiarity theory -> to be changed for LES
     # compute Obukhov length
-    Hv_s  = flux.H*(1+0.61*met.e_air);
-    Tv    = met.T_air*(1+0.61*met.e_air);
-    L     = - flux.ustar^3*Tv/(physcon.grav*physcon.K*Hv_s);
-    ra_m = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m)  ) * ( log((met.zscreen - l.d)/l.z0m) ) ;# momentum aerodynamic resistance
-    ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m)  ) * ( log((met.zscreen - l.d)/l.z0h) ) ;# water aerodynamic resistance
-    #ra_m = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# momentum aerodynamic resistance
-    #ra_w = 1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ) ;# water aerodynamic resistance
-    flux.ustar = sqrt(met.U/ra_m); # keep ustar estimate in memory
-    return ra_w; # based on Monin-Obukhov Similarity theory -> to be changed for LES
+    # iterate a few times
+
+    # first update roughness (if phenology is changing)
+    setRoughness!(l)
+
+    rmin  = 1e-3;
+    Lold  = -1e6;
+    raw_full = -999.0;
+    H     = -999.0;
+    LE    = -999.0;
+    ustar = -999.0;
+
+    #The numerical solution for the fluxes of momentum, sensible heat, and water vapor flux from non-vegetated surfaces proceeds as follows:
+    #1. An initial guess for the wind speed Va is obtained from (5.24) assuming an initial convective velocity Uc = 0 m s-1 for stable conditions (✓v, atm   ✓v, s   0 as evaluated from (5.50) ) and Uc = 0.5 for unstable conditions (✓v,atm  ✓v,s < 0).
+    #2. AninitialguessfortheMonin-ObukhovlengthLisobtainedfromthebulkRichardsonnumberusing(5.46)and (5.48).
+    #3. The following system of equations is iterated three times:
+    #4. Friction velocity u⇤ ((5.32), (5.33), (5.34), (5.35))
+    #5. Potential temperature scale ✓⇤ ((5.37) , (5.38), (5.39), (5.40))
+    #6. Humidity scale q⇤ ((5.41), (5.42), (5.43), (5.44))
+    #7. Roughness lengths for sensible z0h, g and latent heat z0w, g ((5.82) )
+    #8. Virtual potential temperature scale ✓v⇤ ( (5.17))
+    #9. Wind speed including the convective velocity, Va ( (5.24))
+    #10. Monin-Obukhov length L ((5.49))
+    #11. Aerodynamic resistances ram , rah , and raw ((5.55), (5.56), (5.57))
+    #12. Momentum fluxes ⌧x , ⌧y ((5.5), (5.6))
+    #13. Sensible heat flux Hg ((5.62))
+
+    # need to compute the evolving buoyancy flux
+    Tv       = met.T_air*(1.0+0.61*met.e_air);
+    ra_leaf  = 1/l.Cd / sqrt(met.U/l.dleaf);
+
+    DeltaT   =   l.T - met.T_air;
+    esat,desat_dT = SatVap(l.T);
+    VPD      =   max(esat-met.e_air,1.0);
+    ρd       =   met.P_air/(physcon.Rd*met.T_air);      # dry air density (kg/m3)
+    lv       =   Lv(l.T);
+    L        =   met.L; # initial Obukhov length
+    counter = 1;
+    while (counter<20 && abs(1.0-Lold/L)>1e-6) # 1% error
+      Lold     = L;
+      #println("Lold=",Lold)
+      ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ), rmin) ;# momentum aerodynamic resistance
+      ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ), rmin) ;# water aerodynamic resistance
+      ram_full =   ra_leaf + ra_m;
+      raw_full =   ra_leaf + ra_w;
+      H        =   ρd*physcon.Cpd*DeltaT/raw_full;
+      rs_s_m   =   flux.g_m_s_to_micromol_m2_s/l.gs;
+      LE       =   physcon.ε/met.P_air*ρd*lv*VPD/(rs_s_m+raw_full);
+      ustar    =   sqrt(met.U/ram_full);
+      Hv_s     =   H + 0.61 * physcon.Cpd/lv * met.T_air * LE;
+      L        = - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
+      #println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), counter=", counter)
+      counter = counter+1
+    end
+
+    # save these values in leaf and flux structures
+    met.L   = L
+    flux.H  = H
+    flux.LE = LE
+    flux.ustar = ustar
+    l.ra    = raw_full
 end
-
-function setra!(l::leaf_params, flux::fluxes, met::meteo) # set leaf boundary layer
-    ra_leaf = 1/l.Cd / sqrt(met.U/l.dleaf); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
-    l.ra    = max(ra_leaf + setra_atmo(l, flux, met),1.0);
-    println("ra=",l.ra," (s/m), H=", flux.H, " (W/m2)")
-end
-
-
-
-
-
-
-
-
-
 
 
 
