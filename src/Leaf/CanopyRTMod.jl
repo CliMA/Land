@@ -59,7 +59,8 @@ sunRad = incomingRadiation{FT}(loadSun(swl)...)
 
 # Lots of structures predefine here, in principle just placeholders, routines can be run with any!
 # Soil structure (can adapt later, just using a plain albedo here)
-const soil = struct_soil{FT}(wl, 0.4*ones(FT, length(wl)), [0.05])
+# WL, Shortwave_albedo, LE_albedo, Tskin:
+const soil = struct_soil{FT}(wl, 0.4*ones(FT, length(wl)), [0.1],290.0)
 # Leaf structure (need to define the dimensions as in the other structures soon, tbd)
 const leaf   = leafbio{FT,nwl, length(wle), length(wlf)}()
 # Observation angles
@@ -120,7 +121,7 @@ function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canop
     cR.E_down[:,1] = sun.E_diffuse;
 
     @inbounds for j=1:nlayers # from top to bottom
-        cR.netSW_direct[:,j] = cO.Es_[:,j].*(1 .-(τ_ss.+τ_sd[:,j]+ρ_sd[:,j]));
+        cR.netSW_sunlit[:,j] = cO.Es_[:,j].*(1 .-(τ_ss.+τ_sd[:,j]+ρ_sd[:,j]));
         cO.Es_[:,j+1]    =  Xss.*cO.Es_[:,j];
         cR.E_down[:,j+1] =  cO.Xsd[:,j].*cO.Es_[:,j]+cO.Xdd[:,j].*cR.E_down[:,j];
         cR.E_up[:,j]     =  cO.R_sd[:,j].*cO.Es_[:,j]+cO.R_dd[:,j].*cR.E_down[:,j];
@@ -134,7 +135,9 @@ function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canop
     # compute net diffuse radiation per layer:
     @inbounds for j=1:nlayers
         E_ = cR.E_down[:,j] +  cR.E_up[:,j+1];
-        cR.netSW_diffuse[:,j]= E_.*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
+        cR.netSW_shade[:,j]= E_.*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
+        # Add diffuse radiation to direct radiation as well:
+        #cR.netSW_sunlit[:,j] += cR.netSW_shade[:,j]
     end
 
     # outgoing in viewing direction
@@ -210,33 +213,38 @@ function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::
     normi = 1/mean(cO.absfs'*can.lidf)
     lPs = (cO.Ps[1:nl]+cO.Ps[2:nl+1])/2
     @inbounds for j = 1:nl
-    if length(leaf)>1
-        	kChlrel = leaf[j].kChlrel[iPAR]
-    else
-    kChlrel = leaf[1].kChlrel[iPAR]
-    end
-    PAR_diff = (fac/iLAI)*e2phot(wl[iPAR], cR.netSW_diffuse[iPAR,j])
-    # Direct PAR is normalized by layer Ps value:
-    PAR_dir = (fac/iLAI/lPs[j])*e2phot(wl[iPAR], cR.netSW_direct[iPAR,j])
+        if length(leaf)>1
+            	kChlrel = leaf[j].kChlrel[iPAR]
+        else
+        kChlrel = leaf[1].kChlrel[iPAR]
+        end
+        PAR_diff = (fac/iLAI)*e2phot(wl[iPAR], cR.netSW_shade[iPAR,j])
+        # Direct PAR is normalized by layer Ps value:
+        PAR_dir = (fac/iLAI/lPs[j])*e2phot(wl[iPAR], cR.netSW_sunlit[iPAR,j])+PAR_diff
 
-    PAR_diffCab = kChlrel.*PAR_diff
-    #println(leaf.kChlrel[iPAR])
-    # Direct PAR is normalized by layer Ps value:
-    PAR_dirCab  = kChlrel.*PAR_dir;
+        PAR_diffCab = kChlrel.*PAR_diff
+        #println(leaf.kChlrel[iPAR])
+        # Direct PAR is normalized by layer Ps value:
+        PAR_dirCab  = kChlrel.*PAR_dir;
 
-    # Absorbed PAR per leaf for shaded:
-    cR.absPAR_shade[j] = fast∫(dwl[iPAR],PAR_diff);
-    # for sunlit (all angles, normalized)
-    cR.absPAR_sun[:,:,j]  = normi*cO.absfs*fast∫(dwl[iPAR],PAR_dir);
-    # Same for true absorbed PAR by CabCar only  (needs to be taken into account in photosynthesis calculation, i.e. already accounts for leaf green fAPAR!)
-    cR.absPAR_shadeCab[j] = fast∫(dwl[iPAR],PAR_diffCab);
-    cR.absPAR_sunCab[:,:,j]  = normi*cO.absfs*fast∫(dwl[iPAR],PAR_dirCab);
+        # Absorbed PAR per leaf for shaded:
+        cR.absPAR_shade[j] = fast∫(dwl[iPAR],PAR_diff);
+        # for sunlit (all angles, normalized)
+        cR.absPAR_sun[:,:,j]  = normi*cO.absfs*fast∫(dwl[iPAR],PAR_dir);
+        # Same for true absorbed PAR by CabCar only  (needs to be taken into account in photosynthesis calculation, i.e. already accounts for leaf green fAPAR!)
+        cR.absPAR_shadeCab[j] = fast∫(dwl[iPAR],PAR_diffCab);
+        cR.absPAR_sunCab[:,:,j]  = normi*cO.absfs*fast∫(dwl[iPAR],PAR_dirCab);
     #println(PAR_dir[1], " ", cR.Pnh[j])
     end
     #@time fast∫(dwl[iPAR], sun.E_direct[iPAR])
     cR.incomingPAR_direct   = fac * fast∫(dwl[iPAR], e2phot(wl[iPAR],(sun.E_direct[iPAR])));
     cR.incomingPAR_diffuse  = fac * fast∫(dwl[iPAR], e2phot(wl[iPAR],(sun.E_diffuse[iPAR])));
     cR.incomingPAR          = cR.incomingPAR_diffuse*cR.incomingPAR_direct
+    @inbounds for i=1:nl
+        cR.intNetSW_shade[i] =   (fac/iLAI) *fast∫(dwl, cR.netSW_shade[:,i]);
+        cR.intNetSW_sunlit[i]  =   (fac/iLAI/lPs[i]) * fast∫(dwl, cR.netSW_sunlit[:,i]) + cR.intNetSW_shade[i];
+    end
+
 end
 
 
@@ -378,34 +386,84 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2);    #takes care of rounding error
 end
 
-function computeThermalFluxes(Tshade::Array, Tsun::Array, ϵ::Array, iLAI, lidf::Array, fSun::Array, wl::Array)
-    S⁺ = similar(Tshade)
-    S⁻ = similar(Tshade)
+function computeThermalFluxes( leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps,cR::struct_canopyRadiation, can::struct_canopy,so::struct_soil, incLW::Array)
+
+    @unpack Ps, Po, Pso,ddf,ddb = cO
+    @unpack T_sun, T_shade = cR
+    @unpack Ω,nlayers, LAI = can
+    @unpack albedo_LW, soil_skinT = so
+    FT = eltype(LAI)
+
+    iLAI    = LAI/nlayers;
+
+    # Sunlit fraction at mid layer:
+    fSun      = (Ps[1:nlayers] + Ps[2:nlayers+1])/2;
+
+    ϵ = similar(T_shade)
+    τ_dd = zeros(FT,1,length(T_shade))
+    ρ_dd = similar(τ_dd)
+    S⁺ = similar(ρ_dd)
+    S⁻ = similar(ρ_dd)
+    S_shade = similar(ρ_dd)
+    S_sun = similar(ρ_dd)
+
+
+    # If we just have the same leaf everywhere, compute emissivities:
+    if length(leaf)==1
+        le = leaf[1]
+        # Compute layer properties:
+        sigf = ddf*le.ρ_LW + ddb*le.τ_LW
+        sigb = ddb*le.ρ_LW + ddf*le.τ_LW
+        τ_dd = (1 - (1-sigf)*iLAI)*ones(nwl,nl)
+        ρ_dd = (sigb*iLAI)*ones(nwl,nl)
+        ϵ .= (1 - τ_dd-ρ_dd);
+    elseif length(leaf)==nlayers
+        for i=1:nlayers
+            le = leaf[i]
+            sigf = ddf*le.ρ_LW + ddb*le.τ_LW
+            sigb = ddb*le.ρ_LW + ddf*le.τ_LW
+            τ_dd[i] = (1 - (1-sigf)*iLAI)
+            ρ_dd[i]= (sigb*iLAI)
+            ϵ[i] = (1 - τ_dd[i]-ρ_dd[i]);
+        end
+    else
+        println("Complain, Array of leaves is neither 1 nor nlayers ")
+    end
+
     # Only one wavelength --> do Stefan Boltzmann:
-    if length(wl)==1
+    #if length(wl)==1
+    # Let's just do SB for now:
+    if 1==1
         # Shaded leaves first, simple 1D array:
-        emi = (1 .-fSun).*physcon.σ.*ϵ.*(Tshade.^4)
-        S⁺[:] = emi
-        S⁻[:] = emi
+        S_shade=physcon.σ.*ϵ.*(T_shade.^4)
         # Sunlit leaves:
-        if ndims(Tsun)>1
-            @inbounds for i=1:length(Tshade)
-                emi = physcon.σ*ϵ[i]*Tsun[:,:,i].^4
+        if ndims(T_sun)>1
+            @inbounds for i=1:length(T_shade)
+                emi = physcon.σ*ϵ[i]*T_sun[:,:,i].^4
                 # weighted average over angular distribution
-                mean_emi = fSun[i]*mean(emi'*lidf);
-                S⁺[i] += mean_emi
-                S⁻[i] += mean_emi
+                S_sun[i] = mean(emi'*lidf);
             end
         else
             # Sunlit, simple 1D array:
-            emi = physcon.σ.*ϵ.*(fSun).*Tsun.^4
-            S⁺[:] += emi
-            S⁻[:] +=emi
+            S_sun = physcon.σ.*ϵ.*T_sun.^4
         end
     else
         # Do Planck curve, tbd
     end
-    return S⁺*iLAI,S⁻*iLAI
+    S⁺[:] = iLAI*(fSun.*S_sun+(1 .-fSun).*S_shade)
+    S⁻[:] = S⁺[:]
+    soilEmission = physcon.σ*(1 .- albedo_LW) * soil_skinT^4
+    # Run RT:
+    F⁻,F⁺,net_diffuse = RTM_diffuseS(τ_dd, ρ_dd,S⁻, S⁺,incLW, soilEmission, albedo_LW)
+    for j = 1:nlayers
+        cR.intNetLW_sunlit[j]   = net_diffuse[j]- 2S_sun[j];          #  sunlit leaf
+        cR.intNetLW_shade[j]   = net_diffuse[j]- 2S_shade[j];     # shaded leaf
+    end
+    # Net soil LW as difference between up and downwelling at lowest level
+    cR.RnSoilLW = F⁻[1,end]-F⁺[1,end]
+    @show F⁻[:,end]
+    @show F⁺[:,end]
+    return F⁻,F⁺,net_diffuse
 end
 
 function computeSIF_Fluxes!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps,cR::struct_canopyRadiation,can::struct_canopy,so::struct_soil)
@@ -514,7 +572,7 @@ function computeSIF_Fluxes!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProp
         Fdplu[:,i]   =   sigbEmin_shade+sigfEplu_shade;     # Eq. 29b for shade leaf
         # Total weighted fluxes
         S⁻[:,i]         =   iLAI*(Qs[i]*Fsmin[:,i] +(1-Qs[i])*Fdmin[:,i]);
-        S⁺[:,i]         =    iLAI*(Qs[i]* Fsplu[:,i] +(1-Qs[i])*Fdplu[:,i]);
+        S⁺[:,i]         =   iLAI*(Qs[i]* Fsplu[:,i] +(1-Qs[i])*Fdplu[:,i]);
         Femo[:,i]    =  iLAI*(Qs[i]* piLs[:,i] +(1-Qs[i])*piLd[:,i]);
     end
     # Use Zero SIF fluxes as top and bottom boundary:
@@ -523,11 +581,11 @@ function computeSIF_Fluxes!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProp
     #println(size(zeroB), " ", size(rsoil), " ", size(S⁻), " ", size(τ_dd))
     F⁻,F⁺,net_diffuse = RTM_diffuseS(τ_dd, ρ_dd,S⁻, S⁺,zeroB, zeroB, rsoil)
     # Save in output structures!
-    cR.SIF_obs_sunlit[:]    = iLAI/FT(pi)*Pso[1:nlayers]'*piLs';                                               # direct Sunlit leaves
-    cR.SIF_obs_shaded[:]     = iLAI/FT(pi)*(Po[1:nlayers]-Pso[1:nlayers])'*piLd';                    # direct shaded leaves
+    cR.SIF_obs_sunlit[:]    = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
+    cR.SIF_obs_shaded[:]     = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
 
     # SIF scattered internally
-    cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Po[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
+    cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_soil[:]     = (rsoil .* F⁻[:,end] * Po[end])/FT(pi);                                                #Soil contribution
     cR.SIF_hemi[:]    = F⁺[:,1];
     cR.SIF_obs[:] = cR.SIF_obs_sunlit[:]+cR.SIF_obs_shaded[:]+cR.SIF_obs_shaded[:] +cR.SIF_obs_soil[:];

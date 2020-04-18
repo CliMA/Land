@@ -50,6 +50,7 @@ mutable struct incomingRadiation{FT<:Number}
     E_direct::Array{FT,1}
     " Diffuse incoming radiation (mW m^-2 μm^-1)"
     E_diffuse::Array{FT,1}
+
 end
 
 """
@@ -109,6 +110,8 @@ mutable struct struct_soil{FT<:Number}
     albedo_SW::Array{FT,1}    # | -          | (0.0, 1.0)  | "shortwave albedo"
     "longwave albedo"
     albedo_LW::Array{FT,1}    # | -          | (0.0, 1.0)  | "longwave albedo"
+    "Soil surface temperature (K)"
+    soil_skinT::FT    # | -          | (0.0, 1.0)  | "longwave albedo"
 end
 
 """
@@ -129,10 +132,12 @@ $(DocStringExtensions.FIELDS)
     incomingPAR_diffuse::FT = 0;                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated diffuse PAR"
     "net radiation of shaded soil (W m^-2)"
     RnSoil_diffuse::FT = 0 ;                         # | W m^-2               | (0.0, 2500)  | "net radiation of shaded soil"
-    "net radiation of sunlit soil (W m^-2)"
+    "net Short-wave radiation of sunlit soil (W m^-2)"
     RnSoil_direct::FT = 0;
-    "net radiation of soil (shaded + sunlit) (W m^-2)"
-    RnSoil::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit soil"
+    "net Short-wave radiation of soil (shaded + sunlit) (W m^-2)"
+    RnSoil::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation
+    "net long-wave radiation of soil (shaded + sunlit) (W m^-2)"
+    RnSoilLW::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit soil"
     # Dim of nLayers
     "net PAR of shaded leaves (moles m^-2 s^-1)"
     absPAR_shade::Array{FT,1} = zeros(nLayers)                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of shaded leaves"
@@ -140,32 +145,37 @@ $(DocStringExtensions.FIELDS)
     absPAR_shadeCab::Array{FT,1} = zeros(nLayers)
 
     # Dimension of wavelength only:
-    "TOC outgoing radiance in observation direction (mW m^-2 μm^-1 sr^-1)"
+    "Short-wave TOC outgoing radiance in observation direction (mW m^-2 μm^-1 sr^-1)"
     Lo::Array{FT,1} = zeros(nWl)                   # | mW m^-2 μm^-1 sr^-1  | (0.0, 2500)  | "TOC outgoing radiance in observation direction"
-    "TOC outgoing radiation (mW m^-2 μm^-1)"
+    "Short-wave TOC outgoing radiation (mW m^-2 μm^-1)"
     Eout::Array{FT,1} = zeros(nWl)                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "TOC outgoing radiation
-    "Albedo in viewing direction"
+    "Short-wave Albedo in viewing direction"
     alb_obs::Array{FT,1} = zeros(nWl)              # |                      | (0.0, 1.0)  |  "albedo in viewing direction"
-    "Albedo for direct incoming radiation"
+    "Short-wave Albedo for direct incoming radiation"
     alb_direct::Array{FT,1} = zeros(nWl)           # | -                    | (0.0, 1.0)   | "Albedo for direct incoming radiation"
-    "Albedo for diffuse incoming radiation"
+    "Short-wave Albedo for diffuse incoming radiation"
     alb_diffuse::Array{FT,1} = zeros(nWl)          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
 
     # Dimension of nLayer+1 * nWavelengths
-    "upwelling diffuse radiation within canopy (mW m^-2 μm^-1)"
+    "upwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
     E_up::Array{FT,2} = zeros(nWl,nLayers+1)
-    "downwelling diffuse radiation within canopy (mW m^-2 μm^-1)"
+    "downwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
     E_down::Array{FT,2} = zeros(nWl,nLayers+1)
 
     # Dimension of nLayer * nWavelengths
     "net absorbed direct radiation in each layer (mW m^-2 μm^-1)"
-    netSW_direct::Array{FT,2} = zeros(nWl,nLayers)
+    netSW_sunlit::Array{FT,2} = zeros(nWl,nLayers)
     "net absorbed diffuse radiation in each layer (mW m^-2 μm^-1)"
-    netSW_diffuse::Array{FT,2} = zeros(nWl,nLayers)
+    netSW_shade::Array{FT,2} = zeros(nWl,nLayers)
     "spectrally integrated net absorbed direct radiation in each layer (W m^-2)"
-    intNetSW_direct::Array{FT,1} = zeros(nLayers)
+    intNetSW_sunlit::Array{FT,1} = zeros(nLayers)
     "spectrally integrated net absorbed diffuse radiation in each layer (W m^-2)"
-    intNetSW_diffuse::Array{FT,1} = zeros(nLayers)
+    intNetSW_shade::Array{FT,1} = zeros(nLayers)
+    "spectrally integrated net absorbed direct radiation in each layer (W m^-2)"
+    intNetLW_sunlit::Array{FT,1} = zeros(nLayers)
+    "spectrally integrated net absorbed diffuse radiation in each layer (W m^-2)"
+    intNetLW_shade::Array{FT,1} = zeros(nLayers)
+
 
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
     "net PAR of sunlit leaves moles m^-2 s^-1"
@@ -173,7 +183,7 @@ $(DocStringExtensions.FIELDS)
     "net PAR by Cab+Car of sunlit leaves moles m^-2 s^-1"
     absPAR_sunCab::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
     "Leaf temperature (sunlit) (K)"
-    T_sun3D::Array{FT,3} = zeros(nIncl,nAzi,nLayers).+280
+    T_sun3D::Array{FT,3} = zeros(nIncl,nAzi,nLayers).+285
     "Leaf temperature (sunlit) (K)"
     T_sun::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for sunlit leaves"
