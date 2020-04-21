@@ -269,6 +269,7 @@ function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOpt
           cO.vb[j,i]    = cO.dob[j]  * ρ_SW[j]   + cO.dof[j] *  τ_SW[j]; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
           cO.vf[j,i]     = cO.dof[j]  * ρ_SW[j]   + cO.dob[j] *  τ_SW[j]; # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
           cO.w[j,i]     = cO.sob[j]  * ρ_SW[j]   + cO.sof[j] *  τ_SW[j]; # [nl,nwl]  bidirectional scattering coefficent (directional-directional)
+
         end
     end
     cO.a    .= 1 .- cO.sigf;                  # [nl, nwl]     attenuation
@@ -328,26 +329,31 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
 
     #	Weighted sums over LIDF
     @inbounds for i=1:length(litab)
-    # ttl = litab[i];	% leaf inclination discrete values
-    ctl = cosd(litab[i]);
-    #	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
-    chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
-    #	Extinction coefficients
-    ksli = chi_s./cts;
+        # ttl = litab[i];	% leaf inclination discrete values
+        ctl = cosd(litab[i]);
+        #	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
+        chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi_vol,litab[i]);
+        #	Extinction coefficients
+        ksli = chi_s./cts;
 
-    koli = chi_o./cto;
-    #if i==5
-#    println(koli)
-#end
-        #	Area scattering coefficient fractions
-    sobli	= frho*pi/ctscto;
-    sofli	= ftau*pi/ctscto;
-    bfli	= ctl*ctl;
-    cO.ks	= cO.ks+ksli*lidf[i];
-    cO.ko	= cO.ko+koli*lidf[i];
-    cO.bf	= cO.bf+bfli*lidf[i];
-    cO.sob	= cO.sob+sobli*lidf[i];
-    cO.sof	= cO.sof+sofli*lidf[i];
+        koli = chi_o./cto;
+        #if i==5
+    #    println(koli)
+    #end
+            #	Area scattering coefficient fractions
+        if ftau<0
+            sobli	= -ftau*pi/ctscto;
+            sofli	= frho*pi/ctscto;
+        else
+            sobli	= frho*pi/ctscto;
+            sofli	= ftau*pi/ctscto;
+        end
+        bfli	= ctl*ctl;
+        cO.ks	= cO.ks+ksli*lidf[i];
+        cO.ko	= cO.ko+koli*lidf[i];
+        cO.bf	= cO.bf+bfli*lidf[i];
+        cO.sob	= cO.sob+sobli*lidf[i];
+        cO.sof	= cO.sof+sofli*lidf[i];
     end
     #println(sob, " ", sof)
 
@@ -364,6 +370,8 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     Ss          = sin_ttli.*sin_tts;         # [nli]     pag 305 modified by Joris
     cds  = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo';                    # [nli,nlazi]
     cdo  = (cos_ttli.*cto)*ones(FT,1,length(lazitab)) .+ (sin_ttli.*sin_tto)*cos_philo';   # [nli,nlazi]
+
+    # This is basically equivalent to Kb in Bonan, eq. 14.21
     cO.fs          = (cds./cts);
     cO.absfs    = abs.(cO.fs);         # [nli,nlazi] pag 305
     # Added here
@@ -383,6 +391,8 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
 
     #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     # Just ignore Ω for now, it is not yet thought through!
+    #@show cO.ks
+    #@show cO.ko
     @inbounds for j=1:length(xl)
         cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,Ω*LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
     end
@@ -810,7 +820,7 @@ function Psofunction(K,k,LAI,q,dso,xl)
     return pso
 end
 
-# FROM SCOPE v1.73 APPENDIX II function volscat
+# Changed from latest volscat functions (April 2001)
 """********************************************************************************
 !*	tts		= solar zenith
 !*	tto		= viewing zenith
@@ -895,10 +905,11 @@ function volscatt(tts,tto,psi,ttli)
     #c .............................................................................
 
     btran1=abs(bts-bto);
-    btran2=pi-abs(bts+bto-FT(pi));
-    @show psi_rad
-    @show btran1
-    @show btran2
+    btran_=pi-abs(bts+bto-FT(pi));
+    btran2=2FT(pi)-bts-bto;
+    #@show psi_rad
+    #@show btran1
+    #@show btran2
 
     if (psi_rad<=btran1)
     	bt1=psi_rad;
@@ -924,8 +935,16 @@ function volscatt(tts,tto,psi,ttli)
     denom=2 *FT(pi)^2;
     frho=((pi-bt2)*t1+t2)/denom;
     ftau=    (-bt2*t1+t2)/denom;
-
-    return abs(chi_s),abs(chi_o),abs(frho),abs(ftau)
+    #if frho<0 || ftau<0 || chi_s<0 || chi_o < 0
+        #@show bto
+        #@show bts
+        #@show bts-bto
+        #@show btran1
+        #@show btran2
+        #@show btran_
+        #@show psi_rad
+    #end
+    return (chi_s),abs(chi_o),(frho),(ftau)
 end
 
 function dladgen(a::Number,b::Number)
