@@ -286,7 +286,8 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     tto = angle.tto
     psi = angle.psi
     lazitab = can.lazitab
-
+    # only needed for volume scattering for symmetry (not sure why it wasn't working)
+    psi_vol         = abs(psi-FT(360.0)*round(psi/FT(360.0)));
     # Geometric quantities (ougoing direction first!)
     cto = cosd(tto)
     tanto	= tand(tto);
@@ -333,7 +334,11 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi,litab[i]);
     #	Extinction coefficients
     ksli = chi_s./cts;
+
     koli = chi_o./cto;
+    #if i==5
+#    println(koli)
+#end
         #	Area scattering coefficient fractions
     sobli	= frho*pi/ctscto;
     sofli	= ftau*pi/ctscto;
@@ -373,13 +378,13 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     # Leave off Omega for Po here still
     cO.Po[:]          =   Ω*exp.(cO.ko*xl*Ω*LAI);     # [nl+1]  probability of viewing a leaf in observation dir
 
-    #cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*LAI*dx))/(cO.ks*LAI*dx);   # Correct Ps/Po for finite dx
-    #cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*LAI*dx))/(cO.ko*LAI*dx);   # Correct Ps/Po for finite dx
+    cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*LAI*dx))/(cO.ks*LAI*dx);   # Correct Ps/Po for finite dx
+    cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*LAI*dx))/(cO.ko*LAI*dx);   # Correct Ps/Po for finite dx
 
     #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     # Just ignore Ω for now, it is not yet thought through!
     @inbounds for j=1:length(xl)
-        cO.Pso[j] = Ω*quadgk(x -> Psofunction(cO.ko,cO.ks,Ω*LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
+        cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,Ω*LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
     end
 
     #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2);    #takes care of rounding error
@@ -423,6 +428,7 @@ function computeThermalFluxes( leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptP
             sigf = ddf*le.ρ_LW + ddb*le.τ_LW
             sigb = ddb*le.ρ_LW + ddf*le.τ_LW
             τ_dd[i] = (1 - (1-sigf)*iLAI)
+            #τ_dd[i] = (1 - exp(-sigf*iLAI))
             ρ_dd[i]= (sigb*iLAI)
             ϵ[i] = (1 - τ_dd[i]-ρ_dd[i]);
         end
@@ -461,8 +467,8 @@ function computeThermalFluxes( leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptP
     end
     # Net soil LW as difference between up and downwelling at lowest level
     cR.RnSoilLW = F⁻[1,end]-F⁺[1,end]
-    @show F⁻[:,end]
-    @show F⁺[:,end]
+    #@show F⁻[:,end]
+    #@show F⁺[:,end]
     return F⁻,F⁺,net_diffuse
 end
 
@@ -848,37 +854,78 @@ function volscatt(tts,tto,psi,ttli)
     Ss              = sin_ttli*sin_tts;                 #   p305{1}
     Co              = cos_ttli*cos_tto;                 #   p305{1}
     So              = sin_ttli*sin_tto;                 #   p305{1}
-    As              = maximum([Ss,Cs]);
-    Ao              = maximum([So,Co]);
-    #println(-Cs./As, " ", Ss, " ", Cs)
-    bts             = acos.(-Cs./As);                    #   p305{1}
-    bto             = acos.(-Co./Ao);                    #   p305{2}
-    chi_o           = 2/FT(pi)*((bto-FT(pi)/2).*Co + sin(bto).*So);
-    chi_s           = 2/FT(pi)*((bts-FT(pi)/2).*Cs + sin(bts).*Ss);
-    delta1          = abs(bts-bto);                     #   p308{1}
-    delta2          = pi-abs(bts + bto - pi);           #   p308{1}
+    #@show Ss
+    #@show So
+    #@show Cs
+    #@show Co
+    cosbts=1;
+    if (abs(Ss)>1e-6)
+    	cosbts=-Cs/Ss;
+    end
+    cosbto=1;
+    if (abs(So)>1e-6)
+    	cosbto=-Co/So;
+    end
 
-    Tot             = psi_rad + delta1 + delta2;        #   pag 130{1}
+    if (abs(cosbts)<1)
+    	bts=acos(cosbts);
+    	ds=Ss;
+    else
+    	bts=FT(pi);
+    	ds=Cs;
+    end
 
-    bt1             = minimum([psi_rad,delta1]);
-    bt3             = maximum([psi_rad,delta2]);
-    bt2             = Tot - bt1 - bt3;
+    chi_s=2/FT(pi)*((bts-FT(pi)/2)*Cs+sin(bts)*Ss);
 
-    T1              = 2Cs.*Co + Ss.*So.*cos_psi;
-    T2              = sin(bt2).*(2As.*Ao + Ss.*So.*cos(bt1).*cos(bt3));
+    if (abs(cosbto)<1)
+    	bto=acos(cosbto);
+    	doo=So;
+    elseif(tto<90)
+    	bto=pi;
+    	doo=Co;
+    else
+    	bto=0;
+    	doo=-Co;
+    end
+    chi_o=2 /FT(pi)*((bto-FT(pi)/2)*Co+sin(bto)*So);
 
-    Jmin            = (   bt2).*T1 - T2;
-    Jplus           = (pi-bt2).*T1 + T2;
+    #c ..............................................................................
+    #c   Computation of auxiliary azimut angles bt1, bt2, bt3 used
+    #c   for the computation of the bidirectional scattering coefficient w
+    #c .............................................................................
 
-    frho            =  Jplus/(2pi^2);
-    ftau            = -Jmin /(2pi^2);
+    btran1=abs(bts-bto);
+    btran2=pi-abs(bts+bto-FT(pi));
+    @show psi_rad
+    @show btran1
+    @show btran2
 
-    # pag.309 wl-> pag 135{1}
-    frho            = maximum([FT(0),frho]);
-    ftau            = maximum([FT(0),ftau]);
-    #println(tts, " ",tto, " ",psi, " ",ttli)
-    #println(chi_s, " ", chi_o, " ",frho, " ",ftau)
-    return chi_s,chi_o,frho,ftau
+    if (psi_rad<=btran1)
+    	bt1=psi_rad;
+    	bt2=btran1;
+    	bt3=btran2;
+    else
+    	bt1=btran1;
+    	if (psi_rad<=btran2)
+    		bt2=psi_rad;
+    		bt3=btran2;
+        else
+    		bt2=btran2;
+    		bt3=psi_rad;
+        end
+    end
+
+    t1=2Cs*Co+Ss*So*cos_psi;
+    t2=0;
+    if (bt2>0)
+    	t2=sin(bt2)*(2ds*doo+Ss*So*cos(bt1)*cos(bt3));
+    end
+
+    denom=2 *FT(pi)^2;
+    frho=((pi-bt2)*t1+t2)/denom;
+    ftau=    (-bt2*t1+t2)/denom;
+
+    return abs(chi_s),abs(chi_o),abs(frho),abs(ftau)
 end
 
 function dladgen(a::Number,b::Number)

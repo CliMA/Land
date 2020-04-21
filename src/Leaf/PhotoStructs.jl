@@ -322,7 +322,8 @@ $(DocStringExtensions.FIELDS)
     TypeLidf::FT       = 1     # | -          | (-1.0, 1.0)  | "Leaf distribution type (2=campbell, 1=ladgen)"
 
     # Some more derived parameters:
-    lazitab::Array{FT} = collect(5.0:20.0:355.0)
+    lazitab::Array{FT} = collect(5.0:10.0:355.0)
+    # This is changed afterwards, ignore here.
     lidf::Array{FT} = similar(collect(5.0:10.0:355.0))
     xl::Array{FT} = collect(0.0:-1.0/nlayers:-1.0)
     dx::FT             = 1.0/nlayers
