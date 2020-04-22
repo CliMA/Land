@@ -247,6 +247,40 @@ function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::
 
 end
 
+function compCanopyOptsExact!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps, lidf::Array)
+    @unpack fs,fo, fsfo, absfsfo, cosΘ_l = cO
+    fill!(cO.w,0)
+    fill!(cO.sf,0)
+    fill!(cO.sb,0)
+    fill!(cO.vf,0)
+    fill!(cO.vb,0)
+    fill!(cO.sigf,0)
+    fill!(cO.sigb,0)
+
+
+    f₁ = lidf.*(1 .+ cosd.(litab))/2
+    f₂ =  lidf.*(1 .- cosd.(litab))/2
+    @inbounds for i=1:nlayers
+        if length(leaf)>1
+            τ = leaf[i].τ_SW
+            ρ = leaf[i].ρ_SW
+        else
+            τ = leaf[1].τ_SW
+            ρ = leaf[1].ρ_SW
+        end
+        R = CartesianIndices(canOpt.fs)
+        for I in R
+            iL = I[1]
+            @inbounds for j=1:size(cO.sigb, 1)
+                    cO.w[j,i]    += lidf[iL]*(abs(fsfo[I])*(ρ[j]+τ[j])+fsfo[I]*(ρ[j]-τ[j]))/2
+                    cO.vb[j,i]  += lidf[iL]*(abs(fo[I])*(ρ[j]+τ[j])+fo[I]*cosΘ_l[I]*(ρ[j]-τ[j]))/2; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
+                    cO.vf[j,i]    +=  lidf[iL]*(abs(fo[I])*(ρ[j]+τ[j])-fo[I]*cosΘ_l[I]*(ρ[j]-τ[j]))/2 # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
+                    #cO.w[:,i] += lidf[iL]*(abs(fsfo[I])*(ρ.+τ)+fsfo[I]*(ρ.-τ))/2
+                    #w2[:] += canopy.lidf[I[1]]*(abs(canOpt.fsfo[I])*(rho.+tau)+canOpt.fsfo[I]*(rho.-tau))/2
+            end
+        end
+    end
+end
 
 
 function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps)
@@ -334,19 +368,18 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
         #	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
         chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi_vol,litab[i]);
         #	Extinction coefficients
-        ksli = chi_s./cts;
+        ksli = abs(chi_s./cts);
 
-        koli = chi_o./cto;
-        #if i==5
-    #    println(koli)
-    #end
+        koli =abs(chi_o./cto);
             #	Area scattering coefficient fractions
+        #@show ftau
+        #@show frho
         if ftau<0
-            sobli	= -ftau*pi/ctscto;
-            sofli	= frho*pi/ctscto;
+            sobli	= abs(ftau)*FT(pi)/ctscto;
+            sofli	= abs(frho)*FT(pi)/ctscto;
         else
-            sobli	= frho*pi/ctscto;
-            sofli	= ftau*pi/ctscto;
+            sobli	=(frho*FT(pi)/ctscto);
+            sofli	= (ftau*FT(pi)/ctscto);
         end
         bfli	= ctl*ctl;
         cO.ks	= cO.ks+ksli*lidf[i];
@@ -494,9 +527,12 @@ function computeSIF_Fluxes!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProp
 
     dim = size(leaf[1].Mb)
     # Compute mid layer Ps,Po,Pso
-    Qso   = (Pso[1:nlayers] + Pso[2:nlayers+1])/2;
-    Qs      = (Ps[1:nlayers] + Ps[2:nlayers+1])/2;
-    Qo      =(Po[1:nlayers] + Po[2:nlayers+1])/2;
+    #Qso   = (Pso[1:nlayers] + Pso[2:nlayers+1])/2;
+    #Qs      = (Ps[1:nlayers] + Ps[2:nlayers+1])/2;
+    #Qo      =(Po[1:nlayers] + Po[2:nlayers+1])/2;
+    Qso   = Pso[1:nlayers]
+    Qs     = Ps[1:nlayers]
+    Qo     = Po[1:nlayers]
     # Allocate arrays for output:
     di = size(leaf[1].Mb)
     S⁻ = zeros(FT,dim[1],nlayers )
