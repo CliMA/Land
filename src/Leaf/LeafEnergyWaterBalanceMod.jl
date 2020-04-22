@@ -21,20 +21,28 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  flu
     l.T            = Tleaf;
     l.psi_l        = psileaf;
 
+    if(Tleaf<200.0 || psileaf>0.0)
+        println("Error in Tleaf and psi_leaf - unphysical values")
+        process.exit(10)
+    end
     LeafPhotosynthesis(flux, l, met); # compute H, LE in there as well
 
-    #print(l.gs)
-    lv           =   Lv(l.T);
-    flux.Rn      =   (1-l.α)*met.S_down +  met.L_down - l.ε*physcon.σ*Tleaf^4;
+
+    # TODO aerodynamic resistance should be double for the sensible heat flux at leaf level, but do we really care?
+    l.Cleaf = l.LMA* ( (1.0-l.RWC)*physcon.Cdryleaf + l.RWC*physcon.Cpl )/(1.0-l.RWC); # leaf conductivity
+    # println("Cleaf=",l.Cleaf)
+    lv           =   Lv(Tleaf);
+    flux.Rn      =   (1-l.α)*met.S_down +  2.0*(met.L_down - l.ε*physcon.σ*Tleaf^4); # 2 is for two sides of the leaves
+    #println("S_down=",met.S_down," , Ldown=",met.L_down," Tleaf=",Tleaf)
     #dRn_dTs = - 4*l.ε*physcon.σ*Tleaf^3;
     setkx!(l,psi_s, psileaf) ;# set hydraulic conductivity as a function of psis and psi_l
     flux.Sap     =   (psi_s - l.psi_l)*l.kx # equal to int k(psi)dpsi;
-    dT_dt        =   (flux.Rn-flux.H-flux.LE)/(l.LMA*l.c_leaf);
+    dT_dt        =   (flux.Rn-flux.H-flux.LE)/l.Cleaf; # 2 times for up and down part of the leaves - TODO need to check this I am not sure I agree when integrated over the canopy
     dH2Ol_dt     =   (flux.Sap-flux.LE/lv)/l.Ctree;
 
     #print(flux.Cs, " ppm, ". l.VPD/1000.0, " (kPA), ", flux.An, " micromol/s/m2  ")
-    println("Sdown= " , met.S_down, "W/m2, Rn=",flux.Rn,"W/m2, SEB=",flux.Rn-flux.H-flux.LE,"W/m2, H= ",flux.H, "W /m2, LE= ",flux.LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), ra=",l.ra, " (s/m) ")
-    return dT_dt, dH2Ol_dt , flux.Rn, flux.H, flux.LE
+    #println("Sdown= " , met.S_down, "W/m2, Rn=",flux.Rn,"W/m2, SEB=",flux.Rn-flux.H-flux.LE,"W/m2, H= ",flux.H, "W /m2, LE= ",flux.LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), ra=",l.ra, " (s/m) ")
+    return dT_dt, dH2Ol_dt
 end
 
 end # end module

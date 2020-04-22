@@ -14,11 +14,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     ε::TT  = -999;                           # longwave emissivity
 
     # thermal characteristics
-    LMA::TT         = -999;                  # leaf mass area - kg/m2 - density times thickness
-    c_leaf::TT      = -999;                  # leaf heat capacity - J/kg
-
+    LMA::TT         = 100e-3;                # DRY leaf mass area, NOT MEAN VALUE WHICH INCLUDES RELATIVE WATER CONTENT - kg/m2 - density times thickness
+    RWC::TT         = 0.8;                   # leaf relative water content
+    Cleaf::TT       = 100.0;                 # leaf specific heat (J/kg/K)
     # turbulence
-    ra::TT          = 20;                    # leaf aerodynamic resistance (s/m)
+    ra::TT          = 1e6;                    # leaf aerodynamic resistance (s/m)
 
     # Rate constants (arbitrary units here, only relative rates are important):
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
@@ -59,23 +59,24 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
     # Conductances:
     # Ball Berry or Medlyn model
-    g0::TT = 0.01;                             # Ball-Berry minimum leaf conductance, unstressed (mol H2O/m2/s)
-    g1::TT = 9;                                # Ball-Berry slope of conductance-photosynthesis relationship, unstressed
+    g0::TT = 0.1;                              # Ball-Berry minimum leaf conductance, unstressed (mol/m2/s) - Sellers  et  al.  (1996)  used  0.1 b=  for  C3  plants  and  0.4 b=for  C4  plants
+    g1_BB::TT = 9.0;                           # Ball-Berry slope of conductance-photosynthesis relationship, unstressed - m=  for  C3  plants  and  4m=  for  C4  plants  (Collatz  et  al.  1991,  1992)
+    g1_Medlyn::TT = 126.49;                    # Medlyn slope of conductance-photosynthesis relationship, unstressed - Pa^(1/2) Medlyn et al. 2017
     vpd_min = 100.0                            # Min VPD for Medlyn model (blows up otherwise?)
     # Add already here: Mesophyll conductance (Inf for now):
 
-    gleaf::TT = 0.1;                           # total leaf conductance (μmol/m2/s/Pa)
-    gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/Pa)
-    gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s/Pa); just using some prior
-    gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s/Pa);
+    gleaf::TT = 0.1;                           # total leaf conductance (μmol/m2/s)
+    gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/)
+    gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s); just using some prior
+    gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s);
 
     #---------------------------------------------------------------------
     # Kc, Ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
     # Derive sco from cp with o2=0.209 mol/mol and re-calculate Γ to allow
     # variation in O2
     #---------------------------------------------------------------------
-    Kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C μmol/mol
-    Ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  mmol/mol
+    Kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C - μmol/mol
+    Ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  - mmol/mol
     Γ_25_::TT = 42.75;                         # CO2 compensation point at 25C μmol/mol
     sco::TT = 0.5 * 0.209 / (Γ_25_ * 1.e-06);  # Γ_25 (μmol/mol) -> (mol/mol)
     Γ_25::TT = 0.5 * o₂ / sco * 1000.;         # O2 is mmol/mol. Multiply by 1000 for μmol/mol
@@ -133,9 +134,9 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     Je::TT = 0.0 ;                              # electron transport rate
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
-    z0m         = -999.;                     # tree roughness (m)
-    z0h         = -999.;                     # tree roughness (m) - TODO should be changed later
-    d           = -999.;                     # tree displacement height (m)
+    z0m         = -999.;                          # tree roughness (m)
+    z0h         = -999.;                          # tree roughness (m) - TODO should be changed later
+    d           = -999.;                          # tree displacement height (m)
 
     dleaf       = 2e-3;                           # leaf thickness (m)
     Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient

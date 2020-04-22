@@ -1,6 +1,6 @@
 #module LeafPhotosynthesisMod
 
-export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!
+export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis, Medlyn!, BallBerry!
 
 
 using Parameters
@@ -10,14 +10,10 @@ using ..WaterVaporMod
 
 include("Leaf.jl")
 
-# parameter to define stability function for stable case
-stab_type_stable = 1;
 
 "Tolerance threshold for Ci iterations"
 tol = 0.1
 vpd_min = 0.1
-
-
 
 " Just a placeholder for now"
 
@@ -33,6 +29,9 @@ vpd_min = 0.1
      U::TT      = 1e-6;
      zscreen::TT= 10.0; # measurement height - default
      L::TT      = 1e6;  # atmospheric Obukhov length
+     # parameter to define stability function for stable case
+     stab_type_stable::TT = 1; # 2 Webb correction tends to be unstable at night - suggest not using
+
 end
 
 
@@ -61,20 +60,19 @@ end
          Sap::TT = 0.0
          An::TT = 0.0
          ustar::TT = 1e-6
-         g_m_s_to_micromol_m2_s::TT = 1.0/38.0e6
+         g_m_s_to_mol_m2_s::TT = -Inf
 end
 
 
 
 # Ball-Berry stomatal conductance model:
 function BallBerry!(flux::fluxes,  l::leaf_params)
-  #  Cs  : CO2 at leaf surface
-  #  RH  : relative humidity
-  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
-  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
-  #  Ci_input : will calculate gs if A is specified.
+  #  Cs  : CO2 at leaf surface [ppm]
+  #  RH  : relative humidity [0-1]
+  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
+  #  gs   : moles/m2/s
 
-  l.gs = l.g1 * max(flux.An,0.0) * l.RH/flux.Cs  + l.g0;
+  l.gs = l.g1_BB * max(flux.An,1e-9) * l.RH/flux.Cs  + l.g0;
 end # function
 
 
@@ -82,14 +80,13 @@ end # function
 # Medlyn stomatal conductance model:
 function Medlyn!(flux::fluxes, l::leaf_params)
   #  Cs  : CO2 at leaf surface
-  #  VPD  : vapor pressure deficit - Medlyn model
-  #  A   : Net assimilation in 'same units of CO2 as Cs'/m2/s
-  #  minCi : minimum Ci as a fraction of Cs (in case RH is very low?)
-  #  Ci_input : will calculate gs if A is specified.
+  #  VPD  : vapor pressure deficit - Pa
+  #  Cs  : CO2 at leaf surface [ppm]
+  #  RH  : relative humidity [0-1]
+  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
+  #  gs   : moles/m2/s
 
-  #print(A,Cs,l.g0,l.g1,l.gs)
-  l.gs = (1+l.g1/sqrt(l.VPD)) * max(flux.An,0.0) /flux.Cs  + l.g0;
-  #print(l.gs)
+  l.gs = (1.0+l.g1_Medlyn/sqrt(l.VPD)) * max(flux.An,1e-9) /flux.Cs  + l.g0;
 end # function
 
 
@@ -113,7 +110,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
     setLeafT!(leaf)
 
     # conversion factor for conductance - T and P dependent
-    flux.g_m_s_to_micromol_m2_s = 1.0e6/(44.6*273.15/met.T_air*met.P_air/1.013e5); # Körner, C., Scheel, J.A., Bauer, H., 1979. Maximum leaf diffusive conductance in vascular plants. Photosynthetica 13, 45–82.
+    flux.g_m_s_to_mol_m2_s = met.P_air/(physcon.Rgas*met.T_air) ; # Körner, C., Scheel, J.A., Bauer, H., 1979. Maximum leaf diffusive conductance in vascular plants. Photosynthetica 13, 45–82.
 
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
     leaf.Kp = 4.0
@@ -141,7 +138,7 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
     if (leaf.gstyp <= 1)
         Ci_0 = leaf.C3 ? 0.7*met.Ca : 0.4*met.Ca
         # Solve iterative loop:
-        leaf.Ci = hybrid(flux,leaf, met, CiFunc!, Ci_0, 1.05*Ci_0, tol)
+        leaf.Ci = hybrid(flux, leaf, met, CiFunc!, Ci_0, 1.05*Ci_0, tol)
     elseif leaf.gstyp == 2 # Needed for Bonan Stomatal optimization model
         leaf.Ci = CiFuncGs!(leaf.gs, flux, leaf, met)
     end
@@ -230,32 +227,7 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
     setra!(leaf, flux, met)
 
     # CO2 at leaf surface # might need to be changed
-    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_micromol_m2_s
-
-                                                          """
-                                                          # Pierre to Christian: I really don't understand this part - I commented
-                                                          # Stomatal constraint function (not sure we "need" the quadratic colimitations here, why not just use BB or Medlyn?)
-                                                          if (leaf.gstyp == 1) # Ball-Berry
-                                                              if flux.An >0.0
-                                                                  leaf.gs = maximum(quadratic(flux.Cs, flux.Cs*(flux.gbv - leaf.g0) - leaf.g1*flux.An, -flux.gbv * (flux.Cs*leaf.g0 + leaf.g1*flux.An*flux.ceair/leaf.esat)))
-                                                                  leaf.g1 * flux.An * flux.ceair/leaf.esat/flux.Cs  + leaf.g0;
-                                                                  # println(leaf.gs)
-                                                              else
-                                                                  leaf.gs = leaf.g0
-                                                              end
-                                                          elseif (leaf.gstyp == 0) # Medlyn
-                                                              if flux.An >0.0
-                                                                  # Not sure how this all works, copied from Bonan's ML canopy model
-                                                                  vpd_term = max((leaf.esat - flux.ceair), vpd_min) * 0.001
-                                                                  term = 1.6 * flux.An / flux.Cs
-                                                                  leaf.gs = maximum(quadratic(1.0, -(2.0 * (leaf.g0 + term) + (leaf.g1 * term)^2 / (flux.gbv * vpd_term)), leaf.g0 * leaf.g0 + (2.0 * leaf.g0 + term * (1.0 - leaf.g1 * leaf.g1 / vpd_term)) * term))
-                                                              else
-                                                                  leaf.gs = leaf.g0
-                                                              end
-                                                          end
-                                                          """
-
-
+    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_mol_m2_s
 
     # compute stomatal conductance gs
     leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
@@ -268,8 +240,8 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
     end
 
     # Diffusion (supply-based) photosynthetic rate - Calculate Ci from the diffusion rate
-    # total conductance
-    leaf.gleaf = 1.0 / (leaf.ra/flux.g_m_s_to_micromol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+    # total conductance - mol/m2/s
+    leaf.gleaf = 1.0 / (leaf.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
     Cinew = met.Ca - flux.An / leaf.gleaf
 
     # CiFunc returns the difference between the current Ci and the new Ci
@@ -295,7 +267,7 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
     setra!(leaf, flux, met)
 
     # Compute overall conductance (Boundary layer, stomata and mesophyll)
-    leaf.gleaf = 1.0/(leaf.ra/flux.g_m_s_to_micromol_m2_s + 1.6/gs + 1.0/leaf.gm)
+    leaf.gleaf = 1.0/(leaf.ra/flux.g_m_s_to_mol_m2_s + 1.6/gs + 1.0/leaf.gm)
     if leaf.gleaf<eps() leaf.gleaf=eps() end
 
     if leaf.C3
@@ -303,12 +275,14 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
         a0 = leaf.Vcmax
         e0 = 1.0
         d0 = leaf.Kc*(1.0+leaf.o₂/leaf.Ko)
+        # TODO need to cahnge ca by ci
         flux.Ac = minimum(quadratic(1.0/leaf.gleaf, -(e0*met.Ca + d0) - (a0 - e0*leaf.Rdleaf) / leaf.gleaf, a0 * (met.Ca - leaf.Γstar) - leaf.Rdleaf * (e0*met.Ca + d0)))
 
         # C3: RuBP-limited photosynthesis
         a0 = flux.Je
         e0 = 4.0
         d0 = 8.0*leaf.Γstar
+        # TODO need to cahnge ca by ci
         flux.Aj = minimum(quadratic(e0 / leaf.gleaf, -(e0*met.Ca + d0) - (a0 - e0*leaf.Rdleaf) / leaf.gleaf, a0 * (met.Ca - leaf.Γstar) - leaf.Rdleaf * (e0*met.Ca + d0)))
 
         # C3: Product-limited photosynthesis
@@ -337,7 +311,7 @@ function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
     flux.An = flux.Ag - leaf.Rdleaf
 
     # Compute CO2 at leaf surface
-    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_micromol_m2_s
+    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_mol_m2_s
 
     # Compute Ci (included Mesophyll as well in principle)
     ci_val = met.Ca - flux.An /leaf.gleaf
@@ -353,7 +327,7 @@ end # Function CiFuncGs!
 
 
 
-function ψ_m(ζ) # momentum correction function
+function ψ_m(ζ,stab_type_stable) # momentum correction function
 
     if(ζ>=0.0) # stable conditions
         if(stab_type_stable==1) # Grachev default value - Grachev et al SHEBA 2007
@@ -367,13 +341,17 @@ function ψ_m(ζ) # momentum correction function
           ψ = -3.0*am/bm*(x-1.0) + am*Bm/(2.0*bm)*( 2.0*log((x+Bm)/(1.0+Bm))
                                                    - log( (x*x-x*Bm+Bm*Bm)/(1.0-Bm+Bm*Bm) )
                                                    +2*sqrt(3.0)*( atan((2.0*x-Bm)/(sqrt(3.0)*Bm)) -  atan((2.0-Bm)/(sqrt(3.0)*Bm)))  );
-        elseif(stab_type_stable==2) # Webb correction as in NoahMP
+        elseif(stab_type_stable==2) # Webb correction as in NoahMP, quite numerically unstable at night - lots of oscillations
           alpha = 5.0;
+          """ should be the correct one but not continuously differntialble
           if(ζ>=0.0 && ζ<=1)
             ψ = -alpha * ζ;
           else
-            ψ = (1 - alpha) * log(ζ) + ζ;
+            ψ = -alpha; # should be z less anyways but here just made to create a plateau in the value
           end
+          """
+          # Pierre's new one:
+          ψ = -alpha*tanh(ζ);
         elseif(stab_type_stable==3) # Beljaars-Holtslag, 1991, Journal of Applied Meteorology
           # Constants
           a = 1.0;
@@ -396,14 +374,12 @@ function ψ_m(ζ) # momentum correction function
         x   =   (1.0-16.0*ζ)^0.25;
         ψ   =   2.0*log((1.0+x)/2.0) + log((1.0+x*x)/2.0) - 2.0*atan(x) + π/2;
     end
-
-    return ψ
 end
 
 
 
 
-function ψ_h(ζ) # momentum correction function
+function ψ_h(ζ,stab_type_stable) # momentum correction function
 
 if(ζ>=0.0) # stable conditions
       if(stab_type_stable==1) # Grachev default value - Grachev et al SHEBA 2007
@@ -418,11 +394,13 @@ if(ζ>=0.0) # stable conditions
         ψ = -bh/2*log(1+ch*ζ+ζ*ζ) + (-ah/Bh + bh*ch/(2.0*Bh))*(log((2.0*ζ+ch-Bh)/(2.0*ζ+ch+Bh)) - log((ch-Bh)/(ch+Bh)) );
       elseif(stab_type_stable==2) # Webb correction as in NoahMP
         alpha = 5.0;
-        if(ζ>=0.0 && ζ<=1)
-          ψ = -alpha * ζ;
-        else
-          ψ = (1 - alpha) * log(ζ) + ζ;
-        end
+        #if(ζ>=0.0 && ζ<=1)
+        #  ψ = -alpha * ζ;
+        #else
+        #  ψ = -alpha;
+        #end
+        # Pierre - I didn't like this so I changed it to be C1
+        ψ = -alpha*tanh(ζ);
       elseif(stab_type_stable==3) # Beljaars-Holtslag, 1991, Journal of Applied Meteorology
         # Constants
         a = 1.0;
@@ -445,6 +423,7 @@ if(ζ>=0.0) # stable conditions
         x   = (1.0-16.0*ζ)^0.25;
         ψ = 2.0*log((1.0+x*x)/2.0);
     end
+
     return ψ
 end
 
@@ -456,32 +435,27 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     # first update roughness (if phenology is changing)
     setRoughness!(l)
 
-    rmin  = 1e-3;
+    if(l.height>met.zscreen)
+        println("Vegetation height is higher than screen level height")
+        process.exit(20)
+    end
+
+
+    rmin  = 10.0;
     Lold  = -1e6;
     raw_full = -999.0;
     H     = -999.0;
     LE    = -999.0;
     ustar = -999.0;
 
-    #The numerical solution for the fluxes of momentum, sensible heat, and water vapor flux from non-vegetated surfaces proceeds as follows:
-    #1. An initial guess for the wind speed Va is obtained from (5.24) assuming an initial convective velocity Uc = 0 m s-1 for stable conditions (✓v, atm   ✓v, s   0 as evaluated from (5.50) ) and Uc = 0.5 for unstable conditions (✓v,atm  ✓v,s < 0).
-    #2. AninitialguessfortheMonin-ObukhovlengthLisobtainedfromthebulkRichardsonnumberusing(5.46)and (5.48).
-    #3. The following system of equations is iterated three times:
-    #4. Friction velocity u⇤ ((5.32), (5.33), (5.34), (5.35))
-    #5. Potential temperature scale ✓⇤ ((5.37) , (5.38), (5.39), (5.40))
-    #6. Humidity scale q⇤ ((5.41), (5.42), (5.43), (5.44))
-    #7. Roughness lengths for sensible z0h, g and latent heat z0w, g ((5.82) )
-    #8. Virtual potential temperature scale ✓v⇤ ( (5.17))
-    #9. Wind speed including the convective velocity, Va ( (5.24))
-    #10. Monin-Obukhov length L ((5.49))
-    #11. Aerodynamic resistances ram , rah , and raw ((5.55), (5.56), (5.57))
-    #12. Momentum fluxes ⌧x , ⌧y ((5.5), (5.6))
-    #13. Sensible heat flux Hg ((5.62))
+    # TODO change this later - 0 leaf boundary layer resistance - I prefer this as it is somewhat included in z0
+    l.Cd     = Inf;
+
 
     # need to compute the evolving buoyancy flux
     Tv       = met.T_air*(1.0+0.61*met.e_air);
     ra_leaf  = 1/l.Cd / sqrt(met.U/l.dleaf);
-
+    #println("ra_leaf=",ra_leaf)
     DeltaT   =   l.T - met.T_air;
     esat,desat_dT = SatVap(l.T);
     VPD      =   max(esat-met.e_air,1.0);
@@ -489,19 +463,20 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     lv       =   Lv(l.T);
     L        =   met.L; # initial Obukhov length
     counter = 1;
-    while (counter<20 && abs(1.0-Lold/L)>1e-6) # 1% error
-      Lold     = L;
-      #println("Lold=",Lold)
-      ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ), rmin) ;# momentum aerodynamic resistance
-      ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L) + ψ_m(l.z0m/L) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L) + ψ_h(l.z0h/L) ), rmin) ;# water aerodynamic resistance
+    while (counter<20 && abs(1.0-Lold/L)>1e-4) # 1% error
+      #println("L=",L," ,Lold=",Lold)
+      ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# momentum aerodynamic resistance
+      ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# water aerodynamic resistance
+      #println("ra_m=",ra_m)
       ram_full =   ra_leaf + ra_m;
       raw_full =   ra_leaf + ra_w;
       H        =   ρd*physcon.Cpd*DeltaT/raw_full;
-      rs_s_m   =   flux.g_m_s_to_micromol_m2_s/l.gs;
+      rs_s_m   =   flux.g_m_s_to_mol_m2_s/l.gs;
       LE       =   physcon.ε/met.P_air*ρd*lv*VPD/(rs_s_m+raw_full);
       ustar    =   sqrt(met.U/ram_full);
       Hv_s     =   H + 0.61 * physcon.Cpd/lv * met.T_air * LE;
-      L        = - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
+      Lold     =   L;
+      L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
       #println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), counter=", counter)
       counter = counter+1
     end
@@ -620,7 +595,7 @@ function hybrid(flux::fluxes,leaf::leaf_params, met::meteo, func::Function, xa::
 
        # In case of failing to converge within itmax iterations stop at the minimum function
        if (iter > itmax)
-          f1 = func(minx,flux, leaf. met)
+          f1 = func(minx, flux, leaf, met)
           x0 = minx
           break
        end
