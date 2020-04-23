@@ -41,7 +41,7 @@ struct atmos
 end
 
 """
-    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
+    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number, APAR::number)
 
 Compute net assimilation rate A, fluorescence F using biochemical model
 
@@ -49,8 +49,9 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 - `flux::fluxes`: fluxes structure.
 - `leaf::leaf_params`: leaf_params structure.
 - `T::Number`: Leaf Temperature
+- `APAR::Number`: Absorbed PAR radiation
 """
-function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
+function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number, APAR)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf, T)
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
@@ -64,8 +65,8 @@ function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params,T::Number)
     # Save leaf respiration
     flux.rd = leaf.rdleaf
     # Calculate potential electron transport rate (assuming no upper bound, proportional to absorbed light!):
-    flux.Je_pot = 0.5 * leaf.maxPSII * flux.APAR;                          # potential electron transport rate (important for later)
-    flux.Je_red = 0.5 * φ_PSII * flux.APAR;                                # Includes Kn here
+    flux.Je_pot = 0.5 * leaf.maxPSII * APAR;                          # potential electron transport rate (important for later)
+    flux.Je_red = 0.5 * φ_PSII * APAR;                                # Includes Kn here
     # Some bound constraint on VPD:
     flux.ceair = min(max(flux.eair, 0.03*leaf.esat), leaf.esat )
 

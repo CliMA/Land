@@ -9,7 +9,6 @@ file_Sun = joinpath(dirname(pathof(CanopyRTMod)), "sun.mat")
 # Struct for observation and solar angles
 """
     Struct for observation and solar angles
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -24,22 +23,21 @@ end
 
 # Struct for leaf optical properties
 struct optipar{FT<:Number}
-    nr::MArray{FT,1}
-    Km::MArray{FT,1}
-    Kab::MArray{FT,1}
-    Kant::MArray{FT,1}
-    Kcar::MArray{FT,1}
-    Kw::MArray{FT,1}
-    KBrown::MArray{FT,1}
-    phi::MArray{FT,1}
-    KcaV::MArray{FT,1}
-    KcaZ::MArray{FT,1}
-    lambda::MArray{FT,1}
-end
+    nr::Array{FT}
+    Km::Array{FT}
+    Kab::Array{FT}
+    Kant::Array{FT}
+    Kcar::Array{FT}
+    Kw::Array{FT}
+    KBrown::Array{FT}
+    phi::Array{FT}
+    KcaV::Array{FT}
+    KcaZ::Array{FT}
+    lambda::Array{FT}
+end;
 
 """
     incomingRadiation
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -55,7 +53,6 @@ end
 
 """
     leafbio
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -99,7 +96,6 @@ end
 
 """
     struct_soil
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -116,7 +112,6 @@ end
 
 """
     struct_canopyRadiation
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -213,7 +208,6 @@ end
 
 """
     struct_canopyRadiation
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -297,7 +291,6 @@ end
 
 """
     struct_canopy
-
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -330,7 +323,7 @@ $(DocStringExtensions.FIELDS)
 end
 
 
-function loadOpti(swl::Array; file=file_Opti)
+function loadOpti(swl::AbstractArray; file=file_Opti)
     # Read in all optical data:
     FT = typeof(swl)
     opti = matread(file_Opti)["optipar"]
@@ -345,26 +338,25 @@ function loadOpti(swl::Array; file=file_Opti)
     KcaV_   =  opti["KcaV"]
     KcaZ_   =  opti["KcaZ"]
     lambda_ =  opti["wl"]
-    @show length(swl)
-    nr = MArray{Tuple{length(swl)-1}, Float32}(undef)
-    Km =MArray{Tuple{length(swl)-1}, FT}(undef)
-    Kab = MArray{Tuple{length(swl)-1}, FT}(undef)
-    Kant = MArray{Tuple{length(swl)-1}, FT}(undef)
-    Kcar = MArray{Tuple{length(swl)-1}, FT}(undef)
-    Kw =MArray{Tuple{length(swl)-1}, FT}(undef)
-    KBrown = MArray{Tuple{length(swl)-1}, FT}(undef)
-    phi = MArray{Tuple{length(swl)-1}, FT}(undef)
-    KcaV = MArray{Tuple{length(swl)-1}, FT}(undef)
-    KcaZ = MArray{Tuple{length(swl)-1}, FT}(undef)
-    lambda = MArray{Tuple{length(swl)-1}, FT}(undef)
-    kChlrel = MArray{Tuple{length(swl)-1}, FT}(undef)
+
+    nr = FT(undef,length(swl)-1)
+    Km = FT(undef,length(swl)-1)
+    Kab = FT(undef,length(swl)-1)
+    Kant = FT(undef,length(swl)-1)
+    Kcar = FT(undef,length(swl)-1)
+    Kw = FT(undef,length(swl)-1)
+    KBrown = FT(undef,length(swl)-1)
+    phi = FT(undef,length(swl)-1)
+    KcaV = FT(undef,length(swl)-1)
+    KcaZ = FT(undef,length(swl)-1)
+    lambda = FT(undef,length(swl)-1)
+    kChlrel = FT(undef,length(swl)-1)
     println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
-    @inbounds for i in 1:length(swl)-1
+    for i in 1:length(swl)-1
         wo = findall((lambda_.>=swl[i]).&(lambda_.<swl[i+1]) )
         if length(wo)==0
             println("Warning, some wavelengths out of bounds ", swl[i])
         end
-        @show typeof(mean(nr_[wo]))
         nr[i]   =  mean(nr_[wo])
         Km[i]  =  mean(Km_[wo])
         Kab[i]  =  mean(Kab_[wo])

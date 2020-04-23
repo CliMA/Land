@@ -296,13 +296,13 @@ function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOpt
     end
     #CF: Right now, canopy geometry is the same everywhere, can be easily extended to layers as well.
         @inbounds for j=1:size(cO.sigb, 1)
-          cO.sigb[j,i] = cO.ddb[j]  * ρ_SW[j]   + cO.ddf[j] * τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for diffuse  incidence
-          cO.sigf[j,i]  = cO.ddf[j]  * ρ_SW[j]   + cO.ddb[j] * τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for diffuse  incidence
-          cO.sb[j,i]    = cO.sdb[j]  * ρ_SW[j]   + cO.sdf[j] *  τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for specular incidence
-          cO.sf[j,i]     = cO.sdf[j]  * ρ_SW[j]   + cO.sdb[j] *  τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for specular incidence
-          cO.vb[j,i]    = cO.dob[j]  * ρ_SW[j]   + cO.dof[j] *  τ_SW[j]; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
-          cO.vf[j,i]     = cO.dof[j]  * ρ_SW[j]   + cO.dob[j] *  τ_SW[j]; # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
-          cO.w[j,i]     = cO.sob[j]  * ρ_SW[j]   + cO.sof[j] *  τ_SW[j]; # [nl,nwl]  bidirectional scattering coefficent (directional-directional)
+          cO.sigb[j,i] = cO.ddb  * ρ_SW[j]   + cO.ddf * τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for diffuse  incidence
+          cO.sigf[j,i]  = cO.ddf  * ρ_SW[j]   + cO.ddb * τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for diffuse  incidence
+          cO.sb[j,i]    = cO.sdb  * ρ_SW[j]   + cO.sdf *  τ_SW[j]; # [nl,nwl]  diffuse     backscatter scattering coefficient for specular incidence
+          cO.sf[j,i]     = cO.sdf  * ρ_SW[j]   + cO.sdb *  τ_SW[j]; # [nl,nwl]  diffuse     forward     scattering coefficient for specular incidence
+          cO.vb[j,i]    = cO.dob  * ρ_SW[j]   + cO.dof *  τ_SW[j]; # [nl,nwl]  directional backscatter scattering coefficient for diffuse  incidence
+          cO.vf[j,i]     = cO.dof  * ρ_SW[j]   + cO.dob *  τ_SW[j]; # [nl,nwl]  directional forward     scattering coefficient for diffuse  incidence
+          cO.w[j,i]     = cO.sob  * ρ_SW[j]   + cO.sof *  τ_SW[j]; # [nl,nwl]  bidirectional scattering coefficent (directional-directional)
 
         end
     end
@@ -369,7 +369,6 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
         chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi_vol,litab[i]);
         #	Extinction coefficients
         ksli = abs(chi_s./cts);
-
         koli =abs(chi_o./cto);
             #	Area scattering coefficient fractions
         #@show ftau
