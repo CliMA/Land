@@ -1,6 +1,6 @@
 #module LeafPhotosynthesisMod
 
-export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis, Medlyn!, BallBerry!
+export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!, Medlyn!, BallBerry!
 
 
 using Parameters
@@ -96,7 +96,7 @@ end # function
 
 
 """
-    LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
+    LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
 
 Compute net assimilation rate A, fluorescence F using biochemical model
 
@@ -105,7 +105,7 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 - `leaf::leaf_params`: leaf_params structure.
 - `T::Number`: Leaf Temperature
 """
-function LeafPhotosynthesis(flux::fluxes, leaf::leaf_params, met::meteo)
+function LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
     # Adjust rates to leaf Temperature (C3 only for now):
     setLeafT!(leaf)
 

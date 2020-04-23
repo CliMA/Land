@@ -25,7 +25,7 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, met::meteo, l::leaf_params,  flu
         println("Error in Tleaf and psi_leaf - unphysical values")
         process.exit(10)
     end
-    LeafPhotosynthesis(flux, l, met); # compute H, LE in there as well
+    LeafPhotosynthesis!(flux, l, met); # compute H, LE in there as well
 
 
     # TODO aerodynamic resistance should be double for the sensible heat flux at leaf level, but do we really care?
