@@ -16,9 +16,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     # thermal characteristics
     LMA::TT         = 100e-3;                # DRY leaf mass area, NOT MEAN VALUE WHICH INCLUDES RELATIVE WATER CONTENT - kg/m2 - density times thickness
     RWC::TT         = 0.8;                   # leaf relative water content
-    Cleaf::TT       = 100.0;                 # leaf specific heat (J/kg/K)
-    # turbulence
-    ra::TT          = 1e6;                    # leaf aerodynamic resistance (s/m)
+    Cleaf::TT       = 1000.0;                # leaf specific heat (J/kg/K)
+
+    # pore traits
+    #pore_density::TT   = 100.0  / (1e-6);     # pore density in pores/m^2
+    Chloroplast_rel_volume::TT  = 2.0/100.0;        # hloroplast volume airspace (m^3 per pore) - http://kirschner.med.harvard.edu/files/bionumbers/A%20semi%20quantitative%20analysis%20of%20the%20photosynthetic%20system%20in%20an%20'average'%20C3%20plant%20leaf.pdf
 
     # Rate constants (arbitrary units here, only relative rates are important):
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
@@ -125,10 +127,10 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     Jmax::TT   = Jmax25;
     Rdleaf::TT = Rd25;
 
-    #
-    Ci::TT = 0.0;                               # CO2 concentration in mesophyll/internal
-    RH::TT = 0.0;                               # relative humidity at the surface of the leaf
-    VPD::TT = 0.1;                              # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
+
+    Cc::TT = 400.0;                               # CO2 concentration in chloroplast [ppm]
+    RH::TT = 100.0;                               # relative humidity at the surface of the leaf
+    VPD::TT = 0.1;                                # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
 
     # to be computed
     Je::TT = 0.0 ;                              # electron transport rate
@@ -139,11 +141,11 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     d           = -999.;                          # tree displacement height (m)
 
     dleaf       = 2e-3;                           # leaf thickness (m)
+    LAI         = 1.0;                            # leaf area thickness (m^2/m^2)
     Cd          = 0.01;                           # m/sqrt(s) turbulent transfer coefficient
 
     # plant hydraulics
     psi_l::TT   = -1.5e6;                         # leaf water potential (Pa)
-
     psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
     kmax::TT    = 4e-8                            # maximum leaf-xylem conductivity (m/s)
     kx::TT      = kmax                            # actual xylem conductivity (m/s)

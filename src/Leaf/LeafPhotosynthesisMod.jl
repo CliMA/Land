@@ -6,12 +6,12 @@ export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!, Me
 using Parameters
 
 using ..PhysCon
-using ..WaterVaporMod
+using ..WaterMod
 
 include("Leaf.jl")
 
 
-"Tolerance threshold for Ci iterations"
+"Tolerance threshold for Cc iterations"
 tol = 0.1
 vpd_min = 0.1
 
@@ -48,7 +48,6 @@ end
          Ap::TT = 0.0
          Ag::TT = 0.0
          Cs::TT = 0.0
-         #ci::TT = 0.0
          Rd::TT = 0.0
          Je_pot::TT = 0.0
          Ja::TT = 0.0
@@ -58,9 +57,11 @@ end
          H::TT = 0.0
          LE::TT = 0.0
          Sap::TT = 0.0
-         An::TT = 0.0
+         An_biochemistry::TT = 0.0
+         An_diffusion::TT = 0.0
          ustar::TT = 1e-6
          g_m_s_to_mol_m2_s::TT = -Inf
+         ra::TT    = 1e6
 end
 
 
@@ -72,7 +73,7 @@ function BallBerry!(flux::fluxes,  l::leaf_params)
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
 
-  l.gs = l.g1_BB * max(flux.An,1e-9) * l.RH/flux.Cs  + l.g0;
+  l.gs = l.g1_BB * max(flux.An_biochemistry,1e-9) * l.RH/flux.Cs  + l.g0;
 end # function
 
 
@@ -86,7 +87,7 @@ function Medlyn!(flux::fluxes, l::leaf_params)
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
 
-  l.gs = (1.0+l.g1_Medlyn/sqrt(l.VPD)) * max(flux.An,1e-9) /flux.Cs  + l.g0;
+  l.gs = (1.0+l.g1_Medlyn/sqrt(l.VPD)) * max(flux.An_biochemistry,1e-9) /flux.Cs  + l.g0;
 end # function
 
 
@@ -129,28 +130,12 @@ function LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
     # Actual colimited potential Je (curvature and Jmax)
     flux.Je = minimum(quadratic(leaf.θ_j, -(flux.Je_red + leaf.Jmax), flux.Je_red * leaf.Jmax))    # Bonan eq. 11.21
 
-    # Ci calculation
-    # Medlyn or Ball-Berry:
-    if leaf.dynamic_state # Save actual gs
-        gs_actual = leaf.gs
-    end
-
-    if (leaf.gstyp <= 1)
-        Ci_0 = leaf.C3 ? 0.7*met.Ca : 0.4*met.Ca
-        # Solve iterative loop:
-        leaf.Ci = hybrid(flux, leaf, met, CiFunc!, Ci_0, 1.05*Ci_0, tol)
-    elseif leaf.gstyp == 2 # Needed for Bonan Stomatal optimization model
-        leaf.Ci = CiFuncGs!(leaf.gs, flux, leaf, met)
-    end
-    if leaf.dynamic_state
-        leaf.gs_ss = leaf.gs
-        leaf.gs = gs_actual
-        leaf.Ci = CiFuncGs!(leaf.gs, flux, leaf, met)
-    end
+    # computes assimilation
+    CcFunc!(flux, leaf, met)
 
     # Rate of actual CO2 per electron, incl. photorespiration
-    # (Ci-Gamma_star)./(Ci+2*Gamma_star)
-    leaf.CO2_per_electron = (leaf.Ci-leaf.Γstar)/(leaf.Ci+2leaf.Γstar) * leaf.effcon;
+    # (Cc-Gamma_star)./(Cc+2*Gamma_star)
+    leaf.CO2_per_electron = (leaf.Cc-leaf.Γstar)/(leaf.Cc+2leaf.Γstar) * leaf.effcon;
 
     # Actual effective ETR:
     flux.Ja = max(0,flux.Ag / leaf.CO2_per_electron);
@@ -180,23 +165,24 @@ end
 
 
 """
-    CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
+    CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
 
-Compute Assimilation using Ci as input
+Compute Assimilation using Cc as input
 
 # Arguments
-- `Ci::Number`: Ci.
+- `Cc::Number`: Cc.
 - `flux::fluxes`: fluxes structure.
 - `leaf::leaf_params`: leaf_params structure.
 """
-function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
+function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
 
+    #println("Cc_in=",leaf.Cc)
     if leaf.C3
         # C3: Rubisco-limited photosynthesis; still need to check CO2 mixing ratios vs partial pressures.
         # still need to include ppm2bar (but can be done on leaf structure!)
-        flux.Ac = leaf.Vcmax * max(Ci-leaf.Γstar, 0.0) / (Ci + leaf.Kc*(1.0+leaf.o₂/leaf.Ko)) # Bonan eq. 11.28
+        flux.Ac = leaf.Vcmax * max(leaf.Cc-leaf.Γstar, 0.0) / (leaf.Cc + leaf.Kc*(1.0+leaf.o₂/leaf.Ko)) # Bonan eq. 11.28
         # C3: RuBP-limited photosynthesis (this is the NADPH requirement stochiometry)
-        flux.Aj = flux.Je * max(Ci-leaf.Γstar, 0.0) / (4.0*Ci + 8.0*leaf.Γstar)               # Bonan eq. 11.29
+        flux.Aj = flux.Je * max(leaf.Cc-leaf.Γstar, 0.0) / (4.0*leaf.Cc + 8.0*leaf.Γstar)               # Bonan eq. 11.29
 
         # for C3, set ap to Inf
         flux.Ap = Inf
@@ -220,14 +206,14 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
     flux.Aj = max(0.0,flux.Aj)
     flux.Ap = max(0.0,flux.Ap)
 
-    # Net photosynthesis
-    flux.An = flux.Ag - leaf.Rdleaf # net assimilation
+    # Net photosynthesis due to biochemistry
+    flux.An_biochemistry = flux.Ag - leaf.Rdleaf # net assimilation
 
     # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     setra!(leaf, flux, met)
 
-    # CO2 at leaf surface # might need to be changed
-    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_mol_m2_s
+    # TODO modify this CO2 at leaf surface # might need to be changed
+    flux.Cs = met.Ca - flux.An_biochemistry * flux.ra/flux.g_m_s_to_mol_m2_s
 
     # compute stomatal conductance gs
     leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
@@ -239,92 +225,12 @@ function CiFunc!(Ci::Number, flux::fluxes, leaf::leaf_params, met::meteo)
         Medlyn!(flux, leaf)
     end
 
-    # Diffusion (supply-based) photosynthetic rate - Calculate Ci from the diffusion rate
+    # Diffusion (supply-based) photosynthetic rate - Calculate Cc from the diffusion rate
     # total conductance - mol/m2/s
-    leaf.gleaf = 1.0 / (leaf.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
-    Cinew = met.Ca - flux.An / leaf.gleaf
+    leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+    flux.An_diffusion = leaf.gleaf*(met.Ca - leaf.Cc)
 
-    # CiFunc returns the difference between the current Ci and the new Ci
-    leaf.Ci = Cinew
-    return flux.An<0. ? 0.0 : Cinew - Ci
 end
-
-
-
-"""
-    CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
-
-Compute Assimilation using fixed stomatal conductance gs.
-
-# Arguments
-- `gs::Number`: Stomatal conductance.
-- `flux::fluxes`: fluxes structure.
-- `leaf::leaf_params`: leaf_params structure.
-"""
-function CiFuncGs!(gs::Number, flux::fluxes, leaf::leaf_params, met::meteo)
-
-    # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
-    setra!(leaf, flux, met)
-
-    # Compute overall conductance (Boundary layer, stomata and mesophyll)
-    leaf.gleaf = 1.0/(leaf.ra/flux.g_m_s_to_mol_m2_s + 1.6/gs + 1.0/leaf.gm)
-    if leaf.gleaf<eps() leaf.gleaf=eps() end
-
-    if leaf.C3
-        # C3 Rubisco Limited Photosynthesis co-limited by gs
-        a0 = leaf.Vcmax
-        e0 = 1.0
-        d0 = leaf.Kc*(1.0+leaf.o₂/leaf.Ko)
-        # TODO need to cahnge ca by ci
-        flux.Ac = minimum(quadratic(1.0/leaf.gleaf, -(e0*met.Ca + d0) - (a0 - e0*leaf.Rdleaf) / leaf.gleaf, a0 * (met.Ca - leaf.Γstar) - leaf.Rdleaf * (e0*met.Ca + d0)))
-
-        # C3: RuBP-limited photosynthesis
-        a0 = flux.Je
-        e0 = 4.0
-        d0 = 8.0*leaf.Γstar
-        # TODO need to cahnge ca by ci
-        flux.Aj = minimum(quadratic(e0 / leaf.gleaf, -(e0*met.Ca + d0) - (a0 - e0*leaf.Rdleaf) / leaf.gleaf, a0 * (met.Ca - leaf.Γstar) - leaf.Rdleaf * (e0*met.Ca + d0)))
-
-        # C3: Product-limited photosynthesis
-        flux.Ap = Inf
-    # C4 to be implemented
-    elseif !leaf.C3
-        flux.Ac = flux.Aj = flux.Ap = 0.0
-    end
-    if leaf.use_colim
-        flux.Ai = minimum(quadratic(leaf.C3 ? 0.98 : 0.80, -(flux.Ac + flux.Aj), flux.Ac * flux.Aj))   # Bonan Eq 11.33
-        # Ap limitation only for C4 here:
-        if leaf.C3
-            flux.Ag = flux.Ai
-        else # C4 colimitation with ap
-            flux.Ag = minimum(quadratic(0.95, -(flux.Ai + flux.Ap), flux.Ai*flux.Ap))                  # Bonan Eq 11.33
-        end
-    else
-        flux.Ag = min(flux.Ac,flux.Aj,flux.Ap)
-    end
-    flux.Ag = max(0,flux.Ag)
-    flux.Ai = max(0,flux.Ai)
-    flux.Aj = max(0,flux.Aj)
-    flux.Ap = max(0,flux.Ap)
-
-    # Compute net Photosynthesis
-    flux.An = flux.Ag - leaf.Rdleaf
-
-    # Compute CO2 at leaf surface
-    flux.Cs = met.Ca - flux.An * leaf.ra/flux.g_m_s_to_mol_m2_s
-
-    # Compute Ci (included Mesophyll as well in principle)
-    ci_val = met.Ca - flux.An /leaf.gleaf
-
-    #leaf.CO2_per_electron = (ci_val-leaf.Γstar)./(ci_val+2.0*leaf.Γstar) .* leaf.effcon;
-end # Function CiFuncGs!
-
-
-
-
-
-
-
 
 
 function ψ_m(ζ,stab_type_stable) # momentum correction function
@@ -432,6 +338,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     # compute Obukhov length
     # iterate a few times
 
+    # TODO ideally should not have any information about the leaves as it is the turbuence above canopy in log profile
     # first update roughness (if phenology is changing)
     setRoughness!(l)
 
@@ -486,7 +393,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     flux.H  = H
     flux.LE = LE
     flux.ustar = ustar
-    l.ra    = raw_full
+    flux.ra = raw_full
 end
 
 

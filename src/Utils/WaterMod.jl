@@ -1,12 +1,12 @@
-module WaterVaporMod
+module WaterMod
 
 using ..PhysCon
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Calculate saturation vapor pressure and latent heat of vaporization
 #
-export Lv
-export SatVap
+export Lv, SatVap, μ_l
+
 
 function Lv(T)
   # latent heat of vaporization as a function of temperature
@@ -96,6 +96,30 @@ function SatVap(t)
     return es, desdt
 
 end # SatVap
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------
+# DESCRIPTION:
+# Liquid water depenendence on viscosity
+# Reid, Prausnitz, & Poling (1987)
+
+function μ_l(T)
+  A   =   1.856e-14; 	     # Pa·s
+  B   =   4209;            # K
+  C   =  	0.04527;         # K-1
+  D   = 	-3.376e-5;      # K-2
+  μl  =   A*exp( B/T + C*T + D*T*T );
+  return μl
+end # end mu l
+
+
+
 
 
 end # Module
