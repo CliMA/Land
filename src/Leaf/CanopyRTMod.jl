@@ -3,6 +3,7 @@ module CanopyRTMod
 using Polynomials
 using Statistics
 using PhysCon
+using Parameters
 # Matlab reading
 using MAT
 # Numerical integration package (Simpson rule)
@@ -32,7 +33,7 @@ const maxwlf  = FT(850.);
 const fac     = FT(0.001) #(unit conversion factor mW >> W)
 
 # Doubling Adding layers
-const ndub = 15
+const ndub = 10
 
 # Load some standard settings here (can be done differently later but not bad to be fixed here)
 # Wavelength boundaries:
@@ -41,7 +42,7 @@ const swl = [collect(FT(400):FT(10):650); collect(FT(655):FT(5):770); collect(FT
 const dwl = diff(swl)
 #println(dwl)
 # Load optical properties (these can be fixed globally!):
-const optis = optipar{FT}(loadOpti(swl)...);
+const optis = optipar{FT, length(swl)-1}(loadOpti(swl)...);
 
 # Set wavelength here (will stay constant!!)
 const wl = optis.lambda
@@ -62,7 +63,7 @@ sunRad = incomingRadiation{FT}(loadSun(swl)...)
 # WL, Shortwave_albedo, LE_albedo, Tskin:
 const soil = struct_soil{FT}(wl, 0.4*ones(FT, length(wl)), [0.1],290.0)
 # Leaf structure (need to define the dimensions as in the other structures soon, tbd)
-const leaf   = leafbio{FT,nwl, length(wle), length(wlf)}()
+const leaf   = leafbio{FT,nwl, length(wle), length(wlf),length(wle)*length(wlf)}()
 # Observation angles
 const angles  = struct_angles{FT}()
 # Canopy Structure
@@ -70,8 +71,8 @@ const canopy = struct_canopy{FT}()
 # Canopy radiation:
 const canRad = struct_canopyRadiation{FT,nwl,nWlF,length(litab), length(canopy.lazitab), canopy.nlayers}()
 # Canopy Optical Properties:
-const canOpt = struct_canopyOptProps{FT,nwl,canopy.nlayers, length(canopy.lazitab), length(litab)}()
-
+#const canOpt = struct_canopyOptProps{FT,nwl,canopy.nlayers, length(canopy.lazitab), length(litab)}()
+canOpt = create_canopyOpt(FType=FT,nWL=nwl,nLayers=canopy.nlayers, nAzi=length(canopy.lazitab), nIncl=length(litab))
 
 const nlayers = canopy.nlayers
 
@@ -196,7 +197,7 @@ end
 
 
 # Postprocessing, computing all within canopy fluxes from the primary RT output
-function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil, leaf::Array{leafbio{FT}, 1})
+function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil, leaf::Array)
     #
     nl = can.nlayers
     iLAI    = can.LAI/nl;
@@ -230,6 +231,7 @@ function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::
         # Absorbed PAR per leaf for shaded:
         cR.absPAR_shade[j] = fast∫(dwl[iPAR],PAR_diff);
         # for sunlit (all angles, normalized)
+        #@show normi*cO.absfs*fast∫(dwl[iPAR],PAR_dir)
         cR.absPAR_sun[:,:,j]  = normi*cO.absfs*fast∫(dwl[iPAR],PAR_dir);
         # Same for true absorbed PAR by CabCar only  (needs to be taken into account in photosynthesis calculation, i.e. already accounts for leaf green fAPAR!)
         cR.absPAR_shadeCab[j] = fast∫(dwl[iPAR],PAR_diffCab);
@@ -247,7 +249,7 @@ function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::
 
 end
 
-function compCanopyOptsExact!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps, lidf::Array)
+function compCanopyOptsExact!(leaf::Array,cO::struct_canopyOptProps, lidf::Array)
     @unpack fs,fo, fsfo, absfsfo, cosΘ_l = cO
     fill!(cO.w,0)
     fill!(cO.sf,0)
@@ -283,7 +285,7 @@ function compCanopyOptsExact!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptPr
 end
 
 
-function computeCanopyMatrices!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps)
+function computeCanopyMatrices!(leaf::Array,cO::struct_canopyOptProps)
     # 2. Calculation of reflectance
     # 2.1  reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
     @inbounds for i=1:nlayers
@@ -433,7 +435,7 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2);    #takes care of rounding error
 end
 
-function computeThermalFluxes( leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps,cR::struct_canopyRadiation, can::struct_canopy,so::struct_soil, incLW::Array)
+function computeThermalFluxes!( leaf::Array,cO::struct_canopyOptProps,cR::struct_canopyRadiation, can::struct_canopy,so::struct_soil, incLW::Array)
 
     @unpack Ps, Po, Pso,ddf,ddb = cO
     @unpack T_sun, T_shade = cR
@@ -514,7 +516,7 @@ function computeThermalFluxes( leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptP
     return F⁻,F⁺,net_diffuse
 end
 
-function computeSIF_Fluxes!(leaf::Array{leafbio{FT}, 1},cO::struct_canopyOptProps,cR::struct_canopyRadiation,can::struct_canopy,so::struct_soil)
+function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_canopyRadiation,can::struct_canopy,so::struct_soil)
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = cO
     @unpack E_down, E_up,φ_shade,φ_sun = cR
     @unpack Ω,nlayers, LAI = can
@@ -659,13 +661,14 @@ function fluspect!(leaf::leafbio, opti::optipar)
     # provided by Frederic Baret [EMMAH, INRA Avignon, baret@avignon.inra.fr]
     # & used with his autorization.
     # ***********************************************************************
+    @unpack N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx = leaf
+    #println(N, " ", Cab, " ", Car," ",  Ant, " ", Cs, " ", Cw, " ", Cm)
+    Kcaro = (1 -Cx)* opti.KcaV + Cx * opti.KcaZ;
 
-    Kcaro = (1 -leaf.Cx)* opti.KcaV + leaf.Cx * opti.KcaZ;
-
-    Kall    = (leaf.Cab*opti.Kab.+leaf.Car*opti.Kcar.+leaf.Ant*opti.Kant.+leaf.Cs*opti.KBrown.+leaf.Cw*opti.Kw.+leaf.Cm*opti.Km)/leaf.N
+    Kall    = (Cab*opti.Kab.+Car*opti.Kcar.+Ant*opti.Kant.+Cs*opti.KBrown.+Cw*opti.Kw.+Cm*opti.Km)/N
     # Relative absorption by Chlorophyll and Carotenoids only (drives SIF and GPP eventually)
-    leaf.kChlrel  = (leaf.Cab*opti.Kab+leaf.Car*opti.Kcar)./(Kall*leaf.N.+eps(FT));
-    leaf.kChlrel_old  = (leaf.Cab*opti.Kab)./(Kall*leaf.N.+eps(FT));
+    leaf.kChlrel  = (Cab*opti.Kab+Car*opti.Kcar)./(Kall*N.+eps(FT));
+    leaf.kChlrel_old  = (Cab*opti.Kab)./(Kall*N.+eps(FT));
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
     tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
@@ -697,7 +700,7 @@ function fluspect!(leaf::leafbio, opti::optipar)
     #println(typeof(t12), typeof(t21), typeof(denom), typeof(tau))
     # bottom surface side
     t       = t12.*tau.*t21./denom
-    r       = r12.+r21.*tau.*t
+    r       = r12+r21.*tau.*t
 
     # ***********************************************************************
     # reflectance & transmittance of N layers
@@ -715,7 +718,7 @@ function fluspect!(leaf::leafbio, opti::optipar)
     a       = (FT(1) .+rq.-tq.+D)./(2r)
     b       = (FT(1) .-rq.+tq.+D)./(2t)
 
-    bNm1    = b.^(leaf.N.-1);                  #
+    bNm1    = b.^(N-1);                  #
     bN2     = bNm1.^2
     a2      = a.^2
     denom   = a2.*bN2.-1
@@ -731,7 +734,8 @@ function fluspect!(leaf::leafbio, opti::optipar)
     denom   = 1 .-Rsub.*r
     leaf.τ_SW    = Ta.*Tsub./denom
     leaf.ρ_SW    = Ra.+Ta.*Rsub.*t./denom
-
+    τ_SW    = leaf.τ_SW
+    ρ_SW    = leaf.ρ_SW
     #RT     = [refl tran]
     if leaf.fqe ==0.0
         return
@@ -744,11 +748,15 @@ function fluspect!(leaf::leafbio, opti::optipar)
     # now determined by "subtracting" the interfaces
     # CF Note: All of the below takes about 10 times more time than the RT above. Need to rething speed and accuracy. (10nm is bringing it down a lot!)
 
-    Rb  = (leaf.ρ_SW.-ralf)./(talf.*t21+(leaf.ρ_SW.-ralf).*r21);  # Remove the top interface
-    Z   = leaf.τ_SW.*(1 .-Rb.*r21)./(talf.*t21);            # Derive Z from the transmittance
+    Rb  = (ρ_SW-ralf)./(talf.*t21+(ρ_SW-ralf).*r21);  # Remove the top interface
+    tt1 = (talf.*t21);
+    tt2 = τ_SW.*(1 .-Rb.*r21)
+    Z   = tt2./tt1;            # Derive Z from the transmittance
 
-    rho = (Rb.-r21.*Z.^2)./(1 .-(r21.*Z).^2);      # Reflectance and transmittance
-    tau = (1 .-Rb.*r21)./(1 .-(r21.*Z).^2).*Z;    # of the leaf mesophyll layer
+    tt1 = (Rb-r21.*Z.^2); tt2 = (1 .-(r21.*Z).^2)
+    rho = tt1./tt2;      # Reflectance and transmittance
+    tt1 = (1 .-Rb.*r21);
+    tau = tt1./tt2.*Z;    # of the leaf mesophyll layer
     t   =   tau;
     r   =   max.(rho,0);                       # Avoid negative r
 
@@ -773,12 +781,12 @@ function fluspect!(leaf::leafbio, opti::optipar)
     epsi         = FT(2)^(-ndub);
 
     # initialisations
-    te     = 1 .-(k[Iwle].+s[Iwle]) .* epsi;
-    tf     = 1 .-(k[Iwlf].+s[Iwlf]) .* epsi;
-    re     = s[Iwle] .* epsi;
-    rf     = s[Iwlf] .* epsi;
+    te     = 1 .-(k[Iwle].+s[Iwle]) * epsi;
+    tf     = 1 .-(k[Iwlf].+s[Iwlf]) * epsi;
+    re     = s[Iwle] * epsi;
+    rf     = s[Iwlf] * epsi;
 
-    sigmoid     = 1 ./(1 .+exp.(-wlf./10).*exp.(wle'./10));  # matrix computed as an outproduct
+    sigmoid     = 1 ./(1 .+exp.(-wlf/10).*exp.(wle'/10));  # matrix computed as an outproduct
     #println(size(sigmoid)," ", size(phi), " ", size(kChl)," ", size(Iwle), " ", size(Iwlf), " ", size(kChl[Iwle]))
 
     Mf = leaf.fqe .* ((FT(0.5)*opti.phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
@@ -804,9 +812,12 @@ function fluspect!(leaf::leafbio, opti::optipar)
         te   = ten;  re  = ren;   tf   = tfn;   rf   = rfn;
         Mf  = Mfn; Mb = Mbn;
     end
-
     # Here we add the leaf-air interfaces again for obtaining the final
     # leaf level fluorescences.
+    # Here we add the leaf-air interfaces again for obtaining the final
+    # leaf level fluorescences.
+
+    # This reduced red SIF quite a bit in backscatter, not sure why.
     g = Mb; f = Mf;
 
     Rb = rho .+ tau.^2 .*r21./(1 .-rho.*r21);
@@ -824,7 +835,152 @@ function fluspect!(leaf::leafbio, opti::optipar)
 
     leaf.Mb  = gn;
     leaf.Mf  = fn;
-    return
+    return Mf,Mb
+end
+
+function fluspect(N,Cab,Car,Ant,Cs,Cw,Cm,Cx,fqe, opti::optipar)
+    # ***********************************************************************
+    # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
+    # properties spectra; Remote Sens. Environ.; 34:75-91.
+    # Reference:
+    # Féret, Gitelson, Noble & Jacquemoud [2017]. PROSPECT-D: Towards modeling
+    # leaf optical properties through a complete lifecycle
+    # Remote Sensing of Environment; 193:204215
+    # DOI: http://doi.org/10.1016/j.rse.2017.03.004
+    # The specific absorption coefficient corresponding to brown pigment is()
+    # provided by Frederic Baret [EMMAH, INRA Avignon, baret@avignon.inra.fr]
+    # & used with his autorization.
+    # ***********************************************************************
+
+    Kcaro = (1 -Cx)* opti.KcaV + Cx * opti.KcaZ;
+
+    Kall    = (Cab*opti.Kab.+Car*opti.Kcar.+Ant*opti.Kant.+Cs*opti.KBrown.+Cw*opti.Kw.+Cm*opti.Km)/N
+    # Relative absorption by Chlorophyll and Carotenoids only (drives SIF and GPP eventually)
+    kChlrel  = (Cab*opti.Kab+Car*opti.Kcar)./(Kall*N.+eps(FT));
+    kChlrel_old  = (Cab*opti.Kab)./(Kall*N);
+    tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
+    talf    = calctav.(40,opti.nr)
+    ralf    = FT(1) .-talf
+
+    t12     = calctav.(90,opti.nr)
+    r12     = FT(1) .-t12
+    t21     = t12./(opti.nr.^2)
+    r21     = FT(1) .-t21
+    denom   = FT(1) .-r21.*r21.*tau.^2
+    Ta      = talf.*tau.*t21./denom
+    Ra      = ralf.+r21.*tau.*Ta
+    #println(typeof(t12), typeof(t21), typeof(denom), typeof(tau))
+    # bottom surface side
+    t       = t12.*tau.*t21./denom
+    r       = r12.+r21.*tau.*t
+    #@show t
+    #@show r
+    D       = sqrt.((FT(1) .+r.+t).*(FT(1) .+r.-t).*(FT(1) .-r.+t).*(FT(1) .-r.-t))
+    #println(typeof(D), typeof(r), typeof(t))
+    rq      = r.^2
+    tq      = t.^2
+    a       = (FT(1) .+rq.-tq.+D)./(2r)
+    b       = (FT(1) .-rq.+tq.+D)./(2t)
+    #println(size(N), " ", size(b), " ", size(a))
+    bNm1    = b.^(N-1);
+    bN2     = bNm1.^2
+    a2      = a.^2
+    denom   = a2.*bN2.-1
+    Rsub    = a.*(bN2.-1)./denom
+    Tsub    = bNm1.*(a2.-1)./denom
+
+    # Case of zero absorption
+    j       = findall(r.+t .>= 1)
+    Tsub[j] = t[j]./(t[j]+(1 .-t[j])*(leaf.N-1))
+    Rsub[j]	= 1 .-Tsub[j]
+
+    # Reflectance & transmittance of the leaf: combine top layer with next N-1 layers
+    denom   = 1 .-Rsub.*r
+    τ_SW    = Ta.*Tsub./denom
+    ρ_SW    = Ra.+Ta.*Rsub.*t./denom
+
+    # Case of zero absorption
+    j       = findall(r.+t .>= 1)
+    Tsub[j] = t[j]./(t[j]+(1 .-t[j])*(N-1))
+    Rsub[j]	= 1 .-Tsub[j]
+    #RT     = [refl tran]
+    if fqe ==0.0
+        return
+    end
+    # FROM SCOPE notes:
+    # From here a new path is taken: The doubling method used to calculate
+    # fluoresence is now only applied to the part of the leaf where absorption
+    # takes place, that is, the part exclusive of the leaf-air interfaces. The
+    # reflectance (rho) and transmittance (tau) of this part of the leaf are
+    # now determined by "subtracting" the interfaces
+    # CF Note: All of the below takes about 10 times more time than the RT above. Need to rething speed and accuracy. (10nm is bringing it down a lot!)
+
+    Rb  = (ρ_SW-ralf)./(talf.*t21+(ρ_SW-ralf).*r21);  # Remove the top interface
+    #println(size(Rb)," ", size(t21), " ", size(talf), " ", size(τ_SW))
+    tt1 = (talf.*t21);
+    tt2 = τ_SW.*(1 .-Rb.*r21)
+    Z   = tt2./tt1;            # Derive Z from the transmittance
+    tt1 = (Rb-r21.*Z.^2); tt2 = (1 .-(r21.*Z).^2)
+    rho = tt1./tt2;      # Reflectance and transmittance
+    tt1 = (1 .-Rb.*r21);
+    tau = tt1./tt2.*Z;    # of the leaf mesophyll layer
+
+    t   =   tau;
+    r   =   max.(rho,0);                       # Avoid negative r
+
+    # Derive Kubelka-Munk s and k
+    I_rt     =   findall((r.+t).<1);
+    D[I_rt]  =   sqrt.((1 .+ r[I_rt] .+ t[I_rt]) .* (1 .+ r[I_rt] .- t[I_rt]) .* (1 .- r[I_rt] .+ t[I_rt]) .*  (1 .- r[I_rt] .- t[I_rt]));
+    a[I_rt]  =   (1 .+ r[I_rt].^2 .- t[I_rt].^2 .+ D[I_rt]) ./ (2r[I_rt]);
+    b[I_rt]  =   (1 .- r[I_rt].^2 + t[I_rt].^2 .+ D[I_rt]) ./ (2t[I_rt]);
+    a[(r.+t).>=1] .=   FT(1.0);
+    b[(r.+t).>=1] .=   FT(1.0);
+    s        =   r./t;
+    I_a      =   findall((a.>1).&(a.!=Inf));
+    s[I_a]   =   2 .*a[I_a] ./ (a[I_a].^2 .- 1) .* log.(b[I_a]);
+
+    k        =   log.(b);
+    k[I_a]   =   (a[I_a].-1) ./ (a[I_a].+1) .* log.(b[I_a]);
+    kChl     =   kChlrel .* k;
+
+    # indices of wle and wlf within wlp
+    epsi         = FT(2)^(-ndub);
+
+    # initialisations
+    te     = 1 .-(k[Iwle]+s[Iwle]) * epsi;
+    tf     = 1 .-(k[Iwlf]+s[Iwlf]) * epsi;
+    re     = s[Iwle] * epsi;
+    rf     = s[Iwlf] * epsi;
+
+    sigmoid     = 1 ./(1 .+exp.(-wlf/10).*exp.(wle'/10));  # matrix computed as an outproduct
+    #println(size(sigmoid)," ", size(phi), " ", size(kChl)," ", size(Iwle), " ", size(Iwlf), " ", size(kChl[Iwle]))
+    Mf = fqe .* ((FT(0.5)*opti.phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
+    Mb = fqe .* ((FT(0.5)*opti.phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
+
+    Ih          = ones(FT,1,length(te));     # row of ones
+    Iv          = ones(FT,length(tf),1);     # column of ones
+    #A11 = A12 = A21 = A22 = zeros(FT,length(tf),length(te));
+    #println(length(tf),length(te))
+    # Doubling routine
+    for i = 1:ndub
+        xe = te./(1 .-re.*re);  ten = te.*xe;  ren = re.*(1 .+ten);
+        xf = tf./(1 .-rf.*rf);  tfn = tf.*xf;  rfn = rf.*(1 .+tfn);
+        xfxe = xf*xe';
+        rfre = rf*re';
+        lvre = Iv*re';
+        A11  = xf*Ih + Iv*xe';
+        A12 = xfxe.*(rf*Ih .+ lvre);
+        A21  = 1 .+xfxe.*(1 .+rfre );
+        A22 = (xf.*rf)*Ih+Iv*(xe.*re)';
+        #println(typeof(opti.phi), typeof(kChl), typeof(Mf))
+        Mfn   = Mf  .* A11 .+ Mb  .* A12;
+        Mbn   = Mb  .* A21 .+ Mf  .* A22;
+
+        te   = ten;  re  = ren;   tf   = tfn;   rf   = rfn;
+        Mf  = Mfn; Mb = Mbn;
+    end
+    #@show Mf
+    return τ_SW, ρ_SW, Mf, Mb, kChlrel
 end
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.

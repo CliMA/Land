@@ -9,10 +9,11 @@ file_Sun = joinpath(dirname(pathof(CanopyRTMod)), "sun.mat")
 # Struct for observation and solar angles
 """
     Struct for observation and solar angles
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct struct_angles{FT<:Number}
+Base.@kwdef mutable struct struct_angles{FT<:Number}
     "Solar Zenith Angle in degrees"
     tts::FT=30
     "Viewing Zenith Angle in degrees"
@@ -22,26 +23,27 @@ $(DocStringExtensions.FIELDS)
 end
 
 # Struct for leaf optical properties
-struct optipar{FT<:Number}
-    nr::Array{FT}
-    Km::Array{FT}
-    Kab::Array{FT}
-    Kant::Array{FT}
-    Kcar::Array{FT}
-    Kw::Array{FT}
-    KBrown::Array{FT}
-    phi::Array{FT}
-    KcaV::Array{FT}
-    KcaZ::Array{FT}
-    lambda::Array{FT}
-end;
+struct optipar{FT<:AbstractFloat,N}
+    nr::MArray{Tuple{N}, FT,1,N}
+    Km::MArray{Tuple{N}, FT,1,N}
+    Kab::MArray{Tuple{N}, FT,1,N}
+    Kant::MArray{Tuple{N}, FT,1,N}
+    Kcar::MArray{Tuple{N}, FT,1,N}
+    Kw::MArray{Tuple{N}, FT,1,N}
+    KBrown::MArray{Tuple{N}, FT,1,N}
+    phi::MArray{Tuple{N}, FT,1,N}
+    KcaV::MArray{Tuple{N}, FT,1,N}
+    KcaZ::MArray{Tuple{N}, FT,1,N}
+    lambda::MArray{Tuple{N}, FT,1,N}
+end
 
 """
     incomingRadiation
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct incomingRadiation{FT<:Number}
+mutable struct incomingRadiation{FT<:AbstractFloat}
     "Wavelength (nm)"
     wl::Array{FT,1}
     "Direct incoming radiation (mW m^-2 μm^-1)"
@@ -53,10 +55,11 @@ end
 
 """
     leafbio
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct leafbio{FT<:Number,nWl,nWle, nWlf}
+Base.@kwdef mutable struct leafbio{FT<:AbstractFloat,nWl,nWle, nWlf,nWLe_nWLf}
     "Leaf structure parameter"
     N::FT    = 1.4       # | -          | (1.0, 3.0)  | "Leaf structure parameter"
     "Chlorophyll a+b content"
@@ -79,27 +82,28 @@ $(DocStringExtensions.FIELDS)
     τ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal transmission"
     "Leaf fluorescence efficiency"
     fqe::FT = 0.01       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
-    "shortwave leaf reflectance"
-    ρ_SW::Array{FT,1} = zeros(nWl)    # | -          | (0.0, 1.0)  | "shortwave reflectance"
-    "shortwave leaf transmission"
-    τ_SW::Array{FT,1} = zeros(nWl)    # | -          | (0.0, 1.0)  | "shortwave transmission"
-    "relative absorbtion by Chlorophyll+Car"
-    kChlrel::Array{FT,1} = zeros(nWl) # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
-    "relative absorbtion by Chlorophyll"
-    kChlrel_old::Array{FT,1} = zeros(nWl) # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
-    "Fluorescence excitation matrix backwards"
-    Mb::Array{FT,2}= zeros(nWle,nWlf)      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix backwards"
-    "Fluorescence excitation matrix forwards"
-    Mf::Array{FT,2}= zeros(nWle,nWlf)      # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix forwards"
 
+    "shortwave leaf reflectance"
+    ρ_SW::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef);    # | -          | (0.0, 1.0)  | "shortwave reflectance"
+    "shortwave leaf transmission"
+    τ_SW::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef);   # | -          | (0.0, 1.0)  | "shortwave transmission"
+    "relative absorbtion by Chlorophyll+Car"
+    kChlrel::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+    "relative absorbtion by Chlorophyll"
+    kChlrel_old::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+    "Fluorescence excitation matrix backwards"
+    Mb::MArray{Tuple{nWlf,nWle}, FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle}, FT}(undef);     # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix backwards"
+    "Fluorescence excitation matrix forwards"
+    Mf::MArray{Tuple{nWlf,nWle}, FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle}, FT}(undef);     # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix forwards"
 end
 
 """
     struct_soil
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct struct_soil{FT<:Number}
+mutable struct struct_soil{FT<:AbstractFloat}
     "Wavelength (nm)"
     wl::Array{FT,1}
     "shortwave albedo"
@@ -112,10 +116,11 @@ end
 
 """
     struct_canopyRadiation
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIncl,nAzi,nLayers}
+Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIncl,nAzi,nLayers}
     # Scalars
     "integrated TOC outgoing flux (W m^-2)"
     intEout::FT = 0;                       # | W m^-2               | (0.0, 2500)  | "integrated TOC outgoing flux"
@@ -151,7 +156,7 @@ $(DocStringExtensions.FIELDS)
     "Short-wave Albedo for diffuse incoming radiation"
     alb_diffuse::Array{FT,1} = zeros(nWl)          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
 
-    # Dimension of nLayer+1 * nWavelengths
+    # Dimension of nLevel * nWavelengths
     "upwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
     E_up::Array{FT,2} = zeros(nWl,nLayers+1)
     "downwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
@@ -204,14 +209,15 @@ $(DocStringExtensions.FIELDS)
     "Total SIF sum of layer sources  (mW m^-2 μm^-1))"
     SIF_sum::Array{FT,1} = zeros(nWlF)
 
-end
+end;
 
 """
     struct_canopyRadiation
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct struct_canopyOptProps{FT<:AbstractFloat,nWL,nLayer,nAzi,nIncl}
+Base.@kwdef mutable struct struct_canopyOptProps{FT<:AbstractFloat,nWL,nLayer,nLevel,nAzi,nIncl,nLayer_nWL, nLev_nWL,nIncl_nAzi}
     "Solar -> Diffuse backscatter weight"
     sdb::FT = 0;
     "Solar -> Diffuse forward scatter weight"
@@ -237,64 +243,66 @@ $(DocStringExtensions.FIELDS)
 
     # now multi dimensional arrays:
     "per leaf angles"
-    fs::Array{FT,2} = zeros(nIncl, nAzi);
+    fs::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "per leaf angles"
-    absfs::Array{FT,2} = zeros(nIncl, nAzi);
+    absfs::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}     = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "abs(fs*fo)"
-    absfsfo::Array{FT,2} = zeros(nIncl, nAzi);
+    absfsfo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}    = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "fs*fo"
-    fsfo::Array{FT,2} = zeros(nIncl, nAzi);
+    fsfo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "per leaf angles"
-    fo::Array{FT,2} = zeros(nIncl, nAzi);
+    fo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "Cosine of leaf azimuths"
-    cosΘ_l ::Array{FT,2} = zeros(nIncl, nAzi);
+    cosΘ_l ::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "cos of leaf azimuth sqared"
-    cos2Θ_l ::Array{FT,2} = zeros(nIncl, nAzi);
+    cos2Θ_l ::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}           = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "Probability of directly viewing a leaf in solar direction"
-    Ps::Array{FT,1} = zeros(nLayer+1)
+    Ps::MArray{Tuple{nLevel}, FT,1,nLevel}           = MArray{Tuple{nLevel}, FT}(undef);
     "Probability of directly viewing a leaf in viewing direction"
-    Po::Array{FT,1} = zeros(nLayer+1)
+    Po::MArray{Tuple{nLevel}, FT,1,nLevel}           = MArray{Tuple{nLevel}, FT}(undef);
     "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
-    Pso::Array{FT,1} = zeros(nLayer+1)
+    Pso::MArray{Tuple{nLevel}, FT,1,nLevel}            = MArray{Tuple{nLevel}, FT}(undef);
 
     # The following also depend on leaf reflectance and transmission. Might go into a separate strcuture so that we can have it separately for thermal, SW and SIF?
     "diffuse     backscatter scattering coefficient for diffuse  incidence"
-    sigb::Array{FT,2} = zeros(nWL, nLayer)
+    sigb::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}             = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "diffuse     forward     scattering coefficient for diffuse  incidence"
-    sigf::Array{FT,2} = zeros(nWL, nLayer)
+    sigf::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}             = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "diffuse     backscatter scattering coefficient for specular incidence"
-    sb::Array{FT,2} = zeros(nWL, nLayer)
+    sb::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}               = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "diffuse     forward     scattering coefficient for specular incidence"
-    sf::Array{FT,2} = zeros(nWL, nLayer)
+    sf::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}                 = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "directional backscatter scattering coefficient for diffuse  incidence"
-    vb::Array{FT,2} = zeros(nWL, nLayer)
+    vb::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}                = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "directional forward     scattering coefficient for diffuse  incidence"
-    vf::Array{FT,2} = zeros(nWL, nLayer)
+    vf::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}                = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "bidirectional scattering coefficent (directional-directional)"
-    w::Array{FT,2} = zeros(nWL, nLayer)
+    w::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}                 = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "attenuation"
-    a::Array{FT,2} = zeros(nWL, nLayer)
+    a::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}                  = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "Effective layer transmittance (direct->diffuse)"
-    Xsd::Array{FT,2} = zeros(nWL, nLayer)
+    Xsd::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}             = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "Effective layer transmittance (diffuse->diffuse)"
-    Xdd::Array{FT,2} = zeros(nWL, nLayer)
+    Xdd::MArray{Tuple{nWL, nLayer}, FT,2,nLayer_nWL}              = MArray{Tuple{nWL, nLayer}, FT}(undef);
     "Effective layer reflectance (direct->diffuse)"
-    R_sd::Array{FT,2} = zeros(nWL, nLayer+1)
+    R_sd::MArray{Tuple{nWL, nLevel}, FT,2,nLev_nWL}         = MArray{Tuple{nWL, nLevel}, FT}(undef);
     "Effective layer reflectance (diffuse->diffuse)"
-    R_dd::Array{FT,2} = zeros(nWL, nLayer+1)
+    R_dd::MArray{Tuple{nWL, nLevel}, FT,2,nLev_nWL}        = MArray{Tuple{nWL, nLevel}, FT}(undef);
 
     "Solar direct radiation per layer)"
-    Es_::Array{FT,2} = zeros(nWL, nLayer+1)
-
+    Es_::MArray{Tuple{nWL, nLevel}, FT,2,nLev_nWL}        = MArray{Tuple{nWL, nLevel}, FT}(undef);
+end;
+function create_canopyOpt(; FType,nWL::Int,nLayers::Int,nAzi::Int,nIncl::Int)
+    return struct_canopyOptProps{FType,nWL,nLayers,nLayers+1,nAzi,nIncl,nLayers*nWL, (nLayers+1)*nWL,nIncl*nAzi }();
 end
-
 
 """
     struct_canopy
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-@with_kw mutable struct struct_canopy{FT<:Number}
+Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat}
     "number of canopy layers" # This needs to come globally though, can lead to errors right now as defined elsewhere as well!
     nlayers::Int     = 20    # | -          | (2, 60)      | "number of canopy layers"
     "Leaf Area Index"
@@ -323,9 +331,9 @@ $(DocStringExtensions.FIELDS)
 end
 
 
-function loadOpti(swl::AbstractArray; file=file_Opti)
+function loadOpti(swl::Array; file=file_Opti)
     # Read in all optical data:
-    FT = typeof(swl)
+    FT = eltype(swl)
     opti = matread(file_Opti)["optipar"]
     nr_     =  opti["nr"]
     Km_     =  opti["Kdm"]
@@ -338,25 +346,26 @@ function loadOpti(swl::AbstractArray; file=file_Opti)
     KcaV_   =  opti["KcaV"]
     KcaZ_   =  opti["KcaZ"]
     lambda_ =  opti["wl"]
-
-    nr = FT(undef,length(swl)-1)
-    Km = FT(undef,length(swl)-1)
-    Kab = FT(undef,length(swl)-1)
-    Kant = FT(undef,length(swl)-1)
-    Kcar = FT(undef,length(swl)-1)
-    Kw = FT(undef,length(swl)-1)
-    KBrown = FT(undef,length(swl)-1)
-    phi = FT(undef,length(swl)-1)
-    KcaV = FT(undef,length(swl)-1)
-    KcaZ = FT(undef,length(swl)-1)
-    lambda = FT(undef,length(swl)-1)
-    kChlrel = FT(undef,length(swl)-1)
+    #@show length(swl)
+    nr = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    Km =MArray{Tuple{length(swl)-1}, FT}(undef)
+    Kab = MArray{Tuple{length(swl)-1}, FT}(undef)
+    Kant = MArray{Tuple{length(swl)-1}, FT}(undef)
+    Kcar = MArray{Tuple{length(swl)-1}, FT}(undef)
+    Kw =MArray{Tuple{length(swl)-1}, FT}(undef)
+    KBrown = MArray{Tuple{length(swl)-1}, FT}(undef)
+    phi = MArray{Tuple{length(swl)-1}, FT}(undef)
+    KcaV = MArray{Tuple{length(swl)-1}, FT}(undef)
+    KcaZ = MArray{Tuple{length(swl)-1}, FT}(undef)
+    lambda = MArray{Tuple{length(swl)-1}, FT}(undef)
+    kChlrel = MArray{Tuple{length(swl)-1}, FT}(undef)
     println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
-    for i in 1:length(swl)-1
+    @inbounds for i in 1:length(swl)-1
         wo = findall((lambda_.>=swl[i]).&(lambda_.<swl[i+1]) )
         if length(wo)==0
             println("Warning, some wavelengths out of bounds ", swl[i])
         end
+        #@show typeof(mean(nr_[wo]))
         nr[i]   =  mean(nr_[wo])
         Km[i]  =  mean(Km_[wo])
         Kab[i]  =  mean(Kab_[wo])
@@ -373,17 +382,17 @@ function loadOpti(swl::AbstractArray; file=file_Opti)
 end
 
 
-function loadSun(swl::AbstractArray, file=file_Sun)
-    FT = typeof(swl)
+function loadSun(swl::Array, file=file_Sun)
+    FT = eltype(swl)
     # Read in all optical data:
     suni = matread(file_Sun)["sun"]
     wl   =  suni["wl"]
     Edir =  suni["Edirect"]
     Ediff =  suni["Ediffuse"]
 
-    wl_ = FT(undef,length(swl)-1)
-    Edir_ = FT(undef,length(swl)-1)
-    Ediff_ = FT(undef,length(swl)-1)
+    wl_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    Edir_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    Ediff_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
     #println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
     for i in 1:length(swl)-1
         wo = findall((wl.>=swl[i]).&(wl.<swl[i+1]) )
