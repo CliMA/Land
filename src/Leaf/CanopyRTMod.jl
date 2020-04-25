@@ -560,7 +560,7 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
             Mf = leaf[1].Mf
         end
         M⁺ = (Mb + Mf)/2;
-        M⁻ = (Mb-Mf)/2;
+        M⁻ = (Mb - Mf)/2;
         # Need to normalize incoming radiation bin, change from mSCOPE to enable different wl grids!
         M⁻_sun = M⁻ * (sun.*dwl[Iwle]);
         M⁺_sun = M⁺ * (sun.*dwl[Iwle]);
