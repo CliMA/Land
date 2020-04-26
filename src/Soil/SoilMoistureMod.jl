@@ -2,7 +2,12 @@ module SoilMoistureMod
 using Parameters
 using LinearAlgebra
 
-export soil_struct, van_Genuchten,  matric_potential, root_uptake, predictor_corrector, compute_grid_settings
+export soil_struct,
+       van_Genuchten,
+       matric_potential,
+       root_uptake,
+       predictor_corrector,
+       compute_grid_settings
 
 # --- Define soil layers
 

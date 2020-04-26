@@ -3,8 +3,8 @@ using DocStringExtensions
 using StaticArrays
 
 # Fixed path right now here
-file_Opti = joinpath(dirname(pathof(CanopyRTMod)), "Optipar2017_ProspectD.mat")
-file_Sun = joinpath(dirname(pathof(CanopyRTMod)), "sun.mat")
+file_Opti = joinpath(@__DIR__, "Optipar2017_ProspectD.mat")
+file_Sun = joinpath(@__DIR__, "sun.mat")
 
 # Struct for observation and solar angles
 """
@@ -334,7 +334,7 @@ end
 function loadOpti(swl::Array; file=file_Opti)
     # Read in all optical data:
     FT = eltype(swl)
-    opti = matread(file_Opti)["optipar"]
+    opti = matread(file)["optipar"]
     nr_     =  opti["nr"]
     Km_     =  opti["Kdm"]
     Kab_    =  opti["Kab"]
@@ -347,7 +347,7 @@ function loadOpti(swl::Array; file=file_Opti)
     KcaZ_   =  opti["KcaZ"]
     lambda_ =  opti["wl"]
     #@show length(swl)
-    nr = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    nr = MArray{Tuple{length(swl)-1}, FT}(undef)
     Km =MArray{Tuple{length(swl)-1}, FT}(undef)
     Kab = MArray{Tuple{length(swl)-1}, FT}(undef)
     Kant = MArray{Tuple{length(swl)-1}, FT}(undef)
@@ -382,10 +382,10 @@ function loadOpti(swl::Array; file=file_Opti)
 end
 
 
-function loadSun(swl::Array, file=file_Sun)
+function loadSun(swl::Array; file=file_Sun)
     FT = eltype(swl)
     # Read in all optical data:
-    suni = matread(file_Sun)["sun"]
+    suni = matread(file)["sun"]
     wl   =  suni["wl"]
     Edir =  suni["Edirect"]
     Ediff =  suni["Ediffuse"]

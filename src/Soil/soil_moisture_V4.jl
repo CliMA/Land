@@ -1,7 +1,14 @@
 module soil_moisture_V4
 using Parameters
 
-export soil_struct, van_Genuchten, Campbell, tridiagonal_solver, matric_potential, root_uptake, predictor_corrector, compute_grid_settings
+export soil_struct,
+       van_Genuchten,
+       Campbell,
+       tridiagonal_solver,
+       matric_potential,
+       root_uptake,
+       predictor_corrector,
+       compute_grid_settings
 
 # --- Define soil layers
 
