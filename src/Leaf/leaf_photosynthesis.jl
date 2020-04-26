@@ -1,8 +1,5 @@
-module LeafPhotosynthesisMod
-using MathToolsMod
-using Parameters
-using Leaf
 
+using Parameters
 
 export fluxes
 "Tolerance thhreshold for Ci iterations"
@@ -290,5 +287,3 @@ function Fluorescencemodel!(ps::Number,x::Number,leaf::leaf_params )
     leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm-leaf.Fo);
     leaf.NPQ  = Kn/(Kf+Kd);
 end
-
-end #Module

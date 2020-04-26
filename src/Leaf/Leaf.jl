@@ -1,6 +1,6 @@
 module Leaf
-using PhysCon
-using WaterVaporMod
+using ..PhysCon
+using ..WaterVaporMod
 
 using Parameters
 
@@ -13,7 +13,7 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
 
 # Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
 @with_kw mutable struct leaf_params{TT<:Number}
-    
+
     # Rate constants (arbitrary units here, only relative rates are important):
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
     Kd::TT = 0.85;                           # Rate constant for thermal dissipation
@@ -149,5 +149,8 @@ function BallBerry(Cs, RH, A, l::leaf_params)
 
 gs = l.BB_g1 * A * RH/Cs  + l.BB_g0;
 end # function
+
+include("leaf_photosynthesis.jl")
+include("MathTools.jl")
 
 end #Module

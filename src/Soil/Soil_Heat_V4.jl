@@ -1,7 +1,13 @@
 module Soil_Heat_V4
 using Parameters
 
-export physcon, soil, soil_thermal_properties, phase_change, soil_temperature, tridiagonal_solver, compute_grid_settings
+export physcon,
+       soil,
+       soil_thermal_properties,
+       phase_change,
+       soil_temperature,
+       tridiagonal_solver,
+       compute_grid_settings
 
 # --- Physical constants in physcon structure
 @with_kw mutable struct physcon{}
@@ -91,7 +97,7 @@ function compute_grid_settings(soil::soil)
    end
    soil.dz_plus_onehalf[soil.nsoi] = 0.5 * soil.dz[soil.nsoi]
 
-   return soil 
+   return soil
 end # Function
 
 # Function for soil thermal conductivity and specific heat
@@ -270,19 +276,19 @@ e = copy(a)*0.0;
 f = copy(a)*0.0;
 
 e[1] = c[1] / b[1]
-    
+
 
 for i = 2: 1: n-1
    e[i] = c[i] / (b[i] - a[i] * e[i-1])
 end
-    
+
 
 f[1] = d[1] / b[1]
 
 for i = 2: 1: n
    f[i] = (d[i] - a[i] * f[i-1]) / (b[i] - a[i] * e[i-1])
 end
-    
+
 
 # --- Backward substitution [N -> 1] to solve for U
 u = zeros(n);
@@ -483,9 +489,9 @@ function soil_temperature(physcon::physcon, soil::soil, tsurf, dt)
 #
 # Calculate soil temperatures as:
 #
-#      dT   d     dT 
+#      dT   d     dT
 #   cv -- = -- (k --)
-#      dt   dz    dz 
+#      dt   dz    dz
 #
 # where: T = temperature [K]
 #        t = time [s]
@@ -493,7 +499,7 @@ function soil_temperature(physcon::physcon, soil::soil, tsurf, dt)
 #        cv = volumetric heat capacity [J/m3/K]
 #        k = thermal conductivity [W/m/K]
 #
-# Set up a tridiagonal system of equations to solve for T at time n+1; 
+# Set up a tridiagonal system of equations to solve for T at time n+1;
 # where the temperature equation for layer i is()
 #
 #   d_i = a_i [T_i-1] n+1 + b_i [T_i] n+1 + c_i [T_i+1] n+1

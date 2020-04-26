@@ -1,8 +1,18 @@
-module MathToolsMod
-using LeafPhotosynthesisMod:fluxes
-using Leaf:leaf_params
+module MathTools
 
-export quadratic,beta_function,log_gamma_function, hybrid, zbrent, ∫, fast∫, Avogadro, e2phot, ephoton
+using ...Leaf:fluxes
+using ...Leaf:leaf_params
+
+export quadratic,
+       beta_function,
+       log_gamma_function,
+       hybrid,
+       zbrent,
+       ∫,
+       fast∫,
+       Avogadro,
+       e2phot,
+       ephoton
 # hybrid             ! Solve for the root of a function using secant and Brent's methods
 # zbrent             ! Use Brent's method to find the root of a function
 # quadratic          ! Solve a quadratic equation for its two roots
@@ -246,4 +256,4 @@ function fast∫(dx::Vector, f::Vector)
     return result
 end
 
-end # module MathToolsMod
+end

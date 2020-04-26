@@ -2,21 +2,30 @@ module CanopyRTMod
 #using GSL
 using Polynomials
 using Statistics
-using PhysCon
+using ..PhysCon
 using Parameters
 # Matlab reading
 using MAT
 # Numerical integration package (Simpson rule)
 using QuadGK
-using MathToolsMod
+using ..Leaf.MathTools
 
-export optipar, angles, leafbio, leaf, optis, canopy, canRad, canOpt, FT, sunRad
+export optipar,
+       angles,
+       leafbio,
+       leaf,
+       optis,
+       canopy,
+       canRad,
+       canOpt,
+       FT,
+       sunRad
 
 # Floating point precision can be changed here
 const FT = Float32
 
 
-include("PhotoStructs.jl")
+include("photo_structs.jl")
 
 # Leaf inclination distribution
 const litab   = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
@@ -41,7 +50,7 @@ const ndub = 10
 const swl = [collect(FT(400):FT(10):650); collect(FT(655):FT(5):770); collect(FT(780):FT(25):2401)]
 const dwl = diff(swl)
 #println(dwl)
-# Load optical properties (these can be fixed globally!):
+
 const optis = optipar{FT, length(swl)-1}(loadOpti(swl)...);
 
 # Set wavelength here (will stay constant!!)
@@ -1346,4 +1355,5 @@ function expint(x::Number)
     end
     return y
 end
+
 end

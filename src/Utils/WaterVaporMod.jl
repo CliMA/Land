@@ -1,5 +1,5 @@
 module WaterVaporMod
-using PhysCon
+using ..PhysCon
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Calculate saturation vapor pressure and latent heat of vaporization
