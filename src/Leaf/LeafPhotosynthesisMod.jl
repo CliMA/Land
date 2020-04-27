@@ -389,7 +389,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
       Lold     =   L;
       L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
       counter = counter+1
-      println("L=",L," , Lold=",Lold " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", counter=", counter)
+      println("L=",L, " , Lold=" ,Lold, " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", counter=", counter)
     end
 
     # save these values in leaf and flux structures
