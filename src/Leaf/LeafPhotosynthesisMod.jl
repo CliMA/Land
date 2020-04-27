@@ -379,8 +379,6 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     while (counter<20 && abs(1.0-Lold/L)>1e-4) # 1% error
       ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# momentum aerodynamic resistance
       ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# water aerodynamic resistance
-      println("L=",L," , Lold=",Lold, " counter=",counter, " ra_w=", ra_w)
-      #println("ra_m=",ra_m)
       ram_full =   ra_leaf + ra_m;
       raw_full =   ra_leaf + ra_w;
       H        =   ρd*physcon.Cpd*DeltaT/raw_full;
@@ -391,8 +389,8 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
       Lold     =   L;
       L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
       counter = counter+1
+      println("L=",L," , Lold=",Lold " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", counter=", counter)
     end
-    println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", counter=", counter)
 
     # save these values in leaf and flux structures
     met.L   = L
