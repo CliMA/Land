@@ -212,8 +212,12 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
     # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     setra!(leaf, flux, met)
 
-    # TODO modify this CO2 at leaf surface # might need to be changed
-    flux.Cs = met.Ca - flux.An_biochemistry * flux.ra/flux.g_m_s_to_mol_m2_s
+    # CO2 at leaf surface
+    # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
+    leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+    flux.Cs = met.Ca + leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s*(leaf.Cc-met.Ca)
+
+    println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
 
     # compute stomatal conductance gs
     leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
