@@ -342,6 +342,8 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     # compute Obukhov length
     # iterate a few times
 
+    ustar_min = 0.01 # minimum friction velocity s/m
+
     # TODO ideally should not have any information about the leaves as it is the turbuence above canopy in log profile
     # first update roughness (if phenology is changing)
     setRoughness!(l)
@@ -375,7 +377,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     L        =   met.L; # initial Obukhov length
     counter = 1;
     while (counter<20 && abs(1.0-Lold/L)>1e-4) # 1% error
-      #println("L=",L," ,Lold=",Lold)
+      println("L=",L," , Lold=",Lold)
       ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# momentum aerodynamic resistance
       ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# water aerodynamic resistance
       #println("ra_m=",ra_m)
@@ -384,13 +386,13 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
       H        =   ρd*physcon.Cpd*DeltaT/raw_full;
       rs_s_m   =   flux.g_m_s_to_mol_m2_s/l.gs;
       LE       =   physcon.ε/met.P_air*ρd*lv*VPD/(rs_s_m+raw_full);
-      ustar    =   sqrt(met.U/ram_full);
+      ustar    =   min(sqrt(met.U/ram_full),ustar_min);
       Hv_s     =   H + 0.61 * physcon.Cpd/lv * met.T_air * LE;
       Lold     =   L;
       L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
-      #println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), counter=", counter)
       counter = counter+1
     end
+    println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", counter=", counter)
 
     # save these values in leaf and flux structures
     met.L   = L
