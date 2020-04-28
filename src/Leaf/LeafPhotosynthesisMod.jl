@@ -67,13 +67,17 @@ end
 
 
 # Ball-Berry stomatal conductance model:
-function BallBerry!(flux::fluxes,  l::leaf_params)
+function BallBerry!(flux::fluxes, l::leaf_params)
   #  Cs  : CO2 at leaf surface [ppm]
   #  RH  : relative humidity [0-1]
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
 
   l.gs = l.g1_BB * max(flux.An_biochemistry,1e-9) * l.RH/flux.Cs  + l.g0;
+  println("gs=",l.gs,", Cs=",flux.Cs," An_biochemistry=", flux.An_biochemistry," RH=", l.RH )
+  if(l.gs<0)
+    println("Error - gs=",l.gs,", Cs=",flux.Cs," An_biochemistry=", flux.An_biochemistry," RH=", l.RH )
+  end
 end # function
 
 
@@ -100,9 +104,14 @@ function Gentine!(flux::fluxes, l::leaf_params)
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
 
+  println("Gentine parameterization")
   setLeafkl!(l, l.psi_l) # set hydraulic conductivity of leaf
   l.gs = l.g1_BB*l.kleaf/l.kmax * max(flux.An_biochemistry,1e-9) /flux.Cs  + l.g0;
 end # function
+
+
+
+
 
 
 
@@ -228,7 +237,7 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
     leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
     flux.Cs = met.Ca + leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s*(leaf.Cc-met.Ca)
 
-    #println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
+    println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
 
     # compute stomatal conductance gs
     leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
@@ -236,15 +245,13 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
 
     if (leaf.gstyp == 1)
         BallBerry!(flux, leaf)
-    elseif(leaf.gstyp == 2) # Medlyn default
+    else # Medlyn default
         Medlyn!(flux, leaf)
-    elseif(leaf.gstyp == 3) # Gentine model
-        Gentine!(flux, leaf)
     end
 
     # Diffusion (supply-based) photosynthetic rate - Calculate Cc from the diffusion rate
     # total conductance - mol/m2/s
-    leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+
     flux.An_diffusion = leaf.gleaf*(met.Ca - leaf.Cc)
 
 end
@@ -355,8 +362,6 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     # compute Obukhov length
     # iterate a few times
 
-    ustar_min = 0.01 # minimum friction velocity s/m
-
     # TODO ideally should not have any information about the leaves as it is the turbuence above canopy in log profile
     # first update roughness (if phenology is changing)
     setRoughness!(l)
@@ -367,7 +372,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     end
 
 
-    rmin  = 2.0;
+    rmin  = 10.0;
     Lold  = -1e6;
     raw_full = -999.0;
     H     = -999.0;
@@ -390,20 +395,21 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     L        =   met.L; # initial Obukhov length
     counter = 1;
     while (counter<20 && abs(1.0-Lold/L)>1e-4) # 1% error
+      #println("L=",L," ,Lold=",Lold)
       ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# momentum aerodynamic resistance
       ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# water aerodynamic resistance
+      #println("ra_m=",ra_m)
       ram_full =   ra_leaf + ra_m;
       raw_full =   ra_leaf + ra_w;
       H        =   ρd*physcon.Cpd*DeltaT/raw_full;
       rs_s_m   =   flux.g_m_s_to_mol_m2_s/l.gs;
       LE       =   physcon.ε/met.P_air*ρd*lv*VPD/(rs_s_m+raw_full);
-      ustar    =   min(sqrt(met.U/ram_full),ustar_min);
+      ustar    =   sqrt(met.U/ram_full);
       Hv_s     =   H + 0.61 * physcon.Cpd/lv * met.T_air * LE;
       Lold     =   L;
       L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
+      #println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), counter=", counter)
       counter = counter+1
-      ra_neutral = max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) ) * ( log((met.zscreen - l.d)/l.z0m) ), rmin);
-      #println("L=",L, " , Lold=" ,Lold, " ra=",ra_w," (s/m), H=", H, " (W/m2), LE=", LE, "(W/m2), Hv_s=", Hv_s, "(W/m2), U=", met.U, " (m/s), log((z-d)/z0)=", log((met.zscreen - l.d)/l.z0m), ", ra_neutral=", ra_neutral, "counter=", counter) ;# momentum aerodynamic resistance
     end
 
     # save these values in leaf and flux structures
