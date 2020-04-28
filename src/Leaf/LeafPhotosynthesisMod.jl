@@ -1,6 +1,6 @@
 #module LeafPhotosynthesisMod
 
-export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!, Medlyn!, BallBerry!
+export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!, Medlyn!, BallBerry!, Gentine!
 
 
 using Parameters
@@ -91,7 +91,18 @@ function Medlyn!(flux::fluxes, l::leaf_params)
 end # function
 
 
+# Gentine stomatal conductance model:
+function Gentine!(flux::fluxes, l::leaf_params)
+  #  Cs  : CO2 at leaf surface
+  #  VPD  : vapor pressure deficit - Pa
+  #  Cs  : CO2 at leaf surface [ppm]
+  #  RH  : relative humidity [0-1]
+  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
+  #  gs   : moles/m2/s
 
+  setLeafkl!(l, l.psi_l) # set hydraulic conductivity of leaf
+  l.gs = l.g1_BB*l.kleaf/l.kmax * max(flux.An_biochemistry,1e-9) /flux.Cs  + l.g0;
+end # function
 
 
 
@@ -217,7 +228,7 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
     leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
     flux.Cs = met.Ca + leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s*(leaf.Cc-met.Ca)
 
-    println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
+    #println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
 
     # compute stomatal conductance gs
     leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
@@ -225,8 +236,10 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
 
     if (leaf.gstyp == 1)
         BallBerry!(flux, leaf)
-    else # Medlyn default
+    elseif(leaf.gstyp == 2) # Medlyn default
         Medlyn!(flux, leaf)
+    elseif(leaf.gstyp == 3) # Gentine model
+        Gentine!(flux, leaf)
     end
 
     # Diffusion (supply-based) photosynthetic rate - Calculate Cc from the diffusion rate

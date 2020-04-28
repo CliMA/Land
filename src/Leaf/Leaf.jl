@@ -1,5 +1,5 @@
 
-export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setra!,ψ
+export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setLeafkl!, setra!,ψ
 
 # Scaling functions for Photosynthesis temperature response and inhibition
 ft(tl, ha) = exp(ha/(physcon.Rgas*(physcon.tfrz+25)) * (1-(physcon.tfrz+25)/tl));
@@ -149,6 +149,7 @@ fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (ph
     psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
     kmax::TT    = 4e-8                            # maximum leaf-xylem conductivity (m/s)
     kx::TT      = kmax                            # actual xylem conductivity (m/s)
+    kleaf::TT   = kmax                            # leaf level hydraulic conductivity (m/s)
     ck::TT      = 2.95;                           # slope of Weibull curve
     #ε_modulus::TT = 20e6;                        # elastic modulus - for later
     Ctree::TT   = (79 + 8*height)*1e-6;           # tree capacitance (kg m−3 Pa−1)
@@ -172,4 +173,8 @@ end
 
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+end
+
+function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
+    l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end

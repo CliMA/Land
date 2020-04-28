@@ -24,7 +24,7 @@ export quadratic,beta_function,IntWeibull,log_gamma_function
 # beta_function      ! Evaluate the beta function at p and q: B(p,q)
 # log_gamma_function ! Evaluate the log natural of the gamma function at x: ln(G(x))
 
-export quadratic, IntWeibull, beta_function, log_gamma_function
+export quadratic, Weibull, IntWeibull, beta_function, log_gamma_function
 
 #-----------------------------------------------------------------------
 function quadratic(a, b, c)
@@ -38,6 +38,12 @@ function IntWeibull(psis,psil,psil50,ck) # set hydraulic conductivity
     return 2^(-(psis/psil50)^ck) - 2^(-(psil/psil50)^ck);
 end
 
+
+#-----------------------------------------------------------------------
+# integral of weibull function for conductances
+function Weibull(psil,psil50,ck) # set hydraulic conductivity
+    return 2^(-(psil/psil50)^ck) ;
+end
 #-----------------------------------------------------------------------
 function beta_function(p, q)
 #
