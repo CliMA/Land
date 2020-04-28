@@ -314,13 +314,11 @@ Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat}
     "Vegetation height"
     hc::FT             = 2.0   # | m          | (0.0, 70.0)  | "Vegetation height"
     "Leaf Inclination"
-    LIDFa::FT          = -0.35 # | -          | (-1.0, 1.0)  | "Leaf Inclination"
+    LIDFa::FT          = 0. # | -          | (-1.0, 1.0)  | "Leaf Inclination"
     "Variation in leaf inclination"
-    LIDFb::FT          = -0.15 # | -          | (-1.0, 1.0)  | "Variation in leaf inclination"
+    LIDFb::FT          = 0. # | -          | (-1.0, 1.0)  | "Variation in leaf inclination"
     "HotSpot parameter (still need to check!)"
     hot::FT            = 0.05  # | -          | (0, 1.0)     | "HotSpot parameter (still need to check!)"
-    "Leaf distribution type (2=campbell, 1=ladgen)"
-    TypeLidf::FT       = 1     # | -          | (-1.0, 1.0)  | "Leaf distribution type (2=campbell, 1=ladgen)"
 
     # Some more derived parameters:
     lazitab::Array{FT} = collect(5.0:10.0:355.0)
