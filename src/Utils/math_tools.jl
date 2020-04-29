@@ -24,6 +24,8 @@ export quadratic,beta_function,IntWeibull,log_gamma_function
 # beta_function      ! Evaluate the beta function at p and q: B(p,q)
 # log_gamma_function ! Evaluate the log natural of the gamma function at x: ln(G(x))
 
+using IncGammaBeta
+
 export quadratic, Weibull, IntWeibull, beta_function, log_gamma_function
 
 #-----------------------------------------------------------------------
@@ -35,7 +37,15 @@ end # function
 #-----------------------------------------------------------------------
 # integral of weibull function for conductances
 function IntWeibull(psis,psil,psil50,ck) # set hydraulic conductivity
-    return 2^(-(psis/psil50)^ck) - 2^(-(psil/psil50)^ck);
+# checked - this is correct
+    one_c = 1.0/ck;
+    b1 = log(2)*(psil/psil50)^ck;
+    b2 = log(2)*(psis/psil50)^ck;
+    integral = psil50/(ck*log(2)^one_c) * ( inc_gamma_upper(one_c,b1) - inc_gamma_upper(one_c,b2) )
+    #println("Int weibull= ",integral)
+    return max(integral,0.0);
+
+    # -(psi_50*gamma_incomplete(1/c,(ln(2)*x^c)/psi_50^c))/(c*ln(2)^(1/c))
 end
 
 
