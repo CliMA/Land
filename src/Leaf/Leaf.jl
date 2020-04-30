@@ -171,8 +171,8 @@ function setLeafT!(l::leaf_params)
     # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end
 
-function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivity
-    l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivitytimes Delta Psi
+    l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck)/(psis-psi_l); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end
 
 function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
