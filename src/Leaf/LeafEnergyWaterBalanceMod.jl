@@ -37,7 +37,8 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, Cc, met::meteo, l::leaf_params, 
     #println("S_down=",met.S_down," , Ldown=",met.L_down," Tleaf=",Tleaf)
     #dRn_dTs = - 4*l.ε*physcon.σ*Tleaf^3;
     setkx!(l,psi_s, psileaf) ;# set hydraulic conductivity as a function of psis and psi_l
-    flux.Sap     =   (psi_s - l.psi_l + physcon.ρw*physcon.grav*l.height)*l.kx*μ_l(Tleaf)/μ_l(273.15+20.0); # equal to int k(psi)dpsi + gravity term=-rho.g.mean(k)*height, includes also water viscosty;
+    flux.Sap     =   max(psi_s - l.psi_l - physcon.ρw*physcon.grav*l.height,0.0)*l.kx*μ_l(Tleaf)/μ_l(273.15+20.0); # equal to int k(psi)dpsi + gravity term=-rho.g.mean(k)*height, includes also water viscosty;
+    #println("Sap=",lv*flux.Sap," W/m^2, kx=",l.kx,", rho.g.h=",physcon.ρw*physcon.grav*l.height)
     dT_dt        =   (flux.Rn-flux.H-flux.LE)/l.Cleaf; # 2 times for up and down part of the leaves - TODO need to check this I am not sure I agree when integrated over the canopy
     dH2Ol_dt     =   (flux.Sap-flux.LE/lv)/l.Ctree;
     dt           =   1.0; # one second time step for Cc - a bit arbitrary and not cruCcal but will be cahnged later for actual airspace
