@@ -8,7 +8,7 @@ using Parameters
 using MAT
 # Numerical integration package (Simpson rule)
 using QuadGK
-using ..Leaf.MathTools
+using ..Leaf
 
 export optipar,
        angles,
