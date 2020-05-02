@@ -121,6 +121,7 @@ Compute net assimilation rate A, fluorescence F using biochemical model
 """
 function LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
     # Adjust rates to leaf Temperature (C3 only for now):
+    # This is like 1µs already now (used to be 5), need to maybe only run if we change T?
     setLeafT!(leaf)
 
     # conversion factor for conductance - T and P dependent
@@ -193,14 +194,14 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
     if leaf.C3
         # C3: Rubisco-limited photosynthesis; still need to check CO2 mixing ratios vs partial pressures.
         # still need to include ppm2bar (but can be done on leaf structure!)
-        flux.Ac = leaf.Vcmax * max(leaf.Cc-leaf.Γstar, 0.0) / (leaf.Cc + leaf.Kc*(1.0+leaf.o₂/leaf.Ko)) # Bonan eq. 11.28
+        flux.Ac = leaf.Vcmax * max(leaf.Cc-leaf.Γstar, 0) / (leaf.Cc + leaf.Kc*(1 +leaf.o₂/leaf.Ko)) # Bonan eq. 11.28
         # C3: RuBP-limited photosynthesis (this is the NADPH requirement stochiometry)
-        flux.Aj = flux.Je * max(leaf.Cc-leaf.Γstar, 0.0) / (4.0*leaf.Cc + 8.0*leaf.Γstar)               # Bonan eq. 11.29
+        flux.Aj = flux.Je * max(leaf.Cc-leaf.Γstar, 0) / (4leaf.Cc + 8leaf.Γstar)               # Bonan eq. 11.29
 
         # for C3, set ap to Inf
         flux.Ap = Inf
     else #C4 Photosynthesis, still to be implemented
-        flux.Ac = flux.Aj = flux.Ap = 0.0
+        flux.Ac = flux.Aj = flux.Ap = 0
     end
     # Net photosynthesis as the minimum or co-limited rate
     if leaf.use_colim
@@ -214,10 +215,10 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
         flux.Ag = min(flux.Ac,flux.Aj,flux.Ap) # gross assimilation
     end
     # Prevent photosynthesis from ever being negative
-    flux.Ag = max(0.0,flux.Ag)
-    flux.Ai = max(0.0,flux.Ai)
-    flux.Aj = max(0.0,flux.Aj)
-    flux.Ap = max(0.0,flux.Ap)
+    flux.Ag = max(0,flux.Ag)
+    flux.Ai = max(0,flux.Ai)
+    flux.Aj = max(0,flux.Aj)
+    flux.Ap = max(0,flux.Ap)
 
     # Net photosynthesis due to biochemistry
     flux.An_biochemistry = flux.Ag - leaf.Rdleaf # net assimilation
@@ -227,7 +228,7 @@ function CcFunc!(flux::fluxes, leaf::leaf_params, met::meteo)
 
     # CO2 at leaf surface
     # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
-    leaf.gleaf = 1.0 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+    leaf.gleaf = 1 / (flux.ra/flux.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
     flux.Cs = met.Ca + leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s*(leaf.Cc-met.Ca)
 
     # println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
@@ -363,7 +364,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
 
     if(l.height>met.zscreen)
         println("Vegetation height is higher than screen level height")
-        process.exit(20)
+        #process.exit(20)
     end
 
 

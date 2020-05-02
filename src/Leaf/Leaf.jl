@@ -5,9 +5,26 @@ using ..WaterVapor
 export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setLeafkl!, setra!,ψ
 
 # Scaling functions for Photosynthesis temperature response and inhibition
-ft(tl, ha) = exp(ha/(physcon.Rgas*(physcon.tfrz+25)) * (1-(physcon.tfrz+25)/tl));
-fth(tl, hd, se, fc) = fc / (1 + exp((-hd+se*tl)/(physcon.Rgas*tl)));
-fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (physcon.tfrz+25.)) );
+function ft(tl, ha)
+    FT = eltype(tl)
+    Rgas = FT(8.31446261815324);
+    T25 = FT(298.15) 
+    exp(ha/(Rgas*(T25)) * (1-(T25)/tl));
+end;
+
+function fth(tl, hd, se, fc)
+    FT = eltype(tl)
+    Rgas = FT(8.31446261815324);
+    fc / (1 + exp((-hd+se*tl)/(Rgas*tl)));
+end;
+
+function fth25(hd, se) 
+    FT = eltype(hd)
+    T25 = FT(298.15);
+    Rgas = FT(8.31446261815324); 
+    1 + exp( (-hd + se * T25) / (Rgas * T25 ));
+end;
+
 
 # Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
 Base.@kwdef mutable struct leaf_params{TT<:Number}
