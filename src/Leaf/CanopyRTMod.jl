@@ -589,23 +589,23 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
         wfEs = mean((φ_sun[:,:,i].*absfsfo)'*can.lidf)  * M⁺_sun + mean((φ_sun[:,:,i].*fsfo)'*can.lidf)  *M⁻_sun
 
         a1 = mean((φ_sun[:,:,i].*absfs)'*can.lidf)* M⁺_sun;
-        a2 = mean((φ_sun[:,:,i].*cosΘ_l)'*can.lidf)*M⁻_sun
+        a2 = mean((φ_sun[:,:,i].*fs.*cosΘ_l)'*can.lidf)*M⁻_sun
         sfEs = a1 - a2
         sbEs = a1 + a2
 
         a1 = mean((φ_shade[i]*abs.(fo))'*can.lidf) ;
-        a2 = mean((φ_shade[i]*cosΘ_l)'*can.lidf)
-        vfEplu_shade  =   a1  * M⁺⁺ + a2 *M⁻⁺
+        a2 = mean((φ_shade[i]*fo.*cosΘ_l)'*can.lidf)
+        vfEplu_shade =  a1  * M⁺⁺ + a2 *M⁻⁺
         vbEmin_shade =  a1 * M⁺⁻ + a2 *M⁻⁻
 
         a1 = mean((φ_sun[:,:,i].*abs.(fo))'*can.lidf);
-        a2 = mean((φ_sun[:,:,i].*cosΘ_l)'*can.lidf)
-        vfEplu_sun  =         a1 * M⁺⁺ - a2 *M⁻⁺
-        vbEmin_sun  =       a1 * M⁺⁻ + a2 *M⁻⁻
+        a2 = mean((φ_sun[:,:,i].*fo.*cosΘ_l)'*can.lidf)
+        vfEplu_sun  =  a1 * M⁺⁺ - a2 *M⁻⁺
+        vbEmin_sun  =  a1 * M⁺⁻ + a2 *M⁻⁻
 
         a1 = shadeLidf * M⁺⁻;
         a2 = shadeCos2 * M⁻⁻
-        sigfEmin_shade  =   a1 - a2
+        sigfEmin_shade  =  a1 - a2
         sigbEmin_shade  =  a1 + a2
 
         a1 = sunLidf * M⁺⁻;
@@ -624,12 +624,12 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
         sigbEplu_sun  = a1 +a2
 
         # Fluxes:
-        piLs[ :,i]  =   wfEs+vfEplu_sun+vbEmin_sun;       # sunlit for each layer
-        piLd[ :,i]  =   vbEmin_shade+vfEplu_shade;        # shade leaf for each layer
-        Fsmin[:,i]  =   sfEs+sigfEmin_sun+sigbEplu_sun;   # Eq. 29a for sunlit leaf
-        Fsplu[:,i]  =   sbEs+sigbEmin_sun+sigfEplu_sun;   # Eq. 29b for sunlit leaf
-        Fdmin[:,i]  =   sigfEmin_shade+sigbEplu_shade;    # Eq. 29a for shade leaf
-        Fdplu[:,i]  =   sigbEmin_shade+sigfEplu_shade;    # Eq. 29b for shade leaf
+        piLs[ :,i]  =  wfEs+vfEplu_sun+vbEmin_sun;       # sunlit for each layer
+        piLd[ :,i]  =  vbEmin_shade+vfEplu_shade;        # shade leaf for each layer
+        Fsmin[:,i]  =  sfEs+sigfEmin_sun+sigbEplu_sun;   # Eq. 29a for sunlit leaf
+        Fsplu[:,i]  =  sbEs+sigbEmin_sun+sigfEplu_sun;   # Eq. 29b for sunlit leaf
+        Fdmin[:,i]  =  sigfEmin_shade+sigbEplu_shade;    # Eq. 29a for shade leaf
+        Fdplu[:,i]  =  sigbEmin_shade+sigfEplu_shade;    # Eq. 29b for shade leaf
         # Total weighted fluxes
         S⁻[:,i]     =   iLAI*(Qs[i]*Fsmin[:,i] + (1-Qs[i])*Fdmin[:,i]);
         S⁺[:,i]     =   iLAI*(Qs[i]*Fsplu[:,i] + (1-Qs[i])*Fdplu[:,i]);
@@ -642,11 +642,11 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
     #println(size(zeroB), " ", size(rsoil), " ", size(S⁻), " ", size(τ_dd))
     F⁻,F⁺,net_diffuse = RTM_diffuseS(τ_dd, ρ_dd,S⁻, S⁺,zeroB, zeroB, rsoil)
     # Save in output structures!
-    cR.SIF_obs_sunlit[:]    = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
-    cR.SIF_obs_shaded[:]     = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
+    cR.SIF_obs_sunlit[:]  = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
+    cR.SIF_obs_shaded[:]  = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
 
     # SIF scattered internally
-    cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
+    #cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_soil[:]     = (rsoil .* F⁻[:,end] * Po[end])/FT(pi);                                                #Soil contribution
     
