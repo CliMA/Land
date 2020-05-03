@@ -7,9 +7,9 @@ using Plots
 using BenchmarkTools
 using DifferentialEquations
 
-using LSM.PhysCon
-using LSM.WaterVaporMod
-using LSM.LeafPhotosynthesisMod
+using Land.PhysCon
+using Land.WaterVapor
+using Land.LeafPhotosynthesisMod
 
 output_dir = joinpath(@__DIR__,"..","output")
 mkpath(output_dir)

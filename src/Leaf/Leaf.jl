@@ -1,3 +1,6 @@
+module Leaf
+using ..PhysCon
+using ..WaterVapor
 
 export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setLeafkl!, setra!,ψ
 
@@ -7,7 +10,7 @@ fth(tl, hd, se, fc) = fc / (1 + exp((-hd+se*tl)/(physcon.Rgas*tl)));
 fth25(hd, se) = 1.0 + exp( (-hd + se * (physcon.tfrz+25.)) / (physcon.Rgas * (physcon.tfrz+25.)) );
 
 # Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
-@with_kw mutable struct leaf_params{TT<:Number}
+Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     # broadband albedo and emissivity
     α::TT  = -999;                           # broadband shortwave albedo - absurd value to make sure we initialize correctly
@@ -175,6 +178,14 @@ function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivitytimes D
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck)/max(psis-psi_l,1e-6); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
     #println("k_xylem = ",l.kx," psi_s=",psis," psi_l=",psi_l)
 end
+
+function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
+    l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
+end
+
+include("leaf_photosynthesis.jl")
+include("math_tools.jl")
+include("leaf_energy_water_balance.jl")
 
 function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
     l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);

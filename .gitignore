@@ -2,10 +2,11 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
-*.DS_Store
 docs/build/
 docs/site/
 src/**/Manifest.toml
+deps/deps.jl
+*.ipynb_checkpoints/
 *.vtk
 *.dat
 *.vtu
@@ -14,3 +15,8 @@ src/**/Manifest.toml
 *.png
 *.nc
 !docs/src/assets/*.png
+*.jpg
+!pics/*.png
+!pics/*.jpg
+*~
+TAGS
