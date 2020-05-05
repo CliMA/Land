@@ -1,4 +1,5 @@
 
+
 # hybrid             ! Solve for the root of a function using secant and Brent's methods
 # zbrent             ! Use Brent's method to find the root of a function
 # quadratic          ! Solve a quadratic equation for its two roots
@@ -7,6 +8,7 @@
 # log_gamma_function ! Evaluate the log natural of the gamma function at x: ln(G(x))
 
 using IncGammaBeta
+
 
 export quadratic,
        beta_function,
