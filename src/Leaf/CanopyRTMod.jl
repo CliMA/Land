@@ -2,7 +2,7 @@ module CanopyRTMod
 #using GSL
 using Polynomials
 using Statistics
-using PhysCon
+using ..PhysCon
 using Parameters
 # Matlab reading
 using MAT
