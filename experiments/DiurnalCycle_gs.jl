@@ -7,7 +7,7 @@ using Land.PhysCon
 using Land.WaterVapor
 using Land.Leaf
 #using IncGammaBeta
-output_dir = joinpath(@__DIR__,"output")
+output_dir = joinpath(@__DIR__,"experiments/output")
 mkpath(output_dir)
 
 using Plots
@@ -30,13 +30,14 @@ f.Je   = 100; f.gbc  = 100; f.gbv  = 100; f.ceair= 1500; f.eair = 1500; f.APAR =
 l.Kn = 2.44; l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -1e6;l.ck=3;met.zscreen = 2.0;
 l.height   = 1.0; met.zscreen  = 2.0;
 met.stab_type_stable = 2;
-l.gstyp = 3;
+l.gstyp = 1;
+l.dynamic_state=true
 
 
 # A diurnal cycle for radiation and Tair
 Deltat  = 60;
 Samp    = 500; # W/m2 amplitude
-Tmean   = 273.15+22;
+Tmean   = 273.15+15;
 DeltaT  = 3;
 omega   = 2*π/(24*3600);
 t       = range(0, stop=24*3600, step=Deltat); # diurnal cycle in seconds
@@ -75,6 +76,7 @@ dt     = 0.1*60; # in s
 T_t    = zeros(size(Sdown_t));
 psil_t = zeros(size(Sdown_t));
 Cc_t   = zeros(size(Sdown_t));
+gs_t = zeros(size(Sdown_t));
 Rn_t   = zeros(size(Sdown_t));
 GPP_t  = zeros(size(Sdown_t));
 GPP_diffusion_t  = zeros(size(Sdown_t));
@@ -85,10 +87,12 @@ rs_t   = zeros(size(Sdown_t));
 ra_t   = zeros(size(Sdown_t));
 
 function f_ode!(du,u,p,t) # p are parameters
-    du .= LeafEnergyWaterBalance(u[1], u[2], u[3], p.met, p.l, p.f, p.psi_s)[1:3];
+    du .= LeafEnergyWaterBalance(u[1], u[2], u[3], p.met, p.l, p.f, p.psi_s);
     #println("du_inside = $(du), u_inside = $(u)")
 end
 
+Sdown_t[300:400].=600;
+Sdown_t[800:1000].=1400;
 let
     # initial conditions
     met.T_air  = Tair_t[1];
@@ -109,7 +113,7 @@ let
         f.APAR     = met.PAR;
         #println("Tair=",met.T_air," Tleaf=",l.T," psi_leaf=",l.psi_l)
         for j=1:trunc(Deltat/dt)
-            u    = [l.T;l.psi_l;l.Cc];
+            u    = [l.T;l.psi_l;l.Cc;l.gs];
             p    = parameters_ode(l,met,f,psi_s);
             #(p.met, p.l,  p.psi_s, p.U)    = [l;met;psi_s;U];
             #prob = ODEProblem(f_ode!,u0,tspan,p);
@@ -121,8 +125,11 @@ let
 
             du   = zeros(size(u));
             f_ode!(du,u,p,t);
-            (l.T,l.psi_l,l.Cc) = du*dt+u;
-
+            # just remove Cc part here.
+            du[3]=0
+            #@show l.gs
+            (l.T,l.psi_l,test, l.gs) = du*dt+u;
+            #@show l.gs
 #            u0   = [l.T;l.psi_l;l.Cc];
 #            prob = ODEProblem(f_ode!,u0,tspan,p);
 #            sol  = solve(prob);
@@ -145,7 +152,7 @@ let
             T_t[i]    = l.T ; #  = T_old;
             psil_t[i] = l.psi_l;
             Cc_t[i]   = l.Cc;
-
+            gs_t[i]   = l.gs
             if(abs(H_t[i])>500)
                 println("index ($i) ($j)")
             end
@@ -175,26 +182,37 @@ plot(t/3600, T_t-273.15*ones(size(T_t)),xlabel = "t (hr)",ylabel = "T (C)",label
 
 plot(t/3600,psil_t/1e6,xlabel = "t (hr)",ylabel = "|psi_l (MPa)|",label="psi_l",ylim=0:100)
 
-savefig(joinpath(output_dir, "T_psi_diurnal_t.png"))
+savefig(joinpath(output_dir, "T_psi_diurnal_t_gs.png"))
 
 plot(t/3600,  Rn_t,xlabel = "t (hr)",ylabel = "Rn (W/m2)",label="Rn")
 plot!(t/3600, H_t,xlabel  = "t (hr)",ylabel = "H (W/m2)" ,label="H")
 plot!(t/3600, LE_t,xlabel = "t (hr)",ylabel = "LE (W/m2)",label="LE")
 
-savefig(joinpath(output_dir, "Fluxes_diurnal_t.png"))
+savefig(joinpath(output_dir, "Fluxes_diurnal_t_gs.png"))
 
-plot(t/3600,  rs_t,xlabel = "t (s)",ylabel = "rs (s/m)",label="rs")
-plot!(t/3600, ra_t,xlabel  = "t (s)",ylabel = "ra (s/m)" ,label="ra")
+plot(t/3600,  rs_t,xlabel = "t (hr)",ylabel = "rs (s/m)",label="rs")
+plot!(t/3600, ra_t,xlabel  = "t (hr)",ylabel = "ra (s/m)" ,label="ra")
 
-savefig(joinpath(output_dir, "resistances_diurnal_t.png"))
+savefig(joinpath(output_dir, "resistances_diurnal_t_gs.png"))
 
-plot(t/3600, GPP_t,xlabel = "t (s)",ylabel = "GPP (micomles/m2/s)",label="GPP",ylim=0:100)
+plot(t/3600, GPP_t,xlabel = "t (hr)",ylabel = "GPP (micomles/m2/s)",label="GPP",ylim=0:100)
 
-savefig(joinpath(output_dir, "GPP_diurnal_t.png"))
+savefig(joinpath(output_dir, "GPP_diurnal_t_gs.png"))
 
-plot(t/3600, LUE_t,xlabel = "t (s)",ylabel = "LUE (-)",label="GPP",ylim=0:100)
+plot(t/3600, LUE_t,xlabel = "t (hr)",ylabel = "LUE (-)",label="GPP",ylim=0:100)
 
-savefig(joinpath(output_dir, "LUE_diurnal_t.png"))
+savefig(joinpath(output_dir, "LUE_diurnal_t_gs.png"))
 
+plot(t/3600, gs_t,xlabel = "t (hr)",ylabel = "gs (-)",label="gs",ylim=0:100)
+
+savefig(joinpath(output_dir, "Gs_diurnal_gs.png"))
+
+plot(t/3600, Cc_t,xlabel = "t (hr)",ylabel = "Cc (-)",label="Cc",ylim=0:100)
+
+savefig(joinpath(output_dir, "Cc_diurnal_gs.png"))
+
+plot(t/3600, T_t,xlabel = "t (hr)",ylabel = "T_leaf (-)",label="Tleaf",ylim=0:100)
+
+savefig(joinpath(output_dir, "Tleaf_diurnal_gs.png"))
 
 

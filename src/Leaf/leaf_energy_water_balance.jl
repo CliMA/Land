@@ -24,8 +24,9 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, Cc, met::meteo, l::leaf_params, 
         process.exit(10)
     end
     LeafPhotosynthesis!(flux, l, met); # compute H, LE in there as well
-
-
+    LeafPhotosynthesis!(flux, l, met);
+    # Leaf response time in seconds (15min)
+    tau_gs = 15.0*60.0
     # TODO aerodynamic resistance should be double for the sensible heat flux at leaf level, but do we really care?
     l.Cleaf = l.LMA* ( (1.0-l.RWC)*physcon.Cdryleaf + l.RWC*physcon.Cpl )/(1.0-l.RWC); # leaf conductivity
     # println("Cleaf=",l.Cleaf)
@@ -36,13 +37,15 @@ function LeafEnergyWaterBalance(Tleaf, psileaf, Cc, met::meteo, l::leaf_params, 
     setkx!(l,psi_s, psileaf) ;# set hydraulic conductivity as a function of psis and psi_l
     flux.Sap     =   max(psi_s - l.psi_l - physcon.ρw*physcon.grav*l.height,0.0)*l.kx*μ_l(Tleaf)/μ_l(273.15+20.0); # equal to int k(psi)dpsi + gravity term=-rho.g.mean(k)*height, includes also water viscosty;
     #println("Sap=",lv*flux.Sap," W/m^2, kx=",l.kx,", rho.g.h=",physcon.ρw*physcon.grav*l.height)
+    #@show flux.LE
     dT_dt        =   (flux.Rn-flux.H-flux.LE)/l.Cleaf; # 2 times for up and down part of the leaves - TODO need to check this I am not sure I agree when integrated over the canopy
     dH2Ol_dt     =   (flux.Sap-flux.LE/lv)/l.Ctree;
     dt           =   1.0; # one second time step for Cc - a bit arbitrary and not cruCcal but will be cahnged later for actual airspace
     dCc_dt       =   (flux.An_diffusion - flux.An_biochemistry) / dt; #(l.Chloroplast_rel_volume*l.dleaf*l.LAI);
+    dgs_dt       =   (l.gs_ss-l.gs)/tau_gs
     #println("Cc/(dCc/dt)=",1.0/(dCc_dt/l.Cc)," An_biochemistry=",flux.An_biochemistry," An_diffusion=",flux.An_diffusion)
 
     # print(flux.Cs, " ppm, ", l.VPD/1000.0, " (kPA), ", flux.An_biochemistry, " micromol/s/m2  "," An_diffusion=",flux.An_diffusion)
     #println("Sdown= " , met.S_down, "W/m2, Rn=",flux.Rn,"W/m2, SEB=",flux.Rn-flux.H-flux.LE,"W/m2, H= ",flux.H, "W /m2, LE= ",flux.LE, "W /m2, dT_dt=",dT_dt*3600," (K/hr), ra=",flux.ra, " (s/m) ")
-    return dT_dt, dH2Ol_dt, dCc_dt
+    return dT_dt, dH2Ol_dt, dCc_dt, dgs_dt
 end
