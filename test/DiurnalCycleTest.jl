@@ -1,7 +1,4 @@
 
-# Add PATH
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
-
 #using PyPlot
 using Plots
 using BenchmarkTools
