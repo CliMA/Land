@@ -1,8 +1,4 @@
-<<<<<<< HEAD:src/Utils/WaterMod.jl
-module WaterMod
-=======
 module WaterVapor
->>>>>>> 7d81c83da2ccaf2ba0ceb7135b5fd06c31d7b05a:src/Utils/WaterVapor.jl
 
 using ..PhysCon
 #-----------------------------------------------------------------------
@@ -102,15 +98,7 @@ function SatVap(t)
 end # SatVap
 
 
-<<<<<<< HEAD:src/Utils/WaterMod.jl
 
-
-
-
-
-
-=======
->>>>>>> 7d81c83da2ccaf2ba0ceb7135b5fd06c31d7b05a:src/Utils/WaterVapor.jl
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Liquid water depenendence on viscosity
@@ -126,10 +114,4 @@ function μ_l(T)
 end # end mu l
 
 
-
-<<<<<<< HEAD:src/Utils/WaterMod.jl
-
-
-=======
->>>>>>> 7d81c83da2ccaf2ba0ceb7135b5fd06c31d7b05a:src/Utils/WaterVapor.jl
 end # Module

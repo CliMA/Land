@@ -389,8 +389,7 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     ra_leaf  = 1/l.Cd / sqrt(met.U/l.dleaf);
     #println("ra_leaf=",ra_leaf)
     DeltaT   =   l.T - met.T_air;
-    esat,desat_dT = SatVap(l.T);
-    VPD      =   max(esat-met.e_air,1.0);
+    VPD      =   max(l.esat-met.e_air,1.0);
     ρd       =   met.P_air/(physcon.Rd*met.T_air);      # dry air density (kg/m3)
     lv       =   Lv(l.T);
     L        =   met.L; # initial Obukhov length

@@ -26,6 +26,7 @@ Base.@kwdef struct phys{T<:Number}
     Wtoμmole_s::T = 4.57;            # converts Watts/m2 to μmole/s
     K::T    = 0.40;                  # von Karman constant
     Cdryleaf::T = 1396;              # Specific heat of dry leaf at constant pressure (J/kg/K)
+    Vw::T = 18*(1e-2)^3;             # molar volumes of pure water
 end
 
 physcon = phys{Float32}()

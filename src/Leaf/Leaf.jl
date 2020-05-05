@@ -171,6 +171,7 @@ function setLeafT!(l::leaf_params)
     l.Jmax    = l.Jmax25  * ft(l.T, l.Jmaxha)  * fth(l.T, l.Jmaxhd, l.Jmaxse, l.Jmaxc);
     l.Rdleaf  = l.Rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
     (l.esat, l.desat) = SatVap(l.T);
+    l.esat = exp(leaf.psi_l*physcon.Vw/(physcon.Rgas*Tleaf))*l.esat; # modulation due to water under tension
     # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end
 
@@ -183,10 +184,6 @@ function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
     l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end
 
-include("leaf_photosynthesis.jl")
-include("math_tools.jl")
-include("leaf_energy_water_balance.jl")
 
-function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
-    l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
-end
+
+end # end module

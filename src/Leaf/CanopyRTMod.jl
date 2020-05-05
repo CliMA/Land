@@ -341,9 +341,9 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     cospsi	= cosd(psi);
 
     # Generate leaf angle distribution:
-    
+
     lidf = dladgen(can.LIDFa,can.LIDFb, litab_bnd);
-    
+
     can.lidf = lidf
 
     #println(lidf)
@@ -633,7 +633,7 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
         # Total weighted fluxes
         S⁻[:,i]     =   iLAI*(Qs[i]*Fsmin[:,i] + (1-Qs[i])*Fdmin[:,i]);
         S⁺[:,i]     =   iLAI*(Qs[i]*Fsplu[:,i] + (1-Qs[i])*Fdplu[:,i]);
-        
+
         Femo[:,i]   =   iLAI*(Qs[i]* piLs[:,i] + (1-Qs[i])*piLd[:,i]);
     end
     # Use Zero SIF fluxes as top and bottom boundary:
@@ -649,7 +649,7 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
     cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_soil[:]     = (rsoil .* F⁻[:,end] * Po[end])/FT(pi);                                                #Soil contribution
-    
+
     cR.SIF_hemi[:]    = F⁺[:,1];
     cR.SIF_obs[:] = cR.SIF_obs_sunlit[:]+cR.SIF_obs_shaded[:]+cR.SIF_obs_scattered[:] +cR.SIF_obs_soil[:];
     cR.SIF_sum[:] = sum(S⁻+S⁺, dims=2)
@@ -1086,7 +1086,7 @@ end
 #    -GSL.sf_expint_Ei(-x)
 #end
 # From Matlab!
-p = Polynomials.Poly(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
+p = Polynomials.PolyCompat(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
 const egamma=FT(0.57721566490153286061);
 function expint(x::Number)
 
