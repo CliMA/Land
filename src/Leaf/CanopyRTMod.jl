@@ -878,6 +878,7 @@ function Psofunction(K,k,LAI,q,dso,xl)
     return pso
 end;
 
+
 # Changed from latest volscat functions (April 2001)
 """********************************************************************************
 !*	tts		= solar zenith
