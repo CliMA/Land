@@ -80,7 +80,7 @@ Base.@kwdef mutable struct leafbio{FT<:AbstractFloat,nWl,nWle, nWlf,nWLe_nWLf}
     ρ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal reflectance"
     "Broadband thermal transmission"
     τ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal transmission"
-    "Leaf fluorescence efficiency"
+    "Leaf fluorescence efficiency (Fo standard)"
     fqe::FT = 0.01       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
 
     "shortwave leaf reflectance"
@@ -192,6 +192,10 @@ Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIn
     T_shade::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for shaded leaves"
     φ_shade::Array{FT,1} = ones(nLayers)
+    "GPP of sunlit leaves μmoles m^-2 s^-1"
+    GPP_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "GPP of shaded leaves μmoles m^-2 s^-1"
+    GPP_shade::Array{FT,1} = zeros(nLayers)               
 
     # Fluorescence Output:
     "Hemispheric total outgoing SIF flux (mW m^-2 μm^-1))"
@@ -319,6 +323,17 @@ Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat}
     LIDFb::FT          = 0. # | -          | (-1.0, 1.0)  | "Variation in leaf inclination"
     "HotSpot parameter (still need to check!)"
     hot::FT            = 0.05  # | -          | (0, 1.0)     | "HotSpot parameter (still need to check!)"
+    # tree/leaf traits
+    "Canopy height (m)"
+    height::FT      = 20.;                            # tree height (m)
+    "Canopy roughness (m)"
+    z0m::FT         = 1.;                          # tree roughness (m)
+    z0h::FT         = -999.;                          # tree roughness (m) - TODO should be changed later
+    "Canopy displacement height (m)"
+    d::FT           = -999.;                          # tree displacement height (m)
+    "m/sqrt(s) turbulent transfer coefficient"
+    Cd::FT          = 0.01;  
+    
 
     # Some more derived parameters:
     lazitab::Array{FT} = collect(5.0:10.0:355.0)

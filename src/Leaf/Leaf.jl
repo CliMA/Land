@@ -36,8 +36,11 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     ε::TT  = -999;                           # longwave emissivity
 
     # thermal characteristics
+    "DRY leaf mass area"
     LMA::TT         = 100e-3;                # DRY leaf mass area, NOT MEAN VALUE WHICH INCLUDES RELATIVE WATER CONTENT - kg/m2 - density times thickness
+    "leaf relative water content"
     RWC::TT         = 0.8;                   # leaf relative water content
+    "leaf specific heat (J/kg/K)"
     Cleaf::TT       = 1000.0;                # leaf specific heat (J/kg/K)
 
     # pore traits
@@ -45,19 +48,30 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     Chloroplast_rel_volume::TT  = 2.0/100.0;        # hloroplast volume airspace (m^3 per pore) - http://kirschner.med.harvard.edu/files/bionumbers/A%20semi%20quantitative%20analysis%20of%20the%20photosynthetic%20system%20in%20an%20'average'%20C3%20plant%20leaf.pdf
 
     # Rate constants (arbitrary units here, only relative rates are important):
+    "Rate constant for fluorescence (const)"
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
+    "Rate constant for thermal dissipation"
     Kd::TT = 0.85;                           # Rate constant for thermal dissipation
+    "Rate constant for photochemistry (all reaction centers open)"
     Kp::TT = 4.0;                            # Rate constant for photochemistry (all reaction centers open)
+    "NPQ rate constant"
     Kn::TT = 0;                              # NPQ rate constant (initially zero)
     Kn_ss::TT = 0;                           # Kn in steady state
+    "max PSII yield"
     maxPSII::TT = Kp/(Kp+Kf+Kd);             # Max PSII yield (Kn=0, all RC open)
     "Flexas et al derived Fluorescence model params"
     Knparams = [5.01, 1.93, 10.0]
+    "dark-adapted fluorescence yield Fo"
     Fo::TT = 0;     # dark-adapted fluorescence yield Fo,0
+    "light-adapted fluorescence yield in the dark Fo'"
     Fo′::TT = 0;     # light-adapted fluorescence yield in the dark Fo
+    "dark adapted Fm yield"
     Fm::TT = 0;     # light-adapted fluorescence yield Fm
+    "light adapted Fm' yield"
     Fm′::TT = 0;    # dark-adapted fluorescence yield Fm
+    "steady-state (light-adapted) yield Ft (aka Fs)"
     ϕs::TT = 0;     # steady-state (light-adapted) yield Ft (aka Fs)
+    "fluorescence efficiency (to be used for SIF RT)"
     eta::TT = 0;
     qQ::TT = 0;     # photochemical quenching
     qE::TT = 0;     # non-photochemical quenching
@@ -68,12 +82,15 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     effcon::TT = 1/5                       # [mol CO2/mol e-]  number of CO2 per electrons - typically 1/5 for C3 and 1/6 for C4, i.e. about 1/10 for both PSI and PSII!
     CO2_per_electron::TT = 1/5             # Similar to above but accounting for Photorespiration as well (which "steals" electrons)
+    "Actual electron transport rate (μmol m-2 s-1)"
     Ja::TT = 0                               # Actual electron transport rate (needed to compute fluorescence later on)
-
+    "C3 or C4 plant boolean"
     C3::Bool = true                           # C3 (or C4) plant
     use_colim::Bool = true                    # Use co-limitation
     gstyp::Int = 1                            # stomatal conductance type (1=Ball Berry, 0 = Medlyn)
+    "O2 (mmol/mol)"
     o₂::TT = 0.209e3;                         # Standard O2 in mmol/mol
+    "Leaf temperature (K)"
     T::TT = 298.15;                           # standard temperature (25C)
     esat::TT = 0.0
     desat::TT = 0.0
@@ -89,9 +106,13 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     vpd_min = 100.0                            # Min VPD for Medlyn model (blows up otherwise?)
     # Add already here: Mesophyll conductance (Inf for now):
 
+    "total leaf conductance (μmol/m2/s)"
     gleaf::TT = 0.1;                           # total leaf conductance (μmol/m2/s)
+    "Mesophyll conductance (μmol/m2/s/)"
     gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/)
+    "Stomatal conductance (μmol/m2/s)"
     gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s); just using some prior
+    "Steady state Stomatal conductance (μmol/m2/s)"
     gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s);
 
     #---------------------------------------------------------------------
@@ -99,10 +120,15 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     # Derive sco from cp with o2=0.209 mol/mol and re-calculate Γ to allow
     # variation in O2
     #---------------------------------------------------------------------
+    "Michaelis-Menten constant for CO2 at 25C (μmol/mol)"
     Kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C - μmol/mol
+    "Michaelis-Menten constant for O2 at 25C  (mmol/mol)"
     Ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  - mmol/mol
+    "Standard CO2 compensation point at 25C (μmol/mol)"
     Γ_25_::TT = 42.75;                         # CO2 compensation point at 25C μmol/mol
+    "Rubisco specificity"
     sco::TT = 0.5 * 0.209 / (Γ_25_ * 1.e-06);  # Γ_25 (μmol/mol) -> (mol/mol)
+    "CO2 compensation point at 25C (μmol/mol)"
     Γ_25::TT = 0.5 * o₂ / sco * 1000.;         # O2 is mmol/mol. Multiply by 1000 for μmol/mol
 
     #---------------------------------------------------------------------
@@ -111,11 +137,17 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     # Bernacchi et al (2003) Plant, Cell Environment 26:1419-1430
     # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
     #---------------------------------------------------------------------
+    "Activation energy for Kc (J/mol)"
     Kcha::TT    = 79430.;                      # Activation energy for Kc (J/mol)
+    "Activation energy for Ko (J/mol)"
     Koha::TT    = 36380.;                      # Activation energy for Ko (J/mol)
+    "Activation energy for cp (J/mol)"
     cpha::TT    = 37830.;                      # Activation energy for cp (J/mol)
+    "Activation energy for Vcmax (J/mol)"
     Vcmaxha::TT = 65330.;                      # Activation energy for Vcmax (J/mol)
+    "Activation energy for Jmax (J/mol)"
     Jmaxha::TT  = 43540.;                      # Activation energy for Jmax (J/mol)
+    "Activation energy for Rd (J/mol)"
     rdha::TT    = 46390.;                      # Activation energy for Rd (J/mol)
 
     #---------------------------------------------------------------------
@@ -124,37 +156,58 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     # The factor "c" scales the deactivation to a value of 1.0 at 25C
     # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
     #---------------------------------------------------------------------
+    "Deactivation energy for Vcmax (J/mol)"
     Vcmaxhd::TT = 150000.;                    # Deactivation energy for Vcmax (J/mol)
+    "Deactivation energy for Jmax (J/mol)"
     Jmaxhd::TT  = 150000.;                    # Deactivation energy for Jmax (J/mol)
+    "Deactivation energy for Rd (J/mol)"
     rdhd::TT    = 150000.;                    # Deactivation energy for Rd (J/mol)
 
+    "Entropy term for Vcmax (J/mol/K)"
     Vcmaxse::TT = 490.;                       # Entropy term for Vcmax (J/mol/K)
+    "Entropy term for Jmax (J/mol/K)"
     Jmaxse::TT  = 490.;                       # Entropy term for Jmax (J/mol/K)
+    "Entropy term for Rd (J/mol/K)"
     rdse::TT    = 490.;                       # Entropy term for Rd (J/mol/K)
 
+    "Scaling factor for high temperature inhibition (25 C = 1.0)"
     Vcmaxc::TT = fth25(Vcmaxhd, Vcmaxse);    # Scaling factor for high temperature inhibition (25 C = 1.0)
+    "Scaling factor for high temperature inhibition (25 C = 1.0)"
     Jmaxc::TT  = fth25(Jmaxhd, Jmaxse);      # Scaling factor for high temperature inhibition (25 C = 1.0)
+    "Scaling factor for high temperature inhibition (25 C = 1.0)"
     rdc::TT    = fth25(rdhd, rdse);          # Scaling factor for high temperature inhibition (25 C = 1.0)
 
     # Initialize at standard T:
+    "Michaelis-Menten constant for CO2 (μmol/mol)"
     Kc::TT  = Kc_25;
+    "Michaelis-Menten constant for O2(mmol/mol)"
     Ko::TT  = Ko_25;
+    "CO2 compensation point (μmol/mol)"
     Γstar::TT  = Γ_25;
 
     # Use some standard values first
+    "Leaf maximum carboxylation rate at 25C (μmol/m2/s)"
     Vcmax25::TT = 80.0;                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
+    "Maximum electron transport rate at 25C (μmol/m2/s)"
     Jmax25::TT  = 1.97*Vcmax25;                # C3 - maximum electron transport rate at 25C for canopy layer (μmol/m2/s)
+    "Leaf respiration rate at 25C (μmol CO2/m2/s)"
     Rd25::TT    = 0.7605;                      # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
+    "Leaf maximum carboxylation rate at 25C (μmol/m2/s)"
     Vcmax::TT  = Vcmax25;
+    "Maximum electron transport rate(μmol/m2/s)"
     Jmax::TT   = Jmax25;
+    "Leaf respiration rate (μmol CO2/m2/s)"
     Rdleaf::TT = Rd25;
 
-
+    "CO2 concentration in chloroplast (ppm)"
     Cc::TT = 400.0;                               # CO2 concentration in chloroplast [ppm]
+    "relative humidity at the surface of the leaf"
     RH::TT = 100.0;                               # relative humidity at the surface of the leaf
+    "Vapor pressure difference across leaf interface (unit)"
     VPD::TT = 0.1;                                # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
 
     # to be computed
+    "Electron transport rate (μmol m-2 s-1)"
     Je::TT = 0.0 ;                              # electron transport rate
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
