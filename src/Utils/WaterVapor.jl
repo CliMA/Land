@@ -1,6 +1,8 @@
+
 module WaterVapor
 
 using ..PhysCon
+
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Calculate saturation vapor pressure and latent heat of vaporization
@@ -98,7 +100,6 @@ function SatVap(t)
 end # SatVap
 
 
-
 #-----------------------------------------------------------------------
 # DESCRIPTION:
 # Liquid water depenendence on viscosity
@@ -112,6 +113,7 @@ function μ_l(T)
   μl  =   A*exp( B/T + C*T + D*T*T );
   return μl
 end # end mu l
+
 
 
 end # Module

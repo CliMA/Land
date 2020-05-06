@@ -24,9 +24,9 @@ Base.@kwdef struct phys{T<:Number}
     ε::T    = mmh2o/mmdry            # ratio of Molecular mass of water over Molecular mass of dry air
     ρw::T   = 1000.;                 # density of liquid water
     Wtoμmole_s::T = 4.57;            # converts Watts/m2 to μmole/s
+    Vw::T   = 18*(1e-2)^3;           # molar volumes of pure water (m^3/mol)
     K::T    = 0.40;                  # von Karman constant
     Cdryleaf::T = 1396;              # Specific heat of dry leaf at constant pressure (J/kg/K)
-    Vw::T = 18*(1e-2)^3;             # molar volumes of pure water
 end
 
 physcon = phys{Float32}()

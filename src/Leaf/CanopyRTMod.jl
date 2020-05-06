@@ -8,7 +8,9 @@ using Parameters
 using MAT
 # Numerical integration package (Simpson rule)
 using QuadGK
+
 using ..Leaf
+
 
 export optipar,
        angles,
@@ -91,14 +93,14 @@ function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canop
     @unpack Ω,nlayers, LAI = can
 
 
-    iLAI    = LAI/nlayers;
+    iLAI    = LAI*Ω/nlayers;
     # Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
     rsoil = so.albedo_SW;
     soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
 
     # 2.2. convert scattering and extinction coefficients into thin layer reflectances and transmittances
     # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
-    τ_ss = FT(exp(-cO.ks*Ω*iLAI));
+    τ_ss = FT(exp(-cO.ks*iLAI));
     # Here, transmission looks ok, as it has to be sigf for iLAI=1!
     τ_dd = 1 .-cO.a*iLAI;
     τ_sd = cO.sf*iLAI;
@@ -210,7 +212,7 @@ end;
 function deriveCanopyFluxes!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil, leaf::Array)
     #
     nl = can.nlayers
-    iLAI    = can.LAI/nl;
+    iLAI    = (can.LAI*can.Ω)/nl;
     rsoil = so.albedo_SW;
     soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
 
@@ -341,9 +343,9 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     cospsi	= cosd(psi);
 
     # Generate leaf angle distribution:
-
+    
     lidf = dladgen(can.LIDFa,can.LIDFb, litab_bnd);
-
+    
     can.lidf = lidf
 
     #println(lidf)
@@ -423,19 +425,19 @@ function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::s
     cO.absfsfo = abs.(cO.fsfo)
 
     # 1.5 probabilities Ps, Po, Pso
-    cO.Ps[:]          =   Ω*exp.(cO.ks*xl*Ω*LAI);     # [nl+1]  probability of viewing a leaf in solar dir
+    cO.Ps[:]          =   exp.(cO.ks*xl*Ω*LAI);     # [nl+1]  probability of viewing a leaf in solar dir
     # Leave off Omega for Po here still
-    cO.Po[:]          =   Ω*exp.(cO.ko*xl*Ω*LAI);     # [nl+1]  probability of viewing a leaf in observation dir
+    cO.Po[:]          =   exp.(cO.ko*xl*Ω*LAI);     # [nl+1]  probability of viewing a leaf in observation dir
 
-    cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*LAI*dx))/(cO.ks*LAI*dx);   # Correct Ps/Po for finite dx
-    cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*LAI*dx))/(cO.ko*LAI*dx);   # Correct Ps/Po for finite dx
+    cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*Ω*LAI*dx))/(cO.ks*Ω*LAI*dx);   # Correct Ps/Po for finite dx
+    cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*Ω*LAI*dx))/(cO.ko*Ω*LAI*dx);   # Correct Ps/Po for finite dx
 
     #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     # Just ignore Ω for now, it is not yet thought through!
     #@show cO.ks
     #@show cO.ko
     @inbounds for j=1:length(xl)
-        cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,Ω*LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
+        cO.Pso[j] = quadgk(x -> Psofunction(cO.ko,cO.ks,Ω,LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
     end
 
     #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2);    #takes care of rounding error
@@ -450,7 +452,7 @@ function computeThermalFluxes!( leaf::Array,cO::struct_canopyOptProps,cR::struct
     @unpack albedo_LW, soil_skinT = so
     FT = eltype(LAI)
 
-    iLAI    = LAI/nlayers;
+    iLAI    = Ω*LAI/nlayers;
 
     # Sunlit fraction at mid layer:
     fSun      = (Ps[1:nlayers] + Ps[2:nlayers+1])/2;
@@ -528,7 +530,7 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
     @unpack E_down, E_up,φ_shade,φ_sun = cR
     @unpack Ω,nlayers, LAI = can
     rsoil = so.albedo_SW[Iwlf]
-    iLAI    = LAI/nlayers;
+    iLAI    = Ω*LAI/nlayers;
 
     τ_dd = 1 .-a[Iwlf,:]*iLAI;
     ρ_dd = sigb[Iwlf,:]*iLAI;
@@ -589,23 +591,23 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
         wfEs = mean((φ_sun[:,:,i].*absfsfo)'*can.lidf)  * M⁺_sun + mean((φ_sun[:,:,i].*fsfo)'*can.lidf)  *M⁻_sun
 
         a1 = mean((φ_sun[:,:,i].*absfs)'*can.lidf)* M⁺_sun;
-        a2 = mean((φ_sun[:,:,i].*cosΘ_l)'*can.lidf)*M⁻_sun
+        a2 = mean((φ_sun[:,:,i].*fs.*cosΘ_l)'*can.lidf)*M⁻_sun
         sfEs = a1 - a2
         sbEs = a1 + a2
 
         a1 = mean((φ_shade[i]*abs.(fo))'*can.lidf) ;
-        a2 = mean((φ_shade[i]*cosΘ_l)'*can.lidf)
-        vfEplu_shade  =   a1  * M⁺⁺ + a2 *M⁻⁺
+        a2 = mean((φ_shade[i]*fo.*cosΘ_l)'*can.lidf)
+        vfEplu_shade =  a1  * M⁺⁺ + a2 *M⁻⁺
         vbEmin_shade =  a1 * M⁺⁻ + a2 *M⁻⁻
 
         a1 = mean((φ_sun[:,:,i].*abs.(fo))'*can.lidf);
-        a2 = mean((φ_sun[:,:,i].*cosΘ_l)'*can.lidf)
-        vfEplu_sun  =         a1 * M⁺⁺ - a2 *M⁻⁺
-        vbEmin_sun  =       a1 * M⁺⁻ + a2 *M⁻⁻
+        a2 = mean((φ_sun[:,:,i].*fo.*cosΘ_l)'*can.lidf)
+        vfEplu_sun  =  a1 * M⁺⁺ - a2 *M⁻⁺
+        vbEmin_sun  =  a1 * M⁺⁻ + a2 *M⁻⁻
 
         a1 = shadeLidf * M⁺⁻;
         a2 = shadeCos2 * M⁻⁻
-        sigfEmin_shade  =   a1 - a2
+        sigfEmin_shade  =  a1 - a2
         sigbEmin_shade  =  a1 + a2
 
         a1 = sunLidf * M⁺⁻;
@@ -624,16 +626,16 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
         sigbEplu_sun  = a1 +a2
 
         # Fluxes:
-        piLs[ :,i]  =   wfEs+vfEplu_sun+vbEmin_sun;       # sunlit for each layer
-        piLd[ :,i]  =   vbEmin_shade+vfEplu_shade;        # shade leaf for each layer
-        Fsmin[:,i]  =   sfEs+sigfEmin_sun+sigbEplu_sun;   # Eq. 29a for sunlit leaf
-        Fsplu[:,i]  =   sbEs+sigbEmin_sun+sigfEplu_sun;   # Eq. 29b for sunlit leaf
-        Fdmin[:,i]  =   sigfEmin_shade+sigbEplu_shade;    # Eq. 29a for shade leaf
-        Fdplu[:,i]  =   sigbEmin_shade+sigfEplu_shade;    # Eq. 29b for shade leaf
+        piLs[ :,i]  =  wfEs+vfEplu_sun+vbEmin_sun;       # sunlit for each layer
+        piLd[ :,i]  =  vbEmin_shade+vfEplu_shade;        # shade leaf for each layer
+        Fsmin[:,i]  =  sfEs+sigfEmin_sun+sigbEplu_sun;   # Eq. 29a for sunlit leaf
+        Fsplu[:,i]  =  sbEs+sigbEmin_sun+sigfEplu_sun;   # Eq. 29b for sunlit leaf
+        Fdmin[:,i]  =  sigfEmin_shade+sigbEplu_shade;    # Eq. 29a for shade leaf
+        Fdplu[:,i]  =  sigbEmin_shade+sigfEplu_shade;    # Eq. 29b for shade leaf
         # Total weighted fluxes
         S⁻[:,i]     =   iLAI*(Qs[i]*Fsmin[:,i] + (1-Qs[i])*Fdmin[:,i]);
         S⁺[:,i]     =   iLAI*(Qs[i]*Fsplu[:,i] + (1-Qs[i])*Fdplu[:,i]);
-
+        
         Femo[:,i]   =   iLAI*(Qs[i]* piLs[:,i] + (1-Qs[i])*piLd[:,i]);
     end
     # Use Zero SIF fluxes as top and bottom boundary:
@@ -642,14 +644,14 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
     #println(size(zeroB), " ", size(rsoil), " ", size(S⁻), " ", size(τ_dd))
     F⁻,F⁺,net_diffuse = RTM_diffuseS(τ_dd, ρ_dd,S⁻, S⁺,zeroB, zeroB, rsoil)
     # Save in output structures!
-    cR.SIF_obs_sunlit[:]    = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
-    cR.SIF_obs_shaded[:]     = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
+    cR.SIF_obs_sunlit[:]  = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
+    cR.SIF_obs_shaded[:]  = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
 
     # SIF scattered internally
-    cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
+    #cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_soil[:]     = (rsoil .* F⁻[:,end] * Po[end])/FT(pi);                                                #Soil contribution
-
+    
     cR.SIF_hemi[:]    = F⁺[:,1];
     cR.SIF_obs[:] = cR.SIF_obs_sunlit[:]+cR.SIF_obs_shaded[:]+cR.SIF_obs_scattered[:] +cR.SIF_obs_soil[:];
     cR.SIF_sum[:] = sum(S⁻+S⁺, dims=2)
@@ -851,29 +853,30 @@ end;
 
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
-function calcJ1(x,m,k,LAI)
+function calcJ1(x,m,k,LAI,Ω)
     del=(k-m)*LAI
     if abs(del)>1E-3;
-        J1 = (exp(m*LAI*x)-exp(k*LAI*x))/(k-m);
+        J1 = (exp(m*Ω*LAI*x)-exp(k*Ω*LAI*x))/(k-m);
     else
-        J1 = -0.5*LAI*x*(exp(m*LAI*x)+exp(k*LAI*x))*(1.0-del^2/12.0);
+        J1 = -0.5*Ω*LAI*x*(exp(m*Ω*LAI*x)+exp(k*Ω*LAI*x))*(1.0-del^2/12.0);
     end
     return J1
 end
 
-function calcJ2(x,m,k,LAI)
-    return (exp(k*LAI*x)-exp(-k*LAI)*exp(-m*LAI*(1+x)))/(k+m);
-end;
+function calcJ2(x,m,k,LAI,Ω)
+    return (exp(k*Ω*LAI*x)-exp(-k*Ω*LAI)*exp(-m*Ω*LAI*(1+x)))/(k+m);
+end
+
 
 
 
 # APPENDIX IV function Pso from SCOPE v1.73
-function Psofunction(K,k,LAI,q,dso,xl)
+function Psofunction(K,k,Ω,LAI,q,dso,xl)
     if dso!=0.0
         alf         =   (dso/q) *2/(k+K);
-        pso         =   exp((K+k)*LAI*xl + sqrt(K*k)*LAI/(alf  )*(1-exp(xl*(alf  ))));# [nl+1]  factor for correlation of Ps and Po
+        pso         =   exp((K+k)*Ω*LAI*xl + sqrt(K*k)*Ω*LAI/(alf  )*(1-exp(xl*(alf  ))));# [nl+1]  factor for correlation of Ps and Po
     else
-        pso         =   exp((K+k)*LAI*xl - sqrt(K*k)*LAI*xl);# [nl+1]  factor for correlation of Ps and Po
+        pso         =   exp((K+k)*Ω*LAI*xl - sqrt(K*k)*Ω*LAI*xl);# [nl+1]  factor for correlation of Ps and Po
     end
     return pso
 end;
@@ -1086,11 +1089,11 @@ end
 #    -GSL.sf_expint_Ei(-x)
 #end
 # From Matlab!
-p = Polynomials.PolyCompat(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
+p = Polynomial(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
 const egamma=FT(0.57721566490153286061);
 function expint(x::Number)
 
-    polyv = Polynomials.polyval(p,real(x));
+    polyv = p(real(x));
     if abs(imag(x)) <= polyv
         #initialization
         xk = x;
