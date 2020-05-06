@@ -81,7 +81,7 @@ Base.@kwdef mutable struct leafbio{FT<:AbstractFloat,nWl,nWle, nWlf,nWLe_nWLf}
     "Broadband thermal transmission"
     τ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal transmission"
     "Leaf fluorescence efficiency (Fo standard)"
-    fqe::FT = 0.01       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
+    fqe::FT = 1       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
 
     "shortwave leaf reflectance"
     ρ_SW::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef);    # | -          | (0.0, 1.0)  | "shortwave reflectance"

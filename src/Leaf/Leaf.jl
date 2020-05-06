@@ -1,5 +1,5 @@
 module Leaf
-
+using DocStringExtensions
 using ..PhysCon
 using ..WaterVapor
 
@@ -28,7 +28,14 @@ function fth25(hd, se)
 end;
 
 
-# Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
+# 
+"""
+    leafbio
+    Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
 Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     # broadband albedo and emissivity
