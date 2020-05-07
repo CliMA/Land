@@ -532,7 +532,7 @@ function Fluorescencemodel!(ps::Number, x::Number, leaf::leaf_params)
     leaf.Fm   = Kf/(Kf   +Kd);
     leaf.Fm′  = Kf/(Kf   +Kd+Kn);
     leaf.ϕs   = leaf.Fm′*(1-ps);
-    leaf.eta  = leaf.ϕs/leaf.Fo;
+    # leaf.eta  = leaf.ϕs/leaf.Fo; # don't need this anymore, better to use ϕs directly for SIF as Fo is not always fqe=0.01.
     leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
     leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
 
