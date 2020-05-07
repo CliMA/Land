@@ -1,22 +1,35 @@
+# Temporary
 *.DS_Store
+*.swp
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+*~
+TAGS
+*.ipynb_checkpoints/
+
+# Docs
 docs/build/
 docs/site/
+docs/src/tutorials/
+docs/src/generated/
+!docs/src/assets/*.png
+!docs/src/assets/*.svg
+
+# Deps
 src/**/Manifest.toml
-deps/deps.jl
-*.ipynb_checkpoints/
+
+# Data
 *.vtk
 *.dat
 *.vtu
 *.pvtu
-*.swp
-*.png
 *.nc
-!docs/src/assets/*.png
+
+# Figs
+*.png
 *.jpg
+*.jpeg
+*.svg
 !pics/*.png
 !pics/*.jpg
-*~
-TAGS

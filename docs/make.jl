@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 using Land, Documenter, Literate
 
 generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
@@ -8,6 +9,12 @@ include("list_of_tutorials.jl")          # defines a dict `tutorials`
 pages = Any[
     "Home" => "index.md",
     "Tutorials" => tutorials,
+=======
+using Land, Documenter
+
+pages = Any[
+    "Home" => "index.md",
+>>>>>>> master
 ]
 
 mathengine = MathJax(Dict(
@@ -26,6 +33,7 @@ format = Documenter.HTML(
 makedocs(
     sitename = "Land",
     format = format,
+
     clean = false,
     modules = [Documenter, Land],
     pages = pages,
