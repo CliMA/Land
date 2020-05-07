@@ -13,17 +13,17 @@ The entire model will be written in [Julia](https://docs.julialang.org/en/v1/) (
 | **Code Coverage**    | [![codecov][codecov-img]][codecov-url]        |
 | **Bors**             | [![Bors enabled][bors-img]][bors-url]         |
 
-[docs-bld-img]: https://github.com/climate-machine/Land/workflows/Documentation/badge.svg
-[docs-bld-url]: https://github.com/climate-machine/Land/actions?query=workflow%3ADocumentation
+[docs-bld-img]: https://github.com/CliMA/Land/workflows/Documentation/badge.svg
+[docs-bld-url]: https://github.com/CliMA/Land/actions?query=workflow%3ADocumentation
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://climate-machine.github.io/Land/dev/
+[docs-dev-url]: https://CliMA.github.io/Land/dev/
 
 [azure-img]: https://dev.azure.com/climate-machine/Land/_apis/build/status/climate-machine.Land?branchName=master
 [azure-url]: https://dev.azure.com/climate-machine/Land/_build/latest?definitionId=1&branchName=master
 
-[codecov-img]: https://codecov.io/gh/climate-machine/Land/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/climate-machine/Land
+[codecov-img]: https://codecov.io/gh/CliMA/Land/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/CliMA/Land
 
 [bors-img]: https://bors.tech/images/badge_small.svg
-[bors-url]: https://app.bors.tech/repositories/12357
+[bors-url]: https://app.bors.tech/repositories/24777

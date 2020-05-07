@@ -1,5 +1,5 @@
 status = [
-  "climate-machine.Land",
+  "CliMA.Land",
   "docs-build"
 ]
 delete_merged_branches = true
