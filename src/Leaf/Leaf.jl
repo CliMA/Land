@@ -169,12 +169,12 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     # plant hydraulics
     psi_l::TT   = -1.5e6;                         # leaf water potential (Pa)
     psi_l50::TT = -1.75e6;                        # leaf water potential at 50% drop in conductivity (Pa)
-    kmax::TT    = 4e-8                            # maximum leaf-xylem conductivity (m/s)
-    kx::TT      = kmax                            # actual xylem conductivity (m/s)
-    kleaf::TT   = kmax                            # leaf level hydraulic conductivity (m/s)
+    kmax::TT    = 4e-10;                          # maximum leaf-xylem conductivity (m/s)
+    kx::TT      = kmax;                           # actual xylem conductivity (m/s)
+    kleaf::TT   = kmax;                           # leaf level hydraulic conductivity (m/s)
     ck::TT      = 2.95;                           # slope of Weibull curve
     #ε_modulus::TT = 20e6;                        # elastic modulus - for later
-    Ctree::TT   = (79 + 8*height)*1e-6;           # tree capacitance (kg m−3 Pa−1)
+    Ctree::TT   = 1e-3*(79 + 8*height)*1e-6;           # tree capacitance (kg m−3 Pa−1)
                                                   # -Scholz et al. 2011 Book, Hydraulic Capacitance: Biophysics and Functional Significance,
                                                   # can also be related to P50 see same book
 end
