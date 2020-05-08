@@ -6,4 +6,6 @@ include(joinpath("Utils", "WaterVapor.jl"))
 include(joinpath("Leaf", "Leaf.jl"))
 include(joinpath("Leaf", "CanopyRTMod.jl"))
 
+include(joinpath("Tree", "Tree.jl"))
+
 end # module
