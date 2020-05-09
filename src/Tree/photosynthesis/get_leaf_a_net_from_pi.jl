@@ -1,5 +1,5 @@
 # get a from ci
-function get_leaf_a_net_from_pi(v25, j25, gamma, p_i, tem, par, p_o2=21000.0, r25=false, unit="K")
+function get_leaf_a_net_from_pi(v25, j25, gamma, p_i, tem, par, p_o2=21278.25, r25=false, unit="K")
     # convert to degree C
     if unit=="K" || unit=="k"
         temk = tem
@@ -9,9 +9,9 @@ function get_leaf_a_net_from_pi(v25, j25, gamma, p_i, tem, par, p_o2=21000.0, r2
 
     # calculate respiration rate
     if r25==false
-        rday = get_leaf_r_from_v25(v25, temk, unit)
+        rday = get_leaf_r_from_v25(v25, temk)
     else
-        rday = get_leaf_r_from_r25(r25, temk, unit)
+        rday = get_leaf_r_from_r25(r25, temk)
     end
 
     # calculate ac and aj

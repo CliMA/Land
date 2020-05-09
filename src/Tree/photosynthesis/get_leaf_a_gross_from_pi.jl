@@ -1,5 +1,5 @@
 # get a from ci
-function get_leaf_a_gross_from_pi(v25, j25, gamma, p_i, tem, par, p_o2=21000.0, r25=false, unit="K")
+function get_leaf_a_gross_from_pi(v25, j25, gamma, p_i, tem, par, p_o2=21278.25, r25=false, unit="K")
     # convert to degree C
     if unit=="K" || unit=="k"
         temk = tem
