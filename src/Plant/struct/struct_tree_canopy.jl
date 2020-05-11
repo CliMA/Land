@@ -20,12 +20,13 @@ Base.@kwdef mutable struct struct_tree_leaf
     a_gross::Float32 = 0.0       # umol m^-2 s^-1 | gross photosynthetic rate
     a_net  ::Float32 = 0.0       # umol m^-2 s^-1 | net photosynthetic rate
     e      ::Float32 = 0.0       # mol m^-2 s^-1  | flow rate in the xylem
+    e_crit ::Float32 = 0.0       # mol m^-2 s^-1  | maximal flow rate in the xylem
     gsc    ::Float32 = 0.0       # mol m^-2 s^-1  | stomatal conductance for CO2
     gsw    ::Float32 = 0.0       # mol m^-2 s^-1  | stomatal conductance for H2O
     gs_nssf::Float32 = 1e2       #                | non-steady state factor (use by multiplying the d_optimizer / d_g)
-    p_base ::Float32 = 0.0       # MPa            | xylem pressure at the leaf basa
+    p_ups  ::Float32 = 0.0       # MPa            | xylem pressure at the leaf basa (upstream)
     p_i    ::Float32 = 0.0       # Pa             | leaf internal CO2
-    p_leaf ::Float32 = 0.0       # MPa            | xylem pressure of the leaf
+    p_dos  ::Float32 = 0.0       # MPa            | xylem pressure of the leaf (downstream)
     r      ::Float32 = 0.0       # umol m^-2 s^-1 | respiration rate
     t_leaf ::Float32 = 198.15    # K              | leaf temperature
 
@@ -68,5 +69,5 @@ end
 
 # the struct for leaf
 Base.@kwdef mutable struct struct_tree_canopy
-    canopy_list ::Array{struct_tree_canopy_layer,1} = [struct_tree_canopy_layer() for i in 1:20]    # | a list of leaf layers
+    canopy_list::Array{struct_tree_canopy_layer,1} = [struct_tree_canopy_layer() for i in 1:20]    # | a list of leaf layers
 end

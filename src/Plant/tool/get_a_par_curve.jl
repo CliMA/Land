@@ -10,8 +10,8 @@ function get_a_par_curve(v25=80.0, j25=135.0, gamma=2.5, gsc=0.2, ca=40.0, tem=2
     # iterate through the list
     for i in 1:length(list_par)
         par        = list_par[i]
-        a_g,p_g    = get_leaf_a_gross_ci_from_gsc(v25,j25,gamma,gsc,ca,tem,par,p_atm,p_o2,r25,unit)
-        a_n,p_n    = get_leaf_a_net_ci_from_gsc(v25,j25,gamma,gsc,ca,tem,par,p_atm,p_o2,r25,unit)
+        a_g,p_g    = get_leaf_a_gross_pi_from_gsc(v25,j25,gamma,gsc,ca,tem,par,p_atm,p_o2,r25,unit)
+        a_n,p_n    = get_leaf_a_net_pi_from_gsc(v25,j25,gamma,gsc,ca,tem,par,p_atm,p_o2,r25,unit)
         list_ag[i] = a_g
         list_an[i] = a_n
         list_pi[i] = p_n

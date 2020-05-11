@@ -51,17 +51,18 @@ function struct_tree_visualize(tree, save=false)
         ly = [ rooti.z_lo   , rooti.z_hi, rooti.z_lo   ]
         plot(lx, ly, color=:brown)
 
-        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_rhiz), color=:red , ha="right", va="top", fontsize=8)
-        text( rooti.r_layer, rooti.z_lo, number_to_string(rooti.q     ), color=:blue, ha="left" , va="top", fontsize=8)
+        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_ups ), color=:red , ha="right", va="top"   , fontsize=8)
+        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_rhiz), color=:red , ha="right", va="bottom", fontsize=8)
+        text( rooti.r_layer, rooti.z_lo, number_to_string(rooti.q     ), color=:blue, ha="left" , va="top"   , fontsize=8)
     end
 
     # plot the trunk
     lx = [0, 0, 0]
     ly = [0, tree.trunk.z_lo, tree.trunk.z_hi]
     plot(lx, ly, color=:black)
-    text(0, tree.trunk.z_lo    , number_to_string(tree.trunk.p_base ), color=:red , ha="right", va="bottom", fontsize=8)
-    text(0, tree.trunk.z_hi    , number_to_string(tree.trunk.p_joint), color=:red , ha="right", va="top"   , fontsize=8)
-    text(0, tree.trunk.z_hi*0.5, number_to_string(tree.trunk.q      ), color=:blue, ha="left" , va="top"   , fontsize=8)
+    text(0, tree.trunk.z_lo    , number_to_string(tree.trunk.p_ups), color=:red , ha="right", va="bottom", fontsize=8)
+    text(0, tree.trunk.z_hi    , number_to_string(tree.trunk.p_dos), color=:red , ha="right", va="top"   , fontsize=8)
+    text(0, tree.trunk.z_hi*0.5, number_to_string(tree.trunk.q    ), color=:blue, ha="left" , va="top"   , fontsize=8)
 
     # plot the canopy stem and leaf system
     for i in 1:length(tree.branch.branch_list)
@@ -79,8 +80,8 @@ function struct_tree_visualize(tree, save=false)
         plot(lx, ly, color=:green)
 
         # label the stem-leaf joint pressure and flow rate through each branch
-        text(-branchi.r_layer, branchi.z_hi, number_to_string(branchi.p_joint), color=:red , ha="right", va="top", fontsize=8)
-        text( branchi.r_layer, branchi.z_hi, number_to_string(branchi.q      ), color=:blue, ha="left" , va="top", fontsize=8)
+        text(-branchi.r_layer, branchi.z_hi, number_to_string(branchi.p_dos), color=:red , ha="right", va="top", fontsize=8)
+        text( branchi.r_layer, branchi.z_hi, number_to_string(branchi.q    ), color=:blue, ha="left" , va="top", fontsize=8)
 
         # calculate and display mean PAR for sunlit leaves and shaded leaves
         par_sl = sum(canopyi.par_list[1:end-1] .* canopyi.la_list[1:end-1]) / sum(canopyi.la_list[1:end-1])

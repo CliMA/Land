@@ -14,7 +14,7 @@ Base.@kwdef mutable struct struct_tree_root
     k_rhiz::Float32 = 1.5e10    # mol s^-1 MPa^-1      | maximal rhizosphere conductance, = 9.72e12 Kg h-1 MPa-1 m^-2 basal area
 
     # soil parameters
-    p_soil   ::Float32        = 0.0                  # MPa | soil water potential
+    p_ups    ::Float32        = 0.0                  # MPa | soil water potential (upstream)
     soil_a   ::Float32        = 602.0419             #     | soil texture parameter
     soil_m   ::Float32        = 1.0 - 1.0/1.48       #     | soil texture parameter
     soil_n   ::Float32        = 1.48                 #     | soil texture parameter
@@ -26,7 +26,7 @@ Base.@kwdef mutable struct struct_tree_root
 
     # flows and pressures
     p_rhiz::Float32 = 0.0    # MPa      | water potential at the root-rhizosphere interface
-    p_base::Float32 = 0.0    # MPa      | xylem water pressure at the tree base
+    p_dos ::Float32 = 0.0    # MPa      | xylem water pressure at the tree base (downstream)
     q     ::Float32 = 0.0    # mol s^-1 | flow rate in the xylem
 
     # pressure, k, and p_history profile

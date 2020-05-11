@@ -7,7 +7,7 @@ function get_p_base_q_list_from_q(tree, flow)
     count = 0
     while true
         # calculate the q_list from an assumed p_base
-        q_list_0 = [get_q_layer_from_p_base(root_layer, p_base) for root_layer in tree.root_struct.root_layers]
+        q_list_0 = [get_q_layer_from_p_base(root_layer, p_base) for root_layer in tree.roots.root_list]
         q_0      = sum(q_list_0)
 
         # break if sum of q equals flow rate
@@ -16,7 +16,7 @@ function get_p_base_q_list_from_q(tree, flow)
         end
 
         # calculate the new q based on slope
-        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+1E-3) for root_layer in tree.root_struct.root_layers]
+        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+1E-3) for root_layer in tree.roots.root_list]
         q_1      = sum(q_list_1)
         slope    = (q_1-q_0) * 1E3
         p_base  += (flow-q_0) / slope

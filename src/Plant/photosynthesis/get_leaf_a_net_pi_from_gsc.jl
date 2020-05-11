@@ -1,5 +1,5 @@
 # get ci and Anet from gc and ca
-function get_leaf_a_net_ci_from_gsc(v25, j25, gamma, gsc, p_a, tem, par, p_atm=101325.0, p_o2=21278.25, r25=false, unit="K")
+function get_leaf_a_net_pi_from_gsc(v25, j25, gamma, gsc, p_a, tem, par, p_atm=101325.0, p_o2=21278.25, r25=false, unit="K")
     # compute a_net using bi-section method
     tar_p = 0.0
     tar_a = 0.0

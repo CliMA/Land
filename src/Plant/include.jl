@@ -10,6 +10,7 @@ include("struct/struct_tree_visualize.jl")
 # include the hydraulic functions
 include("hydraulics/get_struct_p_end_from_q.jl"            )
 include("hydraulics/get_struct_p_end_from_q_rhizosphere.jl")
+include("hydraulics/update_tree_e_crit.jl"                 )
 
 # include the photosynthesis functions
 include("photosynthesis/get_leaf_a_gross_from_pi.jl"    )
@@ -25,6 +26,9 @@ include("photosynthesis/get_leaf_vcmax.jl"              )
 # include the root functions
 include("root/get_p_base_q_list_from_q.jl")
 include("root/get_q_layer_from_p_base.jl" )
+
+# include the stomatal optimization functions
+include("stomata/get_marginal_penalty_wang.jl")
 
 # include the water property functions, all temperature in K by default
 include("water/get_relative_surface_tension.jl")
