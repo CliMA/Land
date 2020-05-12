@@ -9,8 +9,8 @@ function get_a_pi_curve(v25=80.0, j25=135.0, gamma=2.5, tem=298.15, par=1200.0, 
     # iterate through the list
     for i in 1:length(list_pi)
         p_i        = list_pi[i]
-        a_g        = get_leaf_a_gross_from_pi(v25,j25,gamma,p_i,tem,par,p_o2,r25,unit)
-        a_n        = get_leaf_a_net_from_pi(v25,j25,gamma,p_i,tem,par,p_o2,r25,unit)
+        a_g        = get_leaf_ag_from_pi(v25,j25,gamma,p_i,tem,par,p_o2,r25,unit)
+        a_n        = get_leaf_an_from_pi(v25,j25,gamma,p_i,tem,par,p_o2,r25,unit)
         list_ag[i] = a_g
         list_an[i] = a_n
     end

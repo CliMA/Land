@@ -24,7 +24,7 @@ Base.@kwdef mutable struct struct_tree_root
     soil_vwc ::Float32        = 0.4                  #     | soil volumatric water content
     t_soil   ::Float32        = 298.15               # K   | soil temperature
 
-    # flows and pressures
+    # flows and pressures (need to be updated with time)
     p_rhiz::Float32 = 0.0    # MPa      | water potential at the root-rhizosphere interface
     p_dos ::Float32 = 0.0    # MPa      | xylem water pressure at the tree base (downstream)
     q     ::Float32 = 0.0    # mol s^-1 | flow rate in the xylem

@@ -1,5 +1,5 @@
 # get ci and Anet from gc and ca
-function get_leaf_a_net_pi_from_gsc(v25, j25, gamma, gsc, p_a, tem, par, p_atm=101325.0, p_o2=21278.25, r25=false, unit="K")
+function get_leaf_an_pi_from_gsc(v25, j25, gamma, gsc, p_a, tem, par, p_atm=101325.0, p_o2=21278.25, r25=false, unit="K")
     # compute a_net using bi-section method
     tar_p = 0.0
     tar_a = 0.0
@@ -7,7 +7,7 @@ function get_leaf_a_net_pi_from_gsc(v25, j25, gamma, gsc, p_a, tem, par, p_atm=1
     min_p = gamma
     while true
         tar_p = 0.5 * (max_p+min_p)
-        af    = get_leaf_a_net_from_pi(v25, j25, gamma, tar_p, tem, par, p_o2, r25, unit)
+        af    = get_leaf_an_from_pi(v25, j25, gamma, tar_p, tem, par, p_o2, r25, unit)
         tmp_g = af * 1e-6 / (p_a-tar_p) * p_atm
 
         # increase min_p when g is smaller than target

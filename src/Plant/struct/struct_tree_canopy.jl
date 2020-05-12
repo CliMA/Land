@@ -11,24 +11,28 @@ Base.@kwdef mutable struct struct_tree_leaf
     k_sla ::Float32 = 1.35    # mol s^-1 MPa^-1 m^-2 | maximal leaf hydraulic conductance per leaf area
 
     # leaf photosynthetic parameters
-    g_max::Float32 = 0.8      # mol m^-2 s^-1  | maximal gs at 25 degree C
-    j_max::Float32 = 133.6    # umol m^-2 s^-1 | maximal electron transport rate
-    par  ::Float32 = 0.0      # umol m^-2 s^-1 | photosynthetic active radiation
-    v_max::Float32 = 80.0     # umol m^-2 s^-1 | maximal carboxylation rate
+    g_ias_c::Float32 = 0.0       # unitless       | mesophyll conductance correction factor: multiplier
+    g_ias_e::Float32 = 0.3       # unitless       | mesophyll conductance correction factor: exponent
+    g_max  ::Float32 = 0.8      # mol m^-2 s^-1  | maximal gs at 25 degree C
+    g_star ::Float32 = 2.5      # Pa             | CO2 compensation point with the absence of dark respiration
+    gs_nssf::Float32 = 0.025     #                | non-steady state factor (use by multiplying the dade - dTde), T for Theta
+    j_max  ::Float32 = 133.6    # umol m^-2 s^-1 | maximal electron transport rate
+    par    ::Float32 = 0.0      # umol m^-2 s^-1 | photosynthetic active radiation
+    respir ::Float32 = 1.2      # umol m^-2 s^-1 | leaf respiration rate
+    v_max  ::Float32 = 80.0     # umol m^-2 s^-1 | maximal carboxylation rate
 
-    # flows and pressures
+    # flows and pressures (need to be updated with time)
     a_gross::Float32 = 0.0       # umol m^-2 s^-1 | gross photosynthetic rate
     a_net  ::Float32 = 0.0       # umol m^-2 s^-1 | net photosynthetic rate
     e      ::Float32 = 0.0       # mol m^-2 s^-1  | flow rate in the xylem
     e_crit ::Float32 = 0.0       # mol m^-2 s^-1  | maximal flow rate in the xylem
     gsc    ::Float32 = 0.0       # mol m^-2 s^-1  | stomatal conductance for CO2
     gsw    ::Float32 = 0.0       # mol m^-2 s^-1  | stomatal conductance for H2O
-    gs_nssf::Float32 = 1e2       #                | non-steady state factor (use by multiplying the d_optimizer / d_g)
     p_ups  ::Float32 = 0.0       # MPa            | xylem pressure at the leaf basa (upstream)
     p_i    ::Float32 = 0.0       # Pa             | leaf internal CO2
     p_dos  ::Float32 = 0.0       # MPa            | xylem pressure of the leaf (downstream)
     r      ::Float32 = 0.0       # umol m^-2 s^-1 | respiration rate
-    t_leaf ::Float32 = 198.15    # K              | leaf temperature
+    t_leaf ::Float32 = 298.15    # K              | leaf temperature
 
     # pressure, k, and p_history profile
     k_element::Array{Float32,1} = ones(10) * 13.5      # mol s^-1 MPa^-1 | a list of trunk k_max per element
@@ -56,7 +60,7 @@ Base.@kwdef mutable struct struct_tree_canopy_layer
     t_air::Float32 = 298.15      # K      | air temperature
     wind ::Float32 = 2.0         # m s^-1 | wind speed
 
-    # leaf layers
+    # leaf layers (e_list and q_list need to be updated with time)
     e_list   ::Array{Float32,1}          = zeros(469)                             # mol m^-2 s^1   | flow rate list per leaf area
     la_list  ::Array{Float32,1}          = [ones(468)/468*75.0; 75.0]             # m^2            | leaf area list
     leaf_list::Array{struct_tree_leaf,1} = [struct_tree_leaf() for i in 1:469]    #                | leaf struct list

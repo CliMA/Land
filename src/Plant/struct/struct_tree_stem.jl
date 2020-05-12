@@ -11,7 +11,7 @@ Base.@kwdef mutable struct struct_tree_stem
     k_max::Float32 = 8.333    # mol s^-1 MPa^-1      | maximal hydraulic conductance, = 5400.0 * 8/3 Kg h-1 MPa-1 m^-2 basal area
     k_s  ::Float32 = 250.0    # mol s^-1 MPa^-1 m^-2 | maximal hydraulic conductivity per cross section area per tree height
 
-    # flows and pressures
+    # flows and pressures (need to be updated with time)
     p_ups::Float32 = 0.0    # MPa      | xylem pressure at the tree basa (upstream)
     p_dos::Float32 = 0.0    # MPa      | xylem pressure at the trunk-stem or stem-leaf joint (downstream)
     q    ::Float32 = 0.0    # mol s^-1 | flow rate in the xylem
