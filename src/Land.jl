@@ -6,6 +6,6 @@ include(joinpath("Utils", "PhysCon.jl"))
 include(joinpath("Utils", "WaterVapor.jl"))
 
 include(joinpath("Photosynthesis", "Photosynthesis.jl"))
-include(joinpath("Radiation", "CanopyRTMod.jl"))
+include(joinpath("Radiation", "CanopyRT.jl"))
 
 end # module

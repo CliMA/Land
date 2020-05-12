@@ -18,12 +18,12 @@ using Parameters
 # Now include the Land modules
 
 using Land
-using Land.CanopyRTMod
+using Land.CanopyRT
 #----------------------------------------------------------------------------
 
-# and unpack some of the mostly used variables or structure (same as writing CanopyRTMod.leafbio)
+# and unpack some of the mostly used variables or structure (same as writing CanopyRT.leafbio)
 
-@unpack FT, leafbio, canopy, angles, canOpt, canRad,sunRad,soil, wl, wle, wlf = CanopyRTMod
+#@unpack FT, leafbio, canopy, angles, canOpt, canRad,sunRad,soil, wl, wle, wlf = CanopyRT
 #----------------------------------------------------------------------------
 
 # This extracted a number of structures, which are loaded with default values at startup:
@@ -50,7 +50,7 @@ leaf = leafbio{FT, length(wl), length(wle), length(wlf),length(wle)*length(wlf)}
 # ---
 # ## Leaf Optical Properties
 # 
-# Now we can first run fluspect, which is an extension of the Prospect leaf optical properties program and includes computations of the fluorescence emission responses as well. CanopyRTMod.optis includes all pigment absorption cross sections as well as refractive index of water to compute leaf optical properties. 
+# Now we can first run fluspect, which is an extension of the Prospect leaf optical properties program and includes computations of the fluorescence emission responses as well. CanopyRT.optis includes all pigment absorption cross sections as well as refractive index of water to compute leaf optical properties. 
 # For details, see:
 # 
 # Féret, J.B., Gitelson, A.A., Noble, S.D. and Jacquemoud, S., 2017. PROSPECT-D: Towards modeling leaf optical properties through a complete lifecycle. Remote Sensing of Environment, 193, pp.204-215.
@@ -60,7 +60,7 @@ leaf = leafbio{FT, length(wl), length(wle), length(wlf),length(wle)*length(wlf)}
 # Vilfan, N., Van der Tol, C., Muller, O., Rascher, U. and Verhoef, W., 2016. Fluspect-B: A model for leaf fluorescence, reflectance and transmittance spectra. Remote sensing of environment, 186, pp.596-615.
 
 ## Run Fluspect:
-CanopyRTMod.fluspect!(leaf, CanopyRTMod.optis);
+CanopyRT.fluspect!(leaf, CanopyRT.optis);
 #----------------------------------------------------------------------------
 
 # #### Fluorescence excitation matrices
@@ -125,7 +125,7 @@ leaf_2.Cab = 80
 leaf_2.Cw = 0.012
 ## show leaf Chlorophyll content:
 ## and Run Fluspect:
-CanopyRTMod.fluspect!(leaf_2, CanopyRTMod.optis);
+CanopyRT.fluspect!(leaf_2, CanopyRT.optis);
 #----------------------------------------------------------------------------
 
 plot(wl,1 .-leaf.τ_SW, color=[:black], lw = 2 , label="Leaf Transmission")
@@ -144,11 +144,11 @@ xlabel!("Wavelength (nm)")
 # 
 
 ## This is to be changed later but at the moment, we need to generate an Array of leaves, basically for each layer of the canopy 
-arrayOfLeaves = Array{leafbio{FT,length(wl), length(wle), length(wlf),length(wle)*length(wlf)}, 1}(undef, CanopyRTMod.canopy.nlayers)
-for i = 1:CanopyRTMod.canopy.nlayers
+arrayOfLeaves = Array{leafbio{FT,length(wl), length(wle), length(wlf),length(wle)*length(wlf)}, 1}(undef, CanopyRT.canopy.nlayers)
+for i = 1:CanopyRT.canopy.nlayers
     ##@show i
     arrayOfLeaves[i] = leafbio{FT, length(wl), length(wle), length(wlf),length(wle)*length(wlf)}()
-    CanopyRTMod.fluspect!(arrayOfLeaves[i], CanopyRTMod.optis)
+    CanopyRT.fluspect!(arrayOfLeaves[i], CanopyRT.optis)
 end
 #----------------------------------------------------------------------------
 
@@ -156,15 +156,15 @@ end
 # Below are the basic steps for the canopy radiative transfer (SIF fluxes are dependent on stress levels at each leaf but here we use a standard SIF yield for now):
 
 ## Set Soil albedo to 0.2
-CanopyRTMod.soil.albedo_SW[:] .=0.2;
+CanopyRT.soil.albedo_SW[:] .=0.2;
 ## Compute Canopyoptical properties dependend on sun-sensor and leaf angle distributions:
-CanopyRTMod.computeCanopyGeomProps!(canopy, angles,canOpt);
+CanopyRT.computeCanopyGeomProps!(canopy, angles,canOpt);
 ## Compute RT matrices with leaf reflectance and transmissions folded in:
-CanopyRTMod.computeCanopyMatrices!(arrayOfLeaves,canOpt);
+CanopyRT.computeCanopyMatrices!(arrayOfLeaves,canOpt);
 ## Perform SW radiation transfer:
-CanopyRTMod.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRTMod.soil);
+CanopyRT.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRT.soil);
 ## Compute outgoing SIF flux (using constant fluorescence efficiency at the chloroplast level)
-CanopyRTMod.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRTMod.soil);
+CanopyRT.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRT.soil);
 #----------------------------------------------------------------------------
 
 # ### Test a VZA dependence in the principal plane
@@ -178,20 +178,20 @@ reflNIR = Float32[]
 ## Just running the code over all geometries:
 
 ## Set sun SZA to 30 degrees
-CanopyRTMod.angles.tts=30
+CanopyRT.angles.tts=30
 ## Set 0 azimuth (principal plane)
-CanopyRTMod.angles.psi=0
+CanopyRT.angles.psi=0
 ## LAI of 3:
-CanopyRTMod.canopy.LAI = 3
+CanopyRT.canopy.LAI = 3
 ## Define VZA 
 VZA=collect(-89.5:0.5:89.5)
 
 for VZA_ in VZA
-    CanopyRTMod.angles.tto=VZA_
-    CanopyRTMod.computeCanopyGeomProps!(canopy, angles,canOpt);
-    CanopyRTMod.computeCanopyMatrices!(arrayOfLeaves,canOpt);
-    CanopyRTMod.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRTMod.soil);
-    CanopyRTMod.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRTMod.soil);
+    CanopyRT.angles.tto=VZA_
+    CanopyRT.computeCanopyGeomProps!(canopy, angles,canOpt);
+    CanopyRT.computeCanopyMatrices!(arrayOfLeaves,canOpt);
+    CanopyRT.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRT.soil);
+    CanopyRT.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRT.soil);
     ## Handpicked indices in 
     push!(reflVIS, canRad.alb_obs[ind_red])
     push!(reflNIR, canRad.alb_obs[ind_NIR])
@@ -220,18 +220,18 @@ reflVIS = Float32[]
 reflNIR = Float32[]
 SIF_FR = Float32[]
 SIF_R  = Float32[]
-CanopyRTMod.angles.tts=48
-CanopyRTMod.angles.psi=0
-CanopyRTMod.canopy.LAI=3.22
+CanopyRT.angles.tts=48
+CanopyRT.angles.psi=0
+CanopyRT.canopy.LAI=3.22
 for psi=0:360
-    CanopyRTMod.angles.psi=psi
+    CanopyRT.angles.psi=psi
     for VZA=0:1:85
-        CanopyRTMod.angles.tto=VZA
+        CanopyRT.angles.tto=VZA
 
-        CanopyRTMod.computeCanopyGeomProps!(canopy, angles,canOpt);
-        CanopyRTMod.computeCanopyMatrices!(arrayOfLeaves,canOpt);
-        CanopyRTMod.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRTMod.soil);
-        CanopyRTMod.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRTMod.soil);
+        CanopyRT.computeCanopyGeomProps!(canopy, angles,canOpt);
+        CanopyRT.computeCanopyMatrices!(arrayOfLeaves,canOpt);
+        CanopyRT.RTM_SW!(canopy, canOpt, canRad,sunRad, CanopyRT.soil);
+        CanopyRT.computeSIF_Fluxes!(arrayOfLeaves, canOpt, canRad, canopy, CanopyRT.soil);
         push!(reflVIS, canRad.alb_obs[28])
         push!(reflNIR, canRad.alb_obs[52])
         push!(SIF_R , canRad.SIF_obs[8])

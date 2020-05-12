@@ -25,32 +25,33 @@ end
 
 
 Base.@kwdef mutable struct fluxes{TT<:Number}
-         APAR::TT = 500.0
-         gbc::TT = 100.0
-         gbv::TT = 100.0
-         ceair::TT = 1400.0
-         eair::TT = 1400.0
-         Je::TT = 1100.0
-         Ac::TT = 0.0
-         Aj::TT = 0.0
-         Ai::TT = 0.0
-         Ap::TT = 0.0
-         Ag::TT = 0.0
-         Cs::TT = 0.0
-         Rd::TT = 0.0
-         Je_pot::TT = 0.0
-         Ja::TT = 0.0
-         Je_red::TT = 0.0
-         φ::TT = 0.0
-         Rn::TT = 0.0
-         H::TT = 0.0
-         LE::TT = 0.0
-         Sap::TT = 0.0
-         An_biochemistry::TT = 0.0
-         An_diffusion::TT = 0.0
-         ustar::TT = 1e-6
-         g_m_s_to_mol_m2_s::TT = -Inf
-         ra::TT    = 1e6
+  Ca::TT = 400.0
+  APAR::TT = 500.0
+  gbc::TT = 100.0
+  gbv::TT = 100.0
+  ceair::TT = 1400.0
+  eair::TT = 1400.0
+  Je::TT = 1100.0
+  Ac::TT = 0.0
+  Aj::TT = 0.0
+  Ai::TT = 0.0
+  Ap::TT = 0.0
+  Ag::TT = 0.0
+  Cs::TT = 0.0
+  Rd::TT = 0.0
+  Je_pot::TT = 0.0
+  Ja::TT = 0.0
+  Je_red::TT = 0.0
+  φ::TT = 0.0
+  Rn::TT = 0.0
+  H::TT = 0.0
+  LE::TT = 0.0
+  Sap::TT = 0.0
+  An_biochemistry::TT = 0.0
+  An_diffusion::TT = 0.0
+  ustar::TT = 1e-6
+  g_m_s_to_mol_m2_s::TT = -Inf
+  ra::TT    = 1e6
 end
 
 

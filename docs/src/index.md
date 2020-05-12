@@ -6,26 +6,26 @@
 
 ### Leaf Bio Structure:
 ```@docs
-Land.CanopyRTMod.leafbio
+Land.CanopyRT.leafbio
 ```
 
 ### Leaf Params:
 ```@docs
-Land.Leaf.leaf_params
+Land.Photosynthesis.leaf_params
 ```
 
 ### Canopy Structure
 ```@docs
-Land.CanopyRTMod.struct_canopy
+Land.CanopyRT.struct_canopy
 ```
 
 ### Canopy Radiation Structure
 ```@docs
-Land.CanopyRTMod.struct_canopyRadiation
+Land.CanopyRT.struct_canopyRadiation
 ```
 
 ### Canopy Optical Property Structure
 ```@docs
-Land.CanopyRTMod.struct_canopyOptProps
+Land.CanopyRT.struct_canopyOptProps
 ```
 

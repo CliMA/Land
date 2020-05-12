@@ -11,32 +11,7 @@ abstract type AbstractVpmax <: AbstractVmax end
 "Michaelis Menten (MM) Parameters"
 abstract type AbstractMM end
 
-# Scaling functions for Photosynthesis temperature response and inhibition
-function fArrhenius(tl, Ea)
-    FT = eltype(tl)
-    Rgas = FT(8.31446261815324);
-    exp(-Ea/(Rgas*tl));
-end;
 
-function ft(tl, ha)
-    FT = eltype(tl)
-    Rgas = FT(8.31446261815324);
-    T25 = FT(298.15) 
-    exp(ha/(Rgas*(T25)) * (1-(T25)/tl));
-end;
-
-function fth(tl, hd, se, fc)
-    FT = eltype(tl)
-    Rgas = FT(8.31446261815324);
-    fc / (1 + exp((-hd+se*tl)/(Rgas*tl)));
-end;
-
-function fth25(hd, se) 
-    FT = eltype(hd)
-    T25 = FT(298.15);
-    Rgas = FT(8.31446261815324); 
-    1 + exp( (-hd + se * T25) / (Rgas * T25 ));
-end;
 
 
 "Jmax Rate Parameters as in CLM5"
@@ -163,4 +138,29 @@ function michaelis_menten_constants!(model::MM_CLM, l)
     l.Γstar   = Γ_25 * ft(l.T, ΔHa_Γ);
 end
 
+# Scaling functions for Photosynthesis temperature response and inhibition
+function fArrhenius(tl, Ea)
+    FT = eltype(tl)
+    Rgas = FT(8.31446261815324);
+    exp(-Ea/(Rgas*tl));
+end;
 
+function ft(tl, ha)
+    FT = eltype(tl)
+    Rgas = FT(8.31446261815324);
+    T25 = FT(298.15) 
+    exp(ha/(Rgas*(T25)) * (1-(T25)/tl));
+end;
+
+function fth(tl, hd, se, fc)
+    FT = eltype(tl)
+    Rgas = FT(8.31446261815324);
+    fc / (1 + exp((-hd+se*tl)/(Rgas*tl)));
+end;
+
+function fth25(hd, se) 
+    FT = eltype(hd)
+    T25 = FT(298.15);
+    Rgas = FT(8.31446261815324); 
+    1 + exp( (-hd + se * T25) / (Rgas * T25 ));
+end;

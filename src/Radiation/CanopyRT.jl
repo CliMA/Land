@@ -1,4 +1,4 @@
-module CanopyRTMod
+module CanopyRT
 #using GSL
 using Polynomials
 using Statistics
@@ -11,7 +11,6 @@ using QuadGK
 
 using ..Photosynthesis
 
-
 export optipar,
        angles,
        leafbio,
@@ -20,6 +19,10 @@ export optipar,
        canopy,
        canRad,
        canOpt,
+       wl,
+       wle,
+       wlf,
+       soil,
        FT,
        sunRad
 
@@ -999,15 +1002,7 @@ function volscatt(tts,tto,psi,ttli)
     denom=2 *FT(pi)^2;
     frho=((pi-bt2)*t1+t2)/denom;
     ftau=    (-bt2*t1+t2)/denom;
-    #if frho<0 || ftau<0 || chi_s<0 || chi_o < 0
-        #@show bto
-        #@show bts
-        #@show bts-bto
-        #@show btran1
-        #@show btran2
-        #@show btran_
-        #@show psi_rad
-    #end
+
     return (chi_s),abs(chi_o),(frho),(ftau)
 end;
 
@@ -1085,14 +1080,8 @@ function calctav(α,nr)
     return tav
 end
 
-#function expint(x)
-#    p = Poly([8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09])
-#    polyv = polyval(p,real(x));
-#    k = findall( abs(imag(x)) <= polyv );
-#    -GSL.sf_expint_Ei(-x)
-#end
-# From Matlab!
-p = Polynomial(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
+
+const p = Polynomial(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
 const egamma=FT(0.57721566490153286061);
 function expint(x::Number)
 

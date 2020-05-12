@@ -39,8 +39,7 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     Kn_ss::TT = 0;                           # Kn in steady state
     "max PSII yield"
     maxPSII::TT = Kp/(Kp+Kf+Kd);             # Max PSII yield (Kn=0, all RC open)
-    "Flexas et al derived Fluorescence model params"
-    Knparams = [5.01, 1.93, 10.0]
+    
     "dark-adapted fluorescence yield Fo"
     Fo::TT = 0;     # dark-adapted fluorescence yield Fo,0
     "light-adapted fluorescence yield in the dark Fo'"
@@ -124,7 +123,7 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     "Actual Maximum electron transport rate (μmol/m2/s)"
     Jmax::TT   = Jmax25;
     "Actual Leaf respiration rate (μmol CO2/m2/s)"
-    Rdleaf::TT = Rd25;
+    Rd::TT = Rd25;
 
     "CO2 concentration in chloroplast (ppm)"
     Cc::TT = 400.0;                               
