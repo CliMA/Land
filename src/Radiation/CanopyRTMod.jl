@@ -9,7 +9,7 @@ using MAT
 # Numerical integration package (Simpson rule)
 using QuadGK
 
-using ..Leaf
+using ..Photosynthesis
 
 
 export optipar,
@@ -26,12 +26,14 @@ export optipar,
 # Floating point precision can be changed here
 const FT = Float32
 
-
 include("photo_structs.jl")
 
 # Leaf inclination distribution
-const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
-const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.] [10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88., 90.] ];
+#const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+#const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.] [10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88., 90.] ];
+
+const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,85.];
+const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.] [10.,20.,30.,40.,50.,60.,70.,80., 90.] ];
 
 const minwlPAR  = FT(400.); # PAR range
 const maxwlPAR  = FT(700.);

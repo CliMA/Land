@@ -1,11 +1,5 @@
 
 
-using ..PhysCon
-using ..WaterVapor
-
-using Parameters
-export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!, Medlyn!, BallBerry!, Gentine!
-
 "Tolerance threshold for Cc iterations"
 tol = 0.1
 vpd_min = 0.1

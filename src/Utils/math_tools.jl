@@ -10,7 +10,7 @@
 using IncGammaBeta
 
 
-export quadratic,
+export quadratic, lower_quadratic,
        beta_function,
        log_gamma_function,
        hybrid,
@@ -36,7 +36,12 @@ const c = 299792458.0             #  [m s-1]       speed of light
 
 function quadratic(a, b, c)
   discr = b^2 - 4*a*c
-  discr >= 0 ?   ( (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) ) : error("Only complex roots")
+  discr >= 0 ?   ( (-b + sqrt(discr))/2a, (-b - sqrt(discr))/2a ) : error("imaginary roots in quadratic")
+end # function
+
+function lower_quadratic(a, b, c)
+  discr = b^2 - 4*a*c
+  discr >= 0 ?   (-b - sqrt(discr))/2a  : error("imaginary roots in quadratic")
 end # function
 
 function e2phot(λ::Array,E::Array)

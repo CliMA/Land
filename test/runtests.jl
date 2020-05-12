@@ -10,5 +10,6 @@ using Test
   # include(joinpath(@__DIR__, "..", "experiments", "run_field_data.jl"))
   # include(joinpath(@__DIR__, "..", "experiments", "step_light.jl"))
     include(joinpath(@__DIR__, "..", "experiments", "DiurnalCycle.jl"))
+    include(joinpath(@__DIR__, "..", "notebooks", "Radiation_Test_BRDF.jl))
 end
 
