@@ -6,7 +6,7 @@ using PyPlot
 
 
 # a customized function to convert number to formatted number
-function number_to_string(number,digit=6)
+function number_to_string(number::Number,digit::Int=6)
     if digit==0
         return @sprintf("%0.0f", number)
     elseif digit==1
@@ -28,7 +28,7 @@ end
 
 
 # there is an option to save the figure
-function struct_tree_visualize(tree, save=false)
+function visualize_struct_tree(tree::StructTree, save::Bool=false)
     # clear plot first
     figure("Tree Visualization",figsize=(16,9), dpi=120)
     clf()

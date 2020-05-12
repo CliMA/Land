@@ -2,8 +2,27 @@ using LaTeXStrings
 using PyPlot
 
 # this function plot An-Pi curve
-function plot_a_par_curve(v25=80.0, j25=135.0, gamma=2.5, gsc=0.2, ca=40.0, tem=298.15, p_atm=101325.0,p_o2=21278.25, r25=false, unit="K")
-    list_par,list_an,list_ag,list_pi = get_a_par_curve(v25,j25,gamma,gsc,ca,tem,p_atm,p_o2,r25,unit)
+function plot_a_par_curve(;
+                          v25::Number = 80.0,
+                          j25::Number = 135.0,
+                       Γ_star::Number = 2.5,
+                          gsc::Number = 0.1,
+                          p_a::Number = 40.0,
+                          tem::Number = 298.15,
+                        p_atm::Number = 101325.0,
+                         p_O₂::Number = 21278.25,
+                          r25::Number = Inf,
+                         unit::Number = "K")
+    list_par,list_an,list_ag,list_pi = get_a_par_curve(v25 = v25,
+                                                       j25 = j25,
+                                                    Γ_star = Γ_star,
+                                                       gsc = gsc,
+                                                       p_a = p_a,
+                                                       tem = tem,
+                                                     p_atm = p_atm,
+                                                      p_O₂ = p_O₂,
+                                                       r25 = r25,
+                                                      unit = unit)
 
     # plot the data
     clf()

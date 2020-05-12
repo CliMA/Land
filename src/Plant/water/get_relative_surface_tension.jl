@@ -1,5 +1,5 @@
 # this function returns the surface tension of water relative to 25 degree C (298.15 K)
-function get_relative_surface_tension(tem, unit="K")
+function get_relative_surface_tension(tem::Number; unit::String="K")
     #=
     gamma        = V^(-2/3) * k * (tem_c-tem)
     gamma/gamm25 = (tem_c - tem) / (tem_c - 298.15)

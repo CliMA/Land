@@ -1,6 +1,6 @@
 # this function calculates the q_layer from p_soil in the layer and p_base
 # this function use newton raphson to get q_layer
-function get_q_layer_from_p_base(root_layer, p_base)
+function get_q_layer_from_p_base(root_layer::StructTreeRootLayer, p_base::Number)
     q_min   = 0.0
     q_max   = 1.0
     q_layer = 0.5
@@ -8,7 +8,7 @@ function get_q_layer_from_p_base(root_layer, p_base)
     # use while loop to get q_layer
     count   = 0
     while true
-        p_0 = get_struct_p_end_from_q_rhizosphere(root_layer, q_layer)
+        p_0 = get_struct_p_end_from_q(root_layer, q_layer)
 
         # if meet the requirement break
         if abs(p_0 - p_base) < 1E-6

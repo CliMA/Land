@@ -1,5 +1,5 @@
 # this function returns the saturated vapor pressure in Pa
-function get_saturated_vapor_pressure(tem, unit="K")
+function get_saturated_vapor_pressure(tem::Number; unit::String="K")
     if unit=="c" || unit=="C"
         temc = tem
     else

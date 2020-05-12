@@ -1,5 +1,5 @@
 module Plant
     # include the struct
-    export struct_tree,struct_tree_visualize
+    export StructTree,visualize_struct_tree
     include("include.jl")
 end

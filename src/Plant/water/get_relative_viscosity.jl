@@ -1,5 +1,5 @@
 # this function returns the viscosity relative to 25 degree C (298.15 K)
-function get_relative_viscosity(tem, unit="K")
+function get_relative_viscosity(tem::Number; unit::String="K")
     #=
     mu      = A * exp( B/tem + C*tem + D*tem^2 )
     mu/mu25 = exp( B/tem + C*tem + D*tem^2 - B/tem25 - C*tem25 - D*tem25^2 )

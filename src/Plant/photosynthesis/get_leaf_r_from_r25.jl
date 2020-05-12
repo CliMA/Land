@@ -1,5 +1,5 @@
 # get respiration rate from r25 and leaf temperature
-function get_leaf_r_from_r25(r25, tem, unit="K")
+function get_leaf_r_from_r25(r25::Number, tem::Number; unit::String="K")
     # convert to degree C
     if unit=="K" || unit=="k"
         temc = tem - 273.15

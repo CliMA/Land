@@ -1,5 +1,5 @@
 # function to get vcmax from leaf tempearture
-function get_leaf_vcmax(vcmax25, tem, unit="K")
+function get_leaf_vcmax(vcmax25::Number, tem::Number; unit::String="K")
     # convert to degree C
     if unit=="K" || unit=="k"
         temk = tem
