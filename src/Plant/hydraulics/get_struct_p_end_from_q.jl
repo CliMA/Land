@@ -42,7 +42,7 @@ end
 
 
 # for stem struct
-function get_struct_p_end_from_q(any_struct::StructTreeStem, flow::Float32; p_ini::Float32=Inf)
+function get_struct_p_end_from_q(any_struct::StructTreeStem, flow::Number; p_ini::Number=Inf)
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
@@ -65,7 +65,7 @@ end
 
 
 # for leaf struct
-function get_struct_p_end_from_q(any_struct::StructTreeLeaf, flow::Float32; p_ini::Float32=Inf)
+function get_struct_p_end_from_q(any_struct::StructTreeLeaf, flow::Number; p_ini::Number=Inf)
     if p_ini==Inf
         p_end = any_struct.p_ups
     else

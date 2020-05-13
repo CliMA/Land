@@ -1,16 +1,16 @@
 # function to update e_crit for each layer (sunlit and shaded), increase or decrease by 1E-6 mol m^-2 s^-1
 function update_tree_e_crit(tree::StructTree; displaying::Bool=false)
+    # unpack necessary structs
+    @unpack branch_list = tree.branch
+    @unpack canopy_list = tree.canopy
+    @unpack root_list   = tree.roots
+
     while true
         # define judge = 0
         judge = 0
 
         # q for the whole tree is the sum of q in each leaves
-        q_branch_list = []
-        for indx in 1:length(tree.branch.branch_list)
-            canopyi = tree.canopy.canopy_list[indx]
-            e_crit_list  = [leaf.e_crit for leaf in canopyi.leaf_list]
-            push!( q_branch_list, sum( e_crit_list .* canopyi.la_list) )
-        end
+        q_branch_list = [sum(canopyi.ec_list .* canopyi.la_list) for canopyi in canopy_list]
         q_sum = sum( q_branch_list )
 
         # calculate the p_base from q_sum
@@ -20,22 +20,23 @@ function update_tree_e_crit(tree::StructTree; displaying::Bool=false)
         p_trunk_branch = get_struct_p_end_from_q(tree.trunk, q_sum; p_ini=p_base)
 
         # for each canopy layer
-        for indx in 1:length(tree.branch.branch_list)
-            branchi = tree.branch.branch_list[indx]
-            canopyi = tree.canopy.canopy_list[indx]
+        for indx in 1:length(branch_list)
+            branchi = branch_list[indx]
+            canopyi = canopy_list[indx]
             # compute branch leaf joint pressure for each canopy layer
             p_branch_leaf = get_struct_p_end_from_q(branchi, q_branch_list[indx]; p_ini=p_trunk_branch)
 
             # compute p_leaf for each leaf
-            for leaf in canopyi.leaf_list
-                p_leaf = get_struct_p_end_from_q(leaf, leaf.e_crit; p_ini=p_branch_leaf)
+            for indy in 1:length(canopyi.leaf_list)
+                leaf = canopyi.leaf_list[indy]
+                p_leaf = get_struct_p_end_from_q(leaf, canopyi.ec_list[indy]; p_ini=p_branch_leaf)
                 # increas e_crit by 1E-6 or decrease it by 1E-7
                 if p_leaf >= -20.0
                     judge += 1
-                    leaf.e_crit += 1E-6
+                    canopyi.ec_list[indy] += 1E-6
                 elseif p_leaf == -Inf
                     judge += 1
-                    leaf.e_crit -= 1E-7
+                    canopyi.ec_list[indy] -= 1E-7
                 end
             end
         end

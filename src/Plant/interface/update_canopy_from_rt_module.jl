@@ -1,4 +1,4 @@
-# function to update canopy par, la, and tleaf from RT module
-function  update_canopy_from_rt_module()
+# function to update canopy par, la, and t_leaf from RT module
+function  update_canopy_from_rt_module(tree::StructTree)
     ;
 end

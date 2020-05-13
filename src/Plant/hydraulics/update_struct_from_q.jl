@@ -54,7 +54,7 @@ end
 
 
 # for stem struct
-function update_struct_from_q(any_struct::StructTreeStem, flow::Float32, p_ini::Float32=Inf)
+function update_struct_from_q(any_struct::StructTreeStem, flow::Number, p_ini::Number=Inf)
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
@@ -86,7 +86,7 @@ end
 
 
 # for leaf struct
-function update_struct_from_q(any_struct::StructTreeLeaf, flow::Float32, p_ini::Float32=Inf)
+function update_struct_from_q(any_struct::StructTreeLeaf, flow::Number, p_ini::Number=Inf)
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
