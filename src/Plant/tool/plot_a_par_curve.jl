@@ -13,7 +13,8 @@ function plot_a_par_curve(;
                          p_O₂::Number = 21278.25,
                           r25::Number = Inf,
                          unit::Number = "K")
-    list_par,list_an,list_ag,list_pi = get_a_par_curve(v25 = v25,
+    list_par,list_an,list_ag,list_pi = get_a_par_curve(
+                                                       v25 = v25,
                                                        j25 = j25,
                                                     Γ_star = Γ_star,
                                                        gsc = gsc,

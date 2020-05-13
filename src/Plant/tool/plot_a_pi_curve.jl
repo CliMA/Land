@@ -11,7 +11,8 @@ function plot_a_pi_curve(;
                         p_O₂::Number = 21278.25,
                          r25::Number = false,
                         unit::Number = "K")
-    list_p,list_an,list_ag = get_a_pi_curve(v25 = v25,
+    list_p,list_an,list_ag = get_a_pi_curve(
+                                            v25 = v25,
                                             j25 = j25,
                                          Γ_star = Γ_star,
                                             tem = tem,

@@ -8,12 +8,12 @@ function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String
     @unpack root_list   = tree.roots
 
     # 1. use the gsw from last time instant and update e and a first, because Tleaf was from the last instant
-    @time for canopyi::StructTreeCanopyLayer in canopy_list
+    for canopyi::StructTreeCanopyLayer in canopy_list
         # 1.1 update the e and a for each leaf, per leaf area
-        canopyi.d_list     = (get_saturated_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
+        canopyi.d_list  = (get_saturated_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
         canopyi.e_list  = canopyi.gsw_list .* canopyi.d_list
-        canopyi.q_list = canopyi.e_list .* canopyi.la_list
-        anagrpi_list    = get_leaf_an_ag_r_pi_from_gsc_list(
+        canopyi.q_list  = canopyi.e_list   .* canopyi.la_list
+        anagrpi_lists   = get_leaf_an_ag_r_pi_from_gsc_list(
                                                             v25 = canopyi.v_max,
                                                             j25 = canopyi.j_max,
                                                          Γ_star = canopyi.Γ_star,
@@ -25,10 +25,10 @@ function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String
                                                            p_O₂ = canopyi.p_O₂,
                                                             r25 = canopyi.r_25,
                                                            unit = "K")
-        canopyi.an_list = anagrpi_list[1]
-        canopyi.ag_list = anagrpi_list[2]
-        canopyi.r_list  = anagrpi_list[3]
-        canopyi.pi_list = anagrpi_list[4]
+        canopyi.an_list = anagrpi_lists[1]
+        canopyi.ag_list = anagrpi_lists[2]
+        canopyi.r_list  = anagrpi_lists[3]
+        canopyi.pi_list = anagrpi_lists[4]
     end
 
 
@@ -65,7 +65,7 @@ function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String
     end
 
     # 5. determine how much gsw and gsc should change with time, use Wang 2020 model for day time, will add scheme for nighttime later
-    @time for canopyi in canopy_list
+    for canopyi in canopy_list
         list_∂A∂E = get_marginal_gain(canopyi)
         list_∂Θ∂E = get_marginal_penalty_wang(canopyi)
 

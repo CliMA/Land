@@ -6,7 +6,7 @@ using PyPlot
 
 
 # a customized function to convert number to formatted number
-function number_to_string(number::Number,digit::Int=6)
+function number_to_string(number::Number; digit::Int=6)
     if digit==0
         return @sprintf("%0.0f", number)
     elseif digit==1
@@ -34,7 +34,7 @@ function visualize_struct_tree(tree::StructTree, save::Bool=false)
     clf()
 
     # display table header
-    text(-1.00, tree.h+0.05, L"$P_\mathrm{xylem}$"            , color=:red   , ha="right", va="bottom", fontsize=8)
+    text(-1.00, tree.h+0.05, L"$P_\mathrm{water}$"            , color=:red   , ha="right", va="bottom", fontsize=8)
     text( 1.00, tree.h+0.05, L"$Q_\mathrm{water}$"            , color=:blue  , ha="left" , va="bottom", fontsize=8)
     text( 1.40, tree.h+0.05, L"$\overline{\mathrm{PAR_{sl}}}$", color=:orange, ha="left" , va="bottom", fontsize=8)
     text( 1.60, tree.h+0.05, L"$\mathrm{PAR_{sh}}$"           , color=:orange, ha="left" , va="bottom", fontsize=8)
@@ -51,18 +51,18 @@ function visualize_struct_tree(tree::StructTree, save::Bool=false)
         ly = [ rooti.z_lo   , rooti.z_hi, rooti.z_lo   ]
         plot(lx, ly, color=:brown)
 
-        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_ups ), color=:red , ha="right", va="top"   , fontsize=8)
-        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_rhiz), color=:red , ha="right", va="bottom", fontsize=8)
-        text( rooti.r_layer, rooti.z_lo, number_to_string(rooti.q     ), color=:blue, ha="left" , va="top"   , fontsize=8)
+        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_ups , digit=3), color=:red , ha="right", va="top"   , fontsize=8)
+        text(-rooti.r_layer, rooti.z_lo, number_to_string(rooti.p_rhiz, digit=3), color=:red , ha="left" , va="bottom", fontsize=8)
+        text( rooti.r_layer, rooti.z_lo, number_to_string(rooti.q     , digit=6), color=:blue, ha="left" , va="top"   , fontsize=8)
     end
 
     # plot the trunk
     lx = [0, 0, 0]
     ly = [0, tree.trunk.z_lo, tree.trunk.z_hi]
     plot(lx, ly, color=:black)
-    text(0, tree.trunk.z_lo    , number_to_string(tree.trunk.p_ups), color=:red , ha="right", va="bottom", fontsize=8)
-    text(0, tree.trunk.z_hi    , number_to_string(tree.trunk.p_dos), color=:red , ha="right", va="top"   , fontsize=8)
-    text(0, tree.trunk.z_hi*0.5, number_to_string(tree.trunk.q    ), color=:blue, ha="left" , va="top"   , fontsize=8)
+    text(0, tree.trunk.z_lo    , number_to_string(tree.trunk.p_ups, digit=3), color=:red , ha="right", va="bottom", fontsize=8)
+    text(0, tree.trunk.z_hi    , number_to_string(tree.trunk.p_dos, digit=3), color=:red , ha="right", va="top"   , fontsize=8)
+    text(0, tree.trunk.z_hi*0.5, number_to_string(tree.trunk.q    , digit=6), color=:blue, ha="left" , va="top"   , fontsize=8)
 
     # plot the canopy stem and leaf system
     for i in 1:length(tree.branch.branch_list)
@@ -80,14 +80,14 @@ function visualize_struct_tree(tree::StructTree, save::Bool=false)
         plot(lx, ly, color=:green)
 
         # label the stem-leaf joint pressure and flow rate through each branch
-        text(-branchi.r_layer, branchi.z_hi, number_to_string(branchi.p_dos), color=:red , ha="right", va="top", fontsize=8)
-        text( branchi.r_layer, branchi.z_hi, number_to_string(branchi.q    ), color=:blue, ha="left" , va="top", fontsize=8)
+        text(-branchi.r_layer, branchi.z_hi, number_to_string(branchi.p_dos, digit=3), color=:red , ha="right", va="top", fontsize=8)
+        text( branchi.r_layer, branchi.z_hi, number_to_string(branchi.q    , digit=6), color=:blue, ha="left" , va="top", fontsize=8)
 
         # calculate and display mean PAR for sunlit leaves and shaded leaves
         par_sl = sum(canopyi.par_list[1:end-1] .* canopyi.la_list[1:end-1]) / sum(canopyi.la_list[1:end-1])
         par_sh = canopyi.par_list[end]
-        text(1.40, branchi.z_hi, number_to_string(par_sl,0), color=:orange, ha="left", va="top", fontsize=8)
-        text(1.60, branchi.z_hi, number_to_string(par_sh,0), color=:orange, ha="left", va="top", fontsize=8)
+        text(1.40, branchi.z_hi, number_to_string(par_sl, digit=1), color=:orange, ha="left", va="top", fontsize=8)
+        text(1.60, branchi.z_hi, number_to_string(par_sh, digit=1), color=:orange, ha="left", va="top", fontsize=8)
     end
 
     # plot the ground

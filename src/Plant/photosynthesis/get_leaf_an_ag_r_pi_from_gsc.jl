@@ -20,15 +20,16 @@ function get_leaf_an_ag_r_pi_from_gsc(;
     min_p  = Γ_star
     while true
         tar_p = 0.5 * (max_p+min_p)
-        an,ag,r = get_leaf_an_ag_r_from_pi( v25 = v25,
-                                            j25 = j25,
-                                         Γ_star = Γ_star,
-                                            p_i = tar_p,
-                                            tem = tem,
-                                            par = par,
-                                           p_O₂ = p_O₂,
-                                            r25 = r25,
-                                           unit = unit)
+        an,ag,r = get_leaf_an_ag_r_from_pi(
+                                           v25 = v25,
+                                           j25 = j25,
+                                        Γ_star = Γ_star,
+                                           p_i = tar_p,
+                                           tem = tem,
+                                           par = par,
+                                          p_O₂ = p_O₂,
+                                           r25 = r25,
+                                          unit = unit)
         tmp_g = an * 1e-6 / (p_a-tar_p) * p_atm
 
         # increase min_p when g is smaller than target
@@ -84,7 +85,8 @@ function get_leaf_an_ag_r_pi_from_gsc_list(;
         gsc         = gsc_list[indx]
         tem         = tem_list[indx]
         par         = par_list[indx]
-        an,ag,r,p_i = get_leaf_an_ag_r_pi_from_gsc(v25 = v25,
+        an,ag,r,p_i = get_leaf_an_ag_r_pi_from_gsc(
+                                                   v25 = v25,
                                                    j25 = j25,
                                                 Γ_star = Γ_star,
                                                    gsc = gsc,
@@ -97,7 +99,7 @@ function get_leaf_an_ag_r_pi_from_gsc_list(;
                                                   unit = unit)
         list_an[indx] = an
         list_ag[indx] = ag
-        list_re[indx]  = r
+        list_re[indx] = r
         list_pi[indx] = p_i
     end
 

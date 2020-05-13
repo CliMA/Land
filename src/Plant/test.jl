@@ -1,3 +1,4 @@
+using BenchmarkTools
 
 
 
@@ -9,7 +10,12 @@ tree = StructTree();
 
 
 
-update_tree_with_time(tree,1.0);
+@btime update_tree_with_time(tree,1.0,updating=false);
+
+
+
+
+visualize_struct_tree(tree)
 
 
 
