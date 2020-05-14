@@ -1,103 +1,95 @@
 
+const FT = Float32
+abstract type AbstractPhotosynthesis end
 
-"Tolerance threshold for Cc iterations"
-tol = 0.1
-vpd_min = 0.1
+Base.@kwdef struct PhotoMods{FM,PM,RM,SM,JM,VM,MM} <: AbstractPhotosynthesis
+    fluorescence::FM       = FlexasTolBerryFluorescence{FT}()
+    photosynthesis::PM     = C3FvCBPhoto{FT}()
+    respiration::RM        = RespirationCLM{FT}()
+    stomatal::SM           = BallBerryStomata{FT}()
+    Jmax::JM               = JmaxCLM{FT}()
+    Vmax::VM               = VcmaxCLM{FT}()
+    MichaelisMenten::MM    = MM_CLM{FT}()
+end
 
-" Just a placeholder for now"
+"""
+    LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
 
-Base.@kwdef mutable struct meteo{TT<:Number}
-     S_down::TT = -999.;
-     L_down::TT = -999.;
-     T_air::TT  = -999.;      # T in K
-     e_air::TT  = -999.;
-     P_air::TT  =  1e5 ;      # surface pressure (Pa)
-     Ca::TT     =  400.;
-     PAR::TT    = -999.;
-     U::TT      = 1e-6;
-     zscreen::TT= 10.0; # measurement height - default
-     L::TT      = 1e6;  # atmospheric Obukhov length
-     # parameter to define stability function for stable case
-     stab_type_stable::TT = 1; # 2 Webb correction tends to be unstable at night - suggest not using
-     ustar::TT = 1e-6
-     g_m_s_to_mol_m2_s::TT = -Inf
-     ppm_to_Pa::TT = 0.1
-     ra::TT    = 1e6
-     APAR::TT = 500.0
-    Cs::TT = 0.0
+Compute net assimilation rate A, fluorescence F using biochemical model
+
+# Arguments
+- `flux::fluxes`: fluxes structure.
+- `leaf::leaf_params`: leaf_params structure.
+"""
+function LeafPhotosynthesis!(mod::AbstractPhotosynthesis, flux::fluxes, leaf::leaf_params, met::meteo)
+    # Adjust Vcmax to leaf T:
+    max_carboxylation_rate!(mod.Vmax, leaf)
+    # Adjust Jmax to leaf T:
+    max_electron_transport_rate!(mod.Jmax, leaf)
+    # Adjust Michaelis Menten constants:
+    michaelis_menten_constants!(mod.MichaelisMenten, leaf)
+    # Respiration rates:
+    leaf_respiration!(mod.respiration, leaf)
+    
+    # Compute stomatal conductance:
+    stomatal_conductance!(mod.stomatal, leaf)
+
+    leaf_fluorescence!(mod.fluorescence, leaf., x, leaf)
+
+end # LeafPhotosynthesis (similar to biochem in SCOPE)
+
+
+"""
+    CcFunc!(mod::AbstractPhotosynthesis, flux::fluxes, leaf::leaf_params, met::meteo)
+
+Compute Assimilation using Cc as input
+
+# Arguments
+- `Cc::Number`: Cc.
+- `flux::fluxes`: fluxes structure.
+- `leaf::leaf_params`: leaf_params structure.
+"""
+function CcFunc!(mod::AbstractPhotosynthesis, flux::fluxes, leaf::leaf_params, met::meteo)
+    @unpack Aj,Ac,Ap = leaf
+    # Compute Rubisco Limited Photosynthesis
+    rubisco_limited_rate!(mod.photosynthesis, leaf, met)
+    # Light limited rate
+    light_limited_rate!(mod.photosynthesis, leaf, met, leaf.APAR)
+    # Product limited rate
+    product_limited_rate!(mod.photosynthesis, leaf)
+    
+    # add colimitation later:
+    leaf.Ag = min(Ac,Aj,Ap) # gross assimilation
+    
+    # Net photosynthesis due to biochemistry
+    flux.An = leaf.Ag - leaf.Rd # net assimilation
+
+    # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
+    setra!(leaf, flux, met)
+
+    # CO2 at leaf surface
+    # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
+    leaf.gleaf = 1 / (met.ra/met.g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1.0/leaf.gm)
+    leaf.Cs = met.Ca + leaf.gleaf*meteo.ra/met.g_m_s_to_mol_m2_s*(leaf.Cc-met.Ca)
+
+    # println("Cs=",flux.Cs,", ra=",flux.ra, ", ra/rleaf=",leaf.gleaf*flux.ra/flux.g_m_s_to_mol_m2_s, ", Cc=", leaf.Cc, ", Ca=", met.Ca, " L=", met.L, " u*=", flux.ustar, " H=",flux.H)
+
+    # compute stomatal conductance gs
+    leaf.VPD       = max(leaf.esat-met.e_air,1.0); # can be negative at spin up
+    leaf.RH        = min(max(met.e_air/leaf.esat,0.001),0.999);    # will need to be corrected alter to define surface RH
+
+    # Compute stomatal conductance:
+    stomatal_conductance!(mod.stomatal, leaf)
+
 end
 
 
-Base.@kwdef mutable struct fluxes{TT<:Number}
-  Je::TT = 1100.0
-  Ac::TT = 0.0
-  Aj::TT = 0.0
-  Ai::TT = 0.0
-  Ap::TT = 0.0
-  Ag::TT = 0.0
-
-  Rd::TT = 0.0
-  Je_pot::TT = 0.0
-  Ja::TT = 0.0
-  Je_red::TT = 0.0
-  φ::TT = 0.0
-  Rn::TT = 0.0
-  H::TT = 0.0
-  LE::TT = 0.0
-  Sap::TT = 0.0
-  An_biochemistry::TT = 0.0
-  An_diffusion::TT = 0.0
-
+function setRoughness!(leaf::leaf_params)
+    # adjust roughness coefficients
+    leaf.z0m         = 0.1*leaf.height;                     # tree roughness (m)
+    leaf.z0h         = 0.1*leaf.height;                     # tree roughness (m) - TODO should be changed later
+    leaf.d           = 2/3*leaf.height;                     # tree displacement height (m)
 end
-
-
-
-# Ball-Berry stomatal conductance model:
-function BallBerry!(flux::fluxes, l::leaf_params)
-  #  Cs  : CO2 at leaf surface [ppm]
-  #  RH  : relative humidity [0-1]
-  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
-  #  gs   : moles/m2/s
-
-  l.gs = l.g1_BB * max(flux.An_biochemistry,1e-9) * l.RH/flux.Cs  + l.g0;
-  #println("gs=",l.gs,", Cs=",flux.Cs," An_biochemistry=", flux.An_biochemistry," RH=", l.RH )
-  if(l.gs<0)
-    println("Error - gs=",l.gs,", Cs=",flux.Cs," An_biochemistry=", flux.An_biochemistry," RH=", l.RH )
-  end
-end # function
-
-
-
-# Medlyn stomatal conductance model:
-function Medlyn!(flux::fluxes, l::leaf_params)
-  #  Cs  : CO2 at leaf surface
-  #  VPD  : vapor pressure deficit - Pa
-  #  Cs  : CO2 at leaf surface [ppm]
-  #  RH  : relative humidity [0-1]
-  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
-  #  gs   : moles/m2/s
-
-  l.gs = (1 +l.g1_Medlyn/sqrt(l.VPD)) * max(flux.An_biochemistry,1e-9) /flux.Cs  + l.g0;
-end # function
-
-
-# Gentine stomatal conductance model:
-function Gentine!(flux::fluxes, l::leaf_params)
-  #  Cs  : CO2 at leaf surface
-  #  VPD  : vapor pressure deficit - Pa
-  #  Cs  : CO2 at leaf surface [ppm]
-  #  RH  : relative humidity [0-1]
-  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
-  #  gs   : moles/m2/s
-
-  setLeafkl!(l, l.psi_l) # set hydraulic conductivity of leaf
-  l.gs = l.g1_BB*l.kleaf/l.kmax * max(flux.An_biochemistry,1e-9) /flux.Cs  + l.g0;
-end # function
-
-
-
-
-
 
 
 
@@ -177,14 +169,6 @@ end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
 
 
-
-
-function setRoughness!(leaf::leaf_params)
-    # adjust roughness coefficients
-    leaf.z0m         = 0.1*leaf.height;                     # tree roughness (m)
-    leaf.z0h         = 0.1*leaf.height;                     # tree roughness (m) - TODO should be changed later
-    leaf.d           = 2/3*leaf.height;                     # tree displacement height (m)
-end
 
 
 

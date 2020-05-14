@@ -92,6 +92,12 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     "Steady state Stomatal conductance (μmol/m2/s)"
     gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s);
 
+    # Photosynthesis rates
+    Ag::TT = 0
+    Ai::TT = 0
+    Aj::TT = 0
+    Ap::TT = 0
+
              
     # Placeholders for MM constants (need to be set with current Temperature):
     "Michaelis-Menten constant for CO₂ (Pa)"
@@ -134,9 +140,13 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     VPD::TT = 0.1;                                # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
 
     # to be computed
-    "Electron transport rate (μmol m-2 s-1)"
+    "Electron transport rate (μmol m-2 s-1), light limited only"
     Je::TT = 0.0 ;                              # electron transport rate
 
+    "Potential ETR"
+    Je_pot::TT = 0.0
+    "Actual Potential ETR"
+    Ja::TT = 0.0
 
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
@@ -180,7 +190,7 @@ Base.@kwdef mutable struct meteo{TT<:Number}
      ppm_to_Pa::TT = 0.1
      ra::TT    = 1e6
      APAR::TT = 500.0
-    Cs::TT = 0.0
+     Cs::TT = 0.0
 end
 
 
@@ -193,8 +203,7 @@ Base.@kwdef mutable struct fluxes{TT<:Number}
   Ag::TT = 0.0
 
   Rd::TT = 0.0
-  Je_pot::TT = 0.0
-  Ja::TT = 0.0
+  
   Je_red::TT = 0.0
   φ::TT = 0.0
   Rn::TT = 0.0

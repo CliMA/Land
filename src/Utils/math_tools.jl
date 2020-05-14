@@ -90,7 +90,7 @@ function log_gamma_function(x)
   return tmp + log(stp*ser/x)
 end # function log_gamma_function
 
-function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::Number, tol::Number)
+function hybrid(flux,leaf, func::Function, xa, xb, tol)
     #
     # !DESCRIPTION:
     # Solve for the root of a function, given initial estimates xa and xb.
@@ -158,7 +158,7 @@ function hybrid(flux::fluxes,leaf::leaf_params, func::Function, xa::Number, xb::
     return x0
 end #function hybrid
 
-function zbrent(flux::fluxes,leaf::leaf_params,f::Function, x0::Number, x1::Number, args::Tuple=();
+function zbrent(flux,leaf,f::Function, x0, x1, args::Tuple=();
        xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
        maxiter::Integer=50)
     EPS = eps(Float64)

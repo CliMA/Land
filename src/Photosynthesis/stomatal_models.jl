@@ -16,6 +16,13 @@ Base.@kwdef struct BallBerryStomata{FT} <: AbstractClassicalStomatalModel
     g1::FT = 9.0;
 end
 
+Base.@kwdef struct GentineStomata{FT} <: AbstractClassicalStomatalModel
+    "Ball-Berry minimum leaf conductance (moles/m2/s)"
+    g0::FT = 0.1;                      
+    "Ball-Berry slope of conductance-photosynthesis relationship"
+    g1::FT = 9.0;
+end
+
 Base.@kwdef struct MedlynStomata{FT} <: AbstractLeafRespiration
     "Medlyn slope of conductance-photosynthesis relationship, unstressed - Pa^(1/2) Medlyn et al. 2017"
     g1::FT = 125;
@@ -23,7 +30,7 @@ Base.@kwdef struct MedlynStomata{FT} <: AbstractLeafRespiration
     g0::FT = 0.1;                        
 end
 
-# Ball-Berry stomatal conductance model:
+" Ball-Berry stomatal conductance model:"
 function stomatal_conductance!(mod::BallBerryStomata, l)
   #  Cs  : CO2 at leaf surface [ppm]
   #  RH  : relative humidity [0-1]
@@ -33,7 +40,7 @@ function stomatal_conductance!(mod::BallBerryStomata, l)
 end # function
 
 
-# Medlyn stomatal conductance model:
+" Medlyn stomatal conductance model:"
 function stomatal_conductance!(mod::MedlynStomata, l)
   #  Cs  : CO2 at leaf surface
   #  VPD  : vapor pressure deficit - Pa
@@ -43,3 +50,15 @@ function stomatal_conductance!(mod::MedlynStomata, l)
   #  gs   : moles/m2/s
   l.gs = (1 +mod.g1/sqrt(l.VPD)) * max(l.An,1e-9) /l.Cs  + mod.g0;
 end # function
+
+
+"Gentine stomatal conductance model:"
+function stomatal_conductance!(mod::GentineStomata, l)
+  #  Cs  : CO2 at leaf surface [ppm]
+  #  RH  : relative humidity [0-1]
+  #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
+  #  gs   : moles/m2/s
+  setLeafkl!(l, l.psi_l) # set hydraulic conductivity of leaf
+  l.gs = mod.g1*l.kleaf/l.kmax * max(l.An,1e-9) /l.Cs  + mod.g0;
+end # function
+
