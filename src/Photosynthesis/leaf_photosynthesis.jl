@@ -12,7 +12,6 @@ Base.@kwdef mutable struct meteo{TT<:Number}
      T_air::TT  = -999.;      # T in K
      e_air::TT  = -999.;
      P_air::TT  =  1e5 ;      # surface pressure (Pa)
-     #PAR:TT    = -999.;
      Ca::TT     =  400.;
      PAR::TT    = -999.;
      U::TT      = 1e-6;
@@ -20,24 +19,23 @@ Base.@kwdef mutable struct meteo{TT<:Number}
      L::TT      = 1e6;  # atmospheric Obukhov length
      # parameter to define stability function for stable case
      stab_type_stable::TT = 1; # 2 Webb correction tends to be unstable at night - suggest not using
-
+     ustar::TT = 1e-6
+     g_m_s_to_mol_m2_s::TT = -Inf
+     ppm_to_Pa::TT = 0.1
+     ra::TT    = 1e6
+     APAR::TT = 500.0
+    Cs::TT = 0.0
 end
 
 
 Base.@kwdef mutable struct fluxes{TT<:Number}
-  Ca::TT = 400.0
-  APAR::TT = 500.0
-  gbc::TT = 100.0
-  gbv::TT = 100.0
-  ceair::TT = 1400.0
-  eair::TT = 1400.0
   Je::TT = 1100.0
   Ac::TT = 0.0
   Aj::TT = 0.0
   Ai::TT = 0.0
   Ap::TT = 0.0
   Ag::TT = 0.0
-  Cs::TT = 0.0
+
   Rd::TT = 0.0
   Je_pot::TT = 0.0
   Ja::TT = 0.0
@@ -49,9 +47,7 @@ Base.@kwdef mutable struct fluxes{TT<:Number}
   Sap::TT = 0.0
   An_biochemistry::TT = 0.0
   An_diffusion::TT = 0.0
-  ustar::TT = 1e-6
-  g_m_s_to_mol_m2_s::TT = -Inf
-  ra::TT    = 1e6
+
 end
 
 
@@ -121,7 +117,7 @@ function LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
     setLeafT!(leaf)
 
     # conversion factor for conductance - T and P dependent
-    flux.g_m_s_to_mol_m2_s = met.P_air/(physcon.Rgas*met.T_air) ; # Körner, C., Scheel, J.A., Bauer, H., 1979. Maximum leaf diffusive conductance in vascular plants. Photosynthetica 13, 45–82.
+    met.g_m_s_to_mol_m2_s = met.P_air/(physcon.Rgas*met.T_air) ; # Körner, C., Scheel, J.A., Bauer, H., 1979. Maximum leaf diffusive conductance in vascular plants. Photosynthetica 13, 45–82.
 
     # Compute max PSII efficiency here (can later be used with a variable Kn!)
     leaf.Kp = 4.0
@@ -134,7 +130,7 @@ function LeafPhotosynthesis!(flux::fluxes, leaf::leaf_params, met::meteo)
     flux.Je_pot = 0.5 * leaf.maxPSII * flux.APAR;                          # potential electron transport rate (important for later)
     flux.Je_red = 0.5 * φ_PSII * flux.APAR;                                # Includes Kn here
     # Some bound constraint on VPD:
-    flux.ceair = min(max(flux.eair, 0.03*leaf.esat), leaf.esat )
+    #flux.ceair = min(max(flux.eair, 0.03*leaf.esat), leaf.esat )
 
     # Electron transport rate for C3 plants
     # Actual colimited potential Je (curvature and Jmax)
@@ -499,38 +495,4 @@ function setra!(l::leaf_params, flux::fluxes, met::meteo) # set aerodynamic resi
     flux.ra = raw_full
 end
 
-"""
-    Fluorescencemodel!(ps,x,leaf::leaf_params )
-
-Compute Fluorescence yields, Kn and Kp.
-
-# Arguments
-- `ps::Number`: PSII yield.
-- `x::Number`: Degree of light saturation: [0-1] .
-- `leaf::leaf_params`: leaf_params structure.
-"""
-function Fluorescencemodel!(ps::Number, x::Number, leaf::leaf_params)
-    FT = eltype(ps)
-    Kp_max = FT(4.0)
-    x_alpha = exp(log(x)*leaf.Knparams[2]); # this is the most expensive operation in this fn; doing it twice almost doubles the time spent here (MATLAB 2013b doesn't optimize the duplicate code)
-    #println(x_alpha)
-    leaf.Kn_ss = leaf.Knparams[1] * (1+leaf.Knparams[3])* x_alpha/(leaf.Knparams[3] + x_alpha);
-    Kf = leaf.Kf
-    Kn = leaf.Kn
-    Kd = leaf.Kd
-    leaf.Kp   = max(0,-ps*(Kf+Kd+Kn)/(ps-1));
-    Kp = leaf.Kp
-
-
-    leaf.Fo   = Kf/(Kf+Kp_max+Kd);
-    leaf.Fo′  = Kf/(Kf+Kp_max+Kd+Kn);
-    leaf.Fm   = Kf/(Kf   +Kd);
-    leaf.Fm′  = Kf/(Kf   +Kd+Kn);
-    leaf.ϕs   = leaf.Fm′*(1-ps);
-    # leaf.eta  = leaf.ϕs/leaf.Fo; # don't need this anymore, better to use ϕs directly for SIF as Fo is not always fqe=0.01.
-    leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
-    leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
-
-    leaf.NPQ  = Kn/(Kf+Kd);
-end
 

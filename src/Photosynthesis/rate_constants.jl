@@ -13,15 +13,14 @@ abstract type AbstractMM end
 
 
 
-
 "Jmax Rate Parameters as in CLM5"
 Base.@kwdef struct JmaxCLM{FT} <: AbstractJmax
     "Activation energy for ETR (J/mol)"
-    ΔHa::FT    = 50000.;                      
+    ΔHa::FT    = 43540.;                      
     "Deactivation energy for ETR (J/mol)"
-    ΔHd::FT    = 200000.;
+    ΔHd::FT    = 150000.;
     "Entropy term for ETR (J/mol/K)"
-    ΔS::FT    = 660.;                       
+    ΔS::FT    = 490.;                       
     "Scaling factor to ensure Jmax(25)==Jmax25 "
     scale::FT    = fth25(ΔHd, ΔS);
 end
@@ -29,11 +28,11 @@ end
 "Carboxylation Rate Parameters as in CLM5"
 Base.@kwdef struct VcmaxCLM{FT} <: AbstractVcmax
     "Activation energy for ETR (J/mol)"
-    ΔHa::FT    = 72000.;                      
+    ΔHa::FT    = 65330.;                      
     "Deactivation energy for ETR (J/mol)"
-    ΔHd::FT    = 200000.;
+    ΔHd::FT    = 150000.;
     "Entropy term for ETR (J/mol/K)" # Can be adjusted with growth temperature later!
-    ΔS::FT    = 668.;                       
+    ΔS::FT    = 490.;                       
     "Scaling factor to ensure Vcmax(25)==Vcmax25 "
     scale::FT    = fth25(ΔHd, ΔS);
 end
@@ -41,11 +40,11 @@ end
 "Jmax Rate Parameters as in CLM5"
 Base.@kwdef struct JmaxBernacchi{FT} <: AbstractJmax
     "Activation energy for ETR (J/mol)"
-    ΔHa::FT    = 50000.;                      
+    ΔHa::FT    = 57500.;                      
     "Deactivation energy for ETR (J/mol)"
-    ΔHd::FT    = 200000.;
+    ΔHd::FT    = 439000.;
     "Entropy term for ETR (J/mol/K)"
-    ΔS::FT    = 660.;                       
+    ΔS::FT    = 1400.;                       
     "Scaling factor to ensure Jmax(25)==Jmax25 "
     scale::FT    = fth25(ΔHd, ΔS);
 end
@@ -121,7 +120,7 @@ end
     max_electron_transport_rate(model::JmaxCLM, leaf)
 Calculates the potential max_electron transport rate (Jmax) at the leaf temperature 
 """
-function max_electron_transport_rate!(model::JmaxCLM, l)
+function max_electron_transport_rate!(model::AbstractJmax, l)
     @unpack ΔHa, ΔHd, ΔS, scale = model
     l.Jmax  = l.Jmax25 * ft(l.T, ΔHa) * fth(l.T, ΔHd, ΔS, scale);
 end
@@ -130,7 +129,7 @@ end
     michaelis_menten_constants(model::JmaxCLM, leaf)
 Calculates the leaf temperature adjusted Michaelis Menten constants  
 """
-function michaelis_menten_constants!(model::MM_CLM, l)
+function michaelis_menten_constants!(model::AbstractMM, l)
     @unpack ΔHa_Kc, ΔHa_Ko, ΔHa_Kp, ΔHa_Γ, Kc_25, Ko_25, Kpep_25,Γ_25  = model
     l.Kc  = Kc_25 * ft(l.T, ΔHa_Kc);
     l.Ko  = Ko_25 * ft(l.T, ΔHa_Ko);

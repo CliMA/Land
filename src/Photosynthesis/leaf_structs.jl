@@ -50,10 +50,10 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     Fm′::TT = 0;    # dark-adapted fluorescence yield Fm
     "steady-state (light-adapted) yield Ft (aka Fs)"
     ϕs::TT = 0;     # steady-state (light-adapted) yield Ft (aka Fs)
-    "fluorescence efficiency (to be used for SIF RT)"
-    eta::TT = 0;
-    qQ::TT = 0;     # photochemical quenching
+    "Photochemical quenching"
+    qQ::TT = 0;     # 
     qE::TT = 0;     # non-photochemical quenching
+    "Non-Photochemical quenching"
     NPQ::TT = 0;
     "Dynamic Steady state boolean"
     dynamic_state::Bool = false
@@ -79,10 +79,7 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     θ_j::TT = 0.90;
 
     # Conductances:
-    # Ball Berry or Medlyn model
-    g0::TT = 0.1;                              # Ball-Berry minimum leaf conductance, unstressed (mol/m2/s) - Sellers  et  al.  (1996)  used  0.1 b=  for  C3  plants  and  0.4 b=for  C4  plants
-    g1_BB::TT = 9.0;                           # Ball-Berry slope of conductance-photosynthesis relationship, unstressed - m=  for  C3  plants  and  4m=  for  C4  plants  (Collatz  et  al.  1991,  1992)
-    g1_Medlyn::TT = 126.49;                    # Medlyn slope of conductance-photosynthesis relationship, unstressed - Pa^(1/2) Medlyn et al. 2017
+    
     vpd_min = 100.0                            # Min VPD for Medlyn model (blows up otherwise?)
     # Add already here: Mesophyll conductance (Inf for now):
 
@@ -125,6 +122,8 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     "Actual Leaf respiration rate (μmol CO2/m2/s)"
     Rd::TT = Rd25;
 
+    "CO2 concentration at leaf surface (ppm)"
+    Cs::TT = 400.0;  
     "CO2 concentration in chloroplast (ppm)"
     Cc::TT = 400.0;                               
     "CO2 concentration in chloroplast (Pa)"
@@ -137,6 +136,8 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     # to be computed
     "Electron transport rate (μmol m-2 s-1)"
     Je::TT = 0.0 ;                              # electron transport rate
+
+
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
     z0m         = -999.;                          # tree roughness (m)
@@ -160,16 +161,55 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
                                                   # can also be related to P50 see same book
 end
 
+" Just a placeholder for now"
+Base.@kwdef mutable struct meteo{TT<:Number}
+     S_down::TT = -999.;
+     L_down::TT = -999.;
+     T_air::TT  = -999.;      # T in K
+     e_air::TT  = -999.;
+     P_air::TT  =  1e5 ;      # surface pressure (Pa)
+     Ca::TT     =  400.;
+     PAR::TT    = -999.;
+     U::TT      = 1e-6;
+     zscreen::TT= 10.0; # measurement height - default
+     L::TT      = 1e6;  # atmospheric Obukhov length
+     # parameter to define stability function for stable case
+     stab_type_stable::TT = 1; # 2 Webb correction tends to be unstable at night - suggest not using
+     ustar::TT = 1e-6
+     g_m_s_to_mol_m2_s::TT = -Inf
+     ppm_to_Pa::TT = 0.1
+     ra::TT    = 1e6
+     APAR::TT = 500.0
+    Cs::TT = 0.0
+end
+
+
+Base.@kwdef mutable struct fluxes{TT<:Number}
+  Je::TT = 1100.0
+  Ac::TT = 0.0
+  Aj::TT = 0.0
+  Ai::TT = 0.0
+  Ap::TT = 0.0
+  Ag::TT = 0.0
+
+  Rd::TT = 0.0
+  Je_pot::TT = 0.0
+  Ja::TT = 0.0
+  Je_red::TT = 0.0
+  φ::TT = 0.0
+  Rn::TT = 0.0
+  H::TT = 0.0
+  LE::TT = 0.0
+  Sap::TT = 0.0
+  An_biochemistry::TT = 0.0
+  An_diffusion::TT = 0.0
+
+end
+
 # Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here:
 # For some reason, this is slow and allocates a lot, can be improved!!
 "Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here"
 function setLeafT!(l::leaf_params)
-    l.Kc      = l.Kc_25          * ft(l.T, l.Kcha);
-    l.Ko      = l.Ko_25          * ft(l.T, l.Koha);
-    l.Γstar   = l.Γ_25           * ft(l.T, l.cpha);
-    l.Vcmax   = l.Vcmax25 * ft(l.T, l.Vcmaxha) * fth(l.T, l.Vcmaxhd, l.Vcmaxse, l.Vcmaxc);
-    l.Jmax    = l.Jmax25  * ft(l.T, l.Jmaxha)  * fth(l.T, l.Jmaxhd, l.Jmaxse, l.Jmaxc);
-    l.Rdleaf  = l.Rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
     (l.esat, l.desat) = SatVap(l.T);
     # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end

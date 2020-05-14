@@ -24,7 +24,7 @@ export AbstractFluorescenceModel, FlexasTolBerry_fluorescence
 
 export rubisco_limited_rate, light_limited_rate
 
-include("leaf.jl")
+include("leaf_structs.jl")
 include("leaf_photosynthesis.jl")
 include("../Utils/math_tools.jl")
 include("leaf_energy_water_balance.jl")
