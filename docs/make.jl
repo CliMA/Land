@@ -34,7 +34,7 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/climate-machine/Land.git",
+    repo = "github.com/CliMA/Land.git",
     target = "build",
     push_preview = true,
 )

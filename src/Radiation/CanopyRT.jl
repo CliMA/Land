@@ -330,7 +330,12 @@ end;
 
 # Compute optical properties of canopy
 function computeCanopyGeomProps!(can::struct_canopy, angle::struct_angles, cO::struct_canopyOptProps)
-    @unpack Ω,nlayers,LAI = can
+    @unpack Ω,nlayers,LAI,clump_a,clump_b = can
+    
+    if clump_b > 0
+        can.Ω = clump_a .+ clump_b.*(1. .- cosd(angle.tts))
+    end
+    
     # Number of layers
     nl = nlayers
 
@@ -535,6 +540,7 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
     @unpack E_down, E_up,φ_shade,φ_sun = cR
     @unpack Ω,nlayers, LAI = can
     rsoil = so.albedo_SW[Iwlf]
+        
     iLAI    = Ω*LAI/nlayers;
 
     τ_dd = 1 .-a[Iwlf,:]*iLAI;
@@ -859,7 +865,7 @@ end;
 
 # Had to make this like the Prosail F90 function, forwardDiff didn't work otherwise.
 function calcJ1(x,m,k,LAI,Ω)
-    del=(k-m)*LAI
+    del=(k-m)*Ω*LAI
     if abs(del)>1E-3;
         J1 = (exp(m*Ω*LAI*x)-exp(k*Ω*LAI*x))/(k-m);
     else
