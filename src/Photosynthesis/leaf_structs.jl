@@ -72,6 +72,9 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     o₂::TT = 0.209;                         # Standard O2 in mol/mol
     "Leaf temperature (K)"
     T::TT = 298.15;                           # standard temperature (25C)
+    "Old Leaf temperature (K)"   # Will be checked, if no update, don't recalculate!
+    T_old::TT = -1;
+        
     esat::TT = 0.0
     desat::TT = 0.0
     #(esat, desat) = SatVap(T)
@@ -215,13 +218,7 @@ Base.@kwdef mutable struct fluxes{TT<:Number}
 
 end
 
-# Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here:
-# For some reason, this is slow and allocates a lot, can be improved!!
-"Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here"
-function setLeafT!(l::leaf_params)
-    (l.esat, l.desat) = SatVap(l.T);
-    # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
-end
+
 
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivitytimes Delta Psi
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck)/max(psis-psi_l,1e-6); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);

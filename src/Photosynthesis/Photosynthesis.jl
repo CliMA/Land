@@ -22,11 +22,12 @@ export JmaxCLM, VcmaxCLM, JmaxBernacchi, VcmaxBernacchi, Vpmax, MM_CLM
 
 export AbstractFluorescenceModel, FlexasTolBerry_fluorescence
 
-export rubisco_limited_rate, light_limited_rate
+export rubisco_limited_rate!, light_limited_rate!
 
 
 include("../Utils/math_tools.jl")
 include("leaf_structs.jl")
+include("surface_fluxes_land.jl")
 include("photosynthesis_rates.jl")
 include("rate_constants.jl")
 include("respiration_models.jl")
