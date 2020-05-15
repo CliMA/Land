@@ -3,7 +3,7 @@ using BenchmarkTools
 
 
 
-include("include.jl");
+include("include_plant.jl");
 tree = StructTree();
 @time update_tree_e_crit(tree);
 
