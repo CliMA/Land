@@ -1,9 +1,9 @@
 # this function calculates the q_layer from p_soil in the layer and p_base
 # this function use newton raphson to get q_layer
-function get_q_layer_from_p_base(root_layer::StructTreeRootLayer, p_base::Number)
-    q_min   = 0.0
-    q_max   = 1.0
-    q_layer = 0.5
+function get_q_layer_from_p_base(root_layer::StructTreeRootLayer, p_base::FT) where {FT}
+    q_min   = FT(0.0)
+    q_max   = FT(1.0)
+    q_layer = FT(0.5)
 
     # use while loop to get q_layer
     count   = 0

@@ -1,16 +1,15 @@
 # get lists of an,ag,r,pi from gsc
 function get_leaf_an_ag_r_pi_from_gsc(;
-                                       v25::Number = 80.0,
-                                       j25::Number = 135.0,
-                                    Γ_star::Number = 2.5,
-                                       gsc::Number = 0.1,
-                                       p_a::Number = 40.0,
-                                       tem::Number = 298.15,
-                                       par::Number = 1000.0,
-                                     p_atm::Number = 101325.0,
-                                      p_O₂::Number = 21278.25,
-                                       r25::Number = Inf,
-                                      unit::String = "K")
+                                       v25::FT = FT(80.0),
+                                       j25::FT = FT(135.0),
+                                    Γ_star::FT = FT(2.5),
+                                       gsc::FT = FT(0.1),
+                                       p_a::FT = FT(40.0),
+                                       tem::FT = FT(298.15),
+                                       par::FT = FT(1000.0),
+                                     p_atm::FT = FT(101325.0),
+                                      p_O₂::FT = FT(21278.25),
+                                       r25::FT = FT(Inf) ) where {FT}
     # compute a_net using bi-section method
     tar_p  = 0.0
     tar_ag = 0.0
@@ -28,8 +27,7 @@ function get_leaf_an_ag_r_pi_from_gsc(;
                                            tem = tem,
                                            par = par,
                                           p_O₂ = p_O₂,
-                                           r25 = r25,
-                                          unit = unit)
+                                           r25 = r25)
         tmp_g = an * 1e-6 / (p_a-tar_p) * p_atm
 
         # increase min_p when g is smaller than target
@@ -62,17 +60,16 @@ end
 
 # get lists of an,ag,r,pi from gsc
 function get_leaf_an_ag_r_pi_from_gsc_list(;
-                                           v25::Number = 80.0,
-                                           j25::Number = 135.0,
-                                        Γ_star::Number = 2.5,
-                                      gsc_list::Array  = 0.1 .* ones(10),
-                                           p_a::Number = 40.0,
-                                      tem_list::Array  = 298.15 .* ones(10),
-                                      par_list::Array  = 1000.0 .* ones(10),
-                                         p_atm::Number = 101325.0,
-                                          p_O₂::Number = 21278.25,
-                                           r25::Number = Inf,
-                                          unit::String = "K")
+                                           v25::FT    = FT(80.0),
+                                           j25::FT    = FT(135.0),
+                                        Γ_star::FT    = FT(2.5),
+                                      gsc_list::Array = FT(0.1) .* ones(FT,10),
+                                           p_a::FT    = FT(40.0),
+                                      tem_list::Array = FT(298.15) .* ones(FT,10),
+                                      par_list::Array = FT(1000.0) .* ones(FT,10),
+                                         p_atm::FT    = FT(101325.0),
+                                          p_O₂::FT    = FT(21278.25),
+                                           r25::FT    = FT(Inf) ) where {FT}
     # define lists of results
     len     = length(gsc_list)
     list_an = zeros(len)
@@ -95,8 +92,7 @@ function get_leaf_an_ag_r_pi_from_gsc_list(;
                                                    par = par,
                                                  p_atm = p_atm,
                                                   p_O₂ = p_O₂,
-                                                   r25 = r25,
-                                                  unit = unit)
+                                                   r25 = r25)
         list_an[indx] = an
         list_ag[indx] = ag
         list_re[indx] = r

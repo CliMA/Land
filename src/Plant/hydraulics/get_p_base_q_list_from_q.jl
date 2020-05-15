@@ -1,7 +1,7 @@
 # this function returns the p_base from total transpiration rate
-function get_p_base_q_list_from_q(tree::StructTree, flow::Number)
-    p_base   = 0.0
-    q_list_0 = 0.0
+function get_p_base_q_list_from_q(tree::StructTree, flow::FT) where {FT}
+    p_base   = FT(0.0)
+    q_list_0 = FT(0.0)
 
     # use while loop to get p_base
     count = 0

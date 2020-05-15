@@ -1,16 +1,15 @@
 # this function is meant to obtain the Anet-PAR curve
 # this function may also be used to test the phtosynthesis module
 function get_a_par_curve(;
-                         v25::Number = 80.0,
-                         j25::Number = 135.0,
-                      Γ_star::Number = 2.5,
-                         gsc::Number = 0.1,
-                         p_a::Number = 40.0,
-                         tem::Number = 298.15,
-                       p_atm::Number = 101325.0,
-                        p_O₂::Number = 21278.25,
-                         r25::Number = Inf,
-                        unit::Number = "K")
+                         v25::FT = FT(80.0),
+                         j25::FT = FT(135.0),
+                      Γ_star::FT = FT(2.5),
+                         gsc::FT = FT(0.1),
+                         p_a::FT = FT(40.0),
+                         tem::FT = FT(298.15),
+                       p_atm::FT = FT(101325.0),
+                        p_O₂::FT = FT(21278.25),
+                         r25::FT = FT(Inf)) where {FT}
     # generate a list of p_i from gamma to 200 Pa
     list_par = [val for val in 5.0:5.0:2000.0]
     list_ag  = list_par * -Inf
@@ -30,8 +29,7 @@ function get_a_par_curve(;
                                                    par = par,
                                                  p_atm = p_atm,
                                                   p_O₂ = p_O₂,
-                                                   r25 = r25,
-                                                  unit = "K")
+                                                   r25 = r25)
         list_ag[i]  = ag
         list_an[i]  = an
         list_pi[i]  = p_i

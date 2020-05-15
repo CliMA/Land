@@ -1,5 +1,8 @@
 # directly imclude this file will save the time to compile other Land modules
 
+# include the constants
+include("constants.jl")
+
 # include the tree struct
 include("struct/struct_tree_canopy.jl")
 include("struct/struct_tree_root.jl"  )

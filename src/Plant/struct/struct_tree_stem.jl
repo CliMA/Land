@@ -1,36 +1,36 @@
 # struct for stem
-Base.@kwdef mutable struct StructTreeStem
+Base.@kwdef mutable struct StructTreeStem{FT<:AbstractFloat}
     # trunk structure
-    r_layer::Float32 = 1.0    # m | horizental radius of the layer
-    z_hi   ::Float32 = 3.0    # m | higher height from the ground
-    z_lo   ::Float32 = 0.0    # m | lower height from the ground
+    r_layer::FT = FT(1.0)    # m | horizental radius of the layer
+    z_hi   ::FT = FT(3.0)    # m | higher height from the ground
+    z_lo   ::FT = FT(0.0)    # m | lower height from the ground
 
     # hydraulic parameter
-    b    ::Float32 = 2.0      # MPa               | Weibull B
-    c    ::Float32 = 5.0      #                   | Weibull C
-    k_max::Float32 = 8.333    # mol s⁻¹ MPa⁻¹     | maximal hydraulic conductance, = 5400.0 * 8/3 Kg h⁻¹ MPa⁻¹ m⁻² basal area
-    k_s  ::Float32 = 250.0    # mol s⁻¹ MPa⁻¹ m⁻² | maximal hydraulic conductivity per cross section area per tree height
+    b    ::FT = FT(  2.0  )    # MPa               | Weibull B
+    c    ::FT = FT(  5.0  )    #                   | Weibull C
+    k_max::FT = FT(  8.333)    # mol s⁻¹ MPa⁻¹     | maximal hydraulic conductance, = 5400.0 * 8/3 Kg h⁻¹ MPa⁻¹ m⁻² basal area
+    k_s  ::FT = FT(250.0  )    # mol s⁻¹ MPa⁻¹ m⁻² | maximal hydraulic conductivity per cross section area per tree height
 
     # flows and pressures (need to be updated with time)
-    p_ups::Float32 = 0.0    # MPa     | xylem pressure at the tree basa (upstream)
-    p_dos::Float32 = 0.0    # MPa     | xylem pressure at the trunk-stem or stem-leaf joint (downstream)
-    q    ::Float32 = 0.0    # mol s⁻¹ | flow rate in the xylem
+    p_ups::FT = FT(0.0)    # MPa     | xylem pressure at the tree basa (upstream)
+    p_dos::FT = FT(0.0)    # MPa     | xylem pressure at the trunk-stem or stem-leaf joint (downstream)
+    q    ::FT = FT(0.0)    # mol s⁻¹ | flow rate in the xylem
 
     # pressure, k, and p_history profile
-    k_element::Array{Float32,1} =  ones(10) * 83.33     # mol s⁻¹ MPa⁻¹ | a list of trunk k_max per element
-    p_element::Array{Float32,1} = zeros(10)             # MPa           | a list of trunk xylem pressure per element
-    p_history::Array{Float32,1} = zeros(10)             # MPa           | a list of trunk xylem pressure history per element
-    t_element::Array{Float32,1} =  ones(10) * 298.15    # K             | a list of stem temperature for each element
-    z_element::Array{Float32,1} =  ones(10) * 0.3       # m             | a list of trunk height per element
+    k_element::Array{FT,1} =  ones(FT,10) * FT( 83.33)    # mol s⁻¹ MPa⁻¹ | a list of trunk k_max per element
+    p_element::Array{FT,1} = zeros(FT,10)                 # MPa           | a list of trunk xylem pressure per element
+    p_history::Array{FT,1} = zeros(FT,10)                 # MPa           | a list of trunk xylem pressure history per element
+    t_element::Array{FT,1} =  ones(FT,10) * FT(298.15)    # K             | a list of stem temperature for each element
+    z_element::Array{FT,1} =  ones(FT,10) * FT(  0.3 )    # m             | a list of trunk height per element
 end
 
 
 
 
 # struct for tree stem
-function create_branch_list(n=20, z_lo=3.0, z_hi=8.0)
+function create_branch_list(FT, n=20, z_lo=3.0, z_hi=8.0)
     # create a list of branches following the default of stem
-    branch_list = [StructTreeStem() for i in 1:n]
+    branch_list = [StructTreeStem{FT}() for i in 1:n]
 
     # iterate through the branch for each canopy layers
     for i in 1:n
@@ -52,7 +52,7 @@ end
 
 
 # branch struct
-Base.@kwdef mutable struct StructTreeBranch
+Base.@kwdef mutable struct StructTreeBranch{FT<:AbstractFloat, n}
     # branch structure
-    branch_list::Array{StructTreeStem,1} = create_branch_list()    # | a list of struct_tree_stem
+    branch_list::Array{StructTreeStem{FT},1} = create_branch_list(FT,n)    # | a list of struct_tree_stem
 end

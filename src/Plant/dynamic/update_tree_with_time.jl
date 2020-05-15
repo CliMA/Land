@@ -1,7 +1,7 @@
 using Parameters
 
 # function to update the tree with time, default at a Δt=1s using Wang-2020 scheme
-function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String="Wang2020", updating=false)
+function update_tree_with_time(tree::StructTree, Δt::FT=FT(1.0); scheme::String="Wang2020", updating=false) where {FT}
     # 0. unpack necessary structs
     @unpack branch_list = tree.branch
     @unpack canopy_list = tree.canopy
@@ -23,8 +23,7 @@ function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String
                                                        par_list = canopyi.par_list,
                                                           p_atm = canopyi.p_atm,
                                                            p_O₂ = canopyi.p_O₂,
-                                                            r25 = canopyi.r_25,
-                                                           unit = "K")
+                                                            r25 = canopyi.r_25)
         canopyi.an_list = anagrpi_lists[1]
         canopyi.ag_list = anagrpi_lists[2]
         canopyi.r_list  = anagrpi_lists[3]
@@ -70,7 +69,7 @@ function update_tree_with_time(tree::StructTree, Δt::Number=1.0; scheme::String
         list_∂Θ∂E = get_marginal_penalty_wang(canopyi)
 
         canopyi.gsw_list += canopyi.gs_nssf .* (list_∂A∂E - list_∂Θ∂E) .* Δt
-        canopyi.gsw_list[ canopyi.gsw_list .<0 ] .= 0.0
-        canopyi.gsc_list  = canopyi.gsw_list ./ 1.6 ./ ( 1.0 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+        canopyi.gsw_list[ canopyi.gsw_list .<0 ] .= FT(0.0)
+        canopyi.gsc_list  = canopyi.gsw_list ./ FT(1.6) ./ ( FT(1.0) .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
     end
 end

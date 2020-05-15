@@ -14,8 +14,7 @@ function get_marginal_gain(canopyi::StructTreeCanopyLayer, indx::Number)
                                              par = canopyi.par_list[indx],
                                            p_atm = canopyi.p_atm,
                                             p_O₂ = canopyi.p_O₂,
-                                             r25 = canopyi.r_25,
-                                            unit = "K")
+                                             r25 = canopyi.r_25)
     leaf_a1   = anagrpi[1]
 
     # mol CO₂ mol⁻¹ H₂O, 1e-6 mol (H₂O) and μmol = 1e-6 mol (CO₂) cancel out
@@ -40,8 +39,7 @@ function get_marginal_gain(canopyi::StructTreeCanopyLayer)
                                              par_list = canopyi.par_list,
                                                 p_atm = canopyi.p_atm,
                                                  p_O₂ = canopyi.p_O₂,
-                                                  r25 = canopyi.r_25,
-                                                 unit = "K")
+                                                  r25 = canopyi.r_25)
     leaf_a1   = anagrpi_l[1]
 
     # mol CO₂ mol⁻¹ H₂O, 1e-6 mol (H₂O) and μmol = 1e-6 mol (CO₂) cancel out
