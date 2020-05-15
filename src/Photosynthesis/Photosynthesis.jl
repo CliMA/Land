@@ -31,8 +31,8 @@ include("surface_fluxes_land.jl")
 include("photosynthesis_rates.jl")
 include("rate_constants.jl")
 include("respiration_models.jl")
+include("stomatal_models.jl")
 include("fluorescence_models.jl")
-
 include("leaf_photosynthesis.jl")
 include("leaf_energy_water_balance.jl")
 

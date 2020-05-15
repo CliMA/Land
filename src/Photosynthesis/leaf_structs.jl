@@ -50,6 +50,10 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     Fm′::TT = 0;    # dark-adapted fluorescence yield Fm
     "steady-state (light-adapted) yield Ft (aka Fs)"
     ϕs::TT = 0;     # steady-state (light-adapted) yield Ft (aka Fs)
+
+    "PSII yield"
+    φ::TT = 0;
+
     "Photochemical quenching"
     qQ::TT = 0;     # 
     qE::TT = 0;     # non-photochemical quenching
@@ -95,12 +99,20 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     "Steady state Stomatal conductance (μmol/m2/s)"
     gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s);
 
+    "ppm to Pa conversion"
+    ppm_to_Pa::TT = 0.1;
     # Photosynthesis rates
     Ag::TT = 0
+    An::TT = 0
     Ai::TT = 0
+    Ac::TT = 0
     Aj::TT = 0
     Ap::TT = 0
 
+    H::TT = 0
+    LE::TT = 0
+    "APAR"
+    APAR::TT = 100
              
     # Placeholders for MM constants (need to be set with current Temperature):
     "Michaelis-Menten constant for CO₂ (Pa)"
@@ -148,8 +160,7 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     "Potential ETR"
     Je_pot::TT = 0.0
-    "Actual Potential ETR"
-    Ja::TT = 0.0
+    
 
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
@@ -176,13 +187,13 @@ end
 
 " Just a placeholder for now"
 Base.@kwdef mutable struct meteo{TT<:Number}
-     S_down::TT = -999.;
-     L_down::TT = -999.;
-     T_air::TT  = -999.;      # T in K
-     e_air::TT  = -999.;
+     S_down::TT = 0.;
+     L_down::TT = 0.;
+     T_air::TT  = 280.;      # T in K
+     e_air::TT  = 1500.;
      P_air::TT  =  1e5 ;      # surface pressure (Pa)
      Ca::TT     =  400.;
-     PAR::TT    = -999.;
+     PAR::TT    = 0.;
      U::TT      = 1e-6;
      zscreen::TT= 10.0; # measurement height - default
      L::TT      = 1e6;  # atmospheric Obukhov length
@@ -197,29 +208,7 @@ Base.@kwdef mutable struct meteo{TT<:Number}
 end
 
 
-Base.@kwdef mutable struct fluxes{TT<:Number}
-  Je::TT = 1100.0
-  Ac::TT = 0.0
-  Aj::TT = 0.0
-  Ai::TT = 0.0
-  Ap::TT = 0.0
-  Ag::TT = 0.0
-
-  Rd::TT = 0.0
-  
-  Je_red::TT = 0.0
-  φ::TT = 0.0
-  Rn::TT = 0.0
-  H::TT = 0.0
-  LE::TT = 0.0
-  Sap::TT = 0.0
-  An_biochemistry::TT = 0.0
-  An_diffusion::TT = 0.0
-
-end
-
-
-
+# Need to ba abstracted as well!
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivitytimes Delta Psi
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck)/max(psis-psi_l,1e-6); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
     #println("k_xylem = ",l.kx," psi_s=",psis," psi_l=",psi_l)

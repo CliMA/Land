@@ -10,7 +10,7 @@ struct  C4CollatzPhoto <: AbstractC4Photosynthesis end
 
 "Compute ETR (Je) from Jmax and Jpot using quadratic"
 function electron_transport_rate!(model::AbstractPhotosynthesisModel, leaf, APAR)
-    @unpack  Γstar, Cc, Vcmax, maxPSII, Jmax,θ_j, PSII_frac = leaf
+    @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
     leaf.Je_pot = PSII_frac * maxPSII * APAR;
     leaf.Je = lower_quadratic(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax)
 end
@@ -22,7 +22,7 @@ Solution when Rubisco activity is limiting (Classical Farquhar, von Caemmerer, B
 """
 function rubisco_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
     @unpack  Γstar, Cc, Kc, Ko, o₂, Vcmax = leaf
-    leaf.Ac = Vcmax * max(Cc-Γstar, 0) / (Cc + Kc*(1 +o₂/Ko))
+    leaf.Ac = Vcmax * max(met.ppm_to_Pa*Cc-Γstar, 0) / (met.ppm_to_Pa*Cc + Kc*(1 +o₂/Ko))
 end
 
 """
@@ -42,7 +42,7 @@ Using curvature θ_j and Jmax
 function light_limited_rate!(model::AbstractC3Photosynthesis, leaf, met, APAR)
     @unpack  Γstar, Cc = leaf
     electron_transport_rate!(model, leaf, APAR) 
-    leaf.Aj = leaf.Je * max(Cc-Γstar, 0) / (4Cc + 8Γstar)
+    leaf.Aj = leaf.Je * max(met.ppm_to_Pa*Cc-Γstar, 0) / (4*met.ppm_to_Pa*Cc + 8Γstar)
 end
 
 ############  model::C3FvCBPhotoATP #################################
@@ -55,7 +55,7 @@ Using curvature θ_j and Jmax
 function light_limited_rate!(model::C3FvCBPhotoATP, leaf, met, APAR)
     @unpack  Γstar, Cc = leaf
     electron_transport_rate!(model, leaf, APAR)
-    leaf.Aj = leaf.Je * max(Cc-Γstar, 0) / (4.5*Cc + 10.5*Γstar)
+    leaf.Aj = leaf.Je * max(met.ppm_to_Pa*Cc-Γstar, 0) / (4.5*met.ppm_to_Pa*Cc + 10.5*Γstar)
 end
 
 
@@ -83,8 +83,8 @@ Using curvature θ_j and Jmax
 """
 function light_limited_rate!(model::C3FvCBPhotoGs,  leaf, met, APAR)
     @unpack  Γstar, Cc, gs, gm, Rd = leaf
-    @unpack  Ca, ra, g_m_s_to_mol_m2_s = flux
-    electron_transport_rate!(model, flux, leaf)
+    @unpack  Ca, ra, g_m_s_to_mol_m2_s = met
+    electron_transport_rate!(model, leaf, APAR)
     a = 4*(ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(4Ca + 8Γstar) - (leaf.Je - 4Rd)*a/4
     c = leaf.Je * (Ca-Γstar) - Rd * (4Ca + 8Γstar)
@@ -118,7 +118,7 @@ Solution for PEP carboxylase-limited rate of carboxylation
 """
 function product_limited_rate!(model::C4CollatzPhoto, leaf)
     @unpack  Kp,Vpmax, Cc = leaf
-    leaf.Ap = Vpmax * CC / (Cc + Kp)
+    leaf.Ap = Vpmax * met.ppm_to_Pa*CC / (met.ppm_to_Pa*Cc + Kp)
 end
 
 

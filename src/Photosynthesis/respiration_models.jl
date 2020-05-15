@@ -8,7 +8,7 @@ Base.@kwdef struct RespirationCLM{FT} <: AbstractLeafRespiration
     "Entropy term for Respiration (J/mol/K)"
     ΔS::FT    = 490.;                       # Entropy term for Rd (J/mol/K)
     "Scaling factor for high temperature inhibition (25 C = 1.0)"
-    scale::FT    = fth25(Hd, Se);          # Scaling factor for high temperature inhibition (25 C = 1.0)
+    scale::FT    = fth25(ΔHd, ΔS);          # Scaling factor for high temperature inhibition (25 C = 1.0)
 end
 
 Base.@kwdef struct RespirationBernacchi{FT} <: AbstractLeafRespiration
