@@ -54,4 +54,5 @@ function leaf_fluorescence!(model::FlexasTolBerryFluorescence, leaf::leaf_params
     leaf.qQ   = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
     leaf.qE   = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
     leaf.NPQ  = leaf.Kn/(Kf+Kd);
+    return
 end

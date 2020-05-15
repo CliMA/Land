@@ -27,8 +27,7 @@ function LeafPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met:
   met.g_m_s_to_mol_m2_s = (met.P_air-met.e_air)/(physcon.Rgas*met.T_air) 
   met.ppm_to_Pa = (met.P_air-met.e_air)*1e-6
 
-  # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
-  boundary_layer_resistance!(mo.BoundaryLayer, leaf,  met)
+  
   # Compute Cc and Photosynthesis:
   if leaf.dynamic_state
     CcFunc!(mo, leaf, met)
@@ -37,7 +36,8 @@ function LeafPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met:
   end
 
   # Compute Fluorescence
-  leaf_fluorescence!(mo.fluorescence,  leaf)
+  leaf_fluorescence!(mo.fluorescence,  leaf);
+  return leaf.An
 
 end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
@@ -48,8 +48,7 @@ end # LeafPhotosynthesis (similar to biochem in SCOPE)
 Compute Assimilation using Cc as input
 """
 function CcFunc!(mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
-    @unpack Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc = leaf
-    @unpack Ca, ra, g_m_s_to_mol_m2_s, e_air = met
+    
     #@show Cc
     # Compute Rubisco Limited Photosynthesis
     rubisco_limited_rate!(mods.photosynthesis, leaf, met)
@@ -58,22 +57,27 @@ function CcFunc!(mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
     # Product limited rate
     product_limited_rate!(mods.photosynthesis, leaf)
     
+    # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
+    boundary_layer_resistance!(mods.BoundaryLayer, leaf,  met)
+
+    @unpack Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc = leaf
+    @unpack Ca, ra, g_m_s_to_mol_m2_s, e_air = met
+
     # add colimitation later:
     leaf.Ag = min(Ac,Aj,Ap) # gross assimilation
     #@show leaf.Ag
     # Net photosynthesis due to biochemistry
     leaf.An = leaf.Ag - leaf.Rd # net assimilation
-
-    
-
-    # Compute stomatal conductance:
-    stomatal_conductance!(mods.stomatal, leaf)
+    @show leaf.Ag
     # CO2 at leaf surface
     # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
     leaf.Cs = Ca + gleaf*ra/g_m_s_to_mol_m2_s*(Cc-Ca)
     leaf.gleaf = 1 / (ra/g_m_s_to_mol_m2_s + 1.6/gs + 1/gm)
     leaf.VPD       = max(esat-e_air,1.0); # can be negative at spin up
     leaf.RH        = min(max(e_air/esat,0.001),0.999);    # will need to be corrected alter to define surface RH
+    # Compute stomatal conductance:
+
+    #stomatal_conductance!(mods.stomatal, leaf)
 
     ΔCc = Ca-leaf.An/leaf.gleaf - Cc
     leaf.Cc = Ca-leaf.An/leaf.gleaf

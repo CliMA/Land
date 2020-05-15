@@ -10,6 +10,8 @@ export leaf_params, setLeafT!, BallBerry!, Medlyn!, Gentine!, setkx!, setLeafkl!
 
 export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!
 
+export FlexasTolBerryFluorescence, BallBerryStomata, GentineLeafBoundary
+
 export AbstractLeafRespiration, RespirationCLM, RespirationBernacchi
 
 export AbstractPhotosynthesisModel, C3FvCBPhoto, C3FvCBPhotoGs, C3FvCBPhotoATP, C4CollatzPhoto

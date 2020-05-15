@@ -1,5 +1,11 @@
 # This file is machine-generated - editing it directly is not advised
 
+[[AbstractFFTs]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "051c95d6836228d120f5f4b984dd5aba1624f716"
+uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
+version = "0.5.0"
+
 [[AbstractTrees]]
 deps = ["Markdown"]
 git-tree-sha1 = "33e450545eaf7699da1a6e755f9ea65f14077a45"
@@ -38,9 +44,9 @@ version = "2.8.7"
 
 [[ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "0517f50df07250903194a94c2bc793c2bc239a76"
+git-tree-sha1 = "a504dca2ac7eda8761c8f7c1ed52427a1be75a3c"
 uuid = "4c555306-a7a7-4459-81d9-ec55ddd5c99a"
-version = "0.3.1"
+version = "0.2.6"
 
 [[AxisAlgorithms]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
@@ -50,9 +56,9 @@ version = "1.0.0"
 
 [[BandedMatrices]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "d5ed67b395794ca6997e91ddb2bd7d04746a0d9e"
+git-tree-sha1 = "66629f153db5efd8ee0209e78e938e79463ae850"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.15.8"
+version = "0.15.7"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -154,9 +160,9 @@ version = "0.2.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "b0ae6133d365da2dbc88bc43d997b1b95c9df5f6"
+git-tree-sha1 = "48c20c43e157c6eab6cf88326504ec042b05e456"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.9.1"
+version = "3.10.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Libdl", "Pkg"]
@@ -381,6 +387,10 @@ git-tree-sha1 = "e4813d187be8c7b993cb7f85cbf2b7bfbaadc694"
 uuid = "069b7b12-0de2-55c6-9aab-29f3d0a68a2e"
 version = "1.1.1"
 
+[[Future]]
+deps = ["Random"]
+uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "LinearAlgebra", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
 git-tree-sha1 = "1185d50c5c90ec7c0784af7f8d0d1a600750dc4d"
@@ -422,6 +432,12 @@ deps = ["Libdl", "Pkg", "Zlib_jll"]
 git-tree-sha1 = "85bd2e586a10ae0eab856125bf5245e0d36384a7"
 uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
 version = "1.10.5+5"
+
+[[IRTools]]
+deps = ["InteractiveUtils", "MacroTools", "Test"]
+git-tree-sha1 = "8845400bd2d9815d37720251f1b53d27a335e1f4"
+uuid = "7869d1d1-7146-5819-86e3-90919afe41df"
+version = "0.3.2"
 
 [[IncGammaBeta]]
 deps = ["SpecialFunctions"]
@@ -638,6 +654,12 @@ git-tree-sha1 = "cce0463af83a0f36c7bfa5820e373ac090cc46ad"
 uuid = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
 version = "4.3.0"
 
+[[NNlib]]
+deps = ["BinaryProvider", "Libdl", "LinearAlgebra", "Requires", "Statistics"]
+git-tree-sha1 = "d9f196d911f55aeaff11b11f681b135980783824"
+uuid = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
+version = "0.6.6"
+
 [[NaNMath]]
 git-tree-sha1 = "928b8ca9b2791081dc71a51c55347c27c618760f"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
@@ -685,9 +707,9 @@ version = "1.2.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "ExponentialUtilities", "FiniteDiff", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "NLsolve", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays", "UnPack"]
-git-tree-sha1 = "de79fdddb8bea093617458a2c7503191f1d533f3"
+git-tree-sha1 = "98ae9c7d2bb987a6ab0e4664ff9f6252052c18fb"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.38.0"
+version = "5.38.1"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
@@ -1083,6 +1105,12 @@ deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "f23995a6ab76d634865204fe0a4e7254d1a6d1f9"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
 version = "1.4.4+1"
+
+[[Zygote]]
+deps = ["AbstractFFTs", "ArrayLayouts", "DiffRules", "FillArrays", "ForwardDiff", "Future", "IRTools", "InteractiveUtils", "LinearAlgebra", "MacroTools", "NNlib", "NaNMath", "Random", "Requires", "SpecialFunctions", "Statistics", "ZygoteRules"]
+git-tree-sha1 = "707ceea58e2bd0ff3077ab13a92f8355181d3ee4"
+uuid = "e88e6eb3-aa80-5325-afca-941959d7151f"
+version = "0.4.20"
 
 [[ZygoteRules]]
 deps = ["MacroTools"]
