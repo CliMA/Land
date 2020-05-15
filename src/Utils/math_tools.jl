@@ -90,7 +90,7 @@ function log_gamma_function(x)
   return tmp + log(stp*ser/x)
 end # function log_gamma_function
 
-function hybrid(flux,leaf, func::Function, xa, xb, tol)
+function hybrid(mods, leaf, meteo, func::Function, xa, xb, tol)
     #
     # !DESCRIPTION:
     # Solve for the root of a function, given initial estimates xa and xb.
@@ -106,11 +106,13 @@ function hybrid(flux,leaf, func::Function, xa, xb, tol)
     itmax = 40
     x0 = x1 = f0 = f1 = 0.0
     x0 = xa
-    f0 = func(x0,flux, leaf)
+    leaf.Cc = x0
+    f0 = func(mods,leaf, meteo)
     if (f0 == 0.0) return  x0 end
 
     x1 = xb
-    f1 = func(x1,flux, leaf)
+    leaf.Cc = x1
+    f1 = func(mods,leaf, meteo)
     if (f1 == 0.0) return x1 end
 
     if (f1 < f0)
@@ -133,7 +135,8 @@ function hybrid(flux,leaf, func::Function, xa, xb, tol)
        x0 = x1
        f0 = f1
        x1 = x
-       f1 = func(x1,flux, leaf)
+       leaf.Cc = x1
+       f1 = func(mods,leaf, meteo)
        if (f1 < minf)
       minx = x1
       minf = f1
@@ -141,14 +144,14 @@ function hybrid(flux,leaf, func::Function, xa, xb, tol)
 
        # If a root zone is found, use the brent method for a robust backup strategy
        if (f1 * f0 < 0.0)
-      x = zbrent(flux,  leaf,func,x0, x1, xtol=tol)
+      x = zbrent(mods,leaf,meteo,func,x0, x1, xtol=tol)
       x0 = x
       break
        end
 
        # In case of failing to converge within itmax iterations stop at the minimum function
        if (iter > itmax)
-      f1 = func(minx,flux, leaf)
+      f1 = func(mods,leaf, meteo)
       x0 = minx
       break
        end
@@ -158,12 +161,14 @@ function hybrid(flux,leaf, func::Function, xa, xb, tol)
     return x0
 end #function hybrid
 
-function zbrent(flux,leaf,f::Function, x0, x1, args::Tuple=();
+function zbrent(mods,leaf,meteo, f::Function, x0, x1, args::Tuple=();
        xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
        maxiter::Integer=50)
     EPS = eps(Float64)
-    y0 = f(x0,flux,leaf)
-    y1 = f(x1,flux,leaf)
+    leaf.Cc = x0
+    y0 = f(mods,leaf, meteo)
+    leaf.Cc = x1
+    y1 = f(mods,leaf, meteo)
     if abs(y0) < abs(y1)
     # Swap lower and upper bounds.
     x0, x1 = x1, x0
@@ -204,8 +209,8 @@ function zbrent(flux,leaf,f::Function, x0, x1, args::Tuple=();
     else
     bisection = false
     end
-
-    y = f(x,flux,leaf)
+    leaf.Cc = x
+    y = f(mods,leaf, meteo)
     # y-tolerance.
     if abs(y) < ytol
     return x
