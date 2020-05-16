@@ -206,9 +206,9 @@ version = "1.3.0"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "6166ecfaf2b8bbf2b68d791bc1d54501f345d314"
+git-tree-sha1 = "7d7578b00789cf16c5f68fad71868e773edd58a2"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.17.15"
+version = "0.17.16"
 
 [[Dates]]
 deps = ["Printf"]
@@ -238,15 +238,15 @@ version = "2.13.1"
 
 [[DiffEqFinancial]]
 deps = ["DiffEqBase", "DiffEqNoiseProcess", "LinearAlgebra", "Markdown", "RandomNumbers"]
-git-tree-sha1 = "734f3cc101f9b90ddf4bc8bf1fdddf3d9f185a66"
+git-tree-sha1 = "f0c6f2b0b9fa463a90da06142e45ecf8e0b70bac"
 uuid = "5a0ffddc-d203-54b0-88ba-2c03c0fc2e67"
-version = "2.2.1"
+version = "2.3.0"
 
 [[DiffEqJump]]
 deps = ["Compat", "DataStructures", "DiffEqBase", "FunctionWrappers", "LinearAlgebra", "Parameters", "PoissonRandom", "Random", "RandomNumbers", "RecursiveArrayTools", "StaticArrays", "Statistics", "TreeViews"]
-git-tree-sha1 = "79c426a42f09e02223aa792924fe16725e9bf50f"
+git-tree-sha1 = "b337929b13908dcd4851b9f7223ed36383c39b50"
 uuid = "c894b116-72e5-5b58-be3c-e6d8d4ac2b12"
-version = "6.6.3"
+version = "6.7.3"
 
 [[DiffEqNoiseProcess]]
 deps = ["DataStructures", "DiffEqBase", "LinearAlgebra", "Random", "RandomNumbers", "RecipesBase", "RecursiveArrayTools", "Requires", "ResettableStacks", "StaticArrays", "Statistics"]
