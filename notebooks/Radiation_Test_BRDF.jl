@@ -11,7 +11,7 @@ pyplot()
 
 # First, we include Revise (good for debugging) and Parameters (tools for structures)
 
-using Revise
+#using Revise
 using Parameters
 #----------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ ylabel!("Fluorescence")
 # 
 # Here, we just create another leaf with different concentrations to show the impact on leaf reflectance and transmission due to changes in chlorophyll content and liquid water content (mostly in the two liquid water absorption bands at 1400 and 1900nm).
 
-## Let's create a leaf with a different Cab and Cw (water) content:
+## Let's create a leaf with a different Cab and Cw (water) content (<span style="color:red">Try changing other pigment contents, plot leaf reflectance and transmissions and explain where (spectrally) and why reflectance and transmission changes</span>):
 leaf_2 = leafbio{FT, length(wl), length(wle), length(wlf),length(wle)*length(wlf)}();
 leaf_2.Cab = 80
 leaf_2.Cw = 0.012
