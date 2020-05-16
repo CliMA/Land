@@ -111,6 +111,8 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     H::TT = 0
     LE::TT = 0
+    Rn::TT = 0
+    Sap::TT = 0;
     "APAR"
     APAR::TT = 100
              

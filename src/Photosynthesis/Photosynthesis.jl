@@ -10,7 +10,7 @@ export leaf_params, setLeafT!, BallBerry!, Medlyn!, Gentine!, setkx!, setLeafkl!
 
 export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!
 
-export FlexasTolBerryFluorescence, BallBerryStomata, GentineLeafBoundary
+export FlexasTolBerryFluorescence, BallBerryStomata, GentineLeafBoundary, GentineStomata
 
 export AbstractLeafRespiration, RespirationCLM, RespirationBernacchi
 
@@ -25,6 +25,8 @@ export JmaxCLM, VcmaxCLM, JmaxBernacchi, VcmaxBernacchi, Vpmax, MM_CLM
 export AbstractFluorescenceModel, FlexasTolBerry_fluorescence
 
 export rubisco_limited_rate!, light_limited_rate!
+
+export physcon, SatVap
 
 
 include("../Utils/math_tools.jl")

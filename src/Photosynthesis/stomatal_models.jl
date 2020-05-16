@@ -11,14 +11,14 @@ abstract type AbstractClassicalStomatalModel <: AbstractStomatalModel end
 
 Base.@kwdef struct BallBerryStomata{FT} <: AbstractClassicalStomatalModel
     "Ball-Berry minimum leaf conductance (moles/m2/s)"
-    g0::FT = 0.1;                      
+    g0::FT = 0.025;                      
     "Ball-Berry slope of conductance-photosynthesis relationship"
     g1::FT = 9.0;
 end
 
 Base.@kwdef struct GentineStomata{FT} <: AbstractClassicalStomatalModel
     "Ball-Berry minimum leaf conductance (moles/m2/s)"
-    g0::FT = 0.1;                      
+    g0::FT = 0.025;                      
     "Ball-Berry slope of conductance-photosynthesis relationship"
     g1::FT = 9.0;
 end
@@ -36,7 +36,8 @@ function stomatal_conductance!(mod::BallBerryStomata, l)
   #  RH  : relative humidity [0-1]
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
-  l.gs = mod.g1 * max(l.An,1e-9) * l.RH/l.Cs  + mod.g0;
+  gs = mod.g1 * max(l.An,1e-9) * l.RH/l.Cs  + mod.g0;
+  l.dynamic_state ?   l.gs_ss = gs : l.gs = gs
 end # function
 
 
@@ -48,7 +49,8 @@ function stomatal_conductance!(mod::MedlynStomata, l)
   #  RH  : relative humidity [0-1]
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
-  l.gs = (1 +mod.g1/sqrt(l.VPD)) * max(l.An,1e-9) /l.Cs  + mod.g0;
+  gs = (1 +mod.g1/sqrt(l.VPD)) * max(l.An,1e-9) /l.Cs  + mod.g0;
+  l.dynamic_state ?   l.gs_ss = gs : l.gs = gs 
 end # function
 
 
@@ -59,6 +61,7 @@ function stomatal_conductance!(mod::GentineStomata, l)
   #  An   : Net assimilation in 'same units of CO2 as Cs' micromoles/m2/s
   #  gs   : moles/m2/s
   setLeafkl!(l, l.psi_l) # set hydraulic conductivity of leaf
-  l.gs = mod.g1*l.kleaf/l.kmax * max(l.An,1e-9) /l.Cs  + mod.g0;
+  gs = mod.g1*l.kleaf/l.kmax * max(l.An,1e-9) /l.Cs  + mod.g0;
+  l.dynamic_state ?   l.gs_ss = gs : l.gs = gs
 end # function
 

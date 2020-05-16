@@ -68,7 +68,7 @@ function CcFunc!(mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
     #@show leaf.Ag
     # Net photosynthesis due to biochemistry
     leaf.An = leaf.Ag - leaf.Rd # net assimilation
-    @show leaf.Ag
+    #@show leaf.Ag
     # CO2 at leaf surface
     # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
     leaf.Cs = Ca + gleaf*ra/g_m_s_to_mol_m2_s*(Cc-Ca)
@@ -77,7 +77,7 @@ function CcFunc!(mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
     leaf.RH        = min(max(e_air/esat,0.001),0.999);    # will need to be corrected alter to define surface RH
     # Compute stomatal conductance:
 
-    #stomatal_conductance!(mods.stomatal, leaf)
+    stomatal_conductance!(mods.stomatal, leaf)
 
     ΔCc = Ca-leaf.An/leaf.gleaf - Cc
     leaf.Cc = Ca-leaf.An/leaf.gleaf
