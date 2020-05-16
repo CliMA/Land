@@ -2,35 +2,23 @@
 #using Revise
 
 # Add PATH
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
+#push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
 
 #using PyPlot
 using Plots
 using BenchmarkTools
 using DifferentialEquations
 
-using LSM.PhysCon
-using LSM.WaterMod
-#using LSM.LeafPhotosynthesisMod
-using LSM.LeafEnergyWaterBalanceMod
+using Land
+using Land.PhysCon
+using Land.WaterVapor
+using Land.Leaf
 
-output_dir = joinpath(@__DIR__,"..","output")
-mkpath(output_dir)
-
-# stab_type_stable = 2;
-# z_L = -2.0:0.001:2.0;
-# psim_z = zeros(size(z_L));
-# psih_z = zeros(size(z_L));
-# for i=1:length(z_L) 
-#     psim_z[i] = ψ_m(z_L[i],stab_type_stable);
-#     psih_z[i] = ψ_h(z_L[i],stab_type_stable);
-# end
-
-# plot(z_L,psih_z,label="psi_h")
-# plot!(z_L,psim_z,label="psi_m")
+output_dir = joinpath(@__DIR__,"output")
+#mkpath(output_dir)
 
 using DelimitedFiles
-PAR  = readdlm("PAR.dat");
+PAR  = readdlm("/Users/cfranken/PAR.dat");
 size(PAR)
 # use just a subset 
 #PAR = PAR[1:1000,:];
@@ -49,7 +37,7 @@ mutable struct parameters_ode
 end
 
 function f_ode!(du,u,p,t) # p are parameters
-    du .= LeafEnergyWaterBalance(u[1], u[2], u[3], p.met, p.l, p.f, p.psi_s);
+    du .= LeafEnergyWaterBalance(u[1], u[2], u[3], p.met, p.l, p.f, p.psi_s)[1:3];
     #println("du_inside = $(du), u_inside = $(u)")
 end
 
@@ -83,7 +71,7 @@ l.Cc = 0.6*400;
 tspan      =  (0.0,1.0);
 
 
-
+dt     = 0.1*60
 for c = 2:1:tmax
     #println(apar[c])
        met.S_down = PAR[c]/(45/100*physcon.Wtoμmole_s);
@@ -116,6 +104,12 @@ for c = 2:1:tmax
        #l.Kp = 4
        u    = [l.T;l.psi_l;l.Cc];
        p    = parameters_ode(l,met,f,psi_s);
+       du   = zeros(size(u));
+       f_ode!(du,u,p,t);
+       # just remove Cc part here.
+       #du[3]=0
+            #@show l.gs
+        (l.T,l.psi_l,l.Cc) = du*dt+u;
         #(p.met, p.l,  p.psi_s, p.U)    = [l;met;psi_s;U];
         #prob = ODEProblem(f_ode!,u0,tspan,p);
         #du   = zeros(size(u));
@@ -128,16 +122,7 @@ for c = 2:1:tmax
 #             f_ode!(du,u,p,t);
 #             (l.T,l.psi_l,l.Cc) = du*dt+u;
 
-       u0   = [l.T;l.psi_l;l.Cc];
-       prob = ODEProblem(f_ode!,u0,tspan,p);
-       sol  = solve(prob);            
-       # save values
-       met = p.met;
-       f   = p.f;
-#        println("gs out 1=",l.gs)
-       l   = p.l;
-#        println("gs out 2=",l.gs)
-       (l.T,l.psi_l,l.Cc) = sol[1:3,end];
+       
             
     
        #LeafPhotosynthesis!(f,l,met)

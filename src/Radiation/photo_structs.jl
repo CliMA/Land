@@ -48,7 +48,7 @@ mutable struct incomingRadiation{FT<:AbstractFloat}
     wl::Array{FT,1}
     "Direct incoming radiation (mW m^-2 μm^-1)"
     E_direct::Array{FT,1}
-    " Diffuse incoming radiation (mW m^-2 μm^-1)"
+    "Diffuse incoming radiation (mW m^-2 μm^-1)"
     E_diffuse::Array{FT,1}
 
 end
@@ -60,40 +60,40 @@ end
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct leafbio{FT<:AbstractFloat,nWl,nWle, nWlf,nWLe_nWLf}
-    "Leaf structure parameter"
-    N::FT    = 1.4       # | -          | (1.0, 3.0)  | "Leaf structure parameter"
-    "Chlorophyll a+b content"
-    Cab::FT  = 40.0      # | μg cm^-2   | (0.0, 110)  | "Chlorophyll a+b content"
-    "Carotenoid content"
-    Car::FT  = 10.0      # | μg cm^-2   | (0.0, 40.0) | "Carotenoid content"
-    "Anthocynanin content"
-    Ant::FT  = 0.0       # | μg cm^-2   | (0.0, 40.0) | "Anthocynanin content"
-    "Senescent material fraction"
-    Cs::FT   = 0.0       # | -          | (0.0, 1.0)  | "Senescent material fraction"
-    "Equivalent water thickness"
-    Cw::FT   = 0.009     # | cm         | (0.0, 0.05) | "Equivalent water thickness"
-    "Dry matter content (dry leaf mass per unit area)"
-    Cm::FT   = 0.012      # | g cm^-2    | (0.0, 0.2)  | "Dry matter content (dry leaf mass per unit area)"
-    "Fractionation between Zeaxanthin and Violaxanthin in Car (1=all Zeaxanthin)"
-    Cx::FT   = 0.0       # | -          | (0.0, 1.0)  | "Fractionation between Zeaxanthin and Violaxanthin in Car (1=all Zeaxanthin)"
-    "Broadband thermal reflectance"
-    ρ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal reflectance"
-    "Broadband thermal transmission"
-    τ_LW::FT = 0.01      # | -          | (0.0, 1.0)  | "Broadband thermal transmission"
-    "Leaf fluorescence efficiency"
-    fqe::FT = 0.01       # | -          | (0.0, 1.0)  | "Leaf fluorescence efficiency"
+    "Leaf structure parameter (-)"
+    N::FT    = 1.4      
+    "Chlorophyll a+b content (µg cm-2)"
+    Cab::FT  = 40.0      
+    "Carotenoid content (µg cm-2)"
+    Car::FT  = 10.0      
+    "Anthocynanin content (µg cm-2)"
+    Ant::FT  = 0.0       
+    "Senescent material fraction (-)"
+    Cs::FT   = 0.0      
+    "Equivalent water thickness (cm)"
+    Cw::FT   = 0.009     
+    "Dry matter content (dry leaf mass per unit area) (g cm-2)"
+    Cm::FT   = 0.012      
+    "Fractionation between Zeaxanthin and Violaxanthin in Car (1=all Zeaxanthin) (-)"
+    Cx::FT   = 0.0       
+    "Broadband thermal reflectance (-)"
+    ρ_LW::FT = 0.01      
+    "Broadband thermal transmission (-)"
+    τ_LW::FT = 0.01      
+    "Leaf fluorescence efficiency (Fo standard)"
+    fqe::FT = 1       
 
-    "shortwave leaf reflectance"
-    ρ_SW::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef);    # | -          | (0.0, 1.0)  | "shortwave reflectance"
-    "shortwave leaf transmission"
-    τ_SW::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef);   # | -          | (0.0, 1.0)  | "shortwave transmission"
-    "relative absorbtion by Chlorophyll+Car"
-    kChlrel::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
-    "relative absorbtion by Chlorophyll"
-    kChlrel_old::MArray{Tuple{nWl}, FT,1,nWl} = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
-    "Fluorescence excitation matrix backwards"
+    "shortwave leaf reflectance (-)"
+    ρ_SW::MArray{Tuple{nWl}, FT,1,nWl}           = MArray{Tuple{nWl}, FT}(undef);    # | -          | (0.0, 1.0)  | "shortwave reflectance"
+    "shortwave leaf transmission (-)"
+    τ_SW::MArray{Tuple{nWl}, FT,1,nWl}           = MArray{Tuple{nWl}, FT}(undef);   # | -          | (0.0, 1.0)  | "shortwave transmission"
+    "relative absorbtion by Chlorophyll+Car (-)"
+    kChlrel::MArray{Tuple{nWl}, FT,1,nWl}        = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+    "relative absorbtion by Chlorophyll (-)"
+    kChlrel_old::MArray{Tuple{nWl}, FT,1,nWl}    = MArray{Tuple{nWl}, FT}(undef); # | -          | (0.0, 1.0)  | "relative absorbtion by Chlorophyll"
+    "Fluorescence excitation matrix backwards (-)"
     Mb::MArray{Tuple{nWlf,nWle}, FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle}, FT}(undef);     # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix backwards"
-    "Fluorescence excitation matrix forwards"
+    "Fluorescence excitation matrix forwards (-)"
     Mf::MArray{Tuple{nWlf,nWle}, FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle}, FT}(undef);     # | -          | (0.0, 1.0)  | "Fluorescence excitation matrix forwards"
 end
 
@@ -187,11 +187,15 @@ Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIn
     "Leaf temperature (sunlit) (K)"
     T_sun::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for sunlit leaves"
-    φ_sun::Array{FT,3} = ones(nIncl,nAzi,nLayers)
+    φ_sun::Array{FT,3} = 0.01*ones(nIncl,nAzi,nLayers)
     "Leaf temperature (shaded) (K)"
     T_shade::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for shaded leaves"
-    φ_shade::Array{FT,1} = ones(nLayers)
+    φ_shade::Array{FT,1} = ones(nLayers)*0.01
+    "GPP of sunlit leaves μmoles m^-2 s^-1"
+    GPP_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "GPP of shaded leaves μmoles m^-2 s^-1"
+    GPP_shade::Array{FT,1} = zeros(nLayers)               
 
     # Fluorescence Output:
     "Hemispheric total outgoing SIF flux (mW m^-2 μm^-1))"
@@ -242,15 +246,15 @@ Base.@kwdef mutable struct struct_canopyOptProps{FT<:AbstractFloat,nWL,nLayer,nL
     sof::FT = 0;
 
     # now multi dimensional arrays:
-    "per leaf angles"
+    "conversion factor fs to compute irradiance on inclined leaf"
     fs::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
-    "per leaf angles"
+    "abs(fs)"
     absfs::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}     = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "abs(fs*fo)"
     absfsfo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}    = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "fs*fo"
     fsfo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
-    "per leaf angles"
+    "conversion factor fo for angle towards observer (not sun like fs)"
     fo::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
     "Cosine of leaf azimuths"
     cosΘ_l ::MArray{Tuple{nIncl, nAzi}, FT,2,nIncl_nAzi}          = MArray{Tuple{nIncl, nAzi}, FT}(undef);
@@ -323,6 +327,17 @@ Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat}
     LIDFb::FT          = 0. # | -          | (-1.0, 1.0)  | "Variation in leaf inclination"
     "HotSpot parameter (still need to check!)"
     hot::FT            = 0.05  # | -          | (0, 1.0)     | "HotSpot parameter (still need to check!)"
+    # tree/leaf traits
+    "Canopy height (m)"
+    height::FT      = 20.;                            # tree height (m)
+    "Canopy roughness (m)"
+    z0m::FT         = 1.;                          # tree roughness (m)
+    z0h::FT         = -999.;                          # tree roughness (m) - TODO should be changed later
+    "Canopy displacement height (m)"
+    d::FT           = -999.;                          # tree displacement height (m)
+    "m/sqrt(s) turbulent transfer coefficient"
+    Cd::FT          = 0.01;  
+    
 
     # Some more derived parameters:
     lazitab::Array{FT} = collect(5.0:10.0:355.0)
@@ -387,13 +402,13 @@ end
 function loadSun(swl::Array; file=file_Sun)
     FT = eltype(swl)
     # Read in all optical data:
-    suni = matread(file)["sun"]
-    wl   =  suni["wl"]
-    Edir =  suni["Edirect"]
+    suni  = matread(file)["sun"]
+    wl    =  suni["wl"]
+    Edir  =  suni["Edirect"]
     Ediff =  suni["Ediffuse"]
 
-    wl_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
-    Edir_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    wl_    = MArray{Tuple{length(swl)-1}, Float32}(undef)
+    Edir_  = MArray{Tuple{length(swl)-1}, Float32}(undef)
     Ediff_ = MArray{Tuple{length(swl)-1}, Float32}(undef)
     #println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
     for i in 1:length(swl)-1

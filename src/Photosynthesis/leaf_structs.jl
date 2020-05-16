@@ -1,34 +1,12 @@
-module Leaf
 
-using ..PhysCon
-using ..WaterVapor
+# 
+"""
+    leaf_params
+    Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
 
-
-export leaf_params, setLeafT!, BallBerry!, Medlyn!, setkx!, setLeafkl!, setra!,ψ
-
-# Scaling functions for Photosynthesis temperature response and inhibition
-function ft(tl, ha)
-    FT = eltype(tl)
-    Rgas = FT(8.31446261815324);
-    T25 = FT(298.15) 
-    exp(ha/(Rgas*(T25)) * (1-(T25)/tl));
-end;
-
-function fth(tl, hd, se, fc)
-    FT = eltype(tl)
-    Rgas = FT(8.31446261815324);
-    fc / (1 + exp((-hd+se*tl)/(Rgas*tl)));
-end;
-
-function fth25(hd, se) 
-    FT = eltype(hd)
-    T25 = FT(298.15);
-    Rgas = FT(8.31446261815324); 
-    1 + exp( (-hd + se * T25) / (Rgas * T25 ));
-end;
-
-
-# Structure with all parameter temperature dependencies of a Leaf (largely based on Bonan's Photosynthesis model but exported as struct)
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
 Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     # broadband albedo and emissivity
@@ -36,31 +14,50 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     ε::TT  = -999;                           # longwave emissivity
 
     # thermal characteristics
+    "DRY leaf mass area"
     LMA::TT         = 100e-3;                # DRY leaf mass area, NOT MEAN VALUE WHICH INCLUDES RELATIVE WATER CONTENT - kg/m2 - density times thickness
+    "leaf relative water content"
     RWC::TT         = 0.8;                   # leaf relative water content
+    "leaf specific heat (J/kg/K)"
     Cleaf::TT       = 1000.0;                # leaf specific heat (J/kg/K)
 
     # pore traits
     #pore_density::TT   = 100.0  / (1e-6);     # pore density in pores/m^2
     Chloroplast_rel_volume::TT  = 2.0/100.0;        # hloroplast volume airspace (m^3 per pore) - http://kirschner.med.harvard.edu/files/bionumbers/A%20semi%20quantitative%20analysis%20of%20the%20photosynthetic%20system%20in%20an%20'average'%20C3%20plant%20leaf.pdf
 
+    "Fraction of  absorbed light used by PSII ETR"
+    PSII_frac::TT = 0.5
     # Rate constants (arbitrary units here, only relative rates are important):
+    "Rate constant for fluorescence (const)"
     Kf::TT = 0.05;                           # Rate constant for fluorescence (might try to fit this eventually)
-    Kd::TT = 0.85;                           # Rate constant for thermal dissipation
+    "Rate constant for thermal dissipation"
+    Kd::TT = 0.85;                           # Rate constant for thermal dissipation, can include T dependence later!
+    "Rate constant for photochemistry (all reaction centers open)"
     Kp::TT = 4.0;                            # Rate constant for photochemistry (all reaction centers open)
+    "NPQ rate constant"
     Kn::TT = 0;                              # NPQ rate constant (initially zero)
     Kn_ss::TT = 0;                           # Kn in steady state
+    "max PSII yield"
     maxPSII::TT = Kp/(Kp+Kf+Kd);             # Max PSII yield (Kn=0, all RC open)
-    "Flexas et al derived Fluorescence model params"
-    Knparams = [5.01, 1.93, 10.0]
+    
+    "dark-adapted fluorescence yield Fo"
     Fo::TT = 0;     # dark-adapted fluorescence yield Fo,0
+    "light-adapted fluorescence yield in the dark Fo'"
     Fo′::TT = 0;     # light-adapted fluorescence yield in the dark Fo
+    "dark adapted Fm yield"
     Fm::TT = 0;     # light-adapted fluorescence yield Fm
+    "light adapted Fm' yield"
     Fm′::TT = 0;    # dark-adapted fluorescence yield Fm
+    "steady-state (light-adapted) yield Ft (aka Fs)"
     ϕs::TT = 0;     # steady-state (light-adapted) yield Ft (aka Fs)
-    eta::TT = 0;
-    qQ::TT = 0;     # photochemical quenching
+
+    "PSII yield"
+    φ::TT = 0;
+
+    "Photochemical quenching"
+    qQ::TT = 0;     # 
     qE::TT = 0;     # non-photochemical quenching
+    "Non-Photochemical quenching"
     NPQ::TT = 0;
     "Dynamic Steady state boolean"
     dynamic_state::Bool = false
@@ -68,13 +65,20 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
 
     effcon::TT = 1/5                       # [mol CO2/mol e-]  number of CO2 per electrons - typically 1/5 for C3 and 1/6 for C4, i.e. about 1/10 for both PSI and PSII!
     CO2_per_electron::TT = 1/5             # Similar to above but accounting for Photorespiration as well (which "steals" electrons)
+    "Actual electron transport rate (μmol m-2 s-1)"
     Ja::TT = 0                               # Actual electron transport rate (needed to compute fluorescence later on)
-
+    "C3 or C4 plant boolean"
     C3::Bool = true                           # C3 (or C4) plant
     use_colim::Bool = true                    # Use co-limitation
+
     gstyp::Int = 1                            # stomatal conductance type (1=Ball Berry, 0 = Medlyn)
-    o₂::TT = 0.209e3;                         # Standard O2 in mmol/mol
+    "O2 (mol/mol)"
+    o₂::TT = 0.209;                         # Standard O2 in mol/mol
+    "Leaf temperature (K)"
     T::TT = 298.15;                           # standard temperature (25C)
+    "Old Leaf temperature (K)"   # Will be checked, if no update, don't recalculate!
+    T_old::TT = -1;
+        
     esat::TT = 0.0
     desat::TT = 0.0
     #(esat, desat) = SatVap(T)
@@ -82,80 +86,84 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
     θ_j::TT = 0.90;
 
     # Conductances:
-    # Ball Berry or Medlyn model
-    g0::TT = 0.1;                              # Ball-Berry minimum leaf conductance, unstressed (mol/m2/s) - Sellers  et  al.  (1996)  used  0.1 b=  for  C3  plants  and  0.4 b=for  C4  plants
-    g1_BB::TT = 9.0;                           # Ball-Berry slope of conductance-photosynthesis relationship, unstressed - m=  for  C3  plants  and  4m=  for  C4  plants  (Collatz  et  al.  1991,  1992)
-    g1_Medlyn::TT = 126.49;                    # Medlyn slope of conductance-photosynthesis relationship, unstressed - Pa^(1/2) Medlyn et al. 2017
+    
     vpd_min = 100.0                            # Min VPD for Medlyn model (blows up otherwise?)
     # Add already here: Mesophyll conductance (Inf for now):
 
+    "total leaf conductance (μmol/m2/s)"
     gleaf::TT = 0.1;                           # total leaf conductance (μmol/m2/s)
+    "Mesophyll conductance (μmol/m2/s/)"
     gm::TT = Inf;                              # Mesophyll conductance (μmol/m2/s/)
+    "Stomatal conductance (μmol/m2/s)"
     gs::TT = 0.1;                              # Stomatal conductance (μmol/m2/s); just using some prior
+    "Steady state Stomatal conductance (μmol/m2/s)"
     gs_ss::TT = 0.1;                           # Steady state Stomatal conductance (μmol/m2/s);
 
-    #---------------------------------------------------------------------
-    # Kc, Ko, cp at 25C: Bernacchi et al (2001) Plant, Cell Environment 24:253-259
-    # Derive sco from cp with o2=0.209 mol/mol and re-calculate Γ to allow
-    # variation in O2
-    #---------------------------------------------------------------------
-    Kc_25::TT = 404.9;                         # Michaelis-Menten constant for CO2 at 25C - μmol/mol
-    Ko_25::TT = 278.4;                         # Michaelis-Menten constant for O2 at 25C  - mmol/mol
-    Γ_25_::TT = 42.75;                         # CO2 compensation point at 25C μmol/mol
-    sco::TT = 0.5 * 0.209 / (Γ_25_ * 1.e-06);  # Γ_25 (μmol/mol) -> (mol/mol)
-    Γ_25::TT = 0.5 * o₂ / sco * 1000.;         # O2 is mmol/mol. Multiply by 1000 for μmol/mol
+    "ppm to Pa conversion"
+    ppm_to_Pa::TT = 0.1;
+    # Photosynthesis rates
+    Ag::TT = 0
+    An::TT = 0
+    Ai::TT = 0
+    Ac::TT = 0
+    Aj::TT = 0
+    Ap::TT = 0
 
-    #---------------------------------------------------------------------
-    # Activation energy:
-    # Bernacchi et al (2001) Plant, Cell Environment 24:253-259
-    # Bernacchi et al (2003) Plant, Cell Environment 26:1419-1430
-    # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
-    #---------------------------------------------------------------------
-    Kcha::TT    = 79430.;                      # Activation energy for Kc (J/mol)
-    Koha::TT    = 36380.;                      # Activation energy for Ko (J/mol)
-    cpha::TT    = 37830.;                      # Activation energy for cp (J/mol)
-    Vcmaxha::TT = 65330.;                      # Activation energy for Vcmax (J/mol)
-    Jmaxha::TT  = 43540.;                      # Activation energy for Jmax (J/mol)
-    rdha::TT    = 46390.;                      # Activation energy for Rd (J/mol)
-
-    #---------------------------------------------------------------------
-    # High temperature deactivation:
-    # Leuning (2002) Plant, Cell Environment 25:1205-1210
-    # The factor "c" scales the deactivation to a value of 1.0 at 25C
-    # Acclimation from: Kattge and Knorr (2007) Plant, Cell Environment 30:1176-1190
-    #---------------------------------------------------------------------
-    Vcmaxhd::TT = 150000.;                    # Deactivation energy for Vcmax (J/mol)
-    Jmaxhd::TT  = 150000.;                    # Deactivation energy for Jmax (J/mol)
-    rdhd::TT    = 150000.;                    # Deactivation energy for Rd (J/mol)
-
-    Vcmaxse::TT = 490.;                       # Entropy term for Vcmax (J/mol/K)
-    Jmaxse::TT  = 490.;                       # Entropy term for Jmax (J/mol/K)
-    rdse::TT    = 490.;                       # Entropy term for Rd (J/mol/K)
-
-    Vcmaxc::TT = fth25(Vcmaxhd, Vcmaxse);    # Scaling factor for high temperature inhibition (25 C = 1.0)
-    Jmaxc::TT  = fth25(Jmaxhd, Jmaxse);      # Scaling factor for high temperature inhibition (25 C = 1.0)
-    rdc::TT    = fth25(rdhd, rdse);          # Scaling factor for high temperature inhibition (25 C = 1.0)
-
-    # Initialize at standard T:
-    Kc::TT  = Kc_25;
-    Ko::TT  = Ko_25;
-    Γstar::TT  = Γ_25;
+    H::TT = 0
+    LE::TT = 0
+    Rn::TT = 0
+    Sap::TT = 0;
+    "APAR"
+    APAR::TT = 100
+             
+    # Placeholders for MM constants (need to be set with current Temperature):
+    "Michaelis-Menten constant for CO₂ (Pa)"
+    Kc::TT  = 0;
+    "Michaelis-Menten constant for O₂ (Pa)"
+    Ko::TT  = 0;
+    "Michaelis-Menten constant for PEP carboxylase (Pa)"
+    Kpep::TT  = 0;
+    "CO₂ compensation point (Pa)"
+    Γstar::TT  = 0;
 
     # Use some standard values first
+    "Leaf maximum carboxylation rate at 25C (μmol/m2/s)"
     Vcmax25::TT = 80.0;                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
+    "Leaf maximum PEP carboxylation rate at 25C (μmol/m2/s)"
+    Vpmax25::TT = 120.0;                        # Leaf maximum carboxylation rate at 25C for canopy layer (μmol/m2/s)
+    "Maximum electron transport rate at 25C (μmol/m2/s)"
     Jmax25::TT  = 1.97*Vcmax25;                # C3 - maximum electron transport rate at 25C for canopy layer (μmol/m2/s)
-    Rd25::TT    = 0.7605;                      # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
+    "Leaf respiration rate at 25C (μmol CO2/m2/s)"
+    Rd25::TT    = 0.01*Vcmax25;                      # Leaf respiration rate at 25C for canopy layer (μmol CO2/m2/s)
+    
+    "Actual Leaf maximum carboxylation rate (μmol/m2/s)"
     Vcmax::TT  = Vcmax25;
+    "Actual Leaf maximum PEP carboxylase rate (μmol/m2/s)"
+    Vpmax::TT  = Vpmax25;
+    "Actual Maximum electron transport rate (μmol/m2/s)"
     Jmax::TT   = Jmax25;
-    Rdleaf::TT = Rd25;
+    "Actual Leaf respiration rate (μmol CO2/m2/s)"
+    Rd::TT = Rd25;
 
-
-    Cc::TT = 400.0;                               # CO2 concentration in chloroplast [ppm]
-    RH::TT = 100.0;                               # relative humidity at the surface of the leaf
+    "CO2 concentration at leaf surface (ppm)"
+    Cs::TT = 400.0;  
+    "CO2 concentration in chloroplast (ppm)"
+    Cc::TT = 400.0;                               
+    "CO2 concentration in chloroplast (Pa)"
+    Cc_Pa::TT = 40;                               
+    "relative humidity at the surface of the leaf"
+    RH::TT = 100.0;                               
+    "Vapor pressure difference across leaf interface (kPa)"
     VPD::TT = 0.1;                                # VPD gradient ACROSS THE LEAF interface - NOT the weather station one 8-)
 
     # to be computed
+    "Electron transport rate (μmol m-2 s-1), light limited only"
     Je::TT = 0.0 ;                              # electron transport rate
+
+    "Potential ETR"
+    Je_pot::TT = 0.0
+    
+
     # tree/leaf traits
     height      = 20.;                            # tree height (m)
     z0m         = -999.;                          # tree roughness (m)
@@ -179,20 +187,30 @@ Base.@kwdef mutable struct leaf_params{TT<:Number}
                                                   # can also be related to P50 see same book
 end
 
-# Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here:
-# For some reason, this is slow and allocates a lot, can be improved!!
-"Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here"
-function setLeafT!(l::leaf_params)
-    l.Kc     = l.Kc_25          * ft(l.T, l.Kcha);
-    l.Ko     = l.Ko_25          * ft(l.T, l.Koha);
-    l.Γstar  = l.Γ_25           * ft(l.T, l.cpha);
-    l.Vcmax   = l.Vcmax25 * ft(l.T, l.Vcmaxha) * fth(l.T, l.Vcmaxhd, l.Vcmaxse, l.Vcmaxc);
-    l.Jmax    = l.Jmax25  * ft(l.T, l.Jmaxha)  * fth(l.T, l.Jmaxhd, l.Jmaxse, l.Jmaxc);
-    l.Rdleaf  = l.Rd25    * ft(l.T, l.rdha)    * fth(l.T, l.rdhd, l.rdse, l.rdc);
-    (l.esat, l.desat) = SatVap(l.T);
-    # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
+" Just a placeholder for now"
+Base.@kwdef mutable struct meteo{TT<:Number}
+     S_down::TT = 0.;
+     L_down::TT = 0.;
+     T_air::TT  = 280.;      # T in K
+     e_air::TT  = 1500.;
+     P_air::TT  =  1e5 ;      # surface pressure (Pa)
+     Ca::TT     =  400.;
+     PAR::TT    = 0.;
+     U::TT      = 1e-6;
+     zscreen::TT= 10.0; # measurement height - default
+     L::TT      = 1e6;  # atmospheric Obukhov length
+     # parameter to define stability function for stable case
+     stab_type_stable::TT = 1; # 2 Webb correction tends to be unstable at night - suggest not using
+     ustar::TT = 1e-6
+     g_m_s_to_mol_m2_s::TT = -Inf
+     ppm_to_Pa::TT = 0.1
+     ra::TT    = 1e6
+     APAR::TT = 500.0
+     Cs::TT = 0.0
 end
 
+
+# Need to ba abstracted as well!
 function setkx!(l::leaf_params, psis, psi_l) # set hydraulic conductivitytimes Delta Psi
     l.kx = l.kmax * IntWeibull(psis,psi_l,l.psi_l50,l.ck)/max(psis-psi_l,1e-6); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
     #println("k_xylem = ",l.kx," psi_s=",psis," psi_l=",psi_l)
@@ -202,8 +220,3 @@ function setLeafkl!(l::leaf_params, psi_l) # set hydraulic conductivity
     l.kleaf = l.kmax * Weibull(psi_l,l.psi_l50,l.ck); # kmax . int_psis^psil k(x)dx = kmax . IntWeibull(psil);
 end
 
-include("leaf_photosynthesis.jl")
-include("math_tools.jl")
-include("leaf_energy_water_balance.jl")
-
-end #Module

@@ -1,4 +1,4 @@
-module CanopyRTMod
+module CanopyRT
 #using GSL
 using Polynomials
 using Statistics
@@ -9,8 +9,7 @@ using MAT
 # Numerical integration package (Simpson rule)
 using QuadGK
 
-using ..Leaf
-
+using ..Photosynthesis
 
 export optipar,
        angles,
@@ -20,18 +19,24 @@ export optipar,
        canopy,
        canRad,
        canOpt,
+       wl,
+       wle,
+       wlf,
+       soil,
        FT,
        sunRad
 
 # Floating point precision can be changed here
 const FT = Float32
 
-
 include("photo_structs.jl")
 
 # Leaf inclination distribution
-const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
-const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.] [10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88., 90.] ];
+#const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.];
+#const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.] [10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88., 90.] ];
+
+const litab      = FT[5.,15.,25.,35.,45.,55.,65.,75.,85.];
+const litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.] [10.,20.,30.,40.,50.,60.,70.,80., 90.] ];
 
 const minwlPAR  = FT(400.); # PAR range
 const maxwlPAR  = FT(700.);
@@ -887,6 +892,7 @@ function Psofunction(K,k,Ω,LAI,q,dso,xl)
     return pso
 end;
 
+
 # Changed from latest volscat functions (April 2001)
 """********************************************************************************
 !*	tts		= solar zenith
@@ -1002,15 +1008,7 @@ function volscatt(tts,tto,psi,ttli)
     denom=2 *FT(pi)^2;
     frho=((pi-bt2)*t1+t2)/denom;
     ftau=    (-bt2*t1+t2)/denom;
-    #if frho<0 || ftau<0 || chi_s<0 || chi_o < 0
-        #@show bto
-        #@show bts
-        #@show bts-bto
-        #@show btran1
-        #@show btran2
-        #@show btran_
-        #@show psi_rad
-    #end
+
     return (chi_s),abs(chi_o),(frho),(ftau)
 end;
 
@@ -1088,14 +1086,8 @@ function calctav(α,nr)
     return tav
 end
 
-#function expint(x)
-#    p = Poly([8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09])
-#    polyv = polyval(p,real(x));
-#    k = findall( abs(imag(x)) <= polyv );
-#    -GSL.sf_expint_Ei(-x)
-#end
-# From Matlab!
-p = Polynomial(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
+
+const p = Polynomial(convert(Array{FT},[8.267661952366478e+00, -7.773807325735529e-01, -3.012432892762715e-01, -7.811863559248197e-02, -1.019573529845792e-02,-6.973790859534190e-04,-2.569498322115933e-05, -4.819538452140960e-07,  -3.602693626336023e-09]))
 const egamma=FT(0.57721566490153286061);
 function expint(x::Number)
 
