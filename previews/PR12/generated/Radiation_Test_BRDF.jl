@@ -1,6 +1,6 @@
 # Use Julia Plots package and switch to plotly js option:
 using Plots
-pyplot()
+#pyplot()
 #plotlyjs()
 
 #using Revise
