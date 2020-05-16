@@ -42,8 +42,5 @@ include("water/get_saturated_vapor_pressure.jl")
 include("water/get_specific_latent_heat.jl"    )
 
 # include the testing functions and tools
-include("tool/get_a_par_curve.jl"      )
-include("tool/get_a_pi_curve.jl"       )
-include("tool/plot_a_par_curve.jl"     )
-include("tool/plot_a_pi_curve.jl"      )
-include("tool/visualize_struct_tree.jl")
+include("tool/get_a_par_curve.jl")
+include("tool/get_a_pi_curve.jl" )

@@ -2,6 +2,8 @@ using LaTeXStrings
 using PyPlot
 using Land.Plant
 
+FT = Plant.FT
+
 # this function plot An-Pi curve
 function plot_a_par_curve(;
                           v25::FT = FT(80.0),
