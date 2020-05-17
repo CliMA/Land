@@ -1,8 +1,15 @@
-using Land, Documenter
+using Land, Documenter, Literate
+
+generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
+mkpath(generated_dir)
+
+include("list_of_tutorials.jl")          # defines a dict `tutorials`
 
 pages = Any[
     "Home" => "index.md",
-]
+    "Tutorials" => tutorials,
+    ]
+
 
 mathengine = MathJax(Dict(
     :TeX => Dict(
@@ -20,13 +27,14 @@ format = Documenter.HTML(
 makedocs(
     sitename = "Land",
     format = format,
-    clean = true,
+
+    clean = false,
     modules = [Documenter, Land],
     pages = pages,
 )
 
 deploydocs(
-    repo = "github.com/climate-machine/Land.git",
+    repo = "github.com/CliMA/Land.git",
     target = "build",
     push_preview = true,
 )
