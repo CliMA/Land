@@ -1,5 +1,5 @@
-# struct for leaf
-Base.@kwdef mutable struct StructTreeLeaf{FT<:AbstractFloat}
+# struct for leaf, may need to merge with the leaf struct in the RT module
+Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     # leaf structure
     angle_locat::FT = FT(0.0)    # degree | direction from the tree trunk to the leaf, 0 for east, 270 for south, and 180 for west
     angle_incli::FT = FT(0.0)    # degree | direction of leave, 0 for flat and 90 for vertical
@@ -26,7 +26,7 @@ end
 
 
 # struct of canopy layer
-Base.@kwdef mutable struct StructTreeCanopyLayer{FT<:AbstractFloat, n_total}
+Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
     # canopy layer and leaf structure
     f_layer::FT = FT(  1.0)    #    | fraction of LA of the layer, f_layer = 1.0 / n_layer
     f_view ::FT = FT(  0.5)    #    | view factor for sunlit leaves
@@ -52,27 +52,27 @@ Base.@kwdef mutable struct StructTreeCanopyLayer{FT<:AbstractFloat, n_total}
     v_max  ::FT = FT( 80.0  )    # μmol m⁻² s⁻¹ | maximal carboxylation rate
 
     # leaf layers (e_list and q_list need to be updated with time)
-    ag_list  ::Array{FT,1}                 = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | gross a list per leaf area
-    an_list  ::Array{FT,1}                 = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | net a list per leaf area
-    d_list   ::Array{FT,1}                 = zeros(FT,n_total) .+ FT(0.015)                   #              | leaf-to-air d list
-    e_list   ::Array{FT,1}                 = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | flow rate list per leaf area
-    ec_list  ::Array{FT,1}                 = zeros(FT,n_total) .+ FT(6.3e-4)                  # mol m⁻² s⁻¹  | e_crit list per leaf area
-    gsc_list ::Array{FT,1}                 = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsc list per leaf area
-    gsw_list ::Array{FT,1}                 = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsw list per leaf area
-    la_list  ::Array{FT,1}                 = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])    # m²           | leaf area list
-    leaf_list::Array{StructTreeLeaf{FT},1} = [StructTreeLeaf{FT}() for i in 1:n_total]        #              | leaf struct list
-    par_list ::Array{FT,1}                 = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | PAR list
-    pi_list  ::Array{FT,1}                 = zeros(FT,n_total)                                # Pa           | leaf interanal CO₂ list
-    q_list   ::Array{FT,1}                 = zeros(FT,n_total)                                # mol s⁻¹      | flow rate list
-    r_list   ::Array{FT,1}                 = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | respiration list per leaf area
-    t_list   ::Array{FT,1}                 = zeros(FT,n_total) .+ FT(298.15 )                 # K            | leaf temperature list
+    ag_list  ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | gross a list per leaf area
+    an_list  ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | net a list per leaf area
+    d_list   ::Array{FT,1}       = zeros(FT,n_total) .+ FT(0.015)                   #              | leaf-to-air d list
+    e_list   ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | flow rate list per leaf area
+    ec_list  ::Array{FT,1}       = zeros(FT,n_total) .+ FT(6.3e-4)                  # mol m⁻² s⁻¹  | e_crit list per leaf area
+    gsc_list ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsc list per leaf area
+    gsw_list ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsw list per leaf area
+    la_list  ::Array{FT,1}       = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])    # m²           | leaf area list
+    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_total]                  #              | leaf struct list
+    par_list ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | PAR list
+    pi_list  ::Array{FT,1}       = zeros(FT,n_total)                                # Pa           | leaf interanal CO₂ list
+    q_list   ::Array{FT,1}       = zeros(FT,n_total)                                # mol s⁻¹      | flow rate list
+    r_list   ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | respiration list per leaf area
+    t_list   ::Array{FT,1}       = zeros(FT,n_total) .+ FT(298.15 )                 # K            | leaf temperature list
 end
 
 
 
 
-# the struct for leaf
-Base.@kwdef mutable struct StructTreeCanopy{FT<:AbstractFloat,n, n_total}
-    n_layer    ::Int                                = n                                                     # | number of canopy layers
-    canopy_list::Array{StructTreeCanopyLayer{FT},1} = [StructTreeCanopyLayer{FT,n_total}() for i in 1:n]    # | a list of leaf layers
+# the struct for canopy, may need to merge with the canopy struct in the RT module
+Base.@kwdef mutable struct Canopy{FT<:AbstractFloat,n, n_total}
+    n_layer    ::Int                      = n                                           # | number of canopy layers
+    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]    # | a list of leaf layers
 end

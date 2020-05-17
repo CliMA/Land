@@ -1,14 +1,8 @@
-# function yo get jmax from leaf temperature
+"""
+    get_leaf_jmax(v25, tem)
+This function computes the Jmax from Jmax@25 Celcius
+"""
 function get_leaf_jmax(jmax25::FT, tem::FT) where {FT}
-    # compute the multiplier
-    ha     = 50300.0
-    hd     = 152044.0
-    sv     = 495.0
-    t0     = 298.15
-    r      = 8.315
-    c      = 1.0 + exp((sv*t0 -hd)/(r*t0))
-    factor = c * exp(ha/r/t0*(1.0-t0/tem)) / (1.0 + exp((sv*tem-hd)/(r*tem)))
-
-    # return the jmax at new temperature
+    factor = PS_J_C * exp( PS_J_HA / GAS_R / K_25 * (NUMB_1 - K_25/tem) ) / ( NUMB_1 + exp( (PS_J_SV*tem-PS_J_HD) / (GAS_R*tem) ) )
     return jmax25 * factor
 end

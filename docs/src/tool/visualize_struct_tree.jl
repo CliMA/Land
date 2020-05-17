@@ -29,7 +29,7 @@ end
 
 
 # there is an option to save the figure
-function visualize_struct_tree(tree::StructTree, save::Bool=false)
+function visualize_struct_tree(tree::Tree, save::Bool=false)
     # clear plot first
     figure("Tree Visualization",figsize=(16,9), dpi=120)
     clf()

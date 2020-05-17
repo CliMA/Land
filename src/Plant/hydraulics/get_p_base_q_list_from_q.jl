@@ -1,5 +1,8 @@
-# this function returns the p_base from total transpiration rate
-function get_p_base_q_list_from_q(tree::StructTree, flow::FT) where {FT}
+"""
+    get_p_base_q_list_from_q(tree, flow)
+This function returns the p_base from total transpiration rate
+"""
+function get_p_base_q_list_from_q(tree::Tree, flow::FT) where {FT}
     p_base   = FT(0.0)
     q_list_0 = FT(0.0)
 
@@ -16,9 +19,9 @@ function get_p_base_q_list_from_q(tree::StructTree, flow::FT) where {FT}
         end
 
         # calculate the new q based on slope
-        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+1E-3) for root_layer in tree.roots.root_list]
+        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+ΔEP_3) for root_layer in tree.roots.root_list]
         q_1      = sum(q_list_1)
-        slope    = (q_1-q_0) * 1E3
+        slope    = (q_1-q_0) / ΔEP_3
         p_base  += (flow-q_0) / slope
 
         # break if total iterations >= 50

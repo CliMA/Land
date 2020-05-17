@@ -1,5 +1,5 @@
 # struct for a C3 tree
-Base.@kwdef mutable struct StructTree{FT<:AbstractFloat}
+Base.@kwdef mutable struct Tree{FT<:AbstractFloat}
     # tree information
     age::Int = 10          # year | age
     ba ::FT  = FT( 0.1)    # m²   | basal area
@@ -7,8 +7,8 @@ Base.@kwdef mutable struct StructTree{FT<:AbstractFloat}
     h  ::FT  = FT( 8.0)    # m    | tree height
 
     # tree formation from root to leaves
-    roots ::StructTreeRoot   = StructTreeRoot{FT,5}()           # | root struct with 5 layers by default
-    trunk ::StructTreeStem   = StructTreeStem{FT}()             # | trunk struct
-    branch::StructTreeBranch = StructTreeBranch{FT,20}()        # | branch struct with 20 layers by default
-    canopy::StructTreeCanopy = StructTreeCanopy{FT,20,325}()    # | canopy struct
+    roots ::Root   = Root{FT,5}()           # | root struct with 5 layers by default
+    trunk ::Stem   = Stem{FT}()             # | trunk struct
+    branch::Branch = Branch{FT,20}()        # | branch struct with 20 layers by default
+    canopy::Canopy = Canopy{FT,20,325}()    # | canopy struct
 end

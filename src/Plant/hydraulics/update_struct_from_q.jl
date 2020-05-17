@@ -1,6 +1,10 @@
-# this function returns the end pressure for root struct
-# flow in mol s^-1, p_end in MPa
-function update_struct_from_q(any_struct::StructTreeRootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
+"""
+    update_struct_from_q!(any_struct, flow; p_ini)
+This function returns the end pressure for root struct, including rhizosphere constance.
+The p_ini is either the upstream p of the struct or preset value.
+Flow in mol s⁻¹, p_end in MPa
+"""
+function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
@@ -24,12 +28,12 @@ function update_struct_from_q(any_struct::StructTreeRootLayer, flow::FT; p_ini::
     k_t = get_relative_viscosity(any_struct.t_soil)
     for i in 0:9
         if p_end<0
-            shell_t = (1.0 / (1.0 + (a*(-p_end/k_s))^n)) ^ m
+            shell_t = (NUMB_1 / (NUMB_1 + (a*(-p_end/k_s))^n)) ^ m
         else
-            shell_t = 1.0
+            shell_t = NUMB_1
         end
-        shell_f  = sqrt(shell_t) * (1.0 - (1.0-shell_t^(1.0/m)) ^ m) ^ 2.0
-        shell_k  = k * shell_f * log(10.0) / log((10.0-0.9*i)/(10.0-0.9*(i+1))) / k_t
+        shell_f  = sqrt(shell_t) * (NUMB_1 - (NUMB_1-shell_t^(NUMB_1/m)) ^ m) ^ NUMB_2
+        shell_k  = k * shell_f * log(NUMB_10) / log((NUMB_10-NUMB_0_9*i)/(NUMB_10-NUMB_0_9*(i+1))) / k_t
         dp       = flow / shell_k
         p_end   -= dp
     end
@@ -46,9 +50,9 @@ function update_struct_from_q(any_struct::StructTreeRootLayer, flow::FT; p_ini::
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1.0 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * 1E-6
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1E-6)
 
         # update the values in each element
         if p_25<any_struct.p_history[i]
@@ -64,8 +68,13 @@ end
 
 
 
-# for stem struct
-function update_struct_from_q(any_struct::StructTreeStem, flow::Number, p_ini::Number=Inf)
+"""
+    update_struct_from_q!(any_struct, flow; p_ini)
+This function returns the end pressure for stem struct, including gravity.
+The p_ini is either the upstream p of the struct or preset value.
+Flow in mol s⁻¹, p_end in MPa
+"""
+function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
@@ -84,9 +93,9 @@ function update_struct_from_q(any_struct::StructTreeStem, flow::Number, p_ini::N
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1.0 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * 1E-6
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * ΔEP_6
 
         # update the values in each element
         if p_25<any_struct.p_history[i]
@@ -102,8 +111,13 @@ end
 
 
 
-# for leaf struct
-function update_struct_from_q(any_struct::StructTreeLeaf, flow::Number, p_ini::Number=Inf)
+"""
+    update_struct_from_q!(any_struct, flow; p_ini)
+This function returns the end pressure for leaf struct, including gravity.
+The p_ini is either the upstream p of the struct or preset value.
+Flow in mol s⁻¹, p_end in MPa
+"""
+function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
         p_end = any_struct.p_ups
     else
@@ -119,9 +133,9 @@ function update_struct_from_q(any_struct::StructTreeLeaf, flow::Number, p_ini::N
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1.0 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * 1E-6
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * ΔEP_6
 
         # update the values in each element
         if p_25<any_struct.p_history[i]

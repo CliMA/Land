@@ -1,5 +1,10 @@
 # directly imclude this file will save the time to compile other Land modules
 
+# load modules and packages
+using CLIMAParameters
+using DocStringExtensions
+using Parameters
+
 # include the constants
 include("constants.jl")
 

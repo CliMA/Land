@@ -1,5 +1,8 @@
-# this function is meant to obtain the Anet-Ci curve
-# this function may also be used to test the phtosynthesis module
+"""
+    get_a_pi_curve(v25, j25, Γ_star, tem, par, p_O₂, r25)
+This function is meant to obtain the Anet-Ci curve.
+This function may also be used to test the phtosynthesis module.
+"""
 function get_a_pi_curve(;
                         v25::FT = FT(80.0),
                         j25::FT = FT(135.0),
@@ -9,9 +12,9 @@ function get_a_pi_curve(;
                        p_O₂::FT = FT(21278.25),
                         r25::FT = FT(Inf)) where {FT}
     # generate a list of p_i from gamma to 200 Pa
-    list_pi = [val for val in Γ_star:1.0:200.0]
-    list_ag = list_pi * -Inf
-    list_an = list_pi * -Inf
+    list_pi = [FT(val) for val in Γ_star:1.0:200.0]
+    list_ag = list_pi .* FT(-Inf)
+    list_an = list_pi .* FT(-Inf)
 
     # iterate through the list
     for i in 1:length(list_pi)

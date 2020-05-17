@@ -1,4 +1,7 @@
-# get lists of an,ag,r,pi from gsc
+"""
+    get_leaf_an_ag_r_pi_from_gsc(v25, j25, Γ_star, gsc, p_a, tem, par, p_atm, p_O₂, r25)
+This function calculates A_net, A_gross, R_leaf, and P_i from gsc.
+"""
 function get_leaf_an_ag_r_pi_from_gsc(;
                                        v25::FT = FT(80.0),
                                        j25::FT = FT(135.0),
@@ -11,14 +14,14 @@ function get_leaf_an_ag_r_pi_from_gsc(;
                                       p_O₂::FT = FT(21278.25),
                                        r25::FT = FT(Inf) ) where {FT}
     # compute a_net using bi-section method
-    tar_p  = 0.0
-    tar_ag = 0.0
-    tar_an = 0.0
-    tar_r  = 0.0
+    tar_p  = NUMB_0
+    tar_ag = NUMB_0
+    tar_an = NUMB_0
+    tar_r  = NUMB_0
     max_p  = p_a
     min_p  = Γ_star
     while true
-        tar_p = 0.5 * (max_p+min_p)
+        tar_p = NUMB_0_5 * (max_p+min_p)
         an,ag,r = get_leaf_an_ag_r_from_pi(
                                            v25 = v25,
                                            j25 = j25,
@@ -28,10 +31,10 @@ function get_leaf_an_ag_r_pi_from_gsc(;
                                            par = par,
                                           p_O₂ = p_O₂,
                                            r25 = r25)
-        tmp_g = an * 1e-6 / (p_a-tar_p) * p_atm
+        tmp_g = an * ΔEP_6 / (p_a-tar_p) * p_atm
 
         # increase min_p when g is smaller than target
-        if abs(tmp_g-gsc) < 1E-10
+        if abs(tmp_g-gsc) < ΔEP_5
             tar_ag = ag
             tar_an = an
             tar_r  = r
@@ -43,7 +46,7 @@ function get_leaf_an_ag_r_pi_from_gsc(;
         end
 
         # if the max_p and min_p equals, break; used for the case when g=0
-        if abs(max_p-min_p) < 1E-6
+        if abs(max_p-min_p) < ΔEP_5
             tar_ag = ag
             tar_an = an
             tar_r  = r
@@ -58,7 +61,10 @@ end
 
 
 
-# get lists of an,ag,r,pi from gsc
+"""
+    get_leaf_an_ag_r_pi_from_gsc(v25, j25, Γ_star, gsc, p_a, tem, par, p_atm, p_O₂, r25)
+This function calculates A_net, A_gross, R_leaf, and P_i from a list of gsc.
+"""
 function get_leaf_an_ag_r_pi_from_gsc_list(;
                                            v25::FT    = FT(80.0),
                                            j25::FT    = FT(135.0),
@@ -72,10 +78,10 @@ function get_leaf_an_ag_r_pi_from_gsc_list(;
                                            r25::FT    = FT(Inf) ) where {FT}
     # define lists of results
     len     = length(gsc_list)
-    list_an = zeros(len)
-    list_ag = zeros(len)
-    list_re = zeros(len)
-    list_pi = zeros(len)
+    list_an = zeros(FT,len)
+    list_ag = zeros(FT,len)
+    list_re = zeros(FT,len)
+    list_pi = zeros(FT,len)
 
     # iterate the list
     for indx in 1:length( len )

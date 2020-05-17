@@ -1,8 +1,10 @@
-# calculate j from par
+"""
+    get_leaf_j(jmax, par)
+This function calculates j from par using a quadratic function
+"""
 function get_leaf_j(jmax::FT, par::FT) where {FT}
-    a =  0.9
-    b = -0.3 * par - jmax
-    c =  0.3 * par * jmax
-    j = ( -b - sqrt(b*b-4*a*c) ) / a * 0.5
+    b = PS_J_QY * par + jmax
+    c = PS_J_QY * par * jmax
+    j = ( b - sqrt(b^NUMB_2 - NUMB_4*PS_J_CR*c) ) / PS_J_CR * NUMB_0_5
     return j
 end

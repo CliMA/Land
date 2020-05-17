@@ -1,5 +1,14 @@
-# function to update e_crit for each layer (sunlit and shaded), increase or decrease by 1E-6 mol m^-2 s^-1
-function update_tree_e_crit(tree::StructTree; displaying::Bool=false)
+using DocStringExtensions
+
+"""
+    update_tree_e_crit!(tree, displaying)
+This function update e_crit for each layer (sunlit and shaded).
+The e_crit for each leaf is either increased or decreased so that p_leaf is in the range -Inf to -20.0 MPa.
+The e_crit increases by 1E-6 mol m^-2 s^-1 if p_leaf is less negative than -20 MPa.
+The e_crit decreases by 1E-7 mol m^-2 s^-1 if p_leaf is -Inf.
+There is a "displaying" variable to control whether the information of q_sum will display (true) or not (false).
+"""
+function update_tree_e_crit!(tree::Tree; displaying::Bool=false)
     # unpack necessary structs
     @unpack branch_list = tree.branch
     @unpack canopy_list = tree.canopy
@@ -33,10 +42,10 @@ function update_tree_e_crit(tree::StructTree; displaying::Bool=false)
                 # increas e_crit by 1E-6 or decrease it by 1E-7
                 if p_leaf >= -20.0
                     judge += 1
-                    canopyi.ec_list[indy] += 1E-6
+                    canopyi.ec_list[indy] += ΔEP_6
                 elseif p_leaf == -Inf
                     judge += 1
-                    canopyi.ec_list[indy] -= 1E-7
+                    canopyi.ec_list[indy] -= ΔEP_7
                 end
             end
         end

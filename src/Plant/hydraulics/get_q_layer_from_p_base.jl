@@ -1,9 +1,12 @@
-# this function calculates the q_layer from p_soil in the layer and p_base
-# this function use newton raphson to get q_layer
-function get_q_layer_from_p_base(root_layer::StructTreeRootLayer, p_base::FT) where {FT}
-    q_min   = FT(0.0)
-    q_max   = FT(1.0)
-    q_layer = FT(0.5)
+"""
+    get_q_layer_from_p_base(root_layer, p_base)
+This function calculates the q_layer from p_soil in the layer and p_base
+This function use newton raphson to get q_layer
+"""
+function get_q_layer_from_p_base(root_layer::RootLayer, p_base::FT) where {FT}
+    q_min   = NUMB_0
+    q_max   = NUMB_1
+    q_layer = NUMB_0_5
 
     # use while loop to get q_layer
     count   = 0
@@ -24,10 +27,10 @@ function get_q_layer_from_p_base(root_layer::StructTreeRootLayer, p_base::FT) wh
         
         # update q_layer from bi-section or newton raphson
         if p_0 <= -20.0
-            q_layer  = 0.5 * (q_min + q_max)
+            q_layer  = NUMB_0_5 * (q_min + q_max)
         else
-            p_1      = get_struct_p_end_from_q(root_layer, q_layer+1e-3)
-            slope    = (p_1 - p_0) * 1e3
+            p_1      = get_struct_p_end_from_q(root_layer, q_layer+ΔEP_3)
+            slope    = (p_1 - p_0) / ΔEP_3
             q_layer += (p_base - p_0) / slope
         end
 

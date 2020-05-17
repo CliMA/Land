@@ -1,5 +1,8 @@
-# this function is meant to obtain the Anet-PAR curve
-# this function may also be used to test the phtosynthesis module
+"""
+    get_a_par_curve(v25, j25, Γ_star, gsc, p_a, tem, p_O₂, r25)
+This function is meant to obtain the Anet-PAR curve.
+This function may also be used to test the phtosynthesis module.
+"""
 function get_a_par_curve(;
                          v25::FT = FT(80.0),
                          j25::FT = FT(135.0),
@@ -11,10 +14,10 @@ function get_a_par_curve(;
                         p_O₂::FT = FT(21278.25),
                          r25::FT = FT(Inf)) where {FT}
     # generate a list of p_i from gamma to 200 Pa
-    list_par = [val for val in 5.0:5.0:2000.0]
-    list_ag  = list_par * -Inf
-    list_an  = list_par * -Inf
-    list_pi  = list_par * -Inf
+    list_par = [FT(val) for val in 5.0:5.0:2000.0]
+    list_ag  = list_par .* FT(-Inf)
+    list_an  = list_par .* FT(-Inf)
+    list_pi  = list_par .* FT(-Inf)
 
     # iterate through the list
     for i in 1:length(list_par)
