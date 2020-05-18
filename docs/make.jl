@@ -1,6 +1,7 @@
 using Land, Documenter, Literate
 
 generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
+rm(generated_dir, force = true, recursive = true)
 mkpath(generated_dir)
 
 include("list_of_tutorials.jl")          # defines a dict `tutorials`

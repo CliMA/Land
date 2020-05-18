@@ -1,18 +1,15 @@
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    get_struct_from_q(root_layer, flow; p_ini)
 
-# Arguments
-- `any_struct::RootLayer`    One root layer in Tree struct
-- `flow::FT`                 Flow rate in the given root layer
-- `p_ini::FT`                Upstream soil water potential if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-
-# Description
-This function returns the end pressure for rootlayer struct, including impacts from rhizosphere conductance and gravity.
-Flow in mol s⁻¹, p_end in MPa
+End pressure `p_end` (in MPa) for [`RootLayer`](@ref), including
+impacts from rhizosphere conductance and gravity, given
+- `root_layer` One root layer in [`Tree`](@ref)
+- `flow` Flow rate (in `mol s⁻¹`) in the given root layer
+- `p_ini` Upstream soil water potential if `p_ini` is given, otherwise (`Inf`) `root_layer.p_ups` will be used
 """
-function get_struct_p_end_from_q(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
+function get_struct_p_end_from_q(root_layer::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = root_layer.p_ups
     else
         p_end = p_ini
     end
@@ -23,12 +20,12 @@ function get_struct_p_end_from_q(any_struct::RootLayer, flow::FT; p_ini::FT=FT(I
     2. Calculate dP = flow / Krhiz_i for each of the 10 shells of the rhizosphere
     3. Update the P at the end of the rhizosphere
     =#
-    a   = any_struct.soil_a
-    m   = any_struct.soil_m
-    n   = any_struct.soil_n
-    k   = any_struct.k_rhiz
-    k_s = get_relative_surface_tension(any_struct.t_soil)
-    k_t = get_relative_viscosity(any_struct.t_soil)
+    a   = root_layer.soil_a
+    m   = root_layer.soil_m
+    n   = root_layer.soil_n
+    k   = root_layer.k_rhiz
+    k_s = get_relative_surface_tension(root_layer.t_soil)
+    k_t = get_relative_viscosity(root_layer.t_soil)
     for i in 0:9
         if p_end<=0
             shell_t = (1 / (1 + (a*(-p_end/k_s))^n)) ^ m
@@ -47,35 +44,29 @@ function get_struct_p_end_from_q(any_struct::RootLayer, flow::FT; p_ini::FT=FT(I
     3. Calculate the pressure drop along each slice in the xylem, including the impact from gravity
     4. Update the P at the end of the xylem
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(root_layer.p_element)
+        p_25   = min(root_layer.p_history[i], p_end / get_relative_surface_tension(root_layer.t_element[i]))
+        k_25   = root_layer.k_element[i] * exp( -1 * (-p_25/root_layer.b) ^ (root_layer.c) )
+        k      = k_25 / get_relative_viscosity(root_layer.t_element[i])
+        p_end -= flow / k + ρ_H₂O * gravity * root_layer.z_element[i] * FT(1e-6)
     end
 
-    # return the result
     return p_end
 end
 
-
-
-
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    get_struct_from_q(stem, flow; p_ini)
 
-# Arguments
-- `any_struct::Stem`    Trunk or Branch in Tree struct
-- `flow::FT`            Flow rate in the given Stem
-- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-    
-# Description
-This function returns the end pressure for Stem struct, including impact from gravity.
-Flow in mol s⁻¹, p_end in MPa
+End pressure `p_end` (in MPa) for stem `Stem`
+including impact from gravity, given
+
+- `stem` stem in [`Tree`](@ref)
+- `flow` Flow rate (in `mol s⁻¹`) in the given [`Stem`](@ref)
+- `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `stem.p_ups` will be used
 """
-function get_struct_p_end_from_q(any_struct::Stem, flow::FT; p_ini::FT=(Inf)) where {FT}
+function get_struct_p_end_from_q(stem::Stem, flow::FT; p_ini::FT=(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = stem.p_ups
     else
         p_end = p_ini
     end
@@ -86,14 +77,13 @@ function get_struct_p_end_from_q(any_struct::Stem, flow::FT; p_ini::FT=(Inf)) wh
     3. Calculate the pressure drop along each slice in the xylem, including the impact from gravity
     4. Update the P at the end of the xylem
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(stem.p_element)
+        p_25   = min(stem.p_history[i], p_end / get_relative_surface_tension(stem.t_element[i]))
+        k_25   = stem.k_element[i] * exp( -1 * (-p_25/stem.b) ^ (stem.c) )
+        k      = k_25 / get_relative_viscosity(stem.t_element[i])
+        p_end -= flow / k + ρ_H₂O * gravity * stem.z_element[i] * FT(1e-6)
     end
 
-    # return the result
     return p_end
 end
 
@@ -101,20 +91,19 @@ end
 
 
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    get_struct_from_q(leaf, flow; p_ini)
 
-# Arguments
-- `any_struct::Leaf`    Leaf in CanopyLayer in a Tree struct
-- `flow::FT`            Flow rate in the given Leaf
-- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-    
-# Description
-This function returns the end pressure for Leaf struct, including impact from gravity.
-Flow in mol s⁻¹, p_end in MPa
+End pressure `p_end` (in MPa) for leaf `leaf`
+including impact from gravity, given
+
+- `leaf` leaf in [`CanopyLayer`](@ref) in a [`Tree`](@ref)
+- `flow` Flow rate (`mol s⁻¹`) in the given Leaf
+- `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `leaf.p_ups` will be used
+
 """
-function get_struct_p_end_from_q(any_struct::Leaf, flow::FT; p_ini::FT=FT(Inf)) where {FT}
+function get_struct_p_end_from_q(leaf::Leaf, flow::FT; p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = leaf.p_ups
     else
         p_end = p_ini
     end
@@ -125,13 +114,12 @@ function get_struct_p_end_from_q(any_struct::Leaf, flow::FT; p_ini::FT=FT(Inf)) 
     3. Calculate the pressure drop along each slice in the xylem, including the impact from gravity
     4. Update the P at the end of the xylem
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(leaf.p_element)
+        p_25   = min(leaf.p_history[i], p_end / get_relative_surface_tension(leaf.t_element[i]))
+        k_25   = leaf.k_element[i] * exp( -1 * (-p_25/leaf.b) ^ (leaf.c) )
+        k      = k_25 / get_relative_viscosity(leaf.t_element[i])
+        p_end -= flow / k + ρ_H₂O * gravity * leaf.z_element[i] * FT(1e-6)
     end
 
-    # return the result
     return p_end
 end

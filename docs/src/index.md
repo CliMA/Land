@@ -29,3 +29,10 @@ Land.CanopyRT.struct_canopyRadiation
 Land.CanopyRT.struct_canopyOptProps
 ```
 
+## Plant module
+
+```@docs
+Land.Plant.get_struct_p_end_from_q
+Land.Plant.Tree
+```
+
