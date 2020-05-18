@@ -1,10 +1,9 @@
 """
     get_struct_from_q(root_layer, flow; p_ini)
 
-End pressure `p_end` (in MPa) for [`RootLayer`](@ref), including
-impacts from rhizosphere conductance and gravity, given
-- `root_layer` One root layer in [`Tree`](@ref)
-- `flow` Flow rate (in `mol s⁻¹`) in the given root layer
+End pressure `p_end` (in MPa) for [`RootLayer`](@ref), including impacts from rhizosphere conductance and gravity, given
+- `root_layer` One [`RootLayer`](@ref) in [`Root`](@ref) in [`Tree`](@ref)
+- `flow` Flow rate (in `mol s⁻¹`) in the given [`RootLayer`](@ref)
 - `p_ini` Upstream soil water potential if `p_ini` is given, otherwise (`Inf`) `root_layer.p_ups` will be used
 """
 function get_struct_p_end_from_q(root_layer::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
@@ -57,10 +56,8 @@ end
 """
     get_struct_from_q(stem, flow; p_ini)
 
-End pressure `p_end` (in MPa) for stem `Stem`
-including impact from gravity, given
-
-- `stem` stem in [`Tree`](@ref)
+End pressure `p_end` (in MPa) for stem `Stem`, including impact from gravity, given
+- `stem` [`Stem`](@ref) as Trunk in [`Tree`](@ref) or [`Stem`](@ref) as side branch in [`Branch`](@ref) in [`Tree`](@ref)
 - `flow` Flow rate (in `mol s⁻¹`) in the given [`Stem`](@ref)
 - `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `stem.p_ups` will be used
 """
@@ -93,13 +90,10 @@ end
 """
     get_struct_from_q(leaf, flow; p_ini)
 
-End pressure `p_end` (in MPa) for leaf `leaf`
-including impact from gravity, given
-
-- `leaf` leaf in [`CanopyLayer`](@ref) in a [`Tree`](@ref)
-- `flow` Flow rate (`mol s⁻¹`) in the given Leaf
+End pressure `p_end` (in MPa) for leaf `leaf`, including impact from gravity, given
+- `leaf` [`Leaf`](@ref) in [`CanopyLayer`](@ref) in [`Canopy`](@ref) in [`Tree`](@ref)
+- `flow` Flow rate per leaf area (`mol m⁻² s⁻¹`) in the given [`Leaf`](@ref)
 - `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `leaf.p_ups` will be used
-
 """
 function get_struct_p_end_from_q(leaf::Leaf, flow::FT; p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf

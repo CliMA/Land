@@ -1,33 +1,43 @@
 """
     struct Leaf{FT}
 
-# Arguments
-- `FT`    Floating type for the struct
+A Leaf type which contains leaf hydraulics information.
 
-# Description
-Calling Leaf{FT}() will create a leaf struct with default settings.
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
-    # leaf structure
-    angle_locat::FT = FT(0.0)    # degree | direction from the tree trunk to the leaf, 0 for east, 270 for south, and 180 for west
-    angle_incli::FT = FT(0.0)    # degree | direction of leave, 0 for flat and 90 for vertical
+    # leaf angles, may delete this in the future
+    "direction from the tree trunk to the leaf, 0 for east, 270 for south, and 180 for west `[°]`"
+    angle_locat::FT = FT(0.0)
+    "direction of leave, 0 for flat and 90 for vertical `[°]`"
+    angle_incli::FT = FT(0.0)
 
-    # leaf hydraulic parameters, per leaf area
-    b    ::FT = FT(2.0 )    # MPa               | Weibull B
-    c    ::FT = FT(5.0 )    #                   | Weibull C
-    k_sla::FT = FT(1.35)    # mol s⁻¹ MPa⁻¹ m⁻² | maximal leaf hydraulic conductance per leaf area
+    # leaf hydraulic parameters
+    "Weibull function (`k = k_max * exp( -(-p/B)^C )`) parameter B `[MPa]`"
+    b    ::FT = FT(2.0 )
+    "Weibull function (`k = k_max * exp( -(-p/B)^C )`) parameter C"
+    c    ::FT = FT(5.0 )
+    "Maximal leaf hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
+    k_sla::FT = FT(1.35)
 
     # flows and pressures (need to be updated with time)
-    p_ups::FT = FT(0.0)    # MPa          | xylem pressure at the leaf basa (upstream)
-    p_i  ::FT = FT(0.0)    # Pa           | leaf internal CO₂ partial pressure
-    p_dos::FT = FT(0.0)    # MPa          | xylem pressure of the leaf (downstream)
+    "Leaf xylem water pressure (different from leaf water potential) at the leaf base (upstream) `[MPa]`"
+    p_ups::FT = FT(0.0)
+    "Leaf xylem water pressure at the downstream end of leaf xylem `[MPa]`"
+    p_dos::FT = FT(0.0)
 
     # pressure, k, and p_history profile
-    k_element::Array{FT,1} =  ones(FT,10) * FT( 13.5 )    # mol s⁻¹ MPa⁻¹ | a list of trunk k_max per element
-    p_element::Array{FT,1} = zeros(FT,10)                 # MPa           | a list of trunk xylem pressure per element
-    p_history::Array{FT,1} = zeros(FT,10)                 # MPa           | a list of trunk xylem pressure history per element
-    t_element::Array{FT,1} =  ones(FT,10) * FT(298.15)    # K             | a list of stem temperature for each element
-    z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )    # m             | a list of trunk height per element
+    "List of leaf k_max per element (mol s⁻¹ MPa⁻¹)"
+    k_element::Array{FT,1} =  ones(FT,10) * FT( 13.5 )
+    "List of xylem water pressure per element `[MPa]`"
+    p_element::Array{FT,1} = zeros(FT,10)
+    "List of xylem water pressure history (normalized to 298.15 K) per element `[MPa]`"
+    p_history::Array{FT,1} = zeros(FT,10)
+    "List of xylem water temperature per element `[K]`"
+    t_element::Array{FT,1} =  ones(FT,10) * FT(298.15)
+    "List of leaf element height change to account for gravity, default = 0 `[m]`"
+    z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )
 end
 
 
@@ -36,71 +46,99 @@ end
 """
     struct CanopyLayer{FT, n_total}
 
-# Arguments
-- `FT`         Floating type for the struct
-- `n_total`    Total number of leaves in the canopy layer, = n_Azi * n_Inclination + 1 (n*n for sunlit leaves, 1 for shaded leaves)
+A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_total` [`Leaf`](@ref). The `n_total` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
 
-# Description
-Calling CanopyLayer{FT, n_total}() will create a CanopyLayer struct with n_total leaves. 
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
     # canopy layer and leaf structure
-    f_layer::FT = FT(  1.0)    #    | fraction of LA of the layer, f_layer = 1.0 / n_layer
-    f_view ::FT = FT(  0.5)    #    | view factor for sunlit leaves
-    la     ::FT = FT(150.0)    # m² | leaf area in the layer, la = la:ba * ba
-    width  ::FT = FT(  0.1)    # m  | leaf width
+    "Leaf area fraction in the canopy"
+    f_layer::FT = FT(  1.0)
+    "Fraction of the sunlit leaves"
+    f_view ::FT = FT(  0.5)
+    "Leaf area in the layer `[m²]`"
+    la     ::FT = FT(150.0)
+    "Leaf width `[m]`"
+    width  ::FT = FT(  0.1)
 
     # canopy layer environemnt
-    p_a  ::FT = FT(    40.0 )    # Pa    | atmospheric CO₂ partial pressure
-    p_atm::FT = FT(101325.0 )    # Pa    | atmospheric pressure
-    p_O₂ ::FT = FT( 21278.25)    # Pa    | atmospheric O₂ partial pressure
-    p_H₂O::FT = FT(  1500.0 )    # Pa    | atmospheric H₂O partial pressure
-    t_air::FT = FT(   298.15)    # K     | air temperature
-    wind ::FT = FT(     2.0 )    # m s⁻¹ | wind speed
+    "Atmospheric CO₂ partial pressure in the layer `[Pa]`"
+    p_a  ::FT = FT(    40.0 )
+    "Atmospheric pressure `[Pa]`"
+    p_atm::FT = FT(101325.0 )
+    "Atmospheric O₂ partial presssure `[Pa]`"
+    p_O₂ ::FT = FT( 21278.25)
+    "Atmospheric H₂O partial pressure `[Pa]`"
+    p_H₂O::FT = FT(  1500.0 )
+    "Air temperature `[K]`"
+    t_air::FT = FT(   298.15)
+    "Wind speed `[m s⁻¹]`"
+    wind ::FT = FT(     2.0 )
 
     # leaf photosynthetic parameters
-    g_ias_c::FT = FT(  0.0  )    # unitless     | mesophyll conductance correction factor: multiplier
-    g_ias_e::FT = FT(  0.3  )    # unitless     | mesophyll conductance correction factor: exponent
-    g_max  ::FT = FT(  0.8  )    # mol m⁻² s⁻¹  | maximal gs at 25 °C
-    Γ_star ::FT = FT(  2.5  )    # Pa           | CO₂ compensation point with the absence of dark respiration
-    gs_nssf::FT = FT(  0.025)    #              | non-steady state factor (use by multiplying the ∂A/∂E - ∂Θ/∂E)
-    j_max  ::FT = FT(133.6  )    # μmol m⁻² s⁻¹ | maximal electron transport rate
-    r_25   ::FT = FT(  1.2  )    # μmol m⁻² s⁻¹ | leaf respiration rate
-    v_max  ::FT = FT( 80.0  )    # μmol m⁻² s⁻¹ | maximal carboxylation rate
+    "Mesophyll conductance correction factor: multiplier"
+    g_ias_c::FT = FT(  0.0  )
+    "Mesophyll conductance correction factor: exponent"
+    g_ias_e::FT = FT(  0.3  )
+    "Maximal leaf diffusive conductance for H₂O at 298.15 K `[mol m⁻² s⁻¹]`"
+    g_max  ::FT = FT(  0.8  )
+    "CO₂ compensation point with the absence of dark respiration `[Pa]`"
+    Γ_star ::FT = FT(  2.5  )
+    "Non-steady state factor (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
+    gs_nssf::FT = FT(  0.025)
+    "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    j_max  ::FT = FT(133.6  )
+    "Leaf respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    r_25   ::FT = FT(  1.2  )
+    "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_max  ::FT = FT( 80.0  )
 
     # leaf layers (e_list and q_list need to be updated with time)
-    ag_list  ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | gross a list per leaf area
-    an_list  ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | net a list per leaf area
-    d_list   ::Array{FT,1}       = zeros(FT,n_total) .+ FT(0.015)                   #              | leaf-to-air d list
-    e_list   ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | flow rate list per leaf area
-    ec_list  ::Array{FT,1}       = zeros(FT,n_total) .+ FT(6.3e-4)                  # mol m⁻² s⁻¹  | e_crit list per leaf area
-    gsc_list ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsc list per leaf area
-    gsw_list ::Array{FT,1}       = zeros(FT,n_total)                                # mol m⁻² s⁻¹  | gsw list per leaf area
-    la_list  ::Array{FT,1}       = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])    # m²           | leaf area list
-    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_total]                  #              | leaf struct list
-    par_list ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | PAR list
-    pi_list  ::Array{FT,1}       = zeros(FT,n_total)                                # Pa           | leaf interanal CO₂ list
-    q_list   ::Array{FT,1}       = zeros(FT,n_total)                                # mol s⁻¹      | flow rate list
-    r_list   ::Array{FT,1}       = zeros(FT,n_total)                                # μmol m⁻² s⁻¹ | respiration list per leaf area
-    t_list   ::Array{FT,1}       = zeros(FT,n_total) .+ FT(298.15 )                 # K            | leaf temperature list
+    "List of [`Leaf`](@ref)"
+    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_total]
+    "List of gross photosynthetic rate for n_total leaves `[μmol m⁻² s⁻¹]`"
+    ag_list  ::Array{FT,1} = zeros(FT,n_total)
+    "List of net photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    an_list  ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf-to-air vapor pressure deficit `[unitless]`"
+    d_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(0.015)
+    "List of flow rate per leaf area `[mol m⁻² s⁻¹]`"
+    e_list   ::Array{FT,1} = zeros(FT,n_total)
+    "List of critical flow rate (when leaf xylem pressure induces desiccation) per leaf area `[mol m⁻² s⁻¹]`"
+    ec_list  ::Array{FT,1} = zeros(FT,n_total) .+ FT(6.3e-4)
+    "List of effective leaf diffusive conductance for CO₂ `[mol m⁻² s⁻¹]`"
+    gsc_list ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
+    gsw_list ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf area per leaf `[m²]`"
+    la_list  ::Array{FT,1} = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])
+    "List of PAR for each leaf"
+    par_list ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf internal CO₂ partial pressure `[Pa]`"
+    pi_list  ::Array{FT,1} = zeros(FT,n_total)
+    "List of flow rate `[mol s⁻¹]`"
+    q_list   ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf respiration rate `[μmol m⁻² s⁻¹]`"
+    r_list   ::Array{FT,1} = zeros(FT,n_total)
+    "List of leaf temperature `[K]`"
+    t_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(298.15)
 end
 
 
 
 
 """
-    struct canopy{FT, n, n_total}
+    struct Canopy{FT, n, n_total}
 
-# Arguments
-- `FT`         Floating type for the struct
-- `n`          Number of canopy layers
-- `n_total`    Number of leaves in each layer
+A Canopy type which contains `n` [`CanopyLayer`](@ref).
 
-#Description
-The struct for canopy, may need to merge with the canopy struct in the RT module.
-Calling Canopy{FT, n, n_total}() will create the Canopy struct for Tree struct.
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Canopy{FT<:AbstractFloat,n, n_total}
-    n_layer    ::Int                      = n                                           # | number of canopy layers
-    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]    # | a list of leaf layers
+    "Canopy layer number"
+    n_layer::Int = n
+    "List of [`CanopyLayer`](@ref)"
+    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]
 end

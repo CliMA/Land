@@ -1,11 +1,10 @@
 """
     update_canopy_from_rt_module!(tree)
 
-# Arguments
-- `tree::Tree`    Tree struct
+Updates canopy information from the RT module, given
+- `tree` A [`Tree`](@ref) type
 
-# Description
-This function will link the RT module and the Plant module to update carbon+water+energy fluxes.
+This interface function is pending...
 """
 function  update_canopy_from_rt_module!(tree::Tree)
     ;

@@ -1,13 +1,11 @@
 """
     get_p_base_q_list_from_q(tree, flow)
 
-# Arguments
-- `tree::Tree`    Tree struct
-- `flow::FT`      Flow rate for the whole tree, mol s⁻¹
+Tree base pressyre `p_base` and a list of flow rate in each root layer `q_list`, given
+- `tree` A [`Tree`](@ref) type
+- `flow` Flow rate for the whole tree `[mol s⁻¹]`
 
-# Description
-This function returns the p_base from total transpiration rate using Newton Raphson.
-A warning will display if total iterations is beyond 50 times.
+This function returns the p_base from total transpiration rate using Newton Raphson. A warning will display if total iterations is beyond 50 times.
 """
 function get_p_base_q_list_from_q(tree::Tree, flow::FT) where {FT}
     p_base   = FT(0.0)

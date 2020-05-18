@@ -1,17 +1,11 @@
-using DocStringExtensions
-
 """
-    update_tree_e_crit!(tree, displaying)
+    update_tree_e_crit!(tree; displaying)
 
-# Arguments
-- `tree::Tree`          Tree struct
-- `displaying::Bool`    If true, messages of how e_crit evolves will display
+Update the critical transpiration rate information, given
+- `tree` A [`Tree`](@ref) type
+- `displaying` If true, messages of how `e_crit` evolves step-by-step will display
 
-# Description
-This function update e_crit for each layer (sunlit and shaded).
-The e_crit for each leaf is either increased or decreased so that p_leaf is in the range -Inf to -20.0 MPa.
-The e_crit increases by 1E-6 mol m^-2 s^-1 if p_leaf is less negative than -20 MPa.
-The e_crit decreases by 1E-7 mol m^-2 s^-1 if p_leaf is -Inf.
+This function update `e_crit` for each layer (sunlit and shaded). The `e_crit` for each leaf is either increased or decreased so that `p_leaf` is in the range -Inf to -20.0 MPa. The `e_crit increases by 1e-6 mol m⁻² s⁻¹` if `p_leaf` is less negative than -20 MPa. The `e_crit decreases by 1e-7 mol m⁻² s⁻¹` if `p_leaf` is -Inf.
 """
 function update_tree_e_crit!(tree::Tree; displaying::Bool=false)
     # unpack necessary structs

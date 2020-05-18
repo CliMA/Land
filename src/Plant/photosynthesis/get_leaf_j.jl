@@ -1,12 +1,9 @@
 """
     get_leaf_j(jmax, par)
 
-# Arguments
-- `jmax::FT`    Maximal eclectron transport @ leaf temperature (not 298.15 K)
-- `par::FT`     Photosynthetic active radiation
-
-# Description
-This function calculates j from par using a quadratic function.
+Electron transport rate `j`, given
+- `jmax` Maximal eclectron transport @ leaf temperature (not 298.15 K)
+- `par` Photosynthetic active radiation
 """
 function get_leaf_j(jmax::FT, par::FT) where {FT}
     b = PS_J_QY * par + jmax

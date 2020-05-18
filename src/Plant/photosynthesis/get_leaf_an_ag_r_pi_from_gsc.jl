@@ -1,20 +1,17 @@
 """
     get_leaf_an_ag_r_pi_from_gsc(v25, j25, Γ_star, gsc, p_a, tem, par, p_atm, p_O₂, r25)
 
-# Arguments
-- `v25`       Maixmal carboxylation rate at 298.15 K (25 Celcius)
-- `j25`       Maximal electron transport rate at 298.15 K (25 Celcius)
-- `Γ_star`    CO₂ compensation point with the absense of dark respiration
-- `gsc`       Leaf diffusive conductance to CO₂
-- `p_a`       Atmospheric CO₂ partial pressure
-- `tem`       Leaf temperature
-- `par`       Photosynthetic active radiation
-- `p_atm`     Atmospheric pressure
-- `p_O₂`      O₂ partial pressure
-- `r25`       Leaf respiration rate at 298.15 K (25 Celcius). If ==Inf, r25 will be computed from v25.
-
-# Description
-This function calculates A_net, A_gross, R_leaf, and P_i from gsc.
+Net photosynthetic rate `tar_an`, gross photosynthetic rate `tar_ag`, respiration rate `tar_r`, and leaf internal CO₂ partial pressure `tar_p`, given
+- `v25` Maixmal carboxylation rate at 298.15 K (25 Celcius)
+- `j25` Maximal electron transport rate at 298.15 K (25 Celcius)
+- `Γ_star` CO₂ compensation point with the absense of dark respiration
+- `gsc` Leaf diffusive conductance to CO₂
+- `p_a` Atmospheric CO₂ partial pressure
+- `tem` Leaf temperature
+- `par` Photosynthetic active radiation
+- `p_atm` Atmospheric pressure
+- `p_O₂` O₂ partial pressure
+- `r25` Leaf respiration rate at 298.15 K (25 Celcius). If ==Inf, r25 will be computed from v25.
 """
 function get_leaf_an_ag_r_pi_from_gsc(;
                                        v25::FT = FT(80.0),
@@ -76,22 +73,19 @@ end
 
 
 """
-    get_leaf_an_ag_r_pi_from_gsc(v25, j25, Γ_star, gsc, p_a, tem, par, p_atm, p_O₂, r25)
+    get_leaf_an_ag_r_pi_from_gsc(v25, j25, Γ_star, gsc_list, p_a, tem_list, par_list, p_atm, p_O₂, r25)
 
-# Arguments
-- `v25`         Maixmal carboxylation rate at 298.15 K (25 Celcius)
-- `j25`         Maximal electron transport rate at 298.15 K (25 Celcius)
-- `Γ_star`      CO₂ compensation point with the absense of dark respiration
-- `gsc_list`    A list of leaf diffusive conductance to CO₂
-- `p_a`         Atmospheric CO₂ partial pressure
-- `tem`         A list of leaf temperature
-- `par`         A list of photosynthetic active radiation
-- `p_atm`       Atmospheric pressure
-- `p_O₂`        O₂ partial pressure
-- `r25`         Leaf respiration rate at 298.15 K (25 Celcius). If ==Inf, r25 will be computed from v25.
-
-# Description
-This function calculates A_net, A_gross, R_leaf, and P_i from a list of gsc, tem, and PAR.
+Lists of net photosynthetic rate `list_an`, gross photosynthetic rate `list_ag`, respiration rate `list_re`, and leaf internal CO₂ partial pressure `list_pi`, given
+- `v25` Maixmal carboxylation rate at 298.15 K (25 Celcius)
+- `j25` Maximal electron transport rate at 298.15 K (25 Celcius)
+- `Γ_star` CO₂ compensation point with the absense of dark respiration
+- `gsc_list` A list of leaf diffusive conductance to CO₂
+- `p_a` Atmospheric CO₂ partial pressure
+- `tem_list` A list of leaf temperature
+- `par_list` A list of photosynthetic active radiation
+- `p_atm` Atmospheric pressure
+- `p_O₂` O₂ partial pressure
+- `r25` Leaf respiration rate at 298.15 K (25 Celcius). If ==Inf, r25 will be computed from v25.
 """
 function get_leaf_an_ag_r_pi_from_gsc_list(;
                                            v25::FT          = FT(80.0),

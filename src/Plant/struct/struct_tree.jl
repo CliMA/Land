@@ -5,27 +5,29 @@ A Tree type which, by default, includes
  - 5 root layers
  - a trunk
  - 20 branches
- - canopy layers
+ - 20 canopy layers
 
-Each canopy layer includes 325 leaves (`36*9` sunlit leaves and 1 shaded leaf).
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Tree{FT<:AbstractFloat}
     # tree information
-    "age `[year]`"
+    "Age `[year]`"
     age::Int = 10
-    "basal area `[m²]`"
+    "Basal area `[m²]`"
     ba ::FT  = FT( 0.1)
-    "ground area `[m²]`"
+    "Ground area `[m²]`"
     ga ::FT  = FT(50.0)
-    "tree height `[m]`"
+    "Tree height `[m]`"
     h  ::FT  = FT( 8.0)
+
     # tree formation from root to leaves
-    "root struct with 5 layers by default"
+    "[`Root`](@ref) which contains 5 [`RootLayer`](@ref) by default"
     roots ::Root   = Root{FT,5}()
-    "trunk struct"
+    "Trunk using type [`Stem`](@ref)"
     trunk ::Stem   = Stem{FT}()
-    "branch struct with 20 layers by default"
+    "[`Branch`](@ref) which contains 20 [`Stem`](@ref) by default"
     branch::Branch = Branch{FT,20}()
-    "canopy struct"
+    "[`Canopy`](@ref) which contains 20 [`CanopyLayer`](@ref) by default"
     canopy::Canopy = Canopy{FT,20,325}()
 end

@@ -1,13 +1,11 @@
 """
     get_marginal_penalty_wang(canopyi, indx)
 
-# Arguments
-- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
-- `indx::Number`            indx'th leaf in canopyi.leaf_list
+Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
+- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 
-# Description
-This function returns marginal carbon penalty for the indx th leaf in the canopyi using the Wang 2020 model.
-∂Θ∂E = A / (e_crit - e_leaf), unit mol mol⁻¹
+This function uses the Wang 2020 model. `∂Θ/∂E = A / (e_crit - e_leaf)`, unit `[mol mol⁻¹]`.
 Should be updated to Abstract Type once more models are added
 """
 function get_marginal_penalty_wang(canopyi::CanopyLayer, indx::Number)
@@ -22,12 +20,10 @@ end
 """
     get_marginal_penalty_wang(canopyi, indx)
 
-# Arguments
-- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
+List of marginal water penalty for all the leaves, given
+- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
 
-# Description
-This function returns marginal carbon penalty for all the leavs in canopyi using the Wang 2020 model.
-∂Θ∂E = A / (e_crit - e_leaf), unit mol mol⁻¹
+This function uses the Wang 2020 model. `∂Θ/∂E = A / (e_crit - e_leaf)`, unit `[mol mol⁻¹]`.
 Should be updated to Abstract Type once more models are added
 """
 function get_marginal_penalty_wang(canopyi::CanopyLayer)

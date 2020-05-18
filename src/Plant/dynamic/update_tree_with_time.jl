@@ -1,17 +1,13 @@
 """
     update_tree_with_time!(tree, Δt; scheme="Wang2020", updating=false)
 
-# Arguments
-- `tree::Tree`        Tree struct to operate on
-- `Δt::FT`            Δt
-- `scheme::String`    Optimization model option, will be updated to abstract type once more models are added
-- `updating::Bool`    If true, plant hydraulic parameters will be updated for the Tree struct
+Update the tree flux information and hydraulic parameters, given
+- `tree` One [`Tree`](@ref) type
+- `Δt` Δt
+- `scheme` Optimization model option, default is "Wang2020
+- `updating` If true, plant hydraulic parameters will be updated for the [`Tree`](@ref)
 
-# Description
-Update the tree fluxes information for a given tree within a given time "Δt".
-The function updates the stomatal conductance via a Δgsw = factor * (∂A∂E - ∂Θ∂E).
-The ∂A∂E is the same for every stomatal control model, but ∂Θ∂E differs among models.
-The default "scheme" for computing ∂Θ∂E is from the Wang 2020 model.
+The function updates the stomatal conductance via a `Δgsw = factor * (∂A/∂E - ∂Θ/∂E)`. The `∂A/∂E` is the same for every stomatal control model, but `∂Θ/∂E` differs among models.
 """
 function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wang2020", updating::Bool=false) where {FT}
     # 0. unpack necessary structs
@@ -42,7 +38,7 @@ function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wan
         canopyi.pi_list = anagrpi_lists[4]
     end
 
-    # update the pressure profile in the trunk, branch, and lea
+    # update the pressure profile in the trunk, branch, and leaf
     if updating
         # 2. update the pressure profiles for roots
         q_canopy_list      = [sum(canopyi.q_list) for canopyi in canopy_list]

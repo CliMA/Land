@@ -1,13 +1,11 @@
 """
     get_q_layer_from_p_base(root_layer, p_base)
 
-# Arguments
-- `root_layer::RootLayer`    One layer of root in the tree struct
-- `p_base::FT`               Xylem pressure at the tree base
+Flow rate in a root layer `q_layer`, given
+- `root_layer` One [`RootLayer`](@ref) in [`Root`](@ref) in [`Tree`](@ref)
+- `p_base` Xylem water pressure at the tree base
 
-# Description
-This function calculates the q_layer from known p_soil in the layer and a given p_base.
-This function use Newton Raphson combined with Bi-section to get q_layer.
+This function use Newton Raphson combined with Bi-section to get q_layer. A warning message will display if total iterations exceed 50 times.
 """
 function get_q_layer_from_p_base(root_layer::RootLayer, p_base::FT) where {FT}
     q_min   = FT(0.0)

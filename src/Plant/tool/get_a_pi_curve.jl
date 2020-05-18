@@ -1,18 +1,14 @@
 """
     get_a_pi_curve(v25, j25, Γ_star, tem, par, p_O₂, r25)
 
-# Arguments
-- `v25::FT`       Maximal carboxylation rate at 298.15 K (25 Celcius)
-- `j25::FT`       Maximal electron transport rate at 298.15 K
-- `Γ_star::FT`    CO₂ compensation point with the absence of dark respiration
-- `tem`           Leaf temperature
-- `par`           Photosynthetic active radiation
-- `p_O₂`          O₂ partial pressure
-- `r25`           Leaf respiration rate at 298.15 K. If ==Inf, use v25 to compute r25.
-
-# Description
-This function is meant to obtain the Anet-Pi curve.
-This function may also be used to test the phtosynthesis module.
+Lists of leaf internal CO₂ partial pressure `list_pi`, net photosynthetic rate `list_an`, and gross photosynthetic rate `list_ag`, given constant
+- `v25` Maximal carboxylation rate at 298.15 K (25 Celcius)
+- `j25` Maximal electron transport rate at 298.15 K
+- `Γ_star` CO₂ compensation point with the absence of dark respiration
+- `tem` Leaf temperature
+- `par` Photosynthetic active radiation
+- `p_O₂` O₂ partial pressure
+- `r25` Leaf respiration rate at 298.15 K. If ==Inf, use v25 to compute r25.
 """
 function get_a_pi_curve(;
                         v25::FT = FT(80.0),

@@ -1,8 +1,12 @@
 """
     get_saturated_vapor_pressure(tem)
-This function returns the saturated vapor pressure in Pa.
-p_sat is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
-The a0, e0, and e1 are moved to constants
+
+Saturated vapor pressure in `[Pa]`, given
+- `tem` Water temperature
+
+Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
+
+May need to merge with other CLIMA repository to be consistent.
 """
 function get_saturated_vapor_pressure(tem::FT) where {FT}
     temc = tem - K_0
@@ -14,9 +18,13 @@ end
 
 """
     get_saturated_vapor_pressure(tem)
-This function returns the saturated vapor pressure in Pa for a list of temperatures.
-p_sat is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
-The a0, e0, and e1 are moved to constants
+
+List of saturated vapor pressure in `[Pa]`, given
+- `tem` A list of temperatures
+
+Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
+
+May need to merge with other CLIMA repository to be consistent.
 """
 function get_saturated_vapor_pressure(tem::Array{FT,1}) where {FT}
     temc = tem .- K_0

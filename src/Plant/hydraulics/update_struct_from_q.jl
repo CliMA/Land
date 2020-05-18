@@ -1,25 +1,20 @@
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    update_struct_from_q!(root_layer, flow; p_ini)
 
-# Arguments
-- `any_struct::RootLayer`    One root layer in Tree struct
-- `flow::FT`                 Flow rate in the given root layer
-- `p_ini::FT`                Upstream soil water potential if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-
-# Description
-This function updates the hydraulic parameters in the root struct from a know flow rate.
-The impact from rhizosphere conductance is included.
-Flow in mol s⁻¹, p_end in MPa
+Update root hydraulic information considering the impact from rhizosphere conductance and gravity, given
+- `root_layer` One [`RootLayer`](@ref) in [`Root`](@ref) in [`Tree`](@ref)
+- `flow` Flow rate in the given root layer
+- `p_ini` Upstream soil water potential if `p_ini` is given, otherwise (`Inf`) `root_layer.p_ups` will be used
 """
-function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
+function update_struct_from_q!(root_layer::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = root_layer.p_ups
     else
         p_end = p_ini
     end
 
     # update the flow rate in the struct
-    any_struct.q = flow
+    root_layer.q = flow
 
     #=
     compute the pressure drop along the rhizosphere, note that p_end is corrected for minor change in surface tension
@@ -27,12 +22,12 @@ function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf
     2. Calculate dP = flow / Krhiz_i for each of the 10 shells of the rhizosphere
     3. Update the P at the end of the rhizosphere
     =#
-    a   = any_struct.soil_a
-    m   = any_struct.soil_m
-    n   = any_struct.soil_n
-    k   = any_struct.k_rhiz
-    k_s = get_relative_surface_tension(any_struct.t_soil)
-    k_t = get_relative_viscosity(any_struct.t_soil)
+    a   = root_layer.soil_a
+    m   = root_layer.soil_m
+    n   = root_layer.soil_n
+    k   = root_layer.k_rhiz
+    k_s = get_relative_surface_tension(root_layer.t_soil)
+    k_t = get_relative_viscosity(root_layer.t_soil)
     for i in 0:9
         if p_end<=0
             shell_t = (1 / (1 + (a*(-p_end/k_s))^n)) ^ m
@@ -46,7 +41,7 @@ function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf
     end
 
     # update the water potential at rhizosphere-root connection
-    any_struct.p_rhiz = p_end
+    root_layer.p_rhiz = p_end
 
     #=
     1. Compare the P with drought history in the xylem
@@ -55,37 +50,33 @@ function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf
     4. Update the P at the end of the xylem
     5. Also, update the drought history if the P is more negative than the previous history
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(root_layer.p_element)
+        p_25   = min(root_layer.p_history[i], p_end / get_relative_surface_tension(root_layer.t_element[i]))
+        k_25   = root_layer.k_element[i] * exp( -1 * (-p_25/root_layer.b) ^ (root_layer.c) )
+        k      = k_25 / get_relative_viscosity(root_layer.t_element[i])
+        p_end -= flow / k + ρ_H₂O * gravity * root_layer.z_element[i] * FT(1e-6)
 
         # update the values in each element
-        if p_25<any_struct.p_history[i]
-            any_struct.p_history[i] = p_25
+        if p_25<root_layer.p_history[i]
+            root_layer.p_history[i] = p_25
         end
-        any_struct.p_element[i] = p_end
+        root_layer.p_element[i] = p_end
     end
 
     # update the xylem pressure at the tree base
-    any_struct.p_dos = p_end
+    root_layer.p_dos = p_end
 end
 
 
 
 
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    update_struct_from_q!(stem, flow; p_ini)
 
-# Arguments
-- `any_struct::Stem`    Trunk or Branch in Tree struct
-- `flow::FT`            Flow rate in the given Stem
-- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-    
-# Description
-This function updates the hydraulic parameters in stem struct, including impact from gravity.
-Flow in mol s⁻¹, p_end in MPa
+Update the stem hydraulic information considering the impact from gravity, given
+- `stem` [`Stem`](@ref) as trunk in a [`Tree`](@ref) or as side branch in [`Branch`](ref) in [`Tree`](@ref)
+- `flow::FT` Flow rate in the given stem
+- `p_ini::FT` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `stem.p_ups` will be used
 """
 function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
@@ -125,16 +116,12 @@ end
 
 
 """
-    get_struct_from_q(any_struct, flow; p_ini)
+    update_struct_from_q!(leaf, flow; p_ini)
 
-# Arguments
-- `any_struct::Leaf`    Leaf in CanopyLayer in a Tree struct
-- `flow::FT`            Flow rate in the given Leaf
-- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
-    
-# Description
-This function updates the hydraulic parameters in Leaf struct, including impact from gravity.
-Flow in mol s⁻¹, p_end in MPa
+Update the leaf hydraulic information considering the impact from gravity, given
+- `leaf` [`Leaf`](@ref) type in [`CanopyLayer`](@ref) in a [`Tree`](@ref)
+- `flow` Flow rate per leaf area in the given leaf
+- `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `leaf.p_ups` will be used
 """
 function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf

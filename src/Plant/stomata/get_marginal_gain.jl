@@ -1,12 +1,9 @@
 """
     get_marginal_gain(canopyi, indx)
 
-# Arguments
-- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
-- `indx::Number`            indx'th leaf in the canopyi.leaf_list
-
-# Description
-This function calculates marginal gain for the indx th leaf in the canopyi, useful for any optimization model.
+Marginal water use efficiency `∂A/∂E` for a leaf in a canopy layer, given
+- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 """
 function get_marginal_gain(canopyi::CanopyLayer, indx::Number)
     FTYP      = eltype(canopyi.an_list[indx])
@@ -37,11 +34,8 @@ end
 """
     get_marginal_gain(canopyi, indx)
 
-# Arguments
-- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
-
-# Description
-This function calculates a list of marginal gain for the canopyi, useful for any optimization model.
+A list of marginal water use efficiency for all the leaves, given
+- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
 """
 function get_marginal_gain(canopyi::CanopyLayer)
     FTYP      = eltype(canopyi.an_list[1])
