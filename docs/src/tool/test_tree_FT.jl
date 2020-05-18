@@ -1,3 +1,4 @@
+# This script tests whether all the functions in Land.Plant uses the same FT
 # include("docs/src/tool/test_tree_FT.jl")
 
 using Land.Plant

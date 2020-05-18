@@ -1,12 +1,19 @@
 """
     update_tree_with_time!(tree, Δt; scheme="Wang2020", updating=false)
-Update the tree fluxes information for a given "tree" within a given time "Δt".
+
+# Arguments
+- `tree::Tree`        Tree struct to operate on
+- `Δt::FT`            Δt
+- `scheme::String`    Optimization model option, will be updated to abstract type once more models are added
+- `updating::Bool`    If true, plant hydraulic parameters will be updated for the Tree struct
+
+# Description
+Update the tree fluxes information for a given tree within a given time "Δt".
 The function updates the stomatal conductance via a Δgsw = factor * (∂A∂E - ∂Θ∂E).
 The ∂A∂E is the same for every stomatal control model, but ∂Θ∂E differs among models.
 The default "scheme" for computing ∂Θ∂E is from the Wang 2020 model.
-The "updating" determines whether the plant hydraulic system will be updated (true) or not (false).
 """
-function update_tree_with_time!(tree::Tree, Δt::FT=NUMB_1; scheme::String="Wang2020", updating::Bool=false) where {FT}
+function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wang2020", updating::Bool=false) where {FT}
     # 0. unpack necessary structs
     @unpack branch_list = tree.branch
     @unpack canopy_list = tree.canopy
@@ -75,7 +82,7 @@ function update_tree_with_time!(tree::Tree, Δt::FT=NUMB_1; scheme::String="Wang
 
         # update the gsw and gsc for each leaf
         canopyi.gsw_list += canopyi.gs_nssf .* (list_∂A∂E - list_∂Θ∂E) .* Δt
-        canopyi.gsw_list[ canopyi.gsw_list .< 0 ] .= NUMB_0
-        canopyi.gsc_list  = canopyi.gsw_list ./ NUMB_1_6 ./ ( NUMB_1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+        canopyi.gsw_list[ canopyi.gsw_list .< 0 ] .= 0
+        canopyi.gsc_list  = canopyi.gsw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
     end
 end

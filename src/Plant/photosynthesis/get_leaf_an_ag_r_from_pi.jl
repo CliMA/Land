@@ -1,6 +1,18 @@
 """
     get_leaf_an_ag_r_from_pi(v25, j25, Γ_star, p_i, tem, par, p_O₂, r25)
-This function calculates A_net, A_gross, and R_leaf from P_i
+
+# Arguments
+- `v25`       Maixmal carboxylation rate at 298.15 K (25 Celcius)
+- `j25`       Maximal electron transport rate at 298.15 K (25 Celcius)
+- `Γ_star`    CO₂ compensation point with the absense of dark respiration
+- `p_i`       Leaf internal CO₂ partial pressure
+- `tem`       Leaf temperature
+- `par`       Photosynthetic active radiation
+- `p_O₂`      O₂ partial pressure
+- `r25`       Leaf respiration rate at 298.15 K (25 Celcius). If ==Inf, r25 will be computed from v25.
+
+# Description
+This function calculates A_net, A_gross, and R_leaf from a known p_i
 """
 function get_leaf_an_ag_r_from_pi(;
                                   v25::FT = FT(80.0),
@@ -22,10 +34,10 @@ function get_leaf_an_ag_r_from_pi(;
     vmax = get_leaf_vcmax(v25, tem)
     jmax = get_leaf_jmax(j25, tem)
     j    = get_leaf_j(jmax,par)
-    kc   = PS_KC_25 * PS_KC_Q10^( NUMB_0_1 * (tem-K_25) )
-    ko   = PS_KO_25 * PS_KO_Q10^( NUMB_0_1 * (tem-K_25) )
-    km   = kc * (NUMB_1 + p_O₂/ko)
-    aj   = j * (p_i-Γ_star) / ( NUMB_4*(p_i + NUMB_2*Γ_star) )
+    kc   = PS_KC_25 * PS_KC_Q10^( FT(0.1) * (tem-K_25) )
+    ko   = PS_KO_25 * PS_KO_Q10^( FT(0.1) * (tem-K_25) )
+    km   = kc * (1 + p_O₂/ko)
+    aj   = j * (p_i-Γ_star) / ( 4*(p_i + 2*Γ_star) )
     ac   = vmax * (p_i-Γ_star) / (p_i+km)
     ag   = min(ac,aj)
     an   = ag - rday

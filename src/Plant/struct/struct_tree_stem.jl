@@ -1,4 +1,12 @@
-# struct for stem
+"""
+    struct Stem{FT}
+
+# Arguments
+- `FT` Floating type for the Stem
+
+# Description
+The Stem struct is used for creating a trunk and a list of branches.
+"""
 Base.@kwdef mutable struct Stem{FT<:AbstractFloat}
     # trunk structure
     r_layer::FT = FT(1.0)    # m | horizental radius of the layer
@@ -27,7 +35,20 @@ end
 
 
 
-# struct for tree stem
+"""
+    create_branch_list(FT, n, z_lo, z_hi)
+
+# Arguments
+- `FT`      Floating type for the Stem struct
+- `n`       Total number of canopy layers, one branch for a canopy layer
+- `z_lo`    Minimal canopy distance from the ground
+- `z_hi`    Maximal canopy distance from the ground
+
+# Description
+This function creates a list of stem structs as branch system for the tree.
+Each branch (Stem) is responsible for a canopy layer.
+The branch index from 1:n is from lower to higher canopy.
+"""
 function create_branch_list(FT, n=20, z_lo=3.0, z_hi=8.0)
     # create a list of branches following the default of stem
     branch_list = [Stem{FT}() for i in 1:n]
@@ -51,7 +72,16 @@ end
 
 
 
-# branch struct
+"""
+
+
+# Arguments
+- `FT`    Floating type of the Stem struct
+- `n`     Number of canopy layers (branches accordingly)
+
+# Description
+Calling Branch{FT,n} will create a Branch system with n Stems.
+"""
 Base.@kwdef mutable struct Branch{FT<:AbstractFloat, n}
     # branch structure
     branch_list::Array{Stem{FT},1} = create_branch_list(FT,n)    # | a list of struct_tree_stem

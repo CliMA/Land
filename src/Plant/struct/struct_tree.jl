@@ -1,4 +1,13 @@
-# struct for a C3 tree
+"""
+    struct Tree{FT}
+
+# Arguments
+- `FT`    Floating type for the tree struct
+
+# Description
+A Tree struct, by default, includes 5 root layers, a trunk, 20 branches and canopy layers.
+Each canopy layer includes 325 leaves (36*9 sunlit leaves and 1 shaded leaf).
+"""
 Base.@kwdef mutable struct Tree{FT<:AbstractFloat}
     # tree information
     age::Int = 10          # year | age

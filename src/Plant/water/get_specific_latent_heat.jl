@@ -8,5 +8,5 @@ The constant are moved to constants.jl
 """
 function get_specific_latent_heat(tem::FT) where {FT}
     temc = tem - K_0
-    return slh_a0 + slh_a1*temc + slh_a2*temc^NUMB_2 + slh_a3*temc^NUMB_3
+    return slh_a0 + slh_a1*temc + slh_a2*temc^2 + slh_a3*temc^3
 end

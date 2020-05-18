@@ -1,5 +1,18 @@
 """
     get_a_par_curve(v25, j25, Γ_star, gsc, p_a, tem, p_O₂, r25)
+
+# Arguments
+- `v25::FT`       Maximal carboxylation rate at 298.15 K (25 Celcius)
+- `j25::FT`       Maximal electron transport rate at 298.15 K
+- `Γ_star::FT`    CO₂ compensation point with the absence of dark respiration
+- `gsc::FT`       Leaf diffusive conductance to CO₂
+- `p_a`           Atmospheric CO₂ partial pressure
+- `tem`           Leaf temperature
+- `p_atm`         Atmospheric pressure
+- `p_O₂`          O₂ partial pressure
+- `r25`           Leaf respiration rate at 298.15 K. If ==Inf, use v25 to compute r25.
+
+# Description
 This function is meant to obtain the Anet-PAR curve.
 This function may also be used to test the phtosynthesis module.
 """

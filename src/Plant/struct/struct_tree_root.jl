@@ -1,4 +1,12 @@
-# struct for root layer
+"""
+    struct RootLayer{FT}
+
+# Arguments
+- `FT`    Floating type for the RootLayer
+
+# Description
+Calling RootLayer{FT}() will create one RootLayer struct for the root system.
+"""
 Base.@kwdef mutable struct RootLayer{FT<:AbstractFloat}
     # root structure
     z_lo   ::FT = FT(-1.0)    # m | root depth
@@ -40,7 +48,18 @@ end
 
 
 
-# function to create root list
+"""
+    create_root_list(FT, n, z_lo)
+
+# Arguments
+- `FT`      Floating type for the RootLayer struct
+- `n`       Total number of root layers in the root system
+- `z_lo`    Maximal root depth
+
+# Description
+The function creates a root system with n root layers evenly in the soil.
+This function need to work with another function to quantify the root distribution.
+"""
 function create_root_list(FT, n=5, z_lo=-1.0)
     # create a list of root layers
     root_list = [RootLayer{FT}() for i in 1:n]
@@ -65,7 +84,16 @@ end
 
 
 
-# struct for tree root
+"""
+    struct Root{FT, n}
+
+# Arguments
+- `FT`    Floating type for the Root Struct.
+- `n`     Root layer number in the Root system.
+
+# Description
+The Root Struct needs to work with another function to quantify the root distribution.
+"""
 Base.@kwdef mutable struct Root{FT<:AbstractFloat,n}
     root_frac::Array{FT,1}            = ones(FT,5) .* FT(0.2)              # | a list of root fraction
     root_zs  ::Array{FT,1}            = FT.([-0.2,-0.4,-0.6,-0.8,-1.0])    # | a list of root z (lower value)

@@ -10,5 +10,5 @@ C = 0.04527   K⁻¹
 D = -3.376E-5 K⁻²
 """
 function get_relative_viscosity(tem::FT) where {FT}
-    return exp( vis_b * ( NUMB_1/tem - NUMB_1/K_25) + vis_c * (tem - K_25) + vis_d * (tem^NUMB_2 - K_25^NUMB_2) )
+    return exp( vis_b * ( 1/tem - 1/K_25) + vis_c * (tem - K_25) + vis_d * (tem^2 - K_25^2) )
 end

@@ -1,15 +1,22 @@
 """
     get_q_layer_from_p_base(root_layer, p_base)
-This function calculates the q_layer from p_soil in the layer and p_base
-This function use newton raphson to get q_layer
+
+# Arguments
+- `root_layer::RootLayer`    One layer of root in the tree struct
+- `p_base::FT`               Xylem pressure at the tree base
+
+# Description
+This function calculates the q_layer from known p_soil in the layer and a given p_base.
+This function use Newton Raphson combined with Bi-section to get q_layer.
 """
 function get_q_layer_from_p_base(root_layer::RootLayer, p_base::FT) where {FT}
-    q_min   = NUMB_0
-    q_max   = NUMB_1
-    q_layer = NUMB_0_5
+    q_min   = FT(0.0)
+    q_max   = FT(1.0)
+    q_layer = FT(0.5)
 
-    # use while loop to get q_layer
-    count   = 0
+    # use while loop to get q_layer, Δp cannot be too small to avoid numerical issues
+    Δp    = FT(1e-3)
+    count = 0
     while true
         p_0 = get_struct_p_end_from_q(root_layer, q_layer)
 
@@ -27,10 +34,10 @@ function get_q_layer_from_p_base(root_layer::RootLayer, p_base::FT) where {FT}
         
         # update q_layer from bi-section or newton raphson
         if p_0 <= -20.0
-            q_layer  = NUMB_0_5 * (q_min + q_max)
+            q_layer  = FT(0.5) * (q_min + q_max)
         else
-            p_1      = get_struct_p_end_from_q(root_layer, q_layer+ΔEP_3)
-            slope    = (p_1 - p_0) / ΔEP_3
+            p_1      = get_struct_p_end_from_q(root_layer, q_layer+Δp)
+            slope    = (p_1 - p_0) / Δp
             q_layer += (p_base - p_0) / slope
         end
 

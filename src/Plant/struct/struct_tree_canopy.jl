@@ -1,4 +1,12 @@
-# struct for leaf, may need to merge with the leaf struct in the RT module
+"""
+    struct Leaf{FT}
+
+# Arguments
+- `FT`    Floating type for the struct
+
+# Description
+Calling Leaf{FT}() will create a leaf struct with default settings.
+"""
 Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     # leaf structure
     angle_locat::FT = FT(0.0)    # degree | direction from the tree trunk to the leaf, 0 for east, 270 for south, and 180 for west
@@ -25,7 +33,16 @@ end
 
 
 
-# struct of canopy layer
+"""
+    struct CanopyLayer{FT, n_total}
+
+# Arguments
+- `FT`         Floating type for the struct
+- `n_total`    Total number of leaves in the canopy layer, = n_Azi * n_Inclination + 1 (n*n for sunlit leaves, 1 for shaded leaves)
+
+# Description
+Calling CanopyLayer{FT, n_total}() will create a CanopyLayer struct with n_total leaves. 
+"""
 Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
     # canopy layer and leaf structure
     f_layer::FT = FT(  1.0)    #    | fraction of LA of the layer, f_layer = 1.0 / n_layer
@@ -71,7 +88,18 @@ end
 
 
 
-# the struct for canopy, may need to merge with the canopy struct in the RT module
+"""
+    struct canopy{FT, n, n_total}
+
+# Arguments
+- `FT`         Floating type for the struct
+- `n`          Number of canopy layers
+- `n_total`    Number of leaves in each layer
+
+#Description
+The struct for canopy, may need to merge with the canopy struct in the RT module.
+Calling Canopy{FT, n, n_total}() will create the Canopy struct for Tree struct.
+"""
 Base.@kwdef mutable struct Canopy{FT<:AbstractFloat,n, n_total}
     n_layer    ::Int                      = n                                           # | number of canopy layers
     canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]    # | a list of leaf layers

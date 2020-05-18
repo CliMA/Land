@@ -1,5 +1,5 @@
-# set the default floating type, Float32 for now. Should be the same as in the RT module
-const FT = Float32
+# set the default floating type, Float64 for now. Should be the same as in the RT module
+const FT = Float64
 
 # load the constant gravity value
 struct EarthParameterSet <: AbstractEarthParameterSet end
@@ -7,28 +7,12 @@ const earth   = EarthParameterSet()
 const gravity = FT( CLIMAParameters.Planet.grav(earth) )
 const GAS_R   = FT( gas_constant() )
 
-# pre-defined ΔE and ΔP to avoid repeated FT conversion
-const ΔEP_2 = FT(1e-2)
-const ΔEP_3 = FT(1e-3)
-const ΔEP_4 = FT(1e-4)
-const ΔEP_5 = FT(1e-5)
-const ΔEP_6 = FT(1e-6)
-const ΔEP_7 = FT(1e-7)
-
-# pre-defined number to avoid repeated FT conversion in the code
-const NUMB_0   = FT( 0.0)
-const NUMB_0_1 = FT( 0.1)
-const NUMB_0_5 = FT( 0.5)
-const NUMB_0_9 = FT( 0.9)
-const NUMB_1   = FT( 1.0)
-const NUMB_1_6 = FT( 1.6)
-const NUMB_2   = FT( 2.0)
-const NUMB_3   = FT( 3.0)
-const NUMB_4   = FT( 4.0)
-const NUMB_10  = FT(10.0)
-
+# temperature constants
 const K_0    = FT(273.15)
 const K_25   = FT(298.15)
+
+
+
 
 # more pending, may need to migrate this to CLIMAParameters in the future
 const ρ_H₂O  = FT(998.0 )    # Kg m⁻³ | @ 293.15 K, may need to calculate it from temperature in the future
@@ -50,18 +34,21 @@ const st_k  = FT(2.1E-7)    # J K⁻¹ mol⁻(2/3) | Used for surface tension
 const st_v  = FT(18.0  )    # ml mol⁻¹        | Used for surface tension
 const st_tc = FT(647.0 )    # K               | Used for surface tension
 
+
+
+
 # constants for photosynthesis model, may need to merge with the Photosynthesis in the RT module
 # constants for Vcmax
 const PS_V_HA = FT(73637.0)
 const PS_V_HD = FT(149252.0)
 const PS_V_SV = FT(486.0)
-const PS_V_C  = NUMB_1 + exp( (PS_V_SV*K_25 - PS_V_HD) / (GAS_R*K_25) )
+const PS_V_C  = 1 + exp( (PS_V_SV*K_25 - PS_V_HD) / (GAS_R*K_25) )
 
 # constants for Jmax and J
 const PS_J_HA = FT(50300.0)
 const PS_J_HD = FT(152044.0)
 const PS_J_SV = FT(495.0)
-const PS_J_C  = NUMB_1 + exp( (PS_J_SV*K_25 - PS_J_HD) / (GAS_R*K_25) )
+const PS_J_C  = 1 + exp( (PS_J_SV*K_25 - PS_J_HD) / (GAS_R*K_25) )
 
 const PS_J_QY = FT(0.3)    # quantum yield
 const PS_J_CR = FT(0.9)    # curvature factor

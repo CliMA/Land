@@ -1,7 +1,14 @@
 """
-    update_struct_from_q!(any_struct, flow; p_ini)
-This function returns the end pressure for root struct, including rhizosphere constance.
-The p_ini is either the upstream p of the struct or preset value.
+    get_struct_from_q(any_struct, flow; p_ini)
+
+# Arguments
+- `any_struct::RootLayer`    One root layer in Tree struct
+- `flow::FT`                 Flow rate in the given root layer
+- `p_ini::FT`                Upstream soil water potential if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
+
+# Description
+This function updates the hydraulic parameters in the root struct from a know flow rate.
+The impact from rhizosphere conductance is included.
 Flow in mol s⁻¹, p_end in MPa
 """
 function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf)) where {FT}
@@ -27,13 +34,13 @@ function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf
     k_s = get_relative_surface_tension(any_struct.t_soil)
     k_t = get_relative_viscosity(any_struct.t_soil)
     for i in 0:9
-        if p_end<0
-            shell_t = (NUMB_1 / (NUMB_1 + (a*(-p_end/k_s))^n)) ^ m
+        if p_end<=0
+            shell_t = (1 / (1 + (a*(-p_end/k_s))^n)) ^ m
         else
-            shell_t = NUMB_1
+            shell_t = FT(1.0)
         end
-        shell_f  = sqrt(shell_t) * (NUMB_1 - (NUMB_1-shell_t^(NUMB_1/m)) ^ m) ^ NUMB_2
-        shell_k  = k * shell_f * log(NUMB_10) / log((NUMB_10-NUMB_0_9*i)/(NUMB_10-NUMB_0_9*(i+1))) / k_t
+        shell_f  = sqrt(shell_t) * (1 - (1-shell_t^(1/m)) ^ m) ^ 2
+        shell_k  = k * shell_f * log( FT(10) ) / log( FT((10-0.9*i) / (10-0.9*(i+1))) ) / k_t
         dp       = flow / shell_k
         p_end   -= dp
     end
@@ -50,9 +57,9 @@ function update_struct_from_q!(any_struct::RootLayer, flow::FT; p_ini::FT=FT(Inf
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1E-6)
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
 
         # update the values in each element
         if p_25<any_struct.p_history[i]
@@ -69,9 +76,15 @@ end
 
 
 """
-    update_struct_from_q!(any_struct, flow; p_ini)
-This function returns the end pressure for stem struct, including gravity.
-The p_ini is either the upstream p of the struct or preset value.
+    get_struct_from_q(any_struct, flow; p_ini)
+
+# Arguments
+- `any_struct::Stem`    Trunk or Branch in Tree struct
+- `flow::FT`            Flow rate in the given Stem
+- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
+    
+# Description
+This function updates the hydraulic parameters in stem struct, including impact from gravity.
 Flow in mol s⁻¹, p_end in MPa
 """
 function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) where {FT}
@@ -93,9 +106,9 @@ function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) wh
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * ΔEP_6
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
 
         # update the values in each element
         if p_25<any_struct.p_history[i]
@@ -112,9 +125,15 @@ end
 
 
 """
-    update_struct_from_q!(any_struct, flow; p_ini)
-This function returns the end pressure for leaf struct, including gravity.
-The p_ini is either the upstream p of the struct or preset value.
+    get_struct_from_q(any_struct, flow; p_ini)
+
+# Arguments
+- `any_struct::Leaf`    Leaf in CanopyLayer in a Tree struct
+- `flow::FT`            Flow rate in the given Leaf
+- `p_ini::FT`           Upstream xylem pressure if p_ini is given, otherwise (Inf) any_struct.p_ups will be used
+    
+# Description
+This function updates the hydraulic parameters in Leaf struct, including impact from gravity.
 Flow in mol s⁻¹, p_end in MPa
 """
 function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) where {FT}
@@ -133,9 +152,9 @@ function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) wh
     =#
     for i in 1:length(any_struct.p_element)
         p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -NUMB_1 * (-p_25/any_struct.b) ^ (any_struct.c) )
+        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
         k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * ΔEP_6
+        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
 
         # update the values in each element
         if p_25<any_struct.p_history[i]

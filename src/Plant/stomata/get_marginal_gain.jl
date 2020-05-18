@@ -1,5 +1,11 @@
 """
     get_marginal_gain(canopyi, indx)
+
+# Arguments
+- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
+- `indx::Number`            indx'th leaf in the canopyi.leaf_list
+
+# Description
 This function calculates marginal gain for the indx th leaf in the canopyi, useful for any optimization model.
 """
 function get_marginal_gain(canopyi::CanopyLayer, indx::Number)
@@ -7,7 +13,7 @@ function get_marginal_gain(canopyi::CanopyLayer, indx::Number)
     leaf_e1   = canopyi.e_list[indx] + FTYP(1E-6)
     leaf_d    = (get_saturated_vapor_pressure(canopyi.t_list[indx]) - canopyi.p_H₂O) /  canopyi.p_atm
     leaf_gsw1 = leaf_e1 / leaf_d
-    leaf_gsc1 = leaf_gsw1 / FTYP(1.6) / ( FTYP(1.0) + canopyi.g_ias_c * leaf_gsw1^(canopyi.g_ias_e) )
+    leaf_gsc1 = leaf_gsw1 / FTYP(1.6) / ( 1 + canopyi.g_ias_c * leaf_gsw1^(canopyi.g_ias_e) )
     anagrpi   = get_leaf_an_ag_r_pi_from_gsc(
                                              v25 = canopyi.v_max,
                                              j25 = canopyi.j_max,
@@ -30,13 +36,18 @@ end
 
 """
     get_marginal_gain(canopyi, indx)
-This function calculates marginal gain for the canopyi, useful for any optimization model.
+
+# Arguments
+- `canopyi::CanopyLayer`    A canopy layer in the Tree Struct
+
+# Description
+This function calculates a list of marginal gain for the canopyi, useful for any optimization model.
 """
 function get_marginal_gain(canopyi::CanopyLayer)
     FTYP      = eltype(canopyi.an_list[1])
     leaf_e1   = canopyi.e_list .+ FTYP(1E-6)
     leaf_gsw1 = leaf_e1 ./ canopyi.d_list
-    leaf_gsc1 = leaf_gsw1 ./ FTYP(1.6) ./ ( FTYP(1.0) .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+    leaf_gsc1 = leaf_gsw1 ./ FTYP(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
     anagrpi_l = get_leaf_an_ag_r_pi_from_gsc_list(
                                                   v25 = canopyi.v_max,
                                                   j25 = canopyi.j_max,

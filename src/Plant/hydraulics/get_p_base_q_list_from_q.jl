@@ -1,12 +1,20 @@
 """
     get_p_base_q_list_from_q(tree, flow)
-This function returns the p_base from total transpiration rate
+
+# Arguments
+- `tree::Tree`    Tree struct
+- `flow::FT`      Flow rate for the whole tree, mol s⁻¹
+
+# Description
+This function returns the p_base from total transpiration rate using Newton Raphson.
+A warning will display if total iterations is beyond 50 times.
 """
 function get_p_base_q_list_from_q(tree::Tree, flow::FT) where {FT}
     p_base   = FT(0.0)
     q_list_0 = FT(0.0)
 
-    # use while loop to get p_base
+    # use while loop to get p_base, Δflow cannot be too small to avoid numerical issues
+    Δflow = FT(1e-3)
     count = 0
     while true
         # calculate the q_list from an assumed p_base
@@ -19,9 +27,9 @@ function get_p_base_q_list_from_q(tree::Tree, flow::FT) where {FT}
         end
 
         # calculate the new q based on slope
-        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+ΔEP_3) for root_layer in tree.roots.root_list]
+        q_list_1 = [get_q_layer_from_p_base(root_layer, p_base+Δflow) for root_layer in tree.roots.root_list]
         q_1      = sum(q_list_1)
-        slope    = (q_1-q_0) / ΔEP_3
+        slope    = (q_1-q_0) / Δflow
         p_base  += (flow-q_0) / slope
 
         # break if total iterations >= 50
