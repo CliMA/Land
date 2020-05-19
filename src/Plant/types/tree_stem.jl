@@ -47,9 +47,6 @@ Base.@kwdef mutable struct Stem{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) .* FT(  0.3 )
 end
 
-
-
-
 """
     create_branch_list(FT, n, z_lo, z_hi)
 
@@ -76,12 +73,8 @@ function create_branch_list(FT, n=20, z_lo=3.0, z_hi=8.0)
         branch_list[i].z_element = ones(FT,10) .* FT((z_hi-z_lo) * i/n * 0.1)
     end
 
-    # return the branch list
     return branch_list
 end
-
-
-
 
 """
     Branch{FT<:AbstractFloat, n}

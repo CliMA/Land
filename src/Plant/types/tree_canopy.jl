@@ -1,5 +1,5 @@
 """
-    struct Leaf{FT}
+    Leaf{FT<:AbstractFloat}
 
 A Leaf type which contains leaf hydraulics information.
 
@@ -40,11 +40,8 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )
 end
 
-
-
-
 """
-    struct CanopyLayer{FT, n_total}
+    CanopyLayer{FT<:AbstractFloat, n_total}
 
 A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_total` [`Leaf`](@ref). The `n_total` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
 
@@ -125,11 +122,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
     t_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(298.15)
 end
 
-
-
-
 """
-    struct Canopy{FT, n, n_total}
+    Canopy{FT<:AbstractFloat,n, n_total}
 
 A Canopy type which contains `n` [`CanopyLayer`](@ref).
 

@@ -1,5 +1,5 @@
 """
-    struct RootLayer{FT<:AbstractFloat}
+    RootLayer{FT<:AbstractFloat}
 
 A RootLayer type which contains root hydraulics information, including rhizosphere conductance.
 
@@ -70,9 +70,6 @@ Base.@kwdef mutable struct RootLayer{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) .* FT( 0.1 )
 end
 
-
-
-
 """
     create_root_list(FT, n, z_lo)
 
@@ -98,15 +95,11 @@ function create_root_list(FT, n=5, z_lo=-1.0)
         root_list[i].z_element = ones(FT,10) .* FT(z_lo * i/n * 0.1)
     end
 
-    # return the root list
     return root_list
 end
 
-
-
-
 """
-    struct Root{FT, n}
+    Root{FT<:AbstractFloat,n}
 
 A Root Struct which contains, by default, 5 even [`RootLayer`](@ref).
 

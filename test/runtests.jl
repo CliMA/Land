@@ -1,6 +1,5 @@
 using Test
 
-ENV["DATADEPS_ALWAYS_ACCEPT"] = true
 ENV["JULIA_LOG_LEVEL"] = "WARN"
 
 @testset "Land" begin
