@@ -38,6 +38,7 @@ if generate_tutorials
         input = abspath(tutorial)
         script = Literate.script(input, gen_dir)
         code = strip(read(script, String))
+        @show code
         mdpost(str) = replace(str, "@__CODE__" => code)
         Literate.markdown(input, gen_dir, postprocess = mdpost)
         # Literate.notebook(input, gen_dir, execute = true)
