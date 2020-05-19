@@ -7,7 +7,7 @@ Leaf respiration rate at leaf temperature if r25 is unknown, given
 """
 function get_leaf_r_from_v25(v25::FT, tem::FT) where {FT}
     # compute r25 from v25
-    r25 = v25 * PS_RV_RATIO
+    r25 = v25 * FT(PS_RV_RATIO)
 
     # return the r from r25 and temperature
     return get_leaf_r_from_r25(r25, tem)

@@ -9,8 +9,8 @@ Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 2
 May need to merge with other CLIMA repository to be consistent.
 """
 function get_saturated_vapor_pressure(tem::FT) where {FT}
-    temc = tem - K_0
-    return svp_a0 * exp(svp_e0 * temc / (temc + svp_e1))
+    temc = tem - FT(K_0)
+    return FT(svp_a0) * exp(FT(svp_e0) * temc / (temc + FT(svp_e1)))
 end
 
 
@@ -27,6 +27,6 @@ Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 2
 May need to merge with other CLIMA repository to be consistent.
 """
 function get_saturated_vapor_pressure(tem::Array{FT,1}) where {FT}
-    temc = tem .- K_0
-    return svp_a0 .* exp.(svp_e0 .* temc ./ (temc .+ svp_e1))
+    temc = tem .- FT(K_0)
+    return FT(svp_a0) .* exp.(FT(svp_e0) .* temc ./ (temc .+ FT(svp_e1)))
 end

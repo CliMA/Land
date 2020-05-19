@@ -16,5 +16,5 @@ D = -3.376E-5 K⁻²
 May need to merge with other CLIMA repository to be consistent.
 """
 function get_relative_viscosity(tem::FT) where {FT}
-    return exp( vis_b * ( 1/tem - 1/K_25) + vis_c * (tem - K_25) + vis_d * (tem^2 - K_25^2) )
+    return exp( FT(vis_b) * ( 1/tem - 1/FT(K_25)) + FT(vis_c) * (tem - FT(K_25)) + FT(vis_d) * (tem^2 - FT(K_25)^2) )
 end

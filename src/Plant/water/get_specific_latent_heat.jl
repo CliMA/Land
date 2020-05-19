@@ -11,6 +11,6 @@ A Short Course in Cloud Physics (3rd ed.). Pergamon Press. p. 16. ISBN 0-7506-32
 May need to merge with other CLIMA repository to be consistent.
 """
 function get_specific_latent_heat(tem::FT) where {FT}
-    temc = tem - K_0
-    return slh_a0 + slh_a1*temc + slh_a2*temc^2 + slh_a3*temc^3
+    temc = tem - FT(K_0)
+    return FT(slh_a0) + FT(slh_a1)*temc + FT(slh_a2)*temc^2 + FT(slh_a3)*temc^3
 end

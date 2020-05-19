@@ -47,7 +47,7 @@ function get_struct_p_end_from_q(root_layer::RootLayer, flow::FT; p_ini::FT=FT(I
         p_25   = min(root_layer.p_history[i], p_end / get_relative_surface_tension(root_layer.t_element[i]))
         k_25   = root_layer.k_element[i] * exp( -1 * (-p_25/root_layer.b) ^ (root_layer.c) )
         k      = k_25 / get_relative_viscosity(root_layer.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * root_layer.z_element[i] * FT(1e-6)
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * root_layer.z_element[i] * FT(1e-6)
     end
 
     return p_end
@@ -78,7 +78,7 @@ function get_struct_p_end_from_q(stem::Stem, flow::FT; p_ini::FT=(Inf)) where {F
         p_25   = min(stem.p_history[i], p_end / get_relative_surface_tension(stem.t_element[i]))
         k_25   = stem.k_element[i] * exp( -1 * (-p_25/stem.b) ^ (stem.c) )
         k      = k_25 / get_relative_viscosity(stem.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * stem.z_element[i] * FT(1e-6)
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * stem.z_element[i] * FT(1e-6)
     end
 
     return p_end
@@ -112,7 +112,7 @@ function get_struct_p_end_from_q(leaf::Leaf, flow::FT; p_ini::FT=FT(Inf)) where 
         p_25   = min(leaf.p_history[i], p_end / get_relative_surface_tension(leaf.t_element[i]))
         k_25   = leaf.k_element[i] * exp( -1 * (-p_25/leaf.b) ^ (leaf.c) )
         k      = k_25 / get_relative_viscosity(leaf.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * leaf.z_element[i] * FT(1e-6)
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * leaf.z_element[i] * FT(1e-6)
     end
 
     return p_end

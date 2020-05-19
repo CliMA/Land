@@ -15,5 +15,5 @@ tem_c = 647.0 K
 May need to merge with other CLIMA repository to be consistent.
 """
 function get_relative_surface_tension(tem::FT) where {FT}
-    return (st_tc - tem) / (st_tc - K_25)
+    return (FT(st_tc) - tem) / (FT(st_tc) - FT(K_25))
 end

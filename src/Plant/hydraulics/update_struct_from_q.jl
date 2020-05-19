@@ -54,7 +54,7 @@ function update_struct_from_q!(root_layer::RootLayer, flow::FT; p_ini::FT=FT(Inf
         p_25   = min(root_layer.p_history[i], p_end / get_relative_surface_tension(root_layer.t_element[i]))
         k_25   = root_layer.k_element[i] * exp( -1 * (-p_25/root_layer.b) ^ (root_layer.c) )
         k      = k_25 / get_relative_viscosity(root_layer.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * root_layer.z_element[i] * FT(1e-6)
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * root_layer.z_element[i] * FT(1e-6)
 
         # update the values in each element
         if p_25<root_layer.p_history[i]
@@ -78,15 +78,15 @@ Update the stem hydraulic information considering the impact from gravity, given
 - `flow::FT` Flow rate in the given stem
 - `p_ini::FT` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `stem.p_ups` will be used
 """
-function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) where {FT}
+function update_struct_from_q!(stem::Stem, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = stem.p_ups
     else
         p_end = p_ini
     end
 
     # update the flow rate in the struct
-    any_struct.q = flow
+    stem.q = flow
 
     #=
     1. Compare the P with drought history in the xylem
@@ -95,21 +95,21 @@ function update_struct_from_q!(any_struct::Stem, flow::FT, p_ini::FT=FT(Inf)) wh
     4. Update the P at the end of the xylem
     5. Also, update the drought history if the P is more negative than the previous history
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(stem.p_element)
+        p_25   = min(stem.p_history[i], p_end / get_relative_surface_tension(stem.t_element[i]))
+        k_25   = stem.k_element[i] * exp( -1 * (-p_25/stem.b) ^ (stem.c) )
+        k      = k_25 / get_relative_viscosity(stem.t_element[i])
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * stem.z_element[i] * FT(1e-6)
 
         # update the values in each element
-        if p_25<any_struct.p_history[i]
-            any_struct.p_history[i] = p_25
+        if p_25<stem.p_history[i]
+            stem.p_history[i] = p_25
         end
-        any_struct.p_element[i] = p_end
+        stem.p_element[i] = p_end
     end
 
     # update the xylem pressure at the tree base
-    any_struct.p_dos = p_end
+    stem.p_dos = p_end
 end
 
 
@@ -123,9 +123,9 @@ Update the leaf hydraulic information considering the impact from gravity, given
 - `flow` Flow rate per leaf area in the given leaf
 - `p_ini` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `leaf.p_ups` will be used
 """
-function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) where {FT}
+function update_struct_from_q!(leaf::Leaf, flow::FT, p_ini::FT=FT(Inf)) where {FT}
     if p_ini==Inf
-        p_end = any_struct.p_ups
+        p_end = leaf.p_ups
     else
         p_end = p_ini
     end
@@ -137,19 +137,19 @@ function update_struct_from_q!(any_struct::Leaf, flow::FT, p_ini::FT=FT(Inf)) wh
     4. Update the P at the end of the xylem
     5. Also, update the drought history if the P is more negative than the previous history
     =#
-    for i in 1:length(any_struct.p_element)
-        p_25   = min(any_struct.p_history[i], p_end / get_relative_surface_tension(any_struct.t_element[i]))
-        k_25   = any_struct.k_element[i] * exp( -1 * (-p_25/any_struct.b) ^ (any_struct.c) )
-        k      = k_25 / get_relative_viscosity(any_struct.t_element[i])
-        p_end -= flow / k + ρ_H₂O * gravity * any_struct.z_element[i] * FT(1e-6)
+    for i in 1:length(leaf.p_element)
+        p_25   = min(leaf.p_history[i], p_end / get_relative_surface_tension(leaf.t_element[i]))
+        k_25   = leaf.k_element[i] * exp( -1 * (-p_25/leaf.b) ^ (leaf.c) )
+        k      = k_25 / get_relative_viscosity(leaf.t_element[i])
+        p_end -= flow / k + FT(ρ_H₂O) * FT(gravity) * leaf.z_element[i] * FT(1e-6)
 
         # update the values in each element
-        if p_25<any_struct.p_history[i]
-            any_struct.p_history[i] = p_25
+        if p_25<leaf.p_history[i]
+            leaf.p_history[i] = p_25
         end
-        any_struct.p_element[i] = p_end
+        leaf.p_element[i] = p_end
     end
 
     # update the xylem pressure at the tree base
-    any_struct.p_dos = p_end
+    leaf.p_dos = p_end
 end
