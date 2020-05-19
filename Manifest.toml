@@ -114,6 +114,24 @@ version = "1.0.6+2"
 [[CEnum]]
 git-tree-sha1 = "018a008c61eb9e422dfabbdd6f4ceba8adff9544"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+version = "0.2.0"
+
+[[CLIMAParameters]]
+deps = ["Test"]
+git-tree-sha1 = "9c3eae7d6bcabf604d9e4e9cc0802db01357bc37"
+uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
+version = "0.1.4"
+
+[[CMake]]
+deps = ["BinDeps"]
+git-tree-sha1 = "50a8b41d2c562fccd9ab841085fc7d1e2706da82"
+uuid = "631607c0-34d2-5d66-819e-eb0f9aa2061a"
+version = "1.2.0"
+
+[[CMakeWrapper]]
+deps = ["BinDeps", "CMake", "Libdl", "Parameters", "Test"]
+git-tree-sha1 = "16d4acb3d37dc05b714977ffefa8890843dc8985"
+uuid = "d5fb7624-851a-54ee-a528-d3f3bac0b4a0"
 version = "0.4.0"
 
 [[CanonicalTraits]]

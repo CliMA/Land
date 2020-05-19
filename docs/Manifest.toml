@@ -116,6 +116,12 @@ git-tree-sha1 = "018a008c61eb9e422dfabbdd6f4ceba8adff9544"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.0"
 
+[[CLIMAParameters]]
+deps = ["Test"]
+git-tree-sha1 = "9c3eae7d6bcabf604d9e4e9cc0802db01357bc37"
+uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
+version = "0.1.4"
+
 [[CanonicalTraits]]
 deps = ["MLStyle"]
 git-tree-sha1 = "1728d2633a206e931daf818309d90eb39c1ce93b"
@@ -226,9 +232,9 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "ChainRulesCore", "ConsoleProgressMonitor", "DataStructures", "Distributed", "DocStringExtensions", "FunctionWrappers", "IterativeSolvers", "IteratorInterfaceExtensions", "LabelledArrays", "LinearAlgebra", "Logging", "LoggingExtras", "MuladdMacro", "Parameters", "Printf", "ProgressLogging", "RecipesBase", "RecursiveArrayTools", "RecursiveFactorization", "Requires", "Roots", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "TableTraits", "TerminalLoggers", "TreeViews", "ZygoteRules"]
-git-tree-sha1 = "9e9b98997a0481b2e7f260e2094a3aa6dbc6361f"
+git-tree-sha1 = "68072ae3ac7fbebfcef7bd3aafa05ba819413f35"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.33.0"
+version = "6.34.2"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
@@ -244,9 +250,9 @@ version = "2.3.0"
 
 [[DiffEqJump]]
 deps = ["Compat", "DataStructures", "DiffEqBase", "FunctionWrappers", "LinearAlgebra", "Parameters", "PoissonRandom", "Random", "RandomNumbers", "RecursiveArrayTools", "StaticArrays", "Statistics", "TreeViews"]
-git-tree-sha1 = "b337929b13908dcd4851b9f7223ed36383c39b50"
+git-tree-sha1 = "a3a329e7a078cba4a3f5a00d2d788f4a974677a1"
 uuid = "c894b116-72e5-5b58-be3c-e6d8d4ac2b12"
-version = "6.7.3"
+version = "6.7.5"
 
 [[DiffEqNoiseProcess]]
 deps = ["DataStructures", "DiffEqBase", "LinearAlgebra", "Random", "RandomNumbers", "RecipesBase", "RecursiveArrayTools", "Requires", "ResettableStacks", "StaticArrays", "Statistics"]
@@ -533,12 +539,12 @@ version = "1.1.0"
 
 [[LabelledArrays]]
 deps = ["ArrayInterface", "LinearAlgebra", "MacroTools", "StaticArrays"]
-git-tree-sha1 = "8702ede2e7cfdf872fd2e5c1b5f34c618208be80"
+git-tree-sha1 = "674c830a4ac858e877906405410471f5af2a4756"
 uuid = "2ee39098-c373-598a-b85f-a56591580800"
-version = "1.2.0"
+version = "1.2.1"
 
 [[Land]]
-deps = ["BenchmarkTools", "DelimitedFiles", "DifferentialEquations", "Distributions", "DocStringExtensions", "Documenter", "ForwardDiff", "GSL", "IncGammaBeta", "Interpolations", "LinearAlgebra", "Literate", "MAT", "Parameters", "Plots", "Polynomials", "Printf", "PyPlot", "QuadGK", "StaticArrays", "Statistics", "Test", "Zygote"]
+deps = ["BenchmarkTools", "CLIMAParameters", "DelimitedFiles", "DifferentialEquations", "Distributions", "DocStringExtensions", "Documenter", "ForwardDiff", "GR", "GSL", "HDF5", "IncGammaBeta", "Interpolations", "LinearAlgebra", "Literate", "MAT", "Parameters", "Plots", "Polynomials", "Printf", "PyPlot", "QuadGK", "StaticArrays", "Statistics", "Test", "Zygote"]
 path = ".."
 uuid = "27e3c115-2cb8-4114-b7a5-cd9f011f9dcc"
 version = "0.1.0"
@@ -853,9 +859,9 @@ version = "0.1.2"
 
 [[ProgressMeter]]
 deps = ["Distributed", "Printf"]
-git-tree-sha1 = "ea1f4fa0ff5e8b771bf130d87af5b7ef400760bd"
+git-tree-sha1 = "b3cb8834eee5410c7246734cc6f4f586fe0dc50e"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
-version = "1.2.0"
+version = "1.3.0"
 
 [[PyCall]]
 deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
@@ -958,9 +964,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[SIMDPirates]]
 deps = ["VectorizationBase"]
-git-tree-sha1 = "f9377c7e2e03d245925ce860298e304d3abacfca"
+git-tree-sha1 = "a0384f5fa5812f13a7db3cf724973382c585a4e6"
 uuid = "21efa798-c60a-11e8-04d3-e1a92915a26a"
-version = "0.7.24"
+version = "0.7.25"
 
 [[SLEEFPirates]]
 deps = ["Libdl", "SIMDPirates", "VectorizationBase"]
@@ -1134,9 +1140,9 @@ version = "1.2.0"
 
 [[VectorizationBase]]
 deps = ["CpuId", "LinearAlgebra"]
-git-tree-sha1 = "daaaaca8ced9b518969fec2ed2a8ea239e4544b1"
+git-tree-sha1 = "e471bcf74579adbed671fbc6ee34bfa2b2190bc0"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.11.4"
+version = "0.11.5"
 
 [[VersionParsing]]
 git-tree-sha1 = "80229be1f670524750d905f8fc8148e5a8c4537f"
