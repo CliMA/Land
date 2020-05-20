@@ -5,8 +5,9 @@
 
 ## Use Julia Plots package and switch to plotly js option:
 using Plots
-using Conda
-Conda.add("matplotlib")
+#gr()
+#using Conda
+#Conda.add("matplotlib")
 
 pyplot()
 #plotlyjs()
