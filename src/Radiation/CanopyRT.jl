@@ -83,15 +83,41 @@ const soil   = struct_soil{FT}(wl, 0.4*ones(FT, length(wl)), [0.1],290.0)
 const leaf   = leafbio{FT,nwl, length(wle), length(wlf),length(wle)*length(wlf)}()
 # Observation angles
 const angles = struct_angles{FT}()
-# Canopy Structure
-const canopy = struct_canopy{FT}()
-# Canopy radiation:
+
+
+
+
+
+
+
+
+# Canopy Structure, with nlayers=20 and LAI=3.0
+# this GLOBAL variable is abandoned in the Plant module
+# local variables canopy_rt are used instead
+const canopy = struct_canopy{FT,20,3.0}()
+
+# Canopy radiation
+# this GLOBAL variable is abandoned in the Plant module
+# local variables canRad_rt are used instead
 const canRad = struct_canopyRadiation{FT,nwl,nWlF,length(litab), length(canopy.lazitab), canopy.nlayers}()
+
 # Canopy Optical Properties:
+# this GLOBAL variable is abandoned in the Plant module
+# local variables canOpt_rt are used instead
 #const canOpt = struct_canopyOptProps{FT,nwl,canopy.nlayers, length(canopy.lazitab), length(litab)}()
 canOpt = create_canopyOpt(FType=FT,nWL=nwl,nLayers=canopy.nlayers, nAzi=length(canopy.lazitab), nIncl=length(litab))
 
-const nlayers = canopy.nlayers
+# consider remove this GLOBAL variable as well
+# force more adaptive canopy structure for trees with different heights
+# removed links to nlayers in this file
+# const nlayers = canopy.nlayers
+
+
+
+
+
+
+
 
 function RTM_SW!(can::struct_canopy, cO::struct_canopyOptProps, cR::struct_canopyRadiation, sun::incomingRadiation, so::struct_soil)
     # Unpack variables from can structure
@@ -268,6 +294,7 @@ end;
 
 function compCanopyOptsExact!(leaf::Array,cO::struct_canopyOptProps, lidf::Array)
     @unpack fs,fo, fsfo, absfsfo, cosΘ_l = cO
+    nlayers = size(cO.sigb)[2]
     fill!(cO.w,0)
     fill!(cO.sf,0)
     fill!(cO.sb,0)
@@ -305,6 +332,7 @@ end;
 function computeCanopyMatrices!(leaf::Array,cO::struct_canopyOptProps)
     # 2. Calculation of reflectance
     # 2.1  reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
+    nlayers = size(cO.sigb)[2]
     @inbounds for i=1:nlayers
     if length(leaf)>1
         	τ_SW = leaf[i].τ_SW

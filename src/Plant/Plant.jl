@@ -1,6 +1,8 @@
 module Plant
 
 export Tree,
+       initialize_rt_module,
+       update_canopy_from_rt_module!,
        update_tree_e_crit!,
        update_tree_with_time!
 
@@ -8,6 +10,20 @@ export Tree,
 using CLIMAParameters
 using DocStringExtensions
 using Parameters
+
+# load sub-module CanopyRT
+using ..CanopyRT
+@unpack computeCanopyGeomProps!,
+        computeCanopyMatrices!,
+        computeThermalFluxes!,
+        create_canopyOpt,
+        deriveCanopyFluxes!,
+        fluspect!,
+        leafbio,
+        RTM_SW!,
+        struct_canopy,
+        struct_canopyOptProps,
+        struct_canopyRadiation = CanopyRT
 
 # include the constants
 include("constants.jl")
@@ -29,6 +45,7 @@ include("hydraulics/update_struct_from_q.jl"    )
 include("hydraulics/update_tree_e_crit.jl"      )
 
 # include the interface functions
+include("interface/initialize_rt_module.jl"        )
 include("interface/update_canopy_from_rt_module.jl")
 
 # include the photosynthesis functions

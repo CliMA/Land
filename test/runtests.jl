@@ -9,4 +9,7 @@ ENV["JULIA_LOG_LEVEL"] = "WARN"
 end
 
 # test the plant module isnan and FT consistency
-include( joinpath("Plants", "test_nan_and_FT.jl") )
+include("Plants/test_nan_and_FT.jl")
+
+# test the plant-rt interface
+include("Plants/test_rt_interface.jl")

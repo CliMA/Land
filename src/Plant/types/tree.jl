@@ -1,16 +1,16 @@
 """
     Tree{FT<:AbstractFloat}
 
-A Tree type which, by default, includes
- - 5 root layers
- - a trunk
- - 20 branches
- - 20 canopy layers
+A Tree type which includes
+- `n_root` number of root layers
+- a trunk
+- `n_canopy` branches
+- `n_canopy` canopy layers
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Tree{FT<:AbstractFloat}
+Base.@kwdef mutable struct Tree{FT<:AbstractFloat, n_root, n_canopy, n_leaf}
     # tree information
     "Age `[year]`"
     age::Int = 10
@@ -22,12 +22,12 @@ Base.@kwdef mutable struct Tree{FT<:AbstractFloat}
     h  ::FT  = FT( 8.0)
 
     # tree formation from root to leaves
-    "[`Root`](@ref) which contains 5 [`RootLayer`](@ref) by default"
-    roots ::Root   = Root{FT,5}()
+    "[`Root`](@ref) which contains n_root [`RootLayer`](@ref)"
+    roots ::Root   = Root{FT,n_root}()
     "Trunk using type [`Stem`](@ref)"
     trunk ::Stem   = Stem{FT}()
-    "[`Branch`](@ref) which contains 20 [`Stem`](@ref) by default"
-    branch::Branch = Branch{FT,20}()
-    "[`Canopy`](@ref) which contains 20 [`CanopyLayer`](@ref) by default"
-    canopy::Canopy = Canopy{FT,20,325}()
+    "[`Branch`](@ref) which contains n_canopy [`Stem`](@ref)"
+    branch::Branch = Branch{FT,n_canopy}()
+    "[`Canopy`](@ref) which contains n_canopy [`CanopyLayer`](@ref)"
+    canopy::Canopy = Canopy{FT,n_canopy,n_leaf}()
 end

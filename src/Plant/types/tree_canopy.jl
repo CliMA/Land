@@ -41,14 +41,14 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
 end
 
 """
-    CanopyLayer{FT<:AbstractFloat, n_total}
+    CanopyLayer{FT<:AbstractFloat, n_leaf}
 
-A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_total` [`Leaf`](@ref). The `n_total` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
+A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_leaf` [`Leaf`](@ref). The `n_leaf` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
+Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     # canopy layer and leaf structure
     "Leaf area fraction in the canopy"
     f_layer::FT = FT(  1.0)
@@ -93,46 +93,46 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
 
     # leaf layers (e_list and q_list need to be updated with time)
     "List of [`Leaf`](@ref)"
-    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_total]
-    "List of gross photosynthetic rate for n_total leaves `[μmol m⁻² s⁻¹]`"
-    ag_list  ::Array{FT,1} = zeros(FT,n_total)
+    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_leaf]
+    "List of gross photosynthetic rate for n_leaf leaves `[μmol m⁻² s⁻¹]`"
+    ag_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    an_list  ::Array{FT,1} = zeros(FT,n_total)
+    an_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf-to-air vapor pressure deficit `[unitless]`"
-    d_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(0.015)
+    d_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.015)
     "List of flow rate per leaf area `[mol m⁻² s⁻¹]`"
-    e_list   ::Array{FT,1} = zeros(FT,n_total)
+    e_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of critical flow rate (when leaf xylem pressure induces desiccation) per leaf area `[mol m⁻² s⁻¹]`"
-    ec_list  ::Array{FT,1} = zeros(FT,n_total) .+ FT(6.3e-4)
+    ec_list  ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(6.3e-4)
     "List of effective leaf diffusive conductance for CO₂ `[mol m⁻² s⁻¹]`"
-    gsc_list ::Array{FT,1} = zeros(FT,n_total)
+    gsc_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
-    gsw_list ::Array{FT,1} = zeros(FT,n_total)
+    gsw_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf area per leaf `[m²]`"
-    la_list  ::Array{FT,1} = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])
+    la_list  ::Array{FT,1} = FT.([ones(n_leaf-1)/(n_leaf-1)*75.0; 75.0])
     "List of PAR for each leaf"
-    par_list ::Array{FT,1} = zeros(FT,n_total)
+    par_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf internal CO₂ partial pressure `[Pa]`"
-    pi_list  ::Array{FT,1} = zeros(FT,n_total)
+    pi_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of flow rate `[mol s⁻¹]`"
-    q_list   ::Array{FT,1} = zeros(FT,n_total)
+    q_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf respiration rate `[μmol m⁻² s⁻¹]`"
-    r_list   ::Array{FT,1} = zeros(FT,n_total)
+    r_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf temperature `[K]`"
-    t_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(298.15)
+    t_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(298.15)
 end
 
 """
-    Canopy{FT<:AbstractFloat,n, n_total}
+    Canopy{FT<:AbstractFloat,n, n_leaf}
 
 A Canopy type which contains `n` [`CanopyLayer`](@ref).
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Canopy{FT<:AbstractFloat,n, n_total}
+Base.@kwdef mutable struct Canopy{FT<:AbstractFloat, n, n_leaf}
     "Canopy layer number"
     n_layer::Int = n
     "List of [`CanopyLayer`](@ref)"
-    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]
+    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_leaf}() for i in 1:n]
 end

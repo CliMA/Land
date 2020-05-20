@@ -2,7 +2,7 @@ using Land.Plant
 
 @testset "Plant - isNaN and FT Consistency" begin
     for FT in [Float32 Float64]
-        tree = Plant.Tree{FT}();
+        tree = Plant.Tree{FT,5,20,325}();
            v25::FT = FT(80.0)
            j25::FT = FT(135.0)
         Γ_star::FT = FT(2.5)
