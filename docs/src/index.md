@@ -2,16 +2,11 @@
 
 # Example Documentation
 
-
+## Canopy RT module
 
 ### Leaf Bio Structure:
 ```@docs
 Land.CanopyRT.leafbio
-```
-
-### Leaf Params:
-```@docs
-Land.Photosynthesis.leaf_params
 ```
 
 ### Canopy Structure
@@ -28,6 +23,14 @@ Land.CanopyRT.struct_canopyRadiation
 ```@docs
 Land.CanopyRT.struct_canopyOptProps
 ```
+
+## Photosynthesis module
+
+### Leaf Params:
+```@docs
+Land.Photosynthesis.leaf_params
+```
+
 
 ## Plant module
 
