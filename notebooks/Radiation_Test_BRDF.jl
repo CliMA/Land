@@ -5,12 +5,8 @@
 
 ## Use Julia Plots package and switch to plotly js option:
 using Plots
-#gr()
-#using Conda
-#Conda.add("matplotlib")
-
 pyplot()
-#plotlyjs()
+
 #----------------------------------------------------------------------------
 
 # First, we include Revise (good for debugging) and Parameters (tools for structures)

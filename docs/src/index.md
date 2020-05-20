@@ -30,6 +30,13 @@ Land.CanopyRT.struct_canopyOptProps
 ```@docs
 Land.Photosynthesis.leaf_params
 ```
+### Leaf Rate Limiting Steps:
+```@docs
+Land.Photosynthesis.max_carboxylation_rate!
+Land.Photosynthesis.max_electron_transport_rate!
+Land.Photosynthesis.michaelis_menten_constants!
+Land.Photosynthesis.leaf_respiration!
+```
 
 
 ## Plant module

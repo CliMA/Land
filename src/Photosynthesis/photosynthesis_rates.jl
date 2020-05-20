@@ -8,7 +8,9 @@ struct  C3FvCBPhotoGs  <: AbstractC3Photosynthesis end
 struct  C3FvCBPhotoATP <: AbstractC3Photosynthesis end
 struct  C4CollatzPhoto <: AbstractC4Photosynthesis end
 
-"Compute ETR (Je) from Jmax and Jpot using quadratic"
+"""
+Compute ETR (Je) from Jmax and Jpot using quadratic
+"""
 function electron_transport_rate!(model::AbstractPhotosynthesisModel, leaf, APAR)
     @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
     leaf.Je_pot = PSII_frac * maxPSII * APAR;
@@ -29,7 +31,7 @@ end
     product_limited_rate(f::C3FvCBPhoto, leaf)
 Solution when Triose Phosphate Export is limiting (CLM implementation)) 
 """
-function product_limited_rate!(model::AbstractC3Photosynthesis, leaf)
+function product_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
     leaf.Ap = leaf.Vcmax/2
 end
 
@@ -96,8 +98,8 @@ end
     rubisco_limited_rate(f::C4_Collatz_Photo, leaf)
 Solution when C4 Rubisco activity is limiting (Collatz) 
 """
-function rubisco_limited_rate!(f::C4CollatzPhoto, leaf, met)
-    leaf.Vcmax
+function rubisco_limited_rate!(model::AbstractC4Photosynthesis, leaf, met)
+    leaf.Ac = leaf.Vcmax
 end
 
 """
@@ -116,9 +118,9 @@ end
     product_limited_rate(f::C4_Collatz_Photo, leaf)
 Solution for PEP carboxylase-limited rate of carboxylation
 """
-function product_limited_rate!(model::C4CollatzPhoto, leaf)
+function product_limited_rate!(model::C4CollatzPhoto, leaf, met)
     @unpack  Kp,Vpmax, Cc = leaf
-    leaf.Ap = Vpmax * met.ppm_to_Pa*CC / (met.ppm_to_Pa*Cc + Kp)
+    leaf.Ap = Vpmax * (met.ppm_to_Pa*Cc) / (met.ppm_to_Pa*Cc + Kp)
 end
 
 
