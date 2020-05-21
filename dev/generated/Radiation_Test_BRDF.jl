@@ -1,11 +1,6 @@
 # Use Julia Plots package and switch to plotly js option:
 using Plots
-#gr()
-#using Conda
-#Conda.add("matplotlib")
-
 pyplot()
-#plotlyjs()
 
 #using Revise
 using Parameters
