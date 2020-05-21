@@ -12,14 +12,22 @@ module PhotosynthesisModels
     include("types/kc.jl"         )
     include("types/ko.jl"         )
     include("types/respiration.jl")
+    include("types/v_to_r.jl"     )
     include("types/vmax.jl"       )
     include("types/Γ_star.jl"     )
+    include("types/para_set.jl"   )
 
     # include the correction equations
     include("equation/arrhenius_correction.jl"     )
     include("equation/arrhenius_peak_correction.jl")
 
     # include the calculation procedures
-    include("procedure/get_jmax.jl")
-    include("procedure/get_vmax.jl")
+    include("procedure/get_a_v.jl"   )
+    include("procedure/get_j.jl"     )
+    include("procedure/get_jmax.jl"  )
+    include("procedure/get_kc.jl"    )
+    include("procedure/get_ko.jl"    )
+    include("procedure/get_r.jl"     )
+    include("procedure/get_vmax.jl"  )
+    include("procedure/get_Γ_star.jl")
 end

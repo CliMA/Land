@@ -1,25 +1,25 @@
 #=
-The structure tree of AbstractΓStar
-AbstractΓStar
----> struct ΓStarBernacchi    # using Arrhenius correction
----> struct ΓStarCLM          # using Arrhenius correction
+The structure tree of AbstractΓStarTD
+AbstractΓStarTD
+---> struct ΓStarTDBernacchi    # using Arrhenius correction
+---> struct ΓStarTDCLM          # using Arrhenius correction
 =#
-abstract type AbstractΓStar end
+abstract type AbstractΓStarTD end
 
 
 
 
 """
-    ΓStarBernacchi{FT} <: AbstractΓStar
+    ΓStarTDBernacchi{FT} <: AbstractΓStarTD
 
-A non-mutable AbstractΓStar type `ΓStarBernacchi` that stores information for Γ_star temperature correction.
+A non-mutable AbstractΓStarTD type `ΓStarTDBernacchi` that stores information for Γ_star temperature correction.
 The equation used for temperature correction is `correction = exp( c - ΔHa/(R*T_leaf) )`.
 The data source for the constants can be referred from Bernacchi et al. (2001) "Improved temperature response functions for models of Rubisco‐limited photosynthesis".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ΓStarBernacchi{FT} <: AbstractΓStar
+Base.@kwdef struct ΓStarTDBernacchi{FT} <: AbstractΓStarTD
     "Γ_star at 298.15 K (42.75 ppm) `[Pa]`"
     Γ_star     ::FT = FT(4.33164375)
     "Ratio between ΔHa and R `[K]`"
@@ -32,16 +32,16 @@ end
 
 
 """
-    ΓStarCLM{FT} <: AbstractΓStar
+    ΓStarTDCLM{FT} <: AbstractΓStarTD
 
-A non-mutable AbstractΓStar type `ΓStarCLM` that stores information for Γ_star temperature correction.
+A non-mutable AbstractΓStarTD type `ΓStarTDCLM` that stores information for Γ_star temperature correction.
 The equation used for temperature correction is `correction = exp( c - ΔHa/(R*T_leaf) )`.
 The data source for the constants can be referred "".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ΓStarCLM{FT} <: AbstractΓStar
+Base.@kwdef struct ΓStarTDCLM{FT} <: AbstractΓStarTD
     "Γ_star at 298.15 K `[Pa]`"
     Γ_star     ::FT = FT( 4.275 )
     "Ratio between ΔHa and R `[K]`"

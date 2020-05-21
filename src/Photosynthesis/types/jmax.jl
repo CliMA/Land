@@ -1,26 +1,26 @@
 #=
-The structure tree of AbstractJmax
-AbstractJmax
----> struct JmaxBernacchi    # using Arrhenius peak correction
----> struct JmaxCLM          # using Arrhenius peak correction
----> struct JmaxLeuning      # using Arrhenius peak correction
+The structure tree of AbstractJmaxTD
+AbstractJmaxTD
+---> struct JmaxTDBernacchi    # using Arrhenius peak correction
+---> struct JmaxTDCLM          # using Arrhenius peak correction
+---> struct JmaxTDLeuning      # using Arrhenius peak correction
 =#
-abstract type AbstractJmax end
+abstract type AbstractJmaxTD end
 
 
 
 
 """
-    JmaxBernacchi{FT} <:AbstractJmax
+    JmaxTDBernacchi{FT} <:AbstractJmaxTD
 
-A non-mutable AbstractJmax type `JmaxBernacchi` that stores information for Jmax temperature correction.
+A non-mutable AbstractJmaxTD type `JmaxTDBernacchi` that stores information for Jmax temperature correction.
 The equation used for temperature correction is `Arrhenius equation` (See Leuning (2002) "Leuning, R. "Temperature dependence of two parameters in a photosynthesis model").
 The data source for the constants can be referred from "".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct JmaxBernacchi{FT} <: AbstractJmax
+Base.@kwdef struct JmaxTDBernacchi{FT} <: AbstractJmaxTD
     "Ratio between ΔHa and R*K_25"
     ΔHa_to_RT25::FT = FT(57500.0) / FT(GAS_R*K_25)
     "Ratio between ΔHd and R"
@@ -35,16 +35,16 @@ end
 
 
 """
-    JmaxCLM{FT} <:AbstractJmax
+    JmaxTDCLM{FT} <:AbstractJmaxTD
 
-A non-mutable AbstractJmax type `JmaxCLM` that stores information for Jmax temperature correction.
+A non-mutable AbstractJmaxTD type `JmaxTDCLM` that stores information for Jmax temperature correction.
 The equation used for temperature correction is `Arrhenius equation` (See Leuning (2002) "Leuning, R. "Temperature dependence of two parameters in a photosynthesis model").
 The data source for the constants can be referred from "".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct JmaxCLM{FT} <: AbstractJmax
+Base.@kwdef struct JmaxTDCLM{FT} <: AbstractJmaxTD
     "Ratio between ΔHa and R*K_25"
     ΔHa_to_RT25::FT = FT(43540.0) / FT(GAS_R*K_25)
     "Ratio between ΔHd and R"
@@ -59,16 +59,16 @@ end
 
 
 """
-    JmaxLeuning{FT} <:AbstractJmax
+    JmaxTDLeuning{FT} <:AbstractJmaxTD
 
-A non-mutable AbstractJmax type `JmaxLeuning` that stores information for Jmax temperature correction.
+A non-mutable AbstractJmaxTD type `JmaxTDLeuning` that stores information for Jmax temperature correction.
 The equation used for temperature correction is `Arrhenius equation` (See Leuning (2002) "Leuning, R. "Temperature dependence of two parameters in a photosynthesis model").
 The data source for the constants can be referred from Leuning (2002).
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct JmaxLeuning{FT} <: AbstractJmax
+Base.@kwdef struct JmaxTDLeuning{FT} <: AbstractJmaxTD
     "Ratio between ΔHa and R*K_25"
     ΔHa_to_RT25::FT = FT(50300.0) / FT(GAS_R*K_25)
     "Ratio between ΔHd and R"

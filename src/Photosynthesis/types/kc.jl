@@ -1,25 +1,25 @@
 #=
-The structure tree of AbstractKc
-AbstractKc
----> struct KcBernacchi    # using Arrhenius correction
----> struct KcCLM          # using Arrhenius correction
+The structure tree of AbstractKcTD
+AbstractKcTD
+---> struct KcTDBernacchi    # using Arrhenius correction
+---> struct KcTDCLM          # using Arrhenius correction
 =#
-abstract type AbstractKc end
+abstract type AbstractKcTD end
 
 
 
 
 """
-    KcBernacchi{FT} <: AbstractKc
+    KcTDBernacchi{FT} <: AbstractKcTD
 
-A non-mutable AbstractKc type `KcBernacchi` that stores information for Kc temperature correction.
+A non-mutable AbstractKcTD type `KcTDBernacchi` that stores information for Kc temperature correction.
 The equation used for temperature correction is `correction = exp( c - ΔHa/(R*T_leaf) )`.
 The data source for the constants can be referred from Bernacchi et al. (2001) "Improved temperature response functions for models of Rubisco‐limited photosynthesis".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct KcBernacchi{FT} <: AbstractKc
+Base.@kwdef struct KcTDBernacchi{FT} <: AbstractKcTD
     "Kc at 298.15 K (404.9 ppm) `[Pa]`"
     Kc         ::FT = FT( 41.0264925 )
     "Ratio between ΔHa and R `[K]`"
@@ -32,16 +32,16 @@ end
 
 
 """
-    KcCLM{FT} <: AbstractKc
+    KcTDCLM{FT} <: AbstractKcTD
 
-A non-mutable AbstractKc type `KcCLM` that stores information for Kc temperature correction.
+A non-mutable AbstractKcTD type `KcTDCLM` that stores information for Kc temperature correction.
 The equation used for temperature correction is `correction = exp( c - ΔHa/(R*T_leaf) )`.
 The data source for the constants can be referred from "".
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct KcCLM{FT} <: AbstractKc
+Base.@kwdef struct KcTDCLM{FT} <: AbstractKcTD
     "Kc at 298.15 K `[Pa]`"
     Kc         ::FT = FT( 40.49 )
     "Ratio between ΔHa and R `[K]`"
