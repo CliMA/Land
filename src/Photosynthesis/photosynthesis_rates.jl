@@ -24,7 +24,7 @@ Solution when Rubisco activity is limiting (Classical Farquhar, von Caemmerer, B
 """
 function rubisco_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
     @unpack  Γstar, Cc, Kc, Ko, o₂, Vcmax = leaf
-    leaf.Ac = Vcmax * max(met.ppm_to_Pa*Cc-Γstar, 0) / (met.ppm_to_Pa*Cc + Kc*(1 +o₂/Ko))
+    leaf.Ac = Vcmax * max(met.ppm_to_Pa*Cc-Γstar, 0) / (met.ppm_to_Pa*Cc + Kc*(1 +met.ppm_to_Pa*1e6*o₂/Ko))
 end
 
 """
@@ -70,7 +70,7 @@ Solves quadratic equation
 function rubisco_limited_rate!(model::C3FvCBPhotoGs, leaf, met)
     @unpack  Γstar, Cc, Kc, Ko, o₂, Vcmax, gs, gm, Rd, Γstar = leaf
     @unpack  Ca,ra,g_m_s_to_mol_m2_s = met
-    d = Kc*(1+o₂/Ko)
+    d = Kc*(1+met.ppm_to_Pa*1e6*o₂/Ko)
     a = (ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(Ca + d) - (Vcmax-Rd)*a
     c = Vcmax * (Ca - Γstar) - Rd * (Ca+d)

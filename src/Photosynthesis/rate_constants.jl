@@ -82,7 +82,7 @@ Base.@kwdef struct MM_CLM{FT} <: AbstractMM
     "Michaelis-Menten constant for CO2 at 25C (Pa)"
     Kc_25::FT = 40.49;     
     "Michaelis-Menten constant for O2 at 25C  (Pa)"
-    Ko_25::FT = 27.84;
+    Ko_25::FT = 27840.0;
     "Michaelis-Menten constant for PEP Carboxylase at 25C  (Pa) (from von Caemmerer Book 2000) "
     Kpep_25::FT = 8.0;                   
     "Standard CO2 compensation point at 25C (Pa)"
