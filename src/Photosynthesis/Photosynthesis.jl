@@ -2,6 +2,7 @@ module Photosynthesis
 
 using DocStringExtensions
 using Parameters
+using RootSolvers
 
 using ..PhysCon
 using ..WaterVapor
@@ -10,9 +11,16 @@ export leaf_params, setLeafT!, BallBerry!, Medlyn!, Gentine!, setkx!, setLeafkl!
 
 export fluxes, meteo, ψ_h, ψ_m, setra!, setRoughness!, LeafPhotosynthesis!
 
-export FlexasTolBerryFluorescence, BallBerryStomata, GentineLeafBoundary, GentineStomata
+export FlexasTolBerryFluorescence, 
+	   BallBerryStomata, 
+	   GentineLeafBoundary, 
+	   GentineStomata, 
+	   FixedBoundaryResistance, 
+	   CurvedColimit
 
-export AbstractLeafRespiration, RespirationCLM, RespirationBernacchi
+export AbstractLeafRespiration, 
+	   RespirationCLM, 
+	   RespirationBernacchi
 
 export AbstractPhotosynthesisModel, C3FvCBPhoto, C3FvCBPhotoGs, C3FvCBPhotoATP, C4CollatzPhoto
 
@@ -39,5 +47,7 @@ include("stomatal_models.jl")
 include("fluorescence_models.jl")
 include("leaf_photosynthesis.jl")
 include("leaf_energy_water_balance.jl")
+include("leaf_boundary_layer.jl")
+include("leaf_colimitation.jl")
 
 end # module

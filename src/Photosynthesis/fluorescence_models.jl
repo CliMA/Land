@@ -1,5 +1,8 @@
 abstract type AbstractFluorescenceModel end
 
+"""
+The classical fluorescence model based on the Flexas et al 2002 cotton dataset. 
+"""
 Base.@kwdef struct FlexasTolBerryFluorescence{FT} <: AbstractFluorescenceModel 
     Kn1::FT = 5.01
     Kn2::FT = 1.93
@@ -7,13 +10,13 @@ Base.@kwdef struct FlexasTolBerryFluorescence{FT} <: AbstractFluorescenceModel
 end
 
 """
-    leaf_fluorescence!(model,leaf::leaf_params )
+    leaf_fluorescence!(model,leaf)
 
 Compute Fluorescence yields, Kn and Kp.
 
 # Arguments
-- `model`: Model Type
-- `leaf::leaf_params`: leaf_params structure.
+- `model`: a [`FlexasTolBerryFluorescence`](@ref)
+- `leaf` : a [`leaf_params`](@ref) structure.
 """
 function leaf_fluorescence!(model::FlexasTolBerryFluorescence, leaf::leaf_params)
     #FT = eltype(ps)

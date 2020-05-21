@@ -35,10 +35,9 @@ met = meteo{Float32}();
 
 ## initialize some reasonable values
 ##f.Je   = 100; f.gbc  = 100; f.gbv  = 100; f.ceair= 1500; f.eair = 1500; f.APAR = 500; f.H=0;f.LE=0; ## leaf should not have eair
-l.Kn = 2.44; l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -1e6;l.ck=3;met.zscreen = 2.0;
+l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -1e6;l.ck=3;met.zscreen = 2.0;
 l.height   = 1.0; met.zscreen  = 2.0;
 met.stab_type_stable = 2;
-l.gstyp = 3;
 
 met.e_air = 1500;
 

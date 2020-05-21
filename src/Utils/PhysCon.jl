@@ -29,6 +29,6 @@ Base.@kwdef struct phys{T<:Number}
     Cdryleaf::T = 1396;              # Specific heat of dry leaf at constant pressure (J/kg/K)
 end
 
-physcon = phys{Float32}()
+const physcon = phys{Float32}()
 
 end

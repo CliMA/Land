@@ -57,12 +57,12 @@ Base.@kwdef struct VcmaxBernacchi{FT} <: AbstractVcmax
     scale::FT    = fArrhenius(FT(298.15), ΔHa);
 end
 
-"
+"""
 PEP Carboxylation Rate Parameters 
 from Boyd et al, 2015, Plant Physiology: Temperature Responses of C4 Photosynthesis:
 Biochemical Analysis of Rubisco, Phosphoenolpyruvate Carboxylase, and Carbonic Anhydrase in
 Setaria viridis
-"
+"""
 Base.@kwdef struct Vpmax{FT} <: AbstractVpmax
     "Activation energy for ETR (J/mol)"
     ΔHa::FT    = 95000.;                      
@@ -75,12 +75,14 @@ Base.@kwdef struct Vpmax{FT} <: AbstractVpmax
 end
 
 
-"Michaelis Rate Parameters as in CLM5"
+"""
+Michaelis Rate Parameters as in CLM5
+"""
 Base.@kwdef struct MM_CLM{FT} <: AbstractMM
     "Michaelis-Menten constant for CO2 at 25C (Pa)"
     Kc_25::FT = 40.49;     
     "Michaelis-Menten constant for O2 at 25C  (Pa)"
-    Ko_25::FT = 27.84;
+    Ko_25::FT = 27840.0;
     "Michaelis-Menten constant for PEP Carboxylase at 25C  (Pa) (from von Caemmerer Book 2000) "
     Kpep_25::FT = 8.0;                   
     "Standard CO2 compensation point at 25C (Pa)"
@@ -98,8 +100,11 @@ end
 
 # Functions:
 """ 
-    max_carboxylation_rate(model::VcmaxCLM, leaf)
-Calculates the maximum carboxylation rate (Vcmax) at the leaf temperature
+    max_carboxylation_rate!(model::VcmaxCLM, leaf)
+
+Calculates the maximum carboxylation rate (Vcmax) at the leaf temperature as in CLM, given
+- `model` One [`VcmaxCLM`](@ref) 
+- `leaf` One [`leaf_params`](@ref) 
 """
 function max_carboxylation_rate!(model::VcmaxCLM, l)
     @unpack ΔHa, ΔHd, ΔS, scale = model

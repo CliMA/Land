@@ -13,8 +13,6 @@ using IncGammaBeta
 export quadratic, lower_quadratic,
        beta_function,
        log_gamma_function,
-       hybrid,
-       zbrent,
        ∫,
        fast∫,
        Avogadro,
@@ -90,148 +88,6 @@ function log_gamma_function(x)
   return tmp + log(stp*ser/x)
 end # function log_gamma_function
 
-function hybrid(mods, leaf, meteo, func::Function, xa, xb, tol)
-    #
-    # !DESCRIPTION:
-    # Solve for the root of a function, given initial estimates xa and xb.
-    # The root is updated until its accuracy is tol.
-    #
-    # !USES:
-    #
-    # !ARGUMENTS:
-    #procedure (xfunc) :: func         ! Function to solve
-    #real(r8), intent(in) :: xa, xb    ! Initial estimates of root
-    #real(r8), intent(in) :: tol       ! Error tolerance
-    #type(mlcanopy_type), intent(inout) :: mlcanopy_inst
-    itmax = 40
-    x0 = x1 = f0 = f1 = 0.0
-    x0 = xa
-    leaf.Cc = x0
-    f0 = func(mods,leaf, meteo)
-    if (f0 == 0.0) return  x0 end
-
-    x1 = xb
-    leaf.Cc = x1
-    f1 = func(mods,leaf, meteo)
-    if (f1 == 0.0) return x1 end
-
-    if (f1 < f0)
-       minx = x1
-       minf = f1
-    else
-       minx = x0
-       minf = f0
-    end
-
-    # First use the secant method, and then use the brent method as a backup
-    for iter = 0:itmax
-       iter = iter + 1
-       dx = -f1 * (x1 - x0) / (f1 - f0)
-       x = x1 + dx
-       if (abs(dx) < tol)
-      x0 = x
-      break
-       end
-       x0 = x1
-       f0 = f1
-       x1 = x
-       leaf.Cc = x1
-       f1 = func(mods,leaf, meteo)
-       if (f1 < minf)
-      minx = x1
-      minf = f1
-       end
-
-       # If a root zone is found, use the brent method for a robust backup strategy
-       if (f1 * f0 < 0.0)
-      x = zbrent(mods,leaf,meteo,func,x0, x1, xtol=tol)
-      x0 = x
-      break
-       end
-
-       # In case of failing to converge within itmax iterations stop at the minimum function
-       if (iter > itmax)
-      f1 = func(mods,leaf, meteo)
-      x0 = minx
-      break
-       end
-
-    end
-
-    return x0
-end #function hybrid
-
-function zbrent(mods,leaf,meteo, f::Function, x0, x1, args::Tuple=();
-       xtol::AbstractFloat=1e-7, ytol=2eps(Float64),
-       maxiter::Integer=50)
-    EPS = eps(Float64)
-    leaf.Cc = x0
-    y0 = f(mods,leaf, meteo)
-    leaf.Cc = x1
-    y1 = f(mods,leaf, meteo)
-    if abs(y0) < abs(y1)
-    # Swap lower and upper bounds.
-    x0, x1 = x1, x0
-    y0, y1 = y1, y0
-    end
-    x2 = x0
-    y2 = y0
-    x3 = x2
-    bisection = true
-    for _ in 1:maxiter
-    # x-tolerance.
-    if abs(x1-x0) < xtol
-    return x1
-    end
-
-    # Use inverse quadratic interpolation if f(x0)!=f(x1)!=f(x2)
-    # and linear interpolation (secant method) otherwise.
-    if abs(y0-y2) > ytol && abs(y1-y2) > ytol
-    x = x0*y1*y2/((y0-y1)*(y0-y2)) +
-    x1*y0*y2/((y1-y0)*(y1-y2)) +
-    x2*y0*y1/((y2-y0)*(y2-y1))
-    else
-    x = x1 - y1 * (x1-x0)/(y1-y0)
-    end
-
-    # Use bisection method if satisfies the conditions.
-    delta = abs(2EPS*abs(x1))
-    min1 = abs(x-x1)
-    min2 = abs(x1-x2)
-    min3 = abs(x2-x3)
-    if (x < (3x0+x1)/4 && x > x1) ||
-       (bisection && min1 >= min2/2) ||
-       (!bisection && min1 >= min3/2) ||
-       (bisection && min2 < delta) ||
-       (!bisection && min3 < delta)
-    x = (x0+x1)/2
-    bisection = true
-    else
-    bisection = false
-    end
-    leaf.Cc = x
-    y = f(mods,leaf, meteo)
-    # y-tolerance.
-    if abs(y) < ytol
-    return x
-    end
-    x3 = x2
-    x2 = x1
-    if sign(y0) != sign(y)
-    x1 = x
-    y1 = y
-    else
-    x0 = x
-    y0 = y
-    end
-    if abs(y0) < abs(y1)
-    # Swap lower and upper bounds.
-    x0, x1 = x1, x0
-    y0, y1 = y1, y0
-    end
-    end
-    error("Max iteration exceeded")
-end
 
 """
 Simpson rule for irregularly spaced data.
@@ -266,12 +122,13 @@ function ∫(x::Vector, f::Vector)
     end
     return result
 end
+
 # Already uses diff here
 function fast∫(dx::Vector, f::Vector)
     N = length(f)
     result = eltype(f)(0.0)
     @inbounds for i=1:N
-    result += f[i]* dx[i]
+      result += f[i]* dx[i]
     end
     return result
 end
