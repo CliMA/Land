@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Leaf Photosynthetic rates · Land</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Land logo"/></a><div class="docs-package-name"><span class="docs-autofit">Land</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Tutorials</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><input class="collapse-toggle" id="menuitem-2-1" type="checkbox"/><label class="tocitem" for="menuitem-2-1"><span class="docs-label">Canopy Radiative Transfer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Radiation_Test_BRDF/">Reflected and Emitted Radiance</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-2-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2-2"><span class="docs-label">PhotoSynthesis</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Leaf-Photosynthesis/">Leaf Level Basics</a></li><li><a class="tocitem" href="../Leaf-Photosynthesis-Rates/">Enzyme catalysis T-dependence</a></li><li class="is-active"><a class="tocitem" href>Leaf Photosynthetic rates</a><ul class="internal"><li><a class="tocitem" href="#Stomatal-Conductance-1"><span>Stomatal Conductance</span></a></li><li><a class="tocitem" href="#Modular-stucture:-1"><span>Modular stucture:</span></a></li><li><a class="tocitem" href="#Light-response-curves-1"><span>Light response curves</span></a></li><li><a class="tocitem" href="#More-complex-examples:-1"><span>More complex examples:</span></a></li><li><a class="tocitem" href="#Summary:-1"><span>Summary:</span></a></li></ul></li></ul></li><li><span class="tocitem">Canopy Energy Balance</span></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li><a class="is-disabled">PhotoSynthesis</a></li><li class="is-active"><a href>Leaf Photosynthetic rates</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Leaf Photosynthetic rates</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/CliMA/Land/blob/master/notebooks/Leaf-Photosynthesis-Synthesis.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Leaf-Level-Photosynthesis-1"><a class="docs-heading-anchor" href="#Leaf-Level-Photosynthesis-1">Leaf Level Photosynthesis</a><a class="docs-heading-anchor-permalink" href="#Leaf-Level-Photosynthesis-1" title="Permalink"></a></h1><p>Here, we will go one step further and look at the entire leaf-level response, including the impact of stomatal conductance as well.</p><h2 id="Stomatal-Conductance-1"><a class="docs-heading-anchor" href="#Stomatal-Conductance-1">Stomatal Conductance</a><a class="docs-heading-anchor-permalink" href="#Stomatal-Conductance-1" title="Permalink"></a></h2><p>Before, we focussed mainly on the demand-driven constraints through Rubisco and RuBP regeneration. Stomatal conductance is highly important as it drives the suppy-side of photosynthesis and interacts with the energy balance and leaf temperature as latent heat fluxes are a major factor in surface cooling.</p><p>Before, we have derived net rates of photosynthesis <span>$A_n$</span>, which have to be matched with the supply side through CO<span>$_2$</span> diffusion:</p><div>\[A_n^{diff} = g_{leaf,C}(C_a-C_c)\]</div><p>which can be separated into diffusion from the air to the leaf surface with a boundary layer conductance <span>$g_{b,C}$</span>, diffusion from the surface to the interstitial air-space with stomatal conductance <span>$g_{s,C}$</span> and diffusion from the  interstitial air-space to the chloroplast with mesophyll conductance <span>$g_{m,C}$</span> (the letter C stands for CO2 here, as the diffusion constants vary with species, e.g. H<span>$_2$</span>O stomatal conductance is a factor 1.6 higher than those for CO<span>$_2$</span>):</p><div>\[A_n^{diff} = g_{b,C}(C_a-C_s) = g_{s,C}(C_s-C_i) = g_{m,C}(C_i-C_c) = g_{leaf,C}(C_a-C_c)\]</div><div>\[g_{leaf,C} = \left(\frac{1}{g_{b,C}+g_{s,C}+g_{m,C}}\right)^{-1}\]</div><p>The importance of stomatal conductance and its interplay with photosynthesis here is that the supply and demand rates determine <span>$C_c$</span>. A reduction in <span>$C_c$</span> reduces the demand-limited rates while it increase the diffusion rates (at a given <span>$g$</span>). Most models run internal so-called A-<span>$C_c$</span> iterations to ensure both rates are balanced and in steady-state (<span>$\partial C_c/\partial t=0$</span>). We implement this option but also opt to run stomatal conductance prognostically, as stomata don&#39;t open and close instantanously but have a response time of around 15 minutes.</p><h3 id="Empirical-Stomatal-Conductance-models-1"><a class="docs-heading-anchor" href="#Empirical-Stomatal-Conductance-models-1">Empirical Stomatal Conductance models</a><a class="docs-heading-anchor-permalink" href="#Empirical-Stomatal-Conductance-models-1" title="Permalink"></a></h3><p>Currently, we can choose between the widely used Ball-Berry model<sup class="footnote-reference"><a id="citeref-1" href="#footnote-1">[1]</a></sup> or the Medlyn approach<sup class="footnote-reference"><a id="citeref-2" href="#footnote-2">[2]</a></sup>.</p><p>Ball and Berry derived the following empirical formulation based on leaf level data (RH is relative humidity):</p><div>\[g_{s,w} = g_0 + g_1  \frac{A_n \cdot RH}{C_s}\]</div><p>Medlyn derived the following equations based on stomatal optimization theory but in a similar form as the BB model:</p><div>\[g_{s,w} = g_0 + \left(1 + \frac{g_1}{\sqrt{VPD}}\right) \frac{A_n}{C_s}\]</div><p>Both models are proportional to <span>$A_n$</span> and inversely proportional to <span>$C_s$</span>, with the main difference in the dependence on either relative humidity in the Ball-Berry model vs. vapor pressure deficit (VPD) in Medlyn et al. In both cases, <span>$g_0$</span> is the residual conductivity even if stomata are fully closed and <span>$g_1$</span> is related to the marginal water cost of plant carbon gain. Importantly, <span>$g_1$</span> can&#39;t be inter-changed between the formulations, underlining again that parameters have to be optimized with respect to the model that is eventually being used.</p><h3 id="Stomatal-Optimization-Theories-1"><a class="docs-heading-anchor" href="#Stomatal-Optimization-Theories-1">Stomatal Optimization Theories</a><a class="docs-heading-anchor-permalink" href="#Stomatal-Optimization-Theories-1" title="Permalink"></a></h3><p>The empirical formulations only hold in well-watered soil and our main goal is to implement stomatal optimization models to take the entire soil-plant-atmosphere continuum into account<sup class="footnote-reference"><a id="citeref-3" href="#footnote-3">[3]</a></sup>. Here, we will just use the empirical models and steady-state photosynthesis to show the underlying principles.</p><pre><code class="language-"># Add usual tools we use:
+using Revise
+using BenchmarkTools
+using Plots
+pyplot()</code></pre><pre><code class="language-julia"># load Photosynthesis module:
+using Land.Photosynthesis</code></pre><pre><code class="language-julia"># Specify Field Type
+const FT = Float32</code></pre><pre><code class="language-none">Float32</code></pre><pre><code class="language-julia"># Create a standard leaf with defualt parameters
+leaf = leaf_params{FT}();
+
+# Create a standard meteo structure:
+met = meteo{FT}();</code></pre><pre><code class="language-julia"># Setting some standard values (dynamic-state=false forces A-Cc iterations)
+leaf.dynamic_state = false
+
+
+met.stab_type_stable = 2;
+met.e_air = 1500;
+met.T_air = 298;</code></pre><hr/><h2 id="Modular-stucture:-1"><a class="docs-heading-anchor" href="#Modular-stucture:-1">Modular stucture:</a><a class="docs-heading-anchor-permalink" href="#Modular-stucture:-1" title="Permalink"></a></h2><p>The most important step is to define which submodules to use. There might be different implementations for Fluorescence, Photosynthesis (C3,C4,etc), respiration, stomatal conductance (e.g. Ball-Berry, Medlyn), the T-dependence of J<span>$_{max}$</span>, V<span>$_{c,max}$</span> and Michaelis Menten constants as well as leaf boundary layer resistance (setting it to 0 here to mimic well vented laboratory leaf level measurements) and colimitation.</p><p>Below, we create two different model setups with a C3 and C4 photosynthesis pathway. Note that we chose the Ball Berry stomatal conductance model with different <span>$g_1$</span> for C3 and C4 (C4 typically much lower).</p><pre><code class="language-julia"># use this as the boundary layer resistance (1/gb)
+ra = 0.5
+modC3 = Photosynthesis.PhotoMods(
+    fluorescence    = FlexasTolBerryFluorescence{FT}(),
+    photosynthesis  = C3FvCBPhoto(),
+    respiration     = RespirationCLM{FT}(),
+    stomatal        = BallBerryStomata{FT}(g1=8),
+    Jmax            = JmaxCLM{FT}(),
+    Vmax            = VcmaxCLM{FT}(),
+    MichaelisMenten = MM_CLM{FT}(),
+    BoundaryLayer   = FixedBoundaryResistance{FT}(ra=ra),
+    colimitation = CurvedColimit{FT}(0.99));
+
+modC4 = Photosynthesis.PhotoMods(
+    fluorescence    = FlexasTolBerryFluorescence{FT}(),
+    photosynthesis  = C4CollatzPhoto(),
+    respiration     = RespirationCLM{FT}(),
+    stomatal        = BallBerryStomata{FT}(g1=4),
+    Jmax            = JmaxCLM{FT}(),
+    Vmax            = VcmaxCLM{FT}(),
+    MichaelisMenten = MM_CLM{FT}(),
+    BoundaryLayer   = FixedBoundaryResistance{FT}(ra=ra),
+    colimitation = CurvedColimit{FT}(0.99));</code></pre><h2 id="Light-response-curves-1"><a class="docs-heading-anchor" href="#Light-response-curves-1">Light response curves</a><a class="docs-heading-anchor-permalink" href="#Light-response-curves-1" title="Permalink"></a></h2><p>Now we can compute light response curves for C3 and C4 photosynthesis</p><pre><code class="language-julia">##Again, this looks tedious and repetitive but is the easiest way to do this right now:
+
+# Variable I want to save:
+Ag_C3 = Float32[]; Ag_C4 = Float32[]
+An_C3 = Float32[]; An_C4 = Float32[]
+Aj_C3 = Float32[]; Aj_C4 = Float32[]
+Ap_C3 = Float32[]; Ap_C4 = Float32[]
+Ac_C3 = Float32[]; Ac_C4 = Float32[]
+Cc_C3 = Float32[]; Cc_C4 = Float32[]
+gs_C3 = Float32[]; gs_C4 = Float32[]
+
+# Set Ca to 400ppm
+met.Ca = 400
+
+# Set leaf temperature:
+leaf.T = 298.0
+
+# Specify Vcmax
+leaf.Vcmax25 = 90
+leaf.Jmax25 = 90*1.9
+
+# Specify curvature for J
+leaf.θ_j = 0.995
+
+APAR = collect(0:10:1700)
+for leaf.APAR in APAR
+    # Run C3 photosynthesis:
+    LeafPhotosynthesis!(modC3, leaf, met);
+    # Save leaf variables:
+    push!(An_C3, leaf.An);push!(Ag_C3, leaf.Ag);push!(Aj_C3, leaf.Aj);push!(Ap_C3, leaf.Ap); push!(Ac_C3, leaf.Ac); push!(Cc_C3, leaf.Cc); push!(gs_C3, leaf.gs)
+
+    # Run C4 photosynthesis:
+    LeafPhotosynthesis!(modC4, leaf, met);
+    # Save leaf variables:
+    push!(An_C4, leaf.An);push!(Ag_C4, leaf.Ag);push!(Aj_C4, leaf.Aj);push!(Ap_C4, leaf.Ap); push!(Ac_C4, leaf.Ac); push!(Cc_C4, leaf.Cc);; push!(gs_C4, leaf.gs)
+end</code></pre><pre><code class="language-"># Testing some times, how long does this take (as we need to run it globally, it has to be efficient)?
+@btime LeafPhotosynthesis!(modC3, leaf, met);
+@btime LeafPhotosynthesis!(modC4, leaf, met);
+nothing #hide</code></pre><pre><code class="language-">##plot(APAR, An,  label=&quot;An&quot;)
+plot(APAR, Ag_C3,color=[:black],lw=1, alpha=0.7, label=&quot;Ag C3&quot;)
+plot!(APAR, Ac_C3,line=(:dash,2), label=&quot;Ac C3&quot;)
+plot!(APAR, Aj_C3,line=(:dash,2), label=&quot;Aj C3&quot;)
+plot!(APAR, Ap_C3,line=(:dash,2), label=&quot;Ap C3&quot; )
+xlabel!(&quot;APAR [μmol/m2/s]&quot;)
+ylabel!(&quot;Aᵢ [μmol/m2/s]&quot;)
+title!(&quot;C3 photosynthesis light response&quot;)
+##plot!(APAR, An2)</code></pre><pre><code class="language-">##plot(APAR, An,  label=&quot;An&quot;)
+plot(APAR, Ag_C4,color=[:black],lw=1, alpha=0.7, label=&quot;Ag C4&quot;)
+plot!(APAR, Ac_C4,line=(:dash,2), label=&quot;Ac C4&quot;)
+plot!(APAR, Aj_C4,line=(:dash,2), label=&quot;Aj C4&quot;)
+plot!(APAR, Ap_C4,line=(:dash,2), label=&quot;Ap C4&quot; )
+xlabel!(&quot;APAR [μmol/m2/s]&quot;)
+ylabel!(&quot;Aᵢ [μmol/m2/s]&quot;)
+title!(&quot;C4 photosynthesis light response&quot;)</code></pre><h3 id="Dependence-of-C_c-on-light-1"><a class="docs-heading-anchor" href="#Dependence-of-C_c-on-light-1">Dependence of <span>$C_c$</span> on light</a><a class="docs-heading-anchor-permalink" href="#Dependence-of-C_c-on-light-1" title="Permalink"></a></h3><p>Increasing light should result in overall lower <span>$C_c$</span> concentrations. C4 plants can work with much lower <span>$C_c$</span> as for C4, the concentration in the bundle sheath cells count, not the mesophyll.</p><pre><code class="language-">plot(APAR, Cc_C4/met.Ca,color=[:black],lw=2, alpha=0.7, label=&quot;Cc/Ca C4&quot;)
+plot!(APAR, Cc_C3/met.Ca,color=[:orange],lw=2, alpha=0.7, label=&quot;Cc/Ca C3&quot;)
+xlabel!(&quot;APAR [μmol/m²/s]&quot;)
+ylabel!(&quot;Cc/Ca [-]&quot;)</code></pre><h3 id="Dependence-of-stomatal-coductance-g_s-1"><a class="docs-heading-anchor" href="#Dependence-of-stomatal-coductance-g_s-1">Dependence of stomatal coductance g<span>$_s$</span></a><a class="docs-heading-anchor-permalink" href="#Dependence-of-stomatal-coductance-g_s-1" title="Permalink"></a></h3><pre><code class="language-">plot(APAR, gs_C4,color=[:black],lw=2, alpha=0.7, label=&quot;gs C4&quot;)
+plot!(APAR, gs_C3,color=[:orange],lw=2, alpha=0.7, label=&quot;gs C3&quot;)
+xlabel!(&quot;APAR [μmol/m²/s]&quot;)
+ylabel!(&quot;gs&quot;)</code></pre><h2 id="More-complex-examples:-1"><a class="docs-heading-anchor" href="#More-complex-examples:-1">More complex examples:</a><a class="docs-heading-anchor-permalink" href="#More-complex-examples:-1" title="Permalink"></a></h2><pre><code class="language-julia">##Again, this looks tedious and repetitive but is the easiest way to do this right now:
+
+# Now I want to vary T, APAR and CO2:
+APAR = [100.0, 250.0, 500.0, 1000.0, 1500.0]
+CO2  = collect(2:2:800)
+T    = collect(265:1:310)
+
+n1 = length(APAR);
+n2 = length(CO2);
+n3 = length(T);
+
+Ag_C3 = zeros(n1,n2,n3); Ag_C4 = zeros(n1,n2,n3)
+An_C3 = zeros(n1,n2,n3); An_C4 = zeros(n1,n2,n3)
+Aj_C3 = zeros(n1,n2,n3); Aj_C4 = zeros(n1,n2,n3)
+Ap_C3 = zeros(n1,n2,n3); Ap_C4 = zeros(n1,n2,n3)
+Ac_C3 = zeros(n1,n2,n3); Ac_C4 = zeros(n1,n2,n3)
+Cc_C3 = zeros(n1,n2,n3); Cc_C4 = zeros(n1,n2,n3)
+gs_C3 = zeros(n1,n2,n3); gs_C4 = zeros(n1,n2,n3)
+
+# Set Ca to 400ppm
+met.Ca = 400
+
+# Set leaf temperature:
+leaf.T = 298.0
+
+# Specify Vcmax
+leaf.Vcmax25 = 90
+leaf.Jmax25 = 90*1.9
+
+# Specify curvature for J
+leaf.θ_j = 0.995</code></pre><pre><code class="language-none">0.995</code></pre><pre><code class="language-julia"># Run this over all potential 3D dimensions:
+
+# I really like the compact form of nested loops in Julia!
+for iA in eachindex(APAR), iC in eachindex(CO2), iT in eachindex(T)
+    met.Ca    = CO2[iC];
+    # make sure we have a reasonable start:
+    leaf.Cc   = met.Ca;
+    leaf.Cs   = met.Ca;
+    leaf.gs   = 0.1;
+    leaf.T    = T[iT];
+    leaf.APAR = APAR[iA];
+
+    # Run C3 photosynthesis:
+    LeafPhotosynthesis!(modC3, leaf, met);
+
+    # Save leaf variables:
+    An_C3[iA,iC,iT]=leaf.An;
+    Ag_C3[iA,iC,iT]=leaf.Ag;
+    Aj_C3[iA,iC,iT]=leaf.Aj;
+    Ap_C3[iA,iC,iT]=leaf.Ap;
+    Ac_C3[iA,iC,iT]=leaf.Ac;
+    Cc_C3[iA,iC,iT]=leaf.Cc;
+    gs_C3[iA,iC,iT]=leaf.gs;
+
+    # Run C4 photosynthesis:
+    leaf.Cc   = met.Ca;
+    leaf.Cs   = met.Ca;
+    leaf.gs   = 0.1;
+    LeafPhotosynthesis!(modC4, leaf, met);
+
+    # Save leaf variables:
+    An_C4[iA,iC,iT]=leaf.An;
+    Ag_C4[iA,iC,iT]=leaf.Ag;
+    Aj_C4[iA,iC,iT]=leaf.Aj;
+    Ap_C4[iA,iC,iT]=leaf.Ap;
+    Ac_C4[iA,iC,iT]=leaf.Ac;
+    Cc_C4[iA,iC,iT]=leaf.Cc;
+    gs_C4[iA,iC,iT]=leaf.gs;
+end</code></pre><h4 id="Plotting-2D-contours-of-A_n-vs.-CO_2-and-Temperature-1"><a class="docs-heading-anchor" href="#Plotting-2D-contours-of-A_n-vs.-CO_2-and-Temperature-1">Plotting 2D contours of A<span>$_n$</span> vs. CO<span>$_2$</span> and Temperature</a><a class="docs-heading-anchor-permalink" href="#Plotting-2D-contours-of-A_n-vs.-CO_2-and-Temperature-1" title="Permalink"></a></h4><pre><code class="language-">##Let&#39;s take one slice in APAR space:
+i = 4
+
+# and plot:
+contourf(T.-273.15, CO2, An_C3[i,:,:])
+xlabel!(&quot;T [°C]&quot;)
+ylabel!(&quot;Ambient CO₂ [ppm]&quot;)
+title!(&quot;C3 , An [μmol/m²/s] at APAR=$(APAR[i])&quot;)</code></pre><pre><code class="language-"># Same for C4 plants, why is it so different??
+
+contourf(T.-273.15, CO2, An_C4[i,:,:])
+xlabel!(&quot;T [°C]&quot;)
+ylabel!(&quot;Ambient CO₂ [ppm]&quot;)
+title!(&quot;C4 , An [μmol/m²/s] at APAR=$(APAR[i])&quot;)</code></pre><pre><code class="language-">iA = 4; iT=31
+plot( CO2, Ag_C3[iA,:,iT],color=[:black],lw=2, alpha=0.7, label=&quot;Ag C3&quot;)
+plot!(CO2, Ac_C3[iA,:,iT],line=(:dash,2), label=&quot;Ac C3&quot;)
+plot!(CO2, Aj_C3[iA,:,iT],line=(:dash,2), label=&quot;Aj C3&quot;)
+plot!(CO2, Ap_C3[iA,:,iT],line=(:dash,2), label=&quot;Ap C3&quot; )
+xlabel!(&quot;CO₂ [ppm]&quot;)
+ylabel!(&quot;Aᵢ [μmol/m2/s]&quot;)
+title!(&quot;Ambient C3 CO₂ response, T=$(T[iT]-273), APAR=$(APAR[iA])&quot;)</code></pre><pre><code class="language-">iA = 4; iT=31
+plot(CO2, Ag_C4[iA,:,iT],color=[:black],lw=2, alpha=0.7, label=&quot;Ag C4&quot;)
+plot!(CO2, Ac_C4[iA,:,iT],line=(:dash,2), label=&quot;Ac C4&quot;)
+plot!(CO2, Aj_C4[iA,:,iT],line=(:dash,2), label=&quot;Aj C4&quot;)
+plot!(CO2, Ap_C4[iA,:,iT],line=(:dash,2), label=&quot;Ap C4&quot; )
+xlabel!(&quot;CO₂ [ppm]&quot;)
+ylabel!(&quot;Aᵢ [μmol/m2/s]&quot;)
+title!(&quot;Ambient C4 CO₂ response, T=$(T[iT]-273), APAR=$(APAR[iA])&quot;)</code></pre><hr/><h2 id="Summary:-1"><a class="docs-heading-anchor" href="#Summary:-1">Summary:</a><a class="docs-heading-anchor-permalink" href="#Summary:-1" title="Permalink"></a></h2><p>Play around a bit with different parameters. You can also try to change humidity at the leaf level or the boundary layer resistance. There are many things that can be tested, and we often like to go to the extremes (T, CO<span>$_2$</span>, ra) to check for bugs, which most often have to do with the A-C<span>$_c$</span> iterations.</p><p>Note of caution: we really plotted CO<span>$_2$</span> response curves against ambient CO<span>$_2$</span>. At low C<span>$_c$</span>, leaves can be a source of CO<span>$_2$</span> due to the CO<span>$_2$</span> compensation point (i.e. A<span>$_g$</span> can be negative!). Also, at CO<span>$_2$</span>=0, stomatal conductance using the empirical formulation goes to <span>$\infty$</span>, which can cause unwanted behavior.</p><p>Test things out, learn by changing parameters and try to break it!</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-1"><a class="tag is-link" href="#citeref-1">1</a>Ball, J.T., Woodrow, I.E. and Berry, J.A., 1987. A model predicting stomatal conductance and its contribution to the control of photosynthesis under different environmental conditions. In Progress in photosynthesis research (pp. 221-224). Springer, Dordrecht.</li><li class="footnote" id="footnote-2"><a class="tag is-link" href="#citeref-2">2</a>Medlyn, B.E., Duursma, R.A., Eamus, D., Ellsworth, D.S., Prentice, I.C., Barton, C.V., Crous, K.Y., De Angelis, P., Freeman, M. and Wingate, L., 2011. Reconciling the optimal and empirical approaches to modelling stomatal conductance. Global Change Biology, 17(6), pp.2134-2144.</li><li class="footnote" id="footnote-3"><a class="tag is-link" href="#citeref-3">3</a>Wang, Y., Sperry, J.S., Anderegg, W.R., Venturas, M.D. and Trugman, A.T., 2020. A theoretical and empirical assessment of stomatal optimization modeling. New Phytologist.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Leaf-Photosynthesis-Rates/">« Enzyme catalysis T-dependence</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 22 May 2020 02:03">Friday 22 May 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
