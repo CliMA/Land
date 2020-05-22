@@ -3,9 +3,21 @@ abstract type AbstractPhotosynthesisModel end
 abstract type AbstractC3Photosynthesis <: AbstractPhotosynthesisModel end
 abstract type AbstractC4Photosynthesis <: AbstractPhotosynthesisModel end
 
+"""
+Classical C3 Photosynthesis model from FvCB, using NADPH based stochiometry
+"""
 struct  C3FvCBPhoto    <: AbstractC3Photosynthesis end
+"""
+Classical C3 Photosynthesis model from FvCB, but using a pre-defined gs value as constraint
+"""
 struct  C3FvCBPhotoGs  <: AbstractC3Photosynthesis end
+"""
+Classical C3 Photosynthesis model from FvCB, using ATP based stochiometry
+"""
 struct  C3FvCBPhotoATP <: AbstractC3Photosynthesis end
+"""
+Classical C4 Photosynthesis model from Collatz (but using MM kinetics for PEP-carboxylase)
+"""
 struct  C4CollatzPhoto <: AbstractC4Photosynthesis end
 
 """
@@ -24,7 +36,7 @@ Solution when Rubisco activity is limiting (Classical Farquhar, von Caemmerer, B
 """
 function rubisco_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
     @unpack  Γstar, Cc, Kc, Ko, o₂, Vcmax = leaf
-    leaf.Ac = Vcmax * max(met.ppm_to_Pa*Cc-Γstar, 0) / (met.ppm_to_Pa*Cc + Kc*(1 +met.ppm_to_Pa*1e6*o₂/Ko))
+    leaf.Ac = Vcmax * (met.ppm_to_Pa*Cc-Γstar) / (met.ppm_to_Pa*Cc + Kc*(1 +met.ppm_to_Pa*1e6*o₂/Ko))
 end
 
 """
@@ -44,7 +56,7 @@ Using curvature θ_j and Jmax
 function light_limited_rate!(model::AbstractC3Photosynthesis, leaf, met, APAR)
     @unpack  Γstar, Cc = leaf
     electron_transport_rate!(model, leaf, APAR) 
-    leaf.Aj = leaf.Je * max(met.ppm_to_Pa*Cc-Γstar, 0) / (4*met.ppm_to_Pa*Cc + 8Γstar)
+    leaf.Aj = leaf.Je * (met.ppm_to_Pa*Cc-Γstar) / (4*met.ppm_to_Pa*Cc + 8Γstar)
 end
 
 ############  model::C3FvCBPhotoATP #################################
@@ -57,7 +69,7 @@ Using curvature θ_j and Jmax
 function light_limited_rate!(model::C3FvCBPhotoATP, leaf, met, APAR)
     @unpack  Γstar, Cc = leaf
     electron_transport_rate!(model, leaf, APAR)
-    leaf.Aj = leaf.Je * max(met.ppm_to_Pa*Cc-Γstar, 0) / (4.5*met.ppm_to_Pa*Cc + 10.5*Γstar)
+    leaf.Aj = leaf.Je * (met.ppm_to_Pa*Cc-Γstar) / (4.5*met.ppm_to_Pa*Cc + 10.5*Γstar)
 end
 
 
@@ -119,8 +131,8 @@ end
 Solution for PEP carboxylase-limited rate of carboxylation
 """
 function product_limited_rate!(model::C4CollatzPhoto, leaf, met)
-    @unpack  Kp,Vpmax, Cc = leaf
-    leaf.Ap = Vpmax * (met.ppm_to_Pa*Cc) / (met.ppm_to_Pa*Cc + Kp)
+    @unpack  Kpep,Vpmax, Cc = leaf
+    leaf.Ap = max(0,Vpmax * (met.ppm_to_Pa*Cc) / (met.ppm_to_Pa*Cc + Kpep))
 end
 
 

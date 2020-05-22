@@ -18,5 +18,5 @@ function photosynthesis_colimit(mod::CurvedColimit, A...)
     for j=2:length(A)
         a = lower_quadratic(mod.Θ, -(a + A[j]), a * A[j])
     end
-    a
+    isnan(a) ? minimum(A) : a
 end
