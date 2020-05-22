@@ -19,19 +19,19 @@ List of net photosynthetic rate `list_an`, gross photosynthetic rate `list_ag`, 
 Some parameters are useless here for C3 photosynthesis model (e.g., p25), but they are given for more convenient modeling.
 
 """
-function get_an_ag_r_pi_from_gsc_list(model::C3ParaSet   = C3VcJBernacchi{FT}(),
-                                   gsc_list::Array{FT,1} = FT(0.1) .* ones(FT,10),
-                                        v25::FT          = FT(80.0),
-                                        j25::FT          = FT(135.0),
-                                        p25::FT          = FT(120.0),
-                                        p_a::FT          = FT(40.0),
-                                t_leaf_list::Array{FT,1} = FT(298.15).* ones(FT,10),
-                                   par_list::Array{FT,1} = FT(1000.0).* ones(FT,10),
-                                      p_atm::FT          = FT(101325.0),
-                                       p_O₂::FT          = FT(21278.25),
-                                        r25::FT          = FT(Inf),
-                                  curvature::FT          = FT(0.9),
-                                         qy::FT          = FT(0.4081632653061224)) where {FT}
+function get_an_ag_r_pi_from_gsc_list(model::C3ParaSet,
+                                   gsc_list::Array{FT,1},
+                                        v25::FT,
+                                        j25::FT,
+                                        p25::FT,
+                                        p_a::FT,
+                                t_leaf_list::Array{FT,1},
+                                   par_list::Array{FT,1},
+                                      p_atm::FT,
+                                       p_O₂::FT,
+                                        r25::FT,
+                                  curvature::FT,
+                                         qy::FT) where {FT}
     # define lists of results
     len     = length(gsc_list)
     list_an = zeros(FT,len)
@@ -48,6 +48,7 @@ function get_an_ag_r_pi_from_gsc_list(model::C3ParaSet   = C3VcJBernacchi{FT}(),
                                               gsc,
                                               v25,
                                               j25,
+                                              p25,
                                               p_a,
                                               t_leaf,
                                               par,
@@ -90,19 +91,19 @@ List of net photosynthetic rate `list_an`, gross photosynthetic rate `list_ag`, 
 Some parameters are useless here for C4 photosynthesis model (e.g., p_O₂), but they are given for more convenient modeling.
 
 """
-function get_an_ag_r_pi_from_gsc_list(model::C4ParaSet   = C4VcVpJCLM{FT}(),
-                                   gsc_list::Array{FT,1} = FT(0.1) .* ones(FT,10),
-                                        v25::FT          = FT(80.0),
-                                        j25::FT          = FT(135.0),
-                                        p25::FT          = FT(120.0),
-                                        p_a::FT          = FT(40.0),
-                                t_leaf_list::Array{FT,1} = FT(298.15).* ones(FT,10),
-                                   par_list::Array{FT,1} = FT(1000.0).* ones(FT,10),
-                                      p_atm::FT          = FT(101325.0),
-                                       p_O₂::FT          = FT(21278.25),
-                                        r25::FT          = FT(Inf),
-                                  curvature::FT          = FT(0.9),
-                                         qy::FT          = FT(0.4081632653061224)) where {FT}
+function get_an_ag_r_pi_from_gsc_list(model::C4ParaSet,
+                                   gsc_list::Array{FT,1},
+                                        v25::FT,
+                                        j25::FT,
+                                        p25::FT,
+                                        p_a::FT,
+                                t_leaf_list::Array{FT,1},
+                                   par_list::Array{FT,1},
+                                      p_atm::FT,
+                                       p_O₂::FT,
+                                        r25::FT,
+                                  curvature::FT,
+                                         qy::FT) where {FT}
     # define lists of results
     len     = length(gsc_list)
     list_an = zeros(FT,len)
@@ -118,12 +119,15 @@ function get_an_ag_r_pi_from_gsc_list(model::C4ParaSet   = C4VcVpJCLM{FT}(),
         an,ag,r,p_i = get_an_ag_r_pi_from_gsc(model,
                                               gsc,
                                               v25,
+                                              j25,
                                               p25,
                                               p_a,
                                               t_leaf,
                                               par,
                                               p_atm,
+                                              p_O₂,
                                               r25,
+                                              curvature,
                                               qy)
         list_an[indx] = an
         list_ag[indx] = ag

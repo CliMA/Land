@@ -19,19 +19,19 @@ Net photosynthetic rate `tar_an`, gross photosynthetic rate `tar_ag`, respiratio
 For C3 plants, w/wo ATP limitation. Some parameters are useless in C3 photosynthesis, like p25.
 
 """
-function get_an_ag_r_pi_from_gsc(model::C3ParaSet = C3VcJBernacchi{FT}(),
-                                   gsc::FT        = FT(0.1),
-                                   v25::FT        = FT(80.0),
-                                   j25::FT        = FT(135.0),
-                                   p25::FT        = FT(120.0),
-                                   p_a::FT        = FT(40.0),
-                                t_leaf::FT        = FT(298.15),
-                                   par::FT        = FT(1000.0),
-                                 p_atm::FT        = FT(101325.0),
-                                  p_O₂::FT        = FT(21278.25),
-                                   r25::FT        = FT(Inf),
-                             curvature::FT        = FT(0.9),
-                                    qy::FT        = FT(0.4081632653061224)) where {FT}
+function get_an_ag_r_pi_from_gsc(model::C3ParaSet,
+                                   gsc::FT,
+                                   v25::FT,
+                                   j25::FT,
+                                   p25::FT,
+                                   p_a::FT,
+                                t_leaf::FT,
+                                   par::FT,
+                                 p_atm::FT,
+                                  p_O₂::FT,
+                                   r25::FT,
+                             curvature::FT,
+                                    qy::FT) where {FT}
     # compute a_net using bi-section method
     tar_p  = FT(0.0)
     tar_ag = FT(0.0)
@@ -102,19 +102,19 @@ Net photosynthetic rate `tar_an`, gross photosynthetic rate `tar_ag`, respiratio
 For C4 plants. Some parameters are useless for C4 photosynthesis, like j25, p_O₂, and curvature.
 
 """
-function get_an_ag_r_pi_from_gsc(model::C4ParaSet = C4VcVpJCLM{FT}(),
-                                   gsc::FT        = FT(0.1),
-                                   v25::FT        = FT(80.0),
-                                   j25::FT        = FT(135.0),
-                                   p25::FT        = FT(120.0),
-                                   p_a::FT        = FT(40.0),
-                                t_leaf::FT        = FT(298.15),
-                                   par::FT        = FT(1000.0),
-                                 p_atm::FT        = FT(101325.0),
-                                  p_O₂::FT        = FT(21278.25),
-                                   r25::FT        = FT(Inf),
-                             curvature::FT        = FT(0.9),
-                                    qy::FT        = FT(0.4081632653061224)) where {FT}
+function get_an_ag_r_pi_from_gsc(model::C4ParaSet,
+                                   gsc::FT,
+                                   v25::FT,
+                                   j25::FT,
+                                   p25::FT,
+                                   p_a::FT,
+                                t_leaf::FT,
+                                   par::FT,
+                                 p_atm::FT,
+                                  p_O₂::FT,
+                                   r25::FT,
+                             curvature::FT,
+                                    qy::FT) where {FT}
     # compute a_net using bi-section method
     tar_p  = FT(0.0)
     tar_ag = FT(0.0)

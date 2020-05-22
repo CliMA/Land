@@ -9,7 +9,7 @@ Update the tree flux information and hydraulic parameters, given
 
 The function updates the stomatal conductance via a `Δgsw = factor * (∂A/∂E - ∂Θ/∂E)`. The `∂A/∂E` is the same for every stomatal control model, but `∂Θ/∂E` differs among models.
 """
-function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wang2020", updating::Bool=false) where {FT}
+function update_tree_with_time!(tree::Tree, Δt::FT; scheme::String="Wang2020", updating::Bool=false) where {FT}
     # 0. unpack necessary structs
     @unpack branch_list = tree.branch
     @unpack canopy_list = tree.canopy
@@ -76,7 +76,7 @@ function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wan
     # 5. determine how much gsw and gsc should change with time, use Wang 2020 model for day time, will add scheme for nighttime later
     for canopyi in canopy_list
         # 5.1 compute the ∂A∂E and ∂Θ∂E for each leaf
-        list_∂A∂E = get_marginal_gain(canopyi)
+        list_∂A∂E = get_marginal_gain(canopyi, tree.photo_para_set)
         list_∂Θ∂E = get_marginal_penalty_wang(canopyi)
 
         # update the gsw and gsc for each leaf

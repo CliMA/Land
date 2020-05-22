@@ -32,7 +32,7 @@ function update_canopy_from_rt_module!(tree::Tree, canopy_rt::struct_canopy, can
             canopyi.la_list = la_new
 
             # update leaf temperature
-            canopyi.t_list[1:end-1] .= reshape(canRad_rt.T_sun3D[:,:,rt_layer],(:,1))
+            canopyi.t_list[1:end-1] .= reshape(canRad_rt.T_sun3D[:,:,rt_layer],(:,1))[:,1]
             canopyi.t_list[end]      = canRad_rt.T_shade[rt_layer]
         end
     else

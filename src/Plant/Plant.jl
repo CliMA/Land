@@ -27,8 +27,10 @@ using ..CanopyRT
 
 using ..PhotosynthesisModels
 @unpack AbstractPhotoModelParaSet,
+        C3ParaSet,
         C3VcVpJBernacchi,
         C4VcVpJCLM,
+        get_an_ag_r_from_pi,
         get_an_ag_r_pi_from_gsc,
         get_an_ag_r_pi_from_gsc_list = PhotosynthesisModels
 

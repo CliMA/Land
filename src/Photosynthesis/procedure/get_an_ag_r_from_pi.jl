@@ -16,24 +16,23 @@ Gross photosynthetic rate limited by carboxylation without ATP limitation, given
 The equations used are from Farquhar et al. (1980) "A biochemical model of photosynthetic CO2 assimilation in leaves of C3 species."
 
 """
-function get_an_ag_r_from_pi(model::C3ParaSetVcJ = C3VcJBernacchi{FT}(),
-                               p_i::FT           = FT(30.0),
-                               v25::FT           = FT(80.0),
-                               j25::FT           = FT(135.0),
-                               par::FT           = FT(1000.0),
-                              p_O₂::FT           = FT(21278.25),
-                            t_leaf::FT           = FT(298.15),
-                               r25::FT           = FT(Inf),
-                         curvature::FT           = FT(0.9),
-                                qy::FT           = FT(0.4081632653061224)) where {FT}
-    println("C3ParaSetVcJ")
+function get_an_ag_r_from_pi(model::C3ParaSetVcJ,
+                               p_i::FT,
+                               v25::FT,
+                               j25::FT,
+                               par::FT,
+                              p_O₂::FT,
+                            t_leaf::FT,
+                               r25::FT,
+                         curvature::FT,
+                                qy::FT) where {FT}
     if r25==Inf
         r25 = model.VR.v_to_r * v25
     end
     r_leaf  = get_r(model.ReT, r25, t_leaf)
     vmax    = get_vmax(model.VcT, v25, t_leaf)
-    jmax    = get_jmax(model.JT, j25, t_leaf)
-    j       = get_j(jmax, par; curvature=curvature, qy=qy)
+    jmax    = get_jmax(model.JT , j25, t_leaf)
+    j       = get_j(jmax, par, curvature, qy)
     kc      = get_kc(model.KcT, t_leaf)
     ko      = get_ko(model.KoT, t_leaf)
     km      = kc * (1 + p_O₂/ko)
@@ -66,24 +65,23 @@ Gross photosynthetic rate limited by carboxylation with ATP limitation, given
 The equations used are from Farquhar et al. (1980) "A biochemical model of photosynthetic CO2 assimilation in leaves of C3 species."
 
 """
-function get_an_ag_r_from_pi(model::C3ParaSetVcVpJ = C3VcVpJBernacchi{FT}(),
-                               p_i::FT             = FT(30.0),
-                               v25::FT             = FT(80.0),
-                               j25::FT             = FT(135.0),
-                               par::FT             = FT(1000.0),
-                              p_O₂::FT             = FT(21278.25),
-                            t_leaf::FT             = FT(298.15),
-                               r25::FT             = FT(Inf),
-                         curvature::FT             = FT(0.9),
-                                qy::FT             = FT(0.4081632653061224)) where {FT}
-    println("C3ParaSetVcVpJ")
+function get_an_ag_r_from_pi(model::C3ParaSetVcVpJ,
+                               p_i::FT,
+                               v25::FT,
+                               j25::FT,
+                               par::FT,
+                              p_O₂::FT,
+                            t_leaf::FT,
+                               r25::FT,
+                         curvature::FT,
+                                qy::FT) where {FT}
     if r25==Inf
         r25 = model.VR.v_to_r * v25
     end
     r_leaf  = get_r(model.ReT, r25, t_leaf)
     vmax    = get_vmax(model.VcT, v25, t_leaf)
     jmax    = get_jmax(model.JT, j25, t_leaf)
-    j       = get_j(jmax, par; curvature=curvature, qy=qy)
+    j       = get_j(jmax, par, curvature, qy)
     kc      = get_kc(model.KcT, t_leaf)
     ko      = get_ko(model.KoT, t_leaf)
     km      = kc * (1 + p_O₂/ko)
@@ -115,15 +113,14 @@ Gross photosynthetic rate limited by carboxylation, given
 The model is adapted from Collatz et al. (1992) "Coupled photosynthesis-stomatal conductance model for leaves of C4 plants."
 
 """
-function get_an_ag_r_from_pi(model::C4ParaSetVcVpJ = C4VcVpJCLM{FT}(),
-                               p_i::FT             = FT(30.0),
-                               v25::FT             = FT(80.0),
-                               p25::FT             = FT(100.0),
-                               par::FT             = FT(1000.0),
-                            t_leaf::FT             = FT(298.15),
-                               r25::FT             = FT(Inf),
-                                qy::FT             = FT(0.4081632653061224)) where {FT}
-    println("C4ParaSetVcVpJ")
+function get_an_ag_r_from_pi(model::C4ParaSetVcVpJ,
+                               p_i::FT,
+                               v25::FT,
+                               p25::FT,
+                               par::FT,
+                            t_leaf::FT,
+                               r25::FT,
+                                qy::FT) where {FT}
     if r25==Inf
         r25 = model.VR.v_to_r * v25
     end
