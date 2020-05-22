@@ -38,7 +38,7 @@ if generate_tutorials
         input = abspath(tutorial)
         script = Literate.script(input, gen_dir)
         code = strip(read(script, String))
-        @show code
+        #@show code
         mdpost(str) = replace(str, "@__CODE__" => code)
         Literate.markdown(input, gen_dir, postprocess = mdpost)
         # Literate.notebook(input, gen_dir, execute = true)
@@ -51,7 +51,11 @@ if generate_tutorials
         "Canopy Radiative Transfer" => Any[
             "Reflected and Emitted Radiance" => "generated/Radiation_Test_BRDF.md",
         ],
-        "PhotoSynthesis" => Any[],
+        "PhotoSynthesis" => Any[
+        "Leaf Level Basics" => "generated/Leaf-Photosynthesis.md",
+        "Enzyme catalysis T-dependence" => "generated/Leaf-Photosynthesis-Rates.md",
+        "Leaf Photosynthetic rates" => "generated/Leaf-Photosynthesis-Synthesis.md",
+        ],
         "Canopy Energy Balance" => Any[],
     ]
 

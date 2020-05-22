@@ -32,15 +32,18 @@ function LeafPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met:
   set_leaf_temperature!(mo, leaf)
   met.g_m_s_to_mol_m2_s = (met.P_air-met.e_air)/(physcon.Rgas*met.T_air) 
   met.ppm_to_Pa = (met.P_air-met.e_air)*1e-6
+  isnan(leaf.gleaf) ?  leaf.gleaf = 0.01 :
+  isnan(leaf.gs) ?  leaf.gs = 0.01 :
 
-  
   # Compute Cc and Photosynthesis:
   if leaf.dynamic_state
     CcFunc!(leaf.Cc; mods=mo, leaf=leaf, met=met)
   else
+    #@show (CcFunc!(leaf.Cc; mods=mo, leaf=leaf, met=met))
     @inline f(x) = CcFunc!(x; mods=mo, leaf=leaf, met=met)
-    sol = find_zero(f, SecantMethod{FT}(0.0, 2met.Ca), CompactSolution(),SolutionTolerance{FT}(1e-3))
+    sol = find_zero(f, SecantMethod{FT}(met.Ca*0.6, met.Ca), CompactSolution(),SolutionTolerance{FT}(1e-3))
     leaf.Cc = sol.root
+    #@show sol
     #@show leaf.Cc
     #CcFunc!(mo, leaf, met)
     #@show leaf.Cc
@@ -63,7 +66,8 @@ Compute gross and net assimilation rates Ag, An using biochemical model and give
 
 """
 function CcFunc!(Cc; mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
-    leaf.Cc = Cc
+    leaf.Cc = max(0,Cc)
+    #@show leaf.Cc
     # Compute Rubisco Limited Photosynthesis
     rubisco_limited_rate!(mods.photosynthesis, leaf, met)
     # Light limited rate
@@ -75,6 +79,7 @@ function CcFunc!(Cc; mods::AbstractPhotosynthesis,  leaf::leaf_params, met::mete
     boundary_layer_resistance!(mods.BoundaryLayer, leaf,  met)
 
     @unpack Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc = leaf
+    #@show Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc 
     @unpack Ca, ra, g_m_s_to_mol_m2_s, e_air = met
 
     # add colimitation later:
