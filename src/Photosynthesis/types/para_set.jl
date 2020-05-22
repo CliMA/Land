@@ -1,10 +1,12 @@
 #=
 The structure tree of AbstractPhotoModelParaSet
 AbstractPhotoModelParaSet
----> C3ParaSetVcJ      # Vc, and J model for C3 plants
----> C3ParaSetVcVpJ    # Vc, Vp, and J model for C3 plants
----> C4ParaSetVcJ      # Vc, and J model for C4 plants
----> C4ParaSetVcVpJ    # Vc, Vp, and J model for C4 plants
+---> C3ParaSet
+    ---> C3ParaSetVcJ      # Vc, and J model for C3 plants
+    ---> C3ParaSetVcVpJ    # Vc, Vp, and J model for C3 plants
+---> C4ParaSet
+    ---> C4ParaSetVcJ      # Vc, and J model for C4 plants
+    ---> C4ParaSetVcVpJ    # Vc, Vp, and J model for C4 plants
 =#
 abstract type AbstractPhotoModelParaSet end
 
@@ -13,7 +15,6 @@ abstract type C4ParaSet <: AbstractPhotoModelParaSet end
 
 abstract type C3ParaSetVcJ   <: C3ParaSet end
 abstract type C3ParaSetVcVpJ <: C3ParaSet end
-abstract type C4ParaSetVcJ   <: C4ParaSet end
 abstract type C4ParaSetVcVpJ <: C4ParaSet end
 
 

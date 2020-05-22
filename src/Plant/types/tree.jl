@@ -22,6 +22,8 @@ Base.@kwdef mutable struct Tree{FT<:AbstractFloat, n_root, n_canopy, n_leaf}
     h  ::FT  = FT( 8.0)
     "Photosynthesis type C3/C4/CAM"
     photo_type::String = "C3"
+    "Photosynthesis model parameter set"
+    photo_para_set::C3VcVpJBernacchi = C3VcVpJBernacchi{FT}()
 
     # tree formation from root to leaves
     "[`Root`](@ref) which contains n_root [`RootLayer`](@ref)"

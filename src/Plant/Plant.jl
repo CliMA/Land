@@ -25,6 +25,13 @@ using ..CanopyRT
         struct_canopyOptProps,
         struct_canopyRadiation = CanopyRT
 
+using ..PhotosynthesisModels
+@unpack AbstractPhotoModelParaSet,
+        C3VcVpJBernacchi,
+        C4VcVpJCLM,
+        get_an_ag_r_pi_from_gsc,
+        get_an_ag_r_pi_from_gsc_list = PhotosynthesisModels
+
 # include the constants
 include("constants.jl")
 
@@ -47,15 +54,6 @@ include("hydraulics/update_tree_e_crit.jl"      )
 # include the interface functions
 include("interface/initialize_rt_module.jl"        )
 include("interface/update_canopy_from_rt_module.jl")
-
-# include the photosynthesis functions
-include("photosynthesis/get_leaf_an_ag_r_from_pi.jl"    )
-include("photosynthesis/get_leaf_an_ag_r_pi_from_gsc.jl")
-include("photosynthesis/get_leaf_j.jl"                  )
-include("photosynthesis/get_leaf_jmax.jl"               )
-include("photosynthesis/get_leaf_r_from_r25.jl"         )
-include("photosynthesis/get_leaf_r_from_v25.jl"         )
-include("photosynthesis/get_leaf_vcmax.jl"              )
 
 # include the stomatal optimization functions
 include("stomata/get_marginal_gain.jl"        )

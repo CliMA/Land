@@ -75,23 +75,27 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
 
     # leaf photosynthetic parameters
     "Mesophyll conductance correction factor: multiplier"
-    g_ias_c::FT = FT(  0.0  )
+    g_ias_c  ::FT = FT(  0.0  )
     "Mesophyll conductance correction factor: exponent"
-    g_ias_e::FT = FT(  0.3  )
+    g_ias_e  ::FT = FT(  0.3  )
     "Maximal leaf diffusive conductance for H₂O at 298.15 K `[mol m⁻² s⁻¹]`"
-    g_max  ::FT = FT(  0.8  )
+    g_max    ::FT = FT(  0.8  )
     "CO₂ compensation point with the absence of dark respiration `[Pa]`"
-    Γ_star ::FT = FT(  2.5  )
+    Γ_star   ::FT = FT(  2.5  )
     "Non-steady state factor (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
-    gs_nssf::FT = FT(  0.025)
+    gs_nssf  ::FT = FT(  0.025)
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    j_max  ::FT = FT(133.6  )
+    j_max    ::FT = FT(133.6  )
     "Leaf respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    r_25   ::FT = FT(  1.2  )
+    r_25     ::FT = FT(  1.2  )
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_max  ::FT = FT( 80.0  )
+    v_max    ::FT = FT( 80.0  )
     "Maximal PEP carboxylation rate at 298.15 K (only for C4 plants) `[μmol m⁻² s⁻¹]`"
-    p_max  ::FT = FT(120.0  )
+    p_max    ::FT = FT(120.0  )
+    "Curvature ratio for J"
+    curvature::FT = FT(0.9)
+    "Quntum yield for electron, using aPAR"
+    qy       ::FT = FT(0.4081632653061224)
 
     # leaf layers (e_list and q_list need to be updated with time)
     "List of [`Leaf`](@ref)"

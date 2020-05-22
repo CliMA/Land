@@ -4,6 +4,7 @@ module PhotosynthesisModels
     using Parameters
 
     # define GLOBAL Parameters
+    const FT = Float32
     const GAS_R = gas_constant()
     const K_25  = 298.15 # K @ 25 Celcius
 

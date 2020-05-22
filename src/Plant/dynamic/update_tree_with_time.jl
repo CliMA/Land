@@ -21,17 +21,20 @@ function update_tree_with_time!(tree::Tree, Δt::FT=FT(1.0); scheme::String="Wan
         canopyi.d_list  = (get_saturated_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
         canopyi.e_list  = canopyi.gsw_list .* canopyi.d_list
         canopyi.q_list  = canopyi.e_list   .* canopyi.la_list
-        anagrpi_lists   = get_leaf_an_ag_r_pi_from_gsc_list(
-                                                            v25 = canopyi.v_max,
-                                                            j25 = canopyi.j_max,
-                                                         Γ_star = canopyi.Γ_star,
-                                                       gsc_list = canopyi.gsc_list,
-                                                            p_a = canopyi.p_a,
-                                                       tem_list = canopyi.t_list,
-                                                       par_list = canopyi.par_list,
-                                                          p_atm = canopyi.p_atm,
-                                                           p_O₂ = canopyi.p_O₂,
-                                                            r25 = canopyi.r_25)
+        anagrpi_lists   = get_an_ag_r_pi_from_gsc_list(
+                                                       tree.photo_para_set,
+                                                       canopyi.gsc_list,
+                                                       canopyi.v_max,
+                                                       canopyi.j_max,
+                                                       canopyi.p_max,
+                                                       canopyi.p_a,
+                                                       canopyi.t_list,
+                                                       canopyi.par_list,
+                                                       canopyi.p_atm,
+                                                       canopyi.p_O₂,
+                                                       canopyi.r_25,
+                                                       canopyi.curvature,
+                                                       canopyi.qy)
         canopyi.an_list = anagrpi_lists[1]
         canopyi.ag_list = anagrpi_lists[2]
         canopyi.r_list  = anagrpi_lists[3]
