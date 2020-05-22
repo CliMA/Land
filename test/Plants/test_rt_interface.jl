@@ -1,20 +1,22 @@
 using Land.Plant
 
+PLT = Plant
+
 @testset "Plant - RT interface" begin
     FT = Float32
 
     # create a tree with 10 layers of canopy using Plant module
-    tree = Tree{FT, 5, 10, 325}();
+    tree = PLT.Tree{FT, 5, 10, 325}();
 
     # create 10-layer canopy structs using CanopyRT module
-    canopy_rt, canOpt_rt, canRad_rt, arrayOfLeaves = initialize_rt_module(n_layer=10, LAI=FT(3.0));
+    canopy_rt, canOpt_rt, canRad_rt, arrayOfLeaves = PLT.initialize_rt_module(n_layer=10, LAI=FT(3.0));
 
     # test the canopy layers
     @test tree.canopy.n_layer == canopy_rt.nlayers
     @test length(tree.canopy.canopy_list[1].leaf_list) == length(canRad_rt.absPAR_sunCab[:,:,1])+1
 
     # update tree canopy information from CanopyRT
-    update_canopy_from_rt_module!(tree, canopy_rt, canOpt_rt, canRad_rt);
+    PLT.update_canopy_from_rt_module!(tree, canopy_rt, canOpt_rt, canRad_rt);
     for canopyi in tree.canopy.canopy_list
         @test minimum(canopyi.la_list ) > 0
         @test minimum(canopyi.par_list) > 0
