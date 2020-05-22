@@ -3,7 +3,7 @@
 # Here, we will just briefly summarize how temperature affects enzymatic rate constants and how much uncertainty there actually is in literature (in terms of how to best define them and how plastic some of the variables are)
 
 ## Add usual tools we use:
-using Revise
+#using Revise
 using BenchmarkTools
 using Plots
 pyplot()
