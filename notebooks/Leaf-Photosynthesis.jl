@@ -115,6 +115,7 @@
 # We just want to lay out a first simple example as to how our model setup work:  
 
 ## Loading the Photosynthesis model:
+using Revise
 using Land.Photosynthesis
 ## Defining our Field Type (we can easily switch between Double and Float precision this way)
 const FT = Float32;
@@ -141,6 +142,18 @@ met = meteo{FT}();
 
 ##Here, we just have to worry abou the photosynthesis module, which we set here:
 mod_photo = C3FvCBPhoto()
+
+## All modules here:
+mods = Photosynthesis.PhotoMods(
+    fluorescence    = FlexasTolBerryFluorescence{FT}(),
+    photosynthesis  = C3FvCBPhoto(),
+    respiration     = RespirationCLM{FT}(),
+    stomatal        = BallBerryStomata{FT}(g1=8),
+    Jmax            = JmaxCLM{FT}(),
+    Vmax            = VcmaxCLM{FT}(),
+    MichaelisMenten = MM_CLM{FT}(),
+    BoundaryLayer   = FixedBoundaryResistance{FT}(ra=0),
+    colimitation = CurvedColimit{FT}(0.99));
 #----------------------------------------------------------------------------
 
 ## Set APAR to 250 $\mu mol/m^2/s$
@@ -172,4 +185,7 @@ Ap = Photosynthesis.product_limited_rate!(mod_photo, leaf, met)
 #----------------------------------------------------------------------------
 
 ?C4CollatzPhoto
+#----------------------------------------------------------------------------
+
+
 #----------------------------------------------------------------------------
