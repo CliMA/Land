@@ -11,7 +11,7 @@ A Tree type which includes
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Tree{FT<:AbstractFloat, n_root, n_canopy, n_leaf}
-    # tree information
+    # plant information
     "Age `[year]`"
     age::Int = 10
     "Basal area `[m²]`"
@@ -20,6 +20,8 @@ Base.@kwdef mutable struct Tree{FT<:AbstractFloat, n_root, n_canopy, n_leaf}
     ga ::FT  = FT(50.0)
     "Tree height `[m]`"
     h  ::FT  = FT( 8.0)
+    "Photosynthesis type C3/C4/CAM"
+    photo_type::String = "C3"
 
     # tree formation from root to leaves
     "[`Root`](@ref) which contains n_root [`RootLayer`](@ref)"

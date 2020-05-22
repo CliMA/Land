@@ -90,6 +90,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     r_25   ::FT = FT(  1.2  )
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_max  ::FT = FT( 80.0  )
+    "Maximal PEP carboxylation rate at 298.15 K (only for C4 plants) `[μmol m⁻² s⁻¹]`"
+    p_max  ::FT = FT(120.0  )
 
     # leaf layers (e_list and q_list need to be updated with time)
     "List of [`Leaf`](@ref)"

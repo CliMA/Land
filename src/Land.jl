@@ -8,6 +8,8 @@ include(joinpath("Utils", "WaterVapor.jl"))
 include(joinpath("Photosynthesis", "Photosynthesis.jl"))
 include(joinpath("Radiation", "CanopyRT.jl"))
 
-include(joinpath("Plant", "Plant.jl"))
+# module by Yujie, may need to merge with others
+include("Photosynthesis/PhotosynthesisModels.jl")
+include("Plant/Plant.jl"                        )
 
 end # module
