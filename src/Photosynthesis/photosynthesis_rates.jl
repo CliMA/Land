@@ -55,8 +55,9 @@ Using curvature θ_j and Jmax
 """
 function light_limited_rate!(model::AbstractC3Photosynthesis, leaf, met, APAR)
     @unpack  Γstar, Cc = leaf
-    electron_transport_rate!(model, leaf, APAR) 
-    leaf.Aj = leaf.Je * (met.ppm_to_Pa*Cc-Γstar) / (4*met.ppm_to_Pa*Cc + 8Γstar)
+    electron_transport_rate!(model, leaf, APAR)
+    leaf.CO2_per_electron = (met.ppm_to_Pa*Cc-Γstar) / (4*met.ppm_to_Pa*Cc + 8Γstar) ;
+    leaf.Aj = leaf.Je * leaf.CO2_per_electron;
 end
 
 ############  model::C3FvCBPhotoATP #################################
@@ -123,6 +124,7 @@ function light_limited_rate!(model::C4CollatzPhoto, leaf, met, APAR)
     FT = typeof(APAR)
     # Efficiency of ETR for C4 plants ()
     α= FT(1/6)
+    leaf.CO2_per_electron = α
     leaf.Aj = α*(leaf.maxPSII * APAR)/2;
 end
 
