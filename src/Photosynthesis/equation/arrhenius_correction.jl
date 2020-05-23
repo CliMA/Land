@@ -176,7 +176,7 @@ A correction factor based on arrhenius's fitting procedure, given
 - `t_leaf` Leaf temperature in `[K]`
 
 The equation used is `correction = exp( c - ΔHa/(R*T_leaf) )`.
-    
+
 """
 function arrhenius_correction(para_set::ΓStarTDCLM{FT}, t_leaf::FT) where {FT}
     return exp( -para_set.ΔHa_to_R/t_leaf + para_set.ΔHa_to_RT25 )

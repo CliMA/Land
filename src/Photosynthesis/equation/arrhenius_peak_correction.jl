@@ -1,5 +1,5 @@
 """
-arrhenius_correction(para_set::JmaxTDBernacchi{FT}, t_leaf::FT)
+    arrhenius_correction(para_set::JmaxTDBernacchi{FT}, t_leaf::FT)
 
 Arrhenius correction over Jmax, given
 - `para_set` A JmaxTDBernacchi type parameter set

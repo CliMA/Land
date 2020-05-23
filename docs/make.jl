@@ -8,6 +8,8 @@ include("list_of_tutorials.jl")          # defines a dict `tutorials`
 
 pages = Any[
     "Home" => "index.md",
+    "Plant Module" => "plant_module.md",
+    "PhotosynthesisModels Module" => "photosynthesis_models.md",
     "Tutorials" => tutorials,
     ]
 
