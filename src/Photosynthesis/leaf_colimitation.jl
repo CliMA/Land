@@ -8,15 +8,15 @@ Base.@kwdef struct  CurvedColimit{FT} <: AbstractColimitation
 end
 
 
-function photosynthesis_colimit(mod::MinColimit, A...)
-    min(A...)
+function photosynthesis_colimit!(mod::MinColimit,target, A...)
+    target = min(A...);
 end
 
-function photosynthesis_colimit(mod::CurvedColimit, A...)
+function photosynthesis_colimit!(mod::CurvedColimit,target,A...)
     a = A[1]
     #@show A
     for j=2:length(A)
-        a = lower_quadratic(mod.Θ, -(a + A[j]), a * A[j])
+        lower_quadratic!(mod.Θ, -(a + A[j]), a * A[j],a)
     end
-    isnan(a) ? minimum(A) : a
+    isnan(a) ? target = minimum(A) : target =a
 end

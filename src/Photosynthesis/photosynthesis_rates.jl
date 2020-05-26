@@ -25,8 +25,14 @@ Compute ETR (Je) from Jmax and Jpot using quadratic
 """
 function electron_transport_rate!(model::AbstractPhotosynthesisModel, leaf, APAR)
     @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
-    leaf.Je_pot = PSII_frac * maxPSII * APAR;
-    leaf.Je = lower_quadratic(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax)
+    leaf.Je_pot = PSII_frac * maxPSII .* APAR;
+    lower_quadratic!(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax, leaf.Je)
+end
+
+function electron_transport_rate2!(model::AbstractPhotosynthesisModel, leaf, APAR)
+    @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
+    Je_pot = PSII_frac * maxPSII .* APAR;
+    lower_quadratic2!(θ_j, -(Je_pot .+ Jmax), leaf.Je_pot * Jmax, Je_pot)
 end
 
 ############  model::C3FvCBPhoto #################################
@@ -36,7 +42,7 @@ Solution when Rubisco activity is limiting (Classical Farquhar, von Caemmerer, B
 """
 function rubisco_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
     @unpack  Γstar, Cc, Kc, Ko, o₂, Vcmax = leaf
-    leaf.Ac = Vcmax * (met.ppm_to_Pa*Cc-Γstar) / (met.ppm_to_Pa*Cc + Kc*(1 +met.ppm_to_Pa*1e6*o₂/Ko))
+    leaf.Ac = Vcmax * (met.ppm_to_Pa*Cc-Γstar) / (met.ppm_to_Pa*Cc + Kc*(1 +met.ppm_to_Pa*1e6*o₂/Ko));
 end
 
 """
@@ -44,7 +50,7 @@ end
 Solution when Triose Phosphate Export is limiting (CLM implementation)) 
 """
 function product_limited_rate!(model::AbstractC3Photosynthesis, leaf, met)
-    leaf.Ap = leaf.Vcmax/2
+    leaf.Ap = leaf.Vcmax/2;
 end
 
 """
@@ -76,7 +82,7 @@ end
 
 ############  model::C3FvCBPhotoGs #################################
 """
-    rubisco_limited_rate(f::C3FvCBPhotoGs, leaf)
+    rubisco_limited_rate!(model::C3FvCBPhotoGs, leaf, met)
 Solution when Rubisco activity is limiting and a given gs
 Solves quadratic equation 
 """
@@ -87,11 +93,11 @@ function rubisco_limited_rate!(model::C3FvCBPhotoGs, leaf, met)
     a = (ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(Ca + d) - (Vcmax-Rd)*a
     c = Vcmax * (Ca - Γstar) - Rd * (Ca+d)
-    leaf.Ac = lower_quadratic(a,b,c)
+    lower_quadratic!(a,b,c,leaf.Ac)
 end
 
 """
-    light_limited_rate(f::C3FvCBPhotoGs, flux, leaf)
+    light_limited_rate!(model::C3FvCBPhotoGs,  leaf, met, APAR)
 Solution when Electron Transport Rate is limiting and a given gs
 C3: RuBP-limited photosynthesis (this is the NADPH requirement stochiometry)
 Using curvature θ_j and Jmax
@@ -100,10 +106,11 @@ function light_limited_rate!(model::C3FvCBPhotoGs,  leaf, met, APAR)
     @unpack  Γstar, Cc, gs, gm, Rd = leaf
     @unpack  Ca, ra, g_m_s_to_mol_m2_s = met
     electron_transport_rate!(model, leaf, APAR)
+    # Check out Bonan's book, this equates diffusion limited and demand limited 
     a = 4*(ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(4Ca + 8Γstar) - (leaf.Je - 4Rd)*a/4
     c = leaf.Je * (Ca-Γstar) - Rd * (4Ca + 8Γstar)
-    leaf.Aj = lower_quadratic(a,b,c)
+    lower_quadratic(a,b,c,leaf.Aj)
 end
 
 ############  model::C4_Collatz_Photo #################################
@@ -116,7 +123,7 @@ function rubisco_limited_rate!(model::AbstractC4Photosynthesis, leaf, met)
 end
 
 """
-    light_limited_rate(f::C3FvCBPhoto, leaf)
+    light_limited_rate!(model::C4CollatzPhoto, leaf, met, APAR)
 Solution when C4 Electron Transport Rate is limiting (Collatz model)
 Linear with J
 """
@@ -124,7 +131,7 @@ function light_limited_rate!(model::C4CollatzPhoto, leaf, met, APAR)
     FT = typeof(APAR)
     # Efficiency of ETR for C4 plants ()
     α= FT(1/6)
-    leaf.CO2_per_electron = α
+    leaf.CO2_per_electron = α;
     leaf.Aj = α*(leaf.maxPSII * APAR)/2;
 end
 
