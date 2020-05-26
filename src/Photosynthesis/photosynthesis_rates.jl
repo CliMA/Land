@@ -29,11 +29,6 @@ function electron_transport_rate!(model::AbstractPhotosynthesisModel, leaf, APAR
     lower_quadratic!(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax, leaf.Je)
 end
 
-function electron_transport_rate2!(model::AbstractPhotosynthesisModel, leaf, APAR)
-    @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
-    Je_pot = PSII_frac * maxPSII .* APAR;
-    lower_quadratic2!(θ_j, -(Je_pot .+ Jmax), leaf.Je_pot * Jmax, Je_pot)
-end
 
 ############  model::C3FvCBPhoto #################################
 """
@@ -110,7 +105,7 @@ function light_limited_rate!(model::C3FvCBPhotoGs,  leaf, met, APAR)
     a = 4*(ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(4Ca + 8Γstar) - (leaf.Je - 4Rd)*a/4
     c = leaf.Je * (Ca-Γstar) - Rd * (4Ca + 8Γstar)
-    lower_quadratic(a,b,c,leaf.Aj)
+    lower_quadratic!(a,b,c,leaf.Aj)
 end
 
 ############  model::C4_Collatz_Photo #################################
