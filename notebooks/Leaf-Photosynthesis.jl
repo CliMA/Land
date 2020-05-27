@@ -115,7 +115,7 @@
 # We just want to lay out a first simple example as to how our model setup work:  
 
 ## Loading the Photosynthesis model:
-#using Revise
+using Revise
 using Land.Photosynthesis
 ## Defining our Field Type (we can easily switch between Double and Float precision this way)
 const FT = Float32;
@@ -129,7 +129,7 @@ met = meteo{FT}();
 #----------------------------------------------------------------------------
 
 # ----
-# How to use the documentation, what do we know about leaf_params, which stores most physiologically relevant parameters. 
+# How to use the documentation, what do we know about leaf_params, which stores most physiologically relevant parameters. (Not printed here, try in the command line!).
 
 ?leaf_params
 #----------------------------------------------------------------------------
