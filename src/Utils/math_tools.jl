@@ -39,7 +39,7 @@ end # function
 
 function lower_quadratic(a, b, c)
   discr = b^2 - 4*a*c
-  discr >= 0 ?   (-b - sqrt(discr))/2a : error("imaginary roots in quadratic")
+  discr >= 0 ?   (-b - sqrt(discr))/2a : NaN
 end # function
 
 function lower_quadratic2!(a, b, c,var)
