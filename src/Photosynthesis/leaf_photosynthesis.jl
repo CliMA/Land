@@ -122,7 +122,8 @@ function CcFunc!(Cc; mods::AbstractPhotosynthesis,  leaf::leaf_params, met::mete
 
     # add colimitation later:
     #@show Ac,Aj,Ap, Cc
-    photosynthesis_colimit!(mods.colimitation,leaf.Ag, Ac, Aj, Ap) 
+    leaf.Ag = photosynthesis_colimit!(mods.colimitation, Ac, Aj, Ap) 
+
     # Net photosynthesis due to biochemistry
     leaf.An = leaf.Ag - leaf.Rd # net assimilation
     #@show leaf.An, leaf.Ag
