@@ -44,7 +44,7 @@
 # 
 
 ## Add usual tools we use:
-using Revise
+##using Revise
 using BenchmarkTools
 using Plots
 pyplot()
@@ -60,15 +60,12 @@ const FT = Float32
 
 ## Create a standard leaf with defualt parameters
 leaf = leaf_params{FT}();
-
 ## Create a standard meteo structure:
 met = meteo{FT}();
 #----------------------------------------------------------------------------
 
 ## Setting some standard values (dynamic-state=false forces A-Cc iterations)
 leaf.dynamic_state = false
-
-
 met.stab_type_stable = 2;
 met.e_air = 1500;
 met.T_air = 298;
@@ -82,6 +79,8 @@ met.T_air = 298;
 
 ## use this as the boundary layer resistance (1/gb)
 ra = 0.5
+
+## C3 Photosynthesis
 modC3 = Photosynthesis.PhotoMods(
     fluorescence    = FlexasTolBerryFluorescence{FT}(),
     photosynthesis  = C3FvCBPhoto(),
@@ -93,6 +92,7 @@ modC3 = Photosynthesis.PhotoMods(
     BoundaryLayer   = FixedBoundaryResistance{FT}(ra=ra),
     colimitation = CurvedColimit{FT}(0.99));
 
+## C4 Photosynthesis
 modC4 = Photosynthesis.PhotoMods(
     fluorescence    = FlexasTolBerryFluorescence{FT}(),
     photosynthesis  = C4CollatzPhoto(),
