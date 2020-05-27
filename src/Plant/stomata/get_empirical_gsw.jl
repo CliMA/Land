@@ -21,6 +21,28 @@ end
 
 
 """
+    get_empirical_gsw_from_model(model::ESMGentine, an::FT, k_ratio::FT, p_atm::FT, p_i::FT)
+
+Steady stage gsw from empirical approach given
+- `model` An ESMGentine empirical model type parameter set
+- `an` Net photosynthetic rate `[μmol m⁻² s⁻¹]`
+- `p_atm` Atmospheric pressure
+- `p_i` Leaf internal CO₂ partial pressure
+- `rh` Relative humidity
+- `vpd` Vapor pressure deficit in the air
+- `Γ_star` CO₂ compensation point with the absence of dark respiration
+
+Some parameters are not used for the Leuning type model.
+
+"""
+function get_empirical_gsw_from_model(model::ESMGentine, an::FT, k_ratio::FT, p_atm::FT, p_i::FT) where {FT}
+    return model.g0 + model.g1 * an / (p_i / p_atm * FT(1e6)) * k_ratio
+end
+
+
+
+
+"""
     get_empirical_gsw_from_model(model::ESMLeuning, an::FT, p_atm::FT, p_i::FT, rh::FT, vpd::FT, Γ_star::FT)
 
 Steady stage gsw from empirical approach given
@@ -85,6 +107,7 @@ Steady state gsw from empirical approach, given
 - `v25` Maixmal carboxylation rate at 298.15 K (25 Celcius)
 - `paraset` An C3ParaSet type parameter set
 - `model` An AbstractEmpiricalStomatalModel empirical model type
+
 
 """
 function get_empirical_gsw(
@@ -166,6 +189,7 @@ Steady state gsw from empirical approach, given
 - `v25` Maixmal carboxylation rate at 298.15 K (25 Celcius)
 - `paraset` An C4ParaSet type parameter set
 - `model` An AbstractEmpiricalStomatalModel empirical model type
+
 
 """
 function get_empirical_gsw(

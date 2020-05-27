@@ -83,8 +83,10 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     g_ias_e  ::FT = FT(  0.3  )
     "Maximal leaf diffusive conductance for H₂O at 298.15 K `[mol m⁻² s⁻¹]`"
     g_max    ::FT = FT(  0.8  )
-    "Non-steady state factor (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
+    "Non-steady state factor for optimization approach (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
     gs_nssf  ::FT = FT(  0.025)
+    "Non-steady state factor for empirical apporach (used by multiplying the gsw_mod - gsw_curr)"
+    gs_empi  ::FT = FT(  0.003)
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     j_max    ::FT = FT(133.6  )
     "Leaf respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
@@ -115,6 +117,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     ec_list  ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(6.3e-4)
     "List of effective leaf diffusive conductance for CO₂ `[mol m⁻² s⁻¹]`"
     gsc_list ::Array{FT,1} = zeros(FT,n_leaf)
+    "List of empirical leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
+    gsw_empi ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
     gsw_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of maximal hydraulic conductance [mol m⁻² s⁻¹]"

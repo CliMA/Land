@@ -62,11 +62,11 @@ include("interface/initialize_rt_module.jl"        )
 include("interface/update_canopy_from_rt_module.jl")
 
 # include the stomatal optimization functions
-include("stomata/get_empirical_gsw.jl"      )
-include("stomata/get_marginal_gain.jl"      )
-include("stomata/get_marginal_penalty.jl"   )
-include("stomata/update_empirical_gsw_ss.jl")
-include("stomata/update_leaf_ak_max.jl"     )
+include("stomata/get_empirical_gsw.jl"             )
+include("stomata/get_marginal_gain.jl"             )
+include("stomata/get_marginal_penalty.jl"          )
+include("stomata/update_empirical_gsw_empirical.jl")
+include("stomata/update_leaf_ak_max.jl"            )
 
 # include the water property functions, all temperature in K by default
 include("water/get_relative_surface_tension.jl")
