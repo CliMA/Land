@@ -1,5 +1,5 @@
 """
-    update_leaf_a_max!(tree::Tree)
+    update_leaf_ak_max!(tree::Tree)
 
 Update leaf maximal `A_net` allowed at the given environmental conditions, given
 -`tree` A [`Tree`](@ref) type struct
@@ -7,7 +7,7 @@ Update leaf maximal `A_net` allowed at the given environmental conditions, given
 This function is meant to work with Sperry et al. (2017) model, which requires a_max in the ∂Θ∂E function.
 
 """
-function update_leaf_a_max!(tree::Tree)
+function update_leaf_ak_max!(tree::Tree)
     @unpack canopy_list,photo_para_set = tree
     FTYP = eltype(tree.ba)
 

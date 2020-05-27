@@ -2,7 +2,7 @@
     get_marginal_penalty(canopyi, indx, scheme::OSMEller)
 
 Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 - `scheme` optimizaiton stomatal model scheme OSMEller
 
@@ -33,7 +33,7 @@ end
     get_marginal_penalty(canopyi, scheme::OSMEller)
 
 List of marginal water penalty for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `scheme` optimizaiton stomatal model scheme OSMEller
 
 This function uses the Eller et al. (2018) model. `∂Θ/∂E = A / K * dK/dE`, unit `[mol mol⁻¹]`.
@@ -57,7 +57,7 @@ end
     get_marginal_penalty(canopyi, indx, scheme::OSMSperry)
 
 Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 - `scheme` optimizaiton stomatal model scheme OSMSperry
 
@@ -88,7 +88,7 @@ end
     get_marginal_penalty(canopyi, scheme::OSMSperry)
 
 List of marginal water penalty for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `scheme` optimizaiton stomatal model scheme OSMSperry
 
 This function uses the Sperry et al. (2017) model. `∂Θ/∂E = A_max / K_max * dK/dE`, unit `[mol mol⁻¹]`.
@@ -112,7 +112,7 @@ end
     get_marginal_penalty(canopyi, indx, scheme::OSMWang)
 
 Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 - `scheme` optimizaiton stomatal model scheme OSMWang
 
@@ -132,7 +132,7 @@ end
     get_marginal_penalty(canopyi, scheme::OSMWang)
 
 List of marginal water penalty for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `scheme` optimizaiton stomatal model scheme OSMWang
 
 This function uses the Wang et al. (2020) model. `∂Θ/∂E = A / (e_crit - e_leaf)`, unit `[mol mol⁻¹]`.
@@ -152,16 +152,16 @@ end
     get_marginal_penalty(canopyi, indx, scheme::OSMWAP)
 
 Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 - `scheme` optimizaiton stomatal model scheme OSMWAP
 
-This function uses the Anderegg et al. (2018) model. `∂Θ/∂E = (2*a*P + b*P) / K`, unit `[mol mol⁻¹]`.
+This function uses the Anderegg et al. (2018) model. `∂Θ/∂E = (2*a*P + b) / K`, unit `[mol mol⁻¹]`.
 
 """
 function get_marginal_penalty(canopyi::CanopyLayer, indx::Number, scheme::OSMWAP)
     leaf = canopyi[indx]
-    ∂Θ∂E = -(2 * scheme.a + scheme.b) * leaf.p_element[end] / leaf.k_element[end] * leaf.k_sla * 10
+    ∂Θ∂E = -(2 * scheme.a * leaf.p_element[end] + scheme.b) / leaf.k_element[end] * leaf.k_sla * 10
     return ∂Θ∂E
 end
 
@@ -172,7 +172,7 @@ end
     get_marginal_penalty(canopyi, scheme::OSMWAP)
 
 List of marginal water penalty for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `scheme` optimizaiton stomatal model scheme OSMWAP
 
 This function uses the Anderegg et al. (2018) model. `∂Θ/∂E = (2*a*P + b*P) / K`, unit `[mol mol⁻¹]`.
@@ -181,7 +181,7 @@ This function uses the Anderegg et al. (2018) model. `∂Θ/∂E = (2*a*P + b*P)
 function get_marginal_penalty(canopyi::CanopyLayer, scheme::OSMWAP)
     list_p    = [leaf.p_element[end] for leaf in canopyi.leaf_list]
     list_k    = [leaf.k_element[end] for leaf in canopyi.leaf_list]
-    list_∂Θ∂E = -(2 * scheme.a + scheme.b) .* list_p ./ list_k .* canopyi.leaf_list[1].k_sla .* 10
+    list_∂Θ∂E = -(2 .* scheme.a .* list_p .+ scheme.b) ./ list_k .* canopyi.leaf_list[1].k_sla .* 10
     return list_∂Θ∂E
 end
 
@@ -192,7 +192,7 @@ end
     get_marginal_penalty(canopyi, indx, scheme::OSMWAPMod)
 
 Marginal water penalty (`∂Θ/∂E`) for opening the stomata for a leaf in canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 - `scheme` optimizaiton stomatal model scheme OSMWAPMod
 
@@ -212,7 +212,7 @@ end
     get_marginal_penalty(canopyi, scheme::OSMWAPMod)
 
 List of marginal water penalty for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `scheme` optimizaiton stomatal model scheme OSMWAPMod
 
 This function is modified from Anderegg et al. (2018) model. `∂Θ/∂E = a * A * P / K`, unit `[mol mol⁻¹]`.

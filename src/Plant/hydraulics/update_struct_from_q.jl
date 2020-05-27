@@ -2,7 +2,7 @@
     update_struct_from_q!(root_layer, flow; p_ini)
 
 Update root hydraulic information considering the impact from rhizosphere conductance and gravity, given
-- `root_layer` One [`RootLayer`](@ref) in [`Root`](@ref) in [`Tree`](@ref)
+- `root_layer` One [`RootLayer`](@ref) in [`Tree`](@ref)
 - `flow` Flow rate in the given root layer
 - `p_ini` Upstream soil water potential if `p_ini` is given, otherwise (`Inf`) `root_layer.p_ups` will be used
 """
@@ -74,7 +74,7 @@ end
     update_struct_from_q!(stem, flow; p_ini)
 
 Update the stem hydraulic information considering the impact from gravity, given
-- `stem` [`Stem`](@ref) as trunk in a [`Tree`](@ref) or as side branch in [`Branch`](ref) in [`Tree`](@ref)
+- `stem` [`Stem`](@ref) as trunk in a [`Tree`](@ref) or as side branch in [`Tree`](@ref)
 - `flow::FT` Flow rate in the given stem
 - `p_ini::FT` Upstream xylem pressure if `p_ini` is given, otherwise (`Inf`) `stem.p_ups` will be used
 """

@@ -24,7 +24,7 @@ Note it that these empirical model often takes Ci or Cc as input, so a conversio
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ESMBallBerry{FT}
+Base.@kwdef struct ESMBallBerry{FT} <: AbstractEmpiricalStomatalModel
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -45,7 +45,7 @@ Note it that the Gentine model does not require for a `β` function to tune the 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ESMGentine{FT}
+Base.@kwdef struct ESMGentine{FT} <: AbstractEmpiricalStomatalModel
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -65,7 +65,7 @@ Note it that these empirical model often takes Ci or Cc as input, so a conversio
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ESMLeuning{FT}
+Base.@kwdef struct ESMLeuning{FT} <: AbstractEmpiricalStomatalModel
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
     g0::FT = FT(0.025 )
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -87,9 +87,9 @@ Note it that these empirical model often takes Ci or Cc as input, so a conversio
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct ESMMedlyn{FT}
+Base.@kwdef struct ESMMedlyn{FT} <: AbstractEmpiricalStomatalModel
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
     g0::FT = FT(0.025)
-    "slope of conductance-photosynthesis correlation `[unitless]`"
+    "slope of conductance-photosynthesis correlation `[Pa⁽⁵⁾]`"
     g1::FT = FT(125.0)
 end

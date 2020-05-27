@@ -5,12 +5,12 @@ Initialize the RT module so as to interface with Plant, given
 - `n_layer` Number of canopy layers
 - `LAI` Leaf area index
 
-Note it here that the struct_canopy is used in CanopyRT module, and thus differs from the [`Canopy`](@ref) as in [`Tree`](@ref).
-This function initializes canopy_rt, canOpt_rt, canRad_rt, arrayOfLeaves as local variables rather than global variables as in CanopyRT module.
+Note it here that the struct_canopy is used in CanopyRT module.
+This function initializes `canopy_rt`, `canOpt_rt`, `canRad_rt`, `arrayOfLeaves` as local variables rather than global variables as in CanopyRT module.
 See CanopyRT module for further operations on these variables.
 """
 function initialize_rt_module(; n_layer::Int=10, LAI::FT=FT(3.0)) where {FT}
-    # create canopy struct, note its difference with Canopy in Tree
+    # create canopy struct
     # to signal the difference, the variables from RT module has a postfix of _rt
     canopy_rt = struct_canopy{FT, n_layer, LAI}()
     canRad_rt = struct_canopyRadiation{FT, CanopyRT.nwl, CanopyRT.nWlF, length(CanopyRT.litab), length(canopy_rt.lazitab), canopy_rt.nlayers}()

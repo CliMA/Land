@@ -2,7 +2,7 @@
     get_marginal_gain(canopyi, indx, photo_para_set)
 
 Marginal water use efficiency `∂A/∂E` for a leaf in a canopy layer, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 - `indx` indx'th [`Leaf`](@ref) in the `canopyi.leaf_list`
 """
 function get_marginal_gain(canopyi::CanopyLayer, indx::Number, photo_para_set::AbstractPhotoModelParaSet)
@@ -38,7 +38,7 @@ end
     get_marginal_gain(canopyi, indx)
 
 A list of marginal water use efficiency for all the leaves, given
-- `canopyi` A [`CanopyLayer`](@ref) in [`Canopy`](@ref) in a [`Tree`](@ref)
+- `canopyi` A [`CanopyLayer`](@ref) in a [`Tree`](@ref)
 """
 function get_marginal_gain(canopyi::CanopyLayer, photo_para_set::AbstractPhotoModelParaSet)
     FTYP      = eltype(canopyi.f_view)

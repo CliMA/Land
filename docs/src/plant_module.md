@@ -6,21 +6,18 @@
 ```@docs
 Land.Plant.RootLayer
 Land.Plant.create_root_list
-Land.Plant.Root
 ```
 
 ### Trunk and Branch
 ```@docs
 Land.Plant.Stem
 Land.Plant.create_branch_list
-Land.Plant.Branch
 ```
 
 ### Canopy and Leaf
 ```@docs
 Land.Plant.Leaf
 Land.Plant.CanopyLayer
-Land.Plant.Canopy
 ```
 
 ### Tree
@@ -37,14 +34,35 @@ Land.Plant.update_struct_from_q!
 Land.Plant.update_tree_e_crit!
 ```
 
-## Stoma Dynamics
+## Stomatal Control Options
+```@docs
+Land.Plant.ESMBallBerry
+Land.Plant.ESMGentine
+Land.Plant.ESMLeuning
+Land.Plant.ESMMedlyn
+Land.Plant.OSMEller
+Land.Plant.OSMSperry
+Land.Plant.OSMWang
+Land.Plant.OSMWAP
+Land.Plant.OSMWAPMod
+```
+
+## Optimization Stomatal Dynamics
 ```@docs
 Land.Plant.get_marginal_gain
-Land.Plant.get_marginal_penalty_wang
+Land.Plant.update_leaf_ak_max!
+Land.Plant.get_marginal_penalty
 Land.Plant.update_tree_with_time!
 ```
 
-## Photosynthesis Tools (migration required)
+## Empirical Stomatal Dynamics
+```@docs
+Land.Plant.get_empirical_gsw_from_model
+Land.Plant.get_empirical_gsw
+Land.Plant.update_empirical_gsw_ss!
+```
+
+## Photosynthesis Tools
 ```@docs
 Land.Plant.get_a_par_curve
 Land.Plant.get_a_pi_curve
