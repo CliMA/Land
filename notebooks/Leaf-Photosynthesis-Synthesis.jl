@@ -44,7 +44,7 @@
 # 
 
 ## Add usual tools we use:
-#using Revise
+using Revise
 using BenchmarkTools
 using Plots
 pyplot()
@@ -151,6 +151,8 @@ end
 @btime LeafPhotosynthesis!(modC4, leaf, met);
 #----------------------------------------------------------------------------
 
+# ## C3 Light Response Curve
+
 ##plot(APAR, An,  label="An")
 plot(APAR, Ag_C3,color=[:black],lw=1, alpha=0.7, label="Ag C3")
 plot!(APAR, Ac_C3,line=(:dash,2), label="Ac C3")
@@ -159,8 +161,9 @@ plot!(APAR, Ap_C3,line=(:dash,2), label="Ap C3" )
 xlabel!("APAR [μmol/m2/s]")
 ylabel!("Aᵢ [μmol/m2/s]")
 title!("C3 photosynthesis light response")
-##plot!(APAR, An2)
 #----------------------------------------------------------------------------
+
+# ## C4 Light Response Curve
 
 ##plot(APAR, An,  label="An")
 plot(APAR, Ag_C4,color=[:black],lw=1, alpha=0.7, label="Ag C4")
@@ -283,8 +286,9 @@ contourf(T.-273.15, CO2, An_C4[i,:,:])
 xlabel!("T [°C]")
 ylabel!("Ambient CO₂ [ppm]")
 title!("C4 , An [μmol/m²/s] at APAR=$(APAR[i])")
-
 #----------------------------------------------------------------------------
+
+# ## Ambient CO$_2$ response curves and limiting rates for C3 and C4
 
 iA = 4; iT=31
 plot( CO2, Ag_C3[iA,:,iT],color=[:black],lw=2, alpha=0.7, label="Ag C3")
@@ -300,7 +304,7 @@ iA = 4; iT=31
 plot(CO2, Ag_C4[iA,:,iT],color=[:black],lw=2, alpha=0.7, label="Ag C4")
 plot!(CO2, Ac_C4[iA,:,iT],line=(:dash,2), label="Ac C4")
 plot!(CO2, Aj_C4[iA,:,iT],line=(:dash,2), label="Aj C4")
-plot!(CO2, Ap_C4[iA,:,iT],line=(:dash,2), label="Ap C4" )
+plot!(CO2, Ap_C4[iA,:,iT],line=(:dash,2), label="Ap C4")
 xlabel!("CO₂ [ppm]")
 ylabel!("Aᵢ [μmol/m2/s]")
 title!("Ambient C4 CO₂ response, T=$(T[iT]-273), APAR=$(APAR[iA])")
