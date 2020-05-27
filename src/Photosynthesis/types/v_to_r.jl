@@ -2,6 +2,7 @@
 The structure tree of AbstractVtoR
 AbstractVtoR
 ---> VtoRCollatz    # A ratio of 0.01
+---> VtoRDefault    # A ratio of 0.015
 =#
 abstract type AbstractVtoR end
 

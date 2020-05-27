@@ -14,10 +14,10 @@ function update_canopy_from_rt_module!(tree::Tree, canopy_rt::struct_canopy, can
     fraction_sl = repeat(canopy_rt.lidf, outer=[ length(canopy_rt.lazitab) ]) / length(canopy_rt.lazitab)
 
     # update the PAR from canopyRT module to the Plant module
-    if tree.canopy.n_layer == canopy_rt.nlayers
+    if tree.n_canopy == canopy_rt.nlayers
         nlayers = canopy_rt.nlayers
         for pl_layer in 1:nlayers
-            canopyi  = tree.canopy.canopy_list[pl_layer]
+            canopyi  = tree.canopy_list[pl_layer]
             rt_layer = nlayers + 1 - pl_layer
             
             # set the diffuse par to all the leaves
@@ -34,6 +34,9 @@ function update_canopy_from_rt_module!(tree::Tree, canopy_rt::struct_canopy, can
             # update leaf temperature
             canopyi.t_list[1:end-1] .= reshape(canRad_rt.T_sun3D[:,:,rt_layer],(:,1))[:,1]
             canopyi.t_list[end]      = canRad_rt.T_shade[rt_layer]
+
+            # update leaf-to-air VPD
+            canopyi.d_list = get_saturated_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O
         end
     else
         println("Error: the canopy layer in the Tree differs from that in the struct_canopy!")

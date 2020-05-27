@@ -1,5 +1,5 @@
 """
-    get_j(jmax::FT, par::FT, curvature::FT, f_etr::FT)
+    get_j(jmax::FT, par::FT, curvature::FT, qy::FT)
 
 Electron transport rate `j`, given
 - `jmax` Maximal eclectron transport @ leaf temperature (not 298.15 K)

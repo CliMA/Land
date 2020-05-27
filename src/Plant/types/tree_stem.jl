@@ -47,6 +47,9 @@ Base.@kwdef mutable struct Stem{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) .* FT(  0.3 )
 end
 
+
+
+
 """
     create_branch_list(FT, n, z_lo, z_hi)
 
@@ -74,18 +77,4 @@ function create_branch_list(FT, n=20, z_lo=3.0, z_hi=8.0)
     end
 
     return branch_list
-end
-
-"""
-    Branch{FT<:AbstractFloat, n}
-
-A Branch type which constains `n` [`Stem`](@ref) in response to `n` [`CanopyLayer`](@ref)
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef mutable struct Branch{FT<:AbstractFloat, n}
-    # branch structure
-    "List of [`Stem`](@ref)"
-    branch_list::Array{Stem{FT},1} = create_branch_list(FT,n)
 end

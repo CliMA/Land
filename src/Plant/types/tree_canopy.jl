@@ -40,6 +40,9 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )
 end
 
+
+
+
 """
     CanopyLayer{FT<:AbstractFloat, n_leaf}
 
@@ -80,8 +83,6 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     g_ias_e  ::FT = FT(  0.3  )
     "Maximal leaf diffusive conductance for H₂O at 298.15 K `[mol m⁻² s⁻¹]`"
     g_max    ::FT = FT(  0.8  )
-    "CO₂ compensation point with the absence of dark respiration `[Pa]`"
-    Γ_star   ::FT = FT(  2.5  )
     "Non-steady state factor (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
     gs_nssf  ::FT = FT(  0.025)
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
@@ -104,6 +105,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     ag_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of net photosynthetic rate `[μmol m⁻² s⁻¹]`"
     an_list  ::Array{FT,1} = zeros(FT,n_leaf)
+    "List if maximal A at the given scenario `[μmol m⁻² s⁻¹]`"
+    am_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf-to-air vapor pressure deficit `[unitless]`"
     d_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.015)
     "List of flow rate per leaf area `[mol m⁻² s⁻¹]`"
@@ -114,6 +117,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     gsc_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
     gsw_list ::Array{FT,1} = zeros(FT,n_leaf)
+    "List of maximal hydraulic conductance [mol m⁻² s⁻¹]"
+    km_list  ::Array{FT,1} =  ones(FT,n_leaf)
     "List of leaf area per leaf `[m²]`"
     la_list  ::Array{FT,1} = FT.([ones(n_leaf-1)/(n_leaf-1)*75.0; 75.0])
     "List of PAR for each leaf"
@@ -126,19 +131,4 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     r_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf temperature `[K]`"
     t_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(298.15)
-end
-
-"""
-    Canopy{FT<:AbstractFloat,n, n_leaf}
-
-A Canopy type which contains `n` [`CanopyLayer`](@ref).
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef mutable struct Canopy{FT<:AbstractFloat, n, n_leaf}
-    "Canopy layer number"
-    n_layer::Int = n
-    "List of [`CanopyLayer`](@ref)"
-    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_leaf}() for i in 1:n]
 end

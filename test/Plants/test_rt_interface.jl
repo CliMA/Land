@@ -12,12 +12,12 @@ PLT = Plant
     canopy_rt, canOpt_rt, canRad_rt, arrayOfLeaves = PLT.initialize_rt_module(n_layer=10, LAI=FT(3.0));
 
     # test the canopy layers
-    @test tree.canopy.n_layer == canopy_rt.nlayers
-    @test length(tree.canopy.canopy_list[1].leaf_list) == length(canRad_rt.absPAR_sunCab[:,:,1])+1
+    @test tree.n_canopy == canopy_rt.nlayers
+    @test length(tree.canopy_list[1].leaf_list) == length(canRad_rt.absPAR_sunCab[:,:,1])+1
 
     # update tree canopy information from CanopyRT
     PLT.update_canopy_from_rt_module!(tree, canopy_rt, canOpt_rt, canRad_rt);
-    for canopyi in tree.canopy.canopy_list
+    for canopyi in tree.canopy_list
         @test minimum(canopyi.la_list ) > 0
         @test minimum(canopyi.par_list) > 0
         @test minimum(canopyi.t_list  ) > 200

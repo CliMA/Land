@@ -1,5 +1,5 @@
 """
-    get_jmax(j25::FT, para_set::AbstractJmax, t_leaf::FT)
+    get_jmax(para_set::AbstractJmaxTD, j25::FT, t_leaf::FT)
 
 Maximal electron transport rate at leaf temperature, given
 - `para_set` AbstractJmax parameter set

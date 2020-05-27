@@ -1,8 +1,8 @@
 """
-    get_vmax(v25::FT, para_set::AbstractVmax, t_leaf::FT)
+    get_vmax(v25::FT, para_set::AbstractVmaxTD, t_leaf::FT)
 
 Maximal electron transport rate at leaf temperature, given
-- `para_set` AbstractVmax parameter set
+- `para_set` AbstractVmaxTD parameter set
 - `v25` Maximal carboxylation rate at 298.15 K
 - `t_leaf` Leaf temperature
 """
