@@ -25,8 +25,9 @@ Compute ETR (Je) from Jmax and Jpot using quadratic
 """
 function electron_transport_rate!(model::AbstractPhotosynthesisModel, leaf, APAR)
     @unpack  maxPSII, Jmax,θ_j, PSII_frac = leaf
+    #leaf.Je_pot = PSII_frac * maxPSII .* APAR;
     leaf.Je_pot = PSII_frac * maxPSII .* APAR;
-    lower_quadratic!(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax, leaf.Je)
+    leaf.Je=lower_quadratic(θ_j, -(leaf.Je_pot + Jmax), leaf.Je_pot * Jmax)
 end
 
 
@@ -88,7 +89,7 @@ function rubisco_limited_rate!(model::C3FvCBPhotoGs, leaf, met)
     a = (ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(Ca + d) - (Vcmax-Rd)*a
     c = Vcmax * (Ca - Γstar) - Rd * (Ca+d)
-    lower_quadratic!(a,b,c,leaf.Ac)
+    leaf.Ac = lower_quadratic(a,b,c)
 end
 
 """
@@ -105,7 +106,7 @@ function light_limited_rate!(model::C3FvCBPhotoGs,  leaf, met, APAR)
     a = 4*(ra/g_m_s_to_mol_m2_s + 1.6/gs + 1.0/gm) # = 1/gleaf
     b = -(4Ca + 8Γstar) - (leaf.Je - 4Rd)*a/4
     c = leaf.Je * (Ca-Γstar) - Rd * (4Ca + 8Γstar)
-    lower_quadratic!(a,b,c,leaf.Aj)
+    leaf.Aj = lower_quadratic(a,b,c)
 end
 
 ############  model::C4_Collatz_Photo #################################
