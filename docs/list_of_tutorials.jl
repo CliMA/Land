@@ -50,6 +50,7 @@ if generate_tutorials
     tutorials = Any[
         "Canopy Radiative Transfer" => Any[
             "Reflected and Emitted Radiance" => "generated/Radiation_Test_BRDF.md",
+            "RAMI benchmarking" => "generated/RAMI_benchmarking_example.md",
         ],
         "PhotoSynthesis" => Any[],
         "Canopy Energy Balance" => Any[],
