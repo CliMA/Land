@@ -1,5 +1,5 @@
 # Add usual tools we use:
-#using Revise
+##using Revise
 using BenchmarkTools
 using Plots
 pyplot()
@@ -12,20 +12,19 @@ const FT = Float32
 
 # Create a standard leaf with defualt parameters
 leaf = leaf_params{FT}();
-
 # Create a standard meteo structure:
 met = meteo{FT}();
 
 # Setting some standard values (dynamic-state=false forces A-Cc iterations)
 leaf.dynamic_state = false
-
-
 met.stab_type_stable = 2;
 met.e_air = 1500;
 met.T_air = 298;
 
 # use this as the boundary layer resistance (1/gb)
 ra = 0.5
+
+# C3 Photosynthesis
 modC3 = Photosynthesis.PhotoMods(
     fluorescence    = FlexasTolBerryFluorescence{FT}(),
     photosynthesis  = C3FvCBPhoto(),
@@ -37,6 +36,7 @@ modC3 = Photosynthesis.PhotoMods(
     BoundaryLayer   = FixedBoundaryResistance{FT}(ra=ra),
     colimitation = CurvedColimit{FT}(0.99));
 
+# C4 Photosynthesis
 modC4 = Photosynthesis.PhotoMods(
     fluorescence    = FlexasTolBerryFluorescence{FT}(),
     photosynthesis  = C4CollatzPhoto(),
@@ -97,7 +97,6 @@ plot!(APAR, Ap_C3,line=(:dash,2), label="Ap C3" )
 xlabel!("APAR [μmol/m2/s]")
 ylabel!("Aᵢ [μmol/m2/s]")
 title!("C3 photosynthesis light response")
-##plot!(APAR, An2)
 
 ##plot(APAR, An,  label="An")
 plot(APAR, Ag_C4,color=[:black],lw=1, alpha=0.7, label="Ag C4")
@@ -219,7 +218,7 @@ iA = 4; iT=31
 plot(CO2, Ag_C4[iA,:,iT],color=[:black],lw=2, alpha=0.7, label="Ag C4")
 plot!(CO2, Ac_C4[iA,:,iT],line=(:dash,2), label="Ac C4")
 plot!(CO2, Aj_C4[iA,:,iT],line=(:dash,2), label="Aj C4")
-plot!(CO2, Ap_C4[iA,:,iT],line=(:dash,2), label="Ap C4" )
+plot!(CO2, Ap_C4[iA,:,iT],line=(:dash,2), label="Ap C4")
 xlabel!("CO₂ [ppm]")
 ylabel!("Aᵢ [μmol/m2/s]")
 title!("Ambient C4 CO₂ response, T=$(T[iT]-273), APAR=$(APAR[iA])")

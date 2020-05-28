@@ -1,5 +1,5 @@
 # Loading the Photosynthesis model:
-#using Revise
+using Revise
 using Land.Photosynthesis
 # Defining our Field Type (we can easily switch between Double and Float precision this way)
 const FT = Float32;
