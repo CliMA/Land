@@ -9,7 +9,9 @@ $(DocStringExtensions.FIELDS)
 Base.@kwdef mutable struct leaf_params{TT<:AbstractFloat}
 
     # broadband albedo and emissivity
+    "broadband shortwave albedo"
     α::TT  = -999;                           # broadband shortwave albedo - absurd value to make sure we initialize correctly
+    "longwave emissivity"
     ε::TT  = -999;                           # longwave emissivity
 
     # thermal characteristics

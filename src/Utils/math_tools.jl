@@ -39,7 +39,24 @@ end # function
 
 function lower_quadratic(a, b, c)
   discr = b^2 - 4*a*c
-  discr >= 0 ?   (-b - sqrt(discr))/2a  : error("imaginary roots in quadratic")
+  discr >= 0 ?   (-b - sqrt(discr))/2a : NaN
+end # function
+
+function lower_quadratic2!(a, b, c,var)
+  #r = similar(a)
+  discr = b.^2 .- 4 * a.*c
+  #@show discr
+  var[discr .>= 0] = (-b .- sqrt.(discr[discr .>= 0]))./2a
+  #a[discr .< 0].=NaN
+end # function
+
+function lower_quadratic!(a, b, c,vari)
+  discr = b^2 - 4*a*c
+  if discr >= 0
+      vari=(-b - sqrt(discr))/2a;
+  else
+      vari=NaN
+  end
 end # function
 
 function e2phot(λ::Array,E::Array)
