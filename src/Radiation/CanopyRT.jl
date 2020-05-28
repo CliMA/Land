@@ -553,7 +553,7 @@ function computeThermalFluxes!( leaf::Array,cO::struct_canopyOptProps,cR::struct
     # Run RT:
     F⁻,F⁺,net_diffuse = RTM_diffuseS(τ_dd, ρ_dd,S⁻, S⁺,incLW, soilEmission, albedo_LW)
     for j = 1:nlayers
-        cR.intNetLW_sunlit[j]   = net_diffuse[j]- 2S_sun[j];          #  sunlit leaf
+        cR.intNetLW_sunlit[j]  = net_diffuse[j]- 2S_sun[j];          #  sunlit leaf
         cR.intNetLW_shade[j]   = net_diffuse[j]- 2S_shade[j];     # shaded leaf
     end
     # Net soil LW as difference between up and downwelling at lowest level
@@ -565,7 +565,7 @@ end;
 
 function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_canopyRadiation,can::struct_canopy,so::struct_soil)
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = cO
-    @unpack E_down, E_up,φ_shade,φ_sun = cR
+    @unpack E_down, E_up,ϕ_shade,ϕ_sun = cR
     @unpack Ω,nlayers, LAI = can
     rsoil = so.albedo_SW[Iwlf]
         
@@ -620,27 +620,27 @@ function computeSIF_Fluxes!(leaf::Array,cO::struct_canopyOptProps,cR::struct_can
 
 
         # Here comes the tedious part:
-        sunCos    = mean((φ_sun[:,:,i].*cosΘ_l)'*can.lidf)
-        shadeCos  = mean((φ_shade[i]*cosΘ_l)'*can.lidf)
-        sunCos2   = mean((φ_sun[:,:,i].*cos2Θ_l)'*can.lidf)
-        shadeCos2 = mean((φ_shade[i]*cos2Θ_l)'*can.lidf)
-        sunLidf   = mean(φ_sun[:,:,i]'*can.lidf)
-        shadeLidf = mean(φ_shade[i]'*can.lidf)
+        sunCos    = mean((ϕ_sun[:,:,i].*cosΘ_l)'*can.lidf)
+        shadeCos  = mean((ϕ_shade[i]*cosΘ_l)'*can.lidf)
+        sunCos2   = mean((ϕ_sun[:,:,i].*cos2Θ_l)'*can.lidf)
+        shadeCos2 = mean((ϕ_shade[i]*cos2Θ_l)'*can.lidf)
+        sunLidf   = mean(ϕ_sun[:,:,i]'*can.lidf)
+        shadeLidf = mean(ϕ_shade[i]'*can.lidf)
 
-        wfEs = mean((φ_sun[:,:,i].*absfsfo)'*can.lidf)  * M⁺_sun + mean((φ_sun[:,:,i].*fsfo)'*can.lidf)  *M⁻_sun
+        wfEs = mean((ϕ_sun[:,:,i].*absfsfo)'*can.lidf)  * M⁺_sun + mean((ϕ_sun[:,:,i].*fsfo)'*can.lidf)  *M⁻_sun
 
-        a1 = mean((φ_sun[:,:,i].*absfs)'*can.lidf)* M⁺_sun;
-        a2 = mean((φ_sun[:,:,i].*fs.*cosΘ_l)'*can.lidf)*M⁻_sun
+        a1 = mean((ϕ_sun[:,:,i].*absfs)'*can.lidf)* M⁺_sun;
+        a2 = mean((ϕ_sun[:,:,i].*fs.*cosΘ_l)'*can.lidf)*M⁻_sun
         sfEs = a1 - a2
         sbEs = a1 + a2
 
-        a1 = mean((φ_shade[i]*abs.(fo))'*can.lidf) ;
-        a2 = mean((φ_shade[i]*fo.*cosΘ_l)'*can.lidf)
+        a1 = mean((ϕ_shade[i]*abs.(fo))'*can.lidf) ;
+        a2 = mean((ϕ_shade[i]*fo.*cosΘ_l)'*can.lidf)
         vfEplu_shade =  a1  * M⁺⁺ + a2 *M⁻⁺
         vbEmin_shade =  a1 * M⁺⁻ + a2 *M⁻⁻
 
-        a1 = mean((φ_sun[:,:,i].*abs.(fo))'*can.lidf);
-        a2 = mean((φ_sun[:,:,i].*fo.*cosΘ_l)'*can.lidf)
+        a1 = mean((ϕ_sun[:,:,i].*abs.(fo))'*can.lidf);
+        a2 = mean((ϕ_sun[:,:,i].*fo.*cosΘ_l)'*can.lidf)
         vfEplu_sun  =  a1 * M⁺⁺ - a2 *M⁻⁺
         vbEmin_sun  =  a1 * M⁺⁻ + a2 *M⁻⁻
 
@@ -1182,3 +1182,5 @@ function expint(x::Number)
 end
 
 end
+
+

@@ -1,24 +1,68 @@
 
 const FT = Float32
 abstract type AbstractPhotosynthesis end
-abstract type AbstractLeafBoundaryLayer end
-struct GentineLeafBoundary <: AbstractLeafBoundaryLayer end
 
-Base.@kwdef struct PhotoMods{FM,PM,RM,SM,JM,VM,MM,BL} <: AbstractPhotosynthesis
-    fluorescence::FM       = FlexasTolBerryFluorescence{FT}()
-    photosynthesis::PM     = C3FvCBPhoto()
-    respiration::RM        = RespirationCLM{FT}()
-    stomatal::SM           = BallBerryStomata{FT}()
-    Jmax::JM               = JmaxCLM{FT}()
-    Vmax::VM               = VcmaxCLM{FT}()
-    MichaelisMenten::MM    = MM_CLM{FT}()
-    BoundaryLayer::BL      = GentineLeafBoundary()
+"""
+PhotoMods
+describes all necessary modules
+"""
+Base.@kwdef struct PhotoMods{FM,PM,RM,SM,JM,VM,MM,BL,CL} <: AbstractPhotosynthesis
+    fluorescence::FM     = FlexasTolBerryFluorescence{FT}()
+    photosynthesis::PM   = C3FvCBPhoto()
+    respiration::RM      = RespirationCLM{FT}()
+    stomatal::SM         = BallBerryStomata{FT}()
+    Jmax::JM             = JmaxCLM{FT}()
+    Vmax::VM             = VcmaxCLM{FT}()
+    MichaelisMenten::MM  = MM_CLM{FT}()
+    BoundaryLayer::BL    = FixedBoundaryResistance{FT}(ra=1)
+    colimitation::CL     = CurvedColimit{FT}()
 end
+"""
+  CanopyPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met::meteo, canRad)
+
+Compute Photosynthesis for all leaves in a canopy, given:
+- `mod`    One [`PhotoMods`](@ref) model setup structure
+- `leaf`   One [`leaf_params`](@ref) structure 
+- `met`    One [`lmeteo`](@ref) structure 
+- `canRad` One [`struct_canopyRadiation`](@ref) structure 
+"""
+function CanopyPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met::meteo, canRad)
+  ISun   = CartesianIndices(canRad.absPAR_sunCab)
+  IShade = CartesianIndices(canRad.absPAR_shadeCab)
+  for i in IShade
+    leaf.APAR = 1e6*canRad.absPAR_shadeCab[i]
+    leaf.T    = canRad.T_shade[i]
+    LeafPhotosynthesis!(mo, leaf, met)
+    canRad.GPP_shade[i] = leaf.An;
+    canRad.ϕ_shade[i]   = leaf.ϕs;
+    canRad.gs_shade[i]  = leaf.gs;
+    canRad.H_shade[i]   = leaf.H;
+    canRad.LE_shade[i]  = leaf.LE;
+    canRad.Cc_shade[i]  = leaf.Cc;
+    canRad.NPQ_shade[i] = leaf.NPQ;
+  end
+  for i in ISun
+    leaf.APAR = 1e6*canRad.absPAR_sunCab[i]
+    leaf.T    = canRad.T_sun[i[3]]
+    LeafPhotosynthesis!(mo, leaf, met)
+    canRad.GPP_sun[i] = leaf.An;
+    canRad.ϕ_sun[i]   = leaf.ϕs;
+    canRad.gs_sun[i]  = leaf.gs;
+    canRad.H_sun[i]   = leaf.H;
+    canRad.LE_sun[i]  = leaf.LE;
+    canRad.Cc_sun[i]  = leaf.Cc;
+    canRad.NPQ_sun[i] = leaf.NPQ;
+  end
+end
+
 
 """
     LeafPhotosynthesis!(mod::AbstractPhotosynthesis, leaf::leaf_params, met::meteo)
 
-Compute net assimilation rate A, fluorescence F using biochemical model
+Compute net assimilation rate A, fluorescence F using biochemical model, given
+- `mod` One [`PhotoMods`](@ref) model setup structure
+- `leaf` One [`leaf_params`](@ref) structure 
+- `met` One [`lmeteo`](@ref) structure 
 
 """
 function LeafPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met::meteo)
@@ -26,13 +70,21 @@ function LeafPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::leaf_params, met:
   set_leaf_temperature!(mo, leaf)
   met.g_m_s_to_mol_m2_s = (met.P_air-met.e_air)/(physcon.Rgas*met.T_air) 
   met.ppm_to_Pa = (met.P_air-met.e_air)*1e-6
+  isnan(leaf.gleaf) ?  leaf.gleaf = 0.01 :
+  isnan(leaf.gs) ?  leaf.gs = 0.01 :
 
-  
   # Compute Cc and Photosynthesis:
   if leaf.dynamic_state
-    CcFunc!(mo, leaf, met)
+    CcFunc!(leaf.Cc; mods=mo, leaf=leaf, met=met)
   else
-    hybrid(mo,leaf,met, CcFunc!, met.Ca*7/10, met.Ca*8/10, 1e-3)
+    #@show (CcFunc!(leaf.Cc; mods=mo, leaf=leaf, met=met))
+    @inline f(x) = CcFunc!(x; mods=mo, leaf=leaf, met=met)
+    sol = find_zero(f, SecantMethod{FT}(met.Ca*0.6, met.Ca), CompactSolution(),SolutionTolerance{FT}(1e-3))
+    leaf.Cc = sol.root
+    #@show sol
+    #@show leaf.Cc
+    #CcFunc!(mo, leaf, met)
+    #@show leaf.Cc
   end
 
   # Compute Fluorescence
@@ -43,50 +95,66 @@ end # LeafPhotosynthesis (similar to biochem in SCOPE)
 
 
 """
-    CcFunc!(mod::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
+    CcFunc!(mods::PhotoMods,  leaf::leaf_params, met::meteo)
 
-Compute Assimilation using Cc as input
+Compute gross and net assimilation rates Ag, An using biochemical model and given Cc, using
+- `model` One [`PhotoMods`](@ref) model setup structure
+- `leaf` One [`leaf_params`](@ref) structure 
+- `met` One [`lmeteo`](@ref) structure 
+
 """
-function CcFunc!(mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
-    
-    #@show Cc
+function CcFunc!(Cc; mods::AbstractPhotosynthesis,  leaf::leaf_params, met::meteo)
+    leaf.Cc = max(0,Cc)
+    #@show leaf.Cc
     # Compute Rubisco Limited Photosynthesis
     rubisco_limited_rate!(mods.photosynthesis, leaf, met)
     # Light limited rate
     light_limited_rate!(mods.photosynthesis, leaf, met, leaf.APAR)
     # Product limited rate
-    product_limited_rate!(mods.photosynthesis, leaf)
+    product_limited_rate!(mods.photosynthesis, leaf, met)
     
     # adjust aerodynamic resistance based on leaf boundary layer and Monin Obukhov
     boundary_layer_resistance!(mods.BoundaryLayer, leaf,  met)
 
     @unpack Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc = leaf
+    #@show Ac, Aj,Ap, Cs, VPD, RH, gm, gs, Ag, Rd, An, gleaf, esat, Cc 
     @unpack Ca, ra, g_m_s_to_mol_m2_s, e_air = met
 
     # add colimitation later:
-    leaf.Ag = min(Ac,Aj,Ap) # gross assimilation
-    #@show leaf.Ag
+    #@show Ac,Aj,Ap, Cc
+    leaf.Ag = photosynthesis_colimit!(mods.colimitation, Ac, Aj, Ap) 
+
     # Net photosynthesis due to biochemistry
     leaf.An = leaf.Ag - leaf.Rd # net assimilation
+    #@show leaf.An, leaf.Ag
+    # Compute stomatal conductance (update gs directly or is gs_ss if model is dynamic!):
+    stomatal_conductance!(mods.stomatal, leaf)
+
+    
     #@show leaf.Ag
     # CO2 at leaf surface
     # nodes law - (Ca-Cs) = ra/(ra+rs+rmes)*(Ca-Cc) --> Cs = Ca - ra/(ra+rs+rmes)*(Ca-Cc)
     leaf.Cs = Ca + gleaf*ra/g_m_s_to_mol_m2_s*(Cc-Ca)
-    leaf.gleaf = 1 / (ra/g_m_s_to_mol_m2_s + 1.6/gs + 1/gm)
+    leaf.gleaf = 1 / (ra/g_m_s_to_mol_m2_s + 1.6/leaf.gs + 1/gm)
     leaf.VPD       = max(esat-e_air,1.0); # can be negative at spin up
     leaf.RH        = min(max(e_air/esat,0.001),0.999);    # will need to be corrected alter to define surface RH
-    # Compute stomatal conductance:
-
-    stomatal_conductance!(mods.stomatal, leaf)
+    
+    #@show leaf.gleaf, Cc
 
     ΔCc = Ca-leaf.An/leaf.gleaf - Cc
-    leaf.Cc = Ca-leaf.An/leaf.gleaf
+    # Update Cc now
+    leaf.Cc = max(1,Ca-leaf.An/leaf.gleaf)
     #leaf.Cc = cinew
     # CiFunc returns the difference between the current Ci and the new Ci
     return ΔCc
 end
 
+"""
+  setRoughness!(leaf::leaf_params)
 
+Computes leaf roughness lengths, given
+- `leaf` One [`leaf_params`](@ref) structure 
+"""
 function setRoughness!(leaf::leaf_params)
     # adjust roughness coefficients
     leaf.z0m         = 0.1*leaf.height;                     # tree roughness (m)
@@ -95,17 +163,15 @@ function setRoughness!(leaf::leaf_params)
 end
 
 
+"""
+  set_leaf_temperature!(mods::PhotoMods, l::leaf_params)
 
-
-
-
-
-
-# Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here:
-# For some reason, this is slow and allocates a lot, can be improved!!
-"Set Leaf rates with Vcmax, Jmax and rd at 25C as well as actual T here"
+Computes Vcmax, Jmax, Rd, Kc, Ko, esat, desat, at given leaf temperature (if temperature changed), given
+- `model` One [`PhotoMods`](@ref) model setup structure
+- `leaf` One [`leaf_params`](@ref) structure 
+"""
 function set_leaf_temperature!(mod::AbstractPhotosynthesis, l::leaf_params)
-    if l.T != l.T_old
+    #if l.T != l.T_old
       # Adjust Vcmax to leaf T:
       max_carboxylation_rate!(mod.Vmax, l)
       # Adjust Jmax to leaf T:
@@ -116,75 +182,10 @@ function set_leaf_temperature!(mod::AbstractPhotosynthesis, l::leaf_params)
       leaf_respiration!(mod.respiration, l)
       (l.esat, l.desat) = SatVap(l.T);
       l.T_old = l.T
-    end
+    #end
     # l.kd = max(0.8738,  0.0301*(l.T-273.15)+ 0.0773); # Can implement that later.
 end
 
-function boundary_layer_resistance!(mod::GentineLeafBoundary, l::leaf_params,  met::meteo) # set aerodynamic resistance
-    # based on Monin-Obukhov Similiarity theory -> to be changed for LES
-    # compute Obukhov length
-    # iterate a few times
 
-    # TODO ideally should not have any information about the leaves as it is the turbuence above canopy in log profile
-    # first update roughness (if phenology is changing)
-    # need to make this abstract as well.
-    setRoughness!(l)
-
-    if(l.height>met.zscreen)
-        println("Vegetation height is higher than screen level height")
-        #process.exit(20)
-    end
-
-    rmin  = 10.0;
-    Lold  = -1e6;
-    raw_full = -999.0;
-    H     = -999.0;
-    LE    = -999.0;
-    ustar = -999.0;
-
-    # TODO change this later - 0 leaf boundary layer resistance - I prefer this as it is somewhat included in z0
-    l.Cd     = Inf;
-
-
-    # need to compute the evolving buoyancy flux
-    Tv       = met.T_air*(1.0+0.61*met.e_air);
-    ra_leaf  = 1/l.Cd / sqrt(met.U/l.dleaf);
-    #println("ra_leaf=",ra_leaf)
-    ΔT   =   l.T - met.T_air;
-    VPD      =   max(l.esat-met.e_air,1.0);
-    #@show VPD
-    ρd       =   met.P_air/(physcon.Rd*met.T_air);      # dry air density (kg/m3)
-    lv       =   Lv(l.T);
-    L        =   met.L; # initial Obukhov length
-    counter = 1;
-    #@show abs(1.0-Lold/L)
-    while (counter<20 && abs(1.0-Lold/L)>1e-4) # 1% error
-      #println("L=",L," ,Lold=",Lold)
-      ra_m     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# momentum aerodynamic resistance
-      ra_w     =   max(1.0/(physcon.K^2*met.U) * ( log((met.zscreen - l.d)/l.z0m) - ψ_m((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_m(l.z0m/L,met.stab_type_stable) ) * ( log((met.zscreen - l.d)/l.z0h) - ψ_h((met.zscreen - l.d)/L,met.stab_type_stable) + ψ_h(l.z0h/L,met.stab_type_stable) ), rmin) ;# water aerodynamic resistance
-      #println("ra_m=",ra_m)
-      #@show ra_leaf
-      #@show ra_w
-      ram_full =   ra_leaf + ra_m;
-      raw_full =   ra_leaf + ra_w;
-      H        =   ρd*physcon.Cpd*ΔT/raw_full;
-      rs_s_m   =   met.g_m_s_to_mol_m2_s/l.gs;
-      LE       =   physcon.ε/met.P_air*ρd*lv*VPD/(rs_s_m+raw_full);
-      #@show LE
-      ustar    =   sqrt(met.U/ram_full);
-      Hv_s     =   H + 0.61 * physcon.Cpd/lv * met.T_air * LE;
-      Lold     =   L;
-      L        =   - ustar^3*Tv/(physcon.grav*physcon.K*Hv_s); # update Obukhov length
-      #println("L=",L, " ra=",ra_w," (s/m), H=", H, " (W/m2), counter=", counter)
-      counter = counter+1
-    end
-
-    # save these values in leaf and flux structures
-    met.L   = L
-    l.H  = H
-    l.LE = LE
-    met.ustar = ustar
-    met.ra = raw_full
-end
 
 

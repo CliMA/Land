@@ -3,8 +3,8 @@
 #----------------------------------------------------------------------------
 
 ##using PyPlot
-using Plots
-using BenchmarkTools
+#using Plots
+#using BenchmarkTools
 using DifferentialEquations
 using Land
 using Land.Photosynthesis
@@ -35,10 +35,9 @@ met = meteo{Float32}();
 
 ## initialize some reasonable values
 ##f.Je   = 100; f.gbc  = 100; f.gbv  = 100; f.ceair= 1500; f.eair = 1500; f.APAR = 500; f.H=0;f.LE=0; ## leaf should not have eair
-l.Kn = 2.44; l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -1e6;l.ck=3;met.zscreen = 2.0;
+l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -1e6;l.ck=3;met.zscreen = 2.0;
 l.height   = 1.0; met.zscreen  = 2.0;
 met.stab_type_stable = 2;
-l.gstyp = 3;
 
 met.e_air = 1500;
 
@@ -66,11 +65,6 @@ for i = 1:length(Sdown_t)
     Tair_t[i]  = Tmean + DeltaT*sin(phi_t[i]-π/3);
 end
 
-#----------------------------------------------------------------------------
-
-plot(t/3600,Sdown_t,label="Sdown (W/m2)")
-plot!(t/3600,10*(Tair_t-273.15*ones(size(Tair_t))),label="Tair (C)")
-#----------------------------------------------------------------------------
 
 psi_s      = -0.5e6 ; ## soil water potential (Pa)
 U          =  1.0;
@@ -168,87 +162,4 @@ let
     end
 end
 
-#----------------------------------------------------------------------------
 
-plot(t/3600, T_t-273.15*ones(size(T_t)),xlabel = "t (hr)",ylabel = "T (C)",label="T (C)",ylim=0:100)
-#----------------------------------------------------------------------------
-
-plot(t/3600,psil_t/1e6,xlabel = "t (hr)",ylabel = "|psi_l (MPa)|",label="psi_l",ylim=0:100)
-#----------------------------------------------------------------------------
-
-savefig(joinpath(output_dir, "T_psi_diurnal_t.png"))
-#----------------------------------------------------------------------------
-
-plot(t/3600,  Rn_t,xlabel = "t (hr)",ylabel = "Rn (W/m2)",label="Rn")
-plot!(t/3600, H_t,xlabel  = "t (hr)",ylabel = "H (W/m2)" ,label="H")
-plot!(t/3600, LE_t,xlabel = "t (hr)",ylabel = "LE (W/m2)",label="LE")
-#----------------------------------------------------------------------------
-
-savefig(joinpath(output_dir, "Fluxes_diurnal_t.png"))
-#----------------------------------------------------------------------------
-
-plot(t/3600,  rs_t,xlabel = "t (s)",ylabel = "rs (s/m)",label="rs")
-plot!(t/3600, ra_t,xlabel  = "t (s)",ylabel = "ra (s/m)" ,label="ra")
-#----------------------------------------------------------------------------
-
-savefig(joinpath(output_dir, "resistances_diurnal_t.png"))
-#----------------------------------------------------------------------------
-
-plot(t/3600, GPP_t,xlabel = "t (s)",ylabel = "GPP (micomles/m2/s)",label="GPP",ylim=0:100)
-#----------------------------------------------------------------------------
-
-savefig(joinpath(output_dir, "GPP_diurnal_t.png"))
-#----------------------------------------------------------------------------
-
-plot(t/3600, max.(0,GPP_t)./apar,xlabel = "t (s)",ylabel = "LUE (-)",label="GPP",ylim=0:100)
-#----------------------------------------------------------------------------
-
-savefig(joinpath(output_dir, "LUE_diurnal_t.png"))
-#----------------------------------------------------------------------------
-
-plot(apar, max.(0,GPP_t)./apar,xlabel = "APAR",ylabel = "LUE",label="LUE",ylim=0:100)
-#----------------------------------------------------------------------------
-
-plot(t/3600, gs_t, xlabel = "t (hr)",ylabel = "gs",label="gs")
-#----------------------------------------------------------------------------
-
-plot(t/3600, Cc_t,xlabel = "t (hr)",ylabel = "Cc",label="Cc")
-#----------------------------------------------------------------------------
-
-plot(t/3600, sif_yield,xlabel = "t (hr)",ylabel = "SIF yield",label="SIF yield")
-#----------------------------------------------------------------------------
-
-plot(t/3600, 10sif_yield,xlabel = "t (hr)",ylabel = "SIF yield",label="SIF yield")
-plot!(t/3600, max.(0,GPP_t)./apar,xlabel = "t (hr)",ylabel = "LUE",label="LUE")
-#----------------------------------------------------------------------------
-
-scatter(max.(0,GPP_t)./apar, sif_yield,xlabel = "LUE",ylabel = "SIF yield",label="SIF yield")
-##plot!(t/3600, max.(0,GPP_t)./apar,xlabel = "t (hr)",ylabel = "LUE",label="LUE")
-#----------------------------------------------------------------------------
-
-scatter(max.(0,GPP_t), sif_yield.*apar,xlabel = "GPP",ylabel = "total SIF",label="SIF")
-#----------------------------------------------------------------------------
-
-scatter(apar, sif_yield,xlabel = "APAR",ylabel = "SIF yield",label="SIF")
-#----------------------------------------------------------------------------
-
-scatter(apar, φ_t,xlabel = "GPP",ylabel = "PSII yield",label="SIF")
-#----------------------------------------------------------------------------
-
-
-#----------------------------------------------------------------------------
-
-l.APAR = 100
-LeafPhotosynthesis!(mods, l,met)
-@show l.φ
-@show l.Ac
-@show l.Aj
-@show l.Ap
-@show l.ϕs
-@show l.NPQ
-@show l.Cc
-@show l.Vcmax25
-#----------------------------------------------------------------------------
-
-
-#----------------------------------------------------------------------------

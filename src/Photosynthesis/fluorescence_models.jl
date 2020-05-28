@@ -1,5 +1,8 @@
 abstract type AbstractFluorescenceModel end
 
+"""
+The classical fluorescence model based on the Flexas et al 2002 cotton dataset. 
+"""
 Base.@kwdef struct FlexasTolBerryFluorescence{FT} <: AbstractFluorescenceModel 
     Kn1::FT = 5.01
     Kn2::FT = 1.93
@@ -7,23 +10,23 @@ Base.@kwdef struct FlexasTolBerryFluorescence{FT} <: AbstractFluorescenceModel
 end
 
 """
-    leaf_fluorescence!(model,leaf::leaf_params )
+    leaf_fluorescence!(model,leaf)
 
 Compute Fluorescence yields, Kn and Kp.
 
 # Arguments
-- `model`: Model Type
-- `leaf::leaf_params`: leaf_params structure.
+- `model`: a [`FlexasTolBerryFluorescence`](@ref)
+- `leaf` : a [`leaf_params`](@ref) structure.
 """
 function leaf_fluorescence!(model::FlexasTolBerryFluorescence, leaf::leaf_params)
     #FT = eltype(ps)
     @unpack Kf,Kd,Cc,Γstar,effcon,Ag,maxPSII = leaf
     @unpack Kn1,Kn2,Kn3 = model
     
-    leaf.CO2_per_electron = (Cc-Γstar)/(Cc+2Γstar) * effcon;
+    #@show leaf.CO2_per_electron
     # Actual effective ETR:
     leaf.Ja = max(0,Ag / leaf.CO2_per_electron);
-    leaf.Ja = min(leaf.Ja,leaf.Je_pot )
+    #leaf.Ja = min(leaf.Ja,leaf.Je_pot )
     #@show leaf.Ja
     # Effective photochemical yield:
     if leaf.Ja<= 0
@@ -35,7 +38,8 @@ function leaf_fluorescence!(model::FlexasTolBerryFluorescence, leaf::leaf_params
     #println(flux.Ja, " ", flux.Je_pot)
     leaf.φ = min(1/maxPSII,leaf.φ)
     x   = max(0,  1-leaf.φ/leaf.maxPSII);       # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
-
+    #@show x
+    #@show leaf.φ
     # Max PSII rate constant
     Kp_max = FT(4.0)
 

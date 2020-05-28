@@ -46,9 +46,9 @@ $(DocStringExtensions.FIELDS)
 mutable struct incomingRadiation{FT<:AbstractFloat}
     "Wavelength (nm)"
     wl::Array{FT,1}
-    "Direct incoming radiation (mW m^-2 μm^-1)"
+    "Direct incoming radiation `[mW m^-2 μm^-1]`"
     E_direct::Array{FT,1}
-    "Diffuse incoming radiation (mW m^-2 μm^-1)"
+    "Diffuse incoming radiation `[mW m^-2 μm^-1]`"
     E_diffuse::Array{FT,1}
 
 end
@@ -122,32 +122,32 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIncl,nAzi,nLayers}
     # Scalars
-    "integrated TOC outgoing flux (W m^-2)"
+    "integrated TOC outgoing flux `[W m^-2]`"
     intEout::FT = 0;                       # | W m^-2               | (0.0, 2500)  | "integrated TOC outgoing flux"
-    "incident spectrally integrated total PAR (moles m^-2 s^-1)"
+    "incident spectrally integrated total PAR `[moles m^-2 s^-1]`"
     incomingPAR::FT = 0;                           # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated total PAR"
-    "incident spectrally integrated direct PAR (moles m^-2 s^-1)"
+    "incident spectrally integrated direct PAR `[moles m^-2 s^-1]`"
     incomingPAR_direct::FT = 0;                    # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated direct PAR"
-    "incident spectrally integrated diffuse PAR (moles m^-2 s^-1)"
+    "incident spectrally integrated diffuse PAR `[moles m^-2 s^-1]`"
     incomingPAR_diffuse::FT = 0;                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "incident spectrally integrated diffuse PAR"
-    "net radiation of shaded soil (W m^-2)"
+    "net radiation of shaded soil `[W m^-2]`"
     RnSoil_diffuse::FT = 0 ;                         # | W m^-2               | (0.0, 2500)  | "net radiation of shaded soil"
-    "net Short-wave radiation of sunlit soil (W m^-2)"
+    "net Short-wave radiation of sunlit soil `[W m^-2]`"
     RnSoil_direct::FT = 0;
-    "net Short-wave radiation of soil (shaded + sunlit) (W m^-2)"
+    "net Short-wave radiation of soil (shaded + sunlit) `[W m^-2]`"
     RnSoil::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation
-    "net long-wave radiation of soil (shaded + sunlit) (W m^-2)"
+    "net long-wave radiation of soil (shaded + sunlit) `[W m^-2]`"
     RnSoilLW::FT = 0;                           # | W m^-2               | (0.0, 2500)  | "net radiation of sunlit soil"
     # Dim of nLayers
-    "net PAR of shaded leaves (moles m^-2 s^-1)"
+    "net PAR of shaded leaves `[moles m^-2 s^-1]`"
     absPAR_shade::Array{FT,1} = zeros(nLayers)                  # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of shaded leaves"
-    "net PAR by Cab+Car of shaded leaves (moles m^-2 s^-1)"
+    "net PAR by Cab+Car of shaded leaves `[moles m^-2 s^-1]`"
     absPAR_shadeCab::Array{FT,1} = zeros(nLayers)
 
     # Dimension of wavelength only:
-    "Short-wave TOC outgoing radiance in observation direction (mW m^-2 μm^-1 sr^-1)"
+    "Short-wave TOC outgoing radiance in observation direction `[mW m^-2 μm^-1 sr^-1]`"
     Lo::Array{FT,1} = zeros(nWl)                   # | mW m^-2 μm^-1 sr^-1  | (0.0, 2500)  | "TOC outgoing radiance in observation direction"
-    "Short-wave TOC outgoing radiation (mW m^-2 μm^-1)"
+    "Short-wave TOC outgoing radiation `[mW m^-2 μm^-1]`"
     Eout::Array{FT,1} = zeros(nWl)                 # | mW m^-2 μm^-1        | (0.0, 2500)  | "TOC outgoing radiation
     "Short-wave Albedo in viewing direction"
     alb_obs::Array{FT,1} = zeros(nWl)              # |                      | (0.0, 1.0)  |  "albedo in viewing direction"
@@ -157,48 +157,72 @@ Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIn
     alb_diffuse::Array{FT,1} = zeros(nWl)          # | -                    | (0.0, 1.0)   | "Albedo for diffuse incoming radiation"
 
     # Dimension of nLevel * nWavelengths
-    "upwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
+    "upwelling diffuse short-wave radiation within canopy `[mW m^-2 μm^-1]`"
     E_up::Array{FT,2} = zeros(nWl,nLayers+1)
-    "downwelling diffuse short-wave radiation within canopy (mW m^-2 μm^-1)"
+    "downwelling diffuse short-wave radiation within canopy `[mW m^-2 μm^-1]`"
     E_down::Array{FT,2} = zeros(nWl,nLayers+1)
 
     # Dimension of nLayer * nWavelengths
-    "net absorbed direct radiation in each layer (mW m^-2 μm^-1)"
+    "net absorbed direct radiation in each layer `[mW m^-2 μm^-1]`"
     netSW_sunlit::Array{FT,2} = zeros(nWl,nLayers)
-    "net absorbed diffuse radiation in each layer (mW m^-2 μm^-1)"
+    "net absorbed diffuse radiation in each layer `[mW m^-2 μm^-1]`"
     netSW_shade::Array{FT,2} = zeros(nWl,nLayers)
-    "spectrally integrated net absorbed direct radiation in each layer (W m^-2)"
+    "spectrally integrated net absorbed direct radiation in each layer `[W m^-2)]`"
     intNetSW_sunlit::Array{FT,1} = zeros(nLayers)
-    "spectrally integrated net absorbed diffuse radiation in each layer (W m^-2)"
+    "spectrally integrated net absorbed diffuse radiation in each layer `[W m^-2)]`"
     intNetSW_shade::Array{FT,1} = zeros(nLayers)
-    "spectrally integrated net absorbed direct radiation in each layer (W m^-2)"
+    "spectrally integrated net absorbed direct radiation in each layer `[W m^-2)]`"
     intNetLW_sunlit::Array{FT,1} = zeros(nLayers)
-    "spectrally integrated net absorbed diffuse radiation in each layer (W m^-2)"
+    "spectrally integrated net absorbed diffuse radiation in each layer `[W m^-2)]`"
     intNetLW_shade::Array{FT,1} = zeros(nLayers)
 
 
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
-    "net PAR of sunlit leaves moles m^-2 s^-1"
+    "net PAR of sunlit leaves `[mol m^-2 s^-1]`"
     absPAR_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)                    # | moles m^-2 s^-1      | (0.0, 2.5e-9)| "net PAR of sunlit leaves"
-    "net PAR by Cab+Car of sunlit leaves moles m^-2 s^-1"
+    "net PAR by Cab+Car of sunlit leaves `[mol m^-2 s^-1]`"
     absPAR_sunCab::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
     "Leaf temperature (sunlit) (K)"
     T_sun3D::Array{FT,3} = zeros(nIncl,nAzi,nLayers).+285
     "Leaf temperature (sunlit) (K)"
     T_sun::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for sunlit leaves"
-    φ_sun::Array{FT,3} = 0.01*ones(nIncl,nAzi,nLayers)
+    ϕ_sun::Array{FT,3} = 0.01*ones(nIncl,nAzi,nLayers)
     "Leaf temperature (shaded) (K)"
     T_shade::Array{FT,1} = zeros(nLayers).+280
     "Fluorescence yield for shaded leaves"
-    φ_shade::Array{FT,1} = ones(nLayers)*0.01
-    "GPP of sunlit leaves μmoles m^-2 s^-1"
+    ϕ_shade::Array{FT,1} = ones(nLayers)*0.01
+    "GPP of sunlit leaves `[μmol m^-2 s^-1]`"
     GPP_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
-    "GPP of shaded leaves μmoles m^-2 s^-1"
-    GPP_shade::Array{FT,1} = zeros(nLayers)               
+    "GPP of shaded leaves `[μmol m^-2 s^-1]`"
+    GPP_shade::Array{FT,1} = zeros(nLayers)
+    "gs of shaded leaves `[mol m^-2 s^-1]`"
+    gs_shade::Array{FT,1} = zeros(nLayers)
+    "gs of sunlit leaves `[mol m^-2 s^-1]`"
+    gs_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "Sensible Heat flux H of shaded leaves `[W m-2]`"
+    H_shade::Array{FT,1} = zeros(nLayers)
+    "Sensible Heat flux H of sunlit leaves `[W m-2]`"
+    H_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "Latent Heat flux LE of shaded leaves `[W m-2]`"
+    LE_shade::Array{FT,1} = zeros(nLayers)
+    "Latent Heat flux LE of sunlit leaves `[W m-2]`"
+    LE_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "Leaf water potential of shaded leaves `[MPa]`"
+    ψl_shade::Array{FT,1} = zeros(nLayers)
+    "Leaf water potential of sunlit leaves `[MPa]`"
+    ψl_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)
+    "Cc of shaded leaves `[µmol/mol]`"
+    Cc_shade::Array{FT,1} = zeros(nLayers)
+    "Cc of sunlit leaves `[µmol/mol]`"
+    Cc_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)                       
+    "NPQ of shaded leaves `[-]`"
+    NPQ_shade::Array{FT,1} = zeros(nLayers)
+    "NPQ of sunlit leaves `[-]`"
+    NPQ_sun::Array{FT,3} = zeros(nIncl,nAzi,nLayers)  
 
     # Fluorescence Output:
-    "Hemispheric total outgoing SIF flux (mW m^-2 μm^-1))"
+    "Hemispheric total outgoing SIF flux `[mW m^-2 μm^-1]`)"
     SIF_hemi::Array{FT,1} = zeros(nWlF)
     "Observer-direction outgoing SIF radiance  (mW m^-2 μm^-1 sr^-1))"
     SIF_obs::Array{FT,1} = zeros(nWlF)
@@ -210,7 +234,7 @@ Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIn
     SIF_obs_scattered::Array{FT,1} = zeros(nWlF)
     "Observer-direction outgoing SIF radiance, soil-reflected  (mW m^-2 μm^-1 sr^-1))"
     SIF_obs_soil::Array{FT,1} = zeros(nWlF)
-    "Total SIF sum of layer sources  (mW m^-2 μm^-1))"
+    "Total SIF sum of layer sources  `[mW m^-2 μm^-1]`)"
     SIF_sum::Array{FT,1} = zeros(nWlF)
 
 end;
@@ -384,17 +408,17 @@ function loadOpti(swl::Array; file=file_Opti)
             println("Warning, some wavelengths out of bounds ", swl[i])
         end
         #@show typeof(mean(nr_[wo]))
-        nr[i]   =  mean(nr_[wo])
-        Km[i]  =  mean(Km_[wo])
-        Kab[i]  =  mean(Kab_[wo])
-        Kant[i] =  mean(Kant_[wo])
-        Kcar[i]  =  mean(Kcar_[wo])
-        Kw[i]   =  mean(Kw_[wo])
-        KBrown[i] = mean(KBrown_[wo])
-        phi[i]  =  mean(phi_[wo])
-        KcaV[i] = mean(KcaV_[wo])
-        KcaZ[i] = mean(KcaZ_[wo])
-        lambda[i] = mean(lambda_[wo])
+        nr[i]     =  mean(nr_[wo])
+        Km[i]     =  mean(Km_[wo])
+        Kab[i]    =  mean(Kab_[wo])
+        Kant[i]   =  mean(Kant_[wo])
+        Kcar[i]   =  mean(Kcar_[wo])
+        Kw[i]     =  mean(Kw_[wo])
+        KBrown[i] =  mean(KBrown_[wo])
+        phi[i]    =  mean(phi_[wo])
+        KcaV[i]   =  mean(KcaV_[wo])
+        KcaZ[i]   =  mean(KcaZ_[wo])
+        lambda[i] =  mean(lambda_[wo])
     end
     return nr, Km, Kab, Kant, Kcar, Kw, KBrown, phi, KcaV, KcaZ, lambda
 end
