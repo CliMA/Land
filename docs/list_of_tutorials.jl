@@ -2,7 +2,7 @@
 #### Defines list of tutorials given `generated_dir`
 ####
 
-generate_tutorials = false
+generate_tutorials = true
 
 tutorials = Any[]
 
