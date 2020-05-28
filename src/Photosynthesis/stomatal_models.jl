@@ -23,6 +23,7 @@ Base.@kwdef struct GentineStomata{FT} <: AbstractClassicalStomatalModel
     g1::FT = 9.0;
 end
 
+# Should this one be AbstractClassicalStomatalModel?
 Base.@kwdef struct MedlynStomata{FT} <: AbstractLeafRespiration
     "Medlyn slope of conductance-photosynthesis relationship, unstressed - Pa^(1/2) Medlyn et al. 2017"
     g1::FT = 125;

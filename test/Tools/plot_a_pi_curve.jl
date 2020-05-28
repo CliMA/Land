@@ -1,9 +1,3 @@
-using LaTeXStrings
-using PyPlot
-using Land.Plant
-
-FT = Plant.FT
-
 # this function plot An-Pi curve
 function plot_a_pi_curve(;
                          v25::FT = FT(80.0),
@@ -13,14 +7,14 @@ function plot_a_pi_curve(;
                          par::FT = FT(1200.0),
                         p_O₂::FT = FT(21278.25),
                          r25::FT = FT(Inf)) where FT
-    list_p,list_an,list_ag = Plant.get_a_pi_curve(
-                                                  v25 = v25,
-                                                  j25 = j25,
-                                               Γ_star = Γ_star,
-                                                  tem = tem,
-                                                  par = par,
-                                                 p_O₂ = p_O₂,
-                                                  r25 = r25)
+    list_p,list_an,list_ag = get_a_pi_curve(
+                                            v25 = v25,
+                                            j25 = j25,
+                                         Γ_star = Γ_star,
+                                            tem = tem,
+                                            par = par,
+                                           p_O₂ = p_O₂,
+                                            r25 = r25)
 
     # plot the data
     clf()

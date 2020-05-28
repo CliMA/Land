@@ -1,6 +1,8 @@
 module Plant
 
 export Tree,
+       initialize_rt_module,
+       update_canopy_from_rt_module!,
        update_tree_e_crit!,
        update_tree_with_time!
 
@@ -9,14 +11,41 @@ using CLIMAParameters
 using DocStringExtensions
 using Parameters
 
+# load sub-module CanopyRT
+using ..CanopyRT
+@unpack computeCanopyGeomProps!,
+        computeCanopyMatrices!,
+        computeThermalFluxes!,
+        create_canopyOpt,
+        deriveCanopyFluxes!,
+        fluspect!,
+        leafbio,
+        RTM_SW!,
+        struct_canopy,
+        struct_canopyOptProps,
+        struct_canopyRadiation = CanopyRT
+
+using ..PhotosynthesisModels
+@unpack AbstractPhotoModelParaSet,
+        C3ParaSet,
+        C4ParaSet,
+        C3VcVpJBernacchi,
+        C4VcVpJCLM,
+        get_an_ag_r_from_pi,
+        get_an_ag_r_pi_from_gsc,
+        get_an_ag_r_pi_from_gsc_list,
+        get_Γ_star = PhotosynthesisModels
+
 # include the constants
 include("constants.jl")
 
-# include the tree types
-include("types/tree_canopy.jl")
-include("types/tree_root.jl"  )
-include("types/tree_stem.jl"  )
-include("types/tree.jl"       )
+# include the tree types and empirical model types
+include("types/empirical_model.jl"   )
+include("types/optimization_model.jl")
+include("types/tree_canopy.jl"       )
+include("types/tree_root.jl"         )
+include("types/tree_stem.jl"         )
+include("types/tree.jl"              )
 
 # include the dynamic functions
 include("dynamic/update_tree_with_time.jl")
@@ -29,20 +58,15 @@ include("hydraulics/update_struct_from_q.jl"    )
 include("hydraulics/update_tree_e_crit.jl"      )
 
 # include the interface functions
+include("interface/initialize_rt_module.jl"        )
 include("interface/update_canopy_from_rt_module.jl")
 
-# include the photosynthesis functions
-include("photosynthesis/get_leaf_an_ag_r_from_pi.jl"    )
-include("photosynthesis/get_leaf_an_ag_r_pi_from_gsc.jl")
-include("photosynthesis/get_leaf_j.jl"                  )
-include("photosynthesis/get_leaf_jmax.jl"               )
-include("photosynthesis/get_leaf_r_from_r25.jl"         )
-include("photosynthesis/get_leaf_r_from_v25.jl"         )
-include("photosynthesis/get_leaf_vcmax.jl"              )
-
 # include the stomatal optimization functions
-include("stomata/get_marginal_gain.jl"        )
-include("stomata/get_marginal_penalty_wang.jl")
+include("stomata/get_empirical_gsw.jl"             )
+include("stomata/get_marginal_gain.jl"             )
+include("stomata/get_marginal_penalty.jl"          )
+include("stomata/update_empirical_gsw_empirical.jl")
+include("stomata/update_leaf_ak_max.jl"            )
 
 # include the water property functions, all temperature in K by default
 include("water/get_relative_surface_tension.jl")

@@ -2,7 +2,7 @@
     get_q_layer_from_p_base(root_layer, p_base)
 
 Flow rate in a root layer `q_layer`, given
-- `root_layer` One [`RootLayer`](@ref) in [`Root`](@ref) in [`Tree`](@ref)
+- `root_layer` One [`RootLayer`](@ref) in [`Tree`](@ref)
 - `p_base` Xylem water pressure at the tree base
 
 This function use Newton Raphson combined with Bi-section to get q_layer. A warning message will display if total iterations exceed 50 times.

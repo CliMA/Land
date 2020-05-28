@@ -4,7 +4,7 @@
 Saturated vapor pressure in `[Pa]`, given
 - `tem` Water temperature
 
-Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
+Saturated vapor pressure is computed using `611.0 * exp(17.502 * temc / (temc + 240.97))`.
 
 May need to merge with other CLIMA repository to be consistent.
 """
@@ -22,7 +22,7 @@ end
 List of saturated vapor pressure in `[Pa]`, given
 - `tem` A list of temperatures
 
-Saturated vapor pressure is computed using 611.0 * exp(17.502 * temc / (temc + 240.97)).
+Saturated vapor pressure is computed using `611.0 * exp(17.502 * temc / (temc + 240.97))`.
 
 May need to merge with other CLIMA repository to be consistent.
 """

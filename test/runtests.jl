@@ -8,5 +8,11 @@ ENV["JULIA_LOG_LEVEL"] = "WARN"
     include(joinpath(@__DIR__, "..", "experiments", "Radiation_Test_BRDF.jl"))
 end
 
+# test Yujie's reforged photosynthesis models
+include("Plants/test_photo_models.jl")
+
 # test the plant module isnan and FT consistency
-include( joinpath("Plants", "test_nan_and_FT.jl") )
+include("Plants/test_nan_and_FT.jl")
+
+# test the plant-rt interface
+include("Plants/test_rt_interface.jl")
