@@ -240,7 +240,7 @@ Base.@kwdef mutable struct struct_canopyRadiation{FT<:AbstractFloat,nWl,nWlF,nIn
 end;
 
 """
-    struct_canopyRadiation
+    struct_canopyOptProps
 
 # Fields
 $(DocStringExtensions.FIELDS)
@@ -320,7 +320,8 @@ Base.@kwdef mutable struct struct_canopyOptProps{FT<:AbstractFloat,nWL,nLayer,nL
     "Solar direct radiation per layer)"
     Es_::MArray{Tuple{nWL, nLevel}, FT,2,nLev_nWL}        = MArray{Tuple{nWL, nLevel}, FT}(undef);
 end;
-function create_canopyOpt(; FType,nWL::Int,nLayers::Int,nAzi::Int,nIncl::Int)
+
+function create_canopyOpt(; FType=FT, nWL::Int=114, nLayers::Int=20, nAzi::Int=36, nIncl::Int=9)
     return struct_canopyOptProps{FType,nWL,nLayers,nLayers+1,nAzi,nIncl,nLayers*nWL, (nLayers+1)*nWL,nIncl*nAzi }();
 end
 
@@ -330,11 +331,11 @@ end
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat}
+Base.@kwdef mutable struct struct_canopy{FT<:AbstractFloat, n_layer, lai}
     "number of canopy layers" # This needs to come globally though, can lead to errors right now as defined elsewhere as well!
-    nlayers::Int     = 20    # | -          | (2, 60)      | "number of canopy layers"
+    nlayers::Int     = n_layer    # | -          | (2, 60)      | "number of canopy layers"
     "Leaf Area Index"
-    LAI::FT            = 3.0   # | -          | (0.0, 9.0)   | "Leaf Area Index"
+    LAI::FT            = lai   # | -          | (0.0, 9.0)   | "Leaf Area Index"
     "Clumping factor"
     Ω::FT             = 1.0   # | -          | (0.0, 1.0)   | "clumping factor"
     "Structure factor a"

@@ -70,6 +70,9 @@ Base.@kwdef mutable struct RootLayer{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) .* FT( 0.1 )
 end
 
+
+
+
 """
     create_root_list(FT, n, z_lo)
 
@@ -96,21 +99,4 @@ function create_root_list(FT, n=5, z_lo=-1.0)
     end
 
     return root_list
-end
-
-"""
-    Root{FT<:AbstractFloat,n}
-
-A Root Struct which contains, by default, 5 even [`RootLayer`](@ref).
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef mutable struct Root{FT<:AbstractFloat,n}
-    "List of root fraction"
-    root_frac::Array{FT,1}            = ones(FT,5) .* FT(0.2)
-    "List of root z lower boundary"
-    root_zs  ::Array{FT,1}            = FT.([-0.2,-0.4,-0.6,-0.8,-1.0])
-    "List of [`RootLayer`](@ref)"
-    root_list::Array{RootLayer{FT},1} = create_root_list(FT,n)
 end

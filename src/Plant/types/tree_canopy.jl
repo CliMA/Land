@@ -40,15 +40,18 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )
 end
 
-"""
-    CanopyLayer{FT<:AbstractFloat, n_total}
 
-A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_total` [`Leaf`](@ref). The `n_total` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
+
+
+"""
+    CanopyLayer{FT<:AbstractFloat, n_leaf}
+
+A CanopyLayer type, which constains environemntal conditions and leaf-level fluxes for `n_leaf` [`Leaf`](@ref). The `n_leaf` is the sum of `n_Ari * n_Incli` sunlit leaves and 1 shaded leaves.
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
+Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     # canopy layer and leaf structure
     "Leaf area fraction in the canopy"
     f_layer::FT = FT(  1.0)
@@ -75,64 +78,61 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_total}
 
     # leaf photosynthetic parameters
     "Mesophyll conductance correction factor: multiplier"
-    g_ias_c::FT = FT(  0.0  )
+    g_ias_c  ::FT = FT(  0.0  )
     "Mesophyll conductance correction factor: exponent"
-    g_ias_e::FT = FT(  0.3  )
+    g_ias_e  ::FT = FT(  0.3  )
     "Maximal leaf diffusive conductance for H₂O at 298.15 K `[mol m⁻² s⁻¹]`"
-    g_max  ::FT = FT(  0.8  )
-    "CO₂ compensation point with the absence of dark respiration `[Pa]`"
-    Γ_star ::FT = FT(  2.5  )
-    "Non-steady state factor (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
-    gs_nssf::FT = FT(  0.025)
+    g_max    ::FT = FT(  0.8  )
+    "Non-steady state factor for optimization approach (use it by multiplying the ∂A/∂E - ∂Θ/∂E)"
+    gs_nssf  ::FT = FT(  0.025)
+    "Non-steady state factor for empirical apporach (used by multiplying the gsw_mod - gsw_curr)"
+    gs_empi  ::FT = FT(  0.003)
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    j_max  ::FT = FT(133.6  )
+    j_max    ::FT = FT(133.6  )
     "Leaf respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    r_25   ::FT = FT(  1.2  )
+    r_25     ::FT = FT(  1.2  )
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_max  ::FT = FT( 80.0  )
+    v_max    ::FT = FT( 80.0  )
+    "Maximal PEP carboxylation rate at 298.15 K (only for C4 plants) `[μmol m⁻² s⁻¹]`"
+    p_max    ::FT = FT(120.0  )
+    "Curvature ratio for J"
+    curvature::FT = FT(0.9)
+    "Quntum yield for electron, using aPAR"
+    qy       ::FT = FT(0.4081632653061224)
 
     # leaf layers (e_list and q_list need to be updated with time)
     "List of [`Leaf`](@ref)"
-    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_total]
-    "List of gross photosynthetic rate for n_total leaves `[μmol m⁻² s⁻¹]`"
-    ag_list  ::Array{FT,1} = zeros(FT,n_total)
+    leaf_list::Array{Leaf{FT},1} = [Leaf{FT}() for i in 1:n_leaf]
+    "List of gross photosynthetic rate for n_leaf leaves `[μmol m⁻² s⁻¹]`"
+    ag_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    an_list  ::Array{FT,1} = zeros(FT,n_total)
+    an_list  ::Array{FT,1} = zeros(FT,n_leaf)
+    "List if maximal A at the given scenario `[μmol m⁻² s⁻¹]`"
+    am_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf-to-air vapor pressure deficit `[unitless]`"
-    d_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(0.015)
+    d_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.015)
     "List of flow rate per leaf area `[mol m⁻² s⁻¹]`"
-    e_list   ::Array{FT,1} = zeros(FT,n_total)
+    e_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of critical flow rate (when leaf xylem pressure induces desiccation) per leaf area `[mol m⁻² s⁻¹]`"
-    ec_list  ::Array{FT,1} = zeros(FT,n_total) .+ FT(6.3e-4)
+    ec_list  ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(6.3e-4)
     "List of effective leaf diffusive conductance for CO₂ `[mol m⁻² s⁻¹]`"
-    gsc_list ::Array{FT,1} = zeros(FT,n_total)
+    gsc_list ::Array{FT,1} = zeros(FT,n_leaf)
+    "List of empirical leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
+    gsw_empi ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
-    gsw_list ::Array{FT,1} = zeros(FT,n_total)
+    gsw_list ::Array{FT,1} = zeros(FT,n_leaf)
+    "List of maximal hydraulic conductance [mol m⁻² s⁻¹]"
+    km_list  ::Array{FT,1} =  ones(FT,n_leaf)
     "List of leaf area per leaf `[m²]`"
-    la_list  ::Array{FT,1} = FT.([ones(n_total-1)/(n_total-1)*75.0; 75.0])
+    la_list  ::Array{FT,1} = FT.([ones(n_leaf-1)/(n_leaf-1)*75.0; 75.0])
     "List of PAR for each leaf"
-    par_list ::Array{FT,1} = zeros(FT,n_total)
+    par_list ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf internal CO₂ partial pressure `[Pa]`"
-    pi_list  ::Array{FT,1} = zeros(FT,n_total)
+    pi_list  ::Array{FT,1} = zeros(FT,n_leaf)
     "List of flow rate `[mol s⁻¹]`"
-    q_list   ::Array{FT,1} = zeros(FT,n_total)
+    q_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf respiration rate `[μmol m⁻² s⁻¹]`"
-    r_list   ::Array{FT,1} = zeros(FT,n_total)
+    r_list   ::Array{FT,1} = zeros(FT,n_leaf)
     "List of leaf temperature `[K]`"
-    t_list   ::Array{FT,1} = zeros(FT,n_total) .+ FT(298.15)
-end
-
-"""
-    Canopy{FT<:AbstractFloat,n, n_total}
-
-A Canopy type which contains `n` [`CanopyLayer`](@ref).
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef mutable struct Canopy{FT<:AbstractFloat,n, n_total}
-    "Canopy layer number"
-    n_layer::Int = n
-    "List of [`CanopyLayer`](@ref)"
-    canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_total}() for i in 1:n]
+    t_list   ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(298.15)
 end

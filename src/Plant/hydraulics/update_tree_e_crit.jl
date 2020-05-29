@@ -9,9 +9,7 @@ This function update `e_crit` for each layer (sunlit and shaded). The `e_crit` f
 """
 function update_tree_e_crit!(tree::Tree; displaying::Bool=false)
     # unpack necessary structs
-    @unpack branch_list = tree.branch
-    @unpack canopy_list = tree.canopy
-    @unpack root_list   = tree.roots
+    @unpack branch_list,canopy_list,root_list   = tree
 
     while true
         # define judge = 0

@@ -10,31 +10,35 @@ Lists of leaf internal CO₂ partial pressure `list_pi`, net photosynthetic rate
 - `p_O₂` O₂ partial pressure
 - `r25` Leaf respiration rate at 298.15 K. If ==Inf, use v25 to compute r25.
 """
-function get_a_pi_curve(;
-                        v25::FT = FT(80.0),
-                        j25::FT = FT(135.0),
-                     Γ_star::FT = FT(2.5),
-                        tem::FT = FT(298.15),
-                        par::FT = FT(1200.0),
-                       p_O₂::FT = FT(21278.25),
-                        r25::FT = FT(Inf)) where {FT}
+function get_a_pi_curve(model::C3ParaSet,
+                          v25::FT,
+                          j25::FT,
+                          p25::FT,
+                          tem::FT,
+                          par::FT,
+                         p_O₂::FT,
+                          r25::FT,
+                    curvature::FT,
+                           qy::FT) where {FT}
     # generate a list of p_i from gamma to 200 Pa
-    list_pi = [FT(val) for val in Γ_star:1.0:200.0]
+    list_pi = [FT(val) for val in 1.0:1.0:200.0]
     list_ag = list_pi .* FT(-Inf)
     list_an = list_pi .* FT(-Inf)
 
     # iterate through the list
     for i in 1:length(list_pi)
         p_i        = list_pi[i]
-        a_n,a_g,r  = get_leaf_an_ag_r_from_pi(
-                                              v25 = v25,
-                                              j25 = j25,
-                                           Γ_star = Γ_star,
-                                              p_i = p_i,
-                                              tem = tem,
-                                              par = par,
-                                             p_O₂ = p_O₂,
-                                              r25 = r25)
+        a_n,a_g,r  = get_an_ag_r_from_pi(
+                                         model,
+                                         p_i,
+                                         v25,
+                                         j25,
+                                         par,
+                                         p_O₂,
+                                         tem,
+                                         r25,
+                                         curvature,
+                                         qy)
         list_ag[i] = a_g
         list_an[i] = a_n
     end

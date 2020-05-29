@@ -7,6 +7,7 @@
 *~
 TAGS
 *.ipynb_checkpoints/
+.vscode/*
 
 # Docs
 docs/build/
@@ -20,6 +21,7 @@ docs/src/generated/
 src/**/Manifest.toml
 
 # Data
+*.csv
 *.vtk
 *.dat
 *.vtu
