@@ -451,7 +451,6 @@ plot!(VZA, SIF_R/30, color=[:orange],label="Red SIF (/30)", lw=2)
 plot!(VZA, reflVIS_clump, color=[:black], line=(:dash,2),label="Red Reflectance w/ Clumping", lw=2)
 plot!(VZA, SIF_R_clump/30, color=[:orange], line=(:dash,2),label="Red SIF (/30) w/ Clumping", lw=2)
 xlabel!("Viewing Zenith Angle")
-
 #----------------------------------------------------------------------------
 
 #### Plots Visible 
@@ -460,7 +459,6 @@ plot!(VZA, SIF_FR/6, color=[:orange],label="Far Red SIF (/6)", lw=2)
 plot!(VZA, reflNIR_clump, color=[:black], line=(:dash,2),label="NIR Reflectance w/ Clumping", lw=2)
 plot!(VZA, SIF_FR_clump/6, color=[:orange], line=(:dash,2),label="Far Red SIF (/6) w/ Clumping", lw=2)
 xlabel!("Viewing Zenith Angle")
-
 #----------------------------------------------------------------------------
 
 # # ## BRDF sampling
