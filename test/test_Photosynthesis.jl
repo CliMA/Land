@@ -42,7 +42,7 @@
         r25       = FT(1.0     )
         curvature = FT(0.9     )
         qy        = FT(0.4     )
-        gsc       = FT(0.1     )
+        gsc       = FT(0.01    )
         p_atm     = FT(101325.0)
         p_a       = FT(41.0    )
 

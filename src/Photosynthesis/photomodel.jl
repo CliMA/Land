@@ -381,7 +381,7 @@ function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
         tar_pi = p_a + tar_r*FT(1e-6) * p_atm / gsc
     else
         int_y  = p_a / p_atm * gsc
-        tar_pi = FT(15.0)
+        tar_pi = FT(0.1)
         tar_an = FT(0.0)
         tar_ag = FT(0.0)
         tar_r  = FT(0.0)
@@ -434,10 +434,6 @@ function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
 
             slope   = (tar_h - tar_g) * 1000
             tar_pi += (gsc - tar_g) / slope
-
-            if tar_pi < 0.1
-                tar_pi = 0.1
-            end
         end
     end
 
@@ -482,7 +478,7 @@ function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
             tar_pi = p_a + tar_r*FT(1e-6) * p_atm / _gsc
         else
             int_y  = p_a / p_atm * _gsc
-            tar_pi = FT(15.0)
+            tar_pi = FT(0.1)
             tar_an = FT(0.0)
             tar_ag = FT(0.0)
             tar_r  = FT(0.0)
@@ -535,10 +531,6 @@ function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
 
                 slope   = (tar_h - tar_g) * 1000
                 tar_pi += (_gsc - tar_g) / slope
-
-                if tar_pi < 0.1
-                    tar_pi = 0.1
-                end
             end
         end
 
@@ -576,7 +568,7 @@ function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
         tar_pi = p_a + tar_r*FT(1e-6) * p_atm / gsc
     else
         int_y  = p_a / p_atm * gsc
-        tar_pi = FT(10.0)
+        tar_pi = FT(0.1)
         tar_an = FT(0.0)
         tar_ag = FT(0.0)
         tar_r  = FT(0.0)
@@ -625,10 +617,6 @@ function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
 
             slope   = (tar_h - tar_g) * 1000
             tar_pi += (gsc - tar_g) / slope
-
-            if tar_pi < 0.1
-                tar_pi = 0.1
-            end
         end
     end
 
@@ -673,7 +661,7 @@ function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
             tar_pi = p_a + tar_r*FT(1e-6) * p_atm / _gsc
         else
             int_y  = p_a / p_atm * _gsc
-            tar_pi = FT(10.0)
+            tar_pi = FT(0.1)
             tar_an = FT(0.0)
             tar_ag = FT(0.0)
             tar_r  = FT(0.0)
@@ -722,10 +710,6 @@ function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
 
                 slope   = (tar_h - tar_g) * 1000
                 tar_pi += (_gsc - tar_g) / slope
-
-                if tar_pi < 0.1
-                    tar_pi = 0.1
-                end
             end
         end
 
