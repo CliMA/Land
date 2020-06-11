@@ -95,7 +95,7 @@ function get_empirical_gsw_pi(
     while true
         count += 1
         if count > 50
-            printstyled("Total iteration exceeds 50 times for get_empirical_gsw function.\n", color=:red)
+            #printstyled("Total iteration exceeds 50 times for get_empirical_gsw function.\n", color=:red)
             break
         end
 
@@ -174,7 +174,7 @@ function get_empirical_gsw_pi(
     while true
         count += 1
         if count > 50
-            printstyled("Total iteration exceeds 50 times for get_empirical_gsw function.\n", color=:red)
+            #printstyled("Total iteration exceeds 50 times for get_empirical_gsw function.\n", color=:red)
             break
         end
 
