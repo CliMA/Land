@@ -52,6 +52,8 @@ if generate_tutorials
         "Canopy Radiative Transfer" => Any[
             "Reflected and Emitted Radiance" => "generated/Radiation_Test_BRDF.md",
             "RAMI benchmarking" => "generated/RAMI_benchmarking_example.md",
+            "Soil reflectance" => "generated/GSV_soil_model.md",
+
         ],
         "PhotoSynthesis" => Any[
         "Leaf Level Basics" => "generated/Leaf-Photosynthesis.md",
