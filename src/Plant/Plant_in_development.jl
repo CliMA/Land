@@ -90,7 +90,7 @@ function get_empirical_gsw_pi(
 
     # Use iteration to obtain target p_i
     gsw   = 0
-    p_i   = p_a - 1
+    p_i   = FT(15.0)
     count = 0
     while true
         count += 1
@@ -114,7 +114,7 @@ function get_empirical_gsw_pi(
         g_mod_0  = get_empirical_gsw_from_model(model, an, p_atm, p_i, rh, vpd, Γ_star, FT(1.0))
         g_diff_0 = g_aci_0 - g_mod_0
 
-        if g_diff_0 < 1e-4
+        if g_diff_0 < 1e-3
             gsw = max(gsw_min, min(g_aci_0, gsw_max))
             break
         end
@@ -137,6 +137,10 @@ function get_empirical_gsw_pi(
 
         slope = (g_diff_1 - g_diff_0) * 100
         p_i  -= g_diff_0 / slope
+
+        if p_i >= p_a
+            p_i = p_a - FT(0.1)
+        end
     end
 
     # return the result
@@ -169,7 +173,7 @@ function get_empirical_gsw_pi(
 
     # Use iteration to obtain target p_i
     gsw   = 0
-    p_i   = p_a - 1
+    p_i   = FT(10.0)
     count = 0
     while true
         count += 1
@@ -191,7 +195,7 @@ function get_empirical_gsw_pi(
         g_mod_0  = get_empirical_gsw_from_model(model, an, p_atm, p_i, rh, vpd, Γ_star, FT(1.0))
         g_diff_0 = g_aci_0 - g_mod_0
 
-        if g_diff_0 < 1e-4
+        if g_diff_0 < 1e-3
             gsw = max(gsw_min, min(g_aci_0, gsw_max))
             break
         end
@@ -212,6 +216,10 @@ function get_empirical_gsw_pi(
 
         slope = (g_diff_1 - g_diff_0) * 100
         p_i  -= g_diff_0 / slope
+
+        if p_i >= p_a
+            p_i = p_a - FT(0.1)
+        end
     end
 
     # return the result

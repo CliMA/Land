@@ -58,9 +58,9 @@ Base.@kwdef mutable struct Canopy4RT{FT, n_layer, lai}
     litab_bnd::Array{FT,2} = FT[[ 0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0] [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0]]
     lazitab  ::Array{FT,1} = collect(5.0:10.0:355.0)
     # This is changed afterwards, ignore here.
-    lidf     ::Array{FT,1} = similar(collect(5.0:10.0:355.0))
+    lidf     ::Array{FT,1} = litab .* 0
     xl       ::Array{FT,1} = collect(0.0:-1.0/nlayers:-1.0)
-    dx       ::FT        = 1.0/nlayers
+    dx       ::FT          = 1.0/nlayers
 end
 
 

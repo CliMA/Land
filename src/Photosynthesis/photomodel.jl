@@ -204,19 +204,19 @@ end
 #
 ###############################################################################
 """
-    an_ag_r_from_pi(model::C3ParaSet,
-                    p_i::FT,
-                    v25::FT,
-                    j25::FT,
-                    par::FT,
-                    p_O₂::FT,
-                    T::FT,
-                    r25::FT,
-                    curvature::FT,
-                    qy::FT)
+    an_ag_r_from_pi(paraset::C3ParaSet,
+                        p_i::FT,
+                        v25::FT,
+                        j25::FT,
+                        par::FT,
+                       p_O₂::FT,
+                          T::FT,
+                        r25::FT,
+                  curvature::FT,
+                         qy::FT)
 
 Gross photosynthetic rate limited by carboxylation with ATP limitation, given
-- `model` A C3ParaSet type parameter sets that stores temperature denpendencies
+- `paraset` A C3ParaSet type parameter sets that stores temperature denpendencies
 - `p_i` Leaf internal CO₂ partial pressure
 - `v25` Maximal carboxylation rate at 298.15 K
 - `j25` Maximal electron transport rate
@@ -230,27 +230,27 @@ Gross photosynthetic rate limited by carboxylation with ATP limitation, given
 The equations used are from Farquhar et al. (1980) "A biochemical model of photosynthetic CO₂ assimilation in leaves of C3 species."
 
 """
-function an_ag_r_from_pi(model::C3ParaSet,
-                           p_i::FT,
-                           v25::FT,
-                           j25::FT,
-                           par::FT,
-                          p_O₂::FT,
-                             T::FT,
-                           r25::FT,
-                     curvature::FT,
-                            qy::FT) where {FT}
+function an_ag_r_from_pi(paraset::C3ParaSet,
+                             p_i::FT,
+                             v25::FT,
+                             j25::FT,
+                             par::FT,
+                            p_O₂::FT,
+                               T::FT,
+                             r25::FT,
+                       curvature::FT,
+                              qy::FT) where {FT}
     if r25==Inf
-        r25 = model.VR * v25
+        r25 = paraset.VR * v25
     end
-    r_leaf  = get_r(model.ReT, r25, T)
-    vmax    = get_vmax(model.VcT, v25, T)
-    jmax    = get_jmax(model.JT, j25, T)
+    r_leaf  = get_r(paraset.ReT, r25, T)
+    vmax    = get_vmax(paraset.VcT, v25, T)
+    jmax    = get_jmax(paraset.JT, j25, T)
     j       = get_j(jmax, par, curvature, qy)
-    kc      = get_kc(model.KcT, T)
-    ko      = get_ko(model.KoT, T)
+    kc      = get_kc(paraset.KcT, T)
+    ko      = get_ko(paraset.KoT, T)
     km      = kc * (1 + p_O₂/ko)
-    Γ_star  = get_Γ_star(model.ΓsT, T)
+    Γ_star  = get_Γ_star(paraset.ΓsT, T)
     a_p     = vmax / 2
     a_v     = vmax * (p_i-Γ_star) / (p_i+km)
     a_j     = j * (p_i-Γ_star) / ( 4*(p_i + 2*Γ_star) )
@@ -263,17 +263,17 @@ end
 
 
 """
-    an_ag_r_from_pi(model::C4ParaSet,
-                    p_i::FT,
-                    v25::FT,
-                    p25::FT,
-                    par::FT,
-                    T::FT,
-                    r25::FT,
-                    qy::FT)
+    an_ag_r_from_pi(paraset::C4ParaSet,
+                        p_i::FT,
+                        v25::FT,
+                        p25::FT,
+                        par::FT,
+                          T::FT,
+                        r25::FT,
+                         qy::FT)
 
 Gross photosynthetic rate limited by carboxylation, given
-- `model` A `C4ParaSet` type parameter sets that stores temperature denpendencies
+- `paraset` A `C4ParaSet` type parameter sets that stores temperature denpendencies
 - `p_i` Leaf internal CO₂ partial pressure
 - `v25` Maximal carboxylation rate at 298.15 K
 - `p25` Maximal PEP carboxylation rate at 298.15 K
@@ -285,21 +285,21 @@ Gross photosynthetic rate limited by carboxylation, given
 The model is adapted from Collatz et al. (1992) "Coupled photosynthesis-stomatal conductance model for leaves of C4 plants."
 
 """
-function an_ag_r_from_pi(model::C4ParaSet,
-                           p_i::FT,
-                           v25::FT,
-                           p25::FT,
-                           par::FT,
-                             T::FT,
-                           r25::FT,
-                            qy::FT) where {FT}
+function an_ag_r_from_pi(paraset::C4ParaSet,
+                             p_i::FT,
+                             v25::FT,
+                             p25::FT,
+                             par::FT,
+                               T::FT,
+                             r25::FT,
+                              qy::FT) where {FT}
     if r25==Inf
-        r25 = model.VR * v25
+        r25 = paraset.VR * v25
     end
-    r_leaf  = get_r(model.ReT, r25, T)
-    pmax    = get_vmax(model.VpT, p25, T)
-    a_v     = get_vmax(model.VcT, v25, T)
-    kpep    = get_kpep(model.KpT, T)
+    r_leaf  = get_r(paraset.ReT, r25, T)
+    pmax    = get_vmax(paraset.VpT, p25, T)
+    a_v     = get_vmax(paraset.VcT, v25, T)
+    kpep    = get_kpep(paraset.KpT, T)
     # different a_j calculation from the C3 model
     a_j     = qy * par / 6
     a_p     = pmax * p_i / (p_i + kpep)
@@ -323,22 +323,22 @@ end
 #
 ###############################################################################
 """
-    an_ag_r_pi_from_gsc(model::AbstractPhotoModelParaSet,
-                        gsc::FT,
-                        v25::FT,
-                        j25::FT,
-                        p25::FT,
-                        p_a::FT,
-                        T::FT,
-                        par::FT,
-                        p_atm::FT,
-                        p_O₂::FT,
-                        r25::FT,
-                        curvature::FT,
-                        qy::FT)
+    an_ag_r_pi_from_gsc(paraset::AbstractPhotoModelParaSet,
+                            gsc::FT,
+                            v25::FT,
+                            j25::FT,
+                            p25::FT,
+                            p_a::FT,
+                              T::FT,
+                            par::FT,
+                          p_atm::FT,
+                           p_O₂::FT,
+                            r25::FT,
+                      curvature::FT,
+                             qy::FT)
 
 Net photosynthetic rate `tar_an`, gross photosynthetic rate `tar_ag`, respiration rate `tar_r`, and leaf internal CO₂ partial pressure `tar_p`, given
-- `model` A `C3ParaSet` or `C4ParaSet` type parameter set
+- `paraset` A `C3ParaSet` or `C4ParaSet` type parameter set
 - `gsc` Leaf diffusive conductance to CO₂
 - `v25` Maixmal carboxylation rate at 298.15 K (25 Celcius)
 - `j25` Maximal electron transport rate at 298.15 K (25 Celcius)
@@ -357,38 +357,38 @@ For C3 plants, with ATP limitation. Some parameters are useless in C3 photosynth
 For C4 plants. Some parameters are useless for C4 photosynthesis, like j25, p_O₂, and curvature.
 
 """
-function an_ag_r_pi_from_gsc(model::C3ParaSet,
-                               gsc::FT,
-                               v25::FT,
-                               j25::FT,
-                               p25::FT,
-                               p_a::FT,
-                                 T::FT,
-                               par::FT,
-                             p_atm::FT,
-                              p_O₂::FT,
-                               r25::FT,
-                         curvature::FT,
-                                qy::FT) where {FT}
+function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
+                                 gsc::FT,
+                                 v25::FT,
+                                 j25::FT,
+                                 p25::FT,
+                                 p_a::FT,
+                                   T::FT,
+                                 par::FT,
+                               p_atm::FT,
+                                p_O₂::FT,
+                                 r25::FT,
+                           curvature::FT,
+                                  qy::FT) where {FT}
     # when there is not light
     if par < 1e-3
         if r25==Inf
-            r25 = model.VR * v25
+            r25 = paraset.VR * v25
         end
-        tar_r  = get_r(model.ReT, r25, T)
+        tar_r  = get_r(paraset.ReT, r25, T)
         tar_an = -tar_r
         tar_ag = FT(0.0)
         tar_pi = p_a + tar_r*FT(1e-6) * p_atm / gsc
     else
         int_y  = p_a / p_atm * gsc
-        tar_pi = FT(0.1)
+        tar_pi = FT(15.0)
         tar_an = FT(0.0)
         tar_ag = FT(0.0)
         tar_r  = FT(0.0)
         count  = 0
         while true
             count  += 1
-            an,ag,r = an_ag_r_from_pi(model,
+            an,ag,r = an_ag_r_from_pi(paraset,
                                       tar_pi,
                                       v25,
                                       j25,
@@ -400,7 +400,7 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
                                       qy)
             tar_g   = (int_y - an*FT(1e-6)) / tar_pi * p_atm
 
-            if abs(tar_g - gsc) < 1e-6
+            if abs(tar_g - gsc) < 1e-3
                 tar_an = an
                 tar_ag = ag
                 tar_r  = r
@@ -420,7 +420,7 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
             end
 
             tar_qi  = tar_pi + FT(0.001)
-            ao,ag,r = an_ag_r_from_pi(model,
+            ao,ag,r = an_ag_r_from_pi(paraset,
                                       tar_qi,
                                       v25,
                                       j25,
@@ -434,6 +434,10 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
 
             slope   = (tar_h - tar_g) * 1000
             tar_pi += (gsc - tar_g) / slope
+
+            if tar_pi < 0.1
+                tar_pi = 0.1
+            end
         end
     end
 
@@ -441,19 +445,19 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
     return tar_an, tar_ag, tar_r, tar_pi
 end
 
-function an_ag_r_pi_from_gsc(model::C3ParaSet,
-                               gsc::Array,
-                               v25::FT,
-                               j25::FT,
-                               p25::FT,
-                               p_a::FT,
-                                 T::Array,
-                               par::Array,
-                             p_atm::FT,
-                              p_O₂::FT,
-                               r25::FT,
-                         curvature::FT,
-                                qy::FT) where {FT}
+function an_ag_r_pi_from_gsc(paraset::C3ParaSet,
+                                 gsc::Array,
+                                 v25::FT,
+                                 j25::FT,
+                                 p25::FT,
+                                 p_a::FT,
+                                   T::Array,
+                                 par::Array,
+                               p_atm::FT,
+                                p_O₂::FT,
+                                 r25::FT,
+                           curvature::FT,
+                                  qy::FT) where {FT}
     # create lists to return
     N       = length(gsc)
     list_an = zeros(FT,N)
@@ -470,22 +474,22 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
         # when there is no light
         if _par < 1e-3
             if r25==Inf
-                r25 = model.VR * v25
+                r25 = paraset.VR * v25
             end
-            tar_r  = get_r(model.ReT, r25, _T)
+            tar_r  = get_r(paraset.ReT, r25, _T)
             tar_an = -tar_r
             tar_ag = FT(0.0)
             tar_pi = p_a + tar_r*FT(1e-6) * p_atm / _gsc
         else
             int_y  = p_a / p_atm * _gsc
-            tar_pi = FT(0.1)
+            tar_pi = FT(15.0)
             tar_an = FT(0.0)
             tar_ag = FT(0.0)
             tar_r  = FT(0.0)
             count  = 0
             while true
                 count  += 1
-                an,ag,r = an_ag_r_from_pi(model,
+                an,ag,r = an_ag_r_from_pi(paraset,
                                           tar_pi,
                                           v25,
                                           j25,
@@ -497,7 +501,7 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
                                           qy)
                 tar_g   = (int_y - an*FT(1e-6)) / tar_pi * p_atm
 
-                if abs(tar_g - _gsc) < 1e-6
+                if abs(tar_g - _gsc) < 1e-3
                     tar_an = an
                     tar_ag = ag
                     tar_r  = r
@@ -517,7 +521,7 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
                 end
 
                 tar_qi  = tar_pi + FT(0.001)
-                ao,ag,r = an_ag_r_from_pi(model,
+                ao,ag,r = an_ag_r_from_pi(paraset,
                                           tar_qi,
                                           v25,
                                           j25,
@@ -531,6 +535,10 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
 
                 slope   = (tar_h - tar_g) * 1000
                 tar_pi += (_gsc - tar_g) / slope
+
+                if tar_pi < 0.1
+                    tar_pi = 0.1
+                end
             end
         end
 
@@ -544,38 +552,38 @@ function an_ag_r_pi_from_gsc(model::C3ParaSet,
     return list_an, list_ag, list_r, list_pi
 end
 
-function an_ag_r_pi_from_gsc(model::C4ParaSet,
-                               gsc::FT,
-                               v25::FT,
-                               j25::FT,
-                               p25::FT,
-                               p_a::FT,
-                                 T::FT,
-                               par::FT,
-                             p_atm::FT,
-                              p_O₂::FT,
-                               r25::FT,
-                         curvature::FT,
-                                qy::FT) where {FT}
+function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
+                                 gsc::FT,
+                                 v25::FT,
+                                 j25::FT,
+                                 p25::FT,
+                                 p_a::FT,
+                                   T::FT,
+                                 par::FT,
+                               p_atm::FT,
+                                p_O₂::FT,
+                                 r25::FT,
+                           curvature::FT,
+                                  qy::FT) where {FT}
     # when there is not light
     if par < 1e-3
         if r25==Inf
-            r25 = model.VR * v25
+            r25 = paraset.VR * v25
         end
-        tar_r  = get_r(model.ReT, r25, T)
+        tar_r  = get_r(paraset.ReT, r25, T)
         tar_an = -tar_r
         tar_ag = FT(0.0)
         tar_pi = p_a + tar_r*FT(1e-6) * p_atm / gsc
     else
         int_y  = p_a / p_atm * gsc
-        tar_pi = FT(0.1)
+        tar_pi = FT(10.0)
         tar_an = FT(0.0)
         tar_ag = FT(0.0)
         tar_r  = FT(0.0)
         count  = 0
         while true
             count  += 1
-            an,ag,r = an_ag_r_from_pi(model,
+            an,ag,r = an_ag_r_from_pi(paraset,
                                       tar_pi,
                                       v25,
                                       p25,
@@ -585,7 +593,7 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
                                       qy)
             tar_g   = (int_y - an*FT(1e-6)) / tar_pi * p_atm
 
-            if abs(tar_g - gsc) < 1e-6
+            if abs(tar_g - gsc) < 1e-3
                 tar_an = an
                 tar_ag = ag
                 tar_r  = r
@@ -605,7 +613,7 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
             end
 
             tar_q   = tar_pi + FT(0.001)
-            ao,ag,r = an_ag_r_from_pi(model,
+            ao,ag,r = an_ag_r_from_pi(paraset,
                                       tar_q,
                                       v25,
                                       p25,
@@ -617,6 +625,10 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
 
             slope   = (tar_h - tar_g) * 1000
             tar_pi += (gsc - tar_g) / slope
+
+            if tar_pi < 0.1
+                tar_pi = 0.1
+            end
         end
     end
 
@@ -624,19 +636,19 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
     return tar_an, tar_ag, tar_r, tar_pi
 end
 
-function an_ag_r_pi_from_gsc(model::C4ParaSet,
-                               gsc::Array,
-                               v25::FT,
-                               j25::FT,
-                               p25::FT,
-                               p_a::FT,
-                                 T::Array,
-                               par::Array,
-                             p_atm::FT,
-                              p_O₂::FT,
-                               r25::FT,
-                         curvature::FT,
-                                qy::FT) where {FT}
+function an_ag_r_pi_from_gsc(paraset::C4ParaSet,
+                                 gsc::Array,
+                                 v25::FT,
+                                 j25::FT,
+                                 p25::FT,
+                                 p_a::FT,
+                                   T::Array,
+                                 par::Array,
+                               p_atm::FT,
+                                p_O₂::FT,
+                                 r25::FT,
+                           curvature::FT,
+                                  qy::FT) where {FT}
     # create lists to return
     N       = length(gsc)
     list_an = zeros(FT,N)
@@ -653,22 +665,22 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
         # when there is no light
         if _par < 1e-3
             if r25==Inf
-                r25 = model.VR * v25
+                r25 = paraset.VR * v25
             end
-            tar_r  = get_r(model.ReT, r25, _T)
+            tar_r  = get_r(paraset.ReT, r25, _T)
             tar_an = -tar_r
             tar_ag = FT(0.0)
             tar_pi = p_a + tar_r*FT(1e-6) * p_atm / _gsc
         else
             int_y  = p_a / p_atm * _gsc
-            tar_pi = FT(0.1)
+            tar_pi = FT(10.0)
             tar_an = FT(0.0)
             tar_ag = FT(0.0)
             tar_r  = FT(0.0)
             count  = 0
             while true
                 count  += 1
-                an,ag,r = an_ag_r_from_pi(model,
+                an,ag,r = an_ag_r_from_pi(paraset,
                                           tar_pi,
                                           v25,
                                           p25,
@@ -678,7 +690,7 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
                                           qy)
                 tar_g   = (int_y - an*FT(1e-6)) / tar_pi * p_atm
 
-                if abs(tar_g - _gsc) < 1e-6
+                if abs(tar_g - _gsc) < 1e-3
                     tar_an = an
                     tar_ag = ag
                     tar_r  = r
@@ -698,7 +710,7 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
                 end
 
                 tar_qi  = tar_pi + FT(0.001)
-                ao,ag,r = an_ag_r_from_pi(model,
+                ao,ag,r = an_ag_r_from_pi(paraset,
                                           tar_qi,
                                           v25,
                                           p25,
@@ -710,6 +722,10 @@ function an_ag_r_pi_from_gsc(model::C4ParaSet,
 
                 slope   = (tar_h - tar_g) * 1000
                 tar_pi += (_gsc - tar_g) / slope
+
+                if tar_pi < 0.1
+                    tar_pi = 0.1
+                end
             end
         end
 
