@@ -1,15 +1,16 @@
 module Land
 
-using Parameters
+# load constants and tools
+include("Utils/LandParameters.jl")
+include("Utils/MathTools.jl")
+include("Utils/WaterPhysics.jl")
 
-include(joinpath("Utils", "PhysCon.jl"))
-include(joinpath("Utils", "WaterVapor.jl"))
+# load the feature modules
+include("Photosynthesis/Photosynthesis.jl")
 
-include(joinpath("Photosynthesis", "Photosynthesis.jl"))
-include(joinpath("Radiation", "CanopyRT.jl"))
-
-# module by Yujie, may need to merge with others
-include("Photosynthesis/PhotosynthesisModels.jl")
-include("Plant/Plant.jl"                        )
+include("Plant/Plant.jl")
+include("Leaf/Leaf.jl")
+include("Radiation/CanopyRT.jl")
+include("SPAC/SPAC.jl")
 
 end # module

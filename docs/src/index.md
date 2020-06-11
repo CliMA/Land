@@ -1,39 +1,13 @@
-# Land model
+# CliMA Land Model
 
-# Example Documentation
+## Pages description
+- `Tips           -- docs/src/pages/Tips.md          `
+- `Leaf           -- docs/src/pages/Leaf.md          `
+- `CanopyRT       -- docs/src/pages/CanopyRT.md      `
+- `Photosynthesis -- docs/src/pages/Photosynthesis.md`
+- `Plant          -- docs/src/pages/Plant.md         `
+- `Utils          -- docs/src/pages/Utils.md         `
+- `Tutorials      -- docs/src/tutorial_scripts/*.jl  `
 
-## Canopy RT module
-
-### Leaf Bio Structure:
-```@docs
-Land.CanopyRT.leafbio
-```
-
-### Canopy Structure
-```@docs
-Land.CanopyRT.struct_canopy
-```
-
-### Canopy Radiation Structure
-```@docs
-Land.CanopyRT.struct_canopyRadiation
-```
-
-### Canopy Optical Property Structure
-```@docs
-Land.CanopyRT.struct_canopyOptProps
-```
-
-## Photosynthesis module
-
-### Leaf Params:
-```@docs
-Land.Photosynthesis.leaf_params
-```
-### Leaf Rate Limiting Steps:
-```@docs
-Land.Photosynthesis.max_carboxylation_rate!
-Land.Photosynthesis.max_electron_transport_rate!
-Land.Photosynthesis.michaelis_menten_constants!
-Land.Photosynthesis.leaf_respiration!
-```
+## To do lists
+- Add more docs to the sub-modules
