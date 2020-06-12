@@ -12,7 +12,7 @@ tutorials = Any[]
 # docs build.
 if generate_tutorials
 
-    tutorials_dir = joinpath(@__DIR__, "..", "notebooks")      # julia src files
+    tutorials_dir = joinpath(@__DIR__, "src/tutorial_scripts")      # julia src files
 
     # generate tutorials
     import Literate
@@ -35,6 +35,7 @@ if generate_tutorials
     for tutorial in tutorials_jl
         gen_dir =
             joinpath(generated_dir, relpath(dirname(tutorial), tutorials_dir))
+        mkpath(gen_dir)
         input = abspath(tutorial)
         script = Literate.script(input, gen_dir)
         code = strip(read(script, String))

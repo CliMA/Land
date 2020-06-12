@@ -7,10 +7,14 @@ mkpath(generated_dir)
 include("list_of_tutorials.jl")          # defines a dict `tutorials`
 
 pages = Any[
-    "Home" => "index.md",
-    "Plant Module" => "plant_module.md",
-    "PhotosynthesisModels Module" => "photosynthesis_models.md",
-    "Tutorials" => tutorials,
+    "Home"           => "index.md",
+    "Tips"           => "pages/Tips.md",
+    "Leaf"           => "pages/Leaf.md",
+    "CanopyRT"       => "pages/CanopyRT.md",
+    "Photosynthesis" => "pages/Photosynthesis.md",
+    "Plant"          => "pages/Plant.md",
+    "Utils"          => "pages/Utils.md",
+    "Tutorials"      => tutorials,
     ]
 
 
@@ -32,7 +36,8 @@ makedocs(
     format = format,
 
     clean = false,
-    modules = [Documenter, Land],
+    #modules = [Documenter, Land],
+    modules = [Land],    # remove Documenter to avoid tons of WARNINGS associated
     pages = pages,
 )
 
