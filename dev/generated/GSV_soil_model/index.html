@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Soil reflectance · Land</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="Land logo"/></a><div class="docs-package-name"><span class="docs-autofit">Land</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../pages/Tips/">Tips</a></li><li><a class="tocitem" href="../../pages/Leaf/">Leaf</a></li><li><a class="tocitem" href="../../pages/CanopyRT/">CanopyRT</a></li><li><a class="tocitem" href="../../pages/Photosynthesis/">Photosynthesis</a></li><li><a class="tocitem" href="../../pages/Plant/">Plant</a></li><li><a class="tocitem" href="../../pages/Utils/">Utils</a></li><li><input class="collapse-toggle" id="menuitem-8" type="checkbox" checked/><label class="tocitem" for="menuitem-8"><span class="docs-label">Tutorials</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><input class="collapse-toggle" id="menuitem-8-1" type="checkbox" checked/><label class="tocitem" for="menuitem-8-1"><span class="docs-label">Canopy Radiative Transfer</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Radiation_Test_BRDF/">Reflected and Emitted Radiance</a></li><li><a class="tocitem" href="../RAMI_benchmarking_example/">RAMI benchmarking</a></li><li class="is-active"><a class="tocitem" href>Soil reflectance</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Load-used-packages-1"><span>Load used packages</span></a></li><li class="toplevel"><a class="tocitem" href="#Define-used-variables-1"><span>Define used variables</span></a></li><li class="toplevel"><a class="tocitem" href="#Define-plot-1"><span>Define plot</span></a></li></ul></li></ul></li><li><input class="collapse-toggle" id="menuitem-8-2" type="checkbox"/><label class="tocitem" for="menuitem-8-2"><span class="docs-label">PhotoSynthesis</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../Leaf-Photosynthesis/">Leaf Level Basics</a></li><li><a class="tocitem" href="../Leaf-Photosynthesis-Rates/">Enzyme catalysis T-dependence</a></li><li><a class="tocitem" href="../Leaf-Photosynthesis-Synthesis/">Leaf Photosynthetic rates</a></li></ul></li><li><span class="tocitem">Canopy Energy Balance</span></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li><a class="is-disabled">Canopy Radiative Transfer</a></li><li class="is-active"><a href>Soil reflectance</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Soil reflectance</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/CliMA/Land/blob/master/docs/src/tutorial_scripts/GSV_soil_model.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="#-GSV:-a-general-model-for-hyperspectral-soil-reflectance-simulation-1"><a class="docs-heading-anchor" href="##-GSV:-a-general-model-for-hyperspectral-soil-reflectance-simulation-1"># GSV: a general model for hyperspectral soil reflectance simulation</a><a class="docs-heading-anchor-permalink" href="##-GSV:-a-general-model-for-hyperspectral-soil-reflectance-simulation-1" title="Permalink"></a></h1><p>Soil reflectance is crucial for canopy radiative transfer modeling. Spectral vector models are more flexible than typical soil albedo models, because they can ingest observed data and significantly improves hyperspectral soil reflectance modeling in terms of accuracy and robustness.</p><p>We demonstrate the usage of the general spectral vectors (GSV) model<sup class="footnote-reference"><a id="citeref-1" href="#footnote-1">[1]</a></sup> developed to employ three dry spectral vectors and one humid spectral vector derived from global dry and humid soil reflectance databases including 23,871 soil spectra (400–2500 nm). The GSV model accurately simulates global soil reflectance with an R2 of 0.99 and RMSE of 0.01. The GSV model is highly suitable to be coupled with the CliMA model for vegetation remote sensing studies.</p><p><sup class="footnote-reference"><a id="citeref-1" href="#footnote-1">[1]</a></sup>: Jiang, C., &amp; Fang, H. (2019). GSV: a general model for hyperspectral soil reflectance simulation. International Journal of Applied Earth Observation and Geoinformation, 83(July), 101932. https://doi.org/10.1016/j.jag.2019.101932</p><h1 id="Load-used-packages-1"><a class="docs-heading-anchor" href="#Load-used-packages-1">Load used packages</a><a class="docs-heading-anchor-permalink" href="#Load-used-packages-1" title="Permalink"></a></h1><pre><code class="language-">#### Use Julia Plots package and switch to plotly js option:
+using Plots
+using StatsPlots
+pyplot()
+
+##----------------------------------------------------------------------------
+
+# First, we include Revise (good for debugging) and Parameters (tools for structures)
+
+##using Revise
+using Parameters
+using Statistics
+using CSV
+using DataStructures
+
+##----------------------------------------------------------------------------
+using LinearAlgebra</code></pre><h1 id="Define-used-variables-1"><a class="docs-heading-anchor" href="#Define-used-variables-1">Define used variables</a><a class="docs-heading-anchor-permalink" href="#Define-used-variables-1" title="Permalink"></a></h1><pre><code class="language-"># The hyperspectral wavelengths
+WVL = 400:10:2501
+# The general spectral vectors derived in the manuscript
+GSV = [CSV.read(&quot;DryVec.csv&quot;; header=false);CSV.read(&quot;SMVec.csv&quot;; header=false)]
+# The test hyperspectral data
+hyper = CSV.read(&quot;TestSpectrum_v1.csv&quot;;header=false)
+# The wavelengths of multispectral data
+wvl = [450,550,650,850,1650,2150]
+# The test multispectral data sliced from hyperspectral data
+indices = []
+
+for i in wvl
+    push!(indices, findall(x -&gt; x==i, WVL)[1])
+end
+
+multi = hyper[:,indices]
+
+
+# Step 1: slice GSV according to the wavelengths of multispectral data
+gsv = GSV[:,indices]</code></pre><h1 id="Define-plot-1"><a class="docs-heading-anchor" href="#Define-plot-1">Define plot</a><a class="docs-heading-anchor-permalink" href="#Define-plot-1" title="Permalink"></a></h1><pre><code class="language-"># Step 2: fit multispectral soil reflectance and reconstruct multispectral soil reflectance
+X=convert(Matrix,multi)
+V=convert(Matrix,gsv)
+C = X * LinearAlgebra.pinv(V)
+R = C * V
+R[R.&lt;0] .= 0
+R[R.&gt;1] .= 1</code></pre><pre><code class="language-">scatter(X,R,label=&quot;&quot;)
+plot!([0,0.4],[0,0.4],label=&quot;&quot;)
+ylabel!(&quot;Simulations&quot;)
+xlabel!(&quot;Measurements&quot;)</code></pre><pre><code class="language-"># Step 3: reconstruct hyperspectral soil reflectance using coefficients fitted from multispectral data
+X = convert(Matrix,hyper)
+V = convert(Matrix,GSV)
+R = C * V
+R[R.&lt;0] .= 0
+R[R.&gt;1] .= 1</code></pre><pre><code class="language-">scatter(X,R,label=&quot;&quot;)
+plot!([0,0.4],[0,0.4],label=&quot;&quot;)
+ylabel!(&quot;Simulations&quot;)
+xlabel!(&quot;Measurements&quot;)</code></pre><pre><code class="language-"># Compare measured multispectral data and hyperspectral data with reconstructed ones
+plot(WVL,transpose(convert(Matrix,hyper)),label=&quot;Actual hyperspectral reflectance&quot;)
+scatter!(wvl,transpose(Matrix(multi)),label=&quot;Observed multispectral reflectance&quot;)
+plot!(WVL,transpose(R),label=&quot;Simulated hyperspectral reflectance\nfitted from multispectral reflectance&quot;)
+ylabel!(&quot;Soil albedo&quot;)
+xlabel!(&quot;wl (nm)&quot;)</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../RAMI_benchmarking_example/">« RAMI benchmarking</a><a class="docs-footer-nextpage" href="../Leaf-Photosynthesis/">Leaf Level Basics »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 13 June 2020 02:10">Saturday 13 June 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
