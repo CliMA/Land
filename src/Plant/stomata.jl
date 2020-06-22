@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Calculate the optimization model gain
@@ -18,22 +19,19 @@ function get_marginal_gain(canopyi::CanopyLayer, indx::Number, photo_para_set::A
     FTYP      = eltype(canopyi.f_view)
     leaf_e1   = canopyi.e_list[indx] + FTYP(1E-6)
     leaf_d    = (saturation_vapor_pressure(canopyi.t_list[indx]) - canopyi.p_H₂O) /  canopyi.p_atm
-    leaf_gsw1 = leaf_e1 / leaf_d
-    leaf_gsc1 = leaf_gsw1 / FTYP(1.6) / ( 1 + canopyi.g_ias_c * leaf_gsw1^(canopyi.g_ias_e) )
-    anagrpi   = an_ag_r_pi_from_gsc(
+    leaf_glw1 = leaf_e1 / leaf_d
+    leaf_glc1 = leaf_glw1 / FTYP(1.6) / ( 1 + canopyi.g_ias_c * leaf_glw1^(canopyi.g_ias_e) )
+    _envir    = EnvironmentConditions{FTYP}(p_a = canopyi.p_a, p_atm = canopyi.p_atm, p_O₂ = canopyi.p_O₂)
+    anagrpi   = an_ag_r_pi_from_glc(
                                     photo_para_set,
-                                    leaf_gsc1,
+                                    leaf_glc1,
                                     canopyi.v_max,
                                     canopyi.j_max,
                                     canopyi.p_max,
-                                    canopyi.p_a,
                                     canopyi.t_list[indx],
                                     canopyi.par_list[indx],
-                                    canopyi.p_atm,
-                                    canopyi.p_O₂,
                                     canopyi.r_25,
-                                    canopyi.curvature,
-                                    canopyi.qy)
+                                    _envir)
     leaf_a1   = anagrpi[1]
 
     # mol CO₂ mol⁻¹ H₂O, Δe = 1e-6 mol (H₂O) and μmol = 1e-6 mol (CO₂) cancel out
@@ -43,22 +41,19 @@ end
 function get_marginal_gain(canopyi::CanopyLayer, photo_para_set::AbstractPhotoModelParaSet)
     FTYP      = eltype(canopyi.f_view)
     leaf_e1   = canopyi.e_list .+ FTYP(1E-6)
-    leaf_gsw1 = leaf_e1 ./ canopyi.d_list
-    leaf_gsc1 = leaf_gsw1 ./ FTYP(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
-    anagrpi_l = an_ag_r_pi_from_gsc(
+    leaf_glw1 = leaf_e1 ./ canopyi.d_list
+    leaf_glc1 = leaf_glw1 ./ FTYP(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.glw_list .^ (canopyi.g_ias_e) )
+    _envir    = EnvironmentConditions{FTYP}(p_a = canopyi.p_a, p_atm = canopyi.p_atm, p_O₂ = canopyi.p_O₂)
+    anagrpi_l = an_ag_r_pi_from_glc(
                                     photo_para_set,
-                                    leaf_gsc1,
+                                    leaf_glc1,
                                     canopyi.v_max,
                                     canopyi.j_max,
                                     canopyi.p_max,
-                                    canopyi.p_a,
                                     canopyi.t_list,
                                     canopyi.par_list,
-                                    canopyi.p_atm,
-                                    canopyi.p_O₂,
                                     canopyi.r_25,
-                                    canopyi.curvature,
-                                    canopyi.qy)
+                                    _envir)
     leaf_a1   = anagrpi_l[1]
     # mol CO₂ mol⁻¹ H₂O, 1e-6 mol (H₂O) and μmol = 1e-6 mol (CO₂) cancel out
     return leaf_a1 .- canopyi.an_list
@@ -189,6 +184,7 @@ function get_marginal_penalty(canopyi::CanopyLayer, scheme::OSMWAPMod)
     list_∂Θ∂E = -scheme.a .* canopyi.an_list .* list_p ./ list_k .* canopyi.leaf_list[1].k_sla .* 10
     return list_∂Θ∂E
 end
+=#
 
 
 
@@ -196,91 +192,7 @@ end
 
 
 
-
-###############################################################################
-#
-# Calculate gsw from the equations
-# These functions passed the FT test
-# These functions are documented in the Plant page
-#
-###############################################################################
-"""
-    get_empirical_gsw_from_model(model::AbstractEmpiricalStomatalModel,
-                                 an::FT,
-                                 p_atm::FT,
-                                 p_i::FT,
-                                 rh::FT,
-                                 vpd::FT,
-                                 Γ_star::FT,
-                                 beta::FT)
-    get_empirical_gsw_from_model(model::AbstractEmpiricalStomatalModel,
-                                 an::Array,
-                                 p_atm::FT,
-                                 p_i::Array,
-                                 rh::FT,
-                                 vpd::Array,
-                                 Γ_star::Array,
-                                 beta::Array)
-    get_empirical_gsw_from_model(model::ESMGentine,
-                                 an::FT,
-                                 p_atm::FT,
-                                 p_i::FT,
-                                 beta::FT)
-    get_empirical_gsw_from_model(model::ESMGentine,
-                                 an::Array,
-                                 p_atm::FT,
-                                 p_i::Array,
-                                 beta::Array)
-
-Steady stage gsw from empirical approach given
-- `model` An `AbstractEmpiricalStomatalModel` type empirical model parameter set
-- `an` (Array of) Net photosynthetic rate `[μmol m⁻² s⁻¹]`
-- `p_atm` Atmospheric pressure
-- `p_i` (Array of) Leaf internal CO₂ partial pressure
-- `rh` Relative humidity
-- `vpd` (Array of) Vapor pressure deficit in the air
-- `Γ_star` (Array of) CO₂ compensation point with the absence of dark respiration
-- `beta` (Array of) Correction factor over the g1 part of an empirical model
-"""
-function get_empirical_gsw_from_model(model::ESMBallBerry, an::FT, p_atm::FT, p_i::FT, rh::FT, vpd::FT, Γ_star::FT, beta::FT) where {FT}
-    return model.g0 + beta * model.g1 * rh * an / (p_i / p_atm * FT(1e6))
-end
-
-function get_empirical_gsw_from_model(model::ESMBallBerry, an::Array, p_atm::FT, p_i::Array, rh::FT, vpd::Array, Γ_star::Array, beta::Array) where {FT}
-    return model.g0 .+ beta .* model.g1 .* rh .* an ./ (p_i ./ p_atm .* FT(1e6))
-end
-
-function get_empirical_gsw_from_model(model::ESMGentine, an::FT, p_atm::FT, p_i::FT, beta::FT) where {FT}
-    return model.g0 + beta * model.g1 * an / (p_i / p_atm * FT(1e6))
-end
-
-function get_empirical_gsw_from_model(model::ESMGentine, an::Array, p_atm::FT, p_i::Array, beta::Array) where {FT}
-    return model.g0 .+ beta .* model.g1 .* an ./ (p_i ./ p_atm .* FT(1e6))
-end
-
-function get_empirical_gsw_from_model(model::ESMLeuning, an::FT, p_atm::FT, p_i::FT, rh::FT, vpd::FT, Γ_star::FT, beta::FT) where {FT}
-    return model.g0 + beta * model.g1 * an / ((p_i - Γ_star) / p_atm * FT(1e6)) / (1 + vpd/model.d0)
-end
-
-function get_empirical_gsw_from_model(model::ESMLeuning, an::Array, p_atm::FT, p_i::Array, rh::FT, vpd::Array, Γ_star::Array, beta::Array) where {FT}
-    return model.g0 .+ beta .* model.g1 .* an ./ ((p_i .- Γ_star) ./ p_atm .* FT(1e6)) ./ (1 .+ vpd ./ model.d0)
-end
-
-function get_empirical_gsw_from_model(model::ESMMedlyn, an::FT, p_atm::FT, p_i::FT, rh::FT, vpd::FT, Γ_star::FT, beta::FT) where {FT}
-    return model.g0 + beta * (1 + model.g1/sqrt(vpd)) * an / (p_i / p_atm * FT(1e6))
-end
-
-function get_empirical_gsw_from_model(model::ESMMedlyn, an::Array, p_atm::FT, p_i::Array, rh::FT, vpd::Array, Γ_star::Array, beta::Array) where {FT}
-    return model.g0 .+ beta .* (1 .+ model.g1 ./ sqrt.(vpd)) .* an ./ (p_i ./ p_atm .* FT(1e6))
-end
-
-
-
-
-
-
-
-
+#=
 ###############################################################################
 #
 # Update tree with time
@@ -314,7 +226,7 @@ The function updates the non-steady state stomatal conductance by
 ```
 for optimization stomatal models. The ``\\dfrac{∂A}{∂E}`` is the same for every stomatal control model, but ``\\dfrac{∂Θ}{∂E}`` differs among models.
 
-The function updates the stomatal conductance via a `Δgsw = factor * (gs_ss - gs_nss)` for empirical stomatal models like Ball-Berry, Gentine, Leuning, and Medlyn models. The `gs_mod` stands for the gs calculated from model, and `gs_nss` stands for gs at non-steady state.
+The function updates the stomatal conductance via a `Δglw = factor * (gs_ss - gs_nss)` for empirical stomatal models like Ball-Berry, Gentine, Leuning, and Medlyn models. The `gs_mod` stands for the gs calculated from model, and `gs_nss` stands for gs at non-steady state.
 """
 function update_tree_with_time!(tree::Tree,
                                 Δt::FT,
@@ -323,28 +235,25 @@ function update_tree_with_time!(tree::Tree,
     # 0. unpack necessary structs
     @unpack branch_list,canopy_list,root_list = tree
 
-    # 1. use the gsw from last time instant and update e and a first, because Tleaf was from the last instant
+    # 1. use the glw from last time instant and update e and a first, because Tleaf was from the last instant
     for canopyi in canopy_list
         # 1.1 update the e and a for each leaf, per leaf area
         # TODO make sure canopyi.p_H₂O is lower than saturation_vapor_pressure(canopyi.t_air)
-        N               = length(canopyi.gsc_list)
+        N               = length(canopyi.glc_list)
         canopyi.d_list  = (saturation_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
-        canopyi.e_list  = canopyi.gsw_list .* canopyi.d_list
+        canopyi.e_list  = canopyi.glw_list .* canopyi.d_list
         canopyi.q_list  = canopyi.e_list   .* canopyi.la_list
-        anagrpi_lists   = an_ag_r_pi_from_gsc(
+        _envir          = EnvironmentConditions{FT}(p_a = canopyi.p_a, p_atm = canopyi.p_atm, p_O₂ = canopyi.p_O₂)
+        anagrpi_lists   = an_ag_r_pi_from_glc(
                                               tree.photo_para_set,
-                                              canopyi.gsc_list,
+                                              canopyi.glc_list,
                                               canopyi.v_max,
                                               canopyi.j_max,
                                               canopyi.p_max,
-                                              canopyi.p_a,
                                               canopyi.t_list,
                                               canopyi.par_list,
-                                              canopyi.p_atm,
-                                              canopyi.p_O₂,
                                               canopyi.r_25,
-                                              canopyi.curvature,
-                                              canopyi.qy)
+                                              _envir)
         canopyi.an_list = anagrpi_lists[1]
         canopyi.ag_list = anagrpi_lists[2]
         canopyi.r_list  = anagrpi_lists[3]
@@ -383,19 +292,19 @@ function update_tree_with_time!(tree::Tree,
         end
     end
 
-    # 5. determine how much gsw and gsc should change with time
+    # 5. determine how much glw and glc should change with time
     for canopyi in canopy_list
         # 5.1 compute the ∂A∂E and ∂Θ∂E for each leaf
         list_∂A∂E = get_marginal_gain(canopyi, tree.photo_para_set)
         list_∂Θ∂E = get_marginal_penalty(canopyi, scheme)
 
-        # update the gsw and gsc for each leaf
-        gsw_list = canopyi.gsw_list + canopyi.gs_nssf .* (list_∂A∂E - list_∂Θ∂E) .* Δt
-        gsw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
-        gsw_list = max.( gsw_list, gsw_min )
+        # update the glw and glc for each leaf
+        glw_list = canopyi.glw_list + canopyi.gs_nssf .* (list_∂A∂E - list_∂Θ∂E) .* Δt
+        glw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
+        glw_list = max.( glw_list, glw_min )
 
-        canopyi.gsw_list = gsw_list
-        canopyi.gsc_list = canopyi.gsw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+        canopyi.glw_list = glw_list
+        canopyi.glc_list = canopyi.glw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.glw_list .^ (canopyi.g_ias_e) )
     end
 end
 
@@ -403,28 +312,25 @@ function update_tree_with_time!(tree::Tree, Δt::FT, scheme::ESMGentine; updatin
     # 0. unpack necessary structs
     @unpack branch_list,canopy_list,root_list   = tree
 
-    # 1. use the gsw from last time instant and update e and a first, because Tleaf was from the last instant
+    # 1. use the glw from last time instant and update e and a first, because Tleaf was from the last instant
     for canopyi in canopy_list
         # 1.1 update the e and a for each leaf, per leaf area
         # TODO make sure canopyi.p_H₂O is lower than saturation_vapor_pressure(canopyi.t_air)
-        N               = length(canopyi.gsc_list)
+        N               = length(canopyi.glc_list)
         canopyi.d_list  = (saturation_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
-        canopyi.e_list  = canopyi.gsw_list .* canopyi.d_list
+        canopyi.e_list  = canopyi.glw_list .* canopyi.d_list
         canopyi.q_list  = canopyi.e_list   .* canopyi.la_list
-        anagrpi_lists   = an_ag_r_pi_from_gsc(
+        _envir          = EnvironmentConditions{FT}(p_a = canopyi.p_a, p_atm = canopyi.p_atm, p_O₂ = canopyi.p_O₂)
+        anagrpi_lists   = an_ag_r_pi_from_glc(
                                               tree.photo_para_set,
-                                              canopyi.gsc_list,
+                                              canopyi.glc_list,
                                               canopyi.v_max,
                                               canopyi.j_max,
                                               canopyi.p_max,
-                                              canopyi.p_a,
                                               canopyi.t_list,
                                               canopyi.par_list,
-                                              canopyi.p_atm,
-                                              canopyi.p_O₂,
                                               canopyi.r_25,
-                                              canopyi.curvature,
-                                              canopyi.qy)
+                                              _envir)
         canopyi.an_list = anagrpi_lists[1]
         canopyi.ag_list = anagrpi_lists[2]
         canopyi.r_list  = anagrpi_lists[3]
@@ -463,20 +369,22 @@ function update_tree_with_time!(tree::Tree, Δt::FT, scheme::ESMGentine; updatin
         end
     end
 
-    # 5. determine how much gsw and gsc should change with time
+    # 5. determine how much glw and glc should change with time
     for canopyi in canopy_list
-        N = length(canopyi.gsc_list)
+        N = length(canopyi.glc_list)
         # 5.1 compute the gs at steady state, function to be added
+        # TODO add gb and gm here for empirical model
+        # Distinguidh p_s and p_a later
         k_ratio  = weibull_k_leaf_ratio(canopyi.leaf_list, canopyi.t_list)
-        gss_list = get_empirical_gsw_from_model(scheme, canopyi.an_list, canopyi.p_atm, canopyi.pi_list, k_ratio)
+        gss_list = get_empirical_gsw_from_model(scheme, canopyi.an_list, canopyi.p_atm, canopyi.p_a, k_ratio)
 
-        # update the gsw and gsc for each leaf
-        gsw_list = canopyi.gsw_list + canopyi.gs_nssf .* (gss_list - canopyi.gsw_list) .* Δt
-        gsw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
-        gsw_list = max.( gsw_list, gsw_min )
+        # update the glw and glc for each leaf
+        glw_list = canopyi.glw_list + canopyi.gs_nssf .* (gss_list - canopyi.glw_list) .* Δt
+        glw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
+        glw_list = max.( glw_list, glw_min )
 
-        canopyi.gsw_list = gsw_list
-        canopyi.gsc_list = canopyi.gsw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+        canopyi.glw_list = glw_list
+        canopyi.glc_list = canopyi.glw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.glw_list .^ (canopyi.g_ias_e) )
     end
 end
 
@@ -484,28 +392,25 @@ function update_tree_with_time!(tree::Tree, Δt::FT, scheme::AbstractEmpiricalSt
     # 0. unpack necessary structs
     @unpack branch_list,canopy_list,root_list = tree
 
-    # 1. use the gsw from last time instant and update e and a first, because Tleaf was from the last instant
+    # 1. use the glw from last time instant and update e and a first, because Tleaf was from the last instant
     for canopyi in canopy_list
         # 1.1 update the e and a for each leaf, per leaf area
         # TODO make sure canopyi.p_H₂O is lower than saturation_vapor_pressure(canopyi.t_air)
-        N               = length(canopyi.gsc_list)
+        N               = length(canopyi.glc_list)
         canopyi.d_list  = (saturation_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O) ./ canopyi.p_atm
-        canopyi.e_list  = canopyi.gsw_list .* canopyi.d_list
+        canopyi.e_list  = canopyi.glw_list .* canopyi.d_list
         canopyi.q_list  = canopyi.e_list   .* canopyi.la_list
-        anagrpi_lists   = an_ag_r_pi_from_gsc(
+        _envir          = EnvironmentConditions{FT}(p_a = canopyi.p_a, p_atm = canopyi.p_atm, p_O₂ = canopyi.p_O₂)
+        anagrpi_lists   = an_ag_r_pi_from_glc(
                                               tree.photo_para_set,
-                                              canopyi.gsc_list,
+                                              canopyi.glc_list,
                                               canopyi.v_max,
                                               canopyi.j_max,
                                               canopyi.p_max,
-                                              canopyi.p_a,
                                               canopyi.t_list,
                                               canopyi.par_list,
-                                              canopyi.p_atm,
-                                              canopyi.p_O₂,
                                               canopyi.r_25,
-                                              canopyi.curvature,
-                                              canopyi.qy)
+                                              _envir)
         canopyi.an_list = anagrpi_lists[1]
         canopyi.ag_list = anagrpi_lists[2]
         canopyi.r_list  = anagrpi_lists[3]
@@ -544,12 +449,12 @@ function update_tree_with_time!(tree::Tree, Δt::FT, scheme::AbstractEmpiricalSt
         end
     end
 
-    # 5. determine how much gsw and gsc should change with time
+    # 5. determine how much glw and glc should change with time
     for canopyi in canopy_list
-        N = length(canopyi.gsc_list)
+        N = length(canopyi.glc_list)
         # 5.1 compute the gs at steady state, function to be added
         if tree.photo_type=="C3"
-            Γ_star = get_Γ_star(tree.photo_para_set.ΓsT, canopyi.t_list)
+            Γ_star = photo_TD_from_set(tree.photo_para_set.ΓsT, canopyi.t_list)
         else
             Γ_star = canopyi.t_list .* 0
         end
@@ -557,14 +462,16 @@ function update_tree_with_time!(tree::Tree, Δt::FT, scheme::AbstractEmpiricalSt
         vpd  = saturation_vapor_pressure(canopyi.t_list) .- canopyi.p_H₂O
         beta = ones(FT, length(canopyi.t_air))
         # TODO add beta function later
-        gss_list = get_empirical_gsw_from_model(scheme, canopyi.an_list, canopyi.p_atm, canopyi.pi_list, rh, canopyi.d_list, Γ_star, beta)
+        # TODO add gb and gm as well here
+        gss_list = get_empirical_gsw_from_model(scheme, canopyi.an_list, canopyi.p_atm, canopyi.p_a, rh, canopyi.d_list, Γ_star, beta)
 
-        # update the gsw and gsc for each leaf
-        gsw_list = canopyi.gsw_list + canopyi.gs_nssf .* (gss_list - canopyi.gsw_list) .* Δt
-        gsw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
-        gsw_list = max.( gsw_list, gsw_min )
+        # update the glw and glc for each leaf
+        glw_list = canopyi.glw_list + canopyi.gs_nssf .* (gss_list - canopyi.glw_list) .* Δt
+        glw_min  = canopyi.g_min .* relative_diffusive_coefficient(canopyi.t_list)
+        glw_list = max.( glw_list, glw_min )
 
-        canopyi.gsw_list = gsw_list
-        canopyi.gsc_list = canopyi.gsw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.gsw_list .^ (canopyi.g_ias_e) )
+        canopyi.glw_list = glw_list
+        canopyi.glc_list = canopyi.glw_list ./ FT(1.6) ./ ( 1 .+ canopyi.g_ias_c .* canopyi.glw_list .^ (canopyi.g_ias_e) )
     end
 end
+=#

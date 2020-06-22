@@ -1,9 +1,9 @@
 # FT and NaN test
 @testset "Leaf --- FT consistency and not NaN" begin
     for FT in [Float32, Float64]
-        for data_set in [ LF.BLFixed(FT),
-                      LF.LeafParams{FT}(),
-                      LF.MeteoParams{FT}() ] 
+        for data_set in [ LF.BLFixed(FT, 0),
+                          LF.LeafParams{FT}(),
+                          LF.MeteoParams{FT}() ] 
             recursive_FT_test(data_set, FT)
             recursive_NaN_test(data_set, FT)
         end

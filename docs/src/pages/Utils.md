@@ -8,8 +8,8 @@ Land.LandParameters.AVOGADRO
 Land.LandParameters.CP_D
 Land.LandParameters.CP_I
 Land.LandParameters.CP_L
+Land.LandParameters.CP_V
 Land.LandParameters.GAS_R
-Land.LandParameters.GFT
 Land.LandParameters.GRAVITY
 Land.LandParameters.H_PLANCK
 Land.LandParameters.K_0
@@ -18,6 +18,8 @@ Land.LandParameters.K_BOLTZMANN
 Land.LandParameters.LH_S0
 Land.LandParameters.LH_V0
 Land.LandParameters.LIGHT_SPEED
+Land.LandParameters.MOLMASS_DRYAIR
+Land.LandParameters.MOLMASS_WATER
 Land.LandParameters.PRESS_TRIPLE
 Land.LandParameters.R_D
 Land.LandParameters.R_V
@@ -34,10 +36,12 @@ Land.MathTools.fast∫
 Land.MathTools.lower_quadratic
 Land.MathTools.quadratic
 Land.MathTools.volscatt
+Land.MathTools.weibull_k_ratio
 ```
 
 ## WaterPhysics module
 ```@docs
+Land.WaterPhysics.relative_diffusive_coefficient
 Land.WaterPhysics.latent_heat_vapor
 Land.WaterPhysics.saturation_vapor_pressure
 Land.WaterPhysics.saturation_vapor_pressure_slope

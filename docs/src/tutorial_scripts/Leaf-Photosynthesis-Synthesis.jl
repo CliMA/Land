@@ -43,6 +43,13 @@
 # [^3]: Wang, Y., Sperry, J.S., Anderegg, W.R., Venturas, M.D. and Trugman, A.T., 2020. A theoretical and empirical assessment of stomatal optimization modeling. New Phytologist.
 # 
 
+
+
+
+
+
+
+
 ## Add usual tools we use:
 ##using Revise
 using BenchmarkTools
@@ -51,25 +58,21 @@ using PyPlot
 
 ## load Photosynthesis module: 
 using Land.Photosynthesis
-using Land.Plant
-using Land.Leaf
 #----------------------------------------------------------------------------
 
 ## Specify Field Type
-const FT = Float32
+const FT = Float64
 #----------------------------------------------------------------------------
 
 ## Create a standard leaf with defualt parameters
-leaf = LeafParams{FT}();
+leaf3 = Leaf{FT}(APAR=1200, Vcmax25=90, Jmax25=90*1.9, Vpmax25=100, Rd25=1);
+leaf4 = Leaf{FT}(APAR=1200, Vcmax25=90, Jmax25=90*1.9, Vpmax25=100, Rd25=1);
 ## Create a standard meteo structure:
-met = MeteoParams{FT}();
+envir  = AirLayer{FT}();
 #----------------------------------------------------------------------------
 
 ## Setting some standard values (dynamic-state=false forces A-Cc iterations)
-leaf.dynamic_state = false
-met.stab_type_stable = 2;
-met.e_air = 1500;
-met.T_air = 298;
+##leaf.dynamic_state = false
 #----------------------------------------------------------------------------
 
 # --- 
@@ -79,16 +82,19 @@ met.T_air = 298;
 # Below, we create two different model setups with a C3 and C4 photosynthesis pathway. Note that we chose the Ball Berry stomatal conductance model with different $g_1$ for C3 and C4 (C4 typically much lower).
 
 ## use this as the boundary layer resistance (1/gb)
-ra = FT(0.5)
+## deprecated as there are g_bw and g_bc terms in Leaf struct
+## ra = FT(0.5)
 
 ## C3 Photosynthesis
 # Use pre-defined parameter sets
 modC3 = C3CLM(FT)
-stoC3 = ESMBallBerry{FT}(g1 = 15)
+#modC3.Sto = Photosynthesis.OSMWang()
+modC3.Sto = Photosynthesis.ESMBallBerry{FT}(g1 = 16)
 
 ## C4 Photosynthesis
 modC4 = C4CLM(FT)
-stoC4 = ESMBallBerry{FT}(g1 = 4)
+#modC4.Sto = Photosynthesis.OSMWang()
+modC4.Sto = Photosynthesis.ESMBallBerry{FT}(g1 = 8)
 #----------------------------------------------------------------------------
 
 # ## Light response curves
@@ -105,38 +111,33 @@ Ac_C3 = Float32[]; Ac_C4 = Float32[]
 Cc_C3 = Float32[]; Cc_C4 = Float32[]
 gs_C3 = Float32[]; gs_C4 = Float32[]
 
-## Set P_a to 40 Pa
-p_a = FT(40.0)
-
-## Set leaf temperature:
-leaf.T = FT(298.0)
-
-## Specify Vcmax
-leaf.Vcmax25 = FT(90)
-leaf.Jmax25  = FT(90*1.9)
-
-## Specify curvature for J
-leaf.θ_j = FT(0.995)
-
 APAR = collect(FT, 0:10:1700)
-for leaf.APAR in APAR
+for _APAR in APAR
+    leaf3.APAR = _APAR;
+    leaf4.APAR = _APAR;
     ## Run C3 photosynthesis (general photosynthesis model):
-    leaf_photosynthesis!(modC3, leaf, met, leaf.APAR, stoC3);
+    leaf_photo_from_envir!(modC3, leaf3, envir, modC3.Sto);
     ## Save leaf variables:
-    push!(An_C3, leaf.An);push!(Ag_C3, leaf.Ag);push!(Aj_C3, leaf.Aj);push!(Ap_C3, leaf.Ap); push!(Ac_C3, leaf.Ac); push!(Cc_C3, leaf.p_i); push!(gs_C3, leaf.gs)
+    push!(An_C3, leaf3.An); push!(Ag_C3, leaf3.Ag);
+    push!(Aj_C3, leaf3.Aj); push!(Ap_C3, leaf3.Ap);
+    push!(Ac_C3, leaf3.Ac); push!(Cc_C3, leaf3.p_i);
+    push!(gs_C3, leaf3.g_sw);
     
     ## Run C4 photosynthesis:
-    leaf_photosynthesis!(modC4, leaf, met, leaf.APAR, stoC4);
+    leaf_photo_from_envir!(modC4, leaf4, envir, modC4.Sto);
     ## Save leaf variables:
-    push!(An_C4, leaf.An);push!(Ag_C4, leaf.Ag);push!(Aj_C4, leaf.Aj);push!(Ap_C4, leaf.Ap); push!(Ac_C4, leaf.Ac); push!(Cc_C4, leaf.p_i);; push!(gs_C4, leaf.gs)
+    push!(An_C4, leaf4.An); push!(Ag_C4, leaf4.Ag);
+    push!(Aj_C4, leaf4.Aj); push!(Ap_C4, leaf4.Ap);
+    push!(Ac_C4, leaf4.Ac); push!(Cc_C4, leaf4.p_i);
+    push!(gs_C4, leaf4.g_sw);
 end
 #----------------------------------------------------------------------------
 
 ## Testing some times, how long does this take (as we need to run it globally, it has to be efficient)?
 ## Slow for now, because of unnecessary allocations
 ## Will improve when the structs are cleaned up
-@btime leaf_photosynthesis!(modC3, leaf, met, leaf.APAR, stoC3);
-@btime leaf_photosynthesis!(modC4, leaf, met, leaf.APAR, stoC4);
+#@btime leaf_photo_from_envir!(modC3, leaf3, envir, modC3.Sto);
+#@btime leaf_photo_from_envir!(modC4, leaf4, envir, modC4.Sto);
 #----------------------------------------------------------------------------
 
 # ## C3 Light Response Curve
@@ -173,20 +174,13 @@ gcf()
 # Increasing light should result in overall lower $C_c$ concentrations. C4 plants can work with much lower $C_c$ as for C4, the concentration in the bundle sheath cells count, not the mesophyll. 
 
 figure()
-plot(APAR, Cc_C4/met.p_a,color=:black ,lw=2, alpha=0.7, label="Cc/Ca C4")
-plot(APAR, Cc_C3/met.p_a,color=:orange,lw=2, alpha=0.7, label="Cc/Ca C3")
+plot(APAR, Cc_C4/envir.p_a,color=:black ,lw=2, alpha=0.7, label="Cc/Ca C4")
+plot(APAR, Cc_C3/envir.p_a,color=:orange,lw=2, alpha=0.7, label="Cc/Ca C3")
 xlabel("APAR [μmol/m²/s]")
 ylabel("Cc/Ca [-]")
 legend()
 gcf()
 #----------------------------------------------------------------------------
-
-
-
-
-
-
-#The rest of these need to be revisted after restructuring the leaf struct
 
 # ### Dependence of stomatal coductance g$_s$
 
@@ -201,15 +195,15 @@ gcf()
 #----------------------------------------------------------------------------
 
 
-
 # ## More complex examples:
 
 ##Again, this looks tedious and repetitive but is the easiest way to do this right now:
 
 ## Now I want to vary T, APAR and CO2:
+## Start CO2 from 100 ppm to make sure it is higher than Γ*
 APAR = [100.0, 250.0, 500.0, 1000.0, 1500.0]
-CO2  = collect(10:10:800)
-T    = collect(265:1:310)
+CO2  = collect(100:20:800)
+T    = collect(274:2:310)
 
 n1 = length(APAR);
 n2 = length(CO2);
@@ -223,19 +217,6 @@ Ac_C3 = zeros(n1,n2,n3); Ac_C4 = zeros(n1,n2,n3)
 Cc_C3 = zeros(n1,n2,n3); Cc_C4 = zeros(n1,n2,n3)
 gs_C3 = zeros(n1,n2,n3); gs_C4 = zeros(n1,n2,n3)
 
-## Set Ca to 400ppm
-met.Ca = 400
-met.p_a = 40.0
-
-## Set leaf temperature:
-leaf.T = 298.0
-
-## Specify Vcmax
-leaf.Vcmax25 = 90
-leaf.Jmax25 = 90*1.9
-
-## Specify curvature for J
-leaf.θ_j = 0.995
 #----------------------------------------------------------------------------
 
 ## Run this over all potential 3D dimensions:
@@ -243,42 +224,35 @@ leaf.θ_j = 0.995
 ## I really like the compact form of nested loops in Julia!
 for iA in eachindex(APAR), iC in eachindex(CO2), iT in eachindex(T)
     #println(iA, "/", iC, "/", iT)
-
-    met.Ca    = CO2[iC];
-    met.p_a   = CO2[iC]/10;
-    ## make sure we have a reasonable start:
-    leaf.Cc   = met.Ca;
-    leaf.Cs   = met.Ca;
-    leaf.gs   = 0.1;
-    leaf.T    = T[iT];
-    leaf.APAR = APAR[iA];
+    envir.p_a  = CO2[iC]/10;
+    leaf3.T    = T[iT];
+    leaf3.APAR = APAR[iA];
+    leaf4.T    = T[iT];
+    leaf4.APAR = APAR[iA];
 
     ## Run C3 photosynthesis:
-    leaf_photosynthesis!(modC3, leaf, met, leaf.APAR, stoC3);
+    leaf_photo_from_envir!(modC3, leaf3, envir, modC3.Sto);
     
     ## Save leaf variables:
-    An_C3[iA,iC,iT]=leaf.An;
-    Ag_C3[iA,iC,iT]=leaf.Ag;
-    Aj_C3[iA,iC,iT]=leaf.Aj;
-    Ap_C3[iA,iC,iT]=leaf.Ap;
-    Ac_C3[iA,iC,iT]=leaf.Ac;
-    Cc_C3[iA,iC,iT]=leaf.p_i;
-    gs_C3[iA,iC,iT]=leaf.gs;
+    An_C3[iA,iC,iT]=leaf3.An;
+    Ag_C3[iA,iC,iT]=leaf3.Ag;
+    Aj_C3[iA,iC,iT]=leaf3.Aj;
+    Ap_C3[iA,iC,iT]=leaf3.Ap;
+    Ac_C3[iA,iC,iT]=leaf3.Ac;
+    Cc_C3[iA,iC,iT]=leaf3.p_i;
+    gs_C3[iA,iC,iT]=leaf3.g_sw;
     
     ## Run C4 photosynthesis:
-    leaf.Cc   = met.Ca;
-    leaf.Cs   = met.Ca;
-    leaf.gs   = 0.1;
-    leaf_photosynthesis!(modC4, leaf, met, leaf.APAR, stoC4);
+    leaf_photo_from_envir!(modC4, leaf4, envir, modC4.Sto);
     
     ## Save leaf variables:
-    An_C4[iA,iC,iT]=leaf.An;
-    Ag_C4[iA,iC,iT]=leaf.Ag;
-    Aj_C4[iA,iC,iT]=leaf.Aj;
-    Ap_C4[iA,iC,iT]=leaf.Ap;
-    Ac_C4[iA,iC,iT]=leaf.Ac;
-    Cc_C4[iA,iC,iT]=leaf.p_i;
-    gs_C4[iA,iC,iT]=leaf.gs;
+    An_C4[iA,iC,iT]=leaf4.An;
+    Ag_C4[iA,iC,iT]=leaf4.Ag;
+    Aj_C4[iA,iC,iT]=leaf4.Aj;
+    Ap_C4[iA,iC,iT]=leaf4.Ap;
+    Ac_C4[iA,iC,iT]=leaf4.Ac;
+    Cc_C4[iA,iC,iT]=leaf4.p_i;
+    gs_C4[iA,iC,iT]=leaf4.g_sw;
 end
 #----------------------------------------------------------------------------
 
@@ -289,13 +263,25 @@ i = 4
 
 ## and plot:
 figure()
-contourf(T.-273.15, CO2, Ag_C3[i,:,:])
+contourf(T.-273.15, CO2, An_C3[i,:,:])
 xlabel("T [°C]")
 ylabel("Ambient CO₂ [ppm]")
 title("C3 , An [μmol/m²/s] at APAR=$(APAR[i])")
 colorbar()
 gcf()
 #----------------------------------------------------------------------------
+
+## Same for C4 plants, why is it so different??
+
+figure()
+contourf(T.-273.15, CO2, Cc_C4[i,:,:])
+xlabel("T [°C]")
+ylabel("Ambient CO₂ [ppm]")
+title("C4 , Cc [Pa] at APAR=$(APAR[i])")
+colorbar()
+gcf()
+#----------------------------------------------------------------------------
+
 
 ## Same for C4 plants, why is it so different??
 
@@ -310,7 +296,7 @@ gcf()
 
 # ## Ambient CO$_2$ response curves and limiting rates for C3 and C4
 
-iA = 4; iT=31
+iA = 4; iT=12
 figure()
 plot( CO2, Ag_C3[iA,:,iT],color=:black,lw=2, alpha=0.7, label="Ag C3")
 plot(CO2, Ac_C3[iA,:,iT], ls="--", lw=2, label="Ac C3")
@@ -324,7 +310,7 @@ gcf()
 
 #----------------------------------------------------------------------------
 
-iA = 4; iT=31
+iA = 4; iT=12
 figure()
 plot(CO2, Ag_C4[iA,:,iT],color=:black,lw=2, alpha=0.7, label="Ag C4")
 plot(CO2, Ac_C4[iA,:,iT], ls="--", lw=2, label="Ac C4")

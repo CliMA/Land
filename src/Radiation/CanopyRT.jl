@@ -11,15 +11,19 @@ using Statistics
 using ..LandParameters
 using ..MathTools
 
-@unpack GFT,
-        K_BOLTZMANN = LandParameters
+const K_BOLTZMANN = LandParameters.K_BOLTZMANN
+const file_Opti   = joinpath(@__DIR__, "../../data/Optipar2017_ProspectD.mat")
+const file_Sun    = joinpath(@__DIR__, "../../data/sun.mat")
 
+# export types
 export AbstractCanopyOpti,
        Canopy4RT,
        CanopyRadiation,
        SoilOpti,
-       SolarAngles,
-       compute_canopy_geometry!,
+       SolarAngles
+
+# export public functions
+export compute_canopy_geometry!,
        compute_canopy_matrices!,
        computeSIF_Fluxes!,
        create_canopy_optical,
@@ -30,12 +34,6 @@ export AbstractCanopyOpti,
        derive_canopy_fluxes!,
        fluspect!,
        simulate_short_wave!
-
-
-
-
-file_Opti = joinpath(@__DIR__, "Optipar2017_ProspectD.mat")
-file_Sun  = joinpath(@__DIR__, "sun.mat")
 
 
 
@@ -58,5 +56,3 @@ include("CanopyRT_in_development.jl")
 
 
 end
-
-

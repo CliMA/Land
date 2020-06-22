@@ -1,8 +1,6 @@
 ###############################################################################
 #
 # Canopy4RT
-# This struct passed the FT test
-# This struct is documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -13,7 +11,7 @@ A canopy struct for the radiation transfer module
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Canopy4RT{FT, n_layer, lai}
+Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat, n_layer, lai}
     # TODO Check if there is other functions using global nlayers
     # TODO n_layer has to be 2 * n_double
     "Number of canopy layers"
@@ -73,8 +71,6 @@ end
 ###############################################################################
 #
 # Canopy optical
-# These structs and functions passed the FT test
-# These structs and functions are documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -304,8 +300,6 @@ end
 ###############################################################################
 #
 # Canopy radiation
-# This struct passed the FT test
-# This struct is documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -451,8 +445,6 @@ end
 ###############################################################################
 #
 # Incoming radiation
-# These structs and functions passed the FT test
-# These structs and functions are documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -564,8 +556,6 @@ end
 ###############################################################################
 #
 # Leaf biological parameters
-# These structs and functions passed the FT test
-# These structs and functions are documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -704,8 +694,6 @@ end
 ###############################################################################
 #
 # Leaf optical parameters
-# These structs and functions passed the FT test
-# These structs and functions are documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -862,8 +850,6 @@ end
 ###############################################################################
 #
 # Soil optical parameters
-# This struct passed the FT test
-# This struct is documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -895,8 +881,6 @@ end
 ###############################################################################
 #
 # Solar angle type
-# This struct passed the FT test
-# This struct is documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -926,8 +910,6 @@ end
 ###############################################################################
 #
 # Wave length parameter set
-# These structs and functions passed the FT test
-# These structs and functions are documented in the CanopyRT page
 #
 ###############################################################################
 """
@@ -945,6 +927,8 @@ abstract type AbstractWLParaSet end
 
 Struct for pre-set wave length parameters.
 
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct WLParaSetArray{FT} <: AbstractWLParaSet
     # Wave length (WL) boundaries
@@ -1002,6 +986,9 @@ end
 Struct for pre-set wave length parameters.
 
 # TODO add MArray version?
+
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct WLParaSetMArray{FT} <: AbstractWLParaSet
         # Wave length (WL) boundaries

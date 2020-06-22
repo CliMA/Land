@@ -2,23 +2,39 @@ module Photosynthesis
 
 using DocStringExtensions
 using Parameters
+using RootSolvers
 
 using ..LandParameters
+using ..MathTools
+using ..WaterPhysics
+using ..Hydraulics
 
-@unpack GAS_R, K_25 = LandParameters
+# TODO Add β function options
+# TODO update p_O₂ from p_H₂O
+# TODO Add control for envir.p_H₂O > leaf.p_sat
+# TODO Add a judgment of g_sw > g_max
+# TODO A=Float32 does not work well
 
-export AbstractPhotoModelParaSet,
-       C3ParaSet,
-       C4ParaSet,
-       FluoParaSet,
-       C3Bernacchi,
+# define constants here
+const CP_D             = LandParameters.CP_D
+const GAS_R            = LandParameters.GAS_R
+const K_25             = LandParameters.K_25
+const MOLMASS_DRYAIR   = LandParameters.MOLMASS_DRYAIR
+const MOLMASS_WATER    = LandParameters.MOLMASS_WATER
+
+# export public types
+export AirLayer,
        C3CLM,
        C4CLM,
-       FluorescenceFlexas,
-       arrhenius_correction,
-       an_ag_r_from_pi,
-       an_ag_r_pi_from_gsc,
-       get_Γ_star
+       Leaf
+
+# export public functions
+export leaf_photo_from_envir!,
+       leaf_photo_from_glc!,
+       leaf_photo_from_pi!,
+       photo_CO₂_dependence!,
+       photo_radiation_dependence!,
+       photo_temperature_dependence!
 
 
 
@@ -26,17 +42,8 @@ export AbstractPhotoModelParaSet,
 include("types.jl"     )
 include("parasets.jl"  )
 include("photomodel.jl")
-
-
-
-
-###############################################################################
-#
-# Functions in development
-# Test and document the functions before merging them to this file
-#
-###############################################################################
-include("Photosynthesis_in_development.jl")
+include("stomata.jl"   )
+include("thermo.jl"    )
 
 
 

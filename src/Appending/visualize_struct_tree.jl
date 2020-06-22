@@ -1,3 +1,4 @@
+#=
 # a customized function to convert number to formatted number
 function number_to_string(number::Number; digit::Int=6)
     if digit==0
@@ -96,3 +97,4 @@ function visualize_struct_tree(tree::Tree, save::Bool=false)
         savefig("zzz_tree.pdf", bbox_inches="tight")
     end
 end
+=#

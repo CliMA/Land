@@ -5,11 +5,13 @@
 # Documentation is not yet finished
 #
 ###############################################################################
+#=
 """
     dcum(a::FT, b::FT, t::FT)
 
 TODO Add function description
 """
+=#
 function dcum(a::FT, b::FT, t::FT) where {FT}
     y = FT(0.0)
     if a >= 1
@@ -35,12 +37,13 @@ end
 
 
 
-
+#=
 """
     dladgen(a::FT, b::FT, litab_bnd::Array)
 
 TODO Calculate the freqency of WHAT?
 """
+=#
 function dladgen(a::FT, b::FT, litab_bnd::Array{FT,2}) where {FT}
     @assert a+b< 1
     freq = similar(litab_bnd[:,1])
@@ -64,6 +67,7 @@ end
 # Documentation is not yet finished
 #
 ###############################################################################
+#=
 """
     psofunction(K::FT, k::FT, Ω::FT, LAI::FT, q::FT, dso::FT, xl::FT)
 
@@ -71,6 +75,7 @@ TODO explain the variables
 Return the probability of observing a sunlit leaf at depth `xl` (`pso`, see eq 31 in vdT 2009), given
 - `xl` Leaf depth in the canopy
 """
+=#
 function psofunction(K::FT, k::FT, Ω::FT, LAI::FT, q::FT, dso::FT, xl::FT) where {FT}
     # [nl+1]  factor for correlation of Ps and Po
     if dso != 0
@@ -146,6 +151,7 @@ function lower_quadratic2!(a, b, c,var)
   end # function log_gamma_function
   
   
+  #=
   """
   Simpson rule for irregularly spaced data.
   
@@ -160,6 +166,7 @@ function lower_quadratic2!(a, b, c,var)
       -------
       float : approximation for the integral
   """
+  =#
   function ∫(x::Vector, f::Vector)
       N = length(x)
       h = diff(x)
