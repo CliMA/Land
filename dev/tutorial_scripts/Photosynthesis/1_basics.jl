@@ -1,11 +1,10 @@
-
 # # Leaf Photosynthesis Basics
 # This tutorial will walk you through the most basic aspects of how we implement Photosynthesis at the leaf level. Most of the concepts are described in the literature, with the first quantitative approach to modeling photosynthesis given in Farquhar, von Caemmerer and Berry[^1] in their seminal 1980 paper for C3 photosynthesis. C4 photosynthesis is largely based on Collatz et al[^2] but we approach the photosynthesis modeling with a rather generic approach that facilitates the application of different photosynthesis modeling approaches without changing the core code base. A good overview on the entire process of photosynthesis and different parameterizations can be found in Bonan[^3]. 
 # 
 # At the core of both C3 and C4 photosynthesis is an enzyme catalyzed reaction of ribulose-1,5-bisphosphate (RuBP) with 
-# CO$_2$, yielding two 3-carbon compounds (phosphoglycerate (PGA)) as the initial products of photosynthesis. The enzyme RuBP carboxylase/oxygenase (Rubisco) catalyzes this reaction. With the regeneration of the substrate RuBP through the light reactions (using produced ATP and NADPH), the core cycle of photosynthesis is formed. This cycle was discovered in 1950 by Melvin Calvin, James Bassham, and Andrew Benson at the University of California, Berkeley[^4][^5] by using the radioactive isotope carbon-14.
+# CO₂, yielding two 3-carbon compounds (phosphoglycerate (PGA)) as the initial products of photosynthesis. The enzyme RuBP carboxylase/oxygenase (Rubisco) catalyzes this reaction. With the regeneration of the substrate RuBP through the light reactions (using produced ATP and NADPH), the core cycle of photosynthesis is formed. This cycle was discovered in 1950 by Melvin Calvin, James Bassham, and Andrew Benson at the University of California, Berkeley[^4][^5] by using the radioactive isotope carbon-14.
 # 
-# An oxygenation step of RuBP releases half a CO$_2$. This so called photorespiration process results in inefficiencies in C3 photosynthesis, as both CO$_2$ and O$_2$ compete at the Rubisco site. The overall photosynthetic rate of the enzyme-catalyzed turnover rates at the Rubisco site thus determine the overall photosynthesis
+# An oxygenation step of RuBP releases half a CO₂. This so called photorespiration process results in inefficiencies in C3 photosynthesis, as both CO₂ and O₂ compete at the Rubisco site. The overall photosynthetic rate of the enzyme-catalyzed turnover rates at the Rubisco site thus determine the overall photosynthesis
 # 
 # $$A_n = V_c - 0.5V_o - R_d\,,$$
 # 
@@ -15,22 +14,22 @@
 # 
 # $$V_o = \frac{V_{o,max}O_c}{O_c+K_o(1+C_c/K_c)}\,$$
 # 
-# with $K_c$ and $K_o$ being the Michaelis Menten constants for CO$_2$ and O$_2$, $C_c$ and $O_c$ the partial pressures of CO$_2$ and O$_2$ at the Rubisco site.
+# with $K_c$ and $K_o$ being the Michaelis Menten constants for CO₂ and O₂, $C_c$ and $O_c$ the partial pressures of CO₂ and O₂ at the Rubisco site.
 # 
 # The ratio of oxygenation to carboxylation rates is
 # 
 # $$\phi = \frac{V_o}{V_c} = \frac{V_{o,max}K_c}{V_{c,max}K_o}\frac{O_c}{C_c}\,$$ 
 # 
-# which yields the CO$_2$ compensation point $\Gamma_\star$:
+# which yields the CO₂ compensation point $\Gamma^\star$:
 # 
-# $$\Gamma_\star = 0.5\frac{V_{o,max}K_c}{V_{c,max}K_o}O_c\,$$ 
+# $$\Gamma^\star = 0.5\frac{V_{o,max}K_c}{V_{c,max}K_o}O_c\,$$ 
 # 
-# with is the internal CO$_2$ partial pressure at which oxygenation and carboxylation cancel each other out in terms of CO$_2$ consumption and production (neglecting $R_d$).
-# 
-# 
+# with is the internal CO₂ partial pressure at which oxygenation and carboxylation cancel each other out in terms of CO₂ consumption and production (neglecting $R_d$).
 # 
 # 
-# [^1]: Farquhar, G.D., von Caemmerer, S.V. and Berry, J.A., 1980. A biochemical model of photosynthetic CO$_2$ assimilation in leaves of C3 species. Planta, 149(1), pp.78-90.
+# 
+# 
+# [^1]: Farquhar, G.D., von Caemmerer, S.V. and Berry, J.A., 1980. A biochemical model of photosynthetic CO₂ assimilation in leaves of C3 species. Planta, 149(1), pp.78-90.
 # 
 # [^2]: Collatz, G.J., Ribas-Carbo, M. and Berry, J.A., 1992. Coupled photosynthesis-stomatal conductance model for leaves of C4 plants. Functional Plant Biology, 19(5), pp.519-538.
 # 
@@ -40,7 +39,6 @@
 # 
 # [^5]: Benson, A.A., Bassham, J.A., Calvin, M., Goodale, T.C., Haas, V.A. and Stepka, W., 1950. The path of carbon in photosynthesis. v. paper chromatography and radioautography of the products1. Journal of the American Chemical Society, 72(4), pp.1710-1718.
 # 
-
 # ## Rate Limiting Steps for photosynthesis
 # 
 # ### Rubisco-limited rates:
@@ -60,7 +58,7 @@
 # 
 # $$A_j = \underbrace{\frac{C_c-\Gamma_\star}{Cc}}_{\text{loss in photorespiration}}\underbrace{\frac{J\,C_c}{4C_c+8\Gamma_\star}}_{\text{RuBP regeneration}} = \frac{J(C_c-\Gamma_\star)}{4C_c+8\Gamma_\star}\,$$
 # 
-# One can already see what the key difference between C3 and C4 photosynthesis is based on these set of equation for rubisco turnover and RuBP-regeneration limited rates. In C4 photosynthesis, $C_c$ is typically only about 70% of the ambient CO$_2$ concentration as CO$_2$ has to diffuse through stomata and the mesophyll. For C4, a carbon accumulation mechanism uses a four-carbon organic acid (hence C4) to transport CO$_2$ from the mesophyll cells to the bundle sheath cells, where the reaction with Rubisco takes place. This leads to much higher $C_c$ for C4 plants ($>>$ than ambient air CO$_2$), which is often simplified for $A_c$ as the limit of C3 equation with $\lim_{C_c \to \infty}$ Ac(C3):
+# One can already see what the key difference between C3 and C4 photosynthesis is based on these set of equation for rubisco turnover and RuBP-regeneration limited rates. In C4 photosynthesis, $C_c$ is typically only about 70% of the ambient CO₂ concentration as CO₂ has to diffuse through stomata and the mesophyll. For C4, a carbon accumulation mechanism uses a four-carbon organic acid (hence C4) to transport CO₂ from the mesophyll cells to the bundle sheath cells, where the reaction with Rubisco takes place. This leads to much higher $C_c$ for C4 plants ($>>$ than ambient air CO₂), which is often simplified for $A_c$ as the limit of C3 equation with $\lim_{C_c \to \infty}$ Ac(C3):
 # 
 # $$A_c^{C4} = V_{c,max}$$
 # 
@@ -90,7 +88,7 @@
 # 
 # where our standard definition for C3 used a=0.5, which rarely limits photosynthesis compared to $A_c$ and $A_j$.
 # 
-# For C4 plants, we use the PEP-carboxylase CO$_2$ concentration mechanism into the bundle sheath cell as product limited rate step, using Michaelis-Menten kinetics:
+# For C4 plants, we use the PEP-carboxylase CO₂ concentration mechanism into the bundle sheath cell as product limited rate step, using Michaelis-Menten kinetics:
 # 
 # $$A_p^{C4} = \frac{V_{p,max}C_c}{C_c + K_p}$$
 # 
@@ -110,75 +108,4 @@
 # $$A_n = A_g - R_d$$
 # 
 # [^6]: Von Caemmerer, S., 2000. Biochemical models of leaf photosynthesis. Csiro publishing.
-
-# ## Simple example:
-# We just want to lay out a first simple example as to how our model setup work:  
-
-## Loading the Photosynthesis model:
-using Land.Photosynthesis
-## Defining our Field Type (we can easily switch between Double and Float precision this way)
-const FT = Float32;
-#----------------------------------------------------------------------------
-
-## Create a standard leaf with defualt parameters
-leaf = Leaf{FT}();
-
-## Create a standard meteo structure:
-envir = AirLayer{FT}();
-#----------------------------------------------------------------------------
-
-# ----
-# How to use the documentation, what do we know about leaf_params, which stores most physiologically relevant parameters. (Not printed here, try in the command line! Type in, do not copy and paste!).
-
-##?LeafParams
-#----------------------------------------------------------------------------
-
-##?MeteoParams
-#----------------------------------------------------------------------------
-
-# ### Defining the model setup
-# The most important step is to define which submodules to use. There might be different implementations for Fluorescence, Photosynthesis (C3,C4,etc), respiration, stomatal conductance (e.g. Ball-Berry, Medlyn), the T-dependence of J$_{max}$, V$_{c,max}$ and Michaelis Menten constants as well as leaf boundary layer resistance (setting it to 0 here to mimic well vented laboratory leaf level measurements) and colimitation.   
-
-##Here, we just have to worry abou the photosynthesis module, which we set here:
-#mod_photo = C3FvCBPhoto()
-
-## All modules here:
-const photo_set = C3CLM(FT);
-#----------------------------------------------------------------------------
-
-## Set APAR to 250 $\mu mol/m^2/s$
-leaf.APAR = 250;
-## Set temperature to 290K
-leaf.T = 290;
-## Applying the T-correction for all the rate constants
-photo_temperature_dependence!(photo_set, leaf, envir);
-@show leaf.Vcmax, leaf.Vcmax25;
-#----------------------------------------------------------------------------
-
-@show leaf.Jmax, leaf.Jmax25;
-#----------------------------------------------------------------------------
-
-## Specify Cc directly here in Pa
-leaf.p_i = 35;
-## update radiation dependent values first, like ETR
-photo_radiation_dependence!(photo_set, leaf);
-## update p_i dependent photosynthetic rates
-photo_CO₂_dependence!(photo_set, leaf);
-@show leaf.Ac;
-#----------------------------------------------------------------------------
-
-@show leaf.Aj;
-#----------------------------------------------------------------------------
-
-@show leaf.Ap;
-#----------------------------------------------------------------------------
-
-@show leaf.An;
-#----------------------------------------------------------------------------
-
-# ----
-# ### Summary
-# This was the simplest example to compute A$_c$, A$_j$ and A$_p$ with a specified C$_c$ and APAR. In reality, C$_c$ is defined by the interplay of photosynthetic demand and the supply through diffusion through stomata and the mesophyll. However, you can easily exchange the photosynthesis model above with C4FvCBPhoto(). You can also play around with leaf temperature T and APAR as well as $C_c$. But remember to use the right function.
-
-#?Leaf
-#----------------------------------------------------------------------------
+# 

@@ -1,46 +1,49 @@
 # Loading the Photosynthesis model:
-using Revise
-using Land.Leaf
 using Land.Photosynthesis
 # Defining our Field Type (we can easily switch between Double and Float precision this way)
 const FT = Float32;
 
 # Create a standard leaf with defualt parameters
-leaf = LeafParams{FT}();
+leaf = Leaf{FT}();
 
 # Create a standard meteo structure:
-met = MeteoParams{FT}();
+envir = AirLayer{FT}();
 
-#?LeafParams
+##?LeafParams
 
-#?MeteoParams
+##?MeteoParams
 
 ##Here, we just have to worry abou the photosynthesis module, which we set here:
 #mod_photo = C3FvCBPhoto()
 
 # All modules here:
-mods = C3CLM(FT)
+const photo_set = C3CLM(FT);
 
 # Set APAR to 250 $\mu mol/m^2/s$
 leaf.APAR = 250;
 # Set temperature to 290K
 leaf.T = 290;
-# Applying the T-correction for all rate constants:
-Leaf.update_leaf_TD!(mods, leaf)
-@show leaf.Vcmax
-@show leaf.Jmax
-# Specify Cc directly here in ppm (will be converted to Pa internally)
-leaf.Cc = 350;
+# Applying the T-correction for all the rate constants
+photo_temperature_dependence!(photo_set, leaf, envir);
+@show leaf.Vcmax, leaf.Vcmax25;
 
-Aj = Leaf.light_limited_rate!(mods, leaf, leaf.APAR)
+@show leaf.Jmax, leaf.Jmax25;
 
-Ac = Leaf.rubisco_limited_rate!(mods, leaf)
+# Specify Cc directly here in Pa
+leaf.p_i = 35;
+# update radiation dependent values first, like ETR
+photo_radiation_dependence!(photo_set, leaf);
+# update p_i dependent photosynthetic rates
+photo_CO₂_dependence!(photo_set, leaf);
+@show leaf.Ac;
 
-Ap = Leaf.product_limited_rate!(mods, leaf)
+@show leaf.Aj;
 
-#?C3FvCBPhoto
+@show leaf.Ap;
 
-#?C4CollatzPhoto
+@show leaf.An;
+
+#?Leaf
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
 

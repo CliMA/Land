@@ -6,7 +6,7 @@
 #using Revise
 using BenchmarkTools
 
-# Is it okay to switch to PyPlot?
+# Use PyPlot to plot figures
 using PyPlot
 
 #----------------------------------------------------------------------------
@@ -34,6 +34,7 @@ const FT = Float32
 # 
 
 ## This looks a bit more tedious here than it needs to but in reality
+
 vcmax_Bernacchi = Float32[]
 vcmax_CLM = Float32[]
 
@@ -41,13 +42,16 @@ vcmax_CLM = Float32[]
 Tleaf = collect(FT,260.0:1.0:315.0)
 
 ## Run through temperatures and save Vcmax values:
+td_vc_bernacchi = Photosynthesis.VcmaxTDBernacchi(FT)
+td_vc_clm       = Photosynthesis.VcmaxTDCLM(FT)
 for T in Tleaf
-    _Vcmax = Photosynthesis.get_vmax( Photosynthesis.VcmaxTDBernacchi(FT), FT(100.0), T )
+    _Vcmax = Photosynthesis.photo_TD_from_val(td_vc_bernacchi, FT(100.0), T)
     push!(vcmax_Bernacchi, _Vcmax)
-    _Vcmax = Photosynthesis.get_vmax( Photosynthesis.VcmaxTDCLM(FT), FT(100.0), T )
+    _Vcmax = Photosynthesis.photo_TD_from_val(td_vc_clm, FT(100.0), T)
     push!(vcmax_CLM, _Vcmax)
 end
 #----------------------------------------------------------------------------
+
 figure()
 plot(Tleaf .- 273.15, vcmax_Bernacchi, label="Bernacchi", lw=2)
 plot(Tleaf .- 273.15, vcmax_CLM,  label="CLM5", lw=2)
@@ -62,9 +66,10 @@ gcf()
 ## Here, we only have one implementation:
 Γ_CLM = Float32[]
 Tleaf = collect(FT,260.0:1.0:315.0)
+td_gamma_clm = Photosynthesis.ΓStarTDCLM(FT)
 
 for T in Tleaf
-    _ΓStar = Photosynthesis.get_Γ_star( Photosynthesis.ΓStarTDCLM(FT), T )
+    _ΓStar = Photosynthesis.photo_TD_from_set(td_gamma_clm, T)
     push!(Γ_CLM, _ΓStar)
 end
 #----------------------------------------------------------------------------
@@ -82,10 +87,13 @@ Jmax_Bernacchi = Float32[]
 Jmax_CLM = Float32[]
 Tleaf = collect(FT,260.0:1.0:315.0)
 
+td_j_bernacchi = Photosynthesis.JmaxTDBernacchi(FT)
+td_j_clm = Photosynthesis.JmaxTDCLM(FT)
+
 for T in Tleaf
-    _Jmax = Photosynthesis.get_jmax( Photosynthesis.JmaxTDBernacchi(FT), FT(100.0), T )
+    _Jmax = Photosynthesis.photo_TD_from_val(td_j_bernacchi, FT(100.0), T)
     push!(Jmax_Bernacchi, _Jmax)
-    _Jmax = Photosynthesis.get_jmax( Photosynthesis.JmaxTDCLM(FT), FT(100.0), T )
+    _Jmax = Photosynthesis.photo_TD_from_val(td_j_clm, FT(100.0), T)
     push!(Jmax_CLM, _Jmax)
 end
 #----------------------------------------------------------------------------
