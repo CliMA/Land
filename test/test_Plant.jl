@@ -58,14 +58,14 @@ end
                         PT.get_marginal_penalty(tree.canopy_list[1], PT.OSMWAP{FT}()),
                         PT.get_marginal_penalty(tree.canopy_list[1], 1, PT.OSMWAPMod{FT}()),
                         PT.get_marginal_penalty(tree.canopy_list[1], PT.OSMWAPMod{FT}()),
-                        PT.get_empirical_gsw_from_model(PT.ESMBallBerry{FT}(), FT(5.0), FT(101325.0), FT(20.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
-                        PT.get_empirical_gsw_from_model(PT.ESMGentine{FT}(), FT(5.0), FT(101325.0), FT(20.0), FT(0.5)),
-                        PT.get_empirical_gsw_from_model(PT.ESMLeuning{FT}(), FT(5.0), FT(101325.0), FT(20.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
-                        PT.get_empirical_gsw_from_model(PT.ESMMedlyn{FT}(), FT(5.0), FT(101325.0), FT(20.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
-                        PT.get_empirical_gsw_from_model(PT.ESMBallBerry{FT}(), ones(FT,10).*5, FT(101325.0), ones(FT,10).*20, FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
-                        PT.get_empirical_gsw_from_model(PT.ESMGentine{FT}(), ones(FT,10).*5, FT(101325.0), ones(FT,10).*20, ones(FT,10)/2),
-                        PT.get_empirical_gsw_from_model(PT.ESMLeuning{FT}(), ones(FT,10).*5, FT(101325.0), ones(FT,10).*20, FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
-                        PT.get_empirical_gsw_from_model(PT.ESMMedlyn{FT}(), ones(FT,10).*5, FT(101325.0), ones(FT,10).*20, FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
+                        PT.get_empirical_gsw_from_model(PT.ESMBallBerry{FT}(), FT(5.0), FT(101325.0), FT(40.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
+                        PT.get_empirical_gsw_from_model(PT.ESMGentine{FT}(), FT(5.0), FT(101325.0), FT(40.0), FT(0.5)),
+                        PT.get_empirical_gsw_from_model(PT.ESMLeuning{FT}(), FT(5.0), FT(101325.0), FT(40.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
+                        PT.get_empirical_gsw_from_model(PT.ESMMedlyn{FT}(), FT(5.0), FT(101325.0), FT(40.0), FT(0.5), FT(1500), FT(4.5), FT(0.5)),
+                        PT.get_empirical_gsw_from_model(PT.ESMBallBerry{FT}(), ones(FT,10).*5, FT(101325.0), FT(40.0), FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
+                        PT.get_empirical_gsw_from_model(PT.ESMGentine{FT}(), ones(FT,10).*5, FT(101325.0), FT(40.0), ones(FT,10)/2),
+                        PT.get_empirical_gsw_from_model(PT.ESMLeuning{FT}(), ones(FT,10).*5, FT(101325.0), FT(40.0), FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
+                        PT.get_empirical_gsw_from_model(PT.ESMMedlyn{FT}(), ones(FT,10).*5, FT(101325.0), FT(40.0), FT(0.5), ones(FT,10)*1500, ones(FT,10).*4, ones(FT,10)/2),
                          ]
             recursive_FT_test(result, FT)
             recursive_NaN_test(result, FT)

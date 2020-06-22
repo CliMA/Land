@@ -43,8 +43,6 @@ const CP_L             = Planet.cp_l(EARTH)
 const CP_V             = Planet.cp_v(EARTH)
 """ Universal gas constant `[J K⁻¹ mol⁻¹]` """
 const GAS_R            = gas_constant()
-""" Global Floating Type for Land module """
-const GFT              = Float32
 """ Gravitational acceleration `[m s⁻²]` """
 const GRAVITY          = Planet.grav(EARTH)
 """ Planck constant `[m² kg s⁻¹]` """
@@ -61,6 +59,10 @@ const LH_S0            = Planet.LH_s0(EARTH)
 const LH_V0            = Planet.LH_v0(EARTH)
 """ Light speed `[m s⁻¹]` """
 const LIGHT_SPEED      = light_speed()
+""" Mole mass of dry air `[kg mol⁻¹]` """
+const MOLMASS_DRYAIR   = Planet.molmass_dryair(EARTH)
+""" Mole mass of water `[kg mol⁻¹]` """
+const MOLMASS_WATER    = Planet.molmass_water(EARTH)
 """ Triple point vapor pressure `[Pa]` """
 const PRESS_TRIPLE     = Planet.press_triple(EARTH)
 """ Ideal gas constant for dry air [J kg⁻¹ K⁻¹] """

@@ -9,10 +9,9 @@ include("list_of_tutorials.jl")          # defines a dict `tutorials`
 pages = Any[
     "Home"           => "index.md",
     "Tips"           => "pages/Tips.md",
-    "Leaf"           => "pages/Leaf.md",
-    "CanopyRT"       => "pages/CanopyRT.md",
+    "Hydraulics"     => "pages/Hydraulics.md",
     "Photosynthesis" => "pages/Photosynthesis.md",
-    "Plant"          => "pages/Plant.md",
+    "CanopyRT"       => "pages/CanopyRT.md",
     "Utils"          => "pages/Utils.md",
     "Tutorials"      => tutorials,
     ]

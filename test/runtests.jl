@@ -44,7 +44,7 @@ end
 
 
 # Test the variable NaN recursively
-function recursive_NaN_test(para, FT)
+function recursive_NaN_test(para)
     # if the type is Number
     if typeof(para) <: Number
         try
@@ -55,13 +55,13 @@ function recursive_NaN_test(para, FT)
     # if the type is array
     elseif typeof(para) <: AbstractArray
         for ele in para
-            recursive_NaN_test(ele, FT)
+            recursive_NaN_test(ele)
         end
     else
         # try if the parameter is a struct
         try
             for fn in fieldnames( typeof(para) )
-                recursive_NaN_test( getfield(para, fn), FT )
+                recursive_NaN_test( getfield(para, fn) )
             end
         catch e
             println(typeof(para), "is not supprted by recursive_NaN_test.")
@@ -78,18 +78,22 @@ using Land
 
 MT   = Land.MathTools
 WP   = Land.WaterPhysics
+PH   = Land.Hydraulics
 PM   = Land.Photosynthesis
-LF   = Land.Leaf
-PT   = Land.Plant
 RT   = Land.CanopyRT
-SPAC = Land.SPAC
 
 include("test_MathTools.jl"     )
 include("test_WaterPhysics.jl"  )
+include("test_Hydraulics.jl"    )
 include("test_Photosynthesis.jl")
-include("test_Leaf.jl"          )
-include("test_Plant.jl"         )
 include("test_CanopyRT.jl"      )
-include("test_SPAC.jl"          )
+
+# Deprecated, to be remove
+#LF   = Land.Leaf
+#PT   = Land.Plant
+#SPAC = Land.SPAC
+#include("test_Leaf.jl"          )
+#include("test_Plant.jl"         )
+#include("test_SPAC.jl"          )
 
 println("All tests finished.")

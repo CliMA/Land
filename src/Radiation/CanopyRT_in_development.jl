@@ -6,55 +6,58 @@
 
 # TODO clean up the calculations and add documentation
 # Compute optical properties of canopy
+"""
+    compute_canopy_geometry!(can::Canopy4RT, angle::SolarAngles{FT}, cO::AbstractCanopyOpti) where {FT}
+
+# Description
+Computes canopy optical properties (extinction coefficients for direct and diffuse light) based on the SAIL model. Most important input parameters are leaf inclination and azimuth distribution functions and sun-sensor geometry.
+Canopy clumping Ω is implemented as in Pinty et al (2015). All scattering 
+- `can` An [`Canopy4RT`](@ref) type struct
+- `angle` An [`SolarAngles`](@ref) type struct
+- `cO` An [`AbstractCanopyOpti`](@ref) abstract type, can be either a [`CanopyOptiMArray`](@ref) or [`CanopyOptiArray`](@ref) struct
+
+"""
 function compute_canopy_geometry!(can::Canopy4RT, angle::SolarAngles{FT}, cO::AbstractCanopyOpti) where {FT}
-    @unpack clump_a, clump_b, LAI, litab, litab_bnd, nlayers, Ω = can
+    @unpack clump_a, clump_b, LAI, litab, litab_bnd, nlayers, Ω,lazitab = can
+    @unpack tts,tto,psi = angle
     
     if clump_b > 0
         can.Ω = clump_a .+ clump_b.*(1. .- cosd(angle.tts))
     end
 
-    dx = FT(1/nlayers)
-    xl = collect(FT(0):FT(-1/nlayers):-1)
-    tts = angle.tts
-    tto = angle.tto
-    psi = angle.psi
-    lazitab = can.lazitab
+    dx  = FT(1/nlayers)
+    xl  = collect(FT(0):FT(-1/nlayers):-1)
+    
     # only needed for volume scattering for symmetry (not sure why it wasn't working)
-    psi_vol         = abs(psi-FT(360.0)*round(psi/FT(360.0)))
+    psi_vol = abs(psi-FT(360.0)*round(psi/FT(360.0)))
     # Geometric quantities (ougoing direction first!)
-    cto = cosd(tto)
-    tanto	= tand(tto)
-    cospsi	= cosd(psi)
+    cto     = cosd(tto)
+    tanto   = tand(tto)
+    cospsi  = cosd(psi)
 
     # Generate leaf angle distribution:
-    
-    lidf = dladgen(can.LIDFa, can.LIDFb, litab_bnd)
-    
+    lidf     = dladgen(can.LIDFa, can.LIDFb, litab_bnd)
     can.lidf = lidf
 
-    #println(lidf)
-
     # Precompute all of this before in a separate function?
-    cos_ttlo    = cosd.(lazitab)  #   cos leaf azimuth angles
-    cos_philo    = cosd.(lazitab.-psi)  #   cos leaf azimuth angles
-    cos_ttli    = cosd.(litab)    #   cosine of normal of upperside of leaf
-    sin_ttli    = sind.(litab)    #   sine   of normal of upperside of leaf
-    sin_tto  = sind(tto)
+    cos_ttlo   = cosd.(lazitab)  #   cos leaf azimuth angles
+    cos_philo  = cosd.(lazitab.-psi)  #   cos leaf azimuth angles
+    cos_ttli   = cosd.(litab)    #   cosine of normal of upperside of leaf
+    sin_ttli   = sind.(litab)    #   sine   of normal of upperside of leaf
+    sin_tto    = sind(tto)
     # Solar angle dependent ones:
-    cts = cosd(tts)
-    sin_tts  = sind(tts)
-    ctscto = cts*cto
-    tants	= tand(tts)
-    dso		= sqrt(tants*tants+tanto*tanto-2tants*tanto*cospsi)
+    cts        = cosd(tts)
+    sin_tts    = sind(tts)
+    ctscto     = cts*cto
+    tants	   = tand(tts)
+    dso		   = sqrt(tants*tants+tanto*tanto-2tants*tanto*cospsi)
 
-    # angular distance, compensation of shadow length
     # Calculate geometric factors associated with extinction and scattering
-    #Initialise sums
-    cO.ks    = 0
-    cO.ko    = 0
-    cO.bf    = 0
+    cO.ks  = 0
+    cO.ko  = 0
+    cO.bf  = 0
     cO.sob = 0
-    cO.sof  = 0
+    cO.sof = 0
 
     #	Weighted sums over LIDF
     @inbounds for i=1:length(litab)
@@ -160,6 +163,7 @@ end;
 
 
 
+#=
 """
     simulate_short_wave!(can::Canopy4RT,
                          cO::AbstractCanopyOpti,
@@ -174,6 +178,7 @@ Simulate the short wave radiation, given
 - `sun` An `AbstractIncomingRadiation` type struct using either Array or MArray
 - `sO` A `SoilOpti` type struct for soil optical properties
 """
+=#
 function simulate_short_wave!(can::Canopy4RT,
                               cO::AbstractCanopyOpti,
                               cR::CanopyRadiation,
@@ -328,9 +333,11 @@ end
 # Simulation the long wave radiation
 #
 ###############################################################################
+#=
 """
     RTM_diffuseS(τ_dd::Array, ρ_dd::Array,S⁻::Array, S⁺::Array, boundary_top::Array, boundary_bottom::Array, rsoil::Array)
 """
+=#
 function compute_diffusive_S(τ_dd::Array, ρ_dd::Array,S⁻::Array, S⁺::Array, boundary_top::Array, boundary_bottom::Array, rsoil::Array)
     FT = eltype(τ_dd)
     #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
@@ -371,10 +378,11 @@ function compute_diffusive_S(τ_dd::Array, ρ_dd::Array,S⁻::Array, S⁺::Array
 end
 
 
-
+#=
 """
     computeThermalFluxes!(leaf_array::Array,cO::AbstractCanopyOpti,cR::CanopyRadiation, can::Canopy4RT,so::SoilOpti{FT}, incLW::Array, wl_set::AbstractWLParaSet)
 """
+=#
 function compute_thermal_fluxes!(leaf_array::Array,cO::AbstractCanopyOpti,cR::CanopyRadiation, can::Canopy4RT,so::SoilOpti{FT}, incLW::Array, wl_set::AbstractWLParaSet) where {FT}
     @unpack Ps, Po, Pso,ddf,ddb = cO
     @unpack T_sun, T_shade = cR
@@ -468,7 +476,7 @@ end
 
 
 
-
+#=
 """
     initialize_rt_module(n_layer)
 
@@ -480,6 +488,7 @@ Note it here that the struct_canopy is used in CanopyRT module.
 This function initializes `canopy_rt`, `canOpt_rt`, `canRad_rt`, `arrayOfLeaves` as local variables rather than global variables as in CanopyRT module.
 See CanopyRT module for further operations on these variables.
 """
+=#
 function initialize_rt_module(; n_layer::Int=10, LAI::FT=FT(3.0), using_marray=false) where {FT}
     # create canopy struct
     # to signal the difference, the variables from RT module has a postfix of _rt
@@ -557,10 +566,11 @@ end;
 
 
 
-
+#=
 """
     computeSIF_Fluxes!(leaf::Array,cO::AbstractCanopyOpti,cR::CanopyRadiation,can::Canopy4RT,so::SoilOpti{FT}, wl_set::AbstractWLParaSet)
 """
+=#
 function computeSIF_Fluxes!(leaf::Array,cO::AbstractCanopyOpti,cR::CanopyRadiation,can::Canopy4RT,so::SoilOpti{FT}, wl_set::AbstractWLParaSet) where {FT}
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = cO
     @unpack E_down, E_up,ϕ_shade,ϕ_sun = cR
@@ -920,7 +930,7 @@ end
 
 
 
-
+#=
 """
     calctav(alfa, nr)
 
@@ -935,6 +945,7 @@ end
     ***********************************************************************
 
 """
+=#
 function calctav(α,nr)
     tt = typeof(nr)
     rd  = tt(pi/180)

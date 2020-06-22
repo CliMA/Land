@@ -48,12 +48,12 @@
         # TODO change zenith angle and PAR accordingly
         # TODO add leaf energy balance
         # TODO so slow here? switch to p_i orriented later
-        for i in [collect(1:20); collect(500:520)]
+        for i in 1:N
             for layer in 1:tree.n_canopy
                 tree.canopy_list[layer].par_list .= canopy_par_0[layer] .* PARr_t[i]
             end
             PT.update_tree_with_time!(tree, Deltat, tree.stomata_scheme)
-            #println( i, "\t", PARr_t[i], "\t", mean(tree.canopy_list[end].gsw_list) )
+            #println( i, "\t", PARr_t[i], "\t", mean(tree.canopy_list[end].lw_list) )
         end
 
         @test true

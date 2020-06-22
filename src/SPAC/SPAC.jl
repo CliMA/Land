@@ -1,5 +1,6 @@
 module SPAC
 
+#=
 using DocStringExtensions
 using Parameters
 
@@ -24,7 +25,7 @@ include("simulations.jl")
 #
 ###############################################################################
 include("SPAC_in_development.jl")
-
+=#
 
 
 

@@ -1,219 +1,4 @@
-###############################################################################
-#
-# Stomatal model scheme types
-# These structs passed the FT test
-# These structs are documented in the Plant page
-#
-###############################################################################
-#= AbstractEmpiricalStomatalModel type tree
-AbstractStomatalModel
----> AbstractEmpiricalStomatalModel
-    ---> ESMBallBerry    # use RH
-    ---> ESMGentine      # use k_leaf
-    ---> ESMLeuning      # Use VPD
-    ---> ESMMedlyn       # use VPD
----> AbstractOptimizationStomatalModel
-    ---> OSMEller        # Eller 2018 Model
-    ---> OSMSperry       # Sperry 2017 model
-    ---> OSMWang         # Wang 2020 model
-    ---> OSMWAP          # Wolf-Anderegg-Pacala model
-    ---> OSMWAP          # Modified Wolf-Anderegg-Pacala model
-=#
-"""
-    AbstractStomatalModel
-
-The `AbstractStomatalModel` type includes `AbstractEmpiricalStomatalModel` and `AbstractOptimizationStomatalModel`
-"""
-abstract type AbstractStomatalModel end
-
-
-
-
-"""
-    AbstractEmpiricalStomatalModel
-
-The `AbstractEmpiricalStomatalModel` type include different empirical structs
-"""
-abstract type AbstractEmpiricalStomatalModel <: AbstractStomatalModel end
-
-
-
-
-"""
-    ESMBallBerry{FT}
-
-An empirical model parameter set type for Ball-Berry type model.
-The equation used for Ball-Berry type model is `gs = g0 + g1 * RH * A/Ci`.
-Note it that these empirical model often takes Ci or Cc as input, so a conversion from Pa to ppm is required.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct ESMBallBerry{FT} <: AbstractEmpiricalStomatalModel
-    "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
-    g0::FT = FT(0.025)
-    "slope of conductance-photosynthesis correlation `[unitless]`"
-    g1::FT = FT(9.0  )
-end
-
-
-
-
-"""
-    ESMGentine{FT}
-
-An empirical model parameter set type for Gentine type model.
-The equation used for Gentine type model is `gs = g0 + g1 * k_leaf/k_max * A/Ci`.
-Note it that these empirical model often takes Ci or Cc as input, so a conversion from Pa to ppm is required.
-Note it that the Gentine model does not require for a `β` function to tune the soil drought response, but the use of `k_leaf` also does not permit post-drought stomatal response unless `k_leaf` can be recovered. 
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct ESMGentine{FT} <: AbstractEmpiricalStomatalModel
-    "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
-    g0::FT = FT(0.025)
-    "slope of conductance-photosynthesis correlation `[unitless]`"
-    g1::FT = FT(9.0  )
-end
-
-
-
-
-"""
-    ESMLeuning{FT}
-
-An empirical model parameter set type for Leuning type model.
-The equation used for Leuning type model is `gs = g0 + g1 * A/(Ci-Γ_star) * 1/(1+VPD/d0)`.
-Note it that these empirical model often takes Ci or Cc as input, so a conversion from Pa to ppm is required.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct ESMLeuning{FT} <: AbstractEmpiricalStomatalModel
-    "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
-    g0::FT = FT(0.025 )
-    "slope of conductance-photosynthesis correlation `[unitless]`"
-    g1::FT = FT(8.0   )
-    "fitting parameter of d/d0 below the fraction, same unit as vpd `[Pa]`"
-    d0::FT = FT(3000.0)
-end
-
-
-
-
-"""
-    ESMMedlyn{FT}
-
-An empirical model parameter set type for Medlyn type model.
-The equation used in Medlyn type model is `gs = g0 + (1+g1/sqrt(VPD)) * A/Ci`.
-Note it that these empirical model often takes Ci or Cc as input, so a conversion from Pa to ppm is required.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct ESMMedlyn{FT} <: AbstractEmpiricalStomatalModel
-    "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`, should this one be temperature-dependent?"
-    g0::FT = FT(0.025)
-    "slope of conductance-photosynthesis correlation `[Pa⁽⁵⁾]`"
-    g1::FT = FT(125.0)
-end
-
-
-
-
-"""
-    AbstractOptimizationStomatalModel
-
-The `AbstractOptimizationStomatalModel` includes different optimization structs
-"""
-abstract type AbstractOptimizationStomatalModel <: AbstractStomatalModel end
-
-
-
-
-"""
-    OSMEller
-
-An optimization model parameter set type for Eller model.
-The equation used for Eller model is `∂Θ/∂E = -∂K/∂E * A/K`, where K is ∂E/∂P.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-struct OSMEller  <: AbstractOptimizationStomatalModel end
-
-
-
-
-"""
-    OSMSperry
-
-An optimization model parameter set type for Sperry model.
-The equation used for Sperry model is `∂Θ/∂E = -∂K/∂E * Amax/Kmax`, where K is ∂E/∂P.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-struct OSMSperry <: AbstractOptimizationStomatalModel end
-
-
-
-
-"""
-    OSMWang
-
-An optimization model parameter set type for Eller type model.
-The equation used for Eller model is `∂Θ/∂E = A / (E_crit - E)`.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-struct OSMWang   <: AbstractOptimizationStomatalModel end
-
-
-
-
-"""
-    OSMWAP{FT}
-
-An optimization model parameter set type for Wolf-Anderegg-Pacala type model.
-The equation used for Wolf-Anderegg-Pacala model is `∂Θ/∂E = (2aP+b) / K`, where K is ∂P/∂E.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct OSMWAP{FT} <: AbstractOptimizationStomatalModel
-    "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
-    a::FT = FT(0.5)
-    "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻¹]`"
-    b::FT = FT(2.0)
-end
-
-
-
-
-"""
-    OSMWAPMod{FT}
-
-An optimization model parameter set type for Wolf-Anderegg-Pacala type model, modified by adding a photosynthesis component while set b and c = 0.
-The equation used for modified Wolf-Anderegg-Pacala model is `∂Θ/∂E = a * P`, where P is absolute value of leaf xylem pressure.
-
-# Fields
-$(DocStringExtensions.FIELDS)
-"""
-Base.@kwdef struct OSMWAPMod{FT} <: AbstractOptimizationStomatalModel
-    "Quadratic equation parameter `[mol mol⁻¹ MPa⁻¹]`"
-    a::FT = FT(0.1)
-end
-
-
-
-
-
-
-
-
+#=
 ###############################################################################
 #
 # Root type and function to create root system
@@ -249,7 +34,7 @@ Base.@kwdef mutable struct RootLayer{FT<:AbstractFloat}
     k_max ::FT = FT(1.5625 )
     "Maximal hydraulic conductivity per cross section basal area per root depth `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_s   ::FT = FT(15.625 )
-    "Maximal rhizosphere conductance, default at 9.72e12 Kg h⁻¹ MPa⁻¹ mm⁻² basal area `[mol s⁻¹ MPa⁻¹]`"
+    "Maximal rhizosphere conductance, default at 9.72e12 Kg h⁻¹ MPa⁻¹ m⁻² basal area `[mol s⁻¹ MPa⁻¹]`"
     k_rhiz::FT = FT( 1.5e10)
 
     # soil parameters
@@ -438,6 +223,8 @@ end
 
 A Leaf type which contains leaf hydraulics information.
 
+Migrated to Hydraulics module
+
 # Fields
 $(DocStringExtensions.FIELDS)
 """
@@ -447,32 +234,6 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     angle_locat::FT = FT(0.0)
     "direction of leave, 0 for flat and 90 for vertical `[°]`"
     angle_incli::FT = FT(0.0)
-
-    # leaf hydraulic parameters
-    "Weibull function (`k = k_max * exp( -(-p/B)^C )`) parameter B `[MPa]`"
-    b    ::FT = FT(2.0 )
-    "Weibull function (`k = k_max * exp( -(-p/B)^C )`) parameter C"
-    c    ::FT = FT(5.0 )
-    "Maximal leaf hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
-    k_sla::FT = FT(1.35)
-
-    # flows and pressures (need to be updated with time)
-    "Leaf xylem water pressure (different from leaf water potential) at the leaf base (upstream) `[MPa]`"
-    p_ups::FT = FT(0.0)
-    "Leaf xylem water pressure at the downstream end of leaf xylem `[MPa]`"
-    p_dos::FT = FT(0.0)
-
-    # pressure, k, and p_history profile
-    "List of leaf k_max per element (mol s⁻¹ MPa⁻¹)"
-    k_element::Array{FT,1} =  ones(FT,10) * FT( 13.5 )
-    "List of xylem water pressure per element `[MPa]`"
-    p_element::Array{FT,1} = zeros(FT,10)
-    "List of xylem water pressure history (normalized to 298.15 K) per element `[MPa]`"
-    p_history::Array{FT,1} = zeros(FT,10)
-    "List of xylem water temperature per element `[K]`"
-    t_element::Array{FT,1} =  ones(FT,10) * FT(298.15)
-    "List of leaf element height change to account for gravity, default = 0 `[m]`"
-    z_element::Array{FT,1} =  ones(FT,10) * FT(  0.0 )
 end
 
 
@@ -553,11 +314,11 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat, n_leaf}
     "List of critical flow rate (when leaf xylem pressure induces desiccation) per leaf area `[mol m⁻² s⁻¹]`"
     ec_list  ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.012467781)
     "List of effective leaf diffusive conductance for CO₂ `[mol m⁻² s⁻¹]`"
-    gsc_list ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.001)
+    glc_list ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.001)
     "List of empirical leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
-    gsw_empi ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.0016)
+    glw_empi ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.0016)
     "List of leaf diffusive conductance for H₂O `[mol m⁻² s⁻¹]`"
-    gsw_list ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.0016)
+    glw_list ::Array{FT,1} = zeros(FT,n_leaf) .+ FT(0.0016)
     "List of maximal hydraulic conductance [mol m⁻² s⁻¹]"
     km_list  ::Array{FT,1} =  ones(FT,n_leaf)
     "List of leaf area per leaf `[m²]`"
@@ -645,3 +406,4 @@ Base.@kwdef mutable struct Tree{FT<:AbstractFloat, root_no, canopy_no, leaf_no}
     "List of [`CanopyLayer`](@ref)"
     canopy_list::Array{CanopyLayer{FT},1} = [CanopyLayer{FT,n_leaf}() for i in 1:n_canopy]
 end
+=#

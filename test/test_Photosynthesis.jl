@@ -1,79 +1,105 @@
 # FT and NaN test
 @testset "Photosynthesis --- FT consistency and not NaN" begin
     for FT in [Float32, Float64]
-        for data_set in [ PM.C3Bernacchi(FT),
-                          PM.C3CLM(FT),
-                          PM.C4CLM(FT),
-                          PM.FluorescenceFlexas(FT),
-                          PM.JmaxTDBernacchi(FT),
-                          PM.JmaxTDCLM(FT),
+        envir  = PM.AirLayer{FT}();
+        leaf   = PM.Leaf{FT}();
+        mod_b  = PM.C3Bernacchi(FT);
+        mod_3  = PM.C3CLM(FT);
+        mod_4  = PM.C3CLM(FT);
+        rand_T = rand(FT) + 298;
+
+        leaf_b = deepcopy(leaf);
+        leaf_3 = deepcopy(leaf);
+        leaf_4 = deepcopy(leaf);
+
+        for data_set in [ envir,
+                          leaf,
+                          mod_b,
+                          mod_3,
+                          mod_4,
                           PM.JmaxTDLeuning(FT),
-                          PM.KcTDBernacchi(FT),
-                          PM.KcTDCLM(FT),
-                          PM.KoTDBernacchi(FT),
-                          PM.KoTDCLM(FT),
                           PM.KpepTDBoyd(FT),
-                          PM.KpepTDCLM(FT),
-                          PM.RespirationTDBernacchi(FT),
-                          PM.RespirationTDCLM(FT),
-                          PM.VcmaxTDBernacchi(FT),
-                          PM.VcmaxTDCLM(FT),
                           PM.VcmaxTDLeuning(FT),
-                          PM.VomaxTDBernacchi(FT),
-                          PM.VpmaxTDBoyd(FT),
-                          PM.VtoRCollatz(FT),
-                          PM.VtoRDefault(FT),
-                          PM.ΓStarTDBernacchi(FT),
-                          PM.ΓStarTDCLM(FT) ]
-            recursive_FT_test(data_set, FT)
-            recursive_NaN_test(data_set, FT)
+                          PM.VtoRCollatz(FT)]
+            recursive_FT_test(data_set, FT);
+            recursive_NaN_test(data_set);
         end
 
-        mod_1     = PM.C3Bernacchi(FT)
-        mod_2     = PM.C3CLM(FT)
-        mod_3     = PM.C4CLM(FT)
-        p_i       = FT(20.0    )
-        v25       = FT(50.0    )
-        j25       = FT(100.0   )
-        p25       = FT(100.0   )
-        par       = FT(1000.0  )
-        p_O₂      = FT(21000.0 )
-        t_leaf    = FT(298.3   )
-        r25       = FT(1.0     )
-        curvature = FT(0.9     )
-        qy        = FT(0.4     )
-        gsc       = FT(0.01    )
-        p_atm     = FT(101325.0)
-        p_a       = FT(41.0    )
+        for result in [ PM.arrhenius_correction(mod_3.KcT, rand_T),
+                        PM.arrhenius_correction(mod_3.VcT, rand_T),
+                        PM.glc_diff!(FT(20), mod_b, leaf_b, envir, FT(1)),
+                        PM.glc_diff!(FT(20), mod_3, leaf_3, envir, FT(1)),
+                        PM.glc_diff!(FT(20), mod_4, leaf_4, envir, FT(1)),
+                        PM.photo_TD_from_set(mod_3.KcT, rand_T ),
+                        PM.photo_TD_from_val(mod_3.VcT, leaf.Vcmax25 , rand_T)]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
 
-        rand_T  = rand(FT) + 298
-        rand_Tl = rand(FT,10) .+ 298
-        for result in [ PM.arrhenius_correction(PM.KcTDBernacchi(FT), rand_T),
-                        PM.arrhenius_correction(PM.JmaxTDLeuning(FT), rand_T),
-                        PM.arrhenius_correction(PM.KcTDBernacchi(FT), (rand_Tl)),
-                        PM.arrhenius_correction(PM.JmaxTDLeuning(FT), (rand_Tl)),
-                        PM.get_jmax(PM.JmaxTDBernacchi(FT), rand(FT)*200, rand_T),
-                        PM.get_kc(PM.KcTDBernacchi(FT), rand_T),
-                        PM.get_ko(PM.KoTDBernacchi(FT), rand_T),
-                        PM.get_ko(PM.KpepTDBoyd(FT), rand_T),
-                        PM.get_r(PM.RespirationTDBernacchi(FT), rand(FT)+1, rand_T),
-                        PM.get_vmax(PM.VcmaxTDBernacchi(FT), rand(FT)*100,rand_T),
-                        PM.get_vmax(PM.VomaxTDBernacchi(FT), rand(FT)*100,rand_T),
-                        PM.get_vmax(PM.VpmaxTDBoyd(FT), rand(FT)*100,rand_T),
-                        PM.get_Γ_star(PM.ΓStarTDBernacchi(FT), rand_T),
-                        PM.get_Γ_star(PM.ΓStarTDBernacchi(FT), rand_Tl),
-                        PM.an_ag_r_from_pi(mod_1, p_i, v25, j25, par, p_O₂, t_leaf, r25, curvature, qy),
-                        PM.an_ag_r_from_pi(mod_2, p_i, v25, j25, par, p_O₂, t_leaf, r25, curvature, qy),
-                        PM.an_ag_r_from_pi(mod_3, p_i, v25, p25, par, t_leaf, r25, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_1, gsc, v25, j25, p25, p_a, t_leaf, par, p_atm, p_O₂, r25, curvature, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_2, gsc, v25, j25, p25, p_a, t_leaf, par, p_atm, p_O₂, r25, curvature, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_3, gsc, v25, j25, p25, p_a, t_leaf, par, p_atm, p_O₂, r25, curvature, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_1, gsc.*ones(FT,10), v25, j25, p25, p_a, t_leaf.*ones(FT,10), par.*ones(FT,10), p_atm, p_O₂, r25, curvature, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_2, gsc.*ones(FT,10), v25, j25, p25, p_a, t_leaf.*ones(FT,10), par.*ones(FT,10), p_atm, p_O₂, r25, curvature, qy),
-                        PM.an_ag_r_pi_from_gsc(mod_3, gsc.*ones(FT,10), v25, j25, p25, p_a, t_leaf.*ones(FT,10), par.*ones(FT,10), p_atm, p_O₂, r25, curvature, qy),
-                      ]
-            recursive_FT_test(result, FT)
-            recursive_NaN_test(result, FT)
+        PM.leaf_photo_from_pi!(mod_b, leaf_b, envir);
+        PM.leaf_photo_from_pi!(mod_3, leaf_3, envir);
+        PM.leaf_photo_from_pi!(mod_4, leaf_4, envir);
+        recursive_FT_test(leaf_b, FT);
+        recursive_FT_test(leaf_3, FT);
+        recursive_FT_test(leaf_4, FT);
+        recursive_NaN_test(leaf_b);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+
+        PM.leaf_photo_from_glc!(mod_b, leaf_b, envir);
+        PM.leaf_photo_from_glc!(mod_3, leaf_3, envir);
+        PM.leaf_photo_from_glc!(mod_4, leaf_4, envir);
+        recursive_FT_test(leaf_b, FT);
+        recursive_FT_test(leaf_3, FT);
+        recursive_FT_test(leaf_4, FT);
+        recursive_NaN_test(leaf_b);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+
+        for esm in [PM.ESMBallBerry{FT}(),
+                    PM.ESMGentine{FT}(),
+                    PM.ESMLeuning{FT}(),
+                    PM.ESMMedlyn{FT}()]
+            mod_b.Sto = esm;
+            mod_3.Sto = esm;
+            mod_4.Sto = esm;
+            for res in [PM.empirical_gsw_from_model(esm, leaf_b, envir, FT(1)),
+                        PM.empirical_gsw_from_model(esm, leaf_3, envir, FT(1)),
+                        PM.empirical_gsw_from_model(esm, leaf_4, envir, FT(1))]
+                recursive_FT_test(res, FT);
+                recursive_NaN_test(res);
+            end
+        end
+
+        for sm in [PM.ESMBallBerry{FT}(),
+                   PM.ESMGentine{FT}(),
+                   PM.ESMLeuning{FT}(),
+                   PM.ESMMedlyn{FT}(),
+                   PM.OSMEller(),
+                   PM.OSMSperry(),
+                   PM.OSMWang(),
+                   PM.OSMWAP{FT}()]
+            mod_b.Sto = sm;
+            mod_3.Sto = sm;
+            mod_4.Sto = sm;
+            for res in [PM.envir_diff!(FT(20), mod_b, leaf_b, envir, mod_b.Sto),
+                        PM.envir_diff!(FT(20), mod_3, leaf_3, envir, mod_3.Sto),
+                        PM.envir_diff!(FT(20), mod_4, leaf_4, envir, mod_4.Sto)]
+                recursive_FT_test(res, FT);
+                recursive_NaN_test(res);
+            end
+            PM.leaf_photo_from_envir!(mod_b, leaf_b, envir, mod_b.Sto);
+            PM.leaf_photo_from_envir!(mod_3, leaf_3, envir, mod_3.Sto);
+            PM.leaf_photo_from_envir!(mod_4, leaf_4, envir, mod_4.Sto);
+            PM.leaf_heat_flux!(leaf_b, envir);
+            PM.leaf_heat_flux!(leaf_3, envir);
+            PM.leaf_heat_flux!(leaf_4, envir);
+            recursive_FT_test(leaf_b, FT);
+            recursive_FT_test(leaf_3, FT);
+            recursive_FT_test(leaf_4, FT);
+            recursive_NaN_test(leaf_b);
+            recursive_NaN_test(leaf_3);
+            recursive_NaN_test(leaf_4);
         end
     end
 end

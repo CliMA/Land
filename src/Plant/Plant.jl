@@ -1,7 +1,9 @@
 module Plant
 
+#=
 using DocStringExtensions
 using Parameters
+using RootSolvers
 
 using ..LandParameters
 using ..WaterPhysics
@@ -11,18 +13,13 @@ using ..Photosynthesis
         K_25,
         ρ_H₂O = LandParameters
 
-export AbstractEmpiricalStomatalModel,
-       AbstractOptimizationStomatalModel,
-       ESMBallBerry,
-       Tree,
-       get_empirical_gsw_pi
 
 
 
-
-include("types.jl")
+include("types.jl"     )
 include("hydraulics.jl")
-include("stomata.jl")
+include("stomata.jl"   )
+include("testing.jl"   )
 
 
 
@@ -34,7 +31,7 @@ include("stomata.jl")
 #
 ###############################################################################
 include("Plant_in_development.jl")
-
+=#
 
 
 

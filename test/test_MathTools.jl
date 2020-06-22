@@ -9,9 +9,10 @@
                         MT.psofunction(rand(FT), rand(FT), rand(FT), rand(FT), rand(FT), rand(FT), rand(FT)),
                         MT.lower_quadratic(rand(FT), rand(FT)+2, rand(FT)),
                         MT.quadratic(rand(FT), rand(FT)+2, rand(FT)),
-                        MT.volscatt(rand(FT), rand(FT), rand(FT), rand(FT)) ]
-            recursive_FT_test(result, FT)
-            recursive_NaN_test(result, FT)
+                        MT.volscatt(rand(FT), rand(FT), rand(FT), rand(FT)),
+                        MT.weibull_k_ratio(1+rand(FT), 3+rand(FT), rand(FT)-2, FT(1)) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
         end
     end
 end

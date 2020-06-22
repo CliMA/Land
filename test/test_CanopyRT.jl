@@ -17,7 +17,7 @@
                           RT.create_wl_para_set(FT)
                            ]
             recursive_FT_test(data_set, FT)
-            recursive_NaN_test(data_set, FT)
+            recursive_NaN_test(data_set)
         end
     end
 end

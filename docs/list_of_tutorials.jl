@@ -6,61 +6,55 @@ generate_tutorials = true
 
 tutorials = Any[]
 
-# Allow flag to skip generated
-# tutorials since this is by
-# far the slowest part of the
-# docs build.
+# Allow flag to skip generated tutorials since this is by far the slowest part of the docs build.
+# generate tutorials
+# following the ClimateMachine rules
 if generate_tutorials
-
-    tutorials_dir = joinpath(@__DIR__, "src/tutorial_scripts")      # julia src files
-
-    # generate tutorials
     import Literate
 
-    tutorials_jl = [
-        joinpath(root, f)
-        for (root, dirs, files) in Base.Filesystem.walkdir(tutorials_dir)
-        for f in files
-    ]
-    @show tutorials_jl 
-    filter!(x -> endswith(x, ".jl"), tutorials_jl) # only grab .jl files
-    @show tutorials_jl 
-    #filter!(x -> !occursin("..jl", x), tutorials_jl)                       # currently broken, TODO: Fix me!
+    include("pages_helper.jl")
 
-    println("Building literate tutorials:")
-    for tutorial in tutorials_jl
-        println("    $(tutorial)")
-    end
+    tutorials_dir = joinpath(@__DIR__, "src/tutorial_scripts")
 
-    for tutorial in tutorials_jl
-        gen_dir =
-            joinpath(generated_dir, relpath(dirname(tutorial), tutorials_dir))
-        mkpath(gen_dir)
-        input = abspath(tutorial)
-        script = Literate.script(input, gen_dir)
-        code = strip(read(script, String))
-        #@show code
-        mdpost(str) = replace(str, "@__CODE__" => code)
-        Literate.markdown(input, gen_dir, postprocess = mdpost)
-        # Literate.notebook(input, gen_dir, execute = true)
-    end
-
-    # TODO: Should we use AutoPages.jl?
-
-    # These files mirror the .jl files in `CLIMA/tutorials/`:
-    tutorials = Any[
-        "Canopy Radiative Transfer" => Any[
-            "Reflected and Emitted Radiance" => "generated/Radiation_Test_BRDF.md",
-            "RAMI benchmarking" => "generated/RAMI_benchmarking_example.md",
-            "Soil reflectance" => "generated/GSV_soil_model.md",
-
+    tutorials = [
+        #=
+        "Photosynthesis Testing" => [
+            "Photosynthesis Model"           => "Photosynthesis/1_basics.jl",
+            "Temperature Dependency"         => "Photosynthesis/2_temperature.jl",
+            "Photosynthetic Rates"           => "Photosynthesis/3_photosynthesis.jl",
+            "Stomatal Responses"             => "Photosynthesis/4_stomata.jl"
         ],
-        "PhotoSynthesis" => Any[
-        "Leaf Level Basics" => "generated/Leaf-Photosynthesis.md",
-        "Enzyme catalysis T-dependence" => "generated/Leaf-Photosynthesis-Rates.md",
-        "Leaf Photosynthetic rates" => "generated/Leaf-Photosynthesis-Synthesis.md",
+        =#
+        "Canopy Radiative Transfer" => [
+            "Reflected and Emitted Radiance" => "Radiation_Test_BRDF.jl",
+            "RAMI benchmarking"              => "RAMI_benchmarking_example.jl",
+            #"Soil reflectance"               => "GSV_soil_model.jl",
+        ],
+        "Photosynthesis" => Any[
+            "Leaf Level Basics"              => "Leaf-Photosynthesis.jl",
+            "Enzyme catalysis T-dependence"  => "Leaf-Photosynthesis-Rates.jl",
+            "Leaf Photosynthetic rates"      => "Leaf-Photosynthesis-Synthesis.jl",
         ],
         "Canopy Energy Balance" => Any[],
     ]
 
+    # Prepend tutorials_dir
+    tutorials_jl = flatten_to_array_of_strings(get_second(tutorials))
+    println("Building literate tutorials:")
+    for tutorial in tutorials_jl
+        println("    $(tutorial)")
+    end
+    transform(x) = joinpath(basename(generated_dir), replace(x, ".jl" => ".md"))
+    tutorials    = transform_second(x -> transform(x), tutorials)
+    tutorials_jl = map(x -> joinpath(tutorials_dir, x), tutorials_jl)
+
+    for tutorial in tutorials_jl
+        gen_dir     = joinpath(generated_dir, relpath(dirname(tutorial), tutorials_dir))
+        input       = abspath(tutorial)
+        script      = Literate.script(input, gen_dir)
+        code        = strip(read(script, String))
+        mdpost(str) = replace(str, "@__CODE__" => code)
+        Literate.markdown(input, gen_dir, postprocess = mdpost)
+        Literate.notebook(input, gen_dir, execute = true)
+    end
 end
