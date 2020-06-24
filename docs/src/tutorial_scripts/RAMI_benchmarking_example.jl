@@ -53,7 +53,7 @@ angles = SolarAngles{FT}()
 
 arrayOfLeaves = [create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nlayers]
 for i in 1:canopy_rt.nlayers
-    fluspect!(arrayOfLeaves[i], canopy_rt, wl_set)
+    fluspect!(arrayOfLeaves[i], wl_set)
 end
 
 #----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ function RAMI_case(LAI, soil_albedo, clumping_index)
   for SZA=0.0:1:85
     angles.tts=SZA  
 
-    fluspect!(leaf, canopy_rt, wl_set);
+    fluspect!(leaf, wl_set);
     compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
 
@@ -121,7 +121,7 @@ function RAMI_case(LAI, soil_albedo, clumping_index)
   for SZA=0.0:1:85
     angles.tts=SZA  
 
-    fluspect!(leaf, canopy_rt, wl_set);
+    fluspect!(leaf, wl_set);
     compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
     
