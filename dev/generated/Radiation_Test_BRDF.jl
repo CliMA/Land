@@ -22,7 +22,7 @@ sunRad_rt = create_incoming_radiation(FT, wl_set.swl);
 @show leaf.Cab
 
 # Run Fluspect:
-fluspect!(leaf, canopy_rt, wl_set);
+fluspect!(leaf, wl_set);
 
 # Plot Mb matrix
 figure()
@@ -80,7 +80,7 @@ leaf_2.Cab = 80
 leaf_2.Cw = 0.012
 # show leaf Chlorophyll content:
 # and Run Fluspect:
-fluspect!(leaf_2, canopy_rt, wl_set);
+fluspect!(leaf_2, wl_set);
 
 figure()
 plot(wl_set.wl,1 .-leaf.τ_SW, color=:black, lw = 2 , label="Leaf Transmission")
@@ -95,7 +95,7 @@ gcf()
 
 arrayOfLeaves = [create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nlayers]
 for i in 1:canopy_rt.nlayers
-    fluspect!(arrayOfLeaves[i], canopy_rt, wl_set)
+    fluspect!(arrayOfLeaves[i],  wl_set)
 end
 
 # Set Soil albedo to 0.2
