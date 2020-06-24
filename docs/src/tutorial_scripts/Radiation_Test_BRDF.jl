@@ -67,7 +67,7 @@ sunRad_rt = create_incoming_radiation(FT, wl_set.swl);
 # Vilfan, N., Van der Tol, C., Muller, O., Rascher, U. and Verhoef, W., 2016. Fluspect-B: A model for leaf fluorescence, reflectance and transmittance spectra. Remote sensing of environment, 186, pp.596-615.
 
 ## Run Fluspect:
-fluspect!(leaf, canopy_rt, wl_set);
+fluspect!(leaf, wl_set);
 #----------------------------------------------------------------------------
 
 # #### Fluorescence excitation matrices

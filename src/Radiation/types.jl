@@ -17,8 +17,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat, n_layer, lai}
     "Number of canopy layers"
     nlayers   ::Int = n_layer
     # TODO 
-    "Doubling adding later"
-    ndub      ::Int = n_layer / 2
     "Leaf Area Index"
     LAI       ::FT  = FT(lai )
     "Clumping factor"
@@ -367,9 +365,9 @@ Base.@kwdef mutable struct CanopyRadiation{FT, nWl, nWlF, nIncl, nAzi, nLayers}
     Pi_shade       ::Array{FT,1} = zeros(FT, nLayers)
 
     # Dimension of wavelength
-    "Short-wave TOC outgoing radiance in observation direction `[mW m⁻² μm⁻¹ sr⁻¹]`"
+    "Short-wave TOC outgoing radiance in observation direction `[mW m⁻² nm⁻¹ sr⁻¹]`"
     Lo         ::Array{FT,1} = zeros(FT, nWl)
-    "Short-wave TOC outgoing radiation `[mW m⁻² μm⁻¹]`"
+    "Short-wave TOC outgoing radiation `[mW m⁻² nm⁻¹]`"
     Eout       ::Array{FT,1} = zeros(FT, nWl)
     "Short-wave Albedo in viewing direction"
     alb_obs    ::Array{FT,1} = zeros(FT, nWl)
@@ -379,15 +377,15 @@ Base.@kwdef mutable struct CanopyRadiation{FT, nWl, nWlF, nIncl, nAzi, nLayers}
     alb_diffuse::Array{FT,1} = zeros(FT, nWl)
 
     # Dimension of nLevel * nWavelengths
-    "Upwelling diffuse short-wave radiation within canopy `[mW m⁻² μm⁻¹]`"
+    "Upwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
     E_up  ::Array{FT,2} = zeros(FT, (nWl,nLayers+1))
-    "Downwelling diffuse short-wave radiation within canopy `[mW m⁻² μm⁻¹]`"
+    "Downwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
     E_down::Array{FT,2} = zeros(FT, (nWl,nLayers+1))
 
     # Dimension of nLayer * nWavelengths
-    "Net absorbed direct radiation in each layer `[mW m⁻² μm⁻¹]`"
+    "Net absorbed direct radiation in each layer `[mW m⁻² nm⁻¹]`"
     netSW_sunlit   ::Array{FT,2} = zeros(FT, (nWl,nLayers))
-    "net absorbed diffuse radiation in each layer `[mW m⁻² μm⁻¹]`"
+    "net absorbed diffuse radiation in each layer `[mW m⁻² nm⁻¹]`"
     netSW_shade    ::Array{FT,2} = zeros(FT, (nWl,nLayers))
 
 
@@ -419,19 +417,19 @@ Base.@kwdef mutable struct CanopyRadiation{FT, nWl, nWlF, nIncl, nAzi, nLayers}
     Pi_sun       ::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayers))
 
     # Fluorescence Output:
-    "Hemispheric total outgoing SIF flux `[mW m⁻² μm⁻¹]`)"
+    "Hemispheric total outgoing SIF flux `[mW m⁻² nm⁻¹]`)"
     SIF_hemi         ::Array{FT,1} = zeros(FT, nWlF)
-    "Observer-direction outgoing SIF radiance  (mW m⁻² μm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance  (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs          ::Array{FT,1} = zeros(FT, nWlF)
-    "Observer-direction outgoing SIF radiance, sunlit leaves  (mW m⁻² μm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, sunlit leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs_sunlit   ::Array{FT,1} = zeros(FT, nWlF)
-    "Observer-direction outgoing SIF radiance, shaded leaves  (mW m⁻² μm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, shaded leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs_shaded   ::Array{FT,1} = zeros(FT, nWlF)
-    "Observer-direction outgoing SIF radiance, scattered   (mW m⁻² μm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, scattered   (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs_scattered::Array{FT,1} = zeros(FT, nWlF)
-    "Observer-direction outgoing SIF radiance, soil-reflected  (mW m⁻² μm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, soil-reflected  (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs_soil     ::Array{FT,1} = zeros(FT, nWlF)
-    "Total SIF sum of layer sources  `[mW m⁻² μm⁻¹]`)"
+    "Total SIF sum of layer sources  `[mW m⁻² nm⁻¹]`)"
     SIF_sum          ::Array{FT,1} = zeros(FT, nWlF)
 end
 
@@ -468,9 +466,9 @@ $(DocStringExtensions.FIELDS)
 mutable struct IncomingRadiationArray{FT} <: AbstractIncomingRadiation
     "Wavelength `[nm]`"
     wl       ::Array{FT,1}
-    "Direct incoming radiation `[mW m⁻² μm⁻¹]`"
+    "Direct incoming radiation `[mW m⁻² nm⁻¹]`"
     E_direct ::Array{FT,1}
-    "Diffuse incoming radiation `[mW m⁻² μm⁻¹]`"
+    "Diffuse incoming radiation `[mW m⁻² nm⁻¹]`"
     E_diffuse::Array{FT,1}
 end
 
@@ -488,9 +486,9 @@ $(DocStringExtensions.FIELDS)
 mutable struct IncomingRadiationMArray{FT, N} <: AbstractIncomingRadiation
     "Wavelength `[nm]`"
     wl       ::MArray{Tuple{N},FT,1,N}
-    "Direct incoming radiation `[mW m⁻² μm⁻¹]`"
+    "Direct incoming radiation `[mW m⁻² nm⁻¹]`"
     E_direct ::MArray{Tuple{N},FT,1,N}
-    "Diffuse incoming radiation `[mW m⁻² μm⁻¹]`"
+    "Diffuse incoming radiation `[mW m⁻² nm⁻¹]`"
     E_diffuse::MArray{Tuple{N},FT,1,N}
 end
 
@@ -612,6 +610,8 @@ Base.@kwdef mutable struct LeafBioArray{FT, nWl, nWle, nWlf} <: AbstractLeafBio
     Mb         ::Array{FT,2} = zeros(FT,(nWlf,nWle))
     "Fluorescence excitation matrix forwards"
     Mf         ::Array{FT,2} = zeros(FT,(nWlf,nWle))
+    "Doubling adding layers"
+    ndub      ::Int = 10
 end
 
 
@@ -657,10 +657,12 @@ Base.@kwdef mutable struct LeafBioMArray{FT, nWl, nWle, nWlf, nWLe_nWLf} <: Abst
     kChlrel    ::MArray{Tuple{nWl},FT,1,nWl} = MArray{Tuple{nWl},FT}(undef)
     "Relative absorbtion by Chlorophyll"
     kChlrel_old::MArray{Tuple{nWl},FT,1,nWl} = MArray{Tuple{nWl},FT}(undef)
-    "Fluorescence excitation matrix backwards"
+    "Fluorescence backward excitation matrix "
     Mb::MArray{Tuple{nWlf,nWle},FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle},FT}(undef)
-    "Fluorescence excitation matrix forwards"
+    "Fluorescence forward excitation matrix "
     Mf::MArray{Tuple{nWlf,nWle},FT,2,nWLe_nWLf} = MArray{Tuple{nWlf,nWle},FT}(undef)
+    "Doubling adding layers"
+    ndub      ::Int = 10
 end
 
 
@@ -675,6 +677,8 @@ Create a leaf biological parameters struct with an `using_marray` option, given
 - `nWle` Number of excitation wave length
 - `nWlf` Number of fluorescence wave length
 - `using_marray` If `true`, using MArray; else, using Array
+
+Returns a [`LeafBioMArray`](@ref) or [`LeafBioArray`](@ref) type struct.
 """
 function create_leaf_bio(FType, nWl::Int, nWle::Int, nWlf::Int; using_marray=false)
     if using_marray
