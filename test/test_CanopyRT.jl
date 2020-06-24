@@ -51,12 +51,12 @@ end
 
         leaf_2.Cab = FT(80.0 )
         leaf_2.Cw  = FT(0.012)
-        RT.fluspect!(leaf_1, canopy_rt, wl_set)
-        RT.fluspect!(leaf_2, canopy_rt, wl_set)
+        RT.fluspect!(leaf_1, wl_set)
+        RT.fluspect!(leaf_2, wl_set)
 
         arrayOfLeaves = [RT.create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nlayers]
         for i in 1:canopy_rt.nlayers
-            RT.fluspect!(arrayOfLeaves[i], canopy_rt, wl_set)
+            RT.fluspect!(arrayOfLeaves[i], wl_set)
         end
 
         RT.compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
