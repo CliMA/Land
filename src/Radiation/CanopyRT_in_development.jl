@@ -565,7 +565,7 @@ function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0), using_marray=f
     println("    create leaves...")
     arrayOfLeaves = [create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF; using_marray=using_marray) for i in 1:canopy_rt.nlayers]
     for i in 1:canopy_rt.nlayers
-        fluspect!(arrayOfLeaves[i], canopy_rt, wl_set)
+        fluspect!(arrayOfLeaves[i],  wl_set)
     end
 
     # Four Different steps to compute Short-Wave RT
