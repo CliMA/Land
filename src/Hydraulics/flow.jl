@@ -144,8 +144,8 @@ function leaf_e_crit(
             hs::LeafHydraulics{FT},
             ini::FT = FT(2e-9)
             ) where {FT<:AbstractFloat}
-    _fl = max(ini-1e-6, 1e-9);
-    _fh = max(ini     , 2e-9);
+    _fl = max(ini-FT(1e-6), FT(1e-9));
+    _fh = max(ini     , FT(2e-9));
     _sm = SecantMethod{FT}(_fl, _fh);
     _cs = CompactSolution();
     _st = SolutionTolerance{FT}(1e-10);
