@@ -142,7 +142,7 @@ leaf_2.Cab = 80
 leaf_2.Cw = 0.012
 ## show leaf Chlorophyll content:
 ## and Run Fluspect:
-fluspect!(leaf_2, canopy_rt, wl_set);
+fluspect!(leaf_2, wl_set);
 #----------------------------------------------------------------------------
 
 figure()
@@ -167,7 +167,7 @@ gcf()
 
 arrayOfLeaves = [create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nlayers]
 for i in 1:canopy_rt.nlayers
-    fluspect!(arrayOfLeaves[i], canopy_rt, wl_set)
+    fluspect!(arrayOfLeaves[i],  wl_set)
 end
 #----------------------------------------------------------------------------
 
