@@ -1,5 +1,21 @@
 # CanopyRT module for the LAND model
 
+## Canopy RT functions
+These are the functions being used in the Canopy RT module to do all the fun stuff (need to add more text here later)
+```@docs
+Land.CanopyRT.compute_canopy_geometry!
+Land.CanopyRT.compute_canopy_matrices!
+Land.CanopyRT.simulate_short_wave!
+Land.CanopyRT.derive_canopy_fluxes!
+Land.CanopyRT.compute_diffusive_S
+Land.CanopyRT.compute_thermal_fluxes!
+Land.CanopyRT.initialize_rt_module
+Land.CanopyRT.computeSIF_Fluxes!
+Land.CanopyRT.fluspect!
+Land.CanopyRT.calctav
+```
+
+
 ## Canopy RT structures
 
 ### Canopy
