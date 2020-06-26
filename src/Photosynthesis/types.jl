@@ -360,7 +360,7 @@ end
 An optimization model parameter set type for Wolf-Anderegg-Pacala type model,
     modified by adding a photosynthesis component while set b and c = 0.
 The equation used for modified Wolf-Anderegg-Pacala model is
-```
+```math
 \\dfrac{∂Θ}{∂E} = \\dfrac{aAP}{K}
 ```
 where P is absolute value of leaf xylem pressure.
@@ -616,9 +616,9 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
     J_pot  ::FT = FT(0)
     "Maximal electron transport rate `[μmol m⁻² s⁻¹]`"
-    Jmax   ::FT = FT(100)
+    Jmax   ::FT = FT(120)
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Jmax25 ::FT = FT(100)
+    Jmax25 ::FT = FT(120)
     "RubisCO coefficient Kc `[Pa]`"
     Kc     ::FT = FT(0)
     "RubisCO coefficient Ko `[Pa]`"
@@ -628,7 +628,7 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "Michaelis-Menten's coefficient `[Pa]`"
     Km     ::FT = FT(0)
     "Respiration rate `[μmol m⁻² s⁻¹]`"
-    Rd     ::FT = FT(0)
+    Rd     ::FT = FT(1)
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     Rd25   ::FT = FT(1)
     "Maximal carboxylation rate `[μmol m⁻² s⁻¹]`"
@@ -636,9 +636,9 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     Vcmax25::FT = FT(60)
     "Maximal PEP carboxylation rate `[μmol m⁻² s⁻¹]`"
-    Vpmax  ::FT = FT(60)
+    Vpmax  ::FT = FT(120)
     "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Vpmax25::FT = FT(60)
+    Vpmax25::FT = FT(120)
     "CO₂ compensation point with the absence of Rd `[Pa]`"
     Γ_star ::FT = FT(0)
 

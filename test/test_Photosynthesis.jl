@@ -27,9 +27,6 @@
 
         for result in [ PM.arrhenius_correction(mod_3.KcT, rand_T),
                         PM.arrhenius_correction(mod_3.VcT, rand_T),
-                        PM.glc_diff!(FT(20), mod_b, leaf_b, envir, FT(1)),
-                        PM.glc_diff!(FT(20), mod_3, leaf_3, envir, FT(1)),
-                        PM.glc_diff!(FT(20), mod_4, leaf_4, envir, FT(1)),
                         PM.photo_TD_from_set(mod_3.KcT, rand_T ),
                         PM.photo_TD_from_val(mod_3.VcT, leaf.Vcmax25 , rand_T)]
             recursive_FT_test(result, FT);
@@ -78,7 +75,8 @@
                    PM.OSMEller(),
                    PM.OSMSperry(),
                    PM.OSMWang(),
-                   PM.OSMWAP{FT}()]
+                   PM.OSMWAP{FT}(),
+                   PM.OSMWAPMod{FT}()]
             mod_b.Sto = sm;
             mod_3.Sto = sm;
             mod_4.Sto = sm;

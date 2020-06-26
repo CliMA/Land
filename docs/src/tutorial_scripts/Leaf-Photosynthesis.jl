@@ -151,7 +151,7 @@ leaf.APAR = 250;
 ## Set temperature to 290K
 leaf.T = 290;
 ## Applying the T-correction for all the rate constants
-photo_temperature_dependence!(photo_set, leaf, envir);
+leaf_temperature_dependence!(photo_set, leaf, envir);
 @show leaf.Vcmax, leaf.Vcmax25;
 #----------------------------------------------------------------------------
 
@@ -161,9 +161,7 @@ photo_temperature_dependence!(photo_set, leaf, envir);
 ## Specify Cc directly here in Pa
 leaf.p_i = 35;
 ## update radiation dependent values first, like ETR
-photo_radiation_dependence!(photo_set, leaf);
-## update p_i dependent photosynthetic rates
-photo_CO₂_dependence!(photo_set, leaf);
+leaf_photo_from_pi!(photo_set, leaf, envir);
 @show leaf.Ac;
 #----------------------------------------------------------------------------
 

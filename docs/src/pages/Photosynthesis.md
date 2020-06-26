@@ -120,24 +120,20 @@ Land.Photosynthesis.leaf_Γstar!
 ### Photosynthetic rates (individual)
 ```@docs
 Land.Photosynthesis.rubisco_limited_rate!
+Land.Photosynthesis.rubisco_limited_rate_glc!
 Land.Photosynthesis.leaf_ETR!
 Land.Photosynthesis.light_limited_rate!
+Land.Photosynthesis.light_limited_rate_glc!
 Land.Photosynthesis.product_limited_rate!
+Land.Photosynthesis.product_limited_rate_glc!
 Land.Photosynthesis.photosynthesis_colimit
 Land.Photosynthesis.leaf_fluorescence!
 ```
 
-### Photosynthetic rates (collection)
+### Photosynthetic rates
 ```@docs
-Land.Photosynthesis.photo_temperature_dependence!
-Land.Photosynthesis.photo_radiation_dependence!
-Land.Photosynthesis.photo_CO₂_dependence!
+Land.Photosynthesis.leaf_temperature_dependence!
 Land.Photosynthesis.leaf_photo_from_pi!
-```
-
-### Photosynthesis from Stomatal Conductance
-```@docs
-Land.Photosynthesis.glc_diff!
 Land.Photosynthesis.leaf_photo_from_glc!
 ```
 

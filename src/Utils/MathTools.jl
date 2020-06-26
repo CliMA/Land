@@ -260,7 +260,7 @@ function weibull_k_ratio(
             p_25::FT,
             vis::FT
             ) where {FT<:AbstractFloat}
-    kr = max( FT(1e-9), exp( -1 * (-p_25/b) ^ c ) / vis );
+    kr = max( FT(1e-4), exp( -1 * (-p_25/b) ^ c ) / vis );
 
     return kr
 end

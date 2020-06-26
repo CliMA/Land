@@ -79,7 +79,7 @@ end
     photo_TD_from_val(td_set::AbstractTDParameterSet, val::FT, T::FT)
 
 Make temperature correction from a given value, given
-- `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type parameter set
+- `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type struct
 - `val` Uncorrected value at 298.15 K
 - `T` Leaf temperature
 
@@ -386,6 +386,7 @@ function light_limited_rate!(
 
     leaf.CO₂_per_electron = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
     leaf.Aj               = J * leaf.CO₂_per_electron;
+
     return nothing
 end
 
@@ -395,6 +396,7 @@ function light_limited_rate!(
             ) where {FT<:AbstractFloat}
     leaf.CO₂_per_electron = FT(1/6);
     leaf.Aj               = leaf.J * leaf.CO₂_per_electron;
+
     return nothing
 end
 
@@ -406,7 +408,7 @@ end
     product_limited_rate!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT})
 
 Calculate the Product limited photosynthetic rate, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type photosynthesis parameter set
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
 - `leaf` [`Leaf`](@ref) type struct
 """
 function product_limited_rate!(
@@ -423,6 +425,130 @@ function product_limited_rate!(
             leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Ap = leaf.Vpmax * leaf.p_i / (leaf.p_i + leaf.Kpep);
+
+    return nothing
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Calculate the photosynthetic rates using gs
+#
+###############################################################################
+"""
+    rubisco_limited_rate_glc!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaf{FT},
+            envir::AirLayer{FT})
+
+Calculate the RubisCO limited photosynthetic rate from glc, given
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `leaf` [`Leaf`](@ref) type struct
+- `envir` [`AirLayer`](@ref) type struct
+"""
+function rubisco_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, Km, Rd, Vcmax, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+
+    _a = Vcmax;
+    _b = Vcmax * Γ_star;
+    _d = Km;
+    _f = p_atm / g_lc * FT(1e-6);
+    _p = p_a;
+
+    _qa = _f;
+    _qb = _f*Rd - _p - _d - _a*_f;
+    _qc = _a*_p - _b - Rd*(_p + _d);
+    _an = lower_quadratic(_qa, _qb, _qc);
+
+    leaf.Ac = _an + Rd;
+
+    return nothing
+end
+
+
+
+
+"""
+    light_limited_rate_glc!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaf{FT},
+            envir::AirLayer{FT})
+
+Calculate the Light limited photosynthetic rate from glc, given
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `leaf` [`Leaf`](@ref) type struct
+- `envir` [`AirLayer`](@ref) type struct
+"""
+function light_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, J, Rd, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+    @unpack Eff_1, Eff_2 = photo_set;
+
+    _a = J;
+    _b = J * Γ_star;
+    _c = Eff_1;
+    _d = Eff_2*Γ_star;
+    _f = p_atm / g_lc * FT(1e-6);
+    _p = p_a;
+
+    _qa = _c * _f;
+    _qb = _c*_f*Rd - _c*_p - _d - _a*_f;
+    _qc = _a*_p - _b - Rd*(_c*_p + _d);
+    _an = lower_quadratic(_qa, _qb, _qc);
+
+    leaf.Aj = _an + Rd;
+
+    return nothing
+end
+
+
+
+
+"""
+    product_limited_rate_glc!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaf{FT},
+            envir::AirLayer{FT})
+
+Calculate the Product limited photosynthetic rate from glc, given
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `leaf` [`Leaf`](@ref) type struct
+- `envir` [`AirLayer`](@ref) type struct
+"""
+function product_limited_rate_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, Kpep, Rd, Vpmax = leaf;
+    @unpack p_a, p_atm = envir;
+
+    _a = Vpmax;
+    _d = Kpep;
+    _f = p_atm / g_lc * FT(1e-6);
+    _p = p_a;
+
+    _qa = _f;
+    _qb = _f*Rd - _p - _d - _a*_f;
+    _qc = _a*_p - Rd*(_p + _d);
+    _an = lower_quadratic(_qa, _qb, _qc);
+
+    leaf.Ap = _an + Rd;
 
     return nothing
 end
@@ -566,21 +692,17 @@ end
 #
 ###############################################################################
 """
-    photo_temperature_dependence!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT})
-    photo_temperature_dependence!(
-            photo_set::C4ParaSet{FT},
+    leaf_temperature_dependence!(
+            photo_set::AbstractPhotoModelParaSet,
             leaf::Leaf{FT},
             envir::AirLayer{FT})
 
 Update the temperature dependent photosynthesis only, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
 - `leaf` [`Leaf`](@ref) type struct
 - `envir` [`AirLayer`](@ref) type struct
 """
-function photo_temperature_dependence!(
+function leaf_temperature_dependence!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
@@ -599,12 +721,11 @@ function photo_temperature_dependence!(
     leaf_ko!(photo_set.KoT, leaf);
     leaf_km!(photo_set, leaf, envir);
     leaf_Γstar!(photo_set.ΓsT, leaf);
-    product_limited_rate!(photo_set, leaf);
 
     return nothing
 end
 
-function photo_temperature_dependence!(
+function leaf_temperature_dependence!(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
@@ -620,71 +741,6 @@ function photo_temperature_dependence!(
     leaf_vcmax!(photo_set.VcT, leaf);
     leaf_vpmax!(photo_set.VpT, leaf);
     leaf_kpep!(photo_set.KpT, leaf);
-    rubisco_limited_rate!(photo_set, leaf);
-
-    return nothing
-end
-
-
-
-
-"""
-    photo_radiation_dependence!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}
-    photo_radiation_dependence!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}
-
-Update the radiation dependent photosynthesis only, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
-- `leaf` [`Leaf`](@ref) type struct
-"""
-function photo_radiation_dependence!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT}
-            ) where {FT<:AbstractFloat}
-    leaf_ETR!(photo_set, leaf);
-
-    return nothing
-end
-
-function photo_radiation_dependence!(
-            photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT}
-            ) where {FT<:AbstractFloat}
-    leaf_ETR!(photo_set, leaf);
-    light_limited_rate!(photo_set, leaf);
-
-    return nothing
-end
-
-
-
-
-"""
-    photo_CO₂_dependence!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT})
-    photo_CO₂_dependence!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT})
-
-Update CO₂ pressure dependent photosynthesis only, given
-- `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
-- `leaf` [`Leaf`](@ref) type struct
-"""
-function photo_CO₂_dependence!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT}
-            ) where {FT<:AbstractFloat}
-    rubisco_limited_rate!(photo_set, leaf);
-    light_limited_rate!(photo_set, leaf);
-    leaf.Ag = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An = leaf.Ag - leaf.Rd;
-
-    return nothing
-end
-
-function photo_CO₂_dependence!(
-            photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT}
-            ) where {FT<:AbstractFloat}
-    product_limited_rate!(photo_set, leaf);
-    leaf.Ag = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An = leaf.Ag - leaf.Rd;
 
     return nothing
 end
@@ -708,7 +764,7 @@ end
             envir::AirLayer{FT})
 
 Compute leaf photosynthetic rates, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
 - `leaf` [`Leaf`](@ref) type struct
 - `envir` [`AirLayer`](@ref) type struct
 
@@ -725,12 +781,16 @@ function leaf_photo_from_pi!(
             ) where {FT<:AbstractFloat}
     # update TD only if T changes
     if leaf.T != leaf.T_old
-        photo_temperature_dependence!(photo_set, leaf, envir);
+        leaf_temperature_dependence!(photo_set, leaf, envir);
         leaf.T_old = leaf.T;
     end
 
-    photo_radiation_dependence!(photo_set, leaf);
-    photo_CO₂_dependence!(photo_set, leaf);
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate!(photo_set, leaf);
+    rubisco_limited_rate!(photo_set, leaf);
+    product_limited_rate!(photo_set, leaf);
+    leaf.Ag = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An = leaf.Ag - leaf.Rd;
 
     return nothing
 end
@@ -748,73 +808,57 @@ end
 #
 ###############################################################################
 """
-    glc_diff!(x::FT,
-             photo_set::AbstractPhotoModelParaSet,
-             leaf::Leaf{FT},
-             envir::AirLayer{FT},
-             int_y::FT)
-
-A local function to compute the difference in glc to solve for p_i, given
-- `x` Leaf internal CO₂ partial pressure
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
-- `leaf` [`Leaf`](@ref) container for leaf photosynthesis
-- `envir` [`AirLayer`](@ref) type struct
-- `int_y` Y-intercept of leaf diffusive conductance
-"""
-function glc_diff!(
-            x::FT,
-            photo_set::AbstractPhotoModelParaSet,
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            int_y::FT
-            ) where{FT}
-    leaf.p_i = x;
-    photo_CO₂_dependence!(photo_set, leaf);
-
-    return (int_y - leaf.An*FT(1e-6)) / x * envir.p_atm - leaf.g_lc
-end
-
-
-
-
-"""
     leaf_photo_from_glc!(
             photo_set::AbstractPhotoModelParaSet,
             leaf::Leaf{FT},
             envir::AirLayer{FT})
 
 Update leaf photosynthetic rates from a known leaf diffusive conductance, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
 - `leaf` [`Leaf`](@ref) type struct
 - `envir` [`AirLayer`](@ref) type struct
 """
 function leaf_photo_from_glc!(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::C3ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     # update TD only if T changes
     if leaf.T != leaf.T_old
-        photo_temperature_dependence!(photo_set, leaf, envir);
+        leaf_temperature_dependence!(photo_set, leaf, envir);
         leaf.T_old = leaf.T;
     end
 
-    photo_radiation_dependence!(photo_set, leaf);
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate_glc!(photo_set, leaf, envir);
+    rubisco_limited_rate_glc!(photo_set, leaf, envir);
+    product_limited_rate!(photo_set, leaf);
+    leaf.Ag  = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An  = leaf.Ag - leaf.Rd;
+    leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
+    leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
 
-    if leaf.APAR < 1e-3
-        leaf.p_i     = envir.p_a + leaf.Rd*FT(1e-6) * envir.p_atm / leaf.g_lc;
-        photo_CO₂_dependence!(photo_set, leaf);
-    else
-        _pl          = max( leaf.Γ_star, 1 )
-        _ph          = _pl + FT(0.1)
-        int_y        = envir.p_a / envir.p_atm * leaf.g_lc;
-        @inline f(x) = glc_diff!(x, photo_set, leaf, envir, int_y);
-        _sm          = SecantMethod{FT}(_pl, _ph);
-        _cs          = CompactSolution();
-        _st          = SolutionTolerance{FT}(1e-2);
-        _solut       = find_zero(f, _sm, _cs, _st);
+    return nothing
+end
+
+function leaf_photo_from_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
     end
 
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate!(photo_set, leaf);
+    rubisco_limited_rate!(photo_set, leaf);
+    product_limited_rate_glc!(photo_set, leaf, envir);
+    leaf.Ag  = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An  = leaf.Ag - leaf.Rd;
+    leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
     leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
 
     return nothing

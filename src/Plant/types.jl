@@ -43,7 +43,7 @@ Base.@kwdef mutable struct RootLayer{FT<:AbstractFloat}
     "Soil texture parameter"
     soil_a   ::FT     = FT(602.0419)
     "Soil texture parameter, 1 - 1/n"
-    soil_m   ::FT     = FT(  3.2432)
+    soil_m   ::FT     = FT( 0.32432)
     "Soil texture parameter"
     soil_n   ::FT     = FT(  1.48  )
     "Maximal soil volumatric water content, vary with rock fraction"

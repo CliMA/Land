@@ -6,6 +6,7 @@ using RootSolvers
 
 using ..LandParameters
 using ..MathTools
+using ..RootSolversExtension
 using ..WaterPhysics
 using ..Hydraulics
 
@@ -32,9 +33,7 @@ export AirLayer,
 export leaf_photo_from_envir!,
        leaf_photo_from_glc!,
        leaf_photo_from_pi!,
-       photo_CO₂_dependence!,
-       photo_radiation_dependence!,
-       photo_temperature_dependence!
+       leaf_temperature_dependence!
 
 
 

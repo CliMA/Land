@@ -50,3 +50,11 @@ Land.WaterPhysics.relative_surface_tension
 Land.WaterPhysics.viscosity
 Land.WaterPhysics.relative_viscosity
 ```
+
+## RootSolvers extension
+```@docs
+Land.RootSolversExtension.BisectionMethod
+Land.RootSolversExtension.NewtonBisectionMethod
+Land.RootSolversExtension.if_break
+Land.RootSolversExtension.find_zero_ext
+```

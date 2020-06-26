@@ -2,7 +2,7 @@
 # TODO test the MArrays as well
 @testset "CanopyRT --- FT and NaN test" begin
     for FT in [Float32, Float64]
-        for data_set in [ RT.Canopy4RT{FT, 20, 3.0}(),
+        for data_set in [ RT.Canopy4RT{FT}(nlayers=20, LAI=3),
                           RT.create_canopy_optical(FT, 10, 10, 10, 10; using_marray=false),
                           #RT.create_canopy_optical(FT, 10, 10, 10, 10; using_marray=true),
                           RT.CanopyRadiation{FT, 10, 10, 10, 10, 20}(),
@@ -31,7 +31,7 @@ end
         wl_set    = RT.create_wl_para_set(FT)
         leaf_1    = RT.create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF)
         leaf_2    = RT.create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF)
-        canopy_rt = RT.Canopy4RT{FT, 20, 3.0}()
+        canopy_rt = RT.Canopy4RT{FT}(nlayers=20, LAI=3)
         canRad_rt = RT.CanopyRadiation{FT, wl_set.nwl, wl_set.nWlF, length(canopy_rt.litab), length(canopy_rt.lazitab), canopy_rt.nlayers}()
         canOpt_rt = RT.create_canopy_optical(FT, wl_set.nwl, canopy_rt.nlayers, length(canopy_rt.lazitab), length(canopy_rt.litab); using_marray=false)
         sunRad_rt = RT.create_incoming_radiation(FT, wl_set.swl)

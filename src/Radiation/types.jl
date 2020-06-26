@@ -11,14 +11,11 @@ A canopy struct for the radiation transfer module
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat, n_layer, lai}
-    # TODO Check if there is other functions using global nlayers
-    # TODO n_layer has to be 2 * n_double
+Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     "Number of canopy layers"
-    nlayers   ::Int = n_layer
-    # TODO 
+    nlayers   ::Int = FT(20.0)
     "Leaf Area Index"
-    LAI       ::FT  = FT(lai )
+    LAI       ::FT  = FT(3.0 )
     "Clumping factor"
     Ω         ::FT  = FT(1.0 )
     "Structure factor a"
@@ -50,9 +47,9 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat, n_layer, lai}
     
 
     # Some more derived parameters:
-    litab    ::Array{FT,1} = FT[  5.0, 15.0, 25.0, 35.0, 45.0, 55.0, 65.0, 75.0, 85.0]
-    litab_bnd::Array{FT,2} = FT[[ 0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0] [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0]]
-    lazitab  ::Array{FT,1} = collect(5.0:10.0:355.0)
+    litab    ::Array{FT,1} = collect(FT,5:10:85)
+    litab_bnd::Array{FT,2} = [collect(0:10:80) collect(FT,10:10:90)]
+    lazitab  ::Array{FT,1} = collect(FT,5:10:355)
     # This is changed afterwards, ignore here.
     lidf     ::Array{FT,1} = litab .* 0
     xl       ::Array{FT,1} = collect(0.0:-1.0/nlayers:-1.0)
@@ -995,7 +992,7 @@ Struct for pre-set wave length parameters.
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct WLParaSetMArray{FT} <: AbstractWLParaSet
-        # Wave length (WL) boundaries
+    # Wave length (WL) boundaries
     "Minimal WL for PAR `[nm]`"
     minwlPAR::FT = FT(400.0)
     "Maximal WL for PAR `[nm]`"
@@ -1055,5 +1052,9 @@ Create a pre-set struct of wave length settings, given
 # TODO add MArray version?
 """
 function create_wl_para_set(FType; using_marray::Bool=false)
-    return WLParaSetArray{FType}()
+    if using_marray
+        return WLParaSetMArray{FType}()
+    else
+        return WLParaSetArray{FType}()
+    end
 end

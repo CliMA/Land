@@ -3,25 +3,26 @@
 # Simulation the short wave radiation
 #
 ###############################################################################
-
-# TODO clean up the calculations and add documentation
-# Compute optical properties of canopy
 """
-    compute_canopy_geometry!(can::Canopy4RT, 
-                                  angle::SolarAngles{FT}, 
-                                  cO::AbstractCanopyOpti) where {FT}
+    compute_canopy_geometry!(
+                can::Canopy4RT{FT},
+                angle::SolarAngles{FT}, 
+                cO::AbstractCanopyOpti)
 
-# Description
-Computes canopy optical properties (extinction coefficients for direct and diffuse light) based on the SAIL model. Most important input parameters are leaf inclination and azimuth distribution functions and sun-sensor geometry.
+Computes canopy optical properties (extinction coefficients for direct and
+diffuse light) based on the SAIL model. Most important input parameters are
+leaf inclination and azimuth distribution functions and sun-sensor geometry.
 Canopy clumping Ω is implemented as in Pinty et al (2015).  
 - `can` A [`Canopy4RT`](@ref) type struct, providing canopy structure information
 - `angle` A [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
 - `cO` An [`CanopyOptiArray`](@ref) type, where optical properties will be stored
 
 """
-function compute_canopy_geometry!(can::Canopy4RT, 
-                                  angle::SolarAngles{FT}, 
-                                  cO::AbstractCanopyOpti) where {FT}
+function compute_canopy_geometry!(
+            can::Canopy4RT{FT},
+            angle::SolarAngles{FT},
+            cO::AbstractCanopyOpti
+            ) where {FT<:AbstractFloat}
 
     @unpack clump_a, clump_b, LAI, litab, litab_bnd, nlayers, Ω,lazitab = can
     @unpack tts,tto,psi = angle
@@ -68,72 +69,80 @@ function compute_canopy_geometry!(can::Canopy4RT,
     @inbounds for i=1:length(litab)
         # ttl = litab[i]	% leaf inclination discrete values
         ctl = cosd(litab[i])
-        #	SAIL volume scattering phase function gives interception and portions to be multiplied by rho and tau
+        # SAIL volume scattering phase function gives interception and portions
+        # to be multiplied by rho and tau
         chi_s,chi_o,frho,ftau=volscatt(tts,tto,psi_vol,litab[i])
-        #	Extinction coefficients
+        # Extinction coefficients
         ksli = abs(chi_s./cts)
-        koli =abs(chi_o./cto)
-            #	Area scattering coefficient fractions
+        koli = abs(chi_o./cto)
+        # Area scattering coefficient fractions
         #@show ftau
         #@show frho
         if ftau<0
-            sobli	= abs(ftau)*FT(pi)/ctscto
-            sofli	= abs(frho)*FT(pi)/ctscto
+            sobli = abs(ftau)*FT(pi)/ctscto
+            sofli = abs(frho)*FT(pi)/ctscto
         else
-            sobli	=(frho*FT(pi)/ctscto)
-            sofli	= (ftau*FT(pi)/ctscto)
+            sobli = (frho*FT(pi)/ctscto)
+            sofli = (ftau*FT(pi)/ctscto)
         end
-        bfli	= ctl*ctl
-        cO.ks	= cO.ks+ksli*lidf[i]
-        cO.ko	= cO.ko+koli*lidf[i]
-        cO.bf	= cO.bf+bfli*lidf[i]
-        cO.sob	= cO.sob+sobli*lidf[i]
-        cO.sof	= cO.sof+sofli*lidf[i]
+        bfli   = ctl*ctl
+        cO.ks  = cO.ks+ksli*lidf[i]
+        cO.ko  = cO.ko+koli*lidf[i]
+        cO.bf  = cO.bf+bfli*lidf[i]
+        cO.sob = cO.sob+sobli*lidf[i]
+        cO.sof = cO.sof+sofli*lidf[i]
     end
     #println(sob, " ", sof)
 
     #	Geometric factors to be used later with rho and tau
-    cO.sdb	= (cO.ks+cO.bf)/2
-    cO.sdf	= (cO.ks-cO.bf)/2
-    cO.dob	= (cO.ko+cO.bf)/2
-    cO.dof	= (cO.ko-cO.bf)/2
-    cO.ddb	= (1 .+cO.bf)/2
-    cO.ddf	= (1 .-cO.bf)/2
+    cO.sdb = (cO.ks+cO.bf)/2
+    cO.sdf = (cO.ks-cO.bf)/2
+    cO.dob = (cO.ko+cO.bf)/2
+    cO.dof = (cO.ko-cO.bf)/2
+    cO.ddb = (1 .+cO.bf)/2
+    cO.ddf = (1 .-cO.bf)/2
 
     # See eq 19 in vdT 2009
-    Cs          = cos_ttli.*cts             # [nli]     pag 305 modified by Joris
-    Ss          = sin_ttli.*sin_tts         # [nli]     pag 305 modified by Joris
-    cds  = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo'                    # [nli,nlazi]
-    cdo  = (cos_ttli.*cto)*ones(FT,1,length(lazitab)) .+ (sin_ttli.*sin_tto)*cos_philo'   # [nli,nlazi]
+    Cs  = cos_ttli.*cts             # [nli]     pag 305 modified by Joris
+    Ss  = sin_ttli.*sin_tts         # [nli]     pag 305 modified by Joris
+    cds = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo'   # [nli,nlazi]
+    cdo = (cos_ttli.*cto)*ones(FT,1,length(lazitab)) .+ 
+          (sin_ttli.*sin_tto)*cos_philo'                  # [nli,nlazi]
 
     # This is basically equivalent to Kb in Bonan, eq. 14.21
-    cO.fs          = (cds./cts)
-    cO.absfs    = abs.(cO.fs)         # [nli,nlazi] pag 305
+    cO.fs      = (cds./cts)
+    cO.absfs   = abs.(cO.fs)         # [nli,nlazi] pag 305
     # Added here
-    cO.fo = cdo/cto
-    cO.cosΘ_l = cos_ttli.*ones(FT,1,length(lazitab))
+    cO.fo      = cdo/cto
+    cO.cosΘ_l  = cos_ttli.*ones(FT,1,length(lazitab))
     cO.cos2Θ_l = cO.cosΘ_l.^2
-    cO.fsfo = (cO.fs.*cO.fo)
+    cO.fsfo    = (cO.fs.*cO.fo)
     cO.absfsfo = abs.(cO.fsfo)
 
     # 1.5 probabilities Ps, Po, Pso
-    cO.Ps[:]          =   exp.(cO.ks*xl*Ω*LAI)     # [nl+1]  probability of viewing a leaf in solar dir
+    # probability of viewing a leaf in solar dir
+    cO.Ps[:] = exp.(cO.ks*xl*Ω*LAI)     # [nl+1]
     # Leave off Omega for Po here still
-    cO.Po[:]          =   exp.(cO.ko*xl*Ω*LAI)     # [nl+1]  probability of viewing a leaf in observation dir
+    # probability of viewing a leaf in observation dir
+    cO.Po[:] = exp.(cO.ko*xl*Ω*LAI)     # [nl+1]
 
-    cO.Ps    =   cO.Ps *(1 .-exp.(-cO.ks*Ω*LAI*dx))/(cO.ks*Ω*LAI*dx)   # Correct Ps/Po for finite dx
-    cO.Po    =   cO.Po *(1 .-exp.(-cO.ko*Ω*LAI*dx))/(cO.ko*Ω*LAI*dx)   # Correct Ps/Po for finite dx
+    # # Correct Ps/Po for finite dx
+    cO.Ps = cO.Ps *(1 .-exp.(-cO.ks*Ω*LAI*dx))/(cO.ks*Ω*LAI*dx)
+    cO.Po = cO.Po *(1 .-exp.(-cO.ko*Ω*LAI*dx))/(cO.ko*Ω*LAI*dx)
 
     #Pso: Probability of observing a sunlit leaf at depth x, see eq 31 in vdT 2009
     # Just ignore Ω for now, it is not yet thought through!
     #@show cO.ks
     #@show cO.ko
     @inbounds for j=1:length(xl)
-        cO.Pso[j] = quadgk(x -> psofunction(cO.ko,cO.ks,Ω,LAI,can.hot,dso,x), xl[j]-dx,xl[j], rtol=1e-2)[1]/dx
+        cO.Pso[j] = quadgk(x -> psofunction(cO.ko,cO.ks,Ω,LAI,can.hot,dso,x),
+                           xl[j]-dx,xl[j],
+                           rtol=1e-2)[1] / dx
     end
 
-    #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2)    #takes care of rounding error
-    #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2)    #takes care of rounding error
+    # takes care of rounding error
+    #cO.Pso[cO.Pso.>cO.Po]= minimum([cO.Po[cO.Pso.>cO.Po] cO.Ps[cO.Pso.>cO.Po]],dims=2)
+    #cO.Pso[cO.Pso.>cO.Ps]= minimum([cO.Po[cO.Pso.>cO.Ps] cO.Ps[cO.Pso.>cO.Ps]],dims=2)
 end
 
 
@@ -179,7 +188,7 @@ end;
 
 
 """
-    simulate_short_wave!(can::Canopy4RT,
+    simulate_short_wave!(can::Canopy4RT{FT},
                          cO::AbstractCanopyOpti,
                          cR::CanopyRadiation,
                          sun::AbstractIncomingRadiation,
@@ -192,7 +201,7 @@ Simulate the short wave radiation through the canopy, given
 - `sun` An [`IncomingRadiationArray`](@ref) struct
 - `sO` A [`SoilOpti`](@ref) type struct for soil optical properties
 """
-function simulate_short_wave!(can::Canopy4RT,
+function simulate_short_wave!(can::Canopy4RT{FT},
                               cO::AbstractCanopyOpti,
                               cR::CanopyRadiation,
                               sun::AbstractIncomingRadiation,
@@ -282,7 +291,7 @@ end
 
 # Postprocessing, computing all within canopy fluxes from the primary RT output
 """
-    derive_canopy_fluxes!(can::Canopy4RT,
+    derive_canopy_fluxes!(can::Canopy4RT{FT},
                                cO::AbstractCanopyOpti, 
                                cR::CanopyRadiation, 
                                sun::AbstractIncomingRadiation, 
@@ -299,7 +308,7 @@ Computes a variety of integrated fluxes from the spectrally resolved computation
 - `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
 - `wl_set` An [`WLParaSetArray`](@ref) type struct
 """
-function derive_canopy_fluxes!(can::Canopy4RT,
+function derive_canopy_fluxes!(can::Canopy4RT{FT},
                                cO::AbstractCanopyOpti, 
                                cR::CanopyRadiation, 
                                sun::AbstractIncomingRadiation, 
@@ -429,7 +438,7 @@ end
     compute_thermal_fluxes!(leaf_array::Array,
                                  cO::AbstractCanopyOpti,
                                  cR::CanopyRadiation, 
-                                 can::Canopy4RT,
+                                 can::Canopy4RT{FT},
                                  so::SoilOpti{FT}, 
                                  incLW::Array, 
                                  wl_set::AbstractWLParaSet) where {FT}
@@ -448,7 +457,7 @@ Currently only uses Stefan Boltzmann law to compute spectrally integrated LW but
 function compute_thermal_fluxes!(leaf_array::Array,
                                  cO::AbstractCanopyOpti,
                                  cR::CanopyRadiation, 
-                                 can::Canopy4RT,
+                                 can::Canopy4RT{FT},
                                  so::SoilOpti{FT}, 
                                  incLW::Array, 
                                  wl_set::AbstractWLParaSet) where {FT}
@@ -556,10 +565,13 @@ See CanopyRT module for further operations on these variables.
 function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0), using_marray=false) where {FT}
     # create canopy struct
     # to signal the difference, the variables from RT module has a postfix of _rt
-    canopy_rt = Canopy4RT{FT, n_layer, LAI}()
+    canopy_rt = Canopy4RT{FT}(nlayers=n_layer, LAI=LAI)
     wl_set    = create_wl_para_set(FT; using_marray=using_marray)
     canRad_rt = CanopyRadiation{FT, wl_set.nwl, wl_set.nWlF, length(canopy_rt.litab), length(canopy_rt.lazitab), canopy_rt.nlayers}()
     canOpt_rt = create_canopy_optical(FT, wl_set.nwl, canopy_rt.nlayers, length(canopy_rt.lazitab), length(canopy_rt.litab); using_marray=using_marray)
+    sunRad_rt = create_incoming_radiation(FT, wl_set.swl, using_marray=using_marray)
+    soil      = SoilOpti{FT}(wl_set.wl, FT(0.2)*ones(FT, length(wl_set.wl)), FT[0.1], FT(290.0))
+    angles    = SolarAngles{FT}()
 
     # Create an array of standard leaves (needs to be in Module later on:
     println("    create leaves...")
@@ -570,16 +582,16 @@ function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0), using_marray=f
 
     # Four Different steps to compute Short-Wave RT
     println("    compute short-wave RT...")
-    compute_canopy_geometry!(canopy_rt, CanopyRT.angles, canOpt_rt)
+    compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
-    simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, CanopyRT.sunRad, CanopyRT.soil);
-    derive_canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, CanopyRT.sunRad, CanopyRT.soil, arrayOfLeaves, wl_set);
+    simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
+    derive_canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set);
 
     # # Compute Long Wave (Last term is LW incoming in W m^-2)
     println("    compute long-wave RT...")
-    compute_thermal_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, CanopyRT.soil, [FT(400.0)], wl_set);
+    compute_thermal_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, [FT(400.0)], wl_set);
 
-    return canopy_rt, canOpt_rt, canRad_rt, arrayOfLeaves
+    return angles, arrayOfLeaves, canopy_rt, canOpt_rt, canRad_rt, soil, sunRad_rt, wl_set
 end
 
 
@@ -592,7 +604,7 @@ end
     computeSIF_Fluxes!(leaf::Array,
                        cO::AbstractCanopyOpti,
                        cR::CanopyRadiation,
-                       can::Canopy4RT,
+                       can::Canopy4RT{FT},
                        so::SoilOpti{FT}, 
                        wl_set::AbstractWLParaSet) where {FT}
 
@@ -608,7 +620,7 @@ Layer reflectance and transmission is computed from SW optical properties, layer
 function computeSIF_Fluxes!(leaf::Array,
                             cO::AbstractCanopyOpti,
                             cR::CanopyRadiation,
-                            can::Canopy4RT,
+                            can::Canopy4RT{FT},
                             so::SoilOpti{FT}, 
                             wl_set::AbstractWLParaSet) where {FT}
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = cO

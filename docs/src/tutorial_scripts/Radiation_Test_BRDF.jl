@@ -45,7 +45,7 @@ const FT = Float32
 
 wl_set = create_wl_para_set(FT)
 leaf = create_leaf_bio(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF);
-canopy_rt = Canopy4RT{FT, 20, 3.0}()
+canopy_rt = Canopy4RT{FT}(nlayers=20, LAI=3)
 canRad_rt = CanopyRadiation{FT, wl_set.nwl, wl_set.nWlF, length(canopy_rt.litab), length(canopy_rt.lazitab), canopy_rt.nlayers}()
 canOpt_rt = create_canopy_optical(FT, wl_set.nwl, canopy_rt.nlayers, length(canopy_rt.lazitab), length(canopy_rt.litab); using_marray=false)
 sunRad_rt = create_incoming_radiation(FT, wl_set.swl);

@@ -88,12 +88,12 @@ envir  = AirLayer{FT}();
 ## C3 Photosynthesis
 # Use pre-defined parameter sets
 modC3 = C3CLM(FT)
-#modC3.Sto = Photosynthesis.OSMWang()
+modC3.Col = Photosynthesis.CurvedColimit{FT}();
 modC3.Sto = Photosynthesis.ESMBallBerry{FT}(g1 = 16)
 
 ## C4 Photosynthesis
 modC4 = C4CLM(FT)
-#modC4.Sto = Photosynthesis.OSMWang()
+modC4.Col = Photosynthesis.CurvedColimit{FT}();
 modC4.Sto = Photosynthesis.ESMBallBerry{FT}(g1 = 8)
 #----------------------------------------------------------------------------
 
@@ -103,13 +103,13 @@ modC4.Sto = Photosynthesis.ESMBallBerry{FT}(g1 = 8)
 ##Again, this looks tedious and repetitive but is the easiest way to do this right now:
 
 ## Variable I want to save:
-Ag_C3 = Float32[]; Ag_C4 = Float32[]
-An_C3 = Float32[]; An_C4 = Float32[]
-Aj_C3 = Float32[]; Aj_C4 = Float32[]
-Ap_C3 = Float32[]; Ap_C4 = Float32[]
-Ac_C3 = Float32[]; Ac_C4 = Float32[]
-Cc_C3 = Float32[]; Cc_C4 = Float32[]
-gs_C3 = Float32[]; gs_C4 = Float32[]
+Ag_C3 = Float32[]; Ag_C4 = Float32[];
+An_C3 = Float32[]; An_C4 = Float32[];
+Aj_C3 = Float32[]; Aj_C4 = Float32[];
+Ap_C3 = Float32[]; Ap_C4 = Float32[];
+Ac_C3 = Float32[]; Ac_C4 = Float32[];
+Cc_C3 = Float32[]; Cc_C4 = Float32[];
+gs_C3 = Float32[]; gs_C4 = Float32[];
 
 APAR = collect(FT, 0:10:1700)
 for _APAR in APAR
@@ -209,13 +209,13 @@ n1 = length(APAR);
 n2 = length(CO2);
 n3 = length(T);
 
-Ag_C3 = zeros(n1,n2,n3); Ag_C4 = zeros(n1,n2,n3)
-An_C3 = zeros(n1,n2,n3); An_C4 = zeros(n1,n2,n3)
-Aj_C3 = zeros(n1,n2,n3); Aj_C4 = zeros(n1,n2,n3)
-Ap_C3 = zeros(n1,n2,n3); Ap_C4 = zeros(n1,n2,n3)
-Ac_C3 = zeros(n1,n2,n3); Ac_C4 = zeros(n1,n2,n3)
-Cc_C3 = zeros(n1,n2,n3); Cc_C4 = zeros(n1,n2,n3)
-gs_C3 = zeros(n1,n2,n3); gs_C4 = zeros(n1,n2,n3)
+Ag_C3 = zeros(n1,n2,n3); Ag_C4 = zeros(n1,n2,n3);
+An_C3 = zeros(n1,n2,n3); An_C4 = zeros(n1,n2,n3);
+Aj_C3 = zeros(n1,n2,n3); Aj_C4 = zeros(n1,n2,n3);
+Ap_C3 = zeros(n1,n2,n3); Ap_C4 = zeros(n1,n2,n3);
+Ac_C3 = zeros(n1,n2,n3); Ac_C4 = zeros(n1,n2,n3);
+Cc_C3 = zeros(n1,n2,n3); Cc_C4 = zeros(n1,n2,n3);
+gs_C3 = zeros(n1,n2,n3); gs_C4 = zeros(n1,n2,n3);
 
 #----------------------------------------------------------------------------
 
