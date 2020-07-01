@@ -2,6 +2,7 @@ module Land
 
 # load constants and tools
 include("Utils/LandParameters.jl"      )
+include("Utils/Earth.jl"               )
 include("Utils/MathTools.jl"           )
 include("Utils/RootSolversExtension.jl")
 include("Utils/WaterPhysics.jl"        )

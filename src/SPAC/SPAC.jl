@@ -2,6 +2,7 @@ module SPAC
 
 using ..Hydraulics
 using ..CanopyRT
+using ..Photosynthesis
 
 
 

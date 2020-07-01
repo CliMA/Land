@@ -25,7 +25,8 @@ export AbstractCanopyOpti,
        SolarAngles
 
 # export public functions
-export compute_canopy_geometry!,
+export big_leaf_partition!,
+       compute_canopy_geometry!,
        compute_canopy_matrices!,
        computeSIF_Fluxes!,
        create_canopy_optical,
@@ -42,6 +43,7 @@ export compute_canopy_geometry!,
 
 
 include("types.jl"     )
+include("bigleaf.jl"   )
 include("simulation.jl")
 
 

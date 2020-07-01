@@ -63,18 +63,24 @@ const LIGHT_SPEED      = light_speed()
 const MOLMASS_DRYAIR   = Planet.molmass_dryair(EARTH)
 """ Mole mass of water `[kg mol⁻¹]` """
 const MOLMASS_WATER    = Planet.molmass_water(EARTH)
+""" Mean sea level pressure `[Pa]` """
+const P_ATM            = Planet.MSLP(EARTH)
 """ Triple point vapor pressure `[Pa]` """
 const PRESS_TRIPLE     = Planet.press_triple(EARTH)
 """ Ideal gas constant for dry air [J kg⁻¹ K⁻¹] """
 const R_D              = Planet.R_d(EARTH)
 """ Ideal gas constant for water vapor [J kg⁻¹ K⁻¹] """
 const R_V              = Planet.R_v(EARTH)
+""" Product of GAS_R and K_25 """
+const RK_25            = GAS_R * K_25
 """ Triple point temperature `[K]` """
 const T_TRIPLE         = Planet.T_triple(EARTH)
 """ von Karman constant """
 const VON_KARMAN_CONST = SubgridScale.von_karman_const(EARTH)
 """ Ratio of molecular mass of water and dry air """
 const WATER_AIR_MRATIO = 1 / Planet.molmass_ratio(EARTH)
+""" Days per year """
+const YEAR_D           = 365.2422222
 """ Density of water `[kg m⁻³]`"""
 const ρ_H₂O            = Planet.ρ_cloud_liq(EARTH)
 
