@@ -44,7 +44,7 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     d     ::FT = FT(-999.0)
     "m/sqrt(s) turbulent transfer coefficient"
     Cd    ::FT = FT(0.01  )
-    
+
 
     # Some more derived parameters:
     litab    ::Array{FT,1} = collect(FT,5:10:85)
@@ -709,7 +709,7 @@ abstract type AbstractLeafOptiPara end
 
 """
     struct LeafOptiParaArray{FT, N}
-    
+
 Struct for leaf optical properties using Array
 
 # Fields
@@ -735,7 +735,7 @@ end
 
 """
     struct LeafOptiParaMArray{FT, N}
-    
+
 Struct for leaf optical properties using MArray
 
 # Fields
@@ -819,7 +819,7 @@ function create_opti_par(FType, swl::Array, file::String=file_Opti; using_marray
         if length(wo)==0
             println("Warning, some wavelengths out of bounds ", swl[i])
         end
-        
+
         nr[i]     = mean(    _nr[wo])
         Km[i]     = mean(    _Km[wo])
         Kab[i]    = mean(   _Kab[wo])
@@ -886,7 +886,7 @@ end
 ###############################################################################
 """
     struct SolarAngles{FT}
-    
+
 Struct for observation and solar angles
 
 # Fields
@@ -945,7 +945,7 @@ Base.@kwdef mutable struct WLParaSetArray{FT} <: AbstractWLParaSet
     minwlf  ::FT = FT(640.0)
     "Maximal WL for SIF emission/fluorescence `[nm]` "
     maxwlf  ::FT = FT(850.0)
-    
+
     # Wave length lists
     "Standard wave length `[nm]`"
     swl::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
@@ -1005,7 +1005,7 @@ Base.@kwdef mutable struct WLParaSetMArray{FT} <: AbstractWLParaSet
     minwlf  ::FT = FT(640.0)
     "Maximal WL for SIF emission/fluorescence `[nm]` "
     maxwlf  ::FT = FT(850.0)
-    
+
     # Wave length lists
     "Standard wave length `[nm]`"
     swl::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));

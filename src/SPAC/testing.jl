@@ -11,7 +11,7 @@ function test_diurnal_cycle(Δt::FT) where {FT<:AbstractFloat}
     tree::Tree{FT} = create_tree(FT(-2), FT(5), FT(10), soil_bounds, air_bounds);
 
     # create canopy accordingly
-    angles,arrayOfLeaves,canopy_rt,canOpt_rt,canRad_rt,soil,sunRad_rt,wl_set = 
+    angles,arrayOfLeaves,canopy_rt,canOpt_rt,canRad_rt,soil,sunRad_rt,wl_set =
                 initialize_rt_module(n_layer=tree.n_canopy, LAI=FT(3));
 
     #

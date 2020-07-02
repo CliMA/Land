@@ -26,7 +26,7 @@ function empirical_gsw_from_model(
     @unpack An, p_s   = leaf;
     @unpack p_atm, RH = envir;
 
-    return (@. g0 + β * g1 * RH * An / (p_s / p_atm * FT(1e6)))
+    return g0 .+ g1 * RH * p_atm * FT(1e-6) * β .* An ./ p_s
 end
 
 function empirical_gsw_from_model(
@@ -39,7 +39,7 @@ function empirical_gsw_from_model(
     @unpack An, p_i = leaf;
     @unpack p_atm   = envir;
 
-    return (@. g0 + β * g1 * An / (p_i / p_atm * FT(1e6)))
+    return g0 .+ g1 * p_atm * FT(1e-6) * β .* An ./ p_i
 end
 
 function empirical_gsw_from_model(
@@ -52,8 +52,9 @@ function empirical_gsw_from_model(
     @unpack An, p_s, p_sat, Γ_star = leaf;
     @unpack p_atm, p_H₂O           = envir;
 
-    return (@. g0 + β * g1 * An / ((p_s - Γ_star) / p_atm * FT(1e6)) /
-                    (1 + (p_sat - p_H₂O)/d0))
+    return g0 .+ g1 * p_atm * FT(1e-6) / (1 + (p_sat - p_H₂O)/d0) *
+                 β .* An ./ (p_s .- Γ_star)
+                    
 end
 
 function empirical_gsw_from_model(
@@ -66,8 +67,8 @@ function empirical_gsw_from_model(
     @unpack An, p_sat         = leaf;
     @unpack p_a, p_atm, p_H₂O = envir;
 
-    return (@. g0 + β * (1 + g1/sqrt(p_sat - p_H₂O)) *
-                    An / (p_a / p_atm * FT(1e6)))
+    return g0 .+ p_atm * FT(1e-6) / p_a * (1 + g1/sqrt(p_sat - p_H₂O)) *
+                 β .* An
 end
 
 
@@ -118,6 +119,48 @@ function leaf_gsw_control!(
 
     # update leaf flow rate
     leaf.e = leaf.g_lw * (leaf.p_sat - envir.p_H₂O) / envir.p_atm;
+
+    return nothing
+end
+
+function leaf_gsw_control!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    count = 0
+    for i in eachindex(leaf.g_sw)
+        # if gsw is too small, use g_min
+        if leaf.g_sw[i] < leaf.g_min
+            leaf.g_sw[i] = leaf.g_min;
+            leaf.g_sc[i] = leaf.g_sw[i] / FT(1.6);
+            leaf.g_lw[i] = 1 / (1/leaf.g_sw[i] +
+                                1/leaf.g_bw[i]);
+            leaf.g_lc[i] = 1 / (1/leaf.g_bc[i] +
+                                1/leaf.g_sc[i] +
+                                1/leaf.g_m[i]);
+            count += 1;
+        # if gsw is too big, use g_max
+        elseif leaf.g_sw[i] < leaf.g_min
+            leaf.g_sw[i] = leaf.g_max;
+            leaf.g_sc[i] = leaf.g_sw[i] / FT(1.6);
+            leaf.g_lw[i] = 1 / (1/leaf.g_sw[i] +
+                                1/leaf.g_bw[i]);
+            leaf.g_lc[i] = 1 / (1/leaf.g_bc[i] +
+                                1/leaf.g_sc[i] +
+                                1/leaf.g_m[i]);
+            count += 1;
+        end
+    end
+
+    # update the photosynthetic rates if count > 0
+    if count > 0
+        leaf_photo_from_glc!(photo_set, leaf, envir);
+    end
+
+    # update leaf flow rate
+    _d      = (leaf.p_sat - envir.p_H₂O) / envir.p_atm
+    leaf.e .= leaf.g_lw * _d;
 
     return nothing
 end
@@ -293,7 +336,7 @@ function envir_diff!(
 
         @unpack a_max, An, g_bc, g_bw, g_lc, g_m, hs, kr_max, p_sat = leaf;
         @unpack p_atm, p_H₂O = envir;
-        
+
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
         g_lw = 1 / (1/g_sw + 1/g_bw);
@@ -326,7 +369,7 @@ function envir_diff!(
         println("");
         #sleep(0.1);
         # =#
-    
+
         return diff
     end
 end
@@ -388,7 +431,7 @@ function envir_diff!(
         println("");
         #sleep(0.1);
         # =#
-    
+
         return diff
     end
 end
@@ -452,7 +495,7 @@ function envir_diff!(
         println("");
         #sleep(0.1);
         # =#
-    
+
         return diff
     end
 end
@@ -516,7 +559,7 @@ function envir_diff!(
         println("");
         #sleep(0.1);
         # =#
-    
+
         return diff
     end
 end
@@ -601,7 +644,7 @@ function leaf_photo_from_envir!(
                 _st    = SolutionTolerance{FT}(1e-4);
                 @inline f(x) = envir_diff!(x, photo_set, leaf, envir, sm);
                 _solut = find_zero_ext(f, _sm, _st);
-    
+
                 #= used for debugging
                 @show _g_sw;
                 @show _g_max;
@@ -609,7 +652,7 @@ function leaf_photo_from_envir!(
                 @show _solut;
                 println("");
                 =#
-    
+
                 # update leaf conductances
                 leaf.g_lc = _solut;
                 leaf.g_sc = 1 / (1/leaf.g_lc - 1/leaf.g_m - 1/leaf.g_bc);
@@ -681,7 +724,7 @@ function leaf_photo_from_envir!(
                 _st    = SolutionTolerance{FT}(1e-4);
                 @inline f(x) = envir_diff!(x, photo_set, leaf, envir, sm);
                 _solut = find_zero_ext(f, _sm, _st);
-    
+
                 #= used for debugging
                 @show _g_sw;
                 @show _g_max;
@@ -689,7 +732,7 @@ function leaf_photo_from_envir!(
                 @show _solut;
                 println("");
                 =#
-    
+
                 # update leaf conductances
                 leaf.g_lc = _solut;
                 leaf.g_sc = 1 / (1/leaf.g_lc - 1/leaf.g_m - 1/leaf.g_bc);
@@ -760,7 +803,7 @@ function leaf_photo_from_envir!(
                 _st    = SolutionTolerance{FT}(1e-4);
                 @inline f(x) = envir_diff!(x, photo_set, leaf, envir, sm);
                 _solut = find_zero_ext(f, _sm, _st);
-    
+
                 #= used for debugging
                 @show _g_sw;
                 @show _g_max;
@@ -768,7 +811,7 @@ function leaf_photo_from_envir!(
                 @show _solut;
                 println("");
                 =#
-    
+
                 # update leaf conductances
                 leaf.g_lc = _solut;
                 leaf.g_sc = 1 / (1/leaf.g_lc - 1/leaf.g_m - 1/leaf.g_bc);
@@ -802,7 +845,7 @@ function leaf_photo_from_envir!(
         _st = SolutionTolerance{FT}(1e-7);
         @inline f(x) = envir_diff!(x, photo_set, leaf, envir, sm);
         _solut = find_zero(f, _sm, _cs, _st);
-    
+
         # update leaf conductances
         leaf.g_sc = 1 / max(1/leaf.g_lc - 1/leaf.g_m - 1/leaf.g_bc, FT(1.6e-3));
         leaf.g_sw = leaf.g_sc * FT(1.6);
@@ -810,7 +853,7 @@ function leaf_photo_from_envir!(
     else
         leaf.g_sw = 0;
     end
-    
+
     # make sure g_sw in its range, and update flow rate
     leaf_gsw_control!(photo_set, leaf, envir);
 

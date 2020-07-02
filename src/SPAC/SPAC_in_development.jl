@@ -155,7 +155,7 @@ function update_canopy_from_rt_module!(tree::Tree, canopy_rt::Canopy4RT, canOpt_
         for pl_layer in 1:nlayers
             canopyi  = tree.canopy_list[pl_layer]
             rt_layer = nlayers + 1 - pl_layer
-            
+
             # set the diffuse par to all the leaves
             canopyi.par_list .= canRad_rt.absPAR_shadeCab[rt_layer] * 1E6
             # add the direct PAR to sunlit leaves
@@ -248,9 +248,9 @@ end
 
 Compute Photosynthesis for all leaves in a canopy, given:
 - `mod`    One [`PhotoMods`](@ref) model setup structure
-- `leaf`   One [`LeafPhotosynthesisParams`](@ref) structure 
-- `met`    One [`lmeteo`](@ref) structure 
-- `canRad` One [`struct_canopyRadiation`](@ref) structure 
+- `leaf`   One [`LeafPhotosynthesisParams`](@ref) structure
+- `met`    One [`lmeteo`](@ref) structure
+- `canRad` One [`struct_canopyRadiation`](@ref) structure
 """
 function CanopyPhotosynthesis!(mo::AbstractPhotosynthesis, leaf::LeafPhotosynthesisParams, met::meteo, canRad)
   ISun   = CartesianIndices(canRad.absPAR_sunCab)
@@ -487,7 +487,7 @@ end
 setRoughness!(leaf::LeafPhotosynthesisParams)
 
 Computes leaf roughness lengths, given
-- `leaf` One [`LeafPhotosynthesisParams`](@ref) structure 
+- `leaf` One [`LeafPhotosynthesisParams`](@ref) structure
 """
 function setRoughness!(leaf::LeafParams)
     # adjust roughness coefficients

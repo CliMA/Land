@@ -102,7 +102,7 @@ function lower_quadratic2!(a, b, c,var)
     var[discr .>= 0] = (-b .- sqrt.(discr[discr .>= 0]))./2a
     #a[discr .< 0].=NaN
   end # function
-  
+
   function lower_quadratic!(a, b, c,vari)
     discr = b^2 - 4*a*c
     if discr >= 0
@@ -111,14 +111,14 @@ function lower_quadratic2!(a, b, c,var)
         vari=NaN
     end
   end # function
-  
+
   function ephoton(λ::Array)
       FT = eltype(λ)
       #E = phot2e(lambda) calculates the energy content (J) of 1 photon of
       #wavelength lambda (m)
       return (FT(H_PLANCK)*FT(LIGHT_SPEED))./λ;           # [J]           energy of 1 photon
   end
-  
+
   #-----------------------------------------------------------------------
   function beta_function(p, q)
   #
@@ -128,9 +128,9 @@ function lower_quadratic2!(a, b, c,var)
   # !USES:
   #
   exp(log_gamma_function(p) + log_gamma_function(q) - log_gamma_function(p+q))
-  
+
   end #function beta_function
-  
+
   #-----------------------------------------------------------------------
   function log_gamma_function(x)
   #
@@ -149,19 +149,19 @@ function lower_quadratic2!(a, b, c,var)
     end
     return tmp + log(stp*ser/x)
   end # function log_gamma_function
-  
-  
+
+
   #=
   """
   Simpson rule for irregularly spaced data.
-  
+
       Parameters
       ----------
       x : list or np.array of floats
       Sampling points for the function values
       f : list or np.array of floats
       Function values at the sampling points
-  
+
       Returns
       -------
       float : approximation for the integral
@@ -178,7 +178,7 @@ function lower_quadratic2!(a, b, c,var)
       result += f[i - 1] * ( 2 * h[i - 1]^3 - h[i]^3+ 3. * h[i] * h[i - 1]^2) / ( 6 * h[i - 1] * hph)
       result += f[i + 1] * ( 2 * h[i]^3 - h[i - 1]^3 + 3. * h[i - 1] * h[i]^2)/ ( 6 * h[i] * hph )
       end
-  
+
       if N % 2 == 0
       result += f[N] * ( 2 * h[N - 1]^2+ 3 * h[N - 2] * h[N - 1]) / ( 6 * ( h[N - 2] + h[N - 1] ) )
       result += f[N - 1] * ( h[N - 1]^2+ 3*h[N - 1]* h[N - 2] ) / ( 6 * h[N - 2] )
@@ -186,11 +186,11 @@ function lower_quadratic2!(a, b, c,var)
       end
       return result
   end
-  
+
   # Already uses diff here
-  
-  
-  
+
+
+
   #-----------------------------------------------------------------------
   # integral of weibull function for conductances
   function IntWeibull(psis,psil,psil50,ck) # set hydraulic conductivity
@@ -201,12 +201,11 @@ function lower_quadratic2!(a, b, c,var)
       integral = psil50/(ck*log(2)^one_c) * ( inc_gamma_upper(one_c,b1) - inc_gamma_upper(one_c,b2) )
       #println("Int weibull= ",integral)
       return max(integral,0.0);
-  
+
       # -(psi_50*gamma_incomplete(1/c,(ln(2)*x^c)/psi_50^c))/(c*ln(2)^(1/c))
   end
-  
+
   # integral of weibull function for conductances
   function Weibull(psil,psil50,ck) # set hydraulic conductivity
       return 2^(-(psil/psil50)^ck) ;
   end
-  

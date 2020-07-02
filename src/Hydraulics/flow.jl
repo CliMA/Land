@@ -132,7 +132,7 @@ function root_q_from_pressure(
     @inline f(x) = max(xylem_p_from_flow(root, x), -20) - pressure;
     _solut = find_zero(f, _sm, _cs, _st);
     _q::FT = _solut.root;
-    
+
     return _q
 end
 
@@ -186,7 +186,7 @@ function root_qs_p_from_q(
     _p::FT = _solut.root;
 
     _qs = FT[root_q_from_pressure(root, _p, root.flow) for root in roots];
-    
+
     return _qs, _p
 end
 

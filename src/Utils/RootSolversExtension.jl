@@ -149,7 +149,7 @@ function find_zero_ext(
             elseif y_mid * y_max > 0
                 x_max = x_mid;
                 y_max = y_mid;
-            
+
             # if y_mid = 0 and one of y_min and y_max is 0
             elseif (y_min==0) && (y_mid==0)
                 x_min = x_mid;
@@ -157,7 +157,7 @@ function find_zero_ext(
             elseif (y_max==0) && (y_mid==0)
                 x_max = x_mid;
                 y_max = y_mid;
-            
+
             # else set x_max to x_mid (takes the fisrt one)
             else
                 x_max = x_mid;
@@ -211,7 +211,7 @@ function find_zero_ext(
             elseif y_ntr * y_max > 0
                 x_max = x_ntr;
                 y_max = y_ntr;
-            
+
             # if y_ntr = 0 and one of y_min and y_max is 0
             elseif (y_min==0) && (y_ntr==0)
                 x_min = x_ntr;
@@ -219,7 +219,7 @@ function find_zero_ext(
             elseif (y_max==0) && (y_ntr==0)
                 x_max = x_ntr;
                 y_max = y_ntr;
-            
+
             # else set x_max to x_ntr (takes the fisrt one)
             else
                 x_max = x_ntr;

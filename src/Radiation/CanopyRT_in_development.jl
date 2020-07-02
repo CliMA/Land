@@ -6,13 +6,13 @@
 """
     compute_canopy_geometry!(
                 can::Canopy4RT{FT},
-                angle::SolarAngles{FT}, 
+                angle::SolarAngles{FT},
                 cO::AbstractCanopyOpti)
 
 Computes canopy optical properties (extinction coefficients for direct and
 diffuse light) based on the SAIL model. Most important input parameters are
 leaf inclination and azimuth distribution functions and sun-sensor geometry.
-Canopy clumping Ω is implemented as in Pinty et al (2015).  
+Canopy clumping Ω is implemented as in Pinty et al (2015).
 - `can` A [`Canopy4RT`](@ref) type struct, providing canopy structure information
 - `angle` A [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
 - `cO` An [`CanopyOptiArray`](@ref) type, where optical properties will be stored
@@ -26,14 +26,14 @@ function compute_canopy_geometry!(
 
     @unpack clump_a, clump_b, LAI, litab, litab_bnd, nlayers, Ω,lazitab = can
     @unpack tts,tto,psi = angle
-    
+
     if clump_b > 0
         can.Ω = clump_a .+ clump_b.*(1. .- cosd(angle.tts))
     end
 
     dx  = FT(1/nlayers)
     xl  = collect(FT(0):FT(-1/nlayers):-1)
-    
+
     # only needed for volume scattering for symmetry (not sure why it wasn't working)
     psi_vol = abs(psi-FT(360.0)*round(psi/FT(360.0)))
     # Geometric quantities (ougoing direction first!)
@@ -106,7 +106,7 @@ function compute_canopy_geometry!(
     Cs  = cos_ttli.*cts             # [nli]     pag 305 modified by Joris
     Ss  = sin_ttli.*sin_tts         # [nli]     pag 305 modified by Joris
     cds = Cs*ones(FT,1,length(lazitab)) .+ Ss*cos_ttlo'   # [nli,nlazi]
-    cdo = (cos_ttli.*cto)*ones(FT,1,length(lazitab)) .+ 
+    cdo = (cos_ttli.*cto)*ones(FT,1,length(lazitab)) .+
           (sin_ttli.*sin_tto)*cos_philo'                  # [nli,nlazi]
 
     # This is basically equivalent to Kb in Bonan, eq. 14.21
@@ -292,16 +292,16 @@ end
 # Postprocessing, computing all within canopy fluxes from the primary RT output
 """
     derive_canopy_fluxes!(can::Canopy4RT{FT},
-                               cO::AbstractCanopyOpti, 
-                               cR::CanopyRadiation, 
-                               sun::AbstractIncomingRadiation, 
-                               so::SoilOpti{FT}, 
-                               leaf_array::Array, 
+                               cO::AbstractCanopyOpti,
+                               cR::CanopyRadiation,
+                               sun::AbstractIncomingRadiation,
+                               so::SoilOpti{FT},
+                               leaf_array::Array,
                                wl_set::AbstractWLParaSet) where {FT}
 
 Computes a variety of integrated fluxes from the spectrally resolved computations in the short-wave Canopy RT (e.g. absorbed soil radiation, absorbed direct and diffuse PAR by layer (and angles for direct), net direct and diffuse energy balance per layer)
 - `can` A [`Canopy4RT`](@ref) struct
-- `cO` A [`CanopyOptiArray`](@ref) struct 
+- `cO` A [`CanopyOptiArray`](@ref) struct
 - `cR` A [`CanopyRadiation`](@ref) struct
 - `sun` An [`IncomingRadiationArray`](@ref) struct
 - `sO` A [`SoilOpti`](@ref) type struct for soil optical properties
@@ -309,11 +309,11 @@ Computes a variety of integrated fluxes from the spectrally resolved computation
 - `wl_set` An [`WLParaSetArray`](@ref) type struct
 """
 function derive_canopy_fluxes!(can::Canopy4RT{FT},
-                               cO::AbstractCanopyOpti, 
-                               cR::CanopyRadiation, 
-                               sun::AbstractIncomingRadiation, 
-                               so::SoilOpti{FT}, 
-                               leaf_array::Array, 
+                               cO::AbstractCanopyOpti,
+                               cR::CanopyRadiation,
+                               sun::AbstractIncomingRadiation,
+                               so::SoilOpti{FT},
+                               leaf_array::Array,
                                wl_set::AbstractWLParaSet) where {FT}
     @unpack dwl, iPAR, wl = wl_set
 
@@ -371,29 +371,29 @@ end
 
 
 """
-    compute_diffusive_S(τ_dd::Array, 
+    compute_diffusive_S(τ_dd::Array,
                         ρ_dd::Array,
-                        S⁻::Array, 
-                        S⁺::Array, 
-                        boundary_top::Array, 
-                        boundary_bottom::Array, 
+                        S⁻::Array,
+                        S⁺::Array,
+                        boundary_top::Array,
+                        boundary_bottom::Array,
                         rsoil::Array)
 
 Computes 2-stream diffusive radiation transport (used for thermal and SIF) given:
-- `τ_dd` A 2D Array with layer reflectances 
-- `ρ_dd` A 2D Array with layer transmissions 
-- `S⁻`   A 2D Array with layer source terms in the downwelling direction 
-- `S⁺`   A 2D Array with layer source terms in the upwelling direction  
-- `boundary_top`    A 1D array with downwelling radiation at the top (top of canopy) 
-- `boundary_bottom` A 1D array with upwnwelling radiation at the bottom (soil) 
+- `τ_dd` A 2D Array with layer reflectances
+- `ρ_dd` A 2D Array with layer transmissions
+- `S⁻`   A 2D Array with layer source terms in the downwelling direction
+- `S⁺`   A 2D Array with layer source terms in the upwelling direction
+- `boundary_top`    A 1D array with downwelling radiation at the top (top of canopy)
+- `boundary_bottom` A 1D array with upwnwelling radiation at the bottom (soil)
 - `rsoil` A 1D array with soil reflectance
 """
-function compute_diffusive_S(τ_dd::Array, 
+function compute_diffusive_S(τ_dd::Array,
                              ρ_dd::Array,
-                             S⁻::Array, 
-                             S⁺::Array, 
-                             boundary_top::Array, 
-                             boundary_bottom::Array, 
+                             S⁻::Array,
+                             S⁺::Array,
+                             boundary_top::Array,
+                             boundary_bottom::Array,
                              rsoil::Array)
     FT     = eltype(τ_dd)
     #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
@@ -437,13 +437,13 @@ end
 """
     compute_thermal_fluxes!(leaf_array::Array,
                                  cO::AbstractCanopyOpti,
-                                 cR::CanopyRadiation, 
+                                 cR::CanopyRadiation,
                                  can::Canopy4RT{FT},
-                                 so::SoilOpti{FT}, 
-                                 incLW::Array, 
+                                 so::SoilOpti{FT},
+                                 incLW::Array,
                                  wl_set::AbstractWLParaSet) where {FT}
 
-Computes 2-stream diffusive radiation transport for thermal radiation (calls `compute_diffusive_S` internally). 
+Computes 2-stream diffusive radiation transport for thermal radiation (calls `compute_diffusive_S` internally).
 Layer reflectance and transmission is computed from LW optical properties, layer sources from temperature and Planck law, boundary conditions from the atmosphere and soil emissivity and temperature.
 Currently only uses Stefan Boltzmann law to compute spectrally integrated LW but can be easily adjusted to be spectrally resolved.
 - `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
@@ -456,17 +456,17 @@ Currently only uses Stefan Boltzmann law to compute spectrally integrated LW but
 """
 function compute_thermal_fluxes!(leaf_array::Array,
                                  cO::AbstractCanopyOpti,
-                                 cR::CanopyRadiation, 
+                                 cR::CanopyRadiation,
                                  can::Canopy4RT{FT},
-                                 so::SoilOpti{FT}, 
-                                 incLW::Array, 
+                                 so::SoilOpti{FT},
+                                 incLW::Array,
                                  wl_set::AbstractWLParaSet) where {FT}
     @unpack Ps, Po, Pso,ddf,ddb = cO
     @unpack T_sun, T_shade = cR
     @unpack Ω,nlayers,LAI,lidf = can
     @unpack albedo_LW, soil_skinT = so
     @unpack nwl = wl_set
-    
+
     # Number of layers
     nl      = nlayers
     iLAI    = Ω*LAI/nlayers;
@@ -605,10 +605,10 @@ end
                        cO::AbstractCanopyOpti,
                        cR::CanopyRadiation,
                        can::Canopy4RT{FT},
-                       so::SoilOpti{FT}, 
+                       so::SoilOpti{FT},
                        wl_set::AbstractWLParaSet) where {FT}
 
-Computes 2-stream diffusive radiation transport for SIF radiation (calls `compute_diffusive_S` internally). 
+Computes 2-stream diffusive radiation transport for SIF radiation (calls `compute_diffusive_S` internally).
 Layer reflectance and transmission is computed from SW optical properties, layer sources from absorbed light and SIF efficiencies. Boundary conditions are zero SIF incoming from atmosphere or soil.
 - `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
 - `cO` A [`CanopyOptiArray`](@ref) struct for providing optical layer properties
@@ -621,14 +621,14 @@ function computeSIF_Fluxes!(leaf::Array,
                             cO::AbstractCanopyOpti,
                             cR::CanopyRadiation,
                             can::Canopy4RT{FT},
-                            so::SoilOpti{FT}, 
+                            so::SoilOpti{FT},
                             wl_set::AbstractWLParaSet) where {FT}
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = cO
     @unpack E_down, E_up,ϕ_shade,ϕ_sun = cR
     @unpack Ω,nlayers, LAI = can
     @unpack dwl, Iwle, Iwlf = wl_set
     rsoil = so.albedo_SW[Iwlf]
-        
+
     iLAI  = Ω*LAI/nlayers;
 
     τ_dd  = 1 .-a[Iwlf,:]*iLAI;
@@ -734,7 +734,7 @@ function computeSIF_Fluxes!(leaf::Array,
         # Total weighted fluxes
         S⁻[:,i]     =   iLAI*(Qs[i]*Fsmin[:,i] + (1-Qs[i])*Fdmin[:,i]);
         S⁺[:,i]     =   iLAI*(Qs[i]*Fsplu[:,i] + (1-Qs[i])*Fdplu[:,i]);
-        
+
         Femo[:,i]   =   iLAI*(Qs[i]* piLs[:,i] + (1-Qs[i])*piLd[:,i]);
     end
     # Use Zero SIF fluxes as top and bottom boundary:
@@ -750,7 +750,7 @@ function computeSIF_Fluxes!(leaf::Array,
     #cR.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_scattered[:] = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
     cR.SIF_obs_soil[:]      = (rsoil .* F⁻[:,end] * Po[end])/FT(pi);                                                #Soil contribution
-    
+
     cR.SIF_hemi[:] = F⁺[:,1];
     cR.SIF_obs[:]  = cR.SIF_obs_sunlit[:]+cR.SIF_obs_shaded[:]+cR.SIF_obs_scattered[:] +cR.SIF_obs_soil[:];
     cR.SIF_sum[:]  = sum(S⁻+S⁺, dims=2)
@@ -759,15 +759,15 @@ function computeSIF_Fluxes!(leaf::Array,
 end;
 
 """
-    fluspect!(leaf::AbstractLeafBio, 
+    fluspect!(leaf::AbstractLeafBio,
               wl_set::AbstractWLParaSet
 
 Computes leaf optical properties (reflectance and transittance) based on pigment concentrations. Also computes Fluorescence excitation matrices.
-Mostly based on PROSPECT-D for leaf reflectance/transmission and FluSpec for fluorescence. 
+Mostly based on PROSPECT-D for leaf reflectance/transmission and FluSpec for fluorescence.
 - `leaf` A[`LeafBioArray`](@ref) type struct (includes pigment concentrations, water content, leaf structure)
 - `wl_set` An [`WLParaSetArray`](@ref) type struct, which defines fluoresence excitation and emission wavelengths
 """
-function fluspect!(leaf::AbstractLeafBio, 
+function fluspect!(leaf::AbstractLeafBio,
                    wl_set::AbstractWLParaSet)
     # ***********************************************************************
     # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
@@ -796,7 +796,7 @@ function fluspect!(leaf::AbstractLeafBio,
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
     tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
- 
+
     # ***********************************************************************
     # reflectance & transmittance of one layer
     # ***********************************************************************

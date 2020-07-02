@@ -750,13 +750,13 @@ function leaf_fluorescence!(
     leaf.φ   = min(1/maxPSII, _φ);
     # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
     x        = max(0,  1-leaf.φ/maxPSII);
-    
+
     # Max PSII rate constant
     Kp_max   = FT(4.0);
 
     x_alpha  = exp(log(x)*Kn2);
     #println(x_alpha)
-    
+
     leaf.Kn  = Kn1 * (1+Kn3)* x_alpha/(Kn3 + x_alpha);
     leaf.Kp  = max(0,leaf.φ*(Kf+Kd+leaf.Kn)/(1-leaf.φ));
 
@@ -796,7 +796,7 @@ function leaf_fluorescence!(
 
     x_alpha  = exp.( log.(x) .* Kn2 );
     #println(x_alpha)
-    
+
     leaf.Kn .= Kn1 .* (1 .+ Kn3) .* x_alpha ./ (Kn3 .+ x_alpha);
     leaf.Kp .= max.( 0, leaf.φ .* (Kf .+ Kd .+ leaf.Kn) ./ (1 .- leaf.φ) );
 

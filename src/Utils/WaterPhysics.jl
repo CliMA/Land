@@ -372,7 +372,7 @@ function relative_viscosity(
     _C::FT = VIS_C;
     _D::FT = VIS_D;
     _K::FT = K_25;
-    
+
     return exp( _B * ( 1/T - 1/_K) + _C * (T - _K) + _D * (T^2 - _K^2) )
 end
 
