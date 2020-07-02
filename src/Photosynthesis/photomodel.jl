@@ -4,8 +4,7 @@
 #
 ###############################################################################
 """
-    arrhenius_correction(td_set::ArrheniusTD{FT}    , T::FT)
-    arrhenius_correction(td_set::ArrheniusPeakTD{FT}, T::FT)
+    arrhenius_correction(td_set::AbstractTDParameterSet{FT}, T::FT)
 
 A correction factor based on arrhenius's fitting procedure, given
 - `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type struct
@@ -86,7 +85,7 @@ Make temperature correction from a given value, given
 Useful for Vcmax, Vomac, Vpmax, Jmax, and Respiration.
 """
 function photo_TD_from_val(
-            td_set::AbstractTDParameterSet,
+            td_set::AbstractTDParameterSet{FT},
             val::FT,
             T::FT
             ) where {FT<:AbstractFloat}
@@ -113,8 +112,8 @@ Update maximal electron transport rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_jmax!(
-            td_set::AbstractTDParameterSet,
-            leaf::Leaf{FT}
+            td_set::AbstractTDParameterSet{FT},
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Jmax = photo_TD_from_val(td_set, leaf.Jmax25, leaf.T);
 
@@ -133,7 +132,7 @@ Update Kc at leaf temperature, given
 """
 function leaf_kc!(
             td_set::ArrheniusTD{FT},
-            leaf::Leaf{FT}
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Kc = photo_TD_from_set(td_set, leaf.T);
 
@@ -153,7 +152,7 @@ Update Ko at leaf temperature, given
 """
 function leaf_km!(
             photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     leaf.Km = leaf.Kc * (1 + envir.p_O₂/leaf.Ko);
@@ -173,7 +172,7 @@ Update Ko at leaf temperature, given
 """
 function leaf_ko!(
             td_set::ArrheniusTD{FT},
-            leaf::Leaf{FT}
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Ko = photo_TD_from_set(td_set, leaf.T);
 
@@ -192,7 +191,7 @@ Update Kpep at leaf temperature, given
 """
 function leaf_kpep!(
             td_set::ArrheniusTD{FT},
-            leaf::Leaf{FT}
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Kpep = photo_TD_from_set(td_set, leaf.T);
 
@@ -210,8 +209,8 @@ Update leaf dark respiration rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_rd!(
-            td_set::AbstractTDParameterSet,
-            leaf::Leaf{FT}
+            td_set::AbstractTDParameterSet{FT},
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Rd = photo_TD_from_val(td_set, leaf.Rd25, leaf.T);
 
@@ -229,8 +228,8 @@ Update leaf maximal carboxylation rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_vcmax!(
-            td_set::AbstractTDParameterSet,
-            leaf::Leaf{FT}
+            td_set::AbstractTDParameterSet{FT},
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Vcmax = photo_TD_from_val(td_set, leaf.Vcmax25, leaf.T);
 
@@ -248,8 +247,8 @@ Update leaf maximal PEP carboxylation rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_vpmax!(
-            td_set::AbstractTDParameterSet,
-            leaf::Leaf{FT}
+            td_set::AbstractTDParameterSet{FT},
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Vpmax = photo_TD_from_val(td_set, leaf.Vpmax25, leaf.T);
 
@@ -268,7 +267,7 @@ Update ``Γ^{*}`` at leaf temperature, given
 """
 function leaf_Γstar!(
             td_set::ArrheniusTD{FT},
-            leaf::Leaf{FT}
+            leaf::AbstractLeaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Γ_star = photo_TD_from_set(td_set, leaf.T);
 
@@ -332,10 +331,9 @@ function leaf_ETR!(
 
     # 0 allocation for J_pot this way
     # 4 allocations with 160 bytes for J, can be faster?
-    _f           = maxPSII * PSII_frac;
-    leaf.J_pot   = leaf.APAR;
-    leaf.J_pot .*= _f;
-    leaf.J      .= colimit.([photo_set.Col], leaf.J_pot, Jmax);
+    _f          = maxPSII * PSII_frac;
+    leaf.J_pot .= leaf.APAR .* _f;
+    leaf.J     .= colimit.([photo_set.Col], leaf.J_pot, Jmax);
 
     return nothing
 end
@@ -347,10 +345,9 @@ function leaf_ETR!(
     @unpack maxPSII, PSII_frac = leaf;
 
     # 0 allocation this way, 4X faster
-    _f           = maxPSII * PSII_frac;
-    leaf.J_pot   = leaf.APAR;
-    leaf.J_pot .*= _f;
-    leaf.J       = leaf.J_pot;
+    _f          = maxPSII * PSII_frac;
+    leaf.J_pot .= leaf.APAR .* _f;
+    leaf.J     .= leaf.J_pot;
 
     return nothing
 end
@@ -833,7 +830,7 @@ end
 """
     leaf_temperature_dependence!(
             photo_set::AbstractPhotoModelParaSet,
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf,
             envir::AirLayer{FT})
 
 Update the temperature dependent photosynthesis only, given
@@ -843,7 +840,7 @@ Update the temperature dependent photosynthesis only, given
 """
 function leaf_temperature_dependence!(
             photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf,
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     leaf.g_max      = leaf.g_max25 * relative_diffusive_coefficient(leaf.T);
@@ -866,7 +863,7 @@ end
 
 function leaf_temperature_dependence!(
             photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf,
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     leaf.g_max      = leaf.g_max25 * relative_diffusive_coefficient(leaf.T);
@@ -899,7 +896,7 @@ end
 """
     leaf_photo_from_pi!(
             photo_set::AbstractPhotoModelParaSet,
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf,
             envir::AirLayer{FT})
 
 Compute leaf photosynthetic rates, given
@@ -930,6 +927,27 @@ function leaf_photo_from_pi!(
     product_limited_rate!(photo_set, leaf);
     leaf.Ag = colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An = leaf.Ag - leaf.Rd;
+
+    return nothing
+end
+
+function leaf_photo_from_pi!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
+    end
+
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate!(photo_set, leaf);
+    rubisco_limited_rate!(photo_set, leaf);
+    product_limited_rate!(photo_set, leaf);
+    leaf.Ag .= colimit.([photo_set.Col], leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An .= leaf.Ag .- leaf.Rd;
 
     return nothing
 end
@@ -999,6 +1017,52 @@ function leaf_photo_from_glc!(
     leaf.An  = leaf.Ag - leaf.Rd;
     leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
     leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
+
+    return nothing
+end
+
+function leaf_photo_from_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
+    end
+
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate_glc!(photo_set, leaf, envir);
+    rubisco_limited_rate_glc!(photo_set, leaf, envir);
+    product_limited_rate!(photo_set, leaf);
+    leaf.Ag  .= colimit.([photo_set.Col], leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An  .= leaf.Ag .- leaf.Rd;
+    leaf.p_i .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_lc;
+    leaf.p_s .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_bc;
+
+    return nothing
+end
+
+function leaf_photo_from_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
+    end
+
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate!(photo_set, leaf);
+    rubisco_limited_rate!(photo_set, leaf);
+    product_limited_rate_glc!(photo_set, leaf, envir);
+    leaf.Ag  .= colimit.([photo_set.Col], leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An  .= leaf.Ag .- leaf.Rd;
+    leaf.p_i .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_lc;
+    leaf.p_s .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_bc;
 
     return nothing
 end

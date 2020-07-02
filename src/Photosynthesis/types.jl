@@ -8,13 +8,13 @@
 ---> ArrheniusPeakTD
 =#
 """
-    type AbstractTDParameterSet
+    type AbstractTDParameterSet{FT}
 
 Hierarchy of the `AbstractTDParameterSet`:
 - [`ArrheniusTD`](@ref)
 - [`ArrheniusPeakTD`](@ref)
 """
-abstract type AbstractTDParameterSet end
+abstract type AbstractTDParameterSet{FT} end
 
 
 
@@ -30,7 +30,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet
+struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Uncorrected value at 298.15 K"
     VAL_25     ::FT
     "Ratio between ΔHa and R `[K]`"
@@ -56,7 +56,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet
+struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Ratio between ΔHa and R*K_25"
     ΔHa_to_RT25::FT
     "Ratio between ΔHd and R"
@@ -100,7 +100,7 @@ Hierarchy of the `AbstractStomatalModel`:
 - [`EmpiricalStomatalModel`](@ref)
 - [`OptimizationStomatalModel`](@ref)
 """
-abstract type AbstractStomatalModel end
+abstract type AbstractStomatalModel{FT} end
 
 
 
@@ -114,7 +114,7 @@ Hierarchy of the `EmpiricalStomatalModel`:
 - [`ESMLeuning`](@ref)
 - [`ESMMedlyn`](@ref)
 """
-abstract type EmpiricalStomatalModel <: AbstractStomatalModel end
+abstract type EmpiricalStomatalModel{FT} <: AbstractStomatalModel{FT} end
 
 
 
@@ -131,7 +131,7 @@ gs = g0 + g1 ⋅ RH ⋅ \\dfrac{A}{Cs}
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMBallBerry{FT<:AbstractFloat} <: EmpiricalStomatalModel
+Base.@kwdef mutable struct ESMBallBerry{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -156,7 +156,7 @@ Note it that the Gentine model does not require for a `β` function to tune the
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMGentine{FT<:AbstractFloat} <: EmpiricalStomatalModel
+Base.@kwdef mutable struct ESMGentine{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -178,7 +178,7 @@ gs = g0 + g1 ⋅ \\dfrac{A}{Cs - Γ^{*}} ⋅ \\dfrac{1}{1 + \\dfrac{VPD}{d0}}
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMLeuning{FT<:AbstractFloat} <: EmpiricalStomatalModel
+Base.@kwdef mutable struct ESMLeuning{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025 )
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -202,7 +202,7 @@ gs = g0 + (1 + \\dfrac{g1}{\\sqrt{VPD}} ⋅ \\dfrac{A}{Ca}
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMMedlyn{FT<:AbstractFloat} <: EmpiricalStomatalModel
+Base.@kwdef mutable struct ESMMedlyn{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[Pa⁽⁵⁾]`"
@@ -222,7 +222,7 @@ Hierarchy of the `OptimizationStomatalModel`:
 - [`OSMWAP`](@ref)
 - [`OSMWAPMod`](@ref)
 """
-abstract type OptimizationStomatalModel <: AbstractStomatalModel end
+abstract type OptimizationStomatalModel{FT} <: AbstractStomatalModel{FT} end
 
 
 
@@ -240,7 +240,7 @@ where K is ``\\dfrac{∂E}{∂P}``.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct OSMEller <: OptimizationStomatalModel end
+struct OSMEller{FT} <: OptimizationStomatalModel{FT} end
 
 
 
@@ -258,7 +258,7 @@ where K is ``\\dfrac{∂E}{∂P}``.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct OSMSperry <: OptimizationStomatalModel end
+struct OSMSperry{FT} <: OptimizationStomatalModel{FT} end
 
 
 
@@ -275,7 +275,7 @@ The equation used for Wang model is
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct OSMWang <: OptimizationStomatalModel end
+struct OSMWang{FT} <: OptimizationStomatalModel{FT} end
 
 
 
@@ -293,7 +293,7 @@ where K is ∂P/∂E.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct OSMWAP{FT<:AbstractFloat} <: OptimizationStomatalModel
+Base.@kwdef mutable struct OSMWAP{FT<:AbstractFloat} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
     a::FT = FT(0.5)
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻¹]`"
@@ -317,7 +317,7 @@ where P is absolute value of leaf xylem pressure.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct OSMWAPMod{FT<:AbstractFloat} <: OptimizationStomatalModel
+Base.@kwdef mutable struct OSMWAPMod{FT<:AbstractFloat} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[mol mol⁻¹ MPa⁻¹]`"
     a::FT = FT(0.1)
 end
@@ -343,7 +343,7 @@ end
 Hierarchy of the `AbstractFluoModelParaSet`:
 - [`FluoParaSet`](@ref)
 """
-abstract type AbstractFluoModelParaSet end
+abstract type AbstractFluoModelParaSet{FT} end
 
 
 
@@ -356,7 +356,7 @@ A `AbstractFluoModelParaSet` type paramter set.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct FluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet
+struct FluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet{FT}
     "Fluorescence model coefficient"
     Kn1::FT
     "Fluorescence model coefficient"
@@ -388,7 +388,7 @@ Hierarchy of the `AbstractPhotoModelParaSet`:
 - [`C3ParaSet`](@ref)
 - [`C4ParaSet`](@ref)
 """
-abstract type AbstractPhotoModelParaSet end
+abstract type AbstractPhotoModelParaSet{FT} end
 
 
 
@@ -401,25 +401,25 @@ Parameter sets for C3 photosynthesis.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet
+mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Jmax temperature dependency"
-    JT ::AbstractTDParameterSet
+    JT ::AbstractTDParameterSet{FT}
     "Kc temperature dependency"
-    KcT::AbstractTDParameterSet
+    KcT::AbstractTDParameterSet{FT}
     "Ko temperature dependency"
-    KoT::AbstractTDParameterSet
+    KoT::AbstractTDParameterSet{FT}
     "Respiration temperature dependency"
-    ReT::AbstractTDParameterSet
+    ReT::AbstractTDParameterSet{FT}
     "Vcmax temperature dependency"
-    VcT::AbstractTDParameterSet
+    VcT::AbstractTDParameterSet{FT}
     "Γ_star temperature dependency"
-    ΓsT::AbstractTDParameterSet
+    ΓsT::AbstractTDParameterSet{FT}
     "Colimitation mode"
-    Col::AbstractColimitation
+    Col::AbstractColimitation{FT}
     "Fluorescence model"
-    Flu::AbstractFluoModelParaSet
+    Flu::AbstractFluoModelParaSet{FT}
     "Stomatal model scheme"
-    Sto::AbstractStomatalModel
+    Sto::AbstractStomatalModel{FT}
     "Vcmax25 and respiration correlation"
     VR   ::FT
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -439,21 +439,21 @@ Parameter sets for C3 photosynthesis.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet
+mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Kpep temperature dependency"
-    KpT::AbstractTDParameterSet
+    KpT::AbstractTDParameterSet{FT}
     "Respiration temperature dependency"
-    ReT::AbstractTDParameterSet
+    ReT::AbstractTDParameterSet{FT}
     "Vcmax temperature dependency"
-    VcT::AbstractTDParameterSet
+    VcT::AbstractTDParameterSet{FT}
     "Vpmax temperature dependency"
-    VpT::AbstractTDParameterSet
+    VpT::AbstractTDParameterSet{FT}
     "Colimitation mode"
-    Col::AbstractColimitation
+    Col::AbstractColimitation{FT}
     "Fluorescence model"
-    Flu::AbstractFluoModelParaSet
+    Flu::AbstractFluoModelParaSet{FT}
     "Stomatal model scheme"
-    Sto::AbstractStomatalModel
+    Sto::AbstractStomatalModel{FT}
     "Vcmax25 and respiration correlation"
     VR::FT
 end
@@ -471,6 +471,18 @@ end
 #
 ###############################################################################
 """
+    type AbstractLeaf
+
+Hierarchy of AbstractLeaf
+- [`Leaf`](@ref)
+- [`Leaves`](@ref)
+"""
+abstract type AbstractLeaf{FT} end
+
+
+
+
+"""
     struct Leaf{FT}
 
 Struct to store leaf information.
@@ -478,7 +490,7 @@ Struct to store leaf information.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
+Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
     # Temperature related
     "Sensible Heat Flux `[W m⁻²]`"
     H    ::FT = FT(0)
@@ -640,12 +652,12 @@ end
 """
     struct Leaves{FT}
 
-Struct to store leaf information.
+Struct to store leaf information (multi-dimensional).
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct Leaves{FT<:AbstractFloat}
+Base.@kwdef mutable struct Leaves{FT<:AbstractFloat} <: AbstractLeaf{FT}
     # Number of Leaves per canopy layer
     n_leaf::Int = 325
 
@@ -808,10 +820,10 @@ Base.@kwdef mutable struct Leaves{FT<:AbstractFloat}
     # Stomtal optimization related, different for each leaf
     "Maximal photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_max::Array{FT,1} = zeros(FT, n_leaf)
+    "Flow rate `[mol m⁻² s⁻¹]`"
+    e    ::Array{FT,1} = zeros(FT, n_leaf)
 
     # Stomtal optimization related, same for all leaves
-    "Flow rate `[mol m⁻² s⁻¹]`"
-    e     ::FT = FT(0)
     "Critical flow rate `[mol m⁻² s⁻¹]`"
     ec    ::FT = FT(2e-9)
     "Maximal hydraulic conductance ratio"

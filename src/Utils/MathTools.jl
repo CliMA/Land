@@ -45,7 +45,7 @@ Hierarchy of the `AbstractColimitation`:
 - [`MinColimit`](@ref)
 - [`CurvedColimit`](@ref)
 """
-abstract type AbstractColimitation end
+abstract type AbstractColimitation{FT} end
 
 
 
@@ -55,7 +55,7 @@ abstract type AbstractColimitation end
 
 Takes the minimum of all computed photosynthetic rates.
 """
-struct MinColimit <:AbstractColimitation end
+struct MinColimit{FT} <:AbstractColimitation{FT} end
 
 
 
@@ -68,7 +68,7 @@ Takes curved limitation for computed photosynthetic rates.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef struct CurvedColimit{FT<:AbstractFloat} <:AbstractColimitation
+Base.@kwdef struct CurvedColimit{FT<:AbstractFloat} <:AbstractColimitation{FT}
     "Curveature ratio"
     curvature::FT = FT(0.995)
 end
@@ -88,8 +88,9 @@ Return the colimited photosynthetic rate, given
 Multiple options were added to save time
 """
 function colimit(
-            colim::MinColimit,
-            A...)
+            colim::MinColimit{FT},
+            A...
+            ) where {FT<:AbstractFloat}
     return min(A...)
 end
 

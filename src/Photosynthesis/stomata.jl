@@ -18,7 +18,7 @@ Steady state gsw from empirical approach given
 """
 function empirical_gsw_from_model(
             model::ESMBallBerry{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf{FT},
             envir::AirLayer{FT},
             β::FT
             ) where {FT<:AbstractFloat}
@@ -26,12 +26,12 @@ function empirical_gsw_from_model(
     @unpack An, p_s   = leaf;
     @unpack p_atm, RH = envir;
 
-    return g0 + β * g1 * RH * An / (p_s / p_atm * FT(1e6))
+    return (@. g0 + β * g1 * RH * An / (p_s / p_atm * FT(1e6)))
 end
 
 function empirical_gsw_from_model(
             model::ESMGentine{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf{FT},
             envir::AirLayer{FT},
             β::FT
             ) where {FT<:AbstractFloat}
@@ -39,12 +39,12 @@ function empirical_gsw_from_model(
     @unpack An, p_i = leaf;
     @unpack p_atm   = envir;
 
-    return g0 + β * g1 * An / (p_i / p_atm * FT(1e6))
+    return (@. g0 + β * g1 * An / (p_i / p_atm * FT(1e6)))
 end
 
 function empirical_gsw_from_model(
             model::ESMLeuning{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf{FT},
             envir::AirLayer{FT},
             β::FT
             ) where {FT<:AbstractFloat}
@@ -52,13 +52,13 @@ function empirical_gsw_from_model(
     @unpack An, p_s, p_sat, Γ_star = leaf;
     @unpack p_atm, p_H₂O           = envir;
 
-    return g0 + β * g1 * An / ((p_s - Γ_star) / p_atm * FT(1e6)) /
-                (1 + (p_sat - p_H₂O)/d0)
+    return (@. g0 + β * g1 * An / ((p_s - Γ_star) / p_atm * FT(1e6)) /
+                    (1 + (p_sat - p_H₂O)/d0))
 end
 
 function empirical_gsw_from_model(
             model::ESMMedlyn{FT},
-            leaf::Leaf{FT},
+            leaf::AbstractLeaf{FT},
             envir::AirLayer{FT},
             β::FT
             ) where {FT<:AbstractFloat}
@@ -66,7 +66,8 @@ function empirical_gsw_from_model(
     @unpack An, p_sat         = leaf;
     @unpack p_a, p_atm, p_H₂O = envir;
 
-    return g0 + β * (1 + g1/sqrt(p_sat - p_H₂O)) * An / (p_a / p_atm * FT(1e6))
+    return (@. g0 + β * (1 + g1/sqrt(p_sat - p_H₂O)) *
+                    An / (p_a / p_atm * FT(1e6)))
 end
 
 

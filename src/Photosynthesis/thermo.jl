@@ -44,3 +44,16 @@ function leaf_heat_flux!(
 
     return nothing
 end
+
+function leaf_heat_flux!(
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_bw, T = leaf;
+    @unpack t_air = envir;
+
+    leaf.H  .= 2 .* FT(CP_D) .* g_bw .* (T - t_air) .* FT(MOLMASS_DRYAIR);
+    leaf.LE .= leaf.LV .* leaf.e;
+
+    return nothing
+end

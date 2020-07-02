@@ -211,7 +211,7 @@ function C3Bernacchi(FT)
     ReT = RespirationTDBernacchi(FT);
     VcT = VcmaxTDBernacchi(FT);
     ΓsT = ΓStarTDBernacchi(FT);
-    Col = MinColimit();
+    Col = MinColimit{FT}();
     Flu = FluorescenceFlexas(FT);
     Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
@@ -228,7 +228,7 @@ function C3CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     ΓsT = ΓStarTDCLM(FT);
-    Col = MinColimit();
+    Col = MinColimit{FT}();
     Flu = FluorescenceFlexas(FT);
     Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
@@ -243,7 +243,7 @@ function C4CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     VpT = VpmaxTDBoyd(FT);
-    Col = MinColimit();
+    Col = MinColimit{FT}();
     Flu = FluorescenceFlexas(FT);
     Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
