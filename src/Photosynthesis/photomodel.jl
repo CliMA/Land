@@ -299,15 +299,13 @@ function leaf_ETR!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
-    @unpack APAR, maxPSII, Jmax, θ_j, PSII_frac = leaf
+    @unpack APAR, maxPSII, Jmax, PSII_frac = leaf;
 
-    _Jp = PSII_frac * maxPSII * APAR
-    _b  = _Jp + Jmax
-    _c  = _Jp * Jmax
-    _J  = ( _b - sqrt(_b^2 - 4*θ_j*_c) ) / (2*θ_j)
+    _Jp = PSII_frac * maxPSII * APAR;
+    _J  = colimit(photo_set.Col, _Jp, Jmax);
 
-    leaf.J_pot = _Jp
-    leaf.J     = _J
+    leaf.J_pot = _Jp;
+    leaf.J     = _J;
 
     return nothing
 end
@@ -318,10 +316,41 @@ function leaf_ETR!(
             ) where {FT<:AbstractFloat}
     @unpack APAR, maxPSII, PSII_frac = leaf
 
-    _Jp = PSII_frac * maxPSII * APAR
+    _Jp = PSII_frac * maxPSII * APAR;
 
-    leaf.J_pot = _Jp
-    leaf.J     = _Jp
+    leaf.J_pot = _Jp;
+    leaf.J     = _Jp;
+
+    return nothing
+end
+
+function leaf_ETR!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack maxPSII, Jmax, PSII_frac = leaf;
+
+    # 0 allocation for J_pot this way
+    # 4 allocations with 160 bytes for J, can be faster?
+    _f           = maxPSII * PSII_frac;
+    leaf.J_pot   = leaf.APAR;
+    leaf.J_pot .*= _f;
+    leaf.J      .= colimit.([photo_set.Col], leaf.J_pot, Jmax);
+
+    return nothing
+end
+
+function leaf_ETR!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack maxPSII, PSII_frac = leaf;
+
+    # 0 allocation this way, 4X faster
+    _f           = maxPSII * PSII_frac;
+    leaf.J_pot   = leaf.APAR;
+    leaf.J_pot .*= _f;
+    leaf.J       = leaf.J_pot;
 
     return nothing
 end
@@ -366,6 +395,26 @@ function rubisco_limited_rate!(
     return nothing
 end
 
+function rubisco_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack Km, p_i, Vcmax, Γ_star = leaf
+
+    leaf.Ac .= Vcmax .* (p_i .- Γ_star) ./ (p_i .+ Km);
+
+    return nothing
+end
+
+function rubisco_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    leaf.Ac .= leaf.Vcmax;
+
+    return nothing
+end
+
 
 
 
@@ -400,6 +449,30 @@ function light_limited_rate!(
     return nothing
 end
 
+function light_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack J, p_i, Γ_star = leaf;
+    @unpack Eff_1, Eff_2 = photo_set;
+
+    leaf.CO₂_per_electron .= (p_i .- Γ_star) ./
+                             ( Eff_1 .* p_i .+ Eff_2 .* Γ_star );
+    leaf.Aj               .= J .* leaf.CO₂_per_electron;
+
+    return nothing
+end
+
+function light_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    leaf.CO₂_per_electron .= FT(1/6);
+    leaf.Aj               .= leaf.J .* leaf.CO₂_per_electron;
+
+    return nothing
+end
+
 
 
 
@@ -425,6 +498,24 @@ function product_limited_rate!(
             leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Ap = leaf.Vpmax * leaf.p_i / (leaf.p_i + leaf.Kpep);
+
+    return nothing
+end
+
+function product_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    leaf.Ap .= leaf.Vcmax / 2;
+
+    return nothing
+end
+
+function product_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    leaf.Ap .= leaf.Vpmax .* leaf.p_i ./ (leaf.p_i .+ leaf.Kpep);
 
     return nothing
 end
@@ -476,6 +567,29 @@ function rubisco_limited_rate_glc!(
     return nothing
 end
 
+function rubisco_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, Km, Rd, Vcmax, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+
+    _a = Vcmax;
+    _b = Vcmax * Γ_star;
+    _d = Km;
+    _f = p_atm ./ g_lc .* FT(1e-6);
+    _p = p_a;
+
+    _qa = _f;
+    _qb = _f .* (Rd - _a) .- _p .- _d;
+    _qc = _a*_p - _b - Rd*(_p + _d);
+
+    leaf.Ac .= lower_quadratic.(_qa, _qb, _qc) .+ Rd;
+
+    return nothing
+end
+
 
 
 
@@ -512,6 +626,31 @@ function light_limited_rate_glc!(
     _an = lower_quadratic(_qa, _qb, _qc);
 
     leaf.Aj = _an + Rd;
+
+    return nothing
+end
+
+function light_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, J, Rd, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+    @unpack Eff_1, Eff_2 = photo_set;
+
+    _a = J;
+    _b = J .* Γ_star;
+    _c = Eff_1;
+    _d = Eff_2*Γ_star;
+    _f = p_atm ./ g_lc .* FT(1e-6);
+    _p = p_a;
+
+    _qa = _c .* _f;
+    _qb = (_c .* Rd .- _a) .* _f .- _c*_p .- _d;
+    _qc = _a .* _p .- _b .- Rd .* (_c .* _p .+ _d);
+
+    leaf.Aj .= lower_quadratic.(_qa, _qb, _qc) .+ Rd;
 
     return nothing
 end
@@ -553,66 +692,26 @@ function product_limited_rate_glc!(
     return nothing
 end
 
-
-
-
-
-
-
-
-###############################################################################
-#
-# Compute the colimited photosynthetic rate
-#
-###############################################################################
-"""
-    photosynthesis_colimit(colim::MinColimit, A...)
-    photosynthesis_colimit(colim::CurvedColimit{FT}, A...)
-
-Return the colimited photosynthetic rate, given
--`colim` [`AbstractColimitation`](@ref) type co-limitation
--`A` Tuple of photosynthetic rates
-
-Multiple options were added to save time
-"""
-function photosynthesis_colimit(
-            colim::MinColimit,
-            A...)
-    return min(A...)
-end
-
-function photosynthesis_colimit(
-            colim::CurvedColimit{FT},
-            A1::FT,
-            A2::FT
+function product_limited_rate_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
-    a = lower_quadratic(colim.curvature, -(A1 + A2), A2 * A2);
+    @unpack g_lc, Kpep, Rd, Vpmax = leaf;
+    @unpack p_a, p_atm = envir;
 
-    return isnan(a) ? min(A1,A2) : a
-end
+    _a = Vpmax;
+    _d = Kpep;
+    _f = p_atm ./ g_lc .* FT(1e-6);
+    _p = p_a;
 
-function photosynthesis_colimit(
-            colim::CurvedColimit{FT},
-            A1::FT,
-            A2::FT,
-            A3::FT
-            ) where {FT<:AbstractFloat}
-    a = lower_quadratic(colim.curvature, -(A1 + A2), A1 * A2);
-    a = lower_quadratic(colim.curvature, -(a  + A3), a  * A3);
+    _qa = _f;
+    _qb = _f .* (Rd .- _a) .- _p .- _d;
+    _qc = _a*_p - Rd*(_p + _d);
 
-    return isnan(a) ? min(A1,A2,A3) : a
-end
+    leaf.Ap .= lower_quadratic.(_qa, _qb, _qc) .+ Rd;
 
-function photosynthesis_colimit(
-            colim::CurvedColimit{FT},
-            A...
-            ) where {FT<:AbstractFloat}
-    a = A[1];
-    for j=2:length(A)
-        a = lower_quadratic(colim.curvature, -(a + A[j]), a * A[j]);
-    end
-
-    return isnan(a) ? minimum(A) : a
+    return nothing
 end
 
 
@@ -662,7 +761,7 @@ function leaf_fluorescence!(
     #println(x_alpha)
     
     leaf.Kn  = Kn1 * (1+Kn3)* x_alpha/(Kn3 + x_alpha);
-    leaf.Kp  = max(0,-leaf.φ*(Kf+Kd+leaf.Kn)/(leaf.φ-1));
+    leaf.Kp  = max(0,leaf.φ*(Kf+Kd+leaf.Kn)/(1-leaf.φ));
 
     leaf.Fo  = Kf/(Kf+Kp_max+Kd        );
     leaf.Fo′ = Kf/(Kf+Kp_max+Kd+leaf.Kn);
@@ -675,6 +774,46 @@ function leaf_fluorescence!(
     leaf.qQ  = 1-(leaf.ϕs-leaf.Fo′)/(leaf.Fm-leaf.Fo′);
     leaf.qE  = 1-(leaf.Fm-leaf.Fo′)/(leaf.Fm′-leaf.Fo);
     leaf.NPQ = leaf.Kn/(Kf+Kd);
+
+    return nothing
+end
+
+function leaf_fluorescence!(
+            fluo_set::FluoParaSet{FT},
+            leaf::Leaves{FT}
+            ) where {FT<:AbstractFloat}
+    @unpack Ag, Kd, Kf, Kpmax, maxPSII = leaf;
+    @unpack Kn1, Kn2, Kn3 = fluo_set;
+
+    # Actual effective ETR:
+    leaf.Ja  = max.(0, Ag ./ leaf.CO₂_per_electron);
+
+    # Effective photochemical yield:
+    _φ = [ leaf.Ja[i]<=0 ? maxPSII : maxPSII*leaf.Ja[i]/leaf.J_pot[i]
+           for i in eachindex(Ag) ]
+
+    # TODO are the min and max necessary here?
+    leaf.φ   = min.(1/maxPSII, _φ);
+    # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
+    x        = max.(0,  1 .- leaf.φ ./ maxPSII);
+
+    x_alpha  = exp.( log.(x) .* Kn2 );
+    #println(x_alpha)
+    
+    leaf.Kn .= Kn1 .* (1 .+ Kn3) .* x_alpha ./ (Kn3 .+ x_alpha);
+    leaf.Kp .= max.( 0, leaf.φ .* (Kf .+ Kd .+ leaf.Kn) ./ (1 .- leaf.φ) );
+
+    leaf.Fo   = Kf  / (Kf+Kpmax+Kd);
+    leaf.Fo′ .= Kf ./ (Kf .+ Kpmax .+ Kd .+ leaf.Kn);
+    leaf.Fm   = Kf  / (Kf+Kd);
+    leaf.Fm′ .= Kf ./ (Kf .+ Kd .+ leaf.Kn);
+    leaf.ϕs  .= leaf.Fm′ .* (1 .- leaf.φ);
+    # leaf.eta  = leaf.ϕs/leaf.Fo
+    # don't need this anymore
+    # better to use ϕs directly for SIF as Fo is not always fqe=0.01
+    leaf.qQ  .= 1 .- (leaf.ϕs .- leaf.Fo′) ./ (leaf.Fm  .- leaf.Fo′);
+    leaf.qE  .= 1 .- (leaf.Fm .- leaf.Fo′) ./ (leaf.Fm′ .- leaf.Fo );
+    leaf.NPQ .= leaf.Kn ./ (Kf+Kd);
 
     return nothing
 end
@@ -789,7 +928,7 @@ function leaf_photo_from_pi!(
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
     product_limited_rate!(photo_set, leaf);
-    leaf.Ag = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.Ag = colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An = leaf.Ag - leaf.Rd;
 
     return nothing
@@ -833,7 +972,7 @@ function leaf_photo_from_glc!(
     light_limited_rate_glc!(photo_set, leaf, envir);
     rubisco_limited_rate_glc!(photo_set, leaf, envir);
     product_limited_rate!(photo_set, leaf);
-    leaf.Ag  = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.Ag  = colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
     leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
     leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
@@ -856,7 +995,7 @@ function leaf_photo_from_glc!(
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
     product_limited_rate_glc!(photo_set, leaf, envir);
-    leaf.Ag  = photosynthesis_colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.Ag  = colimit(photo_set.Col, leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
     leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
     leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;

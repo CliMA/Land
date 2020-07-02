@@ -1,5 +1,6 @@
 module MathTools
 
+using DocStringExtensions
 using IncGammaBeta
 using Parameters
 
@@ -9,7 +10,14 @@ const AVOGADRO    = LandParameters.AVOGADRO
 const H_PLANCK    = LandParameters.H_PLANCK
 const LIGHT_SPEED = LandParameters.LIGHT_SPEED
 
-export dladgen,
+# export types
+export AbstractColimitation,
+       CurvedColimit,
+       MinColimit
+
+# export functions
+export colimit,
+       dladgen,
        e2phot,
        fast∫,
        lower_quadratic,
@@ -17,6 +25,126 @@ export dladgen,
        quadratic,
        volscatt,
        weibull_k_ratio
+
+
+
+
+###############################################################################
+#
+# Colimitation
+#
+###############################################################################
+#= AbstractColimitation type tree
+---> MinColimit
+---> CurvedColimit
+=#
+"""
+    type AbstractColimitation
+
+Hierarchy of the `AbstractColimitation`:
+- [`MinColimit`](@ref)
+- [`CurvedColimit`](@ref)
+"""
+abstract type AbstractColimitation end
+
+
+
+
+"""
+    struct MinColimit
+
+Takes the minimum of all computed photosynthetic rates.
+"""
+struct MinColimit <:AbstractColimitation end
+
+
+
+
+"""
+    struct CurvedColimit{FT}
+
+Takes curved limitation for computed photosynthetic rates.
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+Base.@kwdef struct CurvedColimit{FT<:AbstractFloat} <:AbstractColimitation
+    "Curveature ratio"
+    curvature::FT = FT(0.995)
+end
+
+
+
+
+"""
+    colimit(colim::MinColimit, A...)
+    colimit(curvature::FT, A1::FT, A2::FT)
+    colimit(colim::CurvedColimit{FT}, A...)
+
+Return the colimited photosynthetic rate, given
+-`colim` [`AbstractColimitation`](@ref) type co-limitation
+-`A` Tuple of photosynthetic rates
+
+Multiple options were added to save time
+"""
+function colimit(
+            colim::MinColimit,
+            A...)
+    return min(A...)
+end
+
+function colimit(
+            curvature::FT,
+            A1::FT,
+            A2::FT
+            ) where {FT<:AbstractFloat}
+    a = lower_quadratic(curvature, -(A1 + A2), A2 * A2);
+
+    return isnan(a) ? min(A1,A2) : a
+end
+
+function colimit(
+            colim::CurvedColimit{FT},
+            A1::FT,
+            A2::FT
+            ) where {FT<:AbstractFloat}
+    @unpack curvature = colim;
+
+    return colimit(curvature, A1, A2)
+end
+
+function colimit(
+            colim::CurvedColimit{FT},
+            A1::FT,
+            A2::FT,
+            A3::FT
+            ) where {FT<:AbstractFloat}
+    @unpack curvature = colim;
+
+    a = colimit(curvature, A1, A2);
+    a = colimit(curvature,  a, A3);
+
+    return isnan(a) ? min(A1,A2,A3) : a
+end
+
+function colimit(
+            colim::CurvedColimit{FT},
+            A1::FT,
+            Ax...
+            ) where {FT<:AbstractFloat}
+    @unpack curvature = colim;
+
+    a = A1;
+    for b in Ax
+        a = colimit(curvature, a, b);
+    end
+
+    return isnan(a) ? minimum(A1, Ax) : a
+end
+
+
+
+
 
 
 
