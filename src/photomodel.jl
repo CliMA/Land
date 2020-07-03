@@ -113,7 +113,7 @@ Update maximal electron transport rate at leaf temperature, given
 """
 function leaf_jmax!(
             td_set::AbstractTDParameterSet{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Jmax = photo_TD_from_val(td_set, leaf.Jmax25, leaf.T);
 
@@ -132,7 +132,7 @@ Update Kc at leaf temperature, given
 """
 function leaf_kc!(
             td_set::ArrheniusTD{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Kc = photo_TD_from_set(td_set, leaf.T);
 
@@ -152,7 +152,7 @@ Update Ko at leaf temperature, given
 """
 function leaf_km!(
             photo_set::C3ParaSet{FT},
-            leaf::AbstractLeaf{FT},
+            leaf::Leaf{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     leaf.Km = leaf.Kc * (1 + envir.p_O₂/leaf.Ko);
@@ -172,7 +172,7 @@ Update Ko at leaf temperature, given
 """
 function leaf_ko!(
             td_set::ArrheniusTD{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Ko = photo_TD_from_set(td_set, leaf.T);
 
@@ -191,7 +191,7 @@ Update Kpep at leaf temperature, given
 """
 function leaf_kpep!(
             td_set::ArrheniusTD{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Kpep = photo_TD_from_set(td_set, leaf.T);
 
@@ -210,7 +210,7 @@ Update leaf dark respiration rate at leaf temperature, given
 """
 function leaf_rd!(
             td_set::AbstractTDParameterSet{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Rd = photo_TD_from_val(td_set, leaf.Rd25, leaf.T);
 
@@ -229,7 +229,7 @@ Update leaf maximal carboxylation rate at leaf temperature, given
 """
 function leaf_vcmax!(
             td_set::AbstractTDParameterSet{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Vcmax = photo_TD_from_val(td_set, leaf.Vcmax25, leaf.T);
 
@@ -248,7 +248,7 @@ Update leaf maximal PEP carboxylation rate at leaf temperature, given
 """
 function leaf_vpmax!(
             td_set::AbstractTDParameterSet{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Vpmax = photo_TD_from_val(td_set, leaf.Vpmax25, leaf.T);
 
@@ -267,7 +267,7 @@ Update ``Γ^{*}`` at leaf temperature, given
 """
 function leaf_Γstar!(
             td_set::ArrheniusTD{FT},
-            leaf::AbstractLeaf{FT}
+            leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.Γ_star = photo_TD_from_set(td_set, leaf.T);
 
@@ -756,8 +756,6 @@ function leaf_photo_from_glc!(
     product_limited_rate!(photo_set, leaf);
     leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
-    leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
-    leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
 
     return nothing
 end
@@ -779,8 +777,6 @@ function leaf_photo_from_glc!(
     product_limited_rate_glc!(photo_set, leaf, envir);
     leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
-    leaf.p_i = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_lc;
-    leaf.p_s = envir.p_a - leaf.An*FT(1e-6) * envir.p_atm / leaf.g_bc;
 
     return nothing
 end
