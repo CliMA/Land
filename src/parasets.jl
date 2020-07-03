@@ -212,11 +212,10 @@ function C3Bernacchi(FT)
     VcT = VcmaxTDBernacchi(FT);
     ΓsT = ΓStarTDBernacchi(FT);
     Flu = FluorescenceFlexas(FT);
-    Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
-    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, Sto, VR, E1, E2)
+    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2)
 end
 
 """ [`C3ParaSet`](@ref) type C3 photosynthesis using CLM5's data """
@@ -228,11 +227,10 @@ function C3CLM(FT)
     VcT = VcmaxTDCLM(FT);
     ΓsT = ΓStarTDCLM(FT);
     Flu = FluorescenceFlexas(FT);
-    Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
-    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, Sto, VR, E1, E2)
+    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2)
 end
 
 """ [`C4ParaSet`](@ref) type C4 photosynthesis using CLM5's data """
@@ -242,7 +240,6 @@ function C4CLM(FT)
     VcT = VcmaxTDCLM(FT);
     VpT = VpmaxTDBoyd(FT);
     Flu = FluorescenceFlexas(FT);
-    Sto = ESMBallBerry{FT}();
     VR  = VtoRDefault(FT);
-    return C4ParaSet{FT}(KpT, ReT, VcT, VpT, Flu, Sto, VR)
+    return C4ParaSet{FT}(KpT, ReT, VcT, VpT, Flu, VR)
 end

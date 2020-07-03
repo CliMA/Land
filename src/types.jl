@@ -238,7 +238,9 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
 
     # CO₂ pressures
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_i  ::FT = FT(10)
+    p_i ::FT = FT(10)
+    "Leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
+    g_lc::FT = FT(0.01)
 
     # Photosynthesis related
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
