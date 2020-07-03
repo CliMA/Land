@@ -642,6 +642,7 @@ function leaf_temperature_dependence!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
+    leaf.p_sat = saturation_vapor_pressure(leaf.T);
     leaf_rd!(photo_set.ReT, leaf);
     leaf_vcmax!(photo_set.VcT, leaf);
     leaf_jmax!(photo_set.JT , leaf);
@@ -658,6 +659,7 @@ function leaf_temperature_dependence!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
+    leaf.p_sat = saturation_vapor_pressure(leaf.T);
     leaf_rd!(photo_set.ReT, leaf);
     leaf_vcmax!(photo_set.VcT, leaf);
     leaf_vpmax!(photo_set.VpT, leaf);
@@ -756,6 +758,8 @@ function leaf_photo_from_glc!(
     product_limited_rate!(photo_set, leaf);
     leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
+    leaf.p_i = envir.p_a - leaf.An / leaf.g_lc * envir.p_atm * FT(1e-6);
+    leaf.p_s = envir.p_a - leaf.An / leaf.g_bc * envir.p_atm * FT(1e-6);
 
     return nothing
 end
@@ -777,6 +781,8 @@ function leaf_photo_from_glc!(
     product_limited_rate_glc!(photo_set, leaf, envir);
     leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
     leaf.An  = leaf.Ag - leaf.Rd;
+    leaf.p_i = envir.p_a - leaf.An / leaf.g_lc * envir.p_atm * FT(1e-6);
+    leaf.p_s = envir.p_a - leaf.An / leaf.g_bc * envir.p_atm * FT(1e-6);
 
     return nothing
 end

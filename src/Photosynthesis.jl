@@ -3,6 +3,7 @@ module Photosynthesis
 using CLIMAParameters
 using DocStringExtensions
 using Parameters
+using WaterPhysics
 
 # define constants here
 const GAS_R = gas_constant()

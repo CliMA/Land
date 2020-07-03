@@ -238,9 +238,15 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
 
     # CO₂ pressures
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_i ::FT = FT(10)
+    p_i  ::FT = FT(10)
+    "Leaf surface CO₂ partial pressure `[Pa]`"
+    p_s  ::FT = FT(40)
+    "Saturation H₂O vapor pressure `[Pa]`"
+    p_sat::FT = saturation_vapor_pressure(T)
     "Leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_lc::FT = FT(0.01)
+    g_bc ::FT = FT(3/1.35)
+    "Leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
+    g_lc ::FT = FT(0.01)
 
     # Photosynthesis related
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -348,7 +354,7 @@ Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
     "Atmospheric O₂ partial pressure `[Pa]`"
     p_O₂ ::FT = FT(101325.0 * 0.209)
     "Saturation vapor pressure `[Pa]`"
-    p_sat::FT = FT(3166.0)
+    p_sat::FT = saturation_vapor_pressure(t_air)
     "Relatiev humidity"
     RH   ::FT = p_H₂O / p_sat
 end
