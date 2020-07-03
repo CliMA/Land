@@ -33,7 +33,8 @@ const ρg_MPa  = ρ_H₂O * GRAVITY * 1e-6
 
 
 # export public types
-export LeafHydraulics,
+export AbstractHydraulicSystem,
+       LeafHydraulics,
        RootHydraulics,
        StemHydraulics,
        Tree

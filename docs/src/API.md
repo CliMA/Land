@@ -5,6 +5,7 @@ CurrentModule = PlantHydraulics
 
 ## Structs
 ```@docs
+AbstractHydraulicSystem
 LeafHydraulics
 RootHydraulics
 StemHydraulics

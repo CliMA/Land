@@ -19,7 +19,7 @@ version = "0.1.6"
 deps = ["BenchmarkTools", "DocStringExtensions", "Test"]
 git-tree-sha1 = "1f8b79fbd22b3bd1310526ab92f4ebca90d686b7"
 repo-rev = "master"
-repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl"
+repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl.git"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
 version = "0.0.1"
 

@@ -2,8 +2,8 @@ using Documenter
 using PlantHydraulics
 
 pages = Any[
-    "Home"           => "index.md",
-    "Tips"           => "pages/Tips.md"
+    "Home" => "index.md",
+    "API"  => "API.md"
     ]
 
 
