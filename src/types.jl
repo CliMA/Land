@@ -218,9 +218,7 @@ $(DocStringExtensions.FIELDS)
 Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     # Temperature related
     "Temperature `[K]`"
-    T    ::FT = FT(298.15)
-    "Temperature history `[K]`"
-    T_old::FT = FT(0)
+    T::FT = FT(298.15)
 
     # Photosynthesis system
     "Rate constant for thermal dissipation"
