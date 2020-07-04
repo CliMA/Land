@@ -49,10 +49,13 @@ export arrhenius_correction,
 
 
 
-include("types.jl"     )
-include("parasets.jl"  )
-include("math.jl"      )
-include("photomodel.jl")
+include("types.jl"       )
+include("parasets.jl"    )
+include("math.jl"        )
+include("temperature.jl" )
+include("photorates.jl"  )
+include("photomodel.jl"  )
+include("fluorescence.jl")
 
 
 
