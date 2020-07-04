@@ -280,13 +280,13 @@ end
 #
 ###############################################################################
 """
-    leaf_pot_ETR_APAR(leaf::Leaf{FT}, PARs::Array{FT,1})
+    leaf_ETR_pot_APAR(leaf::Leaf{FT}, PARs::Array{FT,1})
 
 Update the electron transport variables in the leaf struct, given
 - `leaf` [`Leaf`](@ref) type struct
 - `PARs` Given Array of PAR
 """
-function leaf_pot_ETR_APAR(
+function leaf_ETR_pot_APAR(
             leaf::Leaf{FT},
             PARs::Array{FT,1}
             ) where {FT<:AbstractFloat}
@@ -301,8 +301,42 @@ end
 
 
 """
+    leaf_ETR_Jps(
+            photo_set::AbstractPhotoModelParaSet{FT},
+            leaf::Leaf{FT},
+            Jps::Array{FT,1})
+
+Update the electron transport variables in the leaf struct, given
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `leaf` [`Leaf`](@ref) type struct
+- `Jps` Given Array of potential ETR
+"""
+function leaf_ETR_Jps(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaf{FT},
+            Jps::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    @unpack Jmax = leaf;
+
+    _J = min.(Jmax, Jps)
+
+    return _J
+end
+
+function leaf_ETR_Jps(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaf{FT},
+            Jps::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    return Jps
+end
+
+
+
+
+"""
     rubisco_limited_an_glc(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             glcs::Array{FT,1})
@@ -329,9 +363,20 @@ function rubisco_limited_an_glc(
     _p = p_a;
 
     _qa = _f;
-    _qb = (Rd - _a) * _f .- _p .- _d;
+    _qb = (Rd - _a) * _f .- (_p + _d);
     _qc = _a*_p - _b - Rd*(_p + _d);
     _an = lower_quadratic.(_qa, _qb, _qc);
+
+    return _an
+end
+
+function rubisco_limited_an_glc(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            glcs::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    _an = leaf.Vcmax
 
     return _an
 end
@@ -341,7 +386,7 @@ end
 
 """
     light_limited_an_glc(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             glcs::Array{FT,1})
@@ -371,11 +416,21 @@ function light_limited_an_glc(
     _p = p_a;
 
     _qa = _c * _f;
-    _qb = (_c*Rd .- _a) * _f .- _c*_p .- _d;
+    _qb = (_c*Rd .- _a) .* _f .- (_c*_p + _d);
     _qc = _a*_p .- _b .- Rd*(_c*_p + _d);
     _an = lower_quadratic.(_qa, _qb, _qc);
 
     return _an
+end
+
+function light_limited_an_glc(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            glcs::Array{FT,1},
+            Js::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    return Js ./ 6
 end
 
 
@@ -383,7 +438,7 @@ end
 
 """
     product_limited_an_glc(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             glcs::Array{FT,1})
@@ -394,6 +449,17 @@ Calculate the Product limited photosynthetic rate from glc, given
 - `envir` [`AirLayer`](@ref) type struct
 - `glcs` Given array of `g_lc`
 """
+function product_limited_an_glc(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            glcs::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    _an = leaf.Vcmax / 2;
+
+    return _an
+end
+
 function product_limited_an_glc(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT},
@@ -409,9 +475,9 @@ function product_limited_an_glc(
     _p = p_a;
 
     _qa = _f;
-    _qb = (Rd-_a)*_f - _p - _d;
+    _qb = (Rd-_a)*_f .- (_p + _d);
     _qc = _a*_p - Rd*(_p + _d);
-    _an = lower_quadratic(_qa, _qb, _qc);
+    _an = lower_quadratic.(_qa, _qb, _qc);
 
     return _an
 end

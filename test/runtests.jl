@@ -79,7 +79,7 @@ end
         leaf   = PM.Leaf{FT}();
         mod_b  = PM.C3Bernacchi(FT);
         mod_3  = PM.C3CLM(FT);
-        mod_4  = PM.C3CLM(FT);
+        mod_4  = PM.C4CLM(FT);
         rand_T = rand(FT) + 298;
 
         leaf_b = deepcopy(leaf);
@@ -130,5 +130,22 @@ end
         recursive_NaN_test(leaf_b);
         recursive_NaN_test(leaf_3);
         recursive_NaN_test(leaf_4);
+
+        # test photosynthesis model for 1D Array of glc
+        glcs = rand(FT, 100) ./ 20 .+ FT(0.1);
+        pars = rand(FT, 100) .+ 1000;
+        Jps  = PM.leaf_ETR_pot_APAR(leaf, pars);
+        Js3  = PM.leaf_ETR_Jps(mod_3, leaf, Jps);
+        Js4  = PM.leaf_ETR_Jps(mod_4, leaf, Jps);
+        Acs3 = PM.rubisco_limited_an_glc(mod_3, leaf, envir, glcs);
+        Ajs3 = PM.light_limited_an_glc(mod_3, leaf, envir, glcs, Js3);
+        Aps3 = PM.product_limited_an_glc(mod_3, leaf, envir, glcs);
+        Acs4 = PM.rubisco_limited_an_glc(mod_4, leaf, envir, glcs);
+        Ajs4 = PM.light_limited_an_glc(mod_4, leaf, envir, glcs, Js4);
+        Aps4 = PM.product_limited_an_glc(mod_4, leaf, envir, glcs);
+        for result in [ Jps, Js3, Js4, Acs3, Ajs3, Aps3, Acs4, Ajs4, Aps4]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
     end
 end

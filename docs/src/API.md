@@ -98,9 +98,18 @@ Photosynthesis.product_limited_rate_glc!
 Photosynthesis.leaf_fluorescence!
 ```
 
-### Photosynthetic rates
+### Photosynthetic rates (collection)
 ```@docs
 Photosynthesis.leaf_temperature_dependence!
 Photosynthesis.leaf_photo_from_pi!
 Photosynthesis.leaf_photo_from_glc!
+```
+
+### For StomtaModels
+```
+Photosynthesis.leaf_ETR_Jps
+Photosynthesis.leaf_pot_ETR
+Photosynthesis.light_limited_an_glc
+Photosynthesis.product_limited_an_glc
+Photosynthesis.rubisco_limited_an_glc
 ```
