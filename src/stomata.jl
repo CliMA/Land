@@ -3,6 +3,26 @@
 # Solve for stomatal conductance from environmental conditions for all leaves
 #
 ###############################################################################
+"""
+    leaf_photo_from_envir!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaves::Leaves{FT},
+            envir::AirLayer{FT},
+            sm::AbstractStomatalModel)
+    leaf_photo_from_envir!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaves::Leaves{FT},
+            envir::AirLayer{FT},
+            sm::AbstractStomatalModel,
+            ind::Int)
+
+Calculate steady state gsw and photosynthesis from empirical approach, given
+- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `leaves` [`Leaves`](@ref) type struct
+- `envir` [`AirLayer`](@ref) type struct
+- `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
+- `ind` Nth leaf in leaves
+"""
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
@@ -34,32 +54,6 @@ function leaf_photo_from_envir!(
     end
 end
 
-
-
-
-
-
-
-
-###############################################################################
-#
-# Solve for stomatal conductance from environmental conditions for each leaf
-#
-###############################################################################
-"""
-    leaf_photo_from_envir!(
-            photo_set::AbstractPhotoModelParaSet,
-            leaves::Leaves{FT},
-            envir::AirLayer{FT},
-            sm::AbstractStomatalModel)
-
-Calculate steady state gsw and photosynthesis from empirical approach, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
-- `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
-- `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
-- `ind` Nth leaf in leaves
-"""
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
