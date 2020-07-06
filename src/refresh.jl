@@ -11,9 +11,9 @@
 
 Update leaf physiological parameters if temperature or pressure changes in the
 daytime, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 """
 function update_leaf_TP!(
             photo_set::AbstractPhotoModelParaSet{FT},
@@ -57,9 +57,9 @@ end
             envir::AirLayer{FT})
 
 Update leaf maximal A and K for Sperry model, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 """
 function update_leaf_AK!(
             photo_set::AbstractPhotoModelParaSet{FT},
@@ -113,9 +113,9 @@ end
             glc::FT)
 
 Update Nth leaf photosynthesis, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 - `ind` Nth leaf
 - `glc` Given leaf diffusive conductance
 """
@@ -164,9 +164,9 @@ end
             glc::FT)
 
 Update Nth leaf photosynthesis, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 - `ind` Nth leaf
 - `gsw` Given stomatal conductance to H₂O
 """
@@ -221,9 +221,9 @@ end
             ind::Int)
 
 make sure g_sw is in its physiological range limited by diffusion, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 """
 function leaf_gsw_control!(
             photo_set::AbstractPhotoModelParaSet,

@@ -23,9 +23,9 @@
 
 Steady state gsw from empirical approach given
 - `model` [`EmpiricalStomatalModel`](@ref) type empirical model parameter set
-- `leaf` [`Leaf`](@ref) type struct
+- `leaf` [`Leaf`] type struct
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 - `β` Correction factor over the g1 part of an empirical model
 - `ind` Nth leaf in Leaves
 """

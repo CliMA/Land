@@ -17,9 +17,9 @@
             ind::Int)
 
 Calculate steady state gsw and photosynthesis from empirical approach, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
+- `envir` [`AirLayer`] type struct
 - `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
 - `ind` Nth leaf in leaves
 """
