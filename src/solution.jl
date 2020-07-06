@@ -14,13 +14,12 @@
 
 Calculate the difference to be minimized for a given
 - `x` Assumed leaf diffusive conductance
-- `photo_set`[`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type parameter set
+- `photo_set`[`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves`[`Leaves`](@ref) type struct
-- `envir`[`AirLayer`](@ref) type struct
+- `envir`[`AirLayer`] type struct
 - `sm` Stomatal model option (photo_set.Sto)
 - `int` Nth leaf in Leaves
 """
-
 function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,

@@ -141,9 +141,7 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[StomataModels]]
 deps = ["CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
-git-tree-sha1 = "b73dd61e90fd5c36edcd1ca6241f3d0d9fc15b8f"
-repo-rev = "wyujie"
-repo-url = "../../StomataModels.jl"
+path = ".."
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 version = "0.0.1"
 
