@@ -96,9 +96,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Test"]
-git-tree-sha1 = "1414f7c2b3a4f7f7d937e00fee23ae4fe897eccf"
-repo-rev = "master"
-repo-url = "../../PlantHydraulics.jl/"
+path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 version = "0.0.1"
 

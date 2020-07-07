@@ -80,25 +80,30 @@ end
         root  = PH.RootHydraulics{FT}();
         stem  = PH.StemHydraulics{FT}();
         roots = [deepcopy(root) for i in 1:5];
+        grass = PH.create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = PH.create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = PH.create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        _vc1 = PH.WeibullSingle{FT}();
+        _vc2 = PH.WeibullDual{FT}();
 
         # Test the struct
-        for data_set in [ leaf,
-                          root,
-                          stem ]
+        for data_set in [ leaf, root, stem, roots, grass, palm, tree, _vc1, _vc2 ]
             recursive_FT_test(data_set, FT)
             recursive_NaN_test(data_set)
         end
 
-        # test weibull_k_ratio function
-        _b  = FT(2)
-        _c  = FT(5)
-        _p1 = FT(-2.1)
-        _p2 = FT( 0.1)
-        _v  = FT(0.9)
-        for result in [ PH.weibull_k_ratio(_b, _c, _p1),
-                        PH.weibull_k_ratio(_b, _c, _p2),
-                        PH.weibull_k_ratio(_b, _c, _p1, _v),
-                        PH.weibull_k_ratio(_b, _c, _p2, _v) ]
+        # test xylem_k_ratio function
+        _p1  = FT(-2.1)
+        _p2  = FT( 0.1)
+        _v   = FT(0.9)
+        for result in [ PH.xylem_k_ratio(_vc1, _p1),
+                        PH.xylem_k_ratio(_vc1, _p2),
+                        PH.xylem_k_ratio(_vc1, _p1, _v),
+                        PH.xylem_k_ratio(_vc1, _p2, _v),
+                        PH.xylem_k_ratio(_vc2, _p1),
+                        PH.xylem_k_ratio(_vc2, _p2),
+                        PH.xylem_k_ratio(_vc2, _p1, _v),
+                        PH.xylem_k_ratio(_vc2, _p2, _v) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
@@ -147,6 +152,25 @@ end
 
         # test the leaf_xylem_risk function
         for result in [ PH.leaf_e_crit(leaf) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+
+        # test the tree_p_from_flow function
+        for result in [ PH.tree_p_from_flow(grass, _f_1),
+                        PH.tree_p_from_flow(grass, _f_2),
+                        PH.tree_p_from_flow(palm, _f_1),
+                        PH.tree_p_from_flow(palm, _f_2),
+                        PH.tree_p_from_flow(tree, _f_1),
+                        PH.tree_p_from_flow(tree, _f_2) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+
+        # test the tree_e_crit function
+        for result in [ PH.tree_e_crit(grass),
+                        PH.tree_e_crit(palm),
+                        PH.tree_e_crit(tree) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end

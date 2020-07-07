@@ -30,29 +30,41 @@ const ρg_MPa  = ρ_H₂O * GRAVITY * 1e-6
 export AbstractHydraulicSystem,
        LeafHydraulics,
        RootHydraulics,
-       Palm,
        StemHydraulics,
-       Tree
+       AbstractPlantHS,
+       GrassLikeHS,
+       PalmLikeHS,
+       TreeLikeHS,
+       AbstractVulnerability,
+       WeibullDual,
+       WeibullSingle
 
 # export public functions
-export create_palm,
-       create_tree,
+export create_grass_like_hs,
+       create_palm_like_hs,
+       create_tree_like_hs,
        hydraulic_p_profile!,
        leaf_e_crit,
        leaf_xylem_risk,
+       q_diff,
        root_qs_p_from_q,
        tree_e_crit,
        tree_p_from_flow,
-       weibull_k_ratio,
+       xylem_k_ratio,
        xylem_p_from_flow
 
 
 
 
-include("types.jl"  )
-include("testing.jl")
-include("weibull.jl")
-include("flow.jl"   )
+include("types/vulnerability.jl"   )
+include("types/hydraulics_organ.jl")
+include("types/hydraulics_plant.jl")
+include("types/initialize_plant.jl")
+include("vulnerability/weibull.jl" )
+include("hydraulics/base.jl"       )
+include("hydraulics/leaf.jl"       )
+include("hydraulics/plant.jl"      )
+include("hydraulics/root.jl"       )
 
 
 
