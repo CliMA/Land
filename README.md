@@ -2,7 +2,6 @@
 
 Plant hydraulics using numerical method.
 
-|||
 |---------------------:|:----------------------------------------------|
 | **Documentation**    | [![dev][docs-dev-img]][docs-dev-url]          |
 

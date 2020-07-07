@@ -20,12 +20,6 @@ const ρg_MPa  = ρ_H₂O * GRAVITY * 1e-6
 
 
 
-# TODO add extra-xylary VC
-# TODO add pressure-volume curve functions
-
-
-
-
 # export public types
 export AbstractHydraulicSystem,
        LeafHydraulics,
