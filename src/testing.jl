@@ -151,3 +151,69 @@ function create_tree(
                     _r_index,
                     _c_index)
 end
+
+
+
+
+# just create a palm-like tree
+function create_palm(
+            h_root::FT,
+            h_trunk::FT,
+            h_canopy::FT,
+            soil_bounds::Array{FT,1},
+            air_bounds::Array{FT,1}
+            ) where {FT<:AbstractFloat}
+    # determine how many layers in roots and canopy
+    _n_root  = 0;
+    _r_index = Int[]
+    for i in eachindex(soil_bounds)
+        _z = soil_bounds[i];
+        if _z > h_root
+            _n_root += 1;
+            push!(_r_index, i);
+        else
+            break
+        end
+    end
+
+    _n_canopy = 0;
+    _c_index  = Int[];
+    for i in eachindex(air_bounds)
+        _z = air_bounds[i]
+        if (_z >= h_trunk) && (_z < h_canopy)
+            _n_canopy += 1;
+            push!(_c_index, i);
+        elseif _z >= h_canopy
+            break
+        end
+    end
+
+    # create evenly distributed root system for now
+    _roots = RootHydraulics{FT}[];
+    for i in _r_index
+        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _rt = RootHydraulics{FT}(
+                    area=0.1/_n_root,
+                    k_max=2.5/_n_root,
+                    k_rhiz=1e14/_n_root,
+                    Δh=_Δh);
+        push!(_roots, _rt);
+    end
+
+    # create Trunk
+    _trunk   = StemHydraulics{FT}(
+                    k_max=5,
+                    Δh=h_trunk);
+
+    # create leaves
+    _leaves = LeafHydraulics{FT}[LeafHydraulics{FT}() for i in 1:_n_canopy];
+
+    # return plant
+    return Palm{FT}(_n_root,
+                    _n_canopy,
+                    _roots,
+                    _trunk,
+                    _leaves,
+                    _r_index,
+                    _c_index)
+end
