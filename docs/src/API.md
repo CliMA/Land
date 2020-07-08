@@ -84,7 +84,7 @@ k = k_\text{max} \cdot \exp \left( -\left( \dfrac{-P}{B} \right)^C \right)
 ```
 where $k_\text{max}$ is the maximal hydraulic conductance, and $B$ and $C$ are the Weibull parameters. This correlation is also known as vulnerability curve (VC) to drought stress. Sometimes, plants exhibit a segmented VC, for example, the fibers may transport water as well and are much more resistant to drought than vessels. Thus, a dual Weibull function is presented for [`WeibullDual`](@ref) type correlation ($P \leq 0$):
 ```math
-k = k_\text{max} \cdot \left\{ f_1 \cdot \exp \left[ -\left( \dfrac{-P}{B_1} \right)^{C_1} \right] + 
+k = k_\text{max} \cdot \left\{ f_1 \cdot \exp \left[ -\left( \dfrac{-P}{B_1} \right)^{C_1} \right] +
                          (1 - f_1) \cdot \exp \left[ -\left( \dfrac{-P}{B_2} \right)^{C_2} \right] \right\}
 ```
 
@@ -100,6 +100,11 @@ The function to call is
 xylem_k_ratio
 ```
 Note it here that `xylem_k_ratio(vc, p)` calculate the k without making temperature corrections, but the `xylem_k_ratio(vc, p_25, vis)` makes correction over the viscosity (the higher the viscosity, the lower the k). Also, `p_25` means that the pressure has been corrected to 298.15 K for surface tension (the higher the surface tension, the more resistant the xylem).
+
+Meanwhile, there is a function to call to calculate the critical pressure, beyond which leaf will decicate. The critical pressure is calculated as the pressure at which $k$ is 0.001 of $k_\text{max}$ for [`WeibullSingle`](@ref) (for [`WeibullDual`](@ref), each segment need to reach 0.001). The functions is
+```@docs
+xylem_p_crit
+```
 
 Examples:
 ```julia

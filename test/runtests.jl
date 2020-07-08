@@ -108,6 +108,13 @@ end
             recursive_NaN_test(result);
         end
 
+        # test xylem_p_crit function
+        for result in [ PH.xylem_p_crit(_vc1),
+                        PH.xylem_p_crit(_vc2) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+
         # test the xylem_p_from_flow function
         _f_1 = FT(0.001)
         _f_2 = FT(1)

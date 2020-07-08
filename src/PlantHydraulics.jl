@@ -45,6 +45,7 @@ export create_grass_like_hs,
        tree_e_crit,
        tree_p_from_flow,
        xylem_k_ratio,
+       xylem_p_crit,
        xylem_p_from_flow
 
 
@@ -54,7 +55,8 @@ include("types/vulnerability.jl"   )
 include("types/hydraulics_organ.jl")
 include("types/hydraulics_plant.jl")
 include("types/initialize_plant.jl")
-include("vulnerability/weibull.jl" )
+include("vulnerability/pcrit.jl"   )
+include("vulnerability/vc.jl"      )
 include("hydraulics/base.jl"       )
 include("hydraulics/leaf.jl"       )
 include("hydraulics/plant.jl"      )
