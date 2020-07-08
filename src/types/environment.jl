@@ -29,4 +29,10 @@ Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
     p_sat::FT = saturation_vapor_pressure(t_air)
     "Relatiev humidity"
     RH   ::FT = p_H₂O / p_sat
+    "Vapor pressure deficit `[Pa]`"
+    vpd  ::FT = p_sat - p_H₂O
+
+    # wind speed
+    "Wind speed `[m s⁻¹]`"
+    wind::FT = FT(2)
 end
