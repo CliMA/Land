@@ -73,10 +73,8 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.0.6"
 
 [[Photosynthesis]]
-deps = ["CLIMAParameters", "DocStringExtensions", "Parameters", "Test"]
-git-tree-sha1 = "44a02882969999be49fb56df504dc068b586284a"
-repo-rev = "wyujie"
-repo-url = "../../Photosynthesis.jl/"
+deps = ["CLIMAParameters", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
+path = ".."
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 version = "0.0.1"
 
@@ -120,3 +118,11 @@ version = "1.0.1"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+
+[[WaterPhysics]]
+deps = ["CLIMAParameters", "Parameters", "Test"]
+git-tree-sha1 = "f26c90a8f89d6c3c12a075bd73059567f90a9a78"
+repo-rev = "master"
+repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
+uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
+version = "0.0.1"

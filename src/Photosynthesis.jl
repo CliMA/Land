@@ -5,9 +5,15 @@ using DocStringExtensions
 using Parameters
 using WaterPhysics
 
+
+
+
 # define constants here
 const GAS_R = gas_constant()
 const K_25  = 298.15
+
+
+
 
 # export public types
 export AbstractFluoModelParaSet,
@@ -20,6 +26,29 @@ export AbstractFluoModelParaSet,
        C4ParaSet,
        FluoParaSet,
        Leaf
+
+# export parasets
+export C3Bernacchi,
+       C3CLM,
+       C4CLM,
+       JmaxTDBernacchi,
+       JmaxTDCLM,
+       JmaxTDLeuning,
+       KcTDBernacchi,
+       KcTDCLM,
+       KoTDBernacchi,
+       KoTDCLM,
+       KpepTDBoyd,
+       KpepTDCLM,
+       RespirationTDBernacchi,
+       RespirationTDCLM,
+       VcmaxTDBernacchi,
+       VcmaxTDCLM,
+       VcmaxTDLeuning,
+       VomaxTDBernacchi,
+       VpmaxTDBoyd,
+       ΓStarTDBernacchi,
+       ΓStarTDCLM
 
 # export functions
 export arrhenius_correction,
@@ -54,13 +83,25 @@ export arrhenius_correction,
 
 
 
-include("types.jl"       )
-include("parasets.jl"    )
-include("math.jl"        )
-include("temperature.jl" )
-include("photorates.jl"  )
-include("photomodel.jl"  )
-include("fluorescence.jl")
+include("math/math.jl")
+
+include("types/environment.jl" )
+include("types/fluorescence.jl")
+include("types/leaf.jl"        )
+include("types/temperature.jl" )
+include("types/photomodel.jl"  )
+include("types/parasets.jl"    )
+
+include("temperature/arrhenius.jl" )
+include("temperature/dependency.jl")
+
+include("photosynthesis/etr.jl"           )
+include("photosynthesis/lightlimited.jl"  )
+include("photosynthesis/productlimited.jl")
+include("photosynthesis/rubiscolimited.jl")
+include("photosynthesis/model.jl"         )
+
+include("fluorescence/fluorescence.jl")
 
 
 

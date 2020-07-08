@@ -4,15 +4,8 @@
 #
 ###############################################################################
 """
-    leaf_photo_from_pi!(
-            photo_set::AbstractPhotoModelParaSet,
-            leaf::AbstractLeaf,
-            envir::AirLayer{FT})
-    leaf_photo_from_pi!(
-            photo_set::AbstractPhotoModelParaSet,
-            leaf::AbstractLeaf,
-            envir::AirLayer{FT},
-            p_i::FT)
+    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Compute leaf photosynthetic rates, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
@@ -27,10 +20,10 @@ The C4 photosynthesis model is adapted from Collatz et al. (1992) "Coupled
     photosynthesis-stomatal conductance model for leaves of C4 plants."
 """
 function leaf_photo_from_pi!(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
@@ -41,12 +34,15 @@ function leaf_photo_from_pi!(
     return nothing
 end
 
+
+
+
 function leaf_photo_from_pi!(
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             p_i::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     leaf.p_i = p_i;
     leaf_photo_from_pi!(photo_set, leaf, envir);
 
@@ -66,15 +62,9 @@ end
 #
 ###############################################################################
 """
-    leaf_photo_from_glc!(
-            photo_set::AbstractPhotoModelParaSet,
-            leaf::Leaf{FT},
-            envir::AirLayer{FT})
-    leaf_photo_from_glc!(
-            photo_set::AbstractPhotoModelParaSet,
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            g_lc::FT)
+    leaf_photo_from_glc!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    leaf_photo_from_glc!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    leaf_photo_from_glc!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT},g_lc::FT) where {FT<:AbstractFloat}
 
 Update leaf photosynthetic rates from a known leaf diffusive conductance, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
@@ -86,7 +76,7 @@ function leaf_photo_from_glc!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     leaf_ETR!(photo_set, leaf);
     light_limited_rate_glc!(photo_set, leaf, envir);
     rubisco_limited_rate_glc!(photo_set, leaf, envir);
@@ -99,11 +89,14 @@ function leaf_photo_from_glc!(
     return nothing
 end
 
+
+
+
 function leaf_photo_from_glc!(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
@@ -116,12 +109,15 @@ function leaf_photo_from_glc!(
     return nothing
 end
 
+
+
+
 function leaf_photo_from_glc!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             g_lc::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     leaf.g_lc = g_lc;
     leaf_photo_from_glc!(photo_set, leaf, envir);
 
