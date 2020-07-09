@@ -1,0 +1,8 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
+Photosynthesis = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
+PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
+Plants = "2d76e174-5bec-4df2-b5ea-844408736dc2"
+StomataModels = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
+WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
