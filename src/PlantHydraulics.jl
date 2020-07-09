@@ -29,6 +29,7 @@ export AbstractHydraulicSystem,
        GrassLikeHS,
        PalmLikeHS,
        TreeLikeHS,
+       TreeSimple,
        AbstractVulnerability,
        WeibullDual,
        WeibullSingle

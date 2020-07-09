@@ -40,10 +40,11 @@ hs_stem = StemHydraulics{FT}();
 
 
 ## Whole-plant HS
-Plants differ in their structures, for example, some plants have a canopy far above the ground elevated by a trunk, some plants have a structured canopy supported by branch systems, and some plant has no trunk at all. To represent the structural differences, several types of plant hydraulics systems are pre-defined, and they are [`GrassLikeHS`](@ref), [`PalmLikeHS`](@ref), and [`TreeLikeHS`](@ref) structs subject to a [`AbstractPlantHS`](@ref) type, where `HS` stands for hydraulic system. The major difference between the `HS`s are
+Plants differ in their structures, for example, some plants have a canopy far above the ground elevated by a trunk, some plants have a structured canopy supported by branch systems, and some plant has no trunk at all. To represent the structural differences, several types of plant hydraulics systems are pre-defined, and they are [`GrassLikeHS`](@ref), [`PalmLikeHS`](@ref), [`TreeLikeHS`](@ref), and [`TreeSimple`](@ref) structs subject to a [`AbstractPlantHS`](@ref) type, where `HS` stands for hydraulic system. The major difference between the `HS`s are
 - [`GrassLikeHS`](@ref) has only mutiple root and canopy layers, no trunk or branch
 - [`PalmLikeHS`](@ref) has multiple root layers, a trunk, and multiple canopy layers, no branch system
 - [`TreeLikeHS`](@ref) has multiple root layers, a trunk, and multiple branch+canopy layers, and each branch corresponds to a canopy layer
+- [`TreeSimple`](@ref) has one root, one stem, and one leaf for testing purpose
 
 See the documentation for each struct for more details:
 ```@docs
@@ -51,6 +52,7 @@ AbstractPlantHS
 GrassLikeHS
 PalmLikeHS
 TreeLikeHS
+TreeSimple
 ```
 
 To ease the initialization of a plant hydraulics system, a few customized functions are provided for quick initialization. More importantly, modifications to each field in the struct are always allowed. The quick functions are [`create_grass_like_hs`](@ref), [`create_palm_like_hs`](@ref), and [`create_tree_like_hs`](@ref):
@@ -70,6 +72,7 @@ FT = Float32;
 grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 tree  =  create_tree_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+treet = TreeSimple{FT}();
 ```
 
 

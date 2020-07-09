@@ -83,11 +83,12 @@ end
         grass = PH.create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
         palm  = PH.create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         tree  = PH.create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        treet = PH.TreeSimple{FT}();
         _vc1 = PH.WeibullSingle{FT}();
         _vc2 = PH.WeibullDual{FT}();
 
         # Test the struct
-        for data_set in [ leaf, root, stem, roots, grass, palm, tree, _vc1, _vc2 ]
+        for data_set in [ leaf, root, stem, roots, grass, palm, tree, treet, _vc1, _vc2 ]
             recursive_FT_test(data_set, FT)
             recursive_NaN_test(data_set)
         end
@@ -169,7 +170,9 @@ end
                         PH.tree_p_from_flow(palm, _f_1),
                         PH.tree_p_from_flow(palm, _f_2),
                         PH.tree_p_from_flow(tree, _f_1),
-                        PH.tree_p_from_flow(tree, _f_2) ]
+                        PH.tree_p_from_flow(tree, _f_2),
+                        PH.tree_p_from_flow(treet, _f_1),
+                        PH.tree_p_from_flow(treet, _f_2) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
@@ -177,7 +180,8 @@ end
         # test the tree_e_crit function
         for result in [ PH.tree_e_crit(grass),
                         PH.tree_e_crit(palm),
-                        PH.tree_e_crit(tree) ]
+                        PH.tree_e_crit(tree),
+                        PH.tree_e_crit(treet) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end

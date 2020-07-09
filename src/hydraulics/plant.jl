@@ -139,6 +139,27 @@ end
 
 
 
+function tree_p_from_flow(
+            tree::TreeSimple{FT},
+            flow::FT
+) where {FT<:AbstractFloat}
+    # calculate the p_dos for roots
+    p_dos = xylem_p_from_flow(tree.root, flow);
+    tree.stem.p_ups = p_dos;
+
+    # calculate the p_dos for stem
+    p_dos = xylem_p_from_flow(tree.stem, flow);
+    tree.leaf.p_ups = p_dos;
+
+    # calculate the p_dos for leaves
+    p_dos = xylem_p_from_flow(tree.leaf, flow/tree.leaf.area);
+
+    return p_dos
+end
+
+
+
+
 
 
 
@@ -156,6 +177,27 @@ Calculate the critical flow rate for the tree per LA, given
     type hydraulics system
 - `ini` Initial guess of the critical flow rate
 """
+function tree_e_crit(
+            tree::TreeSimple{FT},
+            ini::FT = FT(0.5)
+) where {FT<:AbstractFloat}
+    # create a tree copy to avoid changing the tree
+    # tree_copy = deepcopy(tree);
+
+    # calculate maximal flow
+    _hs = tree.leaf;
+    _fh = (-_hs.p_crt) * _hs.k_sla / _hs.f_vis;
+    _fl = FT(0);
+    _fx = min((_fh+_fl)/2, ini);
+    _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
+    _rt = ResidualTolerance{FT}(1e-5);
+    @inline f(x) = tree_p_from_flow(tree, x) - _hs.p_crt;
+    _solut  = find_zero(f, _ms, _rt);
+    _ec = _solut;
+
+    return _ec
+end
+
 function tree_e_crit(
             tree::AbstractPlantHS{FT},
             ini::FT = FT(0.5)

@@ -25,7 +25,7 @@ multiple canopy layers. No trunk or branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -57,7 +57,7 @@ trunk, and multiple canopy layers. No branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -91,7 +91,7 @@ trunk, and multiple branch and canopy layers.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -113,4 +113,25 @@ Base.@kwdef mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     root_index_in_soil ::Array{Int,1}
     "Corresponding air layer per canopy layer"
     canopy_index_in_air::Array{Int,1}
+end
+
+
+
+
+"""
+    mutable struct TreeSimple{FT<:AbstractFloat}
+
+A plant hydraulic system with one root, one stem, and one leaf for testing purpose
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+Base.@kwdef mutable struct TreeSimple{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+    # Arrays of roots and leaves
+    "Root"
+    root::RootHydraulics{FT} = RootHydraulics{FT}()
+    "Stem"
+    stem::StemHydraulics{FT} = StemHydraulics{FT}()
+    "Leaf"
+    leaf::LeafHydraulics{FT} = LeafHydraulics{FT}()
 end
