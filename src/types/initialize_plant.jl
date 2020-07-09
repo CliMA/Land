@@ -48,15 +48,15 @@ function create_grass_like_hs(
     for i in _r_index
         _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
-                    area=0.1/_n_root,
-                    k_max=2.5/_n_root,
-                    k_rhiz=1e14/_n_root,
+                    area=1/_n_root,
+                    k_max=25/_n_root,
+                    k_rhiz=5e14/_n_root,
                     Δh=_Δh);
         push!(_roots, _rt);
     end
 
     # create leaves
-    _leaves = [LeafHydraulics{FT}(area=150/_n_canopy) for i in 1:_n_canopy];
+    _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
     return GrassLikeHS{FT}(_n_root,
@@ -129,20 +129,20 @@ function create_palm_like_hs(
     for i in _r_index
         _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
-                    area=0.1/_n_root,
-                    k_max=2.5/_n_root,
-                    k_rhiz=1e14/_n_root,
+                    area=1/_n_root,
+                    k_max=25/_n_root,
+                    k_rhiz=5e14/_n_root,
                     Δh=_Δh);
         push!(_roots, _rt);
     end
 
     # create Trunk
     _trunk   = StemHydraulics{FT}(
-                    k_max=5,
+                    k_max=50,
                     Δh=z_trunk);
 
     # create leaves
-    _leaves = [LeafHydraulics{FT}(area=150/_n_canopy) for i in 1:_n_canopy];
+    _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
     return PalmLikeHS{FT}(_n_root,
@@ -216,33 +216,33 @@ function create_tree_like_hs(
     for i in _r_index
         _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
-                    area=0.1/_n_root,
-                    k_max=2.5/_n_root,
-                    k_rhiz=1e14/_n_root,
+                    area=1/_n_root,
+                    k_max=25/_n_root,
+                    k_rhiz=5e14/_n_root,
                     Δh=_Δh);
         push!(_roots, _rt);
     end
 
     # create Trunk
-    _k_trunk = z_canopy / z_trunk * 5;
+    _k_trunk = z_canopy / z_trunk * 50;
     _trunk   = StemHydraulics{FT}(
                     k_max=_k_trunk,
                     Δh=z_trunk);
 
     # create Branches
-    _k_branch = z_canopy / (z_canopy - z_trunk) * 5;
+    _k_branch = z_canopy / (z_canopy - z_trunk) * 50;
     _branch   = StemHydraulics{FT}[];
     for i in _c_index
         _Δh = (air_bounds[i] + max(air_bounds[i+1], z_trunk)) / 2 - z_trunk;
         _st = StemHydraulics{FT}(
-                    area=0.1/_n_canopy,
+                    area=1/_n_canopy,
                     k_max=_k_branch/_n_canopy,
                     Δh=_Δh);
         push!(_branch, _st);
     end
 
     # create leaves
-    _leaves = [LeafHydraulics{FT}(area=150/_n_canopy) for i in 1:_n_canopy];
+    _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
     return TreeLikeHS{FT}(_n_root,
