@@ -194,15 +194,15 @@ end
             recursive_NaN_test(result);
         end
 
-        # test the tree_p_from_flow function
-        for result in [ PH.tree_p_from_flow(grass, _f_1),
-                        PH.tree_p_from_flow(grass, _f_2),
-                        PH.tree_p_from_flow(palm, _f_1),
-                        PH.tree_p_from_flow(palm, _f_2),
-                        PH.tree_p_from_flow(tree, _f_1),
-                        PH.tree_p_from_flow(tree, _f_2),
-                        PH.tree_p_from_flow(treet, _f_1),
-                        PH.tree_p_from_flow(treet, _f_2) ]
+        # test the xylem_p_from_flow function for plants
+        for result in [ PH.xylem_p_from_flow(grass, _f_1),
+                        PH.xylem_p_from_flow(grass, _f_2),
+                        PH.xylem_p_from_flow(palm, _f_1),
+                        PH.xylem_p_from_flow(palm, _f_2),
+                        PH.xylem_p_from_flow(tree, _f_1),
+                        PH.xylem_p_from_flow(tree, _f_2),
+                        PH.xylem_p_from_flow(treet, _f_1),
+                        PH.xylem_p_from_flow(treet, _f_2) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end

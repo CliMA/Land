@@ -134,4 +134,8 @@ Base.@kwdef mutable struct TreeSimple{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     stem::StemHydraulics{FT} = StemHydraulics{FT}()
     "Leaf"
     leaf::LeafHydraulics{FT} = LeafHydraulics{FT}()
+
+    # Local container for tree information
+    "Relative hydraulic conductance"
+    krs::Array{FT,1} = ones(FT,4)
 end

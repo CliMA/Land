@@ -42,8 +42,10 @@ export create_grass_like_hs,
        create_palm_like_hs,
        create_tree_like_hs,
        hydraulic_p_profile!,
+       inititialize_legacy!,
        leaf_e_crit,
        leaf_xylem_risk,
+       plant_conductances!,
        q_diff,
        root_qs_p_from_q,
        soil_k_ratio_p25,
@@ -51,7 +53,6 @@ export create_grass_like_hs,
        soil_p_25,
        soil_rwc,
        tree_e_crit,
-       tree_p_from_flow,
        xylem_k_ratio,
        xylem_p_crit,
        xylem_p_from_flow
@@ -64,14 +65,15 @@ include("types/hydraulics_organ.jl")
 include("types/hydraulics_plant.jl")
 include("types/initialize_plant.jl")
 
-include("vulnerability/pcrit.jl"   )
-include("vulnerability/soil.jl"    )
-include("vulnerability/vc.jl"      )
+include("vulnerability/pcrit.jl")
+include("vulnerability/soil.jl" )
+include("vulnerability/vc.jl"   )
 
-include("hydraulics/base.jl"       )
-include("hydraulics/leaf.jl"       )
-include("hydraulics/plant.jl"      )
-include("hydraulics/root.jl"       )
+include("hydraulics/leaf.jl"    )
+include("hydraulics/legacy.jl"  )
+include("hydraulics/plant.jl"   )
+include("hydraulics/pressure.jl")
+include("hydraulics/root.jl"    )
 
 
 
