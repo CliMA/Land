@@ -181,21 +181,20 @@ function tree_e_crit(
             tree::TreeSimple{FT},
             ini::FT = FT(0.5)
 ) where {FT<:AbstractFloat}
-    # create a tree copy to avoid changing the tree
-    # tree_copy = deepcopy(tree);
-
-    # calculate maximal flow
-    _hs = tree.leaf;
-    _fh = (-_hs.p_crt) * _hs.k_sla / _hs.f_vis;
+    # calculate maximal flow for whole tree, remember to times leaf area
+    _kr = tree.root.k_max;
+    _ks = tree.stem.k_max;
+    _kl = tree.leaf.k_sla / tree.leaf.f_vis * tree.leaf.area;
+    _kt = 1 / (1 / _kr + 1 / _ks + 1/ _kl);
+    _fh = -tree.leaf.p_crt * _kt;
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _rt = ResidualTolerance{FT}(1e-5);
-    @inline f(x) = tree_p_from_flow(tree, x) - _hs.p_crt;
+    @inline f(x) = tree_p_from_flow(tree, x) - tree.leaf.p_crt;
     _solut  = find_zero(f, _ms, _rt);
-    _ec = _solut;
 
-    return _ec
+    return _solut
 end
 
 
@@ -205,19 +204,15 @@ function tree_e_crit(
             tree::AbstractPlantHS{FT},
             ini::FT = FT(0.5)
 ) where {FT<:AbstractFloat}
-    # create a tree copy to avoid changing the tree
-    # tree_copy = deepcopy(tree);
-
     # calculate maximal flow
     _hs = tree.leaves[1];
-    _fh = (-_hs.p_crt) * _hs.k_sla / _hs.f_vis;
+    _fh = (-_hs.p_crt) * _hs.k_sla / _hs.f_vis * _hs.area;
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _rt = ResidualTolerance{FT}(1e-5);
     @inline f(x) = tree_p_from_flow(tree, x) - tree.leaves[1].p_crt;
     _solut  = find_zero(f, _ms, _rt);
-    _ec = _solut;
 
-    return _ec
+    return _solut
 end

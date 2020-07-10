@@ -57,7 +57,10 @@ function xylem_p_from_flow(
     # compute pressure drop along rhizosphere, using p_25 for Θ
     _dp = flow / k_rhiz * f_vis / 10;
     for i in 1:10
-        _f    = soil_k_ratio_p25(sh, p_25);
+        # No idea why soil_k_ratio_p25 results in unnecessary allocations
+        # _f  = soil_k_ratio_p25(sh, p_25);
+        _rwc  = soil_rwc(sh, p_25);
+        _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
     p_end = p_25 * f_st;
