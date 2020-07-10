@@ -198,6 +198,9 @@ function tree_e_crit(
     return _ec
 end
 
+
+
+
 function tree_e_crit(
             tree::AbstractPlantHS{FT},
             ini::FT = FT(0.5)

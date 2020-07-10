@@ -21,7 +21,13 @@ const ρg_MPa  = ρ_H₂O * GRAVITY * 1e-6
 
 
 # export public types
-export AbstractHydraulicSystem,
+export AbstractXylemVC,
+       WeibullDual,
+       WeibullSingle,
+       AbstractSoilVC,
+       BrooksCorey,
+       VanGenuchten,
+       AbstractHydraulicSystem,
        LeafHydraulics,
        RootHydraulics,
        StemHydraulics,
@@ -29,10 +35,7 @@ export AbstractHydraulicSystem,
        GrassLikeHS,
        PalmLikeHS,
        TreeLikeHS,
-       TreeSimple,
-       AbstractVulnerability,
-       WeibullDual,
-       WeibullSingle
+       TreeSimple
 
 # export public functions
 export create_grass_like_hs,
@@ -43,6 +46,10 @@ export create_grass_like_hs,
        leaf_xylem_risk,
        q_diff,
        root_qs_p_from_q,
+       soil_k_ratio_p25,
+       soil_k_ratio_rwc,
+       soil_p_25,
+       soil_rwc,
        tree_e_crit,
        tree_p_from_flow,
        xylem_k_ratio,
@@ -56,8 +63,11 @@ include("types/vulnerability.jl"   )
 include("types/hydraulics_organ.jl")
 include("types/hydraulics_plant.jl")
 include("types/initialize_plant.jl")
+
 include("vulnerability/pcrit.jl"   )
+include("vulnerability/soil.jl"    )
 include("vulnerability/vc.jl"      )
+
 include("hydraulics/base.jl"       )
 include("hydraulics/leaf.jl"       )
 include("hydraulics/plant.jl"      )

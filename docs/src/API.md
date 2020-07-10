@@ -78,7 +78,7 @@ treet = TreeSimple{FT}();
 
 
 
-## Hydraulic conductance
+## Xylem hydraulic conductance
 Plants transport water through xylem conduits (vessels in most angiosperms, trachieds in most gymnosperms). With the ascent of sap along the hydraulic system, water pressure in the conduits is typically negative. The negative xylem water pressure tends to pull air from surrounding tisses or the atmosphere into the xylem conduits, resulting in xylem cavitation. The air bubbles in cavitated conduits block water flow, and thus results in decline of water transport capability (measured by xylem hydraulic conductance).
 
 Typically, the correlation between xylem water pressure ($P \leq 0$) and hydraulic conductance ($k$) is expressed by a Weibull function for [`WeibullSingle`](@ref) type correlation:
@@ -93,7 +93,7 @@ k = k_\text{max} \cdot \left\{ f_1 \cdot \exp \left[ -\left( \dfrac{-P}{B_1} \ri
 
 The VC formulations are abstractized as
 ```@docs
-AbstractVulnerability
+AbstractXylemVC
 WeibullDual
 WeibullSingle
 ```
@@ -121,6 +121,25 @@ k_1 = xylem_k_ratio(vc_1, -1.0);
 k_2 = xylem_k_ratio(vc_2, -1.0);
 k_3 = xylem_k_ratio(vc_1, -1.0, 1.2);
 k_4 = xylem_k_ratio(vc_2, -1.0, 1.2);
+```
+
+
+
+
+## Rhizosphere hydraulic conductance
+As mentioned above, there is a rhizosphere component in the root hydraulic system, and thus one needs to compute the pressure dtop along the rhizosphere. The soil properties are classified to [`BrooksCorey`](@ref) and [`VanGenuchten`](@ref) types subjected to [`AbstractSoilVC`](@ref):
+```@docs
+AbstractSoilVC
+BrooksCorey
+VanGenuchten
+```
+
+Correlations among soil relative water content, relative hydraulic conductance, and soil matrix potential are
+```@docs
+soil_k_ratio_p25
+soil_k_ratio_rwc
+soil_p_25
+soil_rwc
 ```
 
 

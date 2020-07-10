@@ -4,13 +4,14 @@
 #
 ###############################################################################
 """
-    xylem_p_from_flow(hs::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(hs::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(hs::StemHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    xylem_p_from_flow(leaf::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    xylem_p_from_flow(root::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    xylem_p_from_flow(stem::StemHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
 
 Return the xylen end pressure from flow rate, given
-- `hs` [`LeafHydraulics`](@ref) or [`RootHydraulics`](@ref) or
-    [`StemHydraulics`](@ref) type struct
+- `leaf` [`LeafHydraulics`](@ref) type struct
+- `root` [`RootHydraulics`](@ref) type struct
+- `stem` [`StemHydraulics`](@ref) type struct
 - `flow` Flow rate (per leaf area)
 
 Note, gravity is accounted for in root and stem; rhizosphere conductance is
@@ -18,10 +19,10 @@ Note, gravity is accounted for in root and stem; rhizosphere conductance is
     leaf here because it calculates xylem end pressure.
 """
 function xylem_p_from_flow(
-            hs::LeafHydraulics{FT},
+            leaf::LeafHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, p_history, p_ups, vc = hs;
+    @unpack f_st, f_vis, k_element, k_history, p_history, p_ups, vc = leaf;
 
     p_end::FT = p_ups;
 
@@ -43,11 +44,11 @@ end
 
 
 function xylem_p_from_flow(
-            hs::RootHydraulics{FT},
+            root::RootHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, soil_α, soil_m, soil_n, vc = hs;
+            p_ups, sh, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -56,12 +57,7 @@ function xylem_p_from_flow(
     # compute pressure drop along rhizosphere, using p_25 for Θ
     _dp = flow / k_rhiz * f_vis / 10;
     for i in 1:10
-        if p_25<=0
-            _Θ = (1 / (1 + (soil_α*(-p_25))^soil_n)) ^ soil_m;
-            _f = max(FT(1e-20), sqrt(_Θ) * (1 - (1-_Θ^(1/soil_m)) ^ soil_m)^2);
-        else
-            _f = FT(1);
-        end
+        _f    = soil_k_ratio_p25(sh, p_25);
         p_25 -= _dp / _f;
     end
     p_end = p_25 * f_st;
@@ -84,11 +80,11 @@ end
 
 
 function xylem_p_from_flow(
-            hs::StemHydraulics{FT},
+            stem::StemHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
-            vc = hs;
+            vc = stem;
 
     p_end::FT = p_ups;
 
@@ -119,20 +115,21 @@ end
 #
 ###############################################################################
 """
-    hydraulic_p_profile!(hs::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    hydraulic_p_profile!(hs::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    hydraulic_p_profile!(hs::StemHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    hydraulic_p_profile!(leaf::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    hydraulic_p_profile!(root::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
+    hydraulic_p_profile!(stem::StemHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
 
 Update the pressure profile, given
-- `hs` [`LeafHydraulics`](@ref) or [`RootHydraulics`](@ref) or
-    [`StemHydraulics`](@ref) type struct
+- `leaf` [`LeafHydraulics`](@ref) type struct
+- `root` [`RootHydraulics`](@ref) type struct
+- `stem` [`StemHydraulics`](@ref) type struct
 - `flow` Flow rate (per leaf area)
 """
 function hydraulic_p_profile!(
-            hs::LeafHydraulics{FT},
+            leaf::LeafHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack k_element, k_history, p_history, p_ups, f_st, f_vis, vc = hs;
+    @unpack k_element, k_history, p_history, p_ups, f_st, f_vis, vc = leaf;
 
     p_end::FT = p_ups;
 
@@ -142,8 +139,8 @@ function hydraulic_p_profile!(
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
             _kr = xylem_k_ratio(vc, p_25, f_vis);
-            hs.p_history[i] = p_25;
-            hs.k_history[i] = _kr;
+            leaf.p_history[i] = p_25;
+            leaf.k_history[i] = _kr;
             k = _kr * k_element[i];
         end
 
@@ -151,12 +148,12 @@ function hydraulic_p_profile!(
         k = k_history[i] * k_element[i];
         p_end -= flow / k;
 
-        hs.p_element[i] = p_end;
+        leaf.p_element[i] = p_end;
     end
 
     # update the leaf xylem end pressure
-    hs.p_dos  = p_end;
-    hs.p_leaf = p_end - flow / hs.k_ox;
+    leaf.p_dos  = p_end;
+    leaf.p_leaf = p_end - flow / leaf.k_ox;
 
     return nothing
 end
@@ -165,11 +162,11 @@ end
 
 
 function hydraulic_p_profile!(
-            hs::RootHydraulics{FT},
+            root::RootHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, soil_α, soil_m, soil_n, vc = hs;
+            p_ups, sh, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -178,12 +175,7 @@ function hydraulic_p_profile!(
     # compute pressure drop along rhizosphere, using p_25 for Θ
     _dp = flow / k_rhiz * f_vis / 10;
     for i in 1:10
-        if p_25<=0
-            _Θ = (1 / (1 + (soil_α*(-p_25))^soil_n)) ^ soil_m;
-            _f = max(FT(1e-20), sqrt(_Θ) * (1 - (1-_Θ^(1/soil_m)) ^ soil_m)^2);
-        else
-            _f = FT(1);
-        end
+        _f    = soil_k_ratio_p25(sh, p_25);
         p_25 -= _dp / _f;
     end
     p_end = p_25 * f_st;
@@ -194,8 +186,8 @@ function hydraulic_p_profile!(
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
             _kr = xylem_k_ratio(vc, p_25, f_vis);
-            hs.p_history[i] = p_25;
-            hs.k_history[i] = _kr;
+            root.p_history[i] = p_25;
+            root.k_history[i] = _kr;
             k = _kr * k_element[i];
         end
 
@@ -203,11 +195,11 @@ function hydraulic_p_profile!(
         k = k_history[i] * k_element[i];
         p_end -= flow / k + p_gravity[i];
 
-        hs.p_element[i] = p_end;
+        root.p_element[i] = p_end;
     end
 
     # update the leaf xylem end pressure
-    hs.p_dos  = p_end;
+    root.p_dos  = p_end;
 
     return nothing
 end
@@ -216,11 +208,11 @@ end
 
 
 function hydraulic_p_profile!(
-            hs::StemHydraulics{FT},
+            stem::StemHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
-            vc = hs;
+            vc = stem;
 
     p_end::FT = p_ups;
 
@@ -230,8 +222,8 @@ function hydraulic_p_profile!(
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
             _kr = xylem_k_ratio(vc, p_25, f_vis);
-            hs.p_history[i] = p_25;
-            hs.k_history[i] = _kr;
+            stem.p_history[i] = p_25;
+            stem.k_history[i] = _kr;
             k = _kr * k_element[i];
         end
 
@@ -239,11 +231,11 @@ function hydraulic_p_profile!(
         k = k_history[i] * k_element[i];
         p_end -= flow / k + p_gravity[i];
 
-        hs.p_element[i] = p_end;
+        stem.p_element[i] = p_end;
     end
 
     # update the leaf xylem end pressure
-    hs.p_dos  = p_end;
+    stem.p_dos  = p_end;
 
     return nothing
 end

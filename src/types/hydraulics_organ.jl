@@ -38,7 +38,7 @@ Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Maximal leaf hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_sla::FT = FT(0.04)
     "Vulnerability curve"
-    vc::AbstractVulnerability{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
     "Critical xylem pressure `[MPa]`"
     p_crt::FT = -vc.b * log(FT(1000)) ^ (1/vc.c)
 
@@ -91,21 +91,15 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Maximal xylem hydraulic conductivity `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_s  ::FT = FT(250)
     "Vulnerability curve"
-    vc::AbstractVulnerability{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
     "Root z difference `[m]`"
     Δh   ::FT = FT(1.0)
 
     # soil parameters
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
     k_rhiz   ::FT     = FT(5e14)
-    "Soil type"
-    soil_type::String = "Sandy Clay Loam"
-    "α is related to the inverse of the air entry suction, α > 0"
-    soil_α   ::FT     = FT(602.0419)
-    "Measure of the pore-size distribution"
-    soil_n   ::FT     = FT(1.48)
-    "1 - 1/n"
-    soil_m   ::FT     = 1 - 1/soil_n
+    "Soil hydraulics"
+    sh::AbstractSoilVC{FT} = VanGenuchten{FT}()
 
     # flows and pressures (need to be updated with time)
     "Flow rate in the xylem `[mol s⁻¹]`"
@@ -158,7 +152,7 @@ Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Maximal xylem hydraulic conductivity `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_s  ::FT = FT(250)
     "Vulnerability curve"
-    vc::AbstractVulnerability{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
     "Stem height difference `[m]`"
     Δh   ::FT = FT(5.0)
 
