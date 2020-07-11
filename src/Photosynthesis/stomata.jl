@@ -229,6 +229,41 @@ end
 function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            sm::ESMGentine{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    # update photosynthesis from g_lc
+    leaf.g_lc[ind] = x;
+    leaf_photo_from_glc!(photo_set, leaf, envir, ind);
+
+    # unpack unchanged variables from structs
+    @unpack An, g_bc, g_bw, g_lc, g_m, hs, p_sat = leaf;
+    @unpack p_a, p_atm, p_H₂O = envir;
+
+    # calculate flow rate
+    g_sc = 1 / max( 1/x - 1/g_m[ind] - 1/g_bc[ind], FT(1.6e-3) );
+    g_sw = g_sc * FT(1.6);
+    g_lw = 1 / (1/g_sw + 1/g_bw);
+    e_lf = g_lw * (p_sat - p_H₂O) / p_atm;
+
+    # calculate the xylem end pressure
+    k_lf = leaf_xylem_risk(hs, e_lf);
+
+    # calculate g_sw from stomatal model
+    g_mod = empirical_gsw_from_model(sm, leaf, envir, k_lf);
+    g_mod = min(leaf.g_max, g_mod);
+
+    # calculate model predicted p_i
+    g_leaf = 1 / (FT(1.6)/g_mod + 1/g_bc[ind] + 1/g_m[ind]);
+
+    return g_leaf - x
+end
+
+function envir_diff!(
+            x::FT,
+            photo_set::AbstractPhotoModelParaSet,
             leaf::Leaf{FT},
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel
@@ -243,6 +278,28 @@ function envir_diff!(
 
     # calculate model predicted p_i
     g_leaf = 1 / (FT(1.6)/g_mod + 1/leaf.g_bc + 1/leaf.g_m);
+
+    return g_leaf - x
+end
+
+function envir_diff!(
+            x::FT,
+            photo_set::AbstractPhotoModelParaSet,
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            sm::EmpiricalStomatalModel,
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    # update photosynthesis from g_lc
+    leaf.g_lc[ind] = x;
+    leaf_photo_from_glc!(photo_set, leaf, envir, ind);
+
+    # calculate g_sw from stomatal model
+    g_mod = empirical_gsw_from_model(sm, leaf, envir, FT(1));
+    g_mod = min(leaf.g_max, g_mod);
+
+    # calculate model predicted p_i
+    g_leaf = 1 / (FT(1.6)/g_mod + 1/leaf.g_bc[ind] + 1/leaf.g_m[ind]);
 
     return g_leaf - x
 end

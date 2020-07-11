@@ -352,6 +352,32 @@ function leaf_ETR!(
     return nothing
 end
 
+function leaf_ETR!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack maxPSII, Jmax, PSII_frac = leaf;
+
+    leaf.J_pot[ind] = leaf.APAR[ind] * maxPSII * PSII_frac;
+    leaf.J[ind]     = colimit(photo_set.Col, leaf.J_pot[ind], Jmax);
+
+    return nothing
+end
+
+function leaf_ETR!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack maxPSII, PSII_frac = leaf;
+
+    leaf.J_pot[ind] = leaf.APAR[ind] * maxPSII * PSII_frac;
+    leaf.J[ind]     = leaf.J_pot[ind];
+
+    return nothing
+end
+
 
 
 
@@ -412,6 +438,28 @@ function rubisco_limited_rate!(
     return nothing
 end
 
+function rubisco_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack Km, p_i, Vcmax, Γ_star = leaf
+
+    leaf.Ac[ind] = Vcmax * (p_i[ind] - Γ_star) / (p_i[ind] + Km);
+
+    return nothing
+end
+
+function rubisco_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    leaf.Ac[ind] = leaf.Vcmax;
+
+    return nothing
+end
+
 
 
 
@@ -441,7 +489,7 @@ function light_limited_rate!(
             leaf::Leaf{FT}
             ) where {FT<:AbstractFloat}
     leaf.CO₂_per_electron = FT(1/6);
-    leaf.Aj               = leaf.J * leaf.CO₂_per_electron;
+    leaf.Aj               = leaf.J / 6;
 
     return nothing
 end
@@ -465,7 +513,33 @@ function light_limited_rate!(
             leaf::Leaves{FT}
             ) where {FT<:AbstractFloat}
     leaf.CO₂_per_electron .= FT(1/6);
-    leaf.Aj               .= leaf.J .* leaf.CO₂_per_electron;
+    leaf.Aj               .= leaf.J / 6;
+
+    return nothing
+end
+
+function light_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack J, p_i, Γ_star = leaf;
+    @unpack Eff_1, Eff_2 = photo_set;
+
+    leaf.CO₂_per_electron[ind] = (p_i[ind] - Γ_star) /
+                                 ( Eff_1 * p_i[ind] + Eff_2 * Γ_star );
+    leaf.Aj[ind]               = J[ind] * leaf.CO₂_per_electron[ind];
+
+    return nothing
+end
+
+function light_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    leaf.CO₂_per_electron[ind] = FT(1/6);
+    leaf.Aj[ind]               = leaf.J / 6;
 
     return nothing
 end
@@ -513,6 +587,26 @@ function product_limited_rate!(
             leaf::Leaves{FT}
             ) where {FT<:AbstractFloat}
     leaf.Ap .= leaf.Vpmax .* leaf.p_i ./ (leaf.p_i .+ leaf.Kpep);
+
+    return nothing
+end
+
+function product_limited_rate!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    leaf.Ap[ind] = leaf.Vcmax / 2;
+
+    return nothing
+end
+
+function product_limited_rate!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    leaf.Ap[ind] = leaf.Vpmax * leaf.p_i[ind] / (leaf.p_i[ind] + leaf.Kpep);
 
     return nothing
 end
@@ -587,6 +681,30 @@ function rubisco_limited_rate_glc!(
     return nothing
 end
 
+function rubisco_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, Km, Rd, Vcmax, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+
+    _a = Vcmax;
+    _b = Vcmax * Γ_star;
+    _d = Km;
+    _f = p_atm / g_lc[ind] * FT(1e-6);
+    _p = p_a;
+
+    _qa = _f;
+    _qb = _f * (Rd - _a) - _p - _d;
+    _qc = _a*_p - _b - Rd*(_p + _d);
+
+    leaf.Ac[ind] = lower_quadratic(_qa, _qb, _qc) + Rd;
+
+    return nothing
+end
+
 
 
 
@@ -652,6 +770,32 @@ function light_limited_rate_glc!(
     return nothing
 end
 
+function light_limited_rate_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, J, Rd, Γ_star = leaf;
+    @unpack p_a, p_atm = envir;
+    @unpack Eff_1, Eff_2 = photo_set;
+
+    _a = J[ind];
+    _b = J[ind] * Γ_star;
+    _c = Eff_1;
+    _d = Eff_2*Γ_star;
+    _f = p_atm / g_lc[ind] * FT(1e-6);
+    _p = p_a;
+
+    _qa = _c * _f;
+    _qb = _c*_f*Rd - _c*_p - _d - _a*_f;
+    _qc = _a*_p - _b - Rd*(_c*_p + _d);
+
+    leaf.Aj[ind] = lower_quadratic(_qa, _qb, _qc) + Rd;
+
+    return nothing
+end
+
 
 
 
@@ -707,6 +851,29 @@ function product_limited_rate_glc!(
     _qc = _a*_p - Rd*(_p + _d);
 
     leaf.Ap .= lower_quadratic.(_qa, _qb, _qc) .+ Rd;
+
+    return nothing
+end
+
+function product_limited_rate_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    @unpack g_lc, Kpep, Rd, Vpmax = leaf;
+    @unpack p_a, p_atm = envir;
+
+    _a = Vpmax;
+    _d = Kpep;
+    _f = p_atm / g_lc[ind] * FT(1e-6);
+    _p = p_a;
+
+    _qa = _f;
+    _qb = _f * (Rd - _a) - _p - _d;
+    _qc = _a*_p - Rd*(_p + _d);
+
+    leaf.Ap[ind] = lower_quadratic(_qa, _qb, _qc) + Rd;
 
     return nothing
 end
@@ -1063,6 +1230,64 @@ function leaf_photo_from_glc!(
     leaf.An  .= leaf.Ag .- leaf.Rd;
     leaf.p_i .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_lc;
     leaf.p_s .= envir.p_a .- leaf.An .* FT(1e-6) .* envir.p_atm ./ leaf.g_bc;
+
+    return nothing
+end
+
+function leaf_photo_from_glc!(
+            photo_set::C3ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
+    end
+
+    leaf_ETR!(photo_set, leaf, ind);
+    light_limited_rate_glc!(photo_set, leaf, envir, ind);
+    rubisco_limited_rate_glc!(photo_set, leaf, envir, ind);
+    product_limited_rate!(photo_set, leaf, ind);
+    leaf.Ag[ind]  = colimit(photo_set.Col,
+                            leaf.Ac[ind],
+                            leaf.Aj[ind],
+                            leaf.Ap[ind]);
+    leaf.An[ind]  = leaf.Ag[ind] - leaf.Rd;
+    leaf.p_i[ind] = envir.p_a - leaf.An[ind] * FT(1e-6) * envir.p_atm /
+                                leaf.g_lc[ind];
+    leaf.p_s[ind] = envir.p_a - leaf.An[ind] * FT(1e-6) * envir.p_atm /
+                                leaf.g_bc[ind];
+
+    return nothing
+end
+
+function leaf_photo_from_glc!(
+            photo_set::C4ParaSet{FT},
+            leaf::Leaves{FT},
+            envir::AirLayer{FT},
+            ind::Int
+            ) where {FT<:AbstractFloat}
+    # update TD only if T changes
+    if leaf.T != leaf.T_old
+        leaf_temperature_dependence!(photo_set, leaf, envir);
+        leaf.T_old = leaf.T;
+    end
+
+    leaf_ETR!(photo_set, leaf, ind);
+    light_limited_rate!(photo_set, leaf, ind);
+    rubisco_limited_rate!(photo_set, leaf, ind);
+    product_limited_rate_glc!(photo_set, leaf, envir, ind);
+    leaf.Ag[ind]  = colimit(photo_set.Col,
+                            leaf.Ac[ind],
+                            leaf.Aj[ind],
+                            leaf.Ap[ind]);
+    leaf.An[ind]  = leaf.Ag[ind] - leaf.Rd;
+    leaf.p_i[ind] = envir.p_a - leaf.An[ind] * FT(1e-6) * envir.p_atm /
+                                leaf.g_lc[ind];
+    leaf.p_s[ind] = envir.p_a - leaf.An[ind] * FT(1e-6) * envir.p_atm /
+                                leaf.g_bc[ind];
 
     return nothing
 end
