@@ -4,6 +4,7 @@ using CLIMAParameters
 using ConstrainedRootSolvers
 using DocStringExtensions
 using Parameters
+using WaterPhysics
 
 
 
@@ -53,6 +54,7 @@ export create_grass_like_hs,
        soil_p_25,
        soil_rwc,
        tree_e_crit,
+       vc_temperature_effects!,
        xylem_k_ratio,
        xylem_p_crit,
        xylem_p_from_flow
@@ -69,11 +71,12 @@ include("vulnerability/pcrit.jl")
 include("vulnerability/soil.jl" )
 include("vulnerability/vc.jl"   )
 
-include("hydraulics/leaf.jl"    )
-include("hydraulics/legacy.jl"  )
-include("hydraulics/plant.jl"   )
-include("hydraulics/pressure.jl")
-include("hydraulics/root.jl"    )
+include("hydraulics/leaf.jl"       )
+include("hydraulics/legacy.jl"     )
+include("hydraulics/plant.jl"      )
+include("hydraulics/pressure.jl"   )
+include("hydraulics/root.jl"       )
+include("hydraulics/temperature.jl")
 
 
 

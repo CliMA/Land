@@ -2,3 +2,4 @@
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
+WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"

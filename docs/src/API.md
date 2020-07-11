@@ -426,3 +426,28 @@ Note that the organ level or whole-plant level conductances are different from
 ```@docs
 plant_conductances!
 ```
+
+
+
+
+## Temperature effects
+Plant hydraulic properties changes with temperature, due to its impacts on
+    surface tension and viscosity. As to surface tension, when temperature
+    increases, air-water interface surface tension decreases, meaning that with
+    the same curvature, the capillary pressure provided decreases. As a result,
+    soil matrix potential becomes less nagative (good for plants!), but the
+    conduit resistance to cavitation decreases (bad for plants!). As to
+    viscosity, when temperature increases, viscosity decreases, meaning that
+    pressure drop decreases at the same flow rate (good for plants!). To
+    account for these effects, we provided [`vc_temperature_effects!`](@ref)
+    function:
+
+```@docs
+vc_temperature_effects!
+```
+
+Keep in mind that, leaf critical pressure changes due to surface tension,
+    though the impact can be neglected for minor temperature change. However,
+    soil water content is still computed using the equivalent matrix potential
+    at 25 Celcius because water content is only related to the air-water
+    interface curvature.

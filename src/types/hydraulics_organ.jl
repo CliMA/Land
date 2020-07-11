@@ -67,6 +67,8 @@ Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     f_st ::FT = FT(1)
     "Relative viscosity"
     f_vis::FT = FT(1)
+    "Temperature memory `[K]`"
+    T_old::FT = FT(K_25)
     "Upstream sap temperature `[K]`"
     T_sap::FT = FT(K_25)
 end
@@ -128,6 +130,8 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     f_st ::FT = FT(1)
     "Relative viscosity"
     f_vis::FT = FT(1)
+    "Temperature memory `[K]`"
+    T_old::FT = FT(K_25)
     "Upstream sap temperature `[K]`"
     T_sap::FT = FT(K_25)
 end
@@ -179,6 +183,8 @@ Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     f_st ::FT = FT(1)
     "Relative viscosity"
     f_vis::FT = FT(1)
+    "Temperature memory `[K]`"
+    T_old::FT = FT(K_25)
     "Upstream sap temperature `[K]`"
     T_sap::FT = FT(K_25)
 end
