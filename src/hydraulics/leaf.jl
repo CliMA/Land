@@ -52,7 +52,7 @@ function leaf_e_crit(
     _fl     = FT(0);
     _fx     = min((_fh+_fl)/2, ini);
     _ms     = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt     = ResidualTolerance{FT}(1e-5);
+    _rt     = SolutionTolerance{FT}(1e-5);
     @inline f(x) = xylem_p_from_flow(hs, x) - hs.p_crt;
     _solut  = find_zero(f, _ms, _rt);
     _ec::FT = _solut;

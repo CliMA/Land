@@ -24,7 +24,7 @@ function tree_e_crit(
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt = ResidualTolerance{FT}(1e-5);
+    _rt = SolutionTolerance{FT}(1e-3);
     @inline f(x) = xylem_p_from_flow(tree, x) - (tree.leaf).p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
@@ -44,7 +44,7 @@ function tree_e_crit(
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt = ResidualTolerance{FT}(1e-5);
+    _rt = SolutionTolerance{FT}(1e-3);
     @inline f(x) = xylem_p_from_flow(tree, x) - tree.leaves[1].p_crt;
     _solut  = find_zero(f, _ms, _rt);
 

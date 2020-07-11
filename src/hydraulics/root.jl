@@ -70,7 +70,7 @@ function root_qs_p_from_q(
     _ph    = FT(20);
     _px    = min(_pl/2, ini);
     _ms    = NewtonBisectionMethod{FT}(_pl, _ph, _px);
-    _st    = ResidualTolerance{FT}(1e-4);
+    _st    = SolutionTolerance{FT}(1e-4);
     @inline f(x) = q_diff(roots, x, flow);
     _solut = find_zero(f, _ms, _st);
 
