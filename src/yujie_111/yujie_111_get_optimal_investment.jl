@@ -1,6 +1,12 @@
+# Use more advanced algorithm?
+
+
+
+
 function Yujie111GetOptimalInvestment(
-            node::Yujie111{FT},
-            weat,
+            node::SPACSimple{FT},
+            photo_set::AbstractPhotoModelParaSet{FT},
+            weat::DataFrame,
             ini_laba=2000.0,
             ini_vmax=60.0,
             max_vmax=100.0,
@@ -9,8 +15,8 @@ function Yujie111GetOptimalInvestment(
     opt_laba = ini_laba
     opt_vmax = ini_vmax
     tmp_node = deepcopy(node)
-    Yujie111UpdateLeaf(tmp_node, opt_laba, opt_vmax)
-    opt_prof = Yujie111GetAnnualProfit(tmp_node, weat, max_vmax)
+    Yujie111UpdateLeaf(tmp_node, photo_set, opt_laba, opt_vmax)
+    opt_prof = Yujie111GetAnnualProfit(tmp_node, photo_set, weat, max_vmax)
     if displaying
         println("        Optimal LaBa: ", opt_laba)
         println("        Optimal Vcmax: ", opt_vmax)
@@ -31,8 +37,8 @@ function Yujie111GetOptimalInvestment(
         if count<1
             while true
                 tmp_node = deepcopy(node)
-                Yujie111UpdateLeaf(tmp_node, opt_laba+df_la, opt_vmax)
-                prof = Yujie111GetAnnualProfit(tmp_node, weat, max_vmax)
+                Yujie111UpdateLeaf(tmp_node, photo_set, opt_laba+df_la, opt_vmax)
+                prof = Yujie111GetAnnualProfit(tmp_node, photo_set, weat, max_vmax)
                 if prof>opt_prof
                     count    += 1
                     opt_prof  = prof
@@ -54,8 +60,8 @@ function Yujie111GetOptimalInvestment(
         if count<1
             while true
                 tmp_node = deepcopy(node)
-                Yujie111UpdateLeaf(tmp_node, max(1.0, opt_laba-df_la), opt_vmax)
-                prof = Yujie111GetAnnualProfit(tmp_node, weat, max_vmax)
+                Yujie111UpdateLeaf(tmp_node, photo_set, max(1.0, opt_laba-df_la), opt_vmax)
+                prof = Yujie111GetAnnualProfit(tmp_node, photo_set, weat, max_vmax)
                 if prof>opt_prof
                     count    += 1
                     opt_prof  = prof
@@ -81,8 +87,8 @@ function Yujie111GetOptimalInvestment(
         if count<1
             while true
                 tmp_node = deepcopy(node)
-                Yujie111UpdateLeaf(tmp_node, opt_laba, min(opt_vmax+df_vc,max_vmax-1E-6))
-                prof = Yujie111GetAnnualProfit(tmp_node, weat, max_vmax)
+                Yujie111UpdateLeaf(tmp_node, photo_set, opt_laba, min(opt_vmax+df_vc,max_vmax-1E-6))
+                prof = Yujie111GetAnnualProfit(tmp_node, photo_set, weat, max_vmax)
                 if prof>opt_prof
                     count    += 1
                     opt_prof  = prof
@@ -107,8 +113,8 @@ function Yujie111GetOptimalInvestment(
         if count<1
             while true
                 tmp_node = deepcopy(node)
-                Yujie111UpdateLeaf(tmp_node, opt_laba, opt_vmax-df_vc)
-                prof = Yujie111GetAnnualProfit(tmp_node, weat, max_vmax)
+                Yujie111UpdateLeaf(tmp_node, photo_set, opt_laba, opt_vmax-df_vc)
+                prof = Yujie111GetAnnualProfit(tmp_node, photo_set, weat, max_vmax)
                 if prof>opt_prof
                     count    += 1
                     opt_prof  = prof

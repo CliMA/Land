@@ -1,7 +1,35 @@
+# include("src/test.jl")
+
+using BenchmarkTools
+using CSV
+using DataFrames
+using Photosynthesis
+using Plants
+
+PL = Plants
+FT = Float64
+
+node  = PL.SPACSimple{FT}();
+photo = C3CLM(FT);
+zeni  = FT(30);
+rall  = FT(1000);
+
+#weat_hist = DataFrame!(CSV.File("./data/Flagstaff_histo_sim0_GS.csv"))
+weat_hist = DataFrame!(CSV.File("/home/wyujie/Data/USAForest20Sites/Flagstaff/Flagstaff_histo_sim0_GS.csv"))
+weat_mask = (weat_hist.Year .== 2005);
+weat_2005 = weat_hist[weat_mask,:];
 
 
+PL.Yujie111EvaluateModel(node, photo, zeni, rall);
+PL.Yujie111GainRiskMatrix(node, photo, zeni, rall);
+PL.Yujie111GetAnnualCiCa(node, photo, weat_2005);
+PL.Yujie111GetAnnualProfit(node, photo, weat_2005, FT(100));
+PL.Yujie111GetOptimaldAdE(node, photo, zeni, rall);
+PL.Yujie111GetOptimalFs(node, photo, zeni, rall);
+#PL.Yujie111GetOptimalFsMap(node, photo, zeni, rall);
+PL.Yujie111GetOptimalInvestment(node, photo, weat_2005);
 
-
+#@btime PL.Yujie111EvaluateModel(node, photo, zeni, rall);
 
 
 

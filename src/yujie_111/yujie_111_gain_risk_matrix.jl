@@ -1,17 +1,15 @@
 function Yujie111GainRiskMatrix(
-            node::Yujie111{FT},
+            node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            envir::AirLayer{FT},
             zenith=30.0,
             r_all=1000.0
 ) where {FT<:AbstractFloat}
     # partition the canopy
-    canopy = Yujie111GetLeafPartition(node, zenith, r_all)
-    r_sl = canopy[1]
-    r_sh = canopy[4]
+    big_leaf_partition!(node, zenith, r_all)
+    @unpack frac_sh, frac_sl = node.container2L;
 
     # calculate the ecrit
-    e_crit = Yujie111GetECrit(node)
+    node.ec = tree_e_crit(node.hs, node.ec);
 
     # mapping the matrix
     f_sl      = 0.0
@@ -20,12 +18,14 @@ function Yujie111GainRiskMatrix(
     judge_sh  = true
     list_f_sl = 0.0
     list_f_sh = 0.0
+
     # initialize the matrix
-    tmp    = Yujie111GetPACGTs(node, photo_set, f_sl, f_sh, canopy, envir)
-    a_sum  = r_sl * tmp[1,3] + r_sh * tmp[2,3]
+    Yujie111GetPACGTs(node, photo_set, f_sl, f_sh)
+    a_sum  = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
     e_sum  = f_sl + f_sh
-    p_tmp  = (e_crit-e_sum) * a_sum
+    p_tmp  = (node.ec-e_sum) * a_sum / node.ec
     matrix = p_tmp
+
     # expand the matrix
     while judge_sl || judge_sh
         # print f_sl and f_sh for debug
@@ -34,15 +34,16 @@ function Yujie111GainRiskMatrix(
         # if sunlit f can be higher
         tmp_list = []
         if judge_sl
-            f_sl += 1.0
+            f_sl += 0.1
             # iterate through the shade layer f
             for tmp_f in list_f_sh
-                tmp    = Yujie111GetPACGTs(node, photo_set, f_sl, tmp_f, canopy, envir)
-                a_sum  = r_sl * tmp[1,3] + r_sh * tmp[2,3]
+                Yujie111GetPACGTs(node, photo_set, f_sl, tmp_f)
+                a_sum  = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
                 e_sum  = f_sl + tmp_f
-                p_tmp  = (e_crit-e_sum) * a_sum
+                p_tmp  = (node.ec-e_sum) * a_sum / node.ec
+
                 # judge if break
-                if (tmp[1,3]<-1111.0)
+                if (node.container2L.cont_sl.an < -1111.0)
                     judge_sl = false
                     break
                 end
@@ -63,15 +64,16 @@ function Yujie111GainRiskMatrix(
         # if shade f can be higher
         tmp_list = []
         if judge_sh
-            f_sh += 1.0
+            f_sh += 0.1
             # iterate through the sunlit layer f
             for tmp_f in list_f_sl
-                tmp    = Yujie111GetPACGTs(node, photo_set, tmp_f, f_sh, canopy, envir)
-                a_sum  = r_sl * tmp[1,3] + r_sh * tmp[2,3]
+                Yujie111GetPACGTs(node, photo_set, tmp_f, f_sh)
+                a_sum  = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
                 e_sum  = tmp_f + f_sh
-                p_tmp  = (e_crit-e_sum) * a_sum
+                p_tmp  = (node.ec-e_sum) * a_sum / node.ec
+
                 # judge if break
-                if (tmp[2,3]<-1111.0)
+                if (node.container2L.cont_sh.an < -1111.0)
                     judge_sh = false
                     break
                 end

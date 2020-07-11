@@ -9,7 +9,7 @@ using Photosynthesis
 FT = Float64
 
 # make node for year 2005
-node = Plants.Yujie111{FT}();
+node = Plants.SPACSimple{FT}();
 node.d_lati =  35.198284;
 node.d_long = -111.651299;
 node.d_alti =  2105.0;
@@ -77,7 +77,7 @@ Yujie111UpdateLeaf(node, 1627.0, 79.3)
 =#
 
 # #= default
-Plants.Yujie111UpdateLeaf(node, 1193.0, 88.9);
+Plants.Yujie111UpdateLeaf(node, c3_set, 1193.0, 88.9);
 # =#
 
 Plants.Yujie111UpdateSoilFromSWC(node, 1.0);
@@ -106,7 +106,8 @@ df[!, "PAR_sl"] .= FT(0)
 df[!, "RAD_sl"] .= FT(0)
 df[!, "E_sl"  ] .= FT(0)
 df[!, "P_sl"  ] .= FT(0)
-df[!, "A_sl"  ] .= FT(0)
+df[!, "An_sl" ] .= FT(0)
+df[!, "Ag_sl" ] .= FT(0)
 df[!, "C_sl"  ] .= FT(0)
 df[!, "G_sl"  ] .= FT(0)
 df[!, "T_sl"  ] .= FT(0)
@@ -115,7 +116,8 @@ df[!, "PAR_sh"] .= FT(0)
 df[!, "RAD_sh"] .= FT(0)
 df[!, "E_sh"  ] .= FT(0)
 df[!, "P_sh"  ] .= FT(0)
-df[!, "A_sh"  ] .= FT(0)
+df[!, "An_sh" ] .= FT(0)
+df[!, "Ag_sh" ] .= FT(0)
 df[!, "C_sh"  ] .= FT(0)
 df[!, "G_sh"  ] .= FT(0)
 df[!, "T_sh"  ] .= FT(0)

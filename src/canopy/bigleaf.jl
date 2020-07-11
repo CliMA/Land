@@ -1,14 +1,3 @@
-#module Radiation
-
-
-
-
-# export public function
-export big_leaf_partition!
-
-
-
-
 ###############################################################################
 #
 # Big leaf canopy model
@@ -23,7 +12,7 @@ const _ALPAR_SQ_KD = _ALPAR_SQ * _K_D
 const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
 
 """
-    big_leaf_partition!(partition::Array{FT,1}, zenith::FT, lai::FT, r_all::FT)
+    big_leaf_partition!(node::SPACSimple{FT}, zenith::FT, r_all::FT) where {FT <:AbstractFloat}
 
 Partition the big-leaf canopy into sunlit and shaded layers, given
 - `partition` Container for partition
@@ -32,11 +21,13 @@ Partition the big-leaf canopy into sunlit and shaded layers, given
 - `r_all` Total radiation in `[W m⁻²]`
 """
 function big_leaf_partition!(
-            partition::Array{FT,1},
+            node::SPACSimple{FT},
             zenith::FT,
-            lai::FT,
             r_all::FT
-            ) where {FT <:AbstractFloat}
+) where {FT <:AbstractFloat}
+    # unpack values
+    @unpack lai = node;
+
     # 1. assume 50%-50% PAR and NIR, 80%-20% beam-diffuse
     par_tot = r_all / 2 / FT(0.235);
     q_ob    = par_tot * FT(0.8);
@@ -79,17 +70,16 @@ function big_leaf_partition!(
     e_sh   = ep_sh*lai_sh + en_sh;
 
     # 7. update the information
-    partition[1] = ratio  ;
-    partition[2] = q_slm  ;
-    partition[3] = e_sl   ;
-    partition[4] = 1-ratio;
-    partition[5] = q_shm  ;
-    partition[6] = e_sh   ;
+    (node.container2L).frac_sl = ratio;
+    (node.container2L).frac_sh = 1 - ratio;
+    (node.container2L).la_sl   = node.laba * ratio;
+    (node.container2L).la_sh   = node.laba * (1 - ratio);
+    (node.container2L).lai_sl  = lai * ratio;
+    (node.container2L).lai_sh  = lai * (1 - ratio);
+    (node.container2L).par_sl  = q_slm;
+    (node.container2L).par_sh  = q_shm;
+    (node.container2L).rad_sl  = e_sl;
+    (node.container2L).rad_sh  = e_sh;
 
     return nothing
 end
-
-
-
-
-#end # module

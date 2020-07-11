@@ -1,23 +1,27 @@
 # function to test birch dataset, know t_leaf
+# not yet tested
+
+
+
+
 function Yujie111GetOptimalFKnowT(
-            node::Yujie111{FT},
+            node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            envir::AirLayer{FT},
             conditions
 ) where {FT<:AbstractFloat}
     # get e_crit
-    e_crit = Yujie111GetECrit(node)
+    node.ec = tree_e_crit(node, node.ec);
 
     # use bi-section method
     e_min = 0.0
-    e_max = e_crit
+    e_max = node.ec
     r_opt = []
     while true
         e_mid       = 0.5 * (e_min+e_max)
-        p,a,c,g     = Yujie111GetPACGKnowT(node, photo_set, envir, conditions, e_mid)
+        p,a,c,g     = Yujie111GetPACGKnowT(node, photo_set, conditions, e_mid)
         e_de        = e_mid + 1.0
-        pd,ad,cd,gd = Yujie111GetPACGKnowT(node, photo_set, envir, conditions, e_de )
-        optimizer   = ad*(e_crit-e_de) - a*(e_crit-e_mid)
+        pd,ad,cd,gd = Yujie111GetPACGKnowT(node, photo_set, conditions, e_de )
+        optimizer   = ad*(node.ec-e_de) - a*(node.ec-e_mid)
         if (e_max-e_min)<1.0
 
 

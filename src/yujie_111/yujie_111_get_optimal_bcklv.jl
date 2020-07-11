@@ -1,4 +1,17 @@
-function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=100.0, displaying=true) where {FT<:AbstractFloat}
+# TODO not yet fixed or tested!
+# To be fixed later
+
+
+
+
+function Yujie111GetOptimalBCKLV(
+            node::SPACSimple{FT},
+            photo_set::AbstractPhotoModelParaSet{FT},
+            weat::DataFrame,
+            selection,
+            max_vmax=100.0,
+            displaying=true
+) where {FT<:AbstractFloat}
     # determine if optimizing B,C,K,L,V
     yesb,yesc,yesk,yesl,yesv = false,false,false,false,false
     if occursin("B", selection) || occursin("b", selection)
@@ -36,11 +49,11 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                 # increase vmax
                 while true
                     node_temp = deepcopy(node)
-                    Yujie111UpdateLeaf(node_temp, node_temp.laba, min(node_temp.ps.Vcmax25+diff_v, max_vmax-1E-6))
+                    Yujie111UpdateLeaf(node_temp, photo_set, node_temp.laba, min(node_temp.ps.Vcmax25+diff_v, max_vmax-1E-6))
                     gscp_incr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_incr>gscp_node
                         gscp_node = gscp_incr
-                        Yujie111UpdateLeaf(node, node.laba, min(node.ps.Vcmax25+diff_v, max_vmax-1E-6))
+                        Yujie111UpdateLeaf(node, photo_set, node.laba, min(node.ps.Vcmax25+diff_v, max_vmax-1E-6))
                         if displaying
                             println("\t\tOptimal Vcmax increases by ", diff_v, " to ", node.ps.Vcmax25)
                         end
@@ -52,11 +65,11 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                 # decrease vmax
                 while true
                     node_temp = deepcopy(node)
-                    Yujie111UpdateLeaf(node_temp, node_temp.laba, max(node_temp.ps.Vcmax25-diff_v, 0.1))
+                    Yujie111UpdateLeaf(node_temp, photo_set, node_temp.laba, max(node_temp.ps.Vcmax25-diff_v, 0.1))
                     gscp_decr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_decr>gscp_node
                         gscp_node = gscp_decr
-                        Yujie111UpdateLeaf(node, node.laba, max(node.ps.Vcmax25-diff_v, 0.1))
+                        Yujie111UpdateLeaf(node, photo_set, node.laba, max(node.ps.Vcmax25-diff_v, 0.1))
                         if displaying
                             println("\t\tOptimal Vcmax decreases by ", diff_v, " to ", node.ps.Vcmax25)
                         end
@@ -83,11 +96,11 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                 # increase laba
                 while true
                     node_temp = deepcopy(node)
-                    Yujie111UpdateLeaf(node_temp, node_temp.laba+diff_l, node_temp.ps.Vcmax25)
+                    Yujie111UpdateLeaf(node_temp, photo_set, node_temp.laba+diff_l, node_temp.ps.Vcmax25)
                     gscp_incr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_incr>gscp_node
                         gscp_node = gscp_incr
-                        Yujie111UpdateLeaf(node, node.laba+diff_l, node.ps.Vcmax25)
+                        Yujie111UpdateLeaf(node, photo_set, node.laba+diff_l, node.ps.Vcmax25)
                         if displaying
                             println("\t\tOptimal LA:BA increases by ", diff_l, " to ", node.laba)
                         end
@@ -99,11 +112,11 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                 # decrease laba
                 while true
                     node_temp = deepcopy(node)
-                    Yujie111UpdateLeaf(node_temp, max(0.1,node_temp.laba-diff_l), node_temp.ps.Vcmax25)
+                    Yujie111UpdateLeaf(node_temp, photo_set, max(0.1,node_temp.laba-diff_l), node_temp.ps.Vcmax25)
                     gscp_decr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_decr>gscp_node
                         gscp_node = gscp_decr
-                        Yujie111UpdateLeaf(node, max(0.1,node.laba-diff_l), node.ps.Vcmax25)
+                        Yujie111UpdateLeaf(node, photo_set, max(0.1,node.laba-diff_l), node.ps.Vcmax25)
                         if displaying
                             println("\t\tOptimal LA:BA decreases by ", diff_l, " to ", node.laba)
                         end
@@ -136,14 +149,14 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                     node_temp.k_root *= 1.0 + diff_k
                     node_temp.k_stem *= 1.0 + diff_k
                     node_temp.k_sla  *= 1.0 + diff_k
-                    Yujie111UpdateLeaf(node_temp, node_temp.laba, node_temp.ps.Vcmax25)
+                    Yujie111UpdateLeaf(node_temp, photo_set, node_temp.laba, node_temp.ps.Vcmax25)
                     gscp_incr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_incr>gscp_node
                         gscp_node = gscp_incr
                         node.k_root *= 1.0 + diff_k
                         node.k_stem *= 1.0 + diff_k
                         node.k_sla  *= 1.0 + diff_k
-                        Yujie111UpdateLeaf(node, node.laba, node.ps.Vcmax25)
+                        Yujie111UpdateLeaf(node, photo_set, node.laba, node.ps.Vcmax25)
                         if displaying
                             println("\t\tOptimal K increases by ", diff_k*100.0, "% to ", node.k_root, " (root)")
                         end
@@ -161,14 +174,14 @@ function Yujie111GetOptimalBCKLV(node::Yujie111{FT}, weat, selection, max_vmax=1
                     node_temp.k_root *= 1.0 - diff_k
                     node_temp.k_stem *= 1.0 - diff_k
                     node_temp.k_sla  *= 1.0 - diff_k
-                    Yujie111UpdateLeaf(node_temp, node_temp.laba, node_temp.ps.Vcmax25)
+                    Yujie111UpdateLeaf(node_temp, photo_set, node_temp.laba, node_temp.ps.Vcmax25)
                     gscp_decr = Yujie111GetAnnualProfit(node_temp, weat, max_vmax)
                     if gscp_decr>gscp_node
                         gscp_node = gscp_decr
                         node.k_root *= 1.0 - diff_k
                         node.k_stem *= 1.0 - diff_k
                         node.k_sla  *= 1.0 - diff_k
-                        Yujie111UpdateLeaf(node, node.laba, node.ps.Vcmax25)
+                        Yujie111UpdateLeaf(node, photo_set, node.laba, node.ps.Vcmax25)
                         if displaying
                             println("\t\tOptimal K decreases by ", diff_k*100.0, "% to ", node.k_root, " (root)")
                         end

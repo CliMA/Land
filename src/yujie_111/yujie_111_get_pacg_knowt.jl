@@ -1,8 +1,12 @@
 # function to test birch dataset, know t_leaf
+# not tested yet
+
+
+
+
 function Yujie111GetPACGKnowT(
-            node::Yujie111{FT},
+            node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            envir::AirLayer{FT},
             conditions,
             flow
 ) where {FT<:AbstractFloat}
@@ -18,15 +22,15 @@ function Yujie111GetPACGKnowT(
 
 
     # 1. get leaf p
-    p_leaf = Yujie111GetP(node, flow)
+    p_leaf = xylem_p_from_flow(node.hs, flow)
 
     # 2. get A for combined layer
-    e_flow = flow * FT(KG_H_2_MOL_S)
-    leaf_temperature_dependence!(photo_set, node.ps, envir, t_leaf+FT(K_0));
-    d_leaf = node.ps.p_sat - envir.p_H₂O
-    g_lw   = e_flow / node.laba / d_leaf * envir.p_atm
+    node.ps.APAR = par;
+    leaf_temperature_dependence!(photo_set, node.ps, t_leaf+FT(K_0));
+    d_leaf = node.ps.p_sat - node.envir.p_H₂O
+    g_lw   = flow / node.laba / d_leaf * node.envir.p_atm
     g_lc   = g_lw / 1.6
-    leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+    leaf_photo_from_glc!(photo_set, node.ps, node.envir, g_lc);
 
     a_leaf = node.ps.An;
     c_leaf = node.ps.p_i;
