@@ -216,10 +216,16 @@ Correlations among soil relative water content, relative hydraulic conductance,
     and soil matrix potential are
 
 ```@docs
-soil_k_ratio_p25
-soil_k_ratio_rwc
-soil_p_25
+soil_erwc
 soil_rwc
+soil_swc
+soil_k_ratio_erwc
+soil_k_ratio_rwc
+soil_k_ratio_swc
+soil_k_ratio_p25
+soil_p_25_erwc
+soil_p_25_rwc
+soil_p_25_swc
 ```
 
 

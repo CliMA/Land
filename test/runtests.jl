@@ -111,32 +111,78 @@ end
             recursive_NaN_test(result);
         end
 
+
+
+
+soil_p_25_erwc
+soil_p_25_rwc
+soil_p_25_swc
+
+
+
+
+
         # test the soil functions
         _rwc1 = FT(0.8);
         _rwc2 = FT(0.5);
-        for result in [ PH.soil_rwc(_sh1, _p1),
+        for result in [ PH.soil_erwc(_sh1, _p1),
+                        PH.soil_erwc(_sh1, _p2),
+                        PH.soil_erwc(_sh2, _p1),
+                        PH.soil_erwc(_sh2, _p2),
+                        PH.soil_rwc(_sh1, _p1),
                         PH.soil_rwc(_sh1, _p2),
                         PH.soil_rwc(_sh2, _p1),
                         PH.soil_rwc(_sh2, _p2),
+                        PH.soil_swc(_sh1, _p1),
+                        PH.soil_swc(_sh1, _p2),
+                        PH.soil_swc(_sh2, _p1),
+                        PH.soil_swc(_sh2, _p2),
+                        PH.soil_k_ratio_erwc(_sh1, _rwc1),
+                        PH.soil_k_ratio_erwc(_sh1, _rwc2),
+                        PH.soil_k_ratio_erwc(_sh2, _rwc1),
+                        PH.soil_k_ratio_erwc(_sh2, _rwc2),
                         PH.soil_k_ratio_rwc(_sh1, _rwc1),
                         PH.soil_k_ratio_rwc(_sh1, _rwc2),
                         PH.soil_k_ratio_rwc(_sh2, _rwc1),
                         PH.soil_k_ratio_rwc(_sh2, _rwc2),
+                        PH.soil_k_ratio_swc(_sh1, _rwc1*_sh1.Θs),
+                        PH.soil_k_ratio_swc(_sh1, _rwc2*_sh1.Θs),
+                        PH.soil_k_ratio_swc(_sh2, _rwc1*_sh2.Θs),
+                        PH.soil_k_ratio_swc(_sh2, _rwc2*_sh2.Θs),
                         PH.soil_k_ratio_p25(_sh1, _p1),
-                        PH.soil_p_25(_sh1, _rwc1),
-                        PH.soil_p_25(_sh1, _rwc2),
-                        PH.soil_p_25(_sh2, _rwc1),
-                        PH.soil_p_25(_sh2, _rwc2) ]
+                        PH.soil_k_ratio_p25(_sh2, _p1),
+                        PH.soil_p_25_erwc(_sh1, _rwc1),
+                        PH.soil_p_25_erwc(_sh1, _rwc2),
+                        PH.soil_p_25_erwc(_sh2, _rwc1),
+                        PH.soil_p_25_erwc(_sh2, _rwc2),
+                        PH.soil_p_25_rwc(_sh1, _rwc1),
+                        PH.soil_p_25_rwc(_sh1, _rwc2),
+                        PH.soil_p_25_rwc(_sh2, _rwc1),
+                        PH.soil_p_25_rwc(_sh2, _rwc2),
+                        PH.soil_p_25_swc(_sh1, _rwc1*_sh1.Θs),
+                        PH.soil_p_25_swc(_sh1, _rwc2*_sh1.Θs),
+                        PH.soil_p_25_swc(_sh2, _rwc1*_sh2.Θs),
+                        PH.soil_p_25_swc(_sh2, _rwc2*_sh2.Θs) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
 
         # test if the soil_p_25 and soil_rwc converge
         _p_giv = FT(-2);
+        _r_m_1 = PH.soil_erwc(_sh1, _p_giv);
+        _r_m_2 = PH.soil_erwc(_sh2, _p_giv);
+        _p_m_1 = PH.soil_p_25_erwc(_sh1, _r_m_1);
+        _p_m_2 = PH.soil_p_25_erwc(_sh2, _r_m_2);
+        @test _p_giv ≈ _p_m_1 ≈ _p_m_2;
         _r_m_1 = PH.soil_rwc(_sh1, _p_giv);
         _r_m_2 = PH.soil_rwc(_sh2, _p_giv);
-        _p_m_1 = PH.soil_p_25(_sh1, _r_m_1);
-        _p_m_2 = PH.soil_p_25(_sh2, _r_m_2);
+        _p_m_1 = PH.soil_p_25_rwc(_sh1, _r_m_1);
+        _p_m_2 = PH.soil_p_25_rwc(_sh2, _r_m_2);
+        @test _p_giv ≈ _p_m_1 ≈ _p_m_2;
+        _r_m_1 = PH.soil_swc(_sh1, _p_giv);
+        _r_m_2 = PH.soil_swc(_sh2, _p_giv);
+        _p_m_1 = PH.soil_p_25_swc(_sh1, _r_m_1);
+        _p_m_2 = PH.soil_p_25_swc(_sh2, _r_m_2);
         @test _p_giv ≈ _p_m_1 ≈ _p_m_2;
 
         # test xylem_p_crit function
