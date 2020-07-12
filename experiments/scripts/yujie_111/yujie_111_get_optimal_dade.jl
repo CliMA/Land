@@ -14,17 +14,17 @@ function Yujie111GetOptimaldAdE(
     @unpack frac_sh, frac_sl = node.container2L;
 
     # get the optimal for this partition
-    Yujie111GetOptimalFs(node, photo_set, zenith, r_all)
-    Yujie111GetPACGTs(node, photo_set, node.opt_f_sl, node.opt_f_sh)
-    anet    = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
+    optimize_flows!(node, photo_set)
+    leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh)
+    anet    = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
 
     # calculate dade
     de_sl   = node.opt_f_sl/(node.opt_f_sl+node.opt_f_sh)
     de_sh   = 1 - de_sl
     f_sl    = node.opt_f_sl + de_sl * FT(0.01)
     f_sh    = node.opt_f_sl + de_sh * FT(0.01)
-    Yujie111GetPACGTs(node, photo_set, f_sl, f_sh)
-    anet_de = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
+    leaf_gas_exchange!(node, photo_set, f_sl, f_sh)
+    anet_de = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
     dade    = (anet_de - anet) * 100
     return dade
 end

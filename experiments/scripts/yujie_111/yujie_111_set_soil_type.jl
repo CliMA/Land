@@ -44,6 +44,6 @@ function Yujie111SetSoilType(node::SPACSimple{FT}, soil_type) where {FT<:Abstrac
     end
     node.hs.root.sh.ϕs = p_ssat
     node.hs.root.sh.b  = b_ssat
-    node.c_ssat        = c_ssat
-    node.k_ssat        = k_ssat
+    #node.c_ssat        = c_ssat
+    #node.k_ssat        = k_ssat
 end

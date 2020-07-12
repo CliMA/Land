@@ -3,6 +3,7 @@ module Plants
 using CLIMAParameters
 using DataFrames
 using DocStringExtensions
+using Optim
 using Parameters
 using Photosynthesis
 using PlantHydraulics
@@ -14,41 +15,48 @@ Planet = CLIMAParameters.Planet
 
 
 
-include("constants.jl")
+# define constants
+struct EarthParameterSet <: AbstractEarthParameterSet end
+const EARTH         = EarthParameterSet()
+const GAS_R         = gas_constant()
+const GRAVITY       = Planet.grav(EARTH)
+const K_0           = Planet.T_freeze(EARTH)
+const K_25          = K_0 + 25
+const K_BOLTZMANN   = k_Boltzmann()
+const MOLMASS_WATER = Planet.molmass_water(EARTH)
+const P_ATM         = Planet.MSLP(EARTH)
+const RK_25         = GAS_R * K_25
+const YEAR_D        = 365.2422222
+const ρ_H₂O         = Planet.ρ_cloud_liq(EARTH)
+
+const KG_2_MOL      = 1 / MOLMASS_WATER
+const KG_H_2_MOL_S  = KG_2_MOL / 3600
+
+
+
 
 include("types/container.jl")
 include("types/spac.jl"     )
 
+include("canopy/bigleaf.jl"     )
+include("canopy/gainriskmap.jl" )
+include("canopy/gasexchange.jl" )
+include("canopy/optimizeflow.jl")
+include("canopy/temperature.jl" )
+include("canopy/testing.jl"     )
+
+include("investment/leafallocation.jl")
+include("investment/optimizeleaf.jl"  )
+
 include("planet/atmpressure.jl")
 include("planet/solarangle.jl" )
 
-include("canopy/bigleaf.jl"    )
-include("canopy/gasexchange.jl")
-include("canopy/temperature.jl")
+include("simulation/annualprofit.jl"    )
+include("simulation/annualsimulation.jl")
+
+include("soil/moisture.jl")
 
 
-
-
-include("yujie_111/simulate_growing_season.jl")
-include("./yujie_111/yujie_111_evaluate_model.jl"        )
-include("./yujie_111/yujie_111_gain_risk_matrix.jl"      )
-include("./yujie_111/yujie_111_get_annual_cica.jl"       )
-include("./yujie_111/yujie_111_get_annual_profit.jl"     )
-include("./yujie_111/yujie_111_get_optimal_bcklv.jl"     )
-include("./yujie_111/yujie_111_get_optimal_dade.jl"      )
-include("./yujie_111/yujie_111_get_optimal_f_knowt.jl"   )
-include("./yujie_111/yujie_111_get_optimal_fs.jl"        )
-include("./yujie_111/yujie_111_get_optimal_fs_map.jl"    )
-include("./yujie_111/yujie_111_get_optimal_investment.jl")
-include("./yujie_111/yujie_111_get_pacg_knowt.jl"        )
-include("./yujie_111/yujie_111_get_pacgt.jl"             )
-include("./yujie_111/yujie_111_get_pacgts.jl"            )
-include("./yujie_111/yujie_111_set_soil_type.jl"         )
-include("./yujie_111/yujie_111_update_leaf.jl"           )
-include("./yujie_111/yujie_111_update_leaf_area.jl"      )
-include("./yujie_111/yujie_111_update_soil.jl"           )
-include("./yujie_111/yujie_111_update_soil_p.jl"         )
-include("./yujie_111/yujie_111_update_soil_swc.jl"       )
 
 
 end # module

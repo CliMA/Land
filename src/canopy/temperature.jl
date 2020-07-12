@@ -124,7 +124,7 @@ function leaf_temperature(
 ) where {FT<:AbstractFloat}
     lai = node.laba / node.gaba;
 
-    e_rad = FT(0.97) * black_body_emittance(node.envir.t_air) / lai;
+    e_rad = FT(0.97) * black_body_emittance(node.envir.t_air) / max(1, lai);
     epla  = flow / node.laba;
 
     return leaf_temperature(node, rad, e_rad, epla)
@@ -146,7 +146,7 @@ function leaf_temperature_sunlit(
             rad::FT,
             f_sl::FT
 ) where {FT<:AbstractFloat}
-    e_rad  = FT(0.97) * black_body_emittance(node.envir.t_air) / (node.container2L).lai_sl;
+    e_rad  = FT(0.97) * black_body_emittance(node.envir.t_air) / max(1, (node.container2L).lai_sl);
     epla   = f_sl / (node.container2L).la_sl;
 
     return leaf_temperature(node, rad, e_rad, epla)

@@ -14,20 +14,72 @@ photo = C3CLM(FT);
 zeni  = FT(30);
 rall  = FT(1000);
 
+#=
+println("Reading the weather data file...")
 #weat_hist = DataFrame!(CSV.File("./data/Flagstaff_histo_sim0_GS.csv"))
 weat_hist = DataFrame!(CSV.File("/home/wyujie/Data/USAForest20Sites/Flagstaff/Flagstaff_histo_sim0_GS.csv"))
 weat_mask = (weat_hist.Year .== 2005);
 weat_2005 = weat_hist[weat_mask,:];
+=#
+
+println("Evaluating the functions...")
+
+#@time PL.optimize_leaf!(node, photo, weat_2005)
+
+PL.big_leaf_partition!(node, zeni, rall);
+mat = PL.gain_risk_map(node, photo);
+
+#=
+df = DataFrame()
+df[!, "Time"  ]  = weat_2005.Day + weat_2005.Hour / FT(24)
+df[!, "T_air" ] .= FT(0)
+df[!, "D_air" ] .= FT(0)
+df[!, "Wind"  ] .= FT(0)
+df[!, "Rain"  ] .= FT(0)
+df[!, "Ca"    ] .= FT(0)
+df[!, "SWC"   ] .= FT(0)
+df[!, "P_soil"] .= FT(0)
+df[!, "H_sun" ] .= FT(0)
+df[!, "A_net" ] .= FT(0)
+df[!, "E_crit"] .= FT(0)
+df[!, "LAI_sl"] .= FT(0)
+df[!, "PAR_sl"] .= FT(0)
+df[!, "RAD_sl"] .= FT(0)
+df[!, "E_sl"  ] .= FT(0)
+df[!, "P_sl"  ] .= FT(0)
+df[!, "An_sl" ] .= FT(0)
+df[!, "Ag_sl" ] .= FT(0)
+df[!, "C_sl"  ] .= FT(0)
+df[!, "G_sl"  ] .= FT(0)
+df[!, "T_sl"  ] .= FT(0)
+df[!, "LAI_sh"] .= FT(0)
+df[!, "PAR_sh"] .= FT(0)
+df[!, "RAD_sh"] .= FT(0)
+df[!, "E_sh"  ] .= FT(0)
+df[!, "P_sh"  ] .= FT(0)
+df[!, "An_sh" ] .= FT(0)
+df[!, "Ag_sh" ] .= FT(0)
+df[!, "C_sh"  ] .= FT(0)
+df[!, "G_sh"  ] .= FT(0)
+df[!, "T_sh"  ] .= FT(0)
+
+@time PL.annual_simulation(node, photo, weat_2005, df)
+=#
 
 
-PL.Yujie111EvaluateModel(node, photo, zeni, rall);
-PL.Yujie111GainRiskMatrix(node, photo, zeni, rall);
-PL.Yujie111GetAnnualCiCa(node, photo, weat_2005);
-PL.Yujie111GetAnnualProfit(node, photo, weat_2005, FT(100));
-PL.Yujie111GetOptimaldAdE(node, photo, zeni, rall);
-PL.Yujie111GetOptimalFs(node, photo, zeni, rall);
+
+#PL.Yujie111EvaluateModel(node, photo, zeni, rall);
+#PL.Yujie111GainRiskMatrix(node, photo, zeni, rall);
+#PL.Yujie111GetAnnualCiCa(node, photo, weat_2005);
+#@time PL.Yujie111GetAnnualProfit(node, photo, weat_2005, FT(100));
+#PL.annual_profit(node, photo, weat_2005);
+#PL.Yujie111GetOptimaldAdE(node, photo, zeni, rall);
+
+#PL.big_leaf_partition!(node, zeni, rall);
+#PL.optimize_flows!(node, photo);
+
 #PL.Yujie111GetOptimalFsMap(node, photo, zeni, rall);
-PL.Yujie111GetOptimalInvestment(node, photo, weat_2005);
+#PL.Yujie111GetOptimalInvestment(node, photo, weat_2005);
 
 #@btime PL.Yujie111EvaluateModel(node, photo, zeni, rall);
 

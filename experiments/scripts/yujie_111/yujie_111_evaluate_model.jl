@@ -24,7 +24,7 @@ function Yujie111EvaluateModel(
                    Pc = FT[])
     flow = FT(0);
     while flow<node.ec
-        Yujie111GetPACGT(node, photo_set, flow)
+        leaf_gas_exchange!(node, photo_set, flow)
         if (node.container1L).p < p_crit
             break
         end

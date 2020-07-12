@@ -7,6 +7,8 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
 
     # photosynthesis parameters
     ps::Leaf = Leaf{FT}()
+    maxv::FT = FT(100)
+    vtoj::FT = FT(1.67)
 
     # Surrounding AirLayer
     envir::AirLayer{FT} = AirLayer{FT}()
@@ -14,14 +16,15 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     # local container for returned results
     container1L::SPACContainer1L{FT} = SPACContainer1L{FT}()
     container2L::SPACContainer2L{FT} = SPACContainer2L{FT}()
-
-    # cica information
-    cica_all::FT = FT(0)
-    cica_fav::FT = FT(0)
+    containerOP::FT = FT(0)
 
     # opt fs information
     opt_f_sl::FT = FT(0)
     opt_f_sh::FT = FT(0)
+
+    # optimal leaf investment information
+    opt_laba::FT = FT(1500)
+    opt_vmax::FT = maxv * FT(0.9)
 
     # leaf related
     lai  ::FT = FT(3)   # leaf area index
@@ -31,9 +34,8 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     width::FT = 0.05    # leaf width in m
 
     # soil related
-    c_ssat::FT = 0.476    # theta at saturation
-    c_curr::FT = 0.476    # theta at current scenario
-    k_ssat::FT = 0.009    # kmax at saturation
+    "soil water content"
+    swc   ::FT = hs.root.sh.Θs
     p_soil::FT = 0.0    # soil P
     h_soil::FT = 2     # soil depth, which is 2X root depth here
 

@@ -1,29 +1,34 @@
-function simulate_growing_season!(
+###############################################################################
+#
+# Calculate annual profit
+#
+###############################################################################
+function annual_simulation(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
             weather::DataFrame,
             output::DataFrame
 ) where {FT<:AbstractFloat}
-    row,col = size(weather)
-    lst     = 0
-    lai     = node.laba / node.gaba
-    ratio   = atmospheric_pressure_ratio(node.d_alti)
-    node.envir.p_atm = ratio * FT(P_ATM);
-    node.envir.p_O₂  = node.envir.p_atm * FT(0.209)
+    # 0. unpack required values
+    @unpack c_cons, c_vmax, d_alti, d_lati, gaba, laba, maxv, vtoj = node;
 
-    # 1. repeat each growing season with a hour interval
-    for i in 1:row
-        day   = weather[i,2 ]
-        hour  = weather[i,3 ]
-        _tair = weather[i,7 ]
-        _dair = weather[i,9 ]
-        p_co2 = weather[i,10] * ratio
-        r_all = weather[i,4 ]
-        wind  = weather[i,6 ]
-        prec  = weather[i,5 ]
-        # update the leaf partitioning
-        zenith = zenith_angle(node.d_lati, day, hour)
-        solh   = max(0.0, 90.0-zenith)
+    # 1. update the environmental constants based on the node geographycal info
+    ratio            = atmospheric_pressure_ratio(d_alti);
+    node.envir.p_atm = ratio * FT(P_ATM);
+    node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
+
+    # 2. calculate the growing season canopy profit
+    gscp   = FT(0);
+    for i in eachindex( (weather).Year )
+        # 2.1 read and update the hourly data
+        day   = (weather).Day[i]
+        hour  = (weather).Hour[i]
+        _tair = (weather).Tair[i]
+        _dair = (weather).D[i]
+        p_co2 = (weather).CO2[i] * ratio
+        r_all = (weather).Solar[i]
+        wind  = (weather).Wind[i]
+        rain  = (weather).Rain[i]
 
         node.envir.t_air = _tair + K_0;
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
@@ -33,16 +38,23 @@ function simulate_growing_season!(
         node.envir.RH    = node.envir.p_H₂O / node.envir.p_sat;
         node.envir.wind  = wind;
 
+        # 2.2 if day time
+        zenith = zenith_angle(d_lati, day, hour);
         if (r_all>0) & (zenith<=85)
+            # 2.2.1 update the leaf partitioning
             big_leaf_partition!(node, zenith, r_all)
-            @unpack frac_sh, frac_sl = (node.container2L);
+            @unpack frac_sh, frac_sl = node.container2L;
 
-            Yujie111GetOptimalFs(node, photo_set, zenith, r_all)
-            Yujie111GetPACGTs(node, photo_set, node.opt_f_sl, node.opt_f_sh)
-            flow = node.opt_f_sl + node.opt_f_sh
+            # 2.2.2 optimize flows in each layer
+            optimize_flows!(node, photo_set);
+            leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
+            flow = node.opt_f_sl + node.opt_f_sh;
             anet = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
-            hydraulic_p_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl)
 
+            # 2.2.3 update drought history
+            hydraulic_p_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
+
+            # 2.2.4 pass values to DataFrame
             output[i, "LAI_sl"] = (node.container2L).lai_sl
             output[i, "PAR_sl"] = (node.container2L).par_sl
             output[i, "RAD_sl"] = (node.container2L).rad_sl
@@ -64,16 +76,23 @@ function simulate_growing_season!(
             output[i, "C_sh"  ] = (node.container2L).cont_sh.c
             output[i, "G_sh"  ] = (node.container2L).cont_sh.gh
             output[i, "T_sh"  ] = (node.container2L).cont_sh.t
+
+        # 2.3 if night time
         else
-            f_sl = 0.0
-            f_sh = 0.0
-            flow = 0.0
-            tlef = max(200, leaf_temperature(node, r_all, flow));
+            # 2.3.1 calculate leaf temperature
+            tlef = max(200, leaf_temperature(node, r_all, FT(0)));
+
+            # 2.3.2 calculate the gas exchange rates
             node.ps.T = tlef;
             leaf_rd!(photo_set.ReT, node.ps);
             anet = -node.ps.Rd;
-            plef = xylem_p_from_flow(node.hs, flow)
 
+            # 2.3.3 update temperature effects and then the leaf water potential
+            flow = FT(0);
+            vc_temperature_effects!(node.hs.leaf, tlef);
+            plef = xylem_p_from_flow(node.hs, flow);
+
+            # 2.3.4 pass values to DataFrame
             output[i, "LAI_sl"] = FT(0)
             output[i, "PAR_sl"] = FT(0)
             output[i, "RAD_sl"] = FT(0)
@@ -85,7 +104,7 @@ function simulate_growing_season!(
             output[i, "G_sl"  ] = FT(0)
             output[i, "T_sl"  ] = tlef
 
-            output[i, "LAI_sh"] = lai
+            output[i, "LAI_sh"] = node.lai
             output[i, "PAR_sh"] = FT(0)
             output[i, "RAD_sh"] = FT(0)
             output[i, "E_sh"  ] = FT(0)
@@ -96,20 +115,24 @@ function simulate_growing_season!(
             output[i, "G_sh"  ] = FT(0)
             output[i, "T_sh"  ] = tlef
         end
+
+        # pass more data to DataFrame
         output[i, "T_air" ] = _tair
         output[i, "D_air" ] = _dair
         output[i, "Wind"  ] = wind
-        output[i, "Rain"  ] = prec
+        output[i, "Rain"  ] = rain
         output[i, "Ca"    ] = p_co2
-        output[i, "SWC"   ] = node.c_curr
+        output[i, "SWC"   ] = node.swc
         output[i, "P_soil"] = node.p_soil
-        output[i, "H_sun" ] = solh
+        output[i, "H_sun" ] = 90 - zenith
         output[i, "A_net" ] = anet
+        output[i, "E_crit"] = node.ec
 
-        # convert flow into kg update the soil
-        flow /= FT(KG_H_2_MOL_S)
-        rain  = prec * 0.001 * node.gaba * ρ_H₂O
-
-        Yujie111UpdateSoil(node, flow-rain, 1.0)
+        # 2.4 update soil moisture by converting flow to Kg per hour
+        flow /= FT(KG_H_2_MOL_S);
+        rain *= gaba * ρ_H₂O / 1000;
+        soil_moisture!(node, flow-rain);
     end
+
+    return nothing
 end

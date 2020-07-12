@@ -80,7 +80,7 @@ Yujie111UpdateLeaf(node, 1627.0, 79.3)
 Plants.Yujie111UpdateLeaf(node, c3_set, 1193.0, 88.9);
 # =#
 
-Plants.Yujie111UpdateSoilFromSWC(node, 1.0);
+Plants.soil_moisture_swc!(node, 1.0);
 
 #weat_hist = DataFrame!(CSV.File("./data/Flagstaff_histo_sim0_GS.csv"))
 weat_hist = DataFrame!(CSV.File("/home/wyujie/Data/USAForest20Sites/Flagstaff/Flagstaff_histo_sim0_GS.csv"))
