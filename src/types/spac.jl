@@ -6,7 +6,7 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     ec::FT = FT(50);
 
     # photosynthesis parameters
-    ps::Leaf = Leaf{FT}()
+    ps::Leaf{FT} = Leaf{FT}()
     maxv::FT = FT(100)
     vtoj::FT = FT(1.67)
 
@@ -35,6 +35,7 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
 
     # soil related
     "soil water content"
+    mswc  ::FT = hs.root.sh.Θs
     swc   ::FT = hs.root.sh.Θs
     p_soil::FT = 0.0    # soil P
     h_soil::FT = 2     # soil depth, which is 2X root depth here

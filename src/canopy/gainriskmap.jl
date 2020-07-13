@@ -22,7 +22,7 @@ function gain_risk_map(
     list_f_sh = FT[0];
 
     # 3. initialize the matrix
-    leaf_gas_exchange(node, photo_set, f_sl, f_sh);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_sh);
     mat = node.containerOP /  node.ec;
 
     # 4. expand the matrix
@@ -38,7 +38,7 @@ function gain_risk_map(
 
             # 4.1.1 iterate through the list_f_sh
             for tmp_f_sh in list_f_sh
-                leaf_gas_exchange(node, photo_set, f_sl, tmp_f_sh);
+                leaf_gas_exchange_nonopt!(node, photo_set, f_sl, tmp_f_sh);
                 ele = node.containerOP / node.ec;
 
                 # expand the tmp_list horizontally
@@ -69,7 +69,7 @@ function gain_risk_map(
 
             # 4.3.1 iterate through the list_f_sl
             for tmp_f_sl in list_f_sl
-                leaf_gas_exchange(node, photo_set, tmp_f_sl, f_sh);
+                leaf_gas_exchange_nonopt!(node, photo_set, tmp_f_sl, f_sh);
                 ele = node.containerOP / node.ec;
 
                 # expand the tmp_list vertically

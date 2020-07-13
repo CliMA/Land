@@ -4,7 +4,7 @@
 function optimize_leaf!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weat::DataFrame;
+            weat::Array{FT,2};
             displaying=true
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize

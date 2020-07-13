@@ -5,7 +5,7 @@
 ###############################################################################
 """
     zenith_angle(latd::FT, decd::FT, lhad::FT) where {FT<:AbstractFloat}
-    zenith_angle(latd::FT, day::Int, hour::Int, minute::FT) where {FT<:AbstractFloat}
+    zenith_angle(latd::FT, day::FT, hour::FT, minute::FT) where {FT<:AbstractFloat}
 
 Calculate the zenith angle, given
 - `latd` Latitude in degree
@@ -30,13 +30,13 @@ end
 
 function zenith_angle(
             latd::FT,
-            day::Int,
-            hour::Int,
-            minute::FT=FT(0)
+            day::FT,
+            hour::FT,
+            minute::FT
 ) where {FT<:AbstractFloat}
     _deg::FT = 360 / FT(YEAR_D) * (day + (hour+minute/60) / 24 + 10);
     decd::FT = -FT(23.44) * cosd(_deg);
-    lhad::FT = (hour-12) * FT(15);
+    lhad::FT = (hour-12) * 15;
 
     return zenith_angle(latd, decd, lhad)
 end

@@ -246,7 +246,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
-git-tree-sha1 = "c4cd9a78276e5f4b77bb486b87a7fc9e1eee269a"
+git-tree-sha1 = "b793e4bdbdf2513f03ff91612c3737143301634a"
 repo-rev = "master"
 repo-url = "https://github.com/Yujie-W/PlantHydraulics.jl.git"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"

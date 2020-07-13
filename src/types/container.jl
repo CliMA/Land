@@ -50,9 +50,9 @@ Base.@kwdef mutable struct SPACContainer2L{FT<:AbstractFloat}
     "Sunlit layer fraction"
     frac_sl::FT = FT(0)
     "Shaded layer leaf area `[m²]`"
-    la_sh ::FT = FT(0)
+    la_sh  ::FT = FT(0)
     "Sunlit layer leaf area `[m²]`"
-    la_sl ::FT = FT(0)
+    la_sl  ::FT = FT(0)
     "Shaded layer LAI"
     lai_sh ::FT = FT(0)
     "Sunlit layer LAI"

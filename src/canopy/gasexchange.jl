@@ -4,9 +4,9 @@
 #
 ###############################################################################
 """
-    leaf_gas_exchange(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT, par::FT, rad::FT, la::FT, container::SPACContainer1L{FT}) where {FT<:AbstractFloat}
-    leaf_gas_exchange(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT) where {FT<:AbstractFloat}
-    leaf_gas_exchange(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, f_sl::FT, f_sh::FT) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT, par::FT, rad::FT, la::FT, container::SPACContainer1L{FT}) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, f_sl::FT, f_sh::FT) where {FT<:AbstractFloat}
 
 Simulate leaf level gas exchange and fill it into the `container` for 1-layer
     or 2-layer canopy, given
@@ -20,7 +20,7 @@ Simulate leaf level gas exchange and fill it into the `container` for 1-layer
 - `la` Leaf area of the leaves (total or each layer)
 - `container` [`SPACContainer1L`] type container
 """
-function leaf_gas_exchange(
+function leaf_gas_exchange_nonopt!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
             flow::FT,
@@ -36,32 +36,35 @@ function leaf_gas_exchange(
     # if flow >= 0
     else
         # 0. unpack required variables
-        @unpack p_atm, p_H₂O, t_air = node.envir;
+        @unpack envir, g_sla = node;
+        @unpack p_atm, p_H₂O, t_air = envir;
 
         # 1. calculate leaf temperature from the flow rate
         t_leaf = max(200, leaf_temperature(node, rad, flow));
 
         # 2. update leaf photosynthetic variables and leaf-to-air VPD
         node.ps.APAR = par;
-        leaf_temperature_dependence!(photo_set, node.ps, node.envir, t_leaf);
+        leaf_temperature_dependence!(photo_set, node.ps, envir, t_leaf);
         d_leaf = node.ps.p_sat - p_H₂O;
 
         # 3. update f_vis and f_st in leaf and calculate water potentials
-        vc_temperature_effects!(node.hs.leaf, t_leaf);
+        # TODO do not account for temperature effects for flow now
+        # More reasonable functions need to be added
+        # vc_temperature_effects!(node.hs.leaf, t_leaf);
 
         # if flow == 0
         if flow == 0
             g_lw = FT(0);
             g_lc = FT(1e-6);
-            leaf_photo_from_glc!(photo_set, node.ps, node.envir, g_lc);
+            leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
             container.an = node.ps.An;
 
         # if flow > 0 and reasonable
         elseif (d_leaf > 0) && (t_leaf > K_0)
             g_lw = flow / la / d_leaf * p_atm
-            g_lc = max(1e-6, g_lw / 1.6)
-            if g_lw < node.g_sla * relative_diffusive_coefficient( (t_leaf+t_air)/2 )
-                leaf_photo_from_glc!(photo_set, node.ps, node.envir, g_lc);
+            g_lc = max(FT(1e-6), g_lw / FT(1.6))
+            if g_lw < g_sla * relative_diffusive_coefficient( (t_leaf+t_air)/2 )
+                leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
                 container.an = node.ps.An;
             else
                 container.an = FT(-Inf);
@@ -79,7 +82,7 @@ end
 
 
 
-function leaf_gas_exchange(
+function leaf_gas_exchange_nonopt!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
             flow::FT
@@ -90,7 +93,7 @@ function leaf_gas_exchange(
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange(node, photo_set, flow, par_mean, rad_mean, node.laba, node.container1L);
+    leaf_gas_exchange_nonopt!(node, photo_set, flow, par_mean, rad_mean, node.laba, node.container1L);
 
     node.containerOP = (node.ec - flow) * (node.container1L).an;
 
@@ -100,7 +103,7 @@ end
 
 
 
-function leaf_gas_exchange(
+function leaf_gas_exchange_nonopt!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
             f_sl::FT,
@@ -110,8 +113,8 @@ function leaf_gas_exchange(
     @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
 
     # calculate gas exchangr for sunlit and shaded layers
-    leaf_gas_exchange(node, photo_set, f_sl, par_sl, rad_sl, la_sl, (node.container2L).cont_sl);
-    leaf_gas_exchange(node, photo_set, f_sh, par_sh, rad_sh, la_sh, (node.container2L).cont_sh);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, par_sl, rad_sl, la_sl, (node.container2L).cont_sl);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sh, par_sh, rad_sh, la_sh, (node.container2L).cont_sh);
 
     a_sum = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
     e_sum = f_sl + f_sh;
@@ -159,24 +162,27 @@ function leaf_gas_exchange!(
             container::SPACContainer1L{FT}
 ) where {FT<:AbstractFloat}
     # 0. unpack required variables
-    @unpack p_atm, p_H₂O, t_air = node.envir;
+    @unpack envir = node;
+    @unpack p_atm, p_H₂O = envir;
 
     # 1. calculate leaf temperature from the flow rate
     t_leaf = max(200, leaf_temperature(node, rad, flow));
 
     # 2. update leaf photosynthetic variables and leaf-to-air VPD
     node.ps.APAR = par;
-    leaf_temperature_dependence!(photo_set, node.ps, node.envir, t_leaf);
+    leaf_temperature_dependence!(photo_set, node.ps, envir, t_leaf);
     d_leaf = node.ps.p_sat - p_H₂O;
 
     # 3. update f_vis and f_st in leaf and calculate water potentials
-    vc_temperature_effects!(node.hs.leaf, t_leaf);
-    p_leaf = xylem_p_from_flow(node.hs, flow)
+    # TODO do not account for temperature effects for flow now
+    # More reasonable functions need to be added
+    # vc_temperature_effects!(node.hs.leaf, t_leaf);
+    p_leaf = xylem_p_from_flow(node.hs, flow);
 
     # 4. calculate photosynthesis
-    g_lw = flow / la / d_leaf * p_atm
-    g_lc = max(1e-6, g_lw / 1.6)
-    leaf_photo_from_glc!(photo_set, node.ps, node.envir, g_lc);
+    g_lw = flow / la / d_leaf * p_atm;
+    g_lc = max(FT(1e-6), g_lw / FT(1.6));
+    leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
     container.ag = node.ps.Ag;
     container.an = node.ps.An;
     container.c  = node.ps.p_i;
@@ -197,12 +203,13 @@ function leaf_gas_exchange!(
             flow::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
+    @unpack container2L, laba = node;
+    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl = container2L;
 
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, node.laba, node.container1L);
+    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, laba, node.container1L);
 
     return nothing
 end

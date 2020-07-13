@@ -3,7 +3,7 @@
 # Calculate annual profit
 #
 ###############################################################################
-function annual_simulation(
+function annual_simulation!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
             weather::DataFrame,
@@ -21,14 +21,14 @@ function annual_simulation(
     gscp   = FT(0);
     for i in eachindex( (weather).Year )
         # 2.1 read and update the hourly data
-        day   = (weather).Day[i]
-        hour  = (weather).Hour[i]
-        _tair = (weather).Tair[i]
-        _dair = (weather).D[i]
-        p_co2 = (weather).CO2[i] * ratio
-        r_all = (weather).Solar[i]
-        wind  = (weather).Wind[i]
-        rain  = (weather).Rain[i]
+        day  ::FT = (weather).Day[i]
+        hour ::FT = (weather).Hour[i]
+        _tair::FT = (weather).Tair[i]
+        _dair::FT = (weather).D[i]
+        p_co2::FT = (weather).CO2[i] * ratio
+        r_all::FT = (weather).Solar[i]
+        wind ::FT = (weather).Wind[i]
+        rain ::FT = (weather).Rain[i]
 
         node.envir.t_air = _tair + K_0;
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
@@ -39,7 +39,7 @@ function annual_simulation(
         node.envir.wind  = wind;
 
         # 2.2 if day time
-        zenith = zenith_angle(d_lati, day, hour);
+        zenith = zenith_angle(d_lati, day, hour, FT(0));
         if (r_all>0) & (zenith<=85)
             # 2.2.1 update the leaf partitioning
             big_leaf_partition!(node, zenith, r_all)
@@ -89,7 +89,8 @@ function annual_simulation(
 
             # 2.3.3 update temperature effects and then the leaf water potential
             flow = FT(0);
-            vc_temperature_effects!(node.hs.leaf, tlef);
+            # TODO morea reasonable functions need to be added
+            # vc_temperature_effects!(node.hs.leaf, tlef);
             plef = xylem_p_from_flow(node.hs, flow);
 
             # 2.3.4 pass values to DataFrame
@@ -130,7 +131,7 @@ function annual_simulation(
 
         # 2.4 update soil moisture by converting flow to Kg per hour
         flow /= FT(KG_H_2_MOL_S);
-        rain *= gaba * ρ_H₂O / 1000;
+        rain *= gaba * FT(ρ_H₂O) / 1000;
         soil_moisture!(node, flow-rain);
     end
 

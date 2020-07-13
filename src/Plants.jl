@@ -35,6 +35,35 @@ const KG_H_2_MOL_S  = KG_2_MOL / 3600
 
 
 
+# export public types
+export SPACContainer1L,
+       SPACContainer2L,
+       SPACSimple
+
+
+
+
+# export public functions
+export annual_profit,
+       annual_simulation!,
+       atmospheric_pressure,
+       atmospheric_pressure_ratio,
+       big_leaf_partition!,
+       gain_risk_map,
+       leaf_allocation!,
+       leaf_gas_exchange!,
+       leaf_gas_exchange_nonopt!,
+       leaf_temperature,
+       leaf_temperature_shaded,
+       leaf_temperature_sunlit,
+       optimize_flows!,
+       optimize_leaf!,
+       ppm_to_Pa,
+       zenith_angle
+
+
+
+
 include("types/container.jl")
 include("types/spac.jl"     )
 

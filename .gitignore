@@ -1,5 +1,5 @@
 data/*
 
-*txt
-*csv
+*.csv
 *.mem
+*.txt

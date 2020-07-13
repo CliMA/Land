@@ -6,7 +6,7 @@
 function annual_profit(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weather::DataFrame
+            weather::Array{FT,2}
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     @unpack c_cons, c_vmax, d_alti, d_lati, gaba, laba, maxv, vtoj = node;
@@ -17,17 +17,28 @@ function annual_profit(
     node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
 
     # 2. calculate the growing season canopy profit
-    gscp   = FT(0);
-    for i in eachindex( (weather).Year )
+    day  ::FT = FT(0);
+    hour ::FT = FT(0);
+    _tair::FT = FT(0);
+    _dair::FT = FT(0);
+    p_co2::FT = FT(0);
+    r_all::FT = FT(0);
+    wind ::FT = FT(0);
+    rain ::FT = FT(0);
+    gscp ::FT = FT(0);
+    anet ::FT = FT(0);
+
+    N = size(weather)[1]
+    for i in 1:N
         # 2.1 read and update the hourly data
-        day   = (weather).Day[i]
-        hour  = (weather).Hour[i]
-        _tair = (weather).Tair[i]
-        _dair = (weather).D[i]
-        p_co2 = (weather).CO2[i] * ratio
-        r_all = (weather).Solar[i]
-        wind  = (weather).Wind[i]
-        rain  = (weather).Rain[i]
+        day   = weather[i,2 ]
+        hour  = weather[i,3 ]
+        _tair = weather[i,7 ]
+        _dair = weather[i,9 ]
+        p_co2 = weather[i,10] * ratio
+        r_all = weather[i,4 ]
+        wind  = weather[i,6 ]
+        rain  = weather[i,5 ]
 
         node.envir.t_air = _tair + K_0;
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
@@ -38,7 +49,7 @@ function annual_profit(
         node.envir.wind  = wind;
 
         # 2.2 if day time
-        zenith = zenith_angle(d_lati, day, hour);
+        zenith = zenith_angle(d_lati, day, hour, FT(0));
         if (r_all>0) & (zenith<=85)
             # 2.2.1 update the leaf partitioning
             big_leaf_partition!(node, zenith, r_all)
@@ -63,7 +74,7 @@ function annual_profit(
 
         # 2.4 update soil moisture by converting flow to Kg per hour
         flow /= FT(KG_H_2_MOL_S);
-        rain *= gaba * ρ_H₂O / 1000;
+        rain *= gaba * FT(ρ_H₂O) / 1000;
         soil_moisture!(node, flow-rain);
 
         # 2.5 add up the gscp

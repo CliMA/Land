@@ -14,10 +14,10 @@ function soil_moisture_swc!(
             node::SPACSimple{FT},
             swc::FT
 ) where {FT<:AbstractFloat}
-    if swc < node.hs.root.sh.Θs
+    if swc < node.mswc
         node.swc = swc;
     else
-        node.swc = node.hs.root.sh.Θs;
+        node.swc = node.mswc;
     end
 
     node.p_soil = soil_p_25_swc(node.hs.root.sh, node.swc) * node.hs.root.f_st;
@@ -77,10 +77,10 @@ function soil_moisture!(
             Δt::FT=FT(1)
 ) where {FT<:AbstractFloat}
     # 1. positive flow means out, flow in Kg h⁻¹, dt in h
-    m_all  = node.swc * node.gaba * node.h_soil * ρ_H₂O;
+    m_all  = node.swc * node.gaba * node.h_soil * FT(ρ_H₂O);
     m_out  = flow * Δt;
     m_all -= m_out;
-    swc    = m_all / (node.gaba * node.h_soil * ρ_H₂O);
+    swc    = m_all / (node.gaba * node.h_soil * FT(ρ_H₂O));
     swc    = max(swc, FT(1e-6));
 
     soil_moisture_swc!(node, swc);

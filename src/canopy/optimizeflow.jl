@@ -22,7 +22,7 @@ function optimize_flows!(
     f_sl = min(ec_sl / FT(1.01), node.opt_f_sl);
     f_sh = min(ec_sh / FT(1.01), node.opt_f_sh);
 
-    leaf_gas_exchange(node, photo_set, f_sl, f_sh)
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_sh)
     p_opt = node.containerOP
 
     # until df < 0.001
@@ -37,7 +37,7 @@ function optimize_flows!(
         while true
             f_tmp = f_sl + df;
             f_tmp > ec_sl ? break : nothing;
-            leaf_gas_exchange(node, photo_set, f_tmp, f_sh);
+            leaf_gas_exchange_nonopt!(node, photo_set, f_tmp, f_sh);
             p_tmp = node.containerOP;
             p_tmp > p_opt ? (count_sl+=1; f_sl=f_tmp; p_opt=p_tmp;) : break;
         end
@@ -47,7 +47,7 @@ function optimize_flows!(
             while true
                 f_tmp = f_sl - df;
                 f_tmp < 0 ? break : nothing;
-                leaf_gas_exchange(node, photo_set, f_tmp, f_sh);
+                leaf_gas_exchange_nonopt!(node, photo_set, f_tmp, f_sh);
                 p_tmp = node.containerOP;
                 p_tmp > p_opt ? (count_sl+=1; f_sl=f_tmp; p_opt=p_tmp;) : break;
             end
@@ -58,7 +58,7 @@ function optimize_flows!(
         while true
             f_tmp = f_sh + df;
             f_tmp > ec_sh ? break : nothing;
-            leaf_gas_exchange(node, photo_set, f_sl, f_tmp);
+            leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_tmp);
             p_tmp = node.containerOP;
             p_tmp > p_opt ? (count_sh+=1; f_sh=f_tmp; p_opt=p_tmp;) : break;
         end
@@ -68,7 +68,7 @@ function optimize_flows!(
             while true
                 f_tmp = f_sh - df;
                 f_tmp < 0 ? break : nothing;
-                leaf_gas_exchange(node, photo_set, f_sl, f_tmp);
+                leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_tmp);
                 p_tmp = node.containerOP;
                 p_tmp > p_opt ? (count_sh+=1; f_sh=f_tmp; p_opt=p_tmp;) : break;
             end

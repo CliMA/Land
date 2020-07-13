@@ -17,7 +17,6 @@ const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
 Partition the big-leaf canopy into sunlit and shaded layers, given
 - `partition` Container for partition
 - `zenith` Zenith angle in degree
-- `lai` Leaf area index
 - `r_all` Total radiation in `[W m⁻²]`
 """
 function big_leaf_partition!(
@@ -26,7 +25,7 @@ function big_leaf_partition!(
             r_all::FT
 ) where {FT <:AbstractFloat}
     # unpack values
-    @unpack lai = node;
+    @unpack laba, lai = node;
 
     # 1. assume 50%-50% PAR and NIR, 80%-20% beam-diffuse
     par_tot = r_all / 2 / FT(0.235);
@@ -72,8 +71,8 @@ function big_leaf_partition!(
     # 7. update the information
     (node.container2L).frac_sl = ratio;
     (node.container2L).frac_sh = 1 - ratio;
-    (node.container2L).la_sl   = node.laba * ratio;
-    (node.container2L).la_sh   = node.laba * (1 - ratio);
+    (node.container2L).la_sl   = laba * ratio;
+    (node.container2L).la_sh   = laba * (1 - ratio);
     (node.container2L).lai_sl  = lai * ratio;
     (node.container2L).lai_sh  = lai * (1 - ratio);
     (node.container2L).par_sl  = q_slm;
