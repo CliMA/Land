@@ -84,10 +84,10 @@ end
         palm  = PH.create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         tree  = PH.create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = PH.TreeSimple{FT}();
-        _vc1 = PH.WeibullSingle{FT}();
-        _vc2 = PH.WeibullDual{FT}();
-        _sh1 = PH.BrooksCorey{FT}();
-        _sh2 = PH.VanGenuchten{FT}();
+        _vc1  = PH.WeibullSingle{FT}();
+        _vc2  = PH.WeibullDual{FT}();
+        _sh1  = PH.BrooksCorey{FT}();
+        _sh2  = PH.VanGenuchten{FT}();
 
         # Test the struct
         for data_set in [ leaf, root, stem, roots, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2 ]
