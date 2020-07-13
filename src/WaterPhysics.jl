@@ -43,15 +43,15 @@ export latent_heat_vapor,
 #
 ###############################################################################
 """
-    latent_heat_vapor(T::FT)
-    latent_heat_vapor(T::Array{FT})
+    latent_heat_vapor(T::FT) where {FT<:AbstractFloat}
+    latent_heat_vapor(T::Array{FT}) where {FT<:AbstractFloat}
 
 The specific latent heat of vaporization, given
  - `T` (Array of) temperature
 """
 function latent_heat_vapor(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0::FT = LH_V0;
     _T_0  ::FT = T_TRIPLE;
     _Δcp_v::FT = CP_V - CP_L;
@@ -59,9 +59,12 @@ function latent_heat_vapor(
     return _LH_v0 + _Δcp_v * (T - _T_0)
 end
 
+
+
+
 function latent_heat_vapor(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0::FT = LH_V0;
     _T_0  ::FT = T_TRIPLE;
     _Δcp_v::FT = CP_V - CP_L;
@@ -83,15 +86,15 @@ end
 #
 ###############################################################################
 """
-    saturation_vapor_pressure(T::FT)
-    saturation_vapor_pressure(T::Array{FT})
+    saturation_vapor_pressure(T::FT) where {FT<:AbstractFloat}
+    saturation_vapor_pressure(T::Array{FT}) where {FT<:AbstractFloat}
 
 Return the saturation vapor pressure over a plane liquid surface given
  - `T` (Array of) temperature
 """
 function saturation_vapor_pressure(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0       ::FT = LH_V0;
     _cp_v        ::FT = CP_V;
     _cp_l        ::FT = CP_L;
@@ -106,9 +109,12 @@ function saturation_vapor_pressure(
            exp((_LH_v0 - _Δcp * _T_0) / _R_v * (1 / _T_triple - 1 / T))
 end
 
+
+
+
 function saturation_vapor_pressure(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0       ::FT = LH_V0;
     _cp_v        ::FT = CP_V;
     _cp_l        ::FT = CP_L;
@@ -127,8 +133,8 @@ end
 
 
 """
-    saturation_vapor_pressure_slope(T::FT)
-    saturation_vapor_pressure_slope(T::Array{FT})
+    saturation_vapor_pressure_slope(T::FT) where {FT<:AbstractFloat}
+    saturation_vapor_pressure_slope(T::Array{FT}) where {FT<:AbstractFloat}
 
 Return the 1st order derivative of saturation vapor pressure over a plane
 liquid surface, given
@@ -145,7 +151,7 @@ The re-arranged Clausius-Clapeyron relation
 """
 function saturation_vapor_pressure_slope(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0::FT = LH_V0;
     _cp_v ::FT = CP_V;
     _cp_l ::FT = CP_L;
@@ -156,9 +162,12 @@ function saturation_vapor_pressure_slope(
     return (_LH_v0 + _Δcp * (T - _T_0)) / (_R_v*T^2)
 end
 
+
+
+
 function saturation_vapor_pressure_slope(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _LH_v0::FT = LH_V0;
     _cp_v ::FT = CP_V;
     _cp_l ::FT = CP_L;
@@ -182,21 +191,24 @@ end
 #
 ###############################################################################
 """
-    relative_diffusive_coefficient(T::FT)
-    relative_diffusive_coefficient(T::Array{FT})
+    relative_diffusive_coefficient(T::FT) where {FT<:AbstractFloat}
+    relative_diffusive_coefficient(T::Array{FT}) where {FT<:AbstractFloat}
 
 Returns the relative diffusive coefficient of water vapor in air, given
 - `T` Water vapor temperature
 """
 function relative_diffusive_coefficient(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     return (T / FT(K_25)) ^ FT(1.8)
 end
 
+
+
+
 function relative_diffusive_coefficient(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     return (T ./ FT(K_25)) .^ FT(1.8)
 end
 
@@ -219,8 +231,8 @@ const ST_corr   = 0.625
 const ST_ref    = 0.07197220523
 
 """
-    surface_tension(T::FT)
-    surface_tension(T::Array{FT})
+    surface_tension(T::FT) where {FT<:AbstractFloat}
+    surface_tension(T::Array{FT}) where {FT<:AbstractFloat}
 
 Surface tension `[N m⁻¹]` of water against air, given
 - `T` (Array of) temperature
@@ -235,7 +247,7 @@ See http://www.iapws.org/relguide/Surf-H2O.html
 """
 function surface_tension(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _ST_corr    ::FT = ST_corr;
     _ST_exp     ::FT = ST_exp;
     _ST_k       ::FT = ST_k;
@@ -245,9 +257,12 @@ function surface_tension(
     return _ST_k * _ST_T_r_diff^_ST_exp * (1 - _ST_corr*_ST_T_r_diff)
 end
 
+
+
+
 function surface_tension(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _ST_corr    ::FT = ST_corr;
     _ST_exp     ::FT = ST_exp;
     _ST_k       ::FT = ST_k;
@@ -261,8 +276,8 @@ end
 
 
 """
-    relative_surface_tension(T::FT)
-    relative_surface_tension(T::Array{FT})
+    relative_surface_tension(T::FT) where {FT<:AbstractFloat}
+    relative_surface_tension(T::Array{FT}) where {FT<:AbstractFloat}
 
 Relative surface tension of water against air relative to 298.15 K, given
 - `T` (Array of) temperature
@@ -280,15 +295,18 @@ and vulnerability curves of plants are described at 298.15 K.
 """
 function relative_surface_tension(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _ST_ref::FT = ST_ref;
 
     return surface_tension(T) / _ST_ref
 end
 
+
+
+
 function relative_surface_tension(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _ST_ref::FT = ST_ref;
 
     return surface_tension(T) ./ _ST_ref
@@ -312,8 +330,8 @@ const VIS_C =  0.04527      # K⁻¹  | Used for viscosity
 const VIS_D = -3.376e-5     # K⁻²  | Used for viscosity
 
 """
-    viscosity(T::FT)
-    viscosity(T::Array{FT})
+    viscosity(T::FT) where {FT<:AbstractFloat}
+    viscosity(T::Array{FT}) where {FT<:AbstractFloat}
 
 Viscosity of water `[Pa s]`, given
 - `T` (Array of) temperature
@@ -333,7 +351,7 @@ D = -3.376E-5 # K⁻²
 """
 function viscosity(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _A::FT = VIS_A;
     _B::FT = VIS_B;
     _C::FT = VIS_C;
@@ -342,9 +360,12 @@ function viscosity(
     return _A * exp( _B/T + _C*T + _D*T^2 )
 end
 
+
+
+
 function viscosity(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _A::FT = VIS_A;
     _B::FT = VIS_B;
     _C::FT = VIS_C;
@@ -357,8 +378,8 @@ end
 
 
 """
-    relative_viscosity(T::FT)
-    relative_viscosity(T::Array{FT})
+    relative_viscosity(T::FT) where {FT<:AbstractFloat}
+    relative_viscosity(T::Array{FT}) where {FT<:AbstractFloat}
 
 Viscosity relative to 25 degree C (298.15 K), given
 - `T` Water temperature
@@ -377,7 +398,7 @@ D = -3.376E-5 # K⁻²
 """
 function relative_viscosity(
             T::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _B::FT = VIS_B;
     _C::FT = VIS_C;
     _D::FT = VIS_D;
@@ -386,9 +407,12 @@ function relative_viscosity(
     return exp( _B * ( 1/T - 1/_K) + _C * (T - _K) + _D * (T^2 - _K^2) )
 end
 
+
+
+
 function relative_viscosity(
             T::Array{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     _B::FT = VIS_B;
     _C::FT = VIS_C;
     _D::FT = VIS_D;
