@@ -24,7 +24,6 @@ function diffusive_S(
             boundary_bottom::Array{FT},
             rsoil::Array{FT}
 ) where {FT<:AbstractFloat}
-    FT     = eltype(τ_dd)
     #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
     nwl,nl = size(τ_dd);
     Xdd    = similar(τ_dd);

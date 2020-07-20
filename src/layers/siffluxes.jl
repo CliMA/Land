@@ -6,7 +6,7 @@ Layer reflectance and transmission is computed from SW optical properties, layer
 - `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
 - `can_opt` A [`CanopyOptiArray`](@ref) struct for providing optical layer properties
 - `can_rad` A [`CanopyRadiation`](@ref) struct
-- `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nlayers and clumping
+- `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
 - `soil_opt` A [`SoilOpti`](@ref) type struct for soil optical properties
 - `wl_set` An [`WLParaSetArray`](@ref) type struct
 """
@@ -20,26 +20,26 @@ function sif_fluxes!(
 ) where {FT<:AbstractFloat}
     @unpack fs,fo, cosΘ_l, absfs, fsfo, absfsfo, cos2Θ_l, Ps, Po, Pso, a,  sigb,vb,vf = can_opt
     @unpack E_down, E_up,ϕ_shade,ϕ_sun = can_rad
-    @unpack Ω,nlayers, LAI = can
+    @unpack Ω, nLayer, LAI = can
     @unpack dwl, Iwle, Iwlf = wl_set
     rsoil = soil_opt.albedo_SW[Iwlf]
 
-    iLAI  = Ω*LAI/nlayers;
+    iLAI  = Ω*LAI/nLayer;
 
     τ_dd  = 1 .-a[Iwlf,:]*iLAI;
     ρ_dd  = sigb[Iwlf,:]*iLAI;
 
     dim   = size(leaf_array[1].Mb)
     # Compute mid layer Ps,Po,Pso
-    #Qso   = (Pso[1:nlayers] + Pso[2:nlayers+1])/2;
-    #Qs      = (Ps[1:nlayers] + Ps[2:nlayers+1])/2;
-    #Qo      =(Po[1:nlayers] + Po[2:nlayers+1])/2;
-    Qso   = Pso[1:nlayers]
-    Qs    = Ps[1:nlayers]
-    Qo    = Po[1:nlayers]
+    #Qso   = (Pso[1:nLayer] + Pso[2:nLayer+1])/2;
+    #Qs      = (Ps[1:nLayer] + Ps[2:nLayer+1])/2;
+    #Qo      =(Po[1:nLayer] + Po[2:nLayer+1])/2;
+    Qso   = Pso[1:nLayer]
+    Qs    = Ps[1:nLayer]
+    Qo    = Po[1:nLayer]
     # Allocate arrays for output:
     di    = size(leaf_array[1].Mb)
-    S⁻    = zeros(FT,dim[1],nlayers )
+    S⁻    = zeros(FT,dim[1],nLayer )
     S⁺    = similar(S⁻)
     piLs  = similar(S⁻)
     piLd  = similar(S⁻)
@@ -54,7 +54,7 @@ function sif_fluxes!(
     # 2. Calculation of reflectance
     # 2.1  reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
     sun = can_opt.Es_[Iwle,1];
-    @inbounds for i=1:nlayers
+    @inbounds for i=1:nLayer
         if length(leaf_array)>1
             Mb = leaf_array[i].Mb
             Mf = leaf_array[i].Mf
@@ -139,11 +139,11 @@ function sif_fluxes!(
     F⁻,F⁺,net_diffuse = diffusive_S(τ_dd, ρ_dd,S⁻, S⁺,zeroB, zeroB, rsoil)
     # Save in output structures!
     can_rad.SIF_obs_sunlit[:] = iLAI/FT(pi)*Qso'*piLs';                                               # direct Sunlit leaves
-    can_rad.SIF_obs_shaded[:] = iLAI/FT(pi)*(Qo[1:nlayers]-Qso[1:nlayers])'*piLd';                    # direct shaded leaves
+    can_rad.SIF_obs_shaded[:] = iLAI/FT(pi)*(Qo[1:nLayer]-Qso[1:nLayer])'*piLd';                    # direct shaded leaves
 
     # SIF scattered internally
-    #can_rad.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
-    can_rad.SIF_obs_scattered[:] = iLAI/FT(pi)*(Qo[1:nlayers]'*(vb[Iwlf,:].*F⁻[:,1:nlayers] + vf[Iwlf,:].*F⁺[:,1:nlayers])');
+    #can_rad.SIF_obs_scattered[:]     = iLAI/FT(pi)*(Qo[1:nLayer]'*(vb[Iwlf,:].*F⁻[:,1:nLayer] + vf[Iwlf,:].*F⁺[:,1:nLayer])');
+    can_rad.SIF_obs_scattered[:] = iLAI/FT(pi)*(Qo[1:nLayer]'*(vb[Iwlf,:].*F⁻[:,1:nLayer] + vf[Iwlf,:].*F⁺[:,1:nLayer])');
     can_rad.SIF_obs_soil[:]      = (rsoil .* F⁻[:,end] * Po[end])/FT(pi); #Soil contribution
 
     can_rad.SIF_hemi[:] = F⁺[:,1];

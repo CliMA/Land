@@ -35,7 +35,7 @@ Base.@kwdef mutable struct WaveLengths{FT}
     dwl::Array{FT,1} = diff(swl)
 
     "Leaf optical parameter set"
-    optis::LeafOpticals = create_opti_par(swl, file_Opti)
+    optis::LeafOpticals = create_leaf_opticals(swl, file_Opti)
 
     "Wave length `[nm]`"
     wl::Array{FT,1} = optis.lambda

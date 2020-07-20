@@ -21,8 +21,8 @@ function canopy_matrices!(
 ) where {FT<:AbstractFloat}
     # 2. Calculation of reflectance
     # 2.1 reflectance, transmittance factors in a thin layer the following are vectors with length [nl,nwl]
-    nlayers = size(can_opt.sigb)[2];
-    @inbounds for i=1:nlayers
+    nLayer = size(can_opt.sigb)[2];
+    @inbounds for i=1:nLayer
         if length(leaf_array)>1
             τ_SW = leaf_array[i].τ_SW;
             ρ_SW = leaf_array[i].ρ_SW;

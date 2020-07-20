@@ -30,13 +30,13 @@ end
 
 
 """
-    create_opti_par(swl::Array, file::String)
+    create_leaf_opticals(swl::Array, file::String)
 
 Create an `AbstractLeafOptiPara` struct, given
 - `swl` Standard wave length
 - `file` Input file name
 """
-function create_opti_par(swl::Array{FT,1}, file::String=file_Opti) where {FT<:AbstractFloat}
+function create_leaf_opticals(swl::Array{FT,1}, file::String=file_Opti) where {FT<:AbstractFloat}
     N = length(swl)-1
 
     # reading data

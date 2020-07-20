@@ -21,15 +21,15 @@ function canopy_geometry!(
             can_opt::CanopyOpticals{FT}
 ) where {FT<:AbstractFloat}
 
-    @unpack clump_a, clump_b, LAI, litab, litab_bnd, nlayers, Ω,lazitab = can
+    @unpack clump_a, clump_b, LAI, litab, litab_bnd, nLayer, Ω,lazitab = can
     @unpack tts,tto,psi = angles
 
     if clump_b > 0
         can.Ω = clump_a .+ clump_b.*(1. .- cosd(tts))
     end
 
-    dx  = FT(1/nlayers)
-    xl  = collect(FT(0):FT(-1/nlayers):-1)
+    dx  = FT(1/nLayer)
+    xl  = collect(FT(0):FT(-1/nLayer):-1)
 
     # only needed for volume scattering for symmetry (not sure why it wasn't working)
     psi_vol = abs(psi-FT(360.0)*round(psi/FT(360.0)))

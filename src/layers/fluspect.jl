@@ -55,10 +55,10 @@ function fluspect!(
     # From Prospect-D, uses 40 here instead of 59 from CVT)
 
     #talf    = calctav.(59.,nr)
-    talf    = calctav.(40,nr)
+    talf    = calctav.(FT(40),nr)
     ralf    = FT(1) .-talf
 
-    t12     = calctav.(90, nr)
+    t12     = calctav.(FT(90), nr)
     r12     = FT(1) .-t12
     t21     = t12./(nr.^2)
     r21     = FT(1) .-t21
