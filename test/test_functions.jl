@@ -1,5 +1,5 @@
 # Function tests adapted from experiments/Radiation_test_BRDF
-@testset "CanopyRT --- RT function test" begin
+@testset "CanopyRadiation --- RT function test" begin
     for FT in [Float32, Float64]
         wl_set    = WaveLengths{FT}()
         leaf_1    = create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF)

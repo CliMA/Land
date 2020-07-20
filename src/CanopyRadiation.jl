@@ -37,7 +37,8 @@ export Canopy4RT,
 
 
 # export public functions
-export canopy_fluxes!,
+export big_leaf_partition,
+       canopy_fluxes!,
        canopy_geometry!,
        canopy_matrices!,
        create_canopy_opticals,
@@ -71,6 +72,8 @@ include("utils/expint.jl"     )
 include("utils/integral.jl"   )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
+
+include("bigleaf/bigleaf.jl")
 
 include("layers/canopyfluxes.jl"  )
 include("layers/canopygeometry.jl")

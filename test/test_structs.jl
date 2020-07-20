@@ -1,6 +1,5 @@
 # FT and NaN tests
-# TODO test the MArrays as well
-@testset "CanopyRT --- FT and NaN test" begin
+@testset "CanopyRadiation --- FT and NaN test" begin
     for FT in [Float32, Float64]
         for data_set in [ Canopy4RT{FT}(nLayer=20, LAI=FT(3)),
                           create_canopy_opticals(FT, 10, 10, 10, 10),
