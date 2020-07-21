@@ -19,6 +19,7 @@
 Calculate steady state gsw and photosynthesis from empirical approach, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
+- `hs` Leaf hydraulic system
 - `envir` [`AirLayer`] type struct
 - `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
 - `ind` Nth leaf in leaves
@@ -26,37 +27,40 @@ Calculate steady state gsw and photosynthesis from empirical approach, given
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OptimizationStomatalModel
             ) where {FT<:AbstractFloat}
     # update the temperature dependent parameters and maximal a and kr
-    update_leaf_TP!(photo_set, leaves, envir);
-    update_leaf_AK!(photo_set, leaves, envir);
+    update_leaf_TP!(photo_set, leaves, hs, envir);
+    update_leaf_AK!(photo_set, leaves, hs, envir);
 
     # calculate optimal solution for each leaf
     for ind in eachindex(leaves.APAR)
-        leaf_photo_from_envir!(photo_set, leaves, envir, sm, ind);
+        leaf_photo_from_envir!(photo_set, leaves, hs, envir, sm, ind);
     end
 end
 
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel
             ) where {FT<:AbstractFloat}
     # update the temperature dependent parameters
-    update_leaf_TP!(photo_set, leaves, envir);
+    update_leaf_TP!(photo_set, leaves, hs, envir);
 
     # calculate optimal solution for each leaf
     for ind in eachindex(leaves.APAR)
-        leaf_photo_from_envir!(photo_set, leaves, envir, sm, ind);
+        leaf_photo_from_envir!(photo_set, leaves, hs, envir, sm, ind);
     end
 end
 
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMEller,
             ind::Int
@@ -89,7 +93,7 @@ function leaf_photo_from_envir!(
             _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = envir_diff!(x, photo_set, leaves, envir, sm, ind);
+            @inline f(x) = envir_diff!(x, photo_set, leaves, hs, envir, sm, ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -118,6 +122,7 @@ end
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMSperry,
             ind::Int
@@ -150,7 +155,7 @@ function leaf_photo_from_envir!(
             _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = envir_diff!(x, photo_set, leaves, envir, sm, ind);
+            @inline f(x) = envir_diff!(x, photo_set, leaves, hs, envir, sm, ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -179,6 +184,7 @@ end
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OptimizationStomatalModel,
             ind::Int
@@ -210,7 +216,7 @@ function leaf_photo_from_envir!(
             _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = envir_diff!(x, photo_set, leaves, envir, sm, ind);
+            @inline f(x) = envir_diff!(x, photo_set, leaves, hs, envir, sm, ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -239,6 +245,7 @@ end
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel,
             ind::Int
@@ -256,7 +263,7 @@ function leaf_photo_from_envir!(
         _gl    = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
         _st    = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = envir_diff!(x, photo_set, leaves, envir, sm, ind);
+        @inline f(x) = envir_diff!(x, photo_set, leaves, hs, envir, sm, ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates

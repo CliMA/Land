@@ -1,4 +1,5 @@
 using Photosynthesis
+using PlantHydraulics
 using StomataModels
 using Test
 
@@ -94,6 +95,7 @@ end
         osm_3  = SM.OSMWang{FT}();
         osm_4  = SM.OSMWAP{FT}();
         osm_5  = SM.OSMWAPMod{FT}();
+        hs     = LeafHydraulics{FT}();
 
         # test the structures
         for result in [ lv_3, esm_1, esm_2, esm_3, esm_4, osm_4, osm_5 ]
@@ -102,10 +104,10 @@ end
         end
 
         # test the refresh functions
-        SM.update_leaf_TP!(mod_3, lv_3, envir);
-        SM.update_leaf_TP!(mod_4, lv_4, envir);
-        SM.update_leaf_AK!(mod_3, lv_3, envir);
-        SM.update_leaf_AK!(mod_4, lv_4, envir);
+        SM.update_leaf_TP!(mod_3, lv_3, hs, envir);
+        SM.update_leaf_TP!(mod_4, lv_4, hs, envir);
+        SM.update_leaf_AK!(mod_3, lv_3, hs, envir);
+        SM.update_leaf_AK!(mod_4, lv_4, hs, envir);
         SM.update_leaf_from_glc!(mod_3, lv_3, envir, 1, FT(0.1));
         SM.update_leaf_from_glc!(mod_4, lv_4, envir, 1, FT(0.1));
         SM.update_leaf_from_gsw!(mod_3, lv_3, envir, 1, FT(0.05));
@@ -145,7 +147,7 @@ end
         # test the solution functions
         for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
             for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                result = SM.envir_diff!(FT(0.1), mod, lv, envir, sm, 1);
+                result = SM.envir_diff!(FT(0.1), mod, lv, hs, envir, sm, 1);
                 recursive_FT_test(result, FT);
                 recursive_NaN_test(result);
             end
@@ -154,13 +156,13 @@ end
         # test the stomata solutions
         for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
             for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                SM.leaf_photo_from_envir!(mod, lv, envir, sm, 1);
+                SM.leaf_photo_from_envir!(mod, lv, hs, envir, sm, 1);
                 recursive_NaN_test(lv);
             end
         end
         for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
             for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                SM.leaf_photo_from_envir!(mod, lv, envir, sm);
+                SM.leaf_photo_from_envir!(mod, lv, hs, envir, sm);
                 recursive_NaN_test(lv);
             end
         end

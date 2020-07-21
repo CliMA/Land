@@ -255,7 +255,7 @@ end
 
 ###############################################################################
 #
-# Leaf parameters container
+# Leaves parameters container
 #
 ###############################################################################
 """
@@ -267,15 +267,13 @@ Struct to store leaf information (multi-dimensional).
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Leaves{FT<:AbstractFloat}
-    # Leaf hydraulics system
-    "Leaf hydraulic system"
-    hs ::LeafHydraulics{FT} = LeafHydraulics{FT}()
+    # Leaves photosynthesis system
     "leaf photosynthesis system"
-    ps ::Leaf{FT}           = Leaf{FT}()
+    ps ::Leaf{FT} = Leaf{FT}()
     "Total leaf area `[m²]`"
-    LA ::FT                 = FT(150)
+    LA ::FT = FT(150)
     "Total leaf area index"
-    LAI::FT                 = FT(3)
+    LAI::FT = FT(3)
 
     # Number of Leaves per canopy layer
     n_leaf::Int = 325

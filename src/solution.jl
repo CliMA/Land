@@ -8,6 +8,7 @@
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::AbstractStomatalModel,
             ind::Int)
@@ -16,6 +17,7 @@ Calculate the difference to be minimized for a given
 - `x` Assumed leaf diffusive conductance
 - `photo_set`[`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves`[`Leaves`](@ref) type struct
+- `hs` Leaf hydraulic system
 - `envir`[`AirLayer`] type struct
 - `sm` Stomatal model option (photo_set.Sto)
 - `int` Nth leaf in Leaves
@@ -25,11 +27,12 @@ function envir_diff!(
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
             envir::AirLayer{FT},
+            hs::LeafHydraulics{FT},
             sm::ESMGentine{FT},
             ind::Int
             ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack hs, p_sat, ps = leaves;
+    @unpack p_sat, ps = leaves;
     @unpack p_atm, p_H₂O = envir;
     g_bc  = leaves.g_bc[ind];
     g_bw  = leaves.g_bw[ind];
@@ -60,6 +63,7 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel,
             ind::Int
@@ -87,12 +91,13 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMEller,
             ind::Int
             ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, hs, p_sat, ps = leaves;
+    @unpack g_max, g_min, p_sat, ps = leaves;
     @unpack p_atm, p_H₂O = envir;
     g_bc = leaves.g_bc[ind];
     g_bw = leaves.g_bw[ind];
@@ -157,12 +162,13 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMSperry,
             ind::Int
             ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, hs, kr_max, p_sat, ps = leaves;
+    @unpack g_max, g_min, kr_max, p_sat, ps = leaves;
     @unpack p_atm, p_H₂O = envir;
     a_max = leaves.a_max[ind];
     g_bc  = leaves.g_bc[ind];
@@ -228,6 +234,7 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWang,
             ind::Int
@@ -296,12 +303,13 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWAP,
             ind::Int
             ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, hs, p_sat, ps = leaves;
+    @unpack g_max, g_min, p_sat, ps = leaves;
     @unpack p_atm, p_H₂O = envir;
     g_bc = leaves.g_bc[ind];
     g_bw = leaves.g_bw[ind];
@@ -366,12 +374,13 @@ function envir_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet,
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWAPMod,
             ind::Int
             ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, hs, p_sat, ps = leaves;
+    @unpack g_max, g_min, p_sat, ps = leaves;
     @unpack p_atm, p_H₂O = envir;
     g_bc = leaves.g_bc[ind];
     g_bw = leaves.g_bw[ind];

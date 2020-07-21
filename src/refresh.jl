@@ -7,17 +7,20 @@
     update_leaf!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaves::Leaves{FT},
-            envir::AirLayer{FT})
+            hs::LeafHydraulics{FT},
+            envir::AirLayer{FT}) where {FT<:AbstractFloat}
 
 Update leaf physiological parameters if temperature or pressure changes in the
 daytime, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `leaves` [`Leaves`](@ref) type struct
+- `hs` Leaf hydraulic system
 - `envir` [`AirLayer`] type struct
 """
 function update_leaf_TP!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     # unpack required variables
@@ -31,16 +34,16 @@ function update_leaf_TP!(
         leaves.ps.T     = leaves.T;
         leaf_temperature_dependence!(photo_set, leaves.ps, envir);
         leaves.p_sat    = leaves.ps.p_sat;
-        leaves.hs.f_st  = relative_surface_tension(T);
-        leaves.hs.f_vis = relative_viscosity(T);
-        leaves.hs.p_ups = leaves.p_ups;
-        leaves.ec       = leaf_e_crit(leaves.hs, leaves.ec);
+        hs.f_st  = relative_surface_tension(T);
+        hs.f_vis = relative_viscosity(T);
+        hs.p_ups = leaves.p_ups;
+        leaves.ec       = leaf_e_crit(hs, leaves.ec);
         leaves.T_old    = leaves.T;
         leaves.p_old    = leaves.p_ups;
     # if only p_ups changes, update ec and p_old
     elseif p_ups != p_old
-        leaves.hs.p_ups = leaves.p_ups;
-        leaves.ec       = leaf_e_crit(leaves.hs, leaves.ec);
+        hs.p_ups = leaves.p_ups;
+        leaves.ec       = leaf_e_crit(hs, leaves.ec);
         leaves.p_old    = leaves.p_ups;
     end
 
@@ -54,7 +57,8 @@ end
     update_leaf_AK!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaves::Leaves{FT},
-            envir::AirLayer{FT})
+            hs::LeafHydraulics{FT},
+            envir::AirLayer{FT}) where {FT<:AbstractFloat}
 
 Update leaf maximal A and K for Sperry model, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
@@ -64,6 +68,7 @@ Update leaf maximal A and K for Sperry model, given
 function update_leaf_AK!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaves::Leaves{FT},
+            hs::LeafHydraulics{FT},
             envir::AirLayer{FT}
             ) where {FT<:AbstractFloat}
     # unpack required variables
@@ -87,7 +92,7 @@ function update_leaf_AK!(
 
     # update a_max and kr_max
     leaves.a_max  .= _Ams;
-    leaves.kr_max  = leaves.hs.k_history[end];
+    leaves.kr_max  = hs.k_history[end];
 
     return nothing
 end
