@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    update_leaf!(
+    update_leaf_TP!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaves::Leaves{FT},
             hs::LeafHydraulics{FT},
@@ -160,6 +160,22 @@ end
 
 
 
+function update_leaf_from_glc!(
+            photo_set::AbstractPhotoModelParaSet{FT},
+            leaves::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update the conductances for each "leaf"
+    for i in eachindex(leaves.g_lc)
+        update_leaf_from_glc!(photo_set, leaves, envir, i, leaves.g_lc[i]);
+    end
+
+    return nothing
+end
+
+
+
+
 """
     update_leaf_from_gsw!(
             photo_set::AbstractPhotoModelParaSet{FT},
@@ -209,6 +225,22 @@ end
 
 
 
+function update_leaf_from_gsw!(
+            photo_set::AbstractPhotoModelParaSet{FT},
+            leaves::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # update the conductances for each "leaf"
+    for i in eachindex(leaves.g_sw)
+        update_leaf_from_gsw!(photo_set, leaves, envir, i, leaves.g_sw[i]);
+    end
+
+    return nothing
+end
+
+
+
+
 
 
 
@@ -241,6 +273,22 @@ function leaf_gsw_control!(
         update_leaf_from_gsw!(photo_set, leaves, envir, ind, leaves.g_min);
     elseif leaves.g_sw[ind] > leaves.g_max
         update_leaf_from_gsw!(photo_set, leaves, envir, ind, leaves.g_max);
+    end
+
+    return nothing
+end
+
+
+
+
+function leaf_gsw_control!(
+            photo_set::AbstractPhotoModelParaSet,
+            leaves::Leaves{FT},
+            envir::AirLayer{FT}
+            ) where {FT<:AbstractFloat}
+    # if g_sw is low than g_min
+    for i in eachindex(leaves.g_sw)
+        leaf_gsw_control!(photo_set, leaves, envir, i);
     end
 
     return nothing
