@@ -4,13 +4,12 @@
 #
 ###############################################################################
 """
-    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
-    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}, p_i::FT) where {FT<:AbstractFloat}
+    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    leaf_photo_from_pi!(photo_set::AbstractPhotoModelParaSet{FT}, leaf::Leaf{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Compute leaf photosynthetic rates, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
 - `leaf` [`Leaf`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
 - `p_i` Given leaf internal CO₂
 
 The C3 photosynthesis model is from Farquhar et al. (1980) "A biochemical model
@@ -21,8 +20,7 @@ The C4 photosynthesis model is adapted from Collatz et al. (1992) "Coupled
 """
 function leaf_photo_from_pi!(
             photo_set::AbstractPhotoModelParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT}
+            leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf);
@@ -40,11 +38,10 @@ end
 function leaf_photo_from_pi!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
-            envir::AirLayer{FT},
             p_i::FT
 ) where {FT<:AbstractFloat}
     leaf.p_i = p_i;
-    leaf_photo_from_pi!(photo_set, leaf, envir);
+    leaf_photo_from_pi!(photo_set, leaf);
 
     return nothing
 end

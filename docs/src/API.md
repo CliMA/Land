@@ -4,13 +4,28 @@
 CurrentModule = Photosynthesis
 ```
 
+
+
+
 ## Leaf and Environment Structures
-To model photosynthesis more efficiently, we use a container ([`Leaf`](@ref) struct) to store the photosynthesis-related information. For example, many of the physiological parameters are temperature-dependent, but these temperature-dependent values only need to be updated when leaf temperature changes. Therefore, use of the container significantly reduces the time required when programing leaf gas exchange prognostically. The [`Leaf`](@ref) struct has the following fields:
+To model photosynthesis more efficiently, we use a container ([`Leaf`](@ref)
+    struct) to store the photosynthesis-related information. For example, many
+    of the physiological parameters are temperature-dependent, but these
+    temperature-dependent values only need to be updated when leaf temperature
+    changes. Therefore, use of the container significantly reduces the time
+    required when programing leaf gas exchange prognostically. The
+    [`Leaf`](@ref) struct has the following fields:
+
 ```@docs
 Leaf
 ```
 
-Also, environmental conditions are required to compute photosynthetic rate, and these conditions are stored in [`AirLayer`](@ref) struct. An [`AirLayer`](@ref) struct further allows for more conveniently modeling photosynthesis the vertical CO₂ and H₂O gradients in the canopy. The [`AirLayer`](@ref) structs has the following fields:
+Also, environmental conditions are required to compute photosynthetic rate, and
+    these conditions are stored in [`AirLayer`](@ref) struct. An
+    [`AirLayer`](@ref) struct further allows for more conveniently modeling
+    photosynthesis the vertical CO₂ and H₂O gradients in the canopy. The
+    [`AirLayer`](@ref) structs has the following fields:
+
 ```@docs
 AirLayer
 ```
@@ -40,14 +55,18 @@ The temperature-dependent (TD) photosynthetic parameters include
 - ``V_\text{pmax}`` Maximal PEP carboxylation rate
 - ``Γ^{*}`` CO₂ compensation point with the absence of dark respiration
 
-There are two typical types of temperature dependencies using the classic Arrhenius equation. We define the two types as [`ArrheniusTD`](@ref) and [`ArrheniusPeakTD`](@ref) subject to [`AbstractTDParameterSet`](@ref) type:
+There are two typical types of temperature dependencies using the classic
+    Arrhenius equation. We define the two types as [`ArrheniusTD`](@ref) and
+    [`ArrheniusPeakTD`](@ref) subject to [`AbstractTDParameterSet`](@ref) type:
+
 ```@docs
 AbstractTDParameterSet
 ArrheniusTD
 ArrheniusPeakTD
 ```
 
-There are many published parameter sets for the various temperature dependencies, and to ease the modeling we predefined most of the structs:
+There are many published parameter sets for the various temperature
+    dependencies, and to ease the modeling we predefined most of the structs:
 ```@docs
 JmaxTDBernacchi
 JmaxTDCLM
@@ -70,6 +89,7 @@ VpmaxTDBoyd
 ```
 
 The TDs can be easily created using commands like
+
 ```julia
 using Photosynthesis
 
@@ -78,7 +98,9 @@ _td_1 = JmaxTDBernacchi(FT);
 _td_2 = VcmaxTDCLM(FT);
 ```
 
-However, be aware that these pre-defined TD structs are not mutable, to create customized TD struct, code like this will be useful
+However, be aware that these pre-defined TD structs are not mutable, to create
+    customized TD struct, code like this will be useful
+
 ```julia
 using Photosynthesis
 
@@ -87,14 +109,22 @@ _td_1 = ArrheniusTD{FT}(1, 10000, 30);
 _td_1 = ArrheniusPeakTD{FT}(1, 10000, 30, 1);
 ```
 
-To further simplify the use of Photosynthesis module, we provide a few collections/structs of temperature dependencies as well as other parameter sets like [`FluoParaSet`](@ref). The structs are catergorized to [`C3ParaSet`](@ref) and [`C4ParaSet`](@ref) subject to an [`AbstractPhotoModelParaSet`](@ref) type, and the structs are meant for modeling C3 photosynthesis and C4 photosynthesis, respectively.
+To further simplify the use of Photosynthesis module, we provide a few
+    collections/structs of temperature dependencies as well as other parameter
+    sets like [`FluoParaSet`](@ref). The structs are catergorized to
+    [`C3ParaSet`](@ref) and [`C4ParaSet`](@ref) subject to an
+    [`AbstractPhotoModelParaSet`](@ref) type, and the structs are meant for
+    modeling C3 photosynthesis and C4 photosynthesis, respectively.
+
 ```@docs
 AbstractPhotoModelParaSet
 C3ParaSet
 C4ParaSet
 ```
 
-Again, to guarantee a quick start, we provided a few pre-defined parameter sets:
+Again, to guarantee a quick start, we provided a few pre-defined parameter
+    sets:
+
 ```@docs
 C3Bernacchi
 C3CLM
@@ -111,7 +141,12 @@ set_3 = C3CLM(FT);
 set_4 = C4CLM(FT);
 ```
 
-Note it here that the [`C3ParaSet`](@ref) and [`C4ParaSet`](@ref) structs are mutable, and the fields can be changed to another non-mutable TD struct. We'd like to mention that in some cases, leaf respiration rate is not measured, and in this case, the dark respiration rate will be computed from $V_\text{cmax}$ using a multiplier
+Note it here that the [`C3ParaSet`](@ref) and [`C4ParaSet`](@ref) structs are
+    mutable, and the fields can be changed to another non-mutable TD struct.
+    We'd like to mention that in some cases, leaf respiration rate is not
+    measured, and in this case, the dark respiration rate will be computed from
+    $V_\text{cmax}$ using a multiplier
+
 ```@docs
 VtoRCollatz
 VtoRDefault
@@ -121,20 +156,33 @@ VtoRDefault
 
 
 ## Temperature Dependency
-As mentioned above, temperature corrections only need to be done once per temperature change, and storing the temperature corrected values will significantly boost the code speed. Here we provide a few functions to change the stored values. First of all, all the temperature corrections are made with [`arrhenius_correction`](@ref):
+As mentioned above, temperature corrections only need to be done once per
+    temperature change, and storing the temperature corrected values will
+    significantly boost the code speed. Here we provide a few functions to
+    change the stored values. First of all, all the temperature corrections are
+    made with [`arrhenius_correction`](@ref):
+
 ```@docs
 arrhenius_correction
 ```
 
-Second, depending on which physiological parameter to correct, some corrections use the `VAL_25` field in the [`ArrheniusTD`](@ref), like $K_\text{c}$, $K_\text{o}$, and $K_\text{pep}$:
+Second, depending on which physiological parameter to correct, some corrections
+    use the `VAL_25` field in the [`ArrheniusTD`](@ref), like $K_\text{c}$,
+    $K_\text{o}$, and $K_\text{pep}$:
+
 ```@docs
 photo_TD_from_set
 ```
-Some corrections use the reference values from the [`Leaf`](@ref) struct, like $V_\text{cmax}$ and $J_\text{max}$:
+
+Some corrections use the reference values from the [`Leaf`](@ref) struct, like
+    $V_\text{cmax}$ and $J_\text{max}$:
+
 ```@docs
 photo_TD_from_val
 ```
+
 The functions to make temperature corrections to each individual variables are
+
 ```@docs
 leaf_jmax!
 leaf_kc!
@@ -147,13 +195,18 @@ leaf_vpmax!
 leaf_Γstar!
 ```
 
-Again to ease the coding, we provide a function to run all the temperature dependencies:
+Again to ease the coding, we provide a function to run all the temperature
+    dependencies:
+
 ```@docs
 leaf_temperature_dependence!
 ```
-Note it here that function [`leaf_temperature_dependence!`](@ref) updates saturated vapor pressure from leaf temperature as well.
+
+Note it here that function [`leaf_temperature_dependence!`](@ref) updates
+    saturated vapor pressure from leaf temperature as well.
 
 Example:
+
 ```julia
 using Photosynthesis
 
@@ -170,54 +223,56 @@ leaf_temperature_dependence!(c3_set, leaf, envir, FT(300));
 
 
 ## RubisCO-limited Photosynthesis
-By default, Photosynthesis module computes gross photosynthetic rate as the minimal of the three:
+By default, Photosynthesis module computes gross photosynthetic rate as the
+    minimal of the three:
+
 - ``A_\text{c}`` RubisCO-limited photosynthetic rate
 - ``A_\text{j}`` Light-limited photosynthetic rate
 - ``A_\text{p}`` Product-limited photosynthetic rate
 
 If leaf internal CO₂ is known, $A_\text{c}$ (gross rate) can be computed using
+
 ```@docs
 rubisco_limited_rate!
 ```
 
-If total leaf diffusive conductance to CO₂ is known, $A_\text{c}$ can be computed analytically using
+If total leaf diffusive conductance to CO₂ is known, $A_\text{c}$ can be
+    computed analytically using
+
 ```@docs
 rubisco_limited_rate_glc!
 ```
 
-Note it here that [`rubisco_limited_rate_glc!`](@ref) only applies to C3 photosynthesis as the RubisCO-limited rate for C4 plants is $V_\text{cmax}$.
-
-To faciliate the computation of photosynthetic rate for a number of leaves with different conductances but same temperature (as in the case of CliMA Land model), function [`rubisco_limited_an_glc`](@ref) returns (an array of) net photosynthetic rate limited by RubisCO.
-```@docs
-rubisco_limited_an_glc
-```
+Note it here that [`rubisco_limited_rate_glc!`](@ref) only applies to C3
+    photosynthesis as the RubisCO-limited rate for C4 plants is
+    $V_\text{cmax}$.
 
 
 
 
 ## Light-limited Photosynthesis
 If leaf internal CO₂ is known, $A_\text{j}$ (gross rate) can be computed using
+
 ```@docs
 light_limited_rate!
 ```
 
-If total leaf diffusive conductance to CO₂ is known, $A_\text{j}$ can be computed analytically using
+If total leaf diffusive conductance to CO₂ is known, $A_\text{j}$ can be
+    computed analytically using
+
 ```@docs
 light_limited_rate_glc!
 ```
 
-Note it here that [`light_limited_rate_glc!`](@ref) only applies to C3 photosynthesis as the RubisCO-limited rate for C4 plants is the electron transport rate.
+Note it here that [`light_limited_rate_glc!`](@ref) only applies to C3
+    photosynthesis as the RubisCO-limited rate for C4 plants is the electron
+    transport rate.
 
-To faciliate the computation of photosynthetic rate for a number of leaves with different conductances but same temperature (as in the case of CliMA Land model), function [`light_limited_an_glc`](@ref) returns (an array of) net photosynthetic rate limited by light.
-```@docs
-light_limited_an_glc
-```
+Be aware that leaf electron transport rate needs to be calculated before the
+    light-limited rate:
 
-Be aware that leaf electron transport rate needs to be calculated before the light-limited rate:
 ```@docs
 leaf_ETR!
-leaf_ETR_Jps
-leaf_ETR_pot_APAR
 ```
 
 
@@ -225,26 +280,32 @@ leaf_ETR_pot_APAR
 
 ## Product-limited Photosynthesis
 If leaf internal CO₂ is known, $A_\text{p}$ (gross rate) can be computed using
+
 ```@docs
 product_limited_rate!
 ```
 
-If total leaf diffusive conductance to CO₂ is known, $A_\text{p}$ can be computed analytically using
+If total leaf diffusive conductance to CO₂ is known, $A_\text{p}$ can be
+    computed analytically using
+
 ```@docs
 product_limited_rate_glc!
 ```
-Note it here that [`product_limited_rate_glc!`](@ref) only applies to C4 photosynthesis as the RubisCO-limited rate for C4 plants is $V_\text{cmax}$/2.
 
-To faciliate the computation of photosynthetic rate for a number of leaves with different conductances but same temperature (as in the case of CliMA Land model), function [`product_limited_an_glc`](@ref) returns (an array of) product-limited net photosynthetic rate.
-```@docs
-product_limited_an_glc
-```
+Note it here that [`product_limited_rate_glc!`](@ref) only applies to C4
+    photosynthesis as the RubisCO-limited rate for C4 plants is
+    $V_\text{cmax}$/2.
 
 
 
 
 ## Photosynthetic Rates
-It is worth noting that [`rubisco_limited_an_glc`](@ref), [`light_limited_an_glc`](@ref), and [`product_limited_an_glc`](@ref) are more efficient than computing the rates for each individual leaf. However, for empirical and optimization stomatal models, iterations are required to get the final solution as in StomataModels module. In this case, more conveniently computing photosynthetic rates for each leaf is preferable. In this case, [`leaf_photo_from_pi!`](@ref) and [`leaf_photo_from_glc!`](@ref) are better options:
+For empirical and optimization stomatal models, iterations are required to get
+    the final solution as in StomataModels module. In this case, more
+    conveniently computing photosynthetic rates for each leaf is preferable. In
+    this case, [`leaf_photo_from_pi!`](@ref) and [`leaf_photo_from_glc!`](@ref)
+    are better options:
+
 ```@docs
 leaf_photo_from_pi!
 leaf_photo_from_glc!
@@ -254,7 +315,10 @@ leaf_photo_from_glc!
 
 
 ## Fluorescence
-Photosynthesis module also provide ways to compute leaf fluorescence. By default, the modules uses fluorescence parameters from Flexas et al. with struct [`FluorescenceFlexas`](@ref):
+Photosynthesis module also provide ways to compute leaf fluorescence. By
+    default, the modules uses fluorescence parameters from Flexas et al. with
+    struct [`FluorescenceFlexas`](@ref):
+
 ```@docs
 AbstractFluoModelParaSet
 FluoParaSet
@@ -262,6 +326,7 @@ FluorescenceFlexas
 ```
 
 The function that is used to compute fluorescene is
+
 ```@docs
 leaf_fluorescence!
 ```
