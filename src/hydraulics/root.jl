@@ -20,7 +20,7 @@ function root_q_from_pressure(
     _fl    = -_fh;
     _fx    = min(_fh, ini);
     _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _st    = SolutionTolerance{FT}(1e-4);
+    _st    = SolutionTolerance{FT}(1e-4, 50);
     @inline f(x) = xylem_p_from_flow(root, x) - pressure;
     _solut = find_zero(f, _ms, _st);
 
@@ -70,7 +70,7 @@ function root_qs_p_from_q(
     _ph    = FT(20);
     _px    = min(_pl/2, ini);
     _ms    = NewtonBisectionMethod{FT}(_pl, _ph, _px);
-    _st    = SolutionTolerance{FT}(1e-4);
+    _st    = SolutionTolerance{FT}(1e-4, 50);
     @inline f(x) = q_diff(roots, x, flow);
     _solut = find_zero(f, _ms, _st);
 
