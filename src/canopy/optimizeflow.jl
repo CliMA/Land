@@ -22,65 +22,15 @@ function optimize_flows!(
     f_sl = min(ec_sl / FT(1.01), node.opt_f_sl);
     f_sh = min(ec_sh / FT(1.01), node.opt_f_sh);
 
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_sh)
-    p_opt = node.containerOP
+    ms = ReduceStepMethodND{FT}(FT[0,0], [ec_sl,ec_sh], [f_sl, f_sh], FT[0.1,0.1]);
+    st = SolutionToleranceND{FT}(FT[9e-4, 9e-4], 50);
+    @inline f(x) = (leaf_gas_exchange_nonopt!(node, photo_set, x[1], x[2]);
+                    return node.containerOP);
+    fs = find_peak(f, ms, st);
 
-    # until df < 0.001
-    df       = FT(0.1);
-    f_tmp    = FT(0);
-    p_tmp    = FT(0);
-    count_sl = 0;
-    count_sh = 0;
-    while df>9e-4
-        # increase the f_sl by df
-        count_sl = 0
-        while true
-            f_tmp = f_sl + df;
-            f_tmp > ec_sl ? break : nothing;
-            leaf_gas_exchange_nonopt!(node, photo_set, f_tmp, f_sh);
-            p_tmp = node.containerOP;
-            p_tmp > p_opt ? (count_sl+=1; f_sl=f_tmp; p_opt=p_tmp;) : break;
-        end
-
-        # decrease the f_sl by df
-        if count_sl == 0
-            while true
-                f_tmp = f_sl - df;
-                f_tmp < 0 ? break : nothing;
-                leaf_gas_exchange_nonopt!(node, photo_set, f_tmp, f_sh);
-                p_tmp = node.containerOP;
-                p_tmp > p_opt ? (count_sl+=1; f_sl=f_tmp; p_opt=p_tmp;) : break;
-            end
-        end
-
-        # increase f_sh by df
-        count_sh = 0
-        while true
-            f_tmp = f_sh + df;
-            f_tmp > ec_sh ? break : nothing;
-            leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_tmp);
-            p_tmp = node.containerOP;
-            p_tmp > p_opt ? (count_sh+=1; f_sh=f_tmp; p_opt=p_tmp;) : break;
-        end
-
-        # decrease f_sh by df
-        if count_sh == 0
-            while true
-                f_tmp = f_sh - df;
-                f_tmp < 0 ? break : nothing;
-                leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_tmp);
-                p_tmp = node.containerOP;
-                p_tmp > p_opt ? (count_sh+=1; f_sh=f_tmp; p_opt=p_tmp;) : break;
-            end
-        end
-
-        # 10% the df
-        (count_sl==0 && count_sh==0) ? df /= 10 : nothing;
-    end
-
-    # return the flows
-    node.opt_f_sl = f_sl;
-    node.opt_f_sh = f_sh;
+    # update the optimal flow rates
+    node.opt_f_sl = fs[1];
+    node.opt_f_sh = fs[2];
 
     return nothing
 end

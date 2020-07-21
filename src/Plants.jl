@@ -1,9 +1,10 @@
 module Plants
 
+using CanopyRadiation
 using CLIMAParameters
+using ConstrainedRootSolvers
 using DataFrames
 using DocStringExtensions
-using Optim
 using Parameters
 using Photosynthesis
 using PlantHydraulics
@@ -72,7 +73,6 @@ include("canopy/gainriskmap.jl" )
 include("canopy/gasexchange.jl" )
 include("canopy/optimizeflow.jl")
 include("canopy/temperature.jl" )
-include("canopy/testing.jl"     )
 
 include("investment/leafallocation.jl")
 include("investment/optimizeleaf.jl"  )

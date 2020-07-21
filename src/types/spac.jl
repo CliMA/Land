@@ -42,7 +42,7 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
 
     # leaf invest related
     c_cons::FT = 2       # leaf construction cost
-    c_vmax::FT = 0.02    # leaf cost in photosynthesis capacity
+    c_vmax::FT = 0.04    # leaf cost in photosynthesis capacity
 
     # geography related
     d_lati::FT = 30     # latitude in degree
