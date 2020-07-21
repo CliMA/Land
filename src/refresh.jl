@@ -34,9 +34,9 @@ function update_leaf_TP!(
         leaves.ps.T     = leaves.T;
         leaf_temperature_dependence!(photo_set, leaves.ps, envir);
         leaves.p_sat    = leaves.ps.p_sat;
-        hs.f_st  = relative_surface_tension(T);
-        hs.f_vis = relative_viscosity(T);
-        hs.p_ups = leaves.p_ups;
+        hs.f_st         = relative_surface_tension(T);
+        hs.f_vis        = relative_viscosity(T);
+        hs.p_ups        = leaves.p_ups;
         leaves.ec       = leaf_e_crit(hs, leaves.ec);
         leaves.T_old    = leaves.T;
         leaves.p_old    = leaves.p_ups;
@@ -232,6 +232,8 @@ function update_leaf_from_gsw!(
             ) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(leaves.g_sw)
+        leaves.ps.APAR = leaves.APAR[i];
+        leaf_ETR!(photo_set, leaves.ps);
         update_leaf_from_gsw!(photo_set, leaves, envir, i, leaves.g_sw[i]);
     end
 
@@ -288,6 +290,8 @@ function leaf_gsw_control!(
             ) where {FT<:AbstractFloat}
     # if g_sw is low than g_min
     for i in eachindex(leaves.g_sw)
+        leaves.ps.APAR = leaves.APAR[i];
+        leaf_ETR!(photo_set, leaves.ps);
         leaf_gsw_control!(photo_set, leaves, envir, i);
     end
 

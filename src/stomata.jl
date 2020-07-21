@@ -37,6 +37,8 @@ function leaf_photo_from_envir!(
 
     # calculate optimal solution for each leaf
     for ind in eachindex(leaves.APAR)
+        leaves.ps.APAR = leaves.APAR[ind];
+        leaf_ETR!(photo_set, leaves.ps);
         leaf_photo_from_envir!(photo_set, leaves, hs, envir, sm, ind);
     end
 end
@@ -53,6 +55,8 @@ function leaf_photo_from_envir!(
 
     # calculate optimal solution for each leaf
     for ind in eachindex(leaves.APAR)
+        leaves.ps.APAR = leaves.APAR[ind];
+        leaf_ETR!(photo_set, leaves.ps);
         leaf_photo_from_envir!(photo_set, leaves, hs, envir, sm, ind);
     end
 end
