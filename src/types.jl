@@ -269,9 +269,13 @@ $(DocStringExtensions.FIELDS)
 Base.@kwdef mutable struct Leaves{FT<:AbstractFloat}
     # Leaf hydraulics system
     "Leaf hydraulic system"
-    hs::LeafHydraulics{FT} = LeafHydraulics{FT}()
+    hs ::LeafHydraulics{FT} = LeafHydraulics{FT}()
     "leaf photosynthesis system"
-    ps::Leaf{FT}           = Leaf{FT}()
+    ps ::Leaf{FT}           = Leaf{FT}()
+    "Total leaf area `[m²]`"
+    LA ::FT                 = FT(150)
+    "Total leaf area index"
+    LAI::FT                 = FT(3)
 
     # Number of Leaves per canopy layer
     n_leaf::Int = 325
@@ -427,6 +431,8 @@ Base.@kwdef mutable struct Leaves{FT<:AbstractFloat}
     # Environment related, different for each leaf
     "Absorbed photosynthetic active radiation `[μmol m⁻² s⁻¹]`"
     APAR::Array{FT,1} = zeros(FT, n_leaf) .+ 100
+    "Leaf area fractions"
+    LAIx::Array{FT,1} = ones(FT, n_leaf) ./ n_leaf;
 
     # Stomtal optimization related, different for each leaf
     "Maximal photosynthetic rate `[μmol m⁻² s⁻¹]`"
