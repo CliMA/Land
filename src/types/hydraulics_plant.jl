@@ -43,6 +43,14 @@ mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     root_index_in_soil ::Array{Int,1}
     "Corresponding air layer per canopy layer"
     canopy_index_in_air::Array{Int,1}
+
+    # containers for root flows
+    "Conductances for each layer at given flow"
+    container_k::Array{FT,1}
+    "Pressure for each layer at given flow"
+    container_p::Array{FT,1}
+    "Flow rate"
+    container_q::Array{FT,1}
 end
 
 
@@ -77,6 +85,14 @@ mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     root_index_in_soil ::Array{Int,1}
     "Corresponding air layer per canopy layer"
     canopy_index_in_air::Array{Int,1}
+
+    # containers for root flows
+    "Conductances for each layer at given flow"
+    container_k::Array{FT,1}
+    "Pressure for each layer at given flow"
+    container_p::Array{FT,1}
+    "Flow rate"
+    container_q::Array{FT,1}
 end
 
 
@@ -113,6 +129,14 @@ mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
     root_index_in_soil ::Array{Int,1}
     "Corresponding air layer per canopy layer"
     canopy_index_in_air::Array{Int,1}
+
+    # containers for root flows
+    "Conductances for each layer at given flow"
+    container_k::Array{FT,1}
+    "Pressure for each layer at given flow"
+    container_p::Array{FT,1}
+    "Flow rate"
+    container_q::Array{FT,1}
 end
 
 

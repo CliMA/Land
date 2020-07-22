@@ -4,6 +4,8 @@ using CLIMAParameters
 using ConstrainedRootSolvers
 using DocStringExtensions
 using Parameters
+using Revise
+using Statistics
 using WaterPhysics
 
 
@@ -47,8 +49,9 @@ export create_grass_like_hs,
        leaf_e_crit,
        leaf_xylem_risk,
        plant_conductances!,
-       q_diff,
-       root_qs_p_from_q,
+       recalculate_roots_flow!,
+       root_q_from_pressure,
+       roots_flow!,
        soil_erwc,
        soil_k_ratio_erwc,
        soil_k_ratio_p25,

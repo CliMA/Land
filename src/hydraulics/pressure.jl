@@ -122,21 +122,16 @@ function xylem_p_from_flow(
             flow::FT
 ) where {FT<:AbstractFloat}
     # Total leaf area
-    tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    #tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    tla = FT(0)
+    for leaf in tree.leaves
+        tla += leaf.area;
+    end
 
-    if tree.n_root == tree.n_canopy == 1
+    if tree.n_canopy == 1
         # calculate the p_dos for roots
-        p_dos = xylem_p_from_flow(tree.roots[1], flow);
-        tree.leaves[1].p_ups = p_dos;
-
-        # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
-
-        return p_dos
-    elseif tree.n_canopy == 1
-        # calculate the p_dos for roots
-        _qs,_p = root_qs_p_from_q(tree.roots, flow, (tree.leaves[1]).p_ups);
-        tree.leaves[1].p_ups = _p;
+        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        tree.leaves[1].p_ups = mean(tree.container_p);
 
         # calculate the p_dos for leaves
         p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
@@ -156,25 +151,16 @@ function xylem_p_from_flow(
             flow::FT
 ) where {FT<:AbstractFloat}
     # Total leaf area
-    tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    #tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    tla = FT(0)
+    for leaf in tree.leaves
+        tla += leaf.area;
+    end
 
-    if tree.n_root == tree.n_canopy == 1
+    if tree.n_canopy == 1
         # calculate the p_dos for roots
-        p_dos = xylem_p_from_flow(tree.roots[1], flow);
-        (tree.trunk).p_ups = p_dos;
-
-        # calculate the p_dos for trunk
-        p_dos = xylem_p_from_flow(tree.trunk, flow);
-        tree.leaves[1].p_ups = p_dos;
-
-        # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
-
-        return p_dos
-    elseif tree.n_canopy == 1
-        # calculate the p_dos for roots
-        _qs,_p = root_qs_p_from_q(tree.roots, flow, (tree.trunk).p_ups);
-        (tree.trunk).p_ups = _p;
+        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk
         p_dos = xylem_p_from_flow(tree.trunk, flow);
@@ -198,29 +184,16 @@ function xylem_p_from_flow(
             flow::FT
 ) where {FT<:AbstractFloat}
     # Total leaf area
-    tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    #tla = sum([tree.leaves[i].area for i in 1:tree.n_canopy])
+    tla = FT(0)
+    for leaf in tree.leaves
+        tla += leaf.area;
+    end
 
-    if tree.n_root == tree.n_canopy == 1
+    if tree.n_canopy == 1
         # calculate the p_dos for roots
-        p_dos = xylem_p_from_flow(tree.roots[1], flow);
-        (tree.trunk).p_ups = p_dos;
-
-        # calculate the p_dos for trunk
-        p_dos = xylem_p_from_flow(tree.trunk, flow);
-        tree.branch[1].p_ups = p_dos;
-
-        # calculate the p_dos for branch
-        p_dos = xylem_p_from_flow(tree.branch[1], flow);
-        tree.leaves[1].p_ups = p_dos;
-
-        # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
-
-        return p_dos
-    elseif tree.n_canopy == 1
-        # calculate the p_dos for roots
-        _qs,_p = root_qs_p_from_q(tree.roots, flow, (tree.trunk).p_ups);
-        (tree.trunk).p_ups = _p;
+        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk
         p_dos = xylem_p_from_flow(tree.trunk, flow);

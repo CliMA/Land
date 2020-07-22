@@ -394,7 +394,7 @@ risk = leaf_e_crit(leaf);
 @show risk;
 ```
 
-## Whow-plant Hydraulics
+## Whole-plant Hydraulics
 Though [`leaf_xylem_risk`](@ref) and [`leaf_e_crit`](@ref) can work on their
     own, the functions only evaluate the risks on leaf level. The more
     realistic case is that when leaf transpiration rate increases, `p_ups` in

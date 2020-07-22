@@ -15,10 +15,16 @@ git-tree-sha1 = "314f0bdd5817abb2df61cc8d3e857c496d421109"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 version = "0.1.6"
 
+[[CodeTracking]]
+deps = ["InteractiveUtils", "UUIDs"]
+git-tree-sha1 = "cab4da992adc0a64f63fa30d2db2fd8bec40cab4"
+uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
+version = "0.5.11"
+
 [[ConstrainedRootSolvers]]
 deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
 git-tree-sha1 = "4282b5b72b8e54ffa2b911e69bb51d422c309f12"
-repo-rev = "master"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl.git"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
 version = "0.0.1"
@@ -37,6 +43,9 @@ git-tree-sha1 = "c5714d9bcdba66389612dc4c47ed827c64112997"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.2"
 
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+
 [[InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
@@ -46,6 +55,12 @@ deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
+
+[[JuliaInterpreter]]
+deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
+git-tree-sha1 = "79e4496b79e8af45198f8c291f26d4514d6b06d6"
+uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+version = "0.7.24"
 
 [[LibGit2]]
 deps = ["Printf"]
@@ -60,6 +75,12 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[LoweredCodeUtils]]
+deps = ["JuliaInterpreter"]
+git-tree-sha1 = "1b632dc108106101a9909db7be8f8b32ed8d02f7"
+uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
+version = "0.4.6"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -101,6 +122,12 @@ uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
+[[Revise]]
+deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "UUIDs", "Unicode"]
+git-tree-sha1 = "0992d4643e27b2deb9f2e4ec7a56b7033813a027"
+uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
+version = "2.7.3"
+
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
@@ -137,7 +164,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 [[WaterPhysics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "Parameters", "Test"]
 git-tree-sha1 = "30af5075afc3639cf75833b3274c42a4873b2e5f"
-repo-rev = "master"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 version = "0.0.1"

@@ -16,9 +16,9 @@ uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 version = "0.1.6"
 
 [[ConstrainedRootSolvers]]
-deps = ["BenchmarkTools", "DocStringExtensions", "Test"]
-git-tree-sha1 = "1f8b79fbd22b3bd1310526ab92f4ebca90d686b7"
-repo-rev = "master"
+deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
+git-tree-sha1 = "4282b5b72b8e54ffa2b911e69bb51d422c309f12"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl.git"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
 version = "0.0.1"
@@ -54,6 +54,7 @@ uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
 [[LibGit2]]
+deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 
 [[Libdl]]
@@ -91,7 +92,7 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.0.7"
 
 [[Pkg]]
-deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Test", "UUIDs"]
+deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
@@ -146,9 +147,9 @@ version = "1.0.1"
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
-deps = ["CLIMAParameters", "Parameters", "Test"]
-git-tree-sha1 = "f26c90a8f89d6c3c12a075bd73059567f90a9a78"
-repo-rev = "master"
+deps = ["BenchmarkTools", "CLIMAParameters", "Parameters", "Test"]
+git-tree-sha1 = "30af5075afc3639cf75833b3274c42a4873b2e5f"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 version = "0.0.1"

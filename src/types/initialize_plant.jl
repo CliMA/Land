@@ -64,7 +64,10 @@ function create_grass_like_hs(
                            _roots,
                            _leaves,
                            _r_index,
-                           _c_index)
+                           _c_index,
+                           zeros(FT,_n_root),
+                           zeros(FT,_n_root),
+                           zeros(FT,_n_root))
 end
 
 
@@ -151,7 +154,10 @@ function create_palm_like_hs(
                           _trunk,
                           _leaves,
                           _r_index,
-                          _c_index)
+                          _c_index,
+                          zeros(FT,_n_root),
+                          zeros(FT,_n_root),
+                          zeros(FT,_n_root))
 end
 
 
@@ -252,5 +258,8 @@ function create_tree_like_hs(
                           _branch,
                           _leaves,
                           _r_index,
-                          _c_index)
+                          _c_index,
+                          zeros(FT,_n_root),
+                          zeros(FT,_n_root),
+                          zeros(FT,_n_root))
 end
