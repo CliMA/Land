@@ -1,24 +1,25 @@
 ###############################################################################
 #
 # Diff function to minimize by ConstrainedRootSolvers
-# Description in BallBerry model section
+# Description in general model section in the empirical folder
 #
 ###############################################################################
 function envir_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet,
+            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
-            sm::OSMEller,
+            sm::OSMSperry{FT},
             ind::Int
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, p_sat, ps = canopyi;
+    @unpack g_max, g_min, kr_max, p_sat, ps = canopyi;
     @unpack p_atm, p_H₂O = envir;
-    g_bc = canopyi.g_bc[ind];
-    g_bw = canopyi.g_bw[ind];
-    g_m  = canopyi.g_m[ind];
+    a_max = canopyi.a_max[ind];
+    g_bc  = canopyi.g_bc[ind];
+    g_bw  = canopyi.g_bw[ind];
+    g_m   = canopyi.g_m[ind];
 
     # calculate the limit of g_lc to ensure x in the physiological range
     _glh = 1 / (1/g_bc + FT(1.6)/g_max + 1/g_m);
@@ -60,7 +61,7 @@ function envir_diff!(
         k_2  = leaf_xylem_risk(hs, e_2);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
-        ∂Θ∂E = (k_1 - k_2) / (e_2 - e_1) * a_2 / k_2;
+        ∂Θ∂E = (k_1 - k_2) / (e_2 - e_1) * a_max / kr_max;
         diff = ∂A∂E - ∂Θ∂E;
 
         #= used for debugging
@@ -93,7 +94,7 @@ function leaf_photo_from_envir!(
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
-            sm::OSMEller{FT},
+            sm::OSMSperry{FT},
             ind::Int
 ) where {FT<:AbstractFloat}
     # if there is light
@@ -106,8 +107,8 @@ function leaf_photo_from_envir!(
         _g_m    = canopyi.g_m[ind];
 
         # calculate the physiological maximal g_sw
-        # add an 90% offset in _g_crit for Eller model to avoid dK/dE = 0
-        _g_crit = FT(0.9) * ec / (p_sat - p_H₂O) * p_atm;
+        # add an 70% offset in _g_crit for Eller model to avoid dK/dE = 0
+        _g_crit = FT(0.7) * ec / (p_sat - p_H₂O) * p_atm;
         _g_max  = 1 / max(1/_g_crit - 1/_g_bw, FT(1e-3));
         _g_max  = min(_g_max, g_max);
 

@@ -36,6 +36,9 @@ export AbstractStomatalModel,
        OSMWAP,
        OSMWAPMod
 
+
+
+
 # export public functions
 export empirical_gsw_from_model,
        envir_diff!,
@@ -52,16 +55,22 @@ export empirical_gsw_from_model,
 include("types/canopylayer.jl"  )
 include("types/stomatalmodel.jl")
 
+include("empirical/general.jl"  )
 include("empirical/ballberry.jl")
 include("empirical/gentine.jl"  )
 include("empirical/leuning.jl"  )
 include("empirical/medlyn.jl"   )
 
-include("optimal/eller.jl")
+include("optimal/general.jl")
+include("optimal/eller.jl"  )
+include("optimal/sperry.jl" )
+include("optimal/wang.jl"   )
+include("optimal/wap.jl"    )
+include("optimal/wapmod.jl" )
 
-include("refresh.jl"  )
-include("solution.jl" )
-include("stomata.jl"  )
+include("gasexchange/control.jl")
+include("gasexchange/refresh.jl")
+include("gasexchange/update.jl" )
 
 
 
