@@ -23,12 +23,12 @@ const MOLMASS_WATER = Planet.molmass_water(EARTH)
 
 # export public types and structs
 export AbstractStomatalModel,
+       CanopyLayer,
        EmpiricalStomatalModel,
        ESMBallBerry,
        ESMGentine,
        ESMLeuning,
        ESMMedlyn,
-       Leaves,
        OptimizationStomatalModel,
        OSMEller,
        OSMSperry,
@@ -49,9 +49,17 @@ export empirical_gsw_from_model,
 
 
 
-include("types.jl"    )
+include("types/canopylayer.jl"  )
+include("types/stomatalmodel.jl")
+
+include("empirical/ballberry.jl")
+include("empirical/gentine.jl"  )
+include("empirical/leuning.jl"  )
+include("empirical/medlyn.jl"   )
+
+include("optimal/eller.jl")
+
 include("refresh.jl"  )
-include("empirical.jl")
 include("solution.jl" )
 include("stomata.jl"  )
 
