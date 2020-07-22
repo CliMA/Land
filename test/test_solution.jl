@@ -44,5 +44,23 @@ println("\nTesting and benchmarking stomatal models...")
                 recursive_NaN_test(can);
             end
         end
+
+        # benchmarking the stomata solutions
+        if benchmarking
+            # test the stomata solutions
+            println("Benchmarking the function for individual leaf...");
+            for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
+                for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
+                    @btime leaf_photo_from_envir!($mod, $can, $hs, $envir, $sm, 1);
+                end
+            end
+
+            println("Benchmarking the function for whole canopy layer...");
+            for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
+                for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
+                    @btime leaf_photo_from_envir!($mod, $can, $hs, $envir, $sm);
+                end
+            end
+        end
     end
 end

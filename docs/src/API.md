@@ -21,7 +21,7 @@ OSMWAPMod
 
 ## Leaves
 ```@docs
-Leaves
+CanopyLayer
 ```
 
 ## Stomatal conductance
