@@ -40,3 +40,17 @@ function zenith_angle(
 
     return zenith_angle(latd, decd, lhad)
 end
+
+
+
+
+function zenith_angle(
+            latd::FT,
+            toy::FT
+) where {FT<:AbstractFloat}
+    _deg::FT = 360 / FT(YEAR_D) * (toy + 10);
+    decd::FT = -FT(23.44) * cosd(_deg);
+    lhad::FT = ((toy%1) - FT(0.5)) * 360;
+
+    return zenith_angle(latd, decd, lhad)
+end

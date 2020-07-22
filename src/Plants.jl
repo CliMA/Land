@@ -8,6 +8,12 @@ using DocStringExtensions
 using Parameters
 using Photosynthesis
 using PlantHydraulics
+
+# remove when finishing the project
+using PyPlot
+
+using Revise
+using Statistics
 using StomataModels
 using WaterPhysics
 
@@ -65,17 +71,20 @@ export annual_profit,
 
 
 
-include("types/container.jl")
-include("types/spac.jl"     )
+include("types/container.jl" )
+include("types/spacmono.jl"  )
+include("types/spacsimple.jl")
 
-include("canopy/bigleaf.jl"     )
-include("canopy/gainriskmap.jl" )
-include("canopy/gasexchange.jl" )
-include("canopy/optimizeflow.jl")
-include("canopy/temperature.jl" )
+include("bigleaf/gainriskmap.jl" )
+include("bigleaf/gasexchange.jl" )
+include("bigleaf/optimizeflow.jl")
+include("bigleaf/partition.jl"   )
+include("bigleaf/temperature.jl" )
 
 include("investment/leafallocation.jl")
 include("investment/optimizeleaf.jl"  )
+
+include("layers/test_diurnal.jl")
 
 include("planet/atmpressure.jl")
 include("planet/solarangle.jl" )

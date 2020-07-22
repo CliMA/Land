@@ -53,11 +53,29 @@ git-tree-sha1 = "a6c17353ee38ddab30e73dcfaa1107752de724ec"
 uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 version = "0.8.1"
 
+[[CodeTracking]]
+deps = ["InteractiveUtils", "UUIDs"]
+git-tree-sha1 = "cab4da992adc0a64f63fa30d2db2fd8bec40cab4"
+uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
+version = "0.5.11"
+
 [[CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "ded953804d019afa9a3f98981d99b33e3db7b6da"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 version = "0.7.0"
+
+[[ColorTypes]]
+deps = ["FixedPointNumbers", "Random"]
+git-tree-sha1 = "6e7aa35d0294f647bb9c985ccc34d4f5d371a533"
+uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+version = "0.10.6"
+
+[[Colors]]
+deps = ["ColorTypes", "FixedPointNumbers", "InteractiveUtils", "Reexport"]
+git-tree-sha1 = "5639e44833cfcf78c6a73fbceb4da75611d312cd"
+uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
+version = "0.12.3"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
@@ -65,10 +83,16 @@ git-tree-sha1 = "a6a8197ae253f2c1a22b2ae17c2dfaf5812c03aa"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
 version = "3.13.0"
 
+[[Conda]]
+deps = ["JSON", "VersionParsing"]
+git-tree-sha1 = "7a58bb32ce5d85f8bf7559aa7c2842f9aecf52fc"
+uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
+version = "1.4.1"
+
 [[ConstrainedRootSolvers]]
 deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
 git-tree-sha1 = "4282b5b72b8e54ffa2b911e69bb51d422c309f12"
-repo-rev = "master"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl.git"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
 version = "0.0.1"
@@ -124,6 +148,15 @@ git-tree-sha1 = "0fa3b52a04a4e210aeb1626def9c90df3ae65268"
 uuid = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
 version = "1.1.0"
 
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+
+[[FixedPointNumbers]]
+deps = ["Statistics"]
+git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
+uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+version = "0.8.4"
+
 [[Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
@@ -167,6 +200,17 @@ git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
+[[JuliaInterpreter]]
+deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
+git-tree-sha1 = "79e4496b79e8af45198f8c291f26d4514d6b06d6"
+uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+version = "0.7.24"
+
+[[LaTeXStrings]]
+git-tree-sha1 = "de44b395389b84fd681394d4e8d39ef14e3a2ea8"
+uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+version = "1.1.0"
+
 [[LibGit2]]
 deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -187,6 +231,12 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
+[[LoweredCodeUtils]]
+deps = ["JuliaInterpreter"]
+git-tree-sha1 = "1b632dc108106101a9909db7be8f8b32ed8d02f7"
+uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
+version = "0.4.6"
+
 [[Lz4_jll]]
 deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "51b1db0732bbdcfabb60e36095cc3ed9c0016932"
@@ -198,6 +248,12 @@ deps = ["BufferedStreams", "CodecZlib", "HDF5", "SparseArrays"]
 git-tree-sha1 = "6a48d291b26d295c62670d956e083926332befb3"
 uuid = "23992714-dd62-5051-b70f-ba57cb901cac"
 version = "0.8.0"
+
+[[MacroTools]]
+deps = ["Markdown", "Random"]
+git-tree-sha1 = "f7d2e3f654af75f01ec49be82c231c382214223a"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.5"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -236,9 +292,9 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.0.7"
 
 [[Photosynthesis]]
-deps = ["CLIMAParameters", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
-git-tree-sha1 = "a759e4be101e44acd3259592461586f8067dc830"
-repo-rev = "master"
+deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
+git-tree-sha1 = "4447f474efb9a18e11449fa01babeb8d647fdac4"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/Photosynthesis.jl.git"
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 version = "0.0.1"
@@ -248,9 +304,9 @@ deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "R
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
-git-tree-sha1 = "1be9d05e13150bceb4b5cd33d017bbc97014a53f"
-repo-rev = "master"
+deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Revise", "Statistics", "Test", "WaterPhysics"]
+git-tree-sha1 = "3c94775dd0861e6264dbd127eb9745ff3715b983"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/PlantHydraulics.jl.git"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 version = "0.0.1"
@@ -270,6 +326,18 @@ version = "0.5.3"
 [[Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[PyCall]]
+deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
+git-tree-sha1 = "3a3fdb9000d35958c9ba2323ca7c4958901f115d"
+uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+version = "1.91.4"
+
+[[PyPlot]]
+deps = ["Colors", "LaTeXStrings", "PyCall", "Sockets", "Test", "VersionParsing"]
+git-tree-sha1 = "67dde2482fe1a72ef62ed93f8c239f947638e5a2"
+uuid = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+version = "2.9.0"
 
 [[QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
@@ -295,6 +363,12 @@ deps = ["Pkg"]
 git-tree-sha1 = "7b1d07f411bc8ddb7977ec7f377b97b158514fe0"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "0.2.0"
+
+[[Revise]]
+deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "UUIDs", "Unicode"]
+git-tree-sha1 = "0992d4643e27b2deb9f2e4ec7a56b7033813a027"
+uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
+version = "2.7.3"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -330,9 +404,9 @@ deps = ["LinearAlgebra", "SparseArrays"]
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[StomataModels]]
-deps = ["CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
-git-tree-sha1 = "1082bd68457d4ecb0eaa3d010e9f02f514614dc5"
-repo-rev = "master"
+deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
+git-tree-sha1 = "407c0956048f24cb60a3828991966da7df4f03d8"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/StomataModels.jl.git"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 version = "0.0.1"
@@ -377,10 +451,15 @@ version = "1.0.1"
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
+[[VersionParsing]]
+git-tree-sha1 = "80229be1f670524750d905f8fc8148e5a8c4537f"
+uuid = "81def892-9a0e-5fdd-b105-ffc91e053289"
+version = "1.2.0"
+
 [[WaterPhysics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "Parameters", "Test"]
 git-tree-sha1 = "30af5075afc3639cf75833b3274c42a4873b2e5f"
-repo-rev = "master"
+repo-rev = "release-0.0.1"
 repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 version = "0.0.1"
