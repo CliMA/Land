@@ -83,7 +83,7 @@ function update_leaf_AK!(
     # calculate the physiological maximal g_sw
     _g_crit = ec / (p_sat - p_H₂O) * p_atm;
     for i in eachindex(APAR)
-        _g_sw = 1 / max(1/_g_crit - 1/g_bw, FT(1e-3));
+        _g_sw = 1 / max(1/_g_crit - 1/g_bw[i], FT(1e-3));
         _g_sw = min(_g_sw, g_max);
         _g_sw = max(_g_sw, g_min);
         _g_lc = 1 / (1/g_bc[i] + FT(1.6)/_g_sw + 1/g_m[i]);

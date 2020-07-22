@@ -1,10 +1,8 @@
+using BenchmarkTools
 using Photosynthesis
 using PlantHydraulics
 using StomataModels
 using Test
-
-PM = Photosynthesis
-SM = StomataModels
 
 
 
@@ -75,96 +73,51 @@ end
 
 
 
+benchmarking = false
+include("test_struct.jl"   )
+include("test_empirical.jl")
+
+benchmarking = true
+include("test_solution.jl")
+
+#=
 # FT and NaN test
 @testset "StomtaModels --- FT consistency and not NaN" begin
     for FT in [Float32, Float64]
-        envir  = PM.AirLayer{FT}();
-        leaf_3 = PM.Leaf{FT}();
-        leaf_4 = PM.Leaf{FT}();
-        mod_3  = PM.C3CLM(FT);
-        mod_4  = PM.C4CLM(FT);
+        envir  = AirLayer{FT}();
+        leaf_3 = Leaf{FT}();
+        leaf_4 = Leaf{FT}();
+        mod_3  = C3CLM(FT);
+        mod_4  = C4CLM(FT);
         rand_T = rand(FT) + 298;
-        lv_3   = SM.Leaves{FT}(n_leaf=2);
-        lv_4   = SM.Leaves{FT}(n_leaf=2);
-        esm_1  = SM.ESMBallBerry{FT}();
-        esm_2  = SM.ESMGentine{FT}();
-        esm_3  = SM.ESMLeuning{FT}();
-        esm_4  = SM.ESMMedlyn{FT}();
-        osm_1  = SM.OSMEller{FT}();
-        osm_2  = SM.OSMSperry{FT}();
-        osm_3  = SM.OSMWang{FT}();
-        osm_4  = SM.OSMWAP{FT}();
-        osm_5  = SM.OSMWAPMod{FT}();
+        lv_3   = CanopyLayer{FT}(n_leaf=2);
+        lv_4   = CanopyLayer{FT}(n_leaf=2);
+        esm_1  = ESMBallBerry{FT}();
+        esm_2  = ESMGentine{FT}();
+        esm_3  = ESMLeuning{FT}();
+        esm_4  = ESMMedlyn{FT}();
+        osm_1  = OSMEller{FT}();
+        osm_2  = OSMSperry{FT}();
+        osm_3  = OSMWang{FT}();
+        osm_4  = OSMWAP{FT}();
+        osm_5  = OSMWAPMod{FT}();
         hs     = LeafHydraulics{FT}();
 
-        # test the structures
-        for result in [ lv_3, esm_1, esm_2, esm_3, esm_4, osm_4, osm_5 ]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
-
         # test the refresh functions
-        SM.update_leaf_TP!(mod_3, lv_3, hs, envir);
-        SM.update_leaf_TP!(mod_4, lv_4, hs, envir);
-        SM.update_leaf_AK!(mod_3, lv_3, hs, envir);
-        SM.update_leaf_AK!(mod_4, lv_4, hs, envir);
-        SM.update_leaf_from_glc!(mod_3, lv_3, envir, 1, FT(0.1));
-        SM.update_leaf_from_glc!(mod_4, lv_4, envir, 1, FT(0.1));
-        SM.update_leaf_from_gsw!(mod_3, lv_3, envir, 1, FT(0.05));
-        SM.update_leaf_from_gsw!(mod_4, lv_4, envir, 1, FT(0.05));
+        update_leaf_TP!(mod_3, lv_3, hs, envir);
+        update_leaf_TP!(mod_4, lv_4, hs, envir);
+        update_leaf_AK!(mod_3, lv_3, hs, envir);
+        update_leaf_AK!(mod_4, lv_4, hs, envir);
+        update_leaf_from_glc!(mod_3, lv_3, envir, 1, FT(0.1));
+        update_leaf_from_glc!(mod_4, lv_4, envir, 1, FT(0.1));
+        update_leaf_from_gsw!(mod_3, lv_3, envir, 1, FT(0.05));
+        update_leaf_from_gsw!(mod_4, lv_4, envir, 1, FT(0.05));
         lv_3.g_sw[2] = 0;
         lv_4.g_sw[2] = 0;
-        SM.leaf_gsw_control!(mod_3, lv_3, envir, 2);
-        SM.leaf_gsw_control!(mod_4, lv_4, envir, 2);
+        leaf_gsw_control!(mod_3, lv_3, envir, 2);
+        leaf_gsw_control!(mod_4, lv_4, envir, 2);
         recursive_NaN_test(lv_3);
         recursive_NaN_test(lv_4);
-
-        # test the empirical model formulations
-        for result in [ SM.empirical_gsw_from_model(esm_1, leaf_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_2, leaf_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_3, leaf_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_4, leaf_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_1, lv_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_2, lv_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_3, lv_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_4, lv_3, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_1, lv_4, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_2, lv_4, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_3, lv_4, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_4, lv_4, envir, FT(1)),
-                        SM.empirical_gsw_from_model(esm_1, lv_3, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_2, lv_3, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_3, lv_3, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_4, lv_3, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_1, lv_4, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_2, lv_4, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_3, lv_4, envir, FT(1), 1),
-                        SM.empirical_gsw_from_model(esm_4, lv_4, envir, FT(1), 1) ]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
-
-        # test the solution functions
-        for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
-            for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                result = SM.envir_diff!(FT(0.1), mod, lv, hs, envir, sm, 1);
-                recursive_FT_test(result, FT);
-                recursive_NaN_test(result);
-            end
-        end
-
-        # test the stomata solutions
-        for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
-            for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                SM.leaf_photo_from_envir!(mod, lv, hs, envir, sm, 1);
-                recursive_NaN_test(lv);
-            end
-        end
-        for (mod,lv) in zip([mod_3, mod_3], [lv_3, lv_4])
-            for sm in [esm_1, esm_2, esm_3, esm_4, osm_1, osm_2, osm_3, osm_4, osm_5]
-                SM.leaf_photo_from_envir!(mod, lv, hs, envir, sm);
-                recursive_NaN_test(lv);
-            end
-        end
     end
 end
+=#
