@@ -31,42 +31,13 @@ end
 
 
 """
-    root_qs_p_from_q(roots::Array{RootHydraulics{FT},1}, ks::Array{FT,1}, ps::Array{FT,1}, qs::Array{FT,1}, flow::FT) where {FT<:AbstractFloat}
+    root_pk_from_flow(root::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
 
-Solve for the flow rates in each root layer and root pressure, given
-- `roots` Array of [`RootHydraulics`](@ref) struts
-- `ks` Container for conductance in each root layer
-- `ps` Container for end xylem pressure in each layer
-- `qs` Container for flow rate in each layer
-- `flow` Total flow rates
+Return root xylem end pressure and root hydraulic conductance (reverse of
+    summed resistance), given
+- `root` [`RootHydraulics`](@ref) struct
+- `flow` Given flow rates in the root layer
 """
-function roots_flow!(
-            roots::Array{RootHydraulics{FT},1},
-            ks::Array{FT,1},
-            ps::Array{FT,1},
-            qs::Array{FT,1},
-            flow::FT
-) where {FT<:AbstractFloat}
-    count = 0
-    while true
-        recalculate_roots_flow!(roots, ks, ps, qs, flow);
-        count += 1;
-
-        if maximum(ps) - minimum(ps) < 1e-4
-            break
-        end
-
-        if count>20
-            break
-        end
-    end
-
-    return nothing
-end
-
-
-
-
 function root_pk_from_flow(
             root::RootHydraulics{FT},
             flow::FT
@@ -112,6 +83,17 @@ end
 
 
 
+"""
+    rrecalculate_roots_flow!(roots::Array{RootHydraulics{FT},1}, ks::Array{FT,1}, ps::Array{FT,1}, qs::Array{FT,1}, flow::FT) where {FT<:AbstractFloat}
+
+Recalculate the flow rates in the root from the pressure and conductance
+    profiles in each root at non-steady state, given
+- `roots` Array of [`RootHydraulics`](@ref) structs
+- `ks` Container for conductance in each root layer
+- `ps` Container for end xylem pressure in each layer
+- `qs` Container for flow rate in each layer
+- `flow` Total flow rate
+"""
 function recalculate_roots_flow!(
             roots::Array{RootHydraulics{FT},1},
             ks::Array{FT,1},
@@ -139,6 +121,44 @@ function recalculate_roots_flow!(
     k_sum  = sum(ks);
     for i in 1:N
         qs[i] -= q_diff * ks[1] / k_sum;
+    end
+
+    return nothing
+end
+
+
+
+
+"""
+    root_qs_p_from_q(roots::Array{RootHydraulics{FT},1}, ks::Array{FT,1}, ps::Array{FT,1}, qs::Array{FT,1}, flow::FT) where {FT<:AbstractFloat}
+
+Solve for the flow rates in each root layer and root pressure at steady state,
+    given
+- `roots` Array of [`RootHydraulics`](@ref) structs
+- `ks` Container for conductance in each root layer
+- `ps` Container for end xylem pressure in each layer
+- `qs` Container for flow rate in each layer
+- `flow` Total flow rate
+"""
+function roots_flow!(
+            roots::Array{RootHydraulics{FT},1},
+            ks::Array{FT,1},
+            ps::Array{FT,1},
+            qs::Array{FT,1},
+            flow::FT
+) where {FT<:AbstractFloat}
+    count = 0
+    while true
+        recalculate_roots_flow!(roots, ks, ps, qs, flow);
+        count += 1;
+
+        if maximum(ps) - minimum(ps) < 1e-4
+            break
+        end
+
+        if count>20
+            break
+        end
     end
 
     return nothing

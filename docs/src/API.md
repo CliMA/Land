@@ -299,22 +299,38 @@ Function [`root_q_from_pressure`](@ref) uses Root Solving method to calculate
 root_q_from_pressure
 ```
 
-Computing the flow rates in all the root layers and the plant base xylem
-    pressure from a given flow needs more iterations based on
-    [`root_q_from_pressure`](@ref). The algorithm is to calculate the flow
-    rates in all the root layers for a given plant base xylem pressure, and
-    then use the Root Solving methods to calculate pressure that yields a total
-    flow rate equals to the given value. The function [`q_diff`](@ref)
-    calculates the difference of total flow rate for a given `pressure` and the
-    `target` flow rate. The function [`root_qs_p_from_q`](@ref) calculates the
-    flows rates in all the root layers and the plant base xylem pressure. Note
-    that `ini` in the function is also optional, but a good guess will speed up
-    the calculations. Be aware that function [`root_qs_p_from_q`](@ref) does
-    not update the pressure profiles in the plant struct.
+In the plant hydraulic module design, flow rate is computed for each canopy
+    layer, and thus computing flow rate for each root layer is required for a
+    multiple layered root system. One feasible way is to do iterations using
+    [`root_q_from_pressure`](@ref) function, i.e., iterate the xylem end
+    pressure til the total flow rate equals the given value. However, this
+    method is too inefficient. What I did is
+
+- Calculate the xylem end pressure and whole root layer conductance from the
+    initial flow rate;
+- Calculate the mean xylem end pressure, and tune the flow rates in all root
+    layers using the difference from mean pressure and root conductance;
+- Sum up the new flow rates, and calculate the difference with given total flow
+    rate;
+- Use the calculated condutcance to weight out the differences.
+
+The functions provided by PlantHydraulics module are
 
 ```@docs
-q_diff
-root_qs_p_from_q
+root_pk_from_flow
+recalculate_roots_flow!
+```
+
+However, the steps above are only 1 iteration, and can only be used for the
+    non-steady state version of model. For the steady-state flow rates,
+    function [`roots_flow!`](@ref) does thw work. What the function does is to
+    iterate [`recalculate_roots_flow!`](@ref) till the difference among the
+    calculated end pressures is small enough. I also emphasize that to speed up
+    the code, 3 containers are added to the [`AbstractPlantHS`](@ref) structs,
+    and they are `container_k`, `container_p`, and `container_q`.
+
+```@docs
+roots_flow!
 ```
 
 Example:
@@ -324,7 +340,7 @@ using PlantHydraulics
 
 FT = Float32;
 palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
-qs,p = root_qs_p_from_q(palm.roots, FT(1));
+roots_flow!(palm.roots, palm.container_k, palm.container_p, palm.container_q, FT(1));
 ```
 
 
