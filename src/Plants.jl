@@ -41,6 +41,7 @@ const KG_H_2_MOL_S  = KG_2_MOL / 3600
 # export public types
 export SPACContainer1L,
        SPACContainer2L,
+       SPACMono,
        SPACSimple
 
 
@@ -52,6 +53,7 @@ export annual_profit,
        atmospheric_pressure,
        atmospheric_pressure_ratio,
        big_leaf_partition!,
+       create_dataframe,
        gain_risk_map,
        leaf_allocation!,
        leaf_gas_exchange!,
@@ -87,6 +89,7 @@ include("planet/solarangle.jl" )
 
 include("simulation/annualprofit.jl"    )
 include("simulation/annualsimulation.jl")
+include("simulation/createdataframe.jl" )
 
 include("soil/moisture.jl")
 
