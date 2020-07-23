@@ -13,6 +13,8 @@
 6. Calculate dGs/dt for the given environment
 7. Update stomatal conductance
 8. Goto step 1
+
+This function will be splited into many functions later!
 =#
 
 function test_diurnal(Δt::FT=FT(10)) where {FT<:AbstractFloat}
@@ -76,7 +78,7 @@ function test_diurnal(Δt::FT=FT(10)) where {FT<:AbstractFloat}
     Esum_t = zeros(FT, size(t));
     for i_tim in 1:N
         # 0. recalculate the canopy RT stuff
-        zenith = zenith_angle(spacmono.d_lati, 180 + t[i_tim]/86400 );
+        zenith = zenith_angle(spacmono.latitude, 180 + t[i_tim]/86400 );
         zenith = min(88, zenith);
         angles.tts = zenith;
         canopy_geometry!(can_rt, angles, can_opt);
@@ -146,6 +148,8 @@ function test_diurnal(Δt::FT=FT(10)) where {FT<:AbstractFloat}
         _par = PARr_t[i_tim]  * can_rad.absPAR_shadeCab[1] * FT(1e6);
     end
 
+    #=
+    # plot the results
     figure(1)
     clf()
     plot(t ./ 3600, Agpp_t, "g-");
@@ -154,6 +158,7 @@ function test_diurnal(Δt::FT=FT(10)) where {FT<:AbstractFloat}
     figure(2)
     clf()
     plot(t ./ 3600, Esum_t, "k-");
+    =#
 
     return nothing
 end

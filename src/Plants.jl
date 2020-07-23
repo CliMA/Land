@@ -8,10 +8,6 @@ using DocStringExtensions
 using Parameters
 using Photosynthesis
 using PlantHydraulics
-
-# remove when finishing the project
-using PyPlot
-
 using Revise
 using Statistics
 using StomataModels

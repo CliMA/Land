@@ -1,4 +1,16 @@
+###############################################################################
+#
+# SPAC system for mono species system
+#
+###############################################################################
+"""
+    mutable struct SPACMono{FT}
 
+Struct that mono species SPAC system.
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
 Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Soil layers bounds `[m]`"
     soil_bounds::Array{FT,1} = FT[0,-0.1,-0.2,-0.3,-0.5,-0.8,-1.2,-2.0]
@@ -42,9 +54,9 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
 
     # geography related
     "Latitude `[°]`"
-    d_lati::FT = 30
+    latitude ::FT = 30
     "Longitude `[°]`"
-    d_long::FT = 116
-    "Altitude `[°]`"
-    d_alti::FT = 0
+    longitude::FT = 116
+    "Elevation `[m]`"
+    elevation::FT = 0
 end

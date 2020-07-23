@@ -1,4 +1,9 @@
 
+###############################################################################
+#
+# Optimize flow rates in the sunlit and shaded layers
+#
+###############################################################################
 """
     optimize_flows!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}) where {FT<:AbstractFloat}
 

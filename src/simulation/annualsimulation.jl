@@ -3,6 +3,15 @@
 # Calculate annual profit
 #
 ###############################################################################
+"""
+    annual_simulation!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::DataFrame, output::DataFrame) where {FT<:AbstractFloat}
+
+Run annual simulation for a growing season, given
+- `node` [`SPACSimple`] type struct
+- `photo_set` [`AbstractPhotoModelParaSet`] type struct
+- `weather` Weather profile in a growing season
+- `output` The predefined output result
+"""
 function annual_simulation!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
@@ -10,10 +19,10 @@ function annual_simulation!(
             output::DataFrame
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
-    @unpack c_cons, d_alti, d_lati, gaba, laba, maxv, vtoj = node;
+    @unpack c_cons, elevation, gaba, laba, latitude, maxv, vtoj = node;
 
     # 1. update the environmental constants based on the node geographycal info
-    ratio            = atmospheric_pressure_ratio(d_alti);
+    ratio            = atmospheric_pressure_ratio(elevation);
     node.envir.p_atm = ratio * FT(P_ATM);
     node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
 
@@ -39,7 +48,7 @@ function annual_simulation!(
         node.envir.wind  = wind;
 
         # 2.2 if day time
-        zenith = zenith_angle(d_lati, day, hour, FT(0));
+        zenith = zenith_angle(latitude, day, hour, FT(0));
         if (r_all>0) & (zenith<=85)
             # 2.2.1 update the leaf partitioning
             big_leaf_partition!(node, zenith, r_all)

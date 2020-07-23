@@ -3,16 +3,23 @@
 # Optimize leaf invstment Vcmax+Jmax and Leaf area
 #
 ###############################################################################
+"""
+    optimize_leaf!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::Array{FT,2}) where {FT<:AbstractFloat}
+
+Optimize leaf area and photosynthetic capacity, given
+- `node` [`SPACSimple`] type struct
+- `photo_set` [`AbstractPhotoModelParaSet`] type struct
+- `weather` Weather profile in a growing season
+"""
 function optimize_leaf!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weat::Array{FT,2};
-            displaying=true
+            weather::Array{FT,2}
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize
     @inline f(x) = (tmp_node = deepcopy(node);
                     leaf_allocation!(tmp_node, photo_set, x[1], x[2]);
-                    tmp_prof = annual_profit(tmp_node, photo_set, weat);
+                    tmp_prof = annual_profit(tmp_node, photo_set, weather);
                     return tmp_prof);
 
     ms = ReduceStepMethodND{FT}(FT[0,0],

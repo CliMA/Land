@@ -1,8 +1,16 @@
-# Function to be refactored!
+###############################################################################
+#
+# Create a matrix to show the sunlit-shaded partition algorithm
+#
+###############################################################################
+"""
+    gain_risk_map(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}) where {FT<:AbstractFloat}
 
-
-
-
+Return the matrix of optimizers at different sunlit and shaded layer flow
+    rates, given
+- `node` [`SPACSimple`] type struct
+- `photo_set` [`AbstractPhotoModelParaSet`] type photosynthesis parameter set
+"""
 function gain_risk_map(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT}
@@ -89,6 +97,6 @@ function gain_risk_map(
         end
     end
 
-    # return the matrix
+    # return the matrix, size(mat)[1] for sunlit, [2] for shaded
     return mat
 end
