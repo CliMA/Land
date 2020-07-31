@@ -60,7 +60,7 @@ function leaf_gas_exchange_nonopt!(
             container.an = node.ps.An;
 
         # if flow > 0 and reasonable
-        elseif (d_leaf > 0) && (t_leaf > K_0)
+        elseif (d_leaf > 0) && (t_leaf > K_0(FT))
             g_lw = flow / la / d_leaf * p_atm
             g_lc = max(FT(1e-6), g_lw / FT(1.6))
             if g_lw < g_sla * relative_diffusive_coefficient( (t_leaf+t_air)/2 )

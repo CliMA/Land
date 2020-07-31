@@ -59,4 +59,28 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     longitude::FT = 116
     "Elevation `[m]`"
     elevation::FT = 0
+
+    # photosynthesis mode and stomatal model scheme
+    "Photosynthesis parameter set"
+    photo_set::AbstractPhotoModelParaSet{FT} = C3CLM(FT)
+    "Stomatal behavior scheme"
+    stomata_model::AbstractStomatalModel{FT} = ESMBallBerry{FT}()
+
+    # For CanopyRadiation module
+    "Solar angle container"
+    angles::SolarAngles{FT} = SolarAngles{FT}()
+    "Canopy4RT container"
+    canopy_rt::Canopy4RT{FT} = Canopy4RT{FT}(nLayer=n_canopy, LAI=la/ga)
+    "Wave length container"
+    wl_set::WaveLengths{FT} = WaveLengths{FT}()
+    "CanopyRads container"
+    can_rad::CanopyRads{FT} = CanopyRads{FT}(nWL=wl_set.nwl, nWLf=wl_set.nWlF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer)
+    "CanopyOpticals container"
+    can_opt::CanopyOpticals{FT} = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab))
+    "Array of LeafBios container"
+    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nLayer]
+    "SoilOpticals container"
+    soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set.wl, FT(0.2)*ones(FT, length(wl_set.wl)), FT[0.1], FT(290.0))
+    "Incoming radiation container"
+    in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set.swl)
 end

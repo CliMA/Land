@@ -15,7 +15,7 @@ function radiative_conductance(
     _A0::FT = 0.1579;
     _A1::FT = 0.0017;
     _A2::FT = 7.17E-6;
-    _T ::FT = T - K_0;
+    _T ::FT = T - K_0(FT);
 
     return _A0 + _A1*T + _A2*T^2
 end
@@ -41,7 +41,7 @@ Return the energy been radiated out, given
 function black_body_emittance(
             T::FT
 ) where {FT<:AbstractFloat}
-    return FT(K_BOLTZMANN) * T^4
+    return K_BOLTZMANN(FT) * T^4
 end
 
 
@@ -104,7 +104,7 @@ function leaf_temperature(
 ) where {FT<:AbstractFloat}
     @unpack t_air,wind = node.envir;
 
-    lambda = latent_heat_vapor(t_air) / FT(KG_2_MOL);
+    lambda = latent_heat_vapor(t_air) / KG_2_MOL(FT);
     Gr     = radiative_conductance(t_air);
     GHa    = boundary_layer_conductance(wind, node.width);
     e_lat  = lambda * epla;

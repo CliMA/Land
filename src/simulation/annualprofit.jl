@@ -22,7 +22,7 @@ function annual_profit(
 
     # 1. update the environmental constants based on the node geographycal info
     ratio            = atmospheric_pressure_ratio(elevation);
-    node.envir.p_atm = ratio * FT(P_ATM);
+    node.envir.p_atm = ratio * P_ATM(FT);
     node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
 
     # 2. calculate the growing season canopy profit
@@ -49,7 +49,7 @@ function annual_profit(
         wind  = weather[i,6 ]
         rain  = weather[i,5 ]
 
-        node.envir.t_air = _tair + K_0;
+        node.envir.t_air = _tair + K_0(FT);
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
         node.envir.p_a   = p_co2;
         node.envir.vpd   = _dair * 1000;
@@ -82,8 +82,8 @@ function annual_profit(
         end
 
         # 2.4 update soil moisture by converting flow to Kg per hour
-        flow /= FT(KG_H_2_MOL_S);
-        rain *= gaba * FT(ρ_H₂O) / 1000;
+        flow /= KG_H_2_MOL_S(FT);
+        rain *= gaba * ρ_H₂O(FT) / 1000;
         soil_moisture!(node, flow-rain);
 
         # 2.5 add up the gscp

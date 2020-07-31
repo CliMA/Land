@@ -34,7 +34,7 @@ function zenith_angle(
             hour::FT,
             minute::FT
 ) where {FT<:AbstractFloat}
-    _deg::FT = 360 / FT(YEAR_D) * (day + (hour+minute/60) / 24 + 10);
+    _deg::FT = 360 / YEAR_D(FT) * (day + (hour+minute/60) / 24 + 10);
     decd::FT = -FT(23.44) * cosd(_deg);
     lhad::FT = (hour-12) * 15;
 
@@ -48,7 +48,7 @@ function zenith_angle(
             latd::FT,
             toy::FT
 ) where {FT<:AbstractFloat}
-    _deg::FT = 360 / FT(YEAR_D) * (toy + 10);
+    _deg::FT = 360 / YEAR_D(FT) * (toy + 10);
     decd::FT = -FT(23.44) * cosd(_deg);
     lhad::FT = ((toy%1) - FT(0.5)) * 360;
 

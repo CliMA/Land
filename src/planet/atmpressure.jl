@@ -3,7 +3,7 @@
 # Atmospheric pressure and partial pressure
 #
 ###############################################################################
-const GM2RT25 = GRAVITY * 0.02896968 / RK_25;
+GM2RT25(FT) = GRAVITY(FT) * FT(0.02896968) / RK_25(FT);
 
 """
     atmospheric_pressure(h::FT)
@@ -14,7 +14,7 @@ Calculate the atmospheric pressure, given
 function atmospheric_pressure_ratio(
             h::FT
 ) where {FT<:AbstractFloat}
-    return exp( -h * FT(GM2RT25) );
+    return exp( -h * GM2RT25(FT) );
 end
 
 
@@ -29,7 +29,7 @@ Calculate the atmospheric pressure, given
 function atmospheric_pressure(
             h::FT
 ) where {FT<:AbstractFloat}
-    return FT(P_ATM) * atmospheric_pressure_ratio(h);
+    return P_ATM(FT) * atmospheric_pressure_ratio(h);
 end
 
 

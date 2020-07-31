@@ -77,10 +77,10 @@ function soil_moisture!(
             Δt::FT=FT(1)
 ) where {FT<:AbstractFloat}
     # 1. positive flow means out, flow in Kg h⁻¹, dt in h
-    m_all  = node.swc * node.gaba * node.h_soil * FT(ρ_H₂O);
+    m_all  = node.swc * node.gaba * node.h_soil * ρ_H₂O(FT);
     m_out  = flow * Δt;
     m_all -= m_out;
-    swc    = m_all / (node.gaba * node.h_soil * FT(ρ_H₂O));
+    swc    = m_all / (node.gaba * node.h_soil * ρ_H₂O(FT));
     swc    = max(swc, FT(1e-6));
 
     soil_moisture_swc!(node, swc);

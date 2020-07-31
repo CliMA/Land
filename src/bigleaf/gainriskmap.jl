@@ -51,9 +51,9 @@ function gain_risk_map(
 
                 # expand the tmp_list horizontally
                 if tmp_list==[]
-                    tmp_list = ele
+                    tmp_list = ele;
                 else
-                    tmp_list = [tmp_list ele]
+                    tmp_list = [tmp_list ele];
                 end
             end
 
@@ -81,7 +81,7 @@ function gain_risk_map(
                 ele = node.containerOP / node.ec;
 
                 # expand the tmp_list vertically
-                push!(tmp_list, ele)
+                push!(tmp_list, ele);
             end
 
             # 4.3.2 break if all -Inf
@@ -93,7 +93,7 @@ function gain_risk_map(
         # 4.4 expand the matrix horizontally
         if judge_sh
             mat = [mat tmp_list];
-            push!(list_f_sh, f_sh)
+            push!(list_f_sh, f_sh);
         end
     end
 

@@ -2,6 +2,7 @@ module Plants
 
 using CanopyRadiation
 using CLIMAParameters
+using CLIMAParameters.Planet
 using ConstrainedRootSolvers
 using DataFrames
 using DocStringExtensions
@@ -13,27 +14,24 @@ using Statistics
 using StomataModels
 using WaterPhysics
 
-Planet = CLIMAParameters.Planet
-
 
 
 
 # define constants
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH         = EarthParameterSet()
-const GAS_R         = gas_constant()
-const GRAVITY       = Planet.grav(EARTH)
-const K_0           = Planet.T_freeze(EARTH)
-const K_25          = K_0 + 25
-const K_BOLTZMANN   = k_Boltzmann()
-const MOLMASS_WATER = Planet.molmass_water(EARTH)
-const P_ATM         = Planet.MSLP(EARTH)
-const RK_25         = GAS_R * K_25
-const YEAR_D        = 365.2422222
-const ρ_H₂O         = Planet.ρ_cloud_liq(EARTH)
-
-const KG_2_MOL      = 1 / MOLMASS_WATER
-const KG_H_2_MOL_S  = KG_2_MOL / 3600
+const EARTH       = EarthParameterSet();
+GAS_R(FT)         = FT( gas_constant() );
+GRAVITY(FT)       = FT( grav(EARTH) );
+K_0(FT)           = FT( T_freeze(EARTH) );
+K_25(FT)          = K_0(FT) + 25;
+K_BOLTZMANN(FT)   = FT( k_Boltzmann() );
+MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
+P_ATM(FT)         = FT( MSLP(EARTH) );
+RK_25(FT)         = GAS_R(FT) * K_25(FT);
+YEAR_D(FT)        = FT( 365.2422222 );
+ρ_H₂O(FT)         = FT( ρ_cloud_liq(EARTH) );
+KG_2_MOL(FT)      = 1 / MOLMASS_WATER(FT);
+KG_H_2_MOL_S(FT)  = KG_2_MOL(FT) / 3600;
 
 
 
@@ -55,6 +53,7 @@ export annual_profit,
        big_leaf_partition!,
        create_dataframe,
        gain_risk_map,
+       initialize_spac_canopy!,
        leaf_allocation!,
        leaf_gas_exchange!,
        leaf_gas_exchange_nonopt!,
@@ -62,8 +61,10 @@ export annual_profit,
        leaf_temperature_shaded,
        leaf_temperature_sunlit,
        optimize_flows!,
+       optimize_hs!,
        optimize_leaf!,
        ppm_to_Pa,
+       test_soil,
        zenith_angle
 
 
@@ -80,9 +81,12 @@ include("bigleaf/partition.jl"   )
 include("bigleaf/temperature.jl" )
 
 include("investment/leafallocation.jl")
+include("investment/optimizehs.jl"    )
 include("investment/optimizeleaf.jl"  )
 
+include("layers/initializert.jl")
 include("layers/test_diurnal.jl")
+include("layers/test_soil.jl"   )
 
 include("planet/atmpressure.jl")
 include("planet/solarangle.jl" )
