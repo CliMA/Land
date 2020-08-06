@@ -71,7 +71,7 @@ end
 
 
 
-benchmarking = false
+benchmarking = true
 include("test_struct.jl")
 include("test_TD.jl")
 include("test_ETR.jl")

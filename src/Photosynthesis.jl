@@ -1,6 +1,7 @@
 module Photosynthesis
 
 using CLIMAParameters
+using CLIMAParameters.Planet
 using DocStringExtensions
 using Parameters
 using WaterPhysics
@@ -9,8 +10,11 @@ using WaterPhysics
 
 
 # define constants here
-const GAS_R = gas_constant()
-const K_25  = 298.15
+struct EarthParameterSet <: AbstractEarthParameterSet end
+const EARTH = EarthParameterSet()
+
+T_25(FT)  = FT(T_freeze(EARTH)) + 25;
+RT_25(FT) = FT(gas_constant()) * T_25(FT);
 
 
 
@@ -26,6 +30,9 @@ export AbstractFluoModelParaSet,
        C4ParaSet,
        FluoParaSet,
        Leaf
+
+
+
 
 # export parasets
 export C3Bernacchi,
@@ -49,6 +56,9 @@ export C3Bernacchi,
        VpmaxTDBoyd,
        ΓStarTDBernacchi,
        ΓStarTDCLM
+
+
+
 
 # export functions
 export arrhenius_correction,

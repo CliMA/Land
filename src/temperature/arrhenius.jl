@@ -41,7 +41,7 @@ function arrhenius_correction(
     @unpack C, ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R = td_set
 
     # _f_a: activation correction, C/_f_b: de-activation correction
-    _f_a::FT = exp( ΔHa_to_RT25 * (1 - FT(K_25)/T) );
+    _f_a::FT = exp( ΔHa_to_RT25 * (1 - T_25(FT)/T) );
     _f_b::FT = 1 + exp(ΔSv_to_R - ΔHd_to_R/T);
 
     return C /_f_b * _f_a

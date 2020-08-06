@@ -237,7 +237,13 @@ rubisco_limited_rate!
 ```
 
 If total leaf diffusive conductance to CO₂ is known, $A_\text{c}$ can be
-    computed analytically using
+    computed analytically by solving the quadratic function using
+
+```@docs
+lower_quadratic
+```
+
+The function to analytically compute $A_\text{c}$ is
 
 ```@docs
 rubisco_limited_rate_glc!
