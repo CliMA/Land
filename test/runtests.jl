@@ -73,6 +73,8 @@ end
 
 
 
+benchmarking = false;
+
 include("test_diffusive_coefficient.jl");
 include("test_latent_heat.jl");
 include("test_surface_tension.jl");

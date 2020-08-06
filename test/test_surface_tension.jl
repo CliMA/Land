@@ -5,10 +5,8 @@ println("\nTesting and Benchmarking surface_tension* functions...");
         rand_T  = rand(FT) + 298
         rand_Tl = rand(FT,10) .+ 298
         for result in [ surface_tension(rand_T),
-                        surface_tension(rand_Tl),
                         surface_tension.(rand_Tl),
                         relative_surface_tension(rand_T),
-                        relative_surface_tension(rand_Tl),
                         relative_surface_tension.(rand_Tl) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
@@ -16,12 +14,12 @@ println("\nTesting and Benchmarking surface_tension* functions...");
 
         @test relative_surface_tension(FT(298.15)) ≈ 1;
 
-        @show FT;
-        @btime surface_tension($rand_T);
-        @btime surface_tension($rand_Tl);
-        @btime surface_tension.($rand_Tl);
-        @btime relative_surface_tension($rand_T);
-        @btime relative_surface_tension($rand_Tl);
-        @btime relative_surface_tension.($rand_Tl);
+        if benchmarking
+            @show FT;
+            @btime surface_tension($rand_T);
+            @btime surface_tension.($rand_Tl);
+            @btime relative_surface_tension($rand_T);
+            @btime relative_surface_tension.($rand_Tl);
+        end
     end
 end

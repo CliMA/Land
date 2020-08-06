@@ -1,25 +1,24 @@
 module WaterPhysics
 
 using CLIMAParameters
+using CLIMAParameters.Planet
 using Parameters
-
-Planet = CLIMAParameters.Planet
 
 
 
 
 # Define a local struct inherited from AbstractEarthParameterSet
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH        = EarthParameterSet()
-const CP_I         = Planet.cp_i(EARTH)
-const CP_L         = Planet.cp_l(EARTH)
-const CP_V         = Planet.cp_v(EARTH)
-const K_25         = Planet.T_freeze(EARTH) + 25
-const LH_S0        = Planet.LH_s0(EARTH)
-const LH_V0        = Planet.LH_v0(EARTH)
-const PRESS_TRIPLE = Planet.press_triple(EARTH)
-const R_V          = Planet.R_v(EARTH)
-const T_TRIPLE     = Planet.T_triple(EARTH)
+const EARTH      = EarthParameterSet();
+CP_I(FT)         = FT( cp_i(EARTH) );
+CP_L(FT)         = FT( cp_l(EARTH) );
+CP_V(FT)         = FT( cp_v(EARTH) );
+K_25(FT)         = FT( T_freeze(EARTH) ) + 25;
+LH_S0(FT)        = FT( LH_s0(EARTH) );
+LH_V0(FT)        = FT( LH_v0(EARTH) );
+PRESS_TRIPLE(FT) = FT( press_triple(EARTH) );
+R_V(FT)          = FT( R_v(EARTH) );
+T_TRIPLE(FT)     = FT( T_triple(EARTH) );
 
 
 
@@ -52,24 +51,11 @@ The specific latent heat of vaporization, given
 function latent_heat_vapor(
             T::FT
 ) where {FT<:AbstractFloat}
-    _LH_v0::FT = LH_V0;
-    _T_0  ::FT = T_TRIPLE;
-    _Δcp_v::FT = CP_V - CP_L;
+    _LH_v0::FT = LH_V0(FT);
+    _T_0  ::FT = T_TRIPLE(FT);
+    _Δcp_v::FT = CP_V(FT) - CP_L(FT);
 
     return _LH_v0 + _Δcp_v * (T - _T_0)
-end
-
-
-
-
-function latent_heat_vapor(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _LH_v0::FT = LH_V0;
-    _T_0  ::FT = T_TRIPLE;
-    _Δcp_v::FT = CP_V - CP_L;
-
-    return _LH_v0 .+ _Δcp_v .* (T .- _T_0)
 end
 
 
@@ -95,38 +81,18 @@ Return the saturation vapor pressure over a plane liquid surface given
 function saturation_vapor_pressure(
             T::FT
 ) where {FT<:AbstractFloat}
-    _LH_v0       ::FT = LH_V0;
-    _cp_v        ::FT = CP_V;
-    _cp_l        ::FT = CP_L;
-    _press_triple::FT = PRESS_TRIPLE;
-    _R_v         ::FT = R_V;
-    _T_triple    ::FT = T_TRIPLE;
-    _T_0         ::FT = T_TRIPLE;
+    _LH_v0       ::FT = LH_V0(FT);
+    _cp_v        ::FT = CP_V(FT);
+    _cp_l        ::FT = CP_L(FT);
+    _press_triple::FT = PRESS_TRIPLE(FT);
+    _R_v         ::FT = R_V(FT);
+    _T_triple    ::FT = T_TRIPLE(FT);
+    _T_0         ::FT = T_TRIPLE(FT);
     _Δcp         ::FT = _cp_v - _cp_l;
 
     return _press_triple *
            (T / _T_triple)^(_Δcp / _R_v) *
            exp((_LH_v0 - _Δcp * _T_0) / _R_v * (1 / _T_triple - 1 / T))
-end
-
-
-
-
-function saturation_vapor_pressure(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _LH_v0       ::FT = LH_V0;
-    _cp_v        ::FT = CP_V;
-    _cp_l        ::FT = CP_L;
-    _press_triple::FT = PRESS_TRIPLE;
-    _R_v         ::FT = R_V;
-    _T_triple    ::FT = T_TRIPLE;
-    _T_0         ::FT = T_TRIPLE;
-    _Δcp         ::FT = _cp_v - _cp_l;
-
-    return _press_triple .*
-           (T ./ _T_triple) .^ (_Δcp / _R_v) .*
-           exp.((_LH_v0 - _Δcp * _T_0) ./ _R_v .* (1 / _T_triple .- 1 ./ T))
 end
 
 
@@ -152,30 +118,14 @@ The re-arranged Clausius-Clapeyron relation
 function saturation_vapor_pressure_slope(
             T::FT
 ) where {FT<:AbstractFloat}
-    _LH_v0::FT = LH_V0;
-    _cp_v ::FT = CP_V;
-    _cp_l ::FT = CP_L;
-    _R_v  ::FT = R_V;
-    _T_0  ::FT = T_TRIPLE;
+    _LH_v0::FT = LH_V0(FT);
+    _cp_v ::FT = CP_V(FT);
+    _cp_l ::FT = CP_L(FT);
+    _R_v  ::FT = R_V(FT);
+    _T_0  ::FT = T_TRIPLE(FT);
     _Δcp  ::FT = _cp_v - _cp_l;
 
     return (_LH_v0 + _Δcp * (T - _T_0)) / (_R_v*T^2)
-end
-
-
-
-
-function saturation_vapor_pressure_slope(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _LH_v0::FT = LH_V0;
-    _cp_v ::FT = CP_V;
-    _cp_l ::FT = CP_L;
-    _R_v  ::FT = R_V;
-    _T_0  ::FT = T_TRIPLE;
-    _Δcp  ::FT = _cp_v - _cp_l;
-
-    return (_LH_v0 .+ _Δcp .* (T .- _T_0)) ./ (_R_v .* T.^2)
 end
 
 
@@ -200,16 +150,7 @@ Returns the relative diffusive coefficient of water vapor in air, given
 function relative_diffusive_coefficient(
             T::FT
 ) where {FT<:AbstractFloat}
-    return (T / FT(K_25)) ^ FT(1.8)
-end
-
-
-
-
-function relative_diffusive_coefficient(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    return (T ./ FT(K_25)) .^ FT(1.8)
+    return (T / K_25(FT)) ^ FT(1.8)
 end
 
 
@@ -240,7 +181,7 @@ Surface tension `[N m⁻¹]` of water against air, given
 The equation used is
 ```math
 γ = 0.2358 ⋅
-    \\left( 1 - \\dfrac{T}{T_c} \\right)^1.256 ⋅
+    \\left( 1 - \\dfrac{T}{T_c} \\right)^{1.256} ⋅
     \\left[ 1 - 0.625 ⋅ \\left( 1 - \\dfrac{T}{T_c} \\right) \\right]
 ```
 See http://www.iapws.org/relguide/Surf-H2O.html
@@ -260,21 +201,6 @@ end
 
 
 
-function surface_tension(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _ST_corr    ::FT = ST_corr;
-    _ST_exp     ::FT = ST_exp;
-    _ST_k       ::FT = ST_k;
-    _ST_T_crit  ::FT = ST_T_crit;
-    _ST_T_r_diff     = 1 .- T ./ _ST_T_crit;
-
-    return _ST_k .* _ST_T_r_diff .^ _ST_exp .* (1 .- _ST_corr .* _ST_T_r_diff)
-end
-
-
-
-
 """
     relative_surface_tension(T::FT) where {FT<:AbstractFloat}
     relative_surface_tension(T::Array{FT}) where {FT<:AbstractFloat}
@@ -285,7 +211,7 @@ Relative surface tension of water against air relative to 298.15 K, given
 The equation used is
 ```math
 γ = 0.2358 ⋅
-    \\left( 1 - \\dfrac{T}{T_c} \\right)^1.256 ⋅
+    \\left( 1 - \\dfrac{T}{T_c} \\right)^{1.256} ⋅
     \\left[ 1 - 0.625 ⋅ \\left( 1 - \\dfrac{T}{T_c} \\right) \\right]
 ```
 See http://www.iapws.org/relguide/Surf-H2O.html
@@ -299,17 +225,6 @@ function relative_surface_tension(
     _ST_ref::FT = ST_ref;
 
     return surface_tension(T) / _ST_ref
-end
-
-
-
-
-function relative_surface_tension(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _ST_ref::FT = ST_ref;
-
-    return surface_tension(T) ./ _ST_ref
 end
 
 
@@ -363,20 +278,6 @@ end
 
 
 
-function viscosity(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _A::FT = VIS_A;
-    _B::FT = VIS_B;
-    _C::FT = VIS_C;
-    _D::FT = VIS_D;
-
-    return _A .* exp.( _B ./ T .+ _C .* T .+ _D .* T.^2 )
-end
-
-
-
-
 """
     relative_viscosity(T::FT) where {FT<:AbstractFloat}
     relative_viscosity(T::Array{FT}) where {FT<:AbstractFloat}
@@ -402,25 +303,9 @@ function relative_viscosity(
     _B::FT = VIS_B;
     _C::FT = VIS_C;
     _D::FT = VIS_D;
-    _K::FT = K_25;
+    _K::FT = K_25(FT);
 
     return exp( _B * ( 1/T - 1/_K) + _C * (T - _K) + _D * (T^2 - _K^2) )
-end
-
-
-
-
-function relative_viscosity(
-            T::Array{FT}
-) where {FT<:AbstractFloat}
-    _B::FT = VIS_B;
-    _C::FT = VIS_C;
-    _D::FT = VIS_D;
-    _K::FT = K_25;
-
-    return exp.( _B .* ( 1 ./ T .- 1/_K) .+
-                 _C .* (T .- _K) .+
-                 _D .* (T .^ 2 .- _K^2) )
 end
 
 
