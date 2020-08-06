@@ -1,6 +1,11 @@
 name: Package CI
 on:
-  - pull_request
+  push:
+    branches:
+      - 'master'
+      - 'release-'
+    tags: '*'
+  pull_request:
 
 jobs:
   test:
@@ -15,4 +20,3 @@ jobs:
         with:
           version: 1.4.2
       - run: julia --project -e 'using Pkg; Pkg.test();'
-        shell: bash
