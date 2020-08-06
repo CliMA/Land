@@ -163,3 +163,51 @@ function roots_flow!(
 
     return nothing
 end
+
+
+
+
+function roots_flow!(
+            plant::GrassLikeHS{FT},
+            flow::FT
+) where {FT<:AbstractFloat}
+    roots_flow!(plant.roots,
+                plant.container_k,
+                plant.container_p,
+                plant.container_q,
+                flow);
+
+    return nothing
+end
+
+
+
+
+function roots_flow!(
+            plant::PalmLikeHS{FT},
+            flow::FT
+) where {FT<:AbstractFloat}
+    roots_flow!(plant.roots,
+                plant.container_k,
+                plant.container_p,
+                plant.container_q,
+                flow);
+
+    return nothing
+end
+
+
+
+
+function roots_flow!(
+            plant::TreeLikeHS{FT},
+            flow::FT
+) where {FT<:AbstractFloat}
+    roots_flow!(plant.roots,
+                plant.container_k,
+                plant.container_p,
+                plant.container_q,
+                flow);
+
+    return nothing
+end

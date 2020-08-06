@@ -44,6 +44,7 @@ println("\nTesting and benchmarking the root-related functions...")
             grass = create_grass_like_hs(FT(-2.1), FT(0.5), collect(FT,0:-0.5:-3.0), collect(FT,0:1:20));
             @btime recalculate_roots_flow!($(grass.roots), $_ks, $_ps, $_qs, $_f2);
             @btime roots_flow!($(grass.roots), $_ks, $_ps, $_qs, $_f2);
+            @btime roots_flow!($grass, $_f2);
         end
     end
 end

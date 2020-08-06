@@ -68,9 +68,9 @@ Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = FT(K_25)
+    T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = FT(K_25)
+    T_sap::FT = K_25(FT)
 end
 
 
@@ -121,7 +121,7 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "List of xylem water pressure `[MPa]`"
     p_element::Array{FT,1} = zeros(FT,10)
     "List of pressure drop caused by gravity `[MPa]`"
-    p_gravity::Array{FT,1} = zeros(FT,10) .+ ρg_MPa .* Δh ./ 10;
+    p_gravity::Array{FT,1} = zeros(FT,10) .+ ρg_MPa(FT) .* Δh ./ 10;
     "List of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
     p_history::Array{FT,1} = zeros(FT,10)
 
@@ -131,9 +131,9 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = FT(K_25)
+    T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = FT(K_25)
+    T_sap::FT = K_25(FT)
 end
 
 
@@ -174,7 +174,7 @@ Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "List of xylem water pressure `[MPa]`"
     p_element::Array{FT,1} = zeros(FT,10)
     "List of pressure drop caused by gravity `[MPa]`"
-    p_gravity::Array{FT,1} = zeros(FT,10) .+ ρg_MPa .* Δh ./ 10;
+    p_gravity::Array{FT,1} = zeros(FT,10) .+ ρg_MPa(FT) .* Δh ./ 10;
     "List of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
     p_history::Array{FT,1} = zeros(FT,10)
 
@@ -184,7 +184,7 @@ Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = FT(K_25)
+    T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = FT(K_25)
+    T_sap::FT = K_25(FT)
 end

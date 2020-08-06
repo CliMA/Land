@@ -1,6 +1,7 @@
 module PlantHydraulics
 
 using CLIMAParameters
+using CLIMAParameters.Planet
 using ConstrainedRootSolvers
 using DocStringExtensions
 using Parameters
@@ -12,13 +13,12 @@ using WaterPhysics
 
 
 # define global constants
-Planet = CLIMAParameters.Planet
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH   = EarthParameterSet()
-const GRAVITY = Planet.grav(EARTH)
-const K_25    = Planet.T_freeze(EARTH) + 25
-const ρ_H₂O   = Planet.ρ_cloud_liq(EARTH)
-const ρg_MPa  = ρ_H₂O * GRAVITY * 1e-6
+const EARTH = EarthParameterSet()
+GRAVITY(FT) = FT( grav(EARTH) );
+K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
+ρ_H₂O(FT)   = FT( ρ_cloud_liq(EARTH) );
+ρg_MPa(FT)  = ρ_H₂O(FT) * GRAVITY(FT) * FT(1e-6);
 
 
 
