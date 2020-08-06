@@ -71,7 +71,7 @@ Create a leaf biological parameters struct, given
 - `nWle` Number of excitation wave length
 - `nWlf` Number of fluorescence wave length
 
-Returns a [`LeafBioMArray`](@ref) or [`LeafBioArray`](@ref) type struct.
+Returns a [`LeafBios`](@ref) type struct.
 """
 function create_leaf_bios(FT, nWL::Int, nWLe::Int, nWLf::Int)
     return LeafBios{FT}(nWL=nWL, nWLe=nWLe, nWLf=nWLf)

@@ -3,12 +3,12 @@
 
 Computes a variety of integrated fluxes from the spectrally resolved computations in the short-wave Canopy RT (e.g. absorbed soil radiation, absorbed direct and diffuse PAR by layer (and angles for direct), net direct and diffuse energy balance per layer)
 - `can` A [`Canopy4RT`](@ref) struct
-- `can_opt` A [`CanopyOptiArray`](@ref) struct
-- `can_rad` A [`CanopyRadiation`](@ref) struct
-- `in_rad` An [`IncomingRadiationArray`](@ref) struct
-- `soil_opt` A [`SoilOpti`](@ref) type struct for soil optical properties
-- `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
-- `wl_set` An [`WLParaSetArray`](@ref) type struct
+- `can_opt` A [`CanopyOpticals`](@ref) struct
+- `can_rad` A [`CanopyRads`](@ref) struct
+- `in_rad` An [`IncomingRadiation`](@ref) struct
+- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
+- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
+- `wl_set` An [`WaveLengths`](@ref) type struct
 """
 function canopy_fluxes!(
             can::Canopy4RT{FT},

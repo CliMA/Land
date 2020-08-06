@@ -12,12 +12,12 @@ using Statistics
 
 
 # define the constants
-const AVOGADRO    = avogad()
-const H_PLANCK    = h_Planck()
-const K_BOLTZMANN = k_Boltzmann()
-const LIGHT_SPEED = light_speed()
-const file_Opti   = joinpath(@__DIR__, "../data/Optipar2017_ProspectD.mat")
-const file_Sun    = joinpath(@__DIR__, "../data/sun.mat")
+AVOGADRO(FT)    = FT( avogad() );
+H_PLANCK(FT)    = FT( h_Planck() );
+K_BOLTZMANN(FT) = FT( k_Boltzmann() );
+LIGHT_SPEED(FT) = FT( light_speed() );
+const file_Opti = joinpath(@__DIR__, "../data/Optipar2017_ProspectD.mat")
+const file_Sun  = joinpath(@__DIR__, "../data/sun.mat")
 
 
 

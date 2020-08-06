@@ -3,12 +3,12 @@
 
 Computes 2-stream diffusive radiation transport for SIF radiation (calls `compute_diffusive_S` internally).
 Layer reflectance and transmission is computed from SW optical properties, layer sources from absorbed light and SIF efficiencies. Boundary conditions are zero SIF incoming from atmosphere or soil.
-- `leaf_array` An array of [`LeafBioArray`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
-- `can_opt` A [`CanopyOptiArray`](@ref) struct for providing optical layer properties
-- `can_rad` A [`CanopyRadiation`](@ref) struct
+- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
+- `can_opt` A [`CanopyOpticals`](@ref) struct for providing optical layer properties
+- `can_rad` A [`CanopyRads`](@ref) struct
 - `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
-- `soil_opt` A [`SoilOpti`](@ref) type struct for soil optical properties
-- `wl_set` An [`WLParaSetArray`](@ref) type struct
+- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
+- `wl_set` An [`WaveLengths`](@ref) type struct
 """
 function sif_fluxes!(
             leaf_array::Array{LeafBios{FT},1},

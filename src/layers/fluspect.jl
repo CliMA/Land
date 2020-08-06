@@ -9,7 +9,7 @@
 Computes leaf optical properties (reflectance and transittance) based on pigment concentrations. Also computes Fluorescence excitation matrices.
 Mostly based on PROSPECT-D for leaf reflectance/transmission and FluSpec for fluorescence.
 - `leaf` [`LeafBios`](@ref) type struct (includes pigment concentrations, water content, leaf structure)
-- `wl_set` An [`WLParaSetArray`](@ref) type struct, which defines fluoresence excitation and emission wavelengths
+- `wl_set` An [`WaveLengths`](@ref) type struct, which defines fluoresence excitation and emission wavelengths
 """
 function fluspect!(
             leaf::LeafBios{FT},

@@ -3,7 +3,7 @@
 # Convert energy to photons
 #
 ###############################################################################
-const _FAC = 1e-9 / (H_PLANCK * LIGHT_SPEED * AVOGADRO)
+_FAC(FT) = FT(1e-9) / (H_PLANCK(FT) * LIGHT_SPEED(FT) * AVOGADRO(FT))
 
 """
     e2phot(λ::Array{FT},E::Array{FT})
@@ -16,5 +16,5 @@ function e2phot(
             λ::Array{FT},
             E::Array{FT}
             ) where {FT<:AbstractFloat}
-    return (E .* λ) .* FT(_FAC)
+    return (E .* λ) .* _FAC(FT)
 end

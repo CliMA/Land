@@ -8,10 +8,10 @@
 
 Simulate the short wave radiation through the canopy, given
 - `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
-- `can_opt` A [`CanopyOptiArray`](@ref) struct for providing optical layer properties
-- `can_rad` A [`CanopyRadiation`](@ref) struct
-- `in_rad` An [`IncomingRadiationArray`](@ref) struct
-- `soil_opt` A [`SoilOpti`](@ref) type struct for soil optical properties
+- `can_opt` A [`CanopyOpticals`](@ref) struct for providing optical layer properties
+- `can_rad` A [`CanopyRads`](@ref) struct
+- `in_rad` An [`IncomingRadiation`](@ref) struct
+- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
 """
 function short_wave!(
             can::Canopy4RT{FT},
