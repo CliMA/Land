@@ -58,8 +58,8 @@ end
 #
 ###############################################################################
 """
-    leaf_photo_from_envir!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, sm::AbstractStomatalModel{FT}) where {FT<:AbstractFloat}
-    leaf_photo_from_envir!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, sm::AbstractStomatalModel{FT}, ind::Int) where {FT<:AbstractFloat}
+    leaf_photo_from_envir!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, hs::LeafHydraulics{FT}, envir::AirLayer{FT}, sm::AbstractStomatalModel{FT}) where {FT<:AbstractFloat}
+    leaf_photo_from_envir!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, hs::LeafHydraulics{FT}, envir::AirLayer{FT}, sm::AbstractStomatalModel{FT}, ind::Int) where {FT<:AbstractFloat}
 
 Calculate steady state gsw and photosynthesis from empirical approach, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set

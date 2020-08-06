@@ -1,6 +1,7 @@
 module StomataModels
 
 using CLIMAParameters
+using CLIMAParameters.Planet
 using ConstrainedRootSolvers
 using DocStringExtensions
 using Parameters
@@ -12,11 +13,11 @@ using WaterPhysics
 
 
 # Define constants
-Planet = CLIMAParameters.Planet
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH         = EarthParameterSet()
-const K_25          = Planet.T_freeze(EARTH) + 25
-const MOLMASS_WATER = Planet.molmass_water(EARTH)
+const EARTH       = EarthParameterSet()
+K_0(FT)           = FT( T_freeze(EARTH) );
+K_25(FT)          = K_0(FT) + 25;
+MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 
 
 

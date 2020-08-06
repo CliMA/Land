@@ -26,7 +26,7 @@ function update_leaf_TP!(
     if T != T_old
         canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
         canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
-        canopyi.LV    = latent_heat_vapor(T) * 1000 / FT(MOLMASS_WATER);
+        canopyi.LV    = latent_heat_vapor(T) * 1000 / MOLMASS_WATER(FT);
         canopyi.ps.T  = canopyi.T;
         leaf_temperature_dependence!(photo_set, canopyi.ps, envir);
         canopyi.p_sat = canopyi.ps.p_sat;
