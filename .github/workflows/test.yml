@@ -2,9 +2,8 @@ name: Package CI
 on:
   push:
     branches:
-      - 'master'
-      - 'release-'
-    tags: '*'
+      - master
+      - release-*
   pull_request:
 
 jobs:
@@ -15,8 +14,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v1
-      - name: "Set up Julia"
+      - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: 1.4.2
+          version: '1.5'
       - run: julia --project -e 'using Pkg; Pkg.test();'
