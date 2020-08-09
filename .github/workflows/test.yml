@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - release-*
   pull_request:
 
 jobs:
@@ -17,5 +16,5 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: 1.5
+          version: '1.5'
       - run: julia --project -e 'using Pkg; Pkg.test();'
