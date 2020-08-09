@@ -2,9 +2,8 @@ name: Package CI
 on:
   push:
     branches:
-      - 'master'
-      - 'release-'
-    tags: '*'
+      - master
+      - release-*
   pull_request:
 
 jobs:
