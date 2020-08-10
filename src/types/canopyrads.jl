@@ -103,7 +103,6 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "net absorbed diffuse radiation in each layer `[mW m⁻² nm⁻¹]`"
     netSW_shade    ::Array{FT,2} = zeros(FT, (nWL,nLayer))
 
-
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
     "net PAR of sunlit leaves `[mol m⁻² s⁻¹]`"
     absPAR_sun   ::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayer))

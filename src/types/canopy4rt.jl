@@ -45,7 +45,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     "m/sqrt(s) turbulent transfer coefficient"
     Cd    ::FT = FT(0.01  )
 
-
     # Some more derived parameters:
     "List of mean inclination angles `[°]`"
     litab    ::Array{FT,1} = collect(FT,5:10:85)

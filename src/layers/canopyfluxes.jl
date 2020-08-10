@@ -28,7 +28,6 @@ function canopy_fluxes!(
     rsoil           = soil_opt.albedo_SW;
     soil_emissivity = 1 .-rsoil # emissivity of soil (goes into structure later)
 
-
     # Compute some fluxes, can be done separately if needed (this is absolute fluxes now, for the entire soil):
     can_rad.RnSoil_diffuse = fac * fast∫(dwl, can_rad.E_down[:,end].*soil_emissivity);
     can_rad.RnSoil_direct  = fac *fast∫(dwl, can_opt.Es_[:,end].*soil_emissivity);

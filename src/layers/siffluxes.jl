@@ -73,7 +73,6 @@ function sif_fluxes!(
         M⁻⁺ = M⁻ * (E_up[Iwle,i+1].*dwl[Iwle]);
         M⁻⁻ = M⁻ * (E_down[Iwle,i].*dwl[Iwle]);
 
-
         # Here comes the tedious part:
         sunCos    = mean((ϕ_sun[:,:,i].*cosΘ_l)'*can.lidf)
         shadeCos  = mean((ϕ_shade[i]*cosΘ_l)'*can.lidf)

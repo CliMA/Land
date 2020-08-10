@@ -1,3 +1,4 @@
+using BenchmarkTools
 using CanopyRadiation
 using Test
 
@@ -69,6 +70,8 @@ end
 
 
 
+
+benchmarking = true;
 
 include("test_bigleaf.jl"  )
 include("test_structs.jl"  )

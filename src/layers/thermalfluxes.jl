@@ -46,7 +46,6 @@ function thermal_fluxes!(
     S_shade = similar(ρ_dd)
     S_sun   = similar(ρ_dd)
 
-
     # If we just have the same leaf everywhere, compute emissivities:
     if length(leaf_array)==1
         le   = leaf_array[1]

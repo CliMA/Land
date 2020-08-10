@@ -20,7 +20,6 @@ function canopy_geometry!(
             angles::SolarAngles{FT},
             can_opt::CanopyOpticals{FT}
 ) where {FT<:AbstractFloat}
-
     @unpack clump_a, clump_b, LAI, litab, litab_bnd, nLayer, Ω,lazitab = can
     @unpack tts,tto,psi = angles
 
@@ -39,14 +38,15 @@ function canopy_geometry!(
     cospsi  = cosd(psi)
 
     # Generate leaf angle distribution:
+    # This is one-time calculation, move it to when initializing the struct
     lidf     = dladgen(can.LIDFa, can.LIDFb, litab_bnd)
     can.lidf = lidf
 
     # Precompute all of this before in a separate function?
-    cos_ttlo   = cosd.(lazitab)  #   cos leaf azimuth angles
-    cos_philo  = cosd.(lazitab.-psi)  #   cos leaf azimuth angles
-    cos_ttli   = cosd.(litab)    #   cosine of normal of upperside of leaf
-    sin_ttli   = sind.(litab)    #   sine   of normal of upperside of leaf
+    cos_ttlo   = cosd.(lazitab)           # cos leaf azimuth angles
+    cos_philo  = cosd.(lazitab .- psi)    # cos leaf azimuth angles
+    cos_ttli   = cosd.(litab)             # cos of normal of upperside of leaf
+    sin_ttli   = sind.(litab)             # sine of normal of upperside of leaf
     sin_tto    = sind(tto)
     # Solar angle dependent ones:
     cts        = cosd(tts)
