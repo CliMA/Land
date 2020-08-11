@@ -55,9 +55,11 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
 
     # This is changed afterwards, ignore here.
     "Inclination angles weight distribution"
-    lidf::Array{FT,1} = litab .* 0
+    lidf::Array{FT,1} = dladgen(LIDFa, LIDFb, litab_bnd)
     "List of level location (level = layer + 1)"
-    xl  ::Array{FT,1} = collect(0.0:-1.0/nLayer:-1.0)
+    xl  ::Array{FT,1} = collect(FT, 0:-1.0/nLayer:-1)
+    "Exp(xl)"
+    xl_e::Array{FT,1} = exp.(xl)
     "1/nlayers"
-    dx  ::FT          = FT(1)/nLayer
+    dx  ::FT = FT(1)/nLayer
 end

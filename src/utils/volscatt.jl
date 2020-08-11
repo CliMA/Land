@@ -7,12 +7,14 @@
     volscatt(tts::FT, tto::FT, psi::FT, ttl::FT)
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance multiplier (`frho`) and transmittance multiplier (`ftau`), given
+- `container` Array container for results
 - `tts` Solar zenith angle
 - `tto` Viewing zenith angle
 - `psi` Azimuth angle
 - `ttl` Leaf inclination angle
 """
-function volscatt(
+function volscatt!(
+            container::Array{FT,1},
             tts::FT,
             tto::FT,
             psi::FT,
@@ -94,5 +96,11 @@ function volscatt(
     frho  = ((pi-bt2) * t1 + t2) / denom;
     ftau  = (-bt2     * t1 + t2) / denom;
 
-    return chi_s, abs(chi_o), frho, ftau
+    # fill the values to container
+    container[1] = chi_s;
+    container[2] = abs(chi_o);
+    container[3] = frho;
+    container[4] = ftau;
+
+    return nothing
 end

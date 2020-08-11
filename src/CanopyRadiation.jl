@@ -2,6 +2,7 @@ module CanopyRadiation
 
 using CLIMAParameters
 using DocStringExtensions
+using LinearAlgebra
 using MAT
 using Parameters
 using Polynomials
@@ -24,7 +25,8 @@ const file_Sun  = joinpath(@__DIR__, "../data/sun.mat")
 
 
 # export public types
-export Canopy4RT,
+export AngleContainer,
+       Canopy4RT,
        CanopyOpticals,
        CanopyRads,
        IncomingRadiation,
@@ -42,6 +44,7 @@ export big_leaf_partition,
        canopy_fluxes!,
        canopy_geometry!,
        canopy_matrices!,
+       create_angle_container,
        create_canopy_opticals,
        create_incoming_radiation,
        create_leaf_bios,
@@ -56,16 +59,6 @@ export big_leaf_partition,
 
 
 
-include("types/canopy4rt.jl"     )
-include("types/canopyopticals.jl")
-include("types/canopyrads.jl"    )
-include("types/incomingrad.jl"   )
-include("types/leafbios.jl"      )
-include("types/leafopticals.jl"  )
-include("types/soilopticals.jl"  )
-include("types/solarangles.jl"   )
-include("types/wavelength.jl"    )
-
 include("utils/calctav.jl"    )
 include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
@@ -73,6 +66,17 @@ include("utils/expint.jl"     )
 include("utils/integral.jl"   )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
+
+include("types/canopy4rt.jl"     )
+include("types/canopyopticals.jl")
+include("types/canopyrads.jl"    )
+include("types/container.jl"     )
+include("types/incomingrad.jl"   )
+include("types/leafbios.jl"      )
+include("types/leafopticals.jl"  )
+include("types/soilopticals.jl"  )
+include("types/solarangles.jl"   )
+include("types/wavelength.jl"    )
 
 include("bigleaf/bigleaf.jl")
 
