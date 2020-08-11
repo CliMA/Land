@@ -18,86 +18,124 @@ function short_wave!(
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             in_rad::IncomingRadiation{FT},
-            soil_opt::SoilOpticals{FT}
+            soil_opt::SoilOpticals{FT},
+            rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
-    # TODO Organize the code for better understanding
-    # Unpack variables from can structure
-    @unpack LAI, nLayer, Ω = can
+    # 1. unpack values from can and soil_opt
+    @unpack LAI, nLayer, Ω = can;
+    @unpack ks, sb, sf, sigb = can_opt;
+    @unpack albedo_SW = soil_opt;
 
-    # TODO change to LAI distribution later
-    iLAI = LAI * Ω / nLayer
-
-    # Define soil as polynomial (depends on state vector size), still TBD in the structure mode now.
-    # TODO emissivity of soil (goes into structure later)
-    rsoil           = soil_opt.albedo_SW
-    soil_emissivity = 1 .- rsoil
-
-    # 2.2. convert scattering and extinction coefficients into thin layer reflectances and transmittances
+    # 2. scattering and extinction coefficients to
+    #    thin layer reflectances and transmittances
     # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
-    τ_ss = exp(-can_opt.ks * iLAI)
-    # Here, transmission looks ok, as it has to be sigf for iLAI=1!
-    τ_dd = 1 .- can_opt.a * iLAI
-    τ_sd = can_opt.sf   * iLAI
-    ρ_sd = can_opt.sb   * iLAI
-    ρ_dd = can_opt.sigb * iLAI
+    # TODO change to LAI distribution later
+    iLAI = LAI * Ω / nLayer;
+    τ_ss = exp(-ks * iLAI);
+    rt_con.τ_dd .= 1 .- can_opt.a .* iLAI;
+    rt_con.τ_sd .= sf   .* iLAI;
+    rt_con.ρ_dd .= sigb .* iLAI;
+    rt_con.ρ_sd .= sb   .* iLAI;
+    @unpack ρ_dd, ρ_sd, τ_dd, τ_sd = rt_con;
 
-    # 2.3. reflectance calculation
-    # Eq. 18 in mSCOPE paper
-    # Just a scalar here but better to write it out:
-    Xss  = τ_ss
+    # 3. reflectance calculation
+    # 3.1 Eq. 18 in mSCOPE paper
+    Xss = τ_ss;
 
-    # Soil reflectance boundary condition (same for diffuse and direct)
-    can_opt.R_sd[:,end] = rsoil
-    can_opt.R_dd[:,end] = rsoil
+    # 3.2 Soil reflectance boundary condition (same for diffuse and direct)
+    can_opt.R_sd[:,end] .= albedo_SW;
+    can_opt.R_dd[:,end] .= albedo_SW;
 
-    # Eq. 18 in mSCOPE paper
-    # from bottom to top:
-    @inbounds for j=nLayer:-1:1
-        dnorm        = 1 .- ρ_dd[:,j] .* can_opt.R_dd[:,j+1]
-        can_opt.Xsd[:,j]  = ( τ_sd[:,j] + Xss * can_opt.R_sd[:,j+1] .* ρ_dd[:,j] ) ./ dnorm
-        can_opt.Xdd[:,j]  = τ_dd[:,j] ./ dnorm
-        can_opt.R_sd[:,j] = ρ_sd[:,j] + τ_dd[:,j] .* ( can_opt.R_sd[:,j+1] * Xss + can_opt.R_dd[:,j+1] .* can_opt.Xsd[:,j] )
-        can_opt.R_dd[:,j] = ρ_dd[:,j] + τ_dd[:,j] .* can_opt.R_dd[:,j+1] .* can_opt.Xdd[:,j]
+    # 3.3 reflectance for each layer from bottom to top
+    @inbounds for j in nLayer:-1:1
+        rt_con.dnorm      .= 1 .-
+                             view(ρ_dd, :, j) .*
+                             view(can_opt.R_dd, :, j+1);
+        can_opt.Xsd[:,j]  .= ( view(τ_sd, :, j) .+
+                               Xss .* view(can_opt.R_sd, :, j+1) .*
+                                      view(ρ_dd, :, j) ) ./
+                             rt_con.dnorm;
+        can_opt.Xdd[:,j]  .= view(τ_dd, :, j) ./ rt_con.dnorm;
+        can_opt.R_sd[:,j] .= view(ρ_sd, :, j) .+
+                             view(τ_dd, :, j) .*
+                                ( view(can_opt.R_sd, :, j+1) .*
+                                  Xss .+
+                                  view(can_opt.R_dd, :, j+1) .*
+                                  view(can_opt.Xsd , :, j  ) );
+        can_opt.R_dd[:,j] .= view(ρ_dd        , :, j  ) .+
+                             view(τ_dd        , :, j  ) .*
+                             view(can_opt.R_dd, :, j+1) .*
+                             view(can_opt.Xdd , :, j  );
     end
 
-    # 3.2 flux profile calculation
+    # 4. flux profile calculation
     # Eq. 19 in mSCOPE paper
-    # Boundary condition at top: Incoming solar radiation
-    #in_rad.E_diffuse = in_rad.E_diffuse.+0.2# Add some here for checking, is almost 0 otherwise!
-    can_opt.Es_[:,1]    = in_rad.E_direct
-    can_rad.E_down[:,1] = in_rad.E_diffuse
+    # 4.1 Boundary condition at top: Incoming solar radiation
+    can_opt.Es_[:,1]    .= in_rad.E_direct;
+    can_rad.E_down[:,1] .= in_rad.E_diffuse;
 
-    @inbounds for j=1:nLayer # from top to bottom
-        can_rad.netSW_sunlit[:,j] = can_opt.Es_[:,j] .* ( 1 .- (τ_ss .+ τ_sd[:,j] + ρ_sd[:,j]) )
-        can_opt.Es_[:,j+1]        = Xss .* can_opt.Es_[:,j]
-        can_rad.E_down[:,j+1]     = can_opt.Xsd[:,j]  .* can_opt.Es_[:,j] + can_opt.Xdd[:,j]  .* can_rad.E_down[:,j]
-        can_rad.E_up[:,j]         = can_opt.R_sd[:,j] .* can_opt.Es_[:,j] + can_opt.R_dd[:,j] .* can_rad.E_down[:,j]
-    end
-    # Boundary condition at the bottom, soil reflectance (Lambertian here)
-    can_rad.E_up[:,end] = can_opt.R_sd[:,end] .* can_opt.Es_[:,end] + can_opt.R_dd[:,end] .* can_rad.E_down[:,end]
-
-    # Hemispheric total outgoing (needs to go into stucture later):
-    can_rad.Eout[:] = can_rad.E_up[:,1]
-
-    # compute net diffuse radiation per layer:
+    # 4.2 from top to bottom
     @inbounds for j=1:nLayer
-        E_ = can_rad.E_down[:,j] + can_rad.E_up[:,j+1]
-        can_rad.netSW_shade[:,j] = E_ .* ( 1 .- (τ_dd[:,j] + ρ_dd[:,j]) )
+        can_rad.netSW_sunlit[:,j] .= view(can_opt.Es_   , :, j) .*
+                                     ( 1 .- (τ_ss .+ view(τ_sd, :, j) .+
+                                     view(ρ_sd          , :, j)) );
+        can_opt.Es_[:,j+1]        .= Xss .*
+                                     view(can_opt.Es_   , :, j);
+        can_rad.E_down[:,j+1]     .= view(can_opt.Xsd   , :, j) .*
+                                     view(can_opt.Es_   , :, j) .+
+                                     view(can_opt.Xdd   , :, j) .*
+                                     view(can_rad.E_down, :, j);
+        can_rad.E_up[:,j]         .= view(can_opt.R_sd  , :, j) .*
+                                     view(can_opt.Es_   , :, j) .+
+                                     view(can_opt.R_dd  , :, j) .*
+                                     view(can_rad.E_down, :, j);
+    end
+
+    # 4.3 Boundary condition at the bottom, soil reflectance (Lambertian here)
+    last_ind_co = lastindex(can_opt.R_sd, 2);
+    can_rad.E_up[:,end] .= view(can_opt.R_sd  , :, last_ind_co) .*
+                           view(can_opt.Es_   , :, last_ind_co) .+
+                           view(can_opt.R_dd  , :, last_ind_co) .*
+                           view(can_rad.E_down, :, last_ind_co);
+
+    # 4.4 Hemispheric total outgoing
+    can_rad.Eout .= view(can_rad.E_up, :, 1);
+
+    # 4.5 compute net diffuse radiation per layer:
+    @inbounds for j in 1:nLayer
+        can_rad.netSW_shade[:,j] .= ( view(can_rad.E_down, :, j) .+
+                                      view(can_rad.E_up, :, j+1) ) .*
+                                    ( 1 .- ( view(τ_dd, :, j) .+
+                                             view(ρ_dd, :, j) ) );
         # Add diffuse radiation to direct radiation as well:
         #can_rad.netSW_sunlit[:,j] += can_rad.netSW_shade[:,j]
     end
 
-    # outgoing in viewing direction
+    # 4.6 outgoing in viewing direction
     # From Canopy
-    piLoc_  = iLAI * sum( can_opt.vb .* can_opt.Po[1:nLayer]' .* can_rad.E_down[:,1:nLayer] + can_opt.vf .* can_opt.Po[1:nLayer]' .* can_rad.E_up[:,1:nLayer] + can_opt.w .* can_opt.Pso[1:nLayer]' .* in_rad.E_direct, dims=2 )[:,1]
-    # From Soil
-    piLos_  = can_rad.E_up[:,end] * can_opt.Po[end]
-    piLo_   = piLoc_ + piLos_
-    can_rad.Lo   = piLo_  / pi
-    # Save albedos (hemispheric direct and diffuse as well as directional (obs))
-    can_rad.alb_obs     = piLo_ ./ ( in_rad.E_direct + in_rad.E_diffuse ) # rso and rdo are not computed separately
-    can_rad.alb_direct  = can_opt.R_sd[:,1]
-    can_rad.alb_diffuse = can_opt.R_dd[:,1]
+    rt_con.piLoc2 .= can_opt.vb .* view(can_opt.Po       , 1:nLayer)' .*
+                                  view(can_rad.E_down, :, 1:nLayer)  .+
+                    can_opt.vf .* view(can_opt.Po       , 1:nLayer)' .*
+                                  view(can_rad.E_up  , :, 1:nLayer)  .+
+                    can_opt.w  .* view(can_opt.Pso      , 1:nLayer)' .*
+                                  in_rad.E_direct;
+    #rt_con.piLoc  .= iLAI .* view(sum(rt_con.piLoc2, dims=2), :, 1);
+    @inbounds for j in eachindex(rt_con.piLoc)
+        rt_con.piLoc[j] = iLAI * sum( view(rt_con.piLoc2, j, :) );
+    end
+
+    # 4.7 From Soil
+    rt_con.piLos .= view(can_rad.E_up, :, last_ind_co) .*
+                    can_opt.Po[end];
+    rt_con.piLo  .= rt_con.piLoc .+ rt_con.piLos;
+    can_rad.Lo   .= rt_con.piLo ./ pi;
+
+    # 4.8 Save albedos (hemispheric direct and diffuse and directional (obs))
+    # rso and rdo are not computed separately
+    can_rad.alb_obs     .= rt_con.piLo ./ ( in_rad.E_direct .+
+                                            in_rad.E_diffuse );
+    can_rad.alb_direct  .= view(can_opt.R_sd, :, 1);
+    can_rad.alb_diffuse .= view(can_opt.R_dd, :, 1);
 
     return nothing
 end

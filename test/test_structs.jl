@@ -8,7 +8,7 @@ println("\nTesting the structures...");
                           create_incoming_radiation(FT[600,620,640]),
                           create_leaf_bios(FT, 10, 10, 10),
                           create_leaf_opticals(FT[600,620,640]),
-                          SoilOpticals{FT}(FT[600,610,620], FT[0.1,0.1,0.1], FT[0.1,0.1,0.1], FT(280.0)),
+                          SoilOpticals{FT}(FT[600,610,620], FT[0.1,0.1,0.1], FT[0.1,0.1,0.1], FT[0.1,0.1,0.1], FT(280.0)),
                           SolarAngles{FT}(),
                           WaveLengths{FT}() ]
             recursive_FT_test(data_set, FT);

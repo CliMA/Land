@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    struct SoilOpticals{FT}
+    mutable struct SoilOpticals{FT}
 
 A struct of soil optical parameters
 
@@ -16,6 +16,8 @@ mutable struct SoilOpticals{FT}
     wl        ::Array{FT,1}
     "Shortwave albedo"
     albedo_SW ::Array{FT,1}
+    "Shortwave Emissivity"
+    emsvty_SW ::Array{FT,1}
     "Longwave albedo"
     albedo_LW ::Array{FT,1}
     "Soil surface temperature `[K]`"

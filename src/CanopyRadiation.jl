@@ -25,13 +25,13 @@ const file_Sun  = joinpath(@__DIR__, "../data/sun.mat")
 
 
 # export public types
-export AngleContainer,
-       Canopy4RT,
+export Canopy4RT,
        CanopyOpticals,
        CanopyRads,
        IncomingRadiation,
        LeafBios,
        LeafOpticals,
+       RTContainer,
        SoilOpticals,
        SolarAngles,
        WaveLengths
@@ -44,11 +44,13 @@ export big_leaf_partition,
        canopy_fluxes!,
        canopy_geometry!,
        canopy_matrices!,
-       create_angle_container,
        create_canopy_opticals,
        create_incoming_radiation,
        create_leaf_bios,
        create_leaf_opticals,
+       create_rt_container,
+       create_soil_opticals,
+       create_wave_length,
        diffusive_S,
        fluspect!,
        initialize_rt_module,
@@ -77,6 +79,14 @@ include("types/leafopticals.jl"  )
 include("types/soilopticals.jl"  )
 include("types/solarangles.jl"   )
 include("types/wavelength.jl"    )
+
+include("initialize/canopyopticals.jl")
+include("initialize/container.jl"     )
+include("initialize/incomingrad.jl"   )
+include("initialize/leafbios.jl"      )
+include("initialize/leafopticals.jl"  )
+include("initialize/soilopticals.jl"  )
+include("initialize/wavelength.jl"    )
 
 include("bigleaf/bigleaf.jl")
 

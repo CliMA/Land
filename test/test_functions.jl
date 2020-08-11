@@ -2,16 +2,16 @@
 println("\nTesting the layered model...");
 @testset "CanopyRadiation --- RT function test" begin
     for FT in [Float32, Float64]
-        wl_set    = WaveLengths{FT}();
+        wl_set    = create_wave_length(FT);
         leaf_1    = create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF);
         leaf_2    = create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF);
         canopy_rt = Canopy4RT{FT}(nLayer=20, LAI=FT(3));
         canRad_rt = CanopyRads{FT}(nWL=wl_set.nwl, nWLf=wl_set.nWlF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer);
         canOpt_rt = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab));
         sunRad_rt = create_incoming_radiation(wl_set.swl);
-        soil      = SoilOpticals{FT}(wl_set.wl, FT(0.2)*ones(FT, length(wl_set.wl)), FT[0.1], FT(290.0));
+        soil      = create_soil_opticals(wl_set);
         angles    = SolarAngles{FT}();
-        ang_con   = create_angle_container(canopy_rt, angles);
+        rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles);
 
         collections = initialize_rt_module(LAI=FT(3));
 
@@ -36,9 +36,9 @@ println("\nTesting the layered model...");
             fluspect!(arrayOfLeaves[i], wl_set);
         end
 
-        canopy_geometry!(canopy_rt, angles, canOpt_rt, ang_con);
+        canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
         canopy_matrices!(arrayOfLeaves, canOpt_rt);
-        short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
+        short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
         canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set);
 
         SIF_FR  = FT[];
@@ -53,9 +53,9 @@ println("\nTesting the layered model...");
 
         for VZA_ in VZA
             angles.tto = VZA_;
-            canopy_geometry!(canopy_rt, angles, canOpt_rt, ang_con);
+            canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
             canopy_matrices!(arrayOfLeaves, canOpt_rt);
-            short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
+            short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
             sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
 
             push!(reflVIS, canRad_rt.alb_obs[ind_red   ]);
@@ -78,9 +78,9 @@ println("\nTesting the layered model...");
             for VZA in 0:5:85
                 angles.tto = VZA;
 
-                canopy_geometry!(canopy_rt, angles, canOpt_rt, ang_con);
+                canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
                 canopy_matrices!(arrayOfLeaves, canOpt_rt);
-                short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
+                short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
                 sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
 
                 push!(reflVIS, canRad_rt.alb_obs[28]);

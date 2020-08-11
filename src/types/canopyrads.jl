@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    struct CanopyRads{FT}
+    mutable struct CanopyRads{FT}
 
 A struct for canopy radiation information
 

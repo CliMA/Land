@@ -33,62 +33,6 @@ end
 
 ###############################################################################
 #
-# Create AngleContainer
-#
-###############################################################################
-"""
-    create_angle_container(can::Canopy4RT{FT}, angles::SolarAngles{FT}) where {FT<:AbstractFloat}
-
-Create an [`AngleContainer`](@ref), given
-- `can` [`Canopy4RT`](@ref) type struct, providing canopy structure information
-- `angles` [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
-"""
-function create_angle_container(
-    can::Canopy4RT{FT},
-    angles::SolarAngles{FT}
-) where {FT<:AbstractFloat}
-    @unpack lazitab, litab = can;
-    @unpack psi = angles;
-
-    cos_ttlo  = cosd.(lazitab);
-    cos_philo = cosd.(lazitab .- psi);
-    cos_ttli  = cosd.(litab);
-    sin_ttli  = sind.(litab);
-    vol_scatt = ones(FT, 4);
-
-    _Cs = cos_ttli .* 0; # [nli]
-    _Ss = sin_ttli .* 0; # [nli]
-    _Co = cos_ttli .* 0; # [nli]
-    _So = sin_ttli .* 0; # [nli]
-    _1s = ones(FT,1,length(lazitab)); #[1, nlazi]
-    cds = _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
-    cdo = _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
-    _2d = _Co * _1s                    ; # [nli, nlazi]
-
-    return AngleContainer{FT}(cos_ttlo,
-                              cos_philo,
-                              cos_ttli,
-                              sin_ttli,
-                              vol_scatt,
-                              _Cs,
-                              _Ss,
-                              _Co,
-                              _So,
-                              _1s,
-                              cds,
-                              cdo,
-                              _2d)
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Update canopy geometry
 #
 ###############################################################################
@@ -101,15 +45,14 @@ Computes canopy optical properties (extinction coefficients for direct and
     geometry . Canopy clumping Ω is implemented as in Pinty et al (2015), given
 - `can` [`Canopy4RT`](@ref) type struct, providing canopy structure information
 - `angles` [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
-- `can_opt` [`CanopyOpticals`](@ref) type, where optical properties will be
-    stored
-- `ang_con` [`AngleContainer`](@ref) type container
+- `can_opt` [`CanopyOpticals`](@ref) type, where optical properties is stored
+- `rt_con` [`RTContainer`](@ref) type container
 """
 function canopy_geometry!(
             can::Canopy4RT{FT},
             angles::SolarAngles{FT},
             can_opt::CanopyOpticals{FT},
-            ang_con::AngleContainer{FT}
+            rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
     # 1. update clumping factor from zenith angle
     clumping_factor!(can, angles);
@@ -130,9 +73,9 @@ function canopy_geometry!(
     # 3. unpack canopy parameters
     @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, xl_e, Ω = can;
 
-    # 4. update the AngleContainer
-    ang_con.cos_philo .= cosd.(lazitab .- psi);
-    @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = ang_con;
+    # 4. update the RTContainer
+    rt_con.cos_philo .= cosd.(lazitab .- psi);
+    @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = rt_con;
 
     # 5. calculate geometric factors associated with extinction and scattering
     can_opt.ks  = 0;
@@ -146,8 +89,8 @@ function canopy_geometry!(
         _ctl = cos_ttli[i];
 
         # interception parameters and ref/trans multipliers
-        volscatt!(ang_con.vol_scatt, tts, tto, psi_vol, _lit);
-        chi_s, chi_o, frho, ftau = ang_con.vol_scatt;
+        volscatt!(rt_con.vol_scatt, tts, tto, psi_vol, _lit);
+        chi_s, chi_o, frho, ftau = rt_con.vol_scatt;
 
         # Extinction coefficients
         ksli = abs(chi_s / cos_tts);
@@ -180,20 +123,20 @@ function canopy_geometry!(
     can_opt.ddf = (1  - bf) / 2;
 
     # 7. eq 19 in vdT 2009 page 305 modified by Joris
-    ang_con._Cs .= cos_ttli .* cos_tts; # [nli]
-    ang_con._Ss .= sin_ttli .* sin_tts; # [nli]
-    ang_con._Co .= cos_ttli .* cos_tto; # [nli]
-    ang_con._So .= sin_ttli .* sin_tto; # [nli]
-    @unpack _Co, _Cs, _So, _Ss, _1s = ang_con;
-    # ang_con.cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
-    # ang_con.cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
-    mul!(ang_con.cds, _Cs, _1s);
-    mul!(ang_con._2d, _Ss, cos_ttlo' );
-    ang_con.cds .+= ang_con._2d;
-    mul!(ang_con.cdo, _Co, _1s);
-    mul!(ang_con._2d, _So, cos_philo');
-    ang_con.cdo .+= ang_con._2d;
-    @unpack cdo, cds = ang_con;
+    rt_con._Cs .= cos_ttli .* cos_tts; # [nli]
+    rt_con._Ss .= sin_ttli .* sin_tts; # [nli]
+    rt_con._Co .= cos_ttli .* cos_tto; # [nli]
+    rt_con._So .= sin_ttli .* sin_tto; # [nli]
+    @unpack _Co, _Cs, _So, _Ss, _1s = rt_con;
+    # rt_con.cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
+    # rt_con.cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
+    mul!(rt_con.cds, _Cs, _1s);
+    mul!(rt_con._2d, _Ss, cos_ttlo' );
+    rt_con.cds .+= rt_con._2d;
+    mul!(rt_con.cdo, _Co, _1s);
+    mul!(rt_con._2d, _So, cos_philo');
+    rt_con.cdo .+= rt_con._2d;
+    @unpack cdo, cds = rt_con;
 
     # 8. update fs and fo
     # This is basically equivalent to Kb in Bonan, eq. 14.21
