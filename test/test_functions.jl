@@ -11,7 +11,7 @@ println("\nTesting the layered model...");
         sunRad_rt = create_incoming_radiation(wl_set.swl);
         soil      = create_soil_opticals(wl_set);
         angles    = SolarAngles{FT}();
-        rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles);
+        rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, wl_set);
 
         collections = initialize_rt_module(LAI=FT(3));
 
@@ -39,7 +39,7 @@ println("\nTesting the layered model...");
         canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
         canopy_matrices!(arrayOfLeaves, canOpt_rt);
         short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
-        canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set);
+        canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set, rt_con);
 
         SIF_FR  = FT[];
         SIF_R   = FT[];

@@ -12,25 +12,7 @@ canOpt_rt = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(cano
 sunRad_rt = create_incoming_radiation(wl_set.swl);
 soil      = create_soil_opticals(wl_set);
 angles    = SolarAngles{FT}();
-rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles);
-
-collections = initialize_rt_module(LAI=FT(3));
-
-wl_blue   = FT(450.0);
-wl_red    = FT(600.0);
-wl_FarRed = FT(740.0);
-wl_Red    = FT(685.0);
-ind_wle_blue = argmin( abs.(wl_set.wle .- wl_blue  ) );
-ind_wle_red  = argmin( abs.(wl_set.wle .- wl_red   ) );
-ind_wlf_FR   = argmin( abs.(wl_set.wlf .- wl_FarRed) );
-ind_wlf_R    = argmin( abs.(wl_set.wlf .- wl_Red   ) );
-ind_red      = argmin( abs.(wl_set.wl  .- wl_Red   ) );
-ind_NIR      = argmin( abs.(wl_set.wl  .- 800      ) );
-
-leaf_2.Cab = FT(80.0 );
-leaf_2.Cw  = FT(0.012);
-fluspect!(leaf_1, wl_set);
-fluspect!(leaf_2, wl_set);
+rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, wl_set);
 
 arrayOfLeaves = [create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nLayer];
 for i in 1:canopy_rt.nLayer
@@ -40,8 +22,8 @@ end
 canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
 canopy_matrices!(arrayOfLeaves, canOpt_rt);
 short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
-canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set);
+canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set, rt_con);
 
 Profile.clear_malloc_data();
 
-#@btime short_wave!($canopy_rt, $canOpt_rt, $canRad_rt, $sunRad_rt, $soil, $rt_con);
+#@btime canopy_fluxes!($canopy_rt, $canOpt_rt, $canRad_rt, $sunRad_rt, $soil, $arrayOfLeaves, $wl_set, $rt_con);

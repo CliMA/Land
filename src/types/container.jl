@@ -12,6 +12,7 @@ A struct for canopy radiation information
 $(DocStringExtensions.FIELDS)
 """
 mutable struct RTContainer{FT}
+    # these names looks very meaningless...
     "cos leaf azimuth angles"
     cos_ttlo ::Array{FT,1}
     "cos leaf azimuth angles - psi"
@@ -60,4 +61,30 @@ mutable struct RTContainer{FT}
     piLoc ::Array{FT,1}
     "pi * Lo from soil"
     piLos ::Array{FT,1}
+
+    # containers to speed up canopy_fluxes!
+    "absorbed energy from wave lengths"
+    abs_wave   ::Array{FT,1}
+    "absfs' * lidf [nAzi]"
+    absfs_lidf ::Array{FT,1}
+    "lPs [nLayer]"
+    lPs        ::Array{FT,1}
+    "kChlrel [same as iPAR]"
+    kChlrel    ::Array{FT,1}
+    "wave lengths of iPAR, set once ans use forever [same as iPAR]"
+    λ_iPAR     ::Array{FT,1}
+    "absorbed iPAR [same as iPAR]"
+    dλ_iPAR    ::Array{FT,1}
+    "wave length energy [same as iPAR]"
+    E_iPAR     ::Array{FT,1}
+    "wave length energy [same as dwl]"
+    E_all      ::Array{FT,1}
+    "diffusive PAR [same as iPAR]"
+    PAR_diff   ::Array{FT,1}
+    "direct PAR [same as iPAR]"
+    PAR_dir    ::Array{FT,1}
+    "diffusive PAR for photosynthesis [same as iPAR]"
+    PAR_diffCab::Array{FT,1}
+    "diffusive PAR for photosynthesis [same as iPAR]"
+    PAR_dirCab ::Array{FT,1}
 end

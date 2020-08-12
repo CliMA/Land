@@ -37,7 +37,7 @@ end
 #
 ###############################################################################
 """
-    canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
+    canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::CanopyOpticals{FT}, rt_con::RTContainer{FT}) where {FT<:AbstractFloat}
 
 Computes canopy optical properties (extinction coefficients for direct and
     diffuse light) based on the SAIL model. Most important input parameters are
@@ -155,6 +155,9 @@ function canopy_geometry!(
     can_opt.Ps  .= xl_e .* _fac_s;
     can_opt.Po  .= xl_e .* _fac_o;
     @inline f(x) = psofunction(ko, ks, Ω, LAI, hot, dso, x);
+
+    # TODO minimize the allocations here
+    # length(xl) * 7 allocations here!
     @inbounds for j=1:length(xl)
         can_opt.Pso[j] = quadgk(f, xl[j]-dx, xl[j], rtol=1e-2)[1] / dx;
     end

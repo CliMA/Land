@@ -4,14 +4,15 @@
 #
 ###############################################################################
 """
-    short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals, can_rad::CanopyRads{FT}, in_rad::IncomingRadiation{FT}, soil_opt::SoilOpticals{FT}) where {FT<:AbstractFloat}
+    short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals, can_rad::CanopyRads{FT}, in_rad::IncomingRadiation{FT}, soil_opt::SoilOpticals{FT}, rt_con::RTContainer{FT}) where {FT<:AbstractFloat}
 
 Simulate the short wave radiation through the canopy, given
-- `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
-- `can_opt` A [`CanopyOpticals`](@ref) struct for providing optical layer properties
+- `can` [`Canopy4RT`](@ref) type struct of canopy information
+- `can_opt` [`CanopyOpticals`](@ref) struct of optical layer properties
 - `can_rad` A [`CanopyRads`](@ref) struct
 - `in_rad` An [`IncomingRadiation`](@ref) struct
 - `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
+- `rt_con` [`RTContainer`](@ref) type container
 """
 function short_wave!(
             can::Canopy4RT{FT},
@@ -114,11 +115,11 @@ function short_wave!(
     # 4.6 outgoing in viewing direction
     # From Canopy
     rt_con.piLoc2 .= can_opt.vb .* view(can_opt.Po       , 1:nLayer)' .*
-                                  view(can_rad.E_down, :, 1:nLayer)  .+
-                    can_opt.vf .* view(can_opt.Po       , 1:nLayer)' .*
-                                  view(can_rad.E_up  , :, 1:nLayer)  .+
-                    can_opt.w  .* view(can_opt.Pso      , 1:nLayer)' .*
-                                  in_rad.E_direct;
+                                   view(can_rad.E_down, :, 1:nLayer)  .+
+                     can_opt.vf .* view(can_opt.Po       , 1:nLayer)' .*
+                                   view(can_rad.E_up  , :, 1:nLayer)  .+
+                     can_opt.w  .* view(can_opt.Pso      , 1:nLayer)' .*
+                                   in_rad.E_direct;
     #rt_con.piLoc  .= iLAI .* view(sum(rt_con.piLoc2, dims=2), :, 1);
     @inbounds for j in eachindex(rt_con.piLoc)
         rt_con.piLoc[j] = iLAI * sum( view(rt_con.piLoc2, j, :) );
