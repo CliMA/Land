@@ -144,6 +144,7 @@ function canopy_geometry!(
     can_opt.fs      .= cds ./ cos_tts;
     can_opt.fo      .= cdo ./ cos_tto;
     can_opt.absfs   .= abs.( can_opt.fs );
+    can_opt.absfo   .= abs.( can_opt.fo );
     can_opt.cosΘ_l  .= cos_ttli .* _1s;
     can_opt.cos2Θ_l .= can_opt.cosΘ_l .^ 2;
     can_opt.fsfo    .= can_opt.fs .* can_opt.fo;

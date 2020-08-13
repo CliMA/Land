@@ -11,7 +11,7 @@ A struct of soil optical parameters
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct SoilOpticals{FT}
+Base.@kwdef mutable struct SoilOpticals{FT}
     "Wavelength `[nm]`"
     wl        ::Array{FT,1}
     "Shortwave albedo"

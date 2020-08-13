@@ -66,6 +66,8 @@ Base.@kwdef mutable struct CanopyOpticals{FT}
     fsfo   ::Array{FT,2} = zeros(FT, (nIncl, nAzi))
     "conversion factor fo for angle towards observer (not sun like fs)"
     fo     ::Array{FT,2} = zeros(FT, (nIncl, nAzi))
+    "abs(fo)"
+    absfo  ::Array{FT,2} = zeros(FT, (nIncl, nAzi))
     "Cosine of leaf azimuths"
     cosΘ_l ::Array{FT,2} = zeros(FT, (nIncl, nAzi))
     "cos of leaf azimuth sqared"

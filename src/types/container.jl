@@ -1,6 +1,7 @@
 ###############################################################################
 #
 # Container of values to speed up the calculations
+# Need to move many variables to other structures
 #
 ###############################################################################
 """
@@ -11,7 +12,7 @@ A struct for canopy radiation information
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct RTContainer{FT}
+Base.@kwdef mutable struct RTContainer{FT}
     # these names looks very meaningless...
     "cos leaf azimuth angles"
     cos_ttlo ::Array{FT,1}
@@ -75,6 +76,8 @@ mutable struct RTContainer{FT}
     λ_iPAR     ::Array{FT,1}
     "absorbed iPAR [same as iPAR]"
     dλ_iPAR    ::Array{FT,1}
+    "absorbed iPAR [same as iWlE]"
+    dλ_iWlE    ::Array{FT,1}
     "wave length energy [same as iPAR]"
     E_iPAR     ::Array{FT,1}
     "wave length energy [same as dwl]"
@@ -87,4 +90,100 @@ mutable struct RTContainer{FT}
     PAR_diffCab::Array{FT,1}
     "diffusive PAR for photosynthesis [same as iPAR]"
     PAR_dirCab ::Array{FT,1}
+
+    # containers to speed up sif_fluxes!
+    "soil albedo for SIF related wave length"
+    soil_sif_albedo::Array{FT,1}
+    "transmission of diffusive light?"
+    τ_dd_sif       ::Array{FT,2}
+    "extinction of diffuse light?"
+    ρ_dd_sif       ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    S⁻             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    S⁺             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    piLs           ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    piLd           ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    Fsmin          ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    Fsplu          ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    Fdmin          ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    Fdplu          ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    Femo           ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    M⁺             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    M⁻             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    M⁻_sun         ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    M⁺_sun         ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    wfEs           ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sfEs           ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sbEs           ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    M⁺⁻            ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    M⁺⁺            ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    M⁻⁺            ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    M⁻⁻            ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sun_dwl_iWlE   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    tmp_dwl_iWlE   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    ϕ_cosΘ         ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    ϕ_cosΘ_lidf    ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    vfEplu_shade   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    vbEmin_shade   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    vfEplu_sun     ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    vbEmin_sun     ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigfEmin_shade ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigbEmin_shade ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigfEmin_sun   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigbEmin_sun   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigfEplu_shade ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigbEplu_shade ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigfEplu_sun   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    sigbEplu_sun   ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    zeroB          ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    F⁻             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    F⁺             ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    net_diffuse    ::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    tmp_1d_nWlF    ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    tmp_1d_nLayer  ::Array{FT,1}
+    "temporary variables for sif_fluxes!"
+    tmp_2d_nWlF_nLayer::Array{FT,2}
+    "temporary variables for sif_fluxes!"
+    tmp_2d_nWlF_nLayer_2::Array{FT,2}
 end

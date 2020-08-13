@@ -24,7 +24,7 @@ function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0)) where {FT}
     sunRad_rt = create_incoming_radiation(wl_set.swl);
     soil      = create_soil_opticals(wl_set);
     angles    = SolarAngles{FT}();
-    rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, wl_set);
+    rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
     # Create an array of standard leaves (needs to be in Module later on:
     #println("    create leaves...")

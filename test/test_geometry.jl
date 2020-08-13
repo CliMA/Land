@@ -12,7 +12,7 @@ canOpt_rt = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(cano
 sunRad_rt = create_incoming_radiation(wl_set.swl);
 soil      = create_soil_opticals(wl_set);
 angles    = SolarAngles{FT}();
-rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, wl_set);
+rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
 arrayOfLeaves = [create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nLayer];
 for i in 1:canopy_rt.nLayer
@@ -23,7 +23,8 @@ canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
 canopy_matrices!(arrayOfLeaves, canOpt_rt);
 short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
 canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set, rt_con);
+sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set, rt_con);
 
 Profile.clear_malloc_data();
 
-#@btime canopy_fluxes!($canopy_rt, $canOpt_rt, $canRad_rt, $sunRad_rt, $soil, $arrayOfLeaves, $wl_set, $rt_con);
+@btime sif_fluxes!($arrayOfLeaves, $canOpt_rt, $canRad_rt, $canopy_rt, $soil, $wl_set, $rt_con);

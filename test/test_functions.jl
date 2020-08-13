@@ -11,7 +11,7 @@ println("\nTesting the layered model...");
         sunRad_rt = create_incoming_radiation(wl_set.swl);
         soil      = create_soil_opticals(wl_set);
         angles    = SolarAngles{FT}();
-        rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, wl_set);
+        rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
         collections = initialize_rt_module(LAI=FT(3));
 
@@ -56,7 +56,7 @@ println("\nTesting the layered model...");
             canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
             canopy_matrices!(arrayOfLeaves, canOpt_rt);
             short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
-            sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
+            sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set, rt_con);
 
             push!(reflVIS, canRad_rt.alb_obs[ind_red   ]);
             push!(reflNIR, canRad_rt.alb_obs[ind_NIR   ]);
@@ -81,7 +81,7 @@ println("\nTesting the layered model...");
                 canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
                 canopy_matrices!(arrayOfLeaves, canOpt_rt);
                 short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
-                sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
+                sif_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set, rt_con);
 
                 push!(reflVIS, canRad_rt.alb_obs[28]);
                 push!(reflNIR, canRad_rt.alb_obs[52]);
@@ -96,6 +96,7 @@ println("\nTesting the layered model...");
         SIFFER_FR = reshape(SIF_FR , (18,73));
 
         # do something?
+        println("Pass the ", FT ," test");
 
         @test true;
     end
