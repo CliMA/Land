@@ -16,9 +16,9 @@ Base.@kwdef mutable struct LeafBios{FT}
     "Number of wave length"
     nWL ::Int = 10
     "Number of wave length for excitation"
-    nWLe::Int = 10
+    nWLE::Int = 10
     "Number of wave length for SIF"
-    nWLf::Int = 10
+    nWLF::Int = 10
 
     "Leaf structure parameter"
     N   ::FT = FT(1.4  )
@@ -52,9 +52,9 @@ Base.@kwdef mutable struct LeafBios{FT}
     "Relative absorbtion by Chlorophyll"
     kChlrel_old::Array{FT,1} = zeros(FT, nWL)
     "Fluorescence excitation matrix backwards"
-    Mb         ::Array{FT,2} = zeros(FT,(nWLf,nWLe))
+    Mb         ::Array{FT,2} = zeros(FT,(nWLF,nWLE))
     "Fluorescence excitation matrix forwards"
-    Mf         ::Array{FT,2} = zeros(FT,(nWLf,nWLe))
+    Mf         ::Array{FT,2} = zeros(FT,(nWLF,nWLE))
     "Doubling adding layers"
     ndub      ::Int = 10
 end

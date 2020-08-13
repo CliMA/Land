@@ -28,31 +28,31 @@ Base.@kwdef mutable struct WaveLengths{FT}
 
     # Wave length lists
     "Standard wave length `[nm]`"
-    swl::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
+    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
                         collect(FT(655.0):FT( 5.0):FT( 770.1));
                         collect(FT(780.0):FT(25.0):FT(2400.1))]
     "Differential wavelength"
-    dwl::Array{FT,1} = diff(swl)
+    dWL::Array{FT,1} = diff(sWL)
 
     "Leaf optical parameter set"
     optis::LeafOpticals = LeafOpticals{FT}()
 
     "Wave length `[nm]`"
-    wl  ::Array{FT,1}  = optis.lambda
-    "Index of wle in wl"
-    Iwle::Array{Int,1} = findall( (wl .>= minwle) .& (wl .<= maxwle) )
-    "Index of wlf in wl"
-    Iwlf::Array{Int,1} = findall( (wl .>= minwlf) .& (wl .<= maxwlf) )
-    "index of wlPAR in wl"
-    iPAR::Array{Int,1} = findall( (wl .>= minwlPAR) .& (wl .<= maxwlPAR) )
+    WL  ::Array{FT,1}  = optis.lambda
+    "Index of WLE in WL"
+    iWLE::Array{Int,1} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
+    "Index of WLF in WL"
+    iWLF::Array{Int,1} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
+    "index of wlPAR in WL"
+    iPAR::Array{Int,1} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
     "excitation wave length `[nm]`"
-    wle ::Array{FT,1}  = wl[Iwle]
+    WLE ::Array{FT,1}  = WL[iWLE]
     "Fluorescence wave length `[nm]`"
-    wlf ::Array{FT,1}  = wl[Iwlf]
-    "Length of wl"
-    nwl ::Int = length(wl)
-    "length of wle"
-    nWlE::Int = length(Iwle)
-    "length of wlf"
-    nWlF::Int = length(Iwlf)
+    WLF ::Array{FT,1}  = WL[iWLF]
+    "Length of WL"
+    nWL ::Int = length(WL)
+    "length of WLE"
+    nWLE::Int = length(iWLE)
+    "length of WLF"
+    nWLF::Int = length(iWLF)
 end

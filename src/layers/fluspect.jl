@@ -29,7 +29,7 @@ function fluspect!(
     # ***********************************************************************
 
     @unpack N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx, ndub = leaf;
-    @unpack Iwle, Iwlf, optis, wle, wlf = wl_set;
+    @unpack iWLE, iWLF, optis, WLE, WLF = wl_set;
     @unpack Kab, Kant, KBrown, Kcar, KcaV, KcaZ, Km, Kw, nr, phi = optis;
 
     #println(N, " ", Cab, " ", Car," ",  Ant, " ", Cs, " ", Cw, " ", Cm)
@@ -146,21 +146,21 @@ function fluspect!(
     k[I_a]   =   (a[I_a].-1) ./ (a[I_a].+1) .* log.(b[I_a]);
     kChl     =   leaf.kChlrel .* k;
 
-    # indices of wle and wlf within wlp
+    # indices of WLE and WLF within wlp
 
     epsi         = FT(2)^(-ndub);
 
     # initialisations
-    te     = 1 .-(k[Iwle].+s[Iwle]) * epsi;
-    tf     = 1 .-(k[Iwlf].+s[Iwlf]) * epsi;
-    re     = s[Iwle] * epsi;
-    rf     = s[Iwlf] * epsi;
+    te     = 1 .-(k[iWLE].+s[iWLE]) * epsi;
+    tf     = 1 .-(k[iWLF].+s[iWLF]) * epsi;
+    re     = s[iWLE] * epsi;
+    rf     = s[iWLF] * epsi;
 
-    sigmoid     = 1 ./(1 .+exp.(-wlf/10).*exp.(wle'/10));  # matrix computed as an outproduct
-    #println(size(sigmoid)," ", size(phi), " ", size(kChl)," ", size(Iwle), " ", size(Iwlf), " ", size(kChl[Iwle]))
+    sigmoid     = 1 ./(1 .+exp.(-WLF/10).*exp.(WLE'/10));  # matrix computed as an outproduct
+    #println(size(sigmoid)," ", size(phi), " ", size(kChl)," ", size(iWLE), " ", size(iWLF), " ", size(kChl[iWLE]))
 
-    Mf = leaf.fqe .* ((FT(0.5)*phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
-    Mb = leaf.fqe .* ((FT(0.5)*phi[Iwlf]).*epsi) .* kChl[Iwle]'.*sigmoid
+    Mf = leaf.fqe .* ((FT(0.5)*phi[iWLF]).*epsi) .* kChl[iWLE]'.*sigmoid
+    Mb = leaf.fqe .* ((FT(0.5)*phi[iWLF]).*epsi) .* kChl[iWLE]'.*sigmoid
 
     Ih          = ones(FT,1,length(te));     # row of ones
     Iv          = ones(FT,length(tf),1);     # column of ones
@@ -189,10 +189,10 @@ function fluspect!(
 
     Rb = rho .+ tau.^2 .*r21./(1 .-rho.*r21);
 
-    Xe = Iv * (talf[Iwle]./(1 .-r21[Iwle].*Rb[Iwle]))';
-    Xf = t21[Iwlf]./(1 .-r21[Iwlf].*Rb[Iwlf]) * Ih;
-    Ye = Iv * (tau[Iwle].*r21[Iwle]./(1 .-rho[Iwle].*r21[Iwle]))';
-    Yf = tau[Iwlf].*r21[Iwlf]./(1 .-rho[Iwlf].*r21[Iwlf]) * Ih;
+    Xe = Iv * (talf[iWLE]./(1 .-r21[iWLE].*Rb[iWLE]))';
+    Xf = t21[iWLF]./(1 .-r21[iWLF].*Rb[iWLF]) * Ih;
+    Ye = Iv * (tau[iWLE].*r21[iWLE]./(1 .-rho[iWLE].*r21[iWLE]))';
+    Yf = tau[iWLF].*r21[iWLF]./(1 .-rho[iWLF].*r21[iWLF]) * Ih;
 
     A = Xe .* (1 .+ Ye.*Yf) .* Xf;
     B = Xe .* (Ye .+ Yf) .* Xf;

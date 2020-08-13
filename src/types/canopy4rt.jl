@@ -60,6 +60,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     xl  ::Array{FT,1} = collect(FT, 0:-1.0/nLayer:-1)
     "Exp(xl)"
     xl_e::Array{FT,1} = exp.(xl)
-    "1/nlayers"
+    "1/nLayer"
     dx  ::FT = FT(1)/nLayer
 end

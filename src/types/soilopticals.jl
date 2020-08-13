@@ -13,7 +13,7 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct SoilOpticals{FT}
     "Wavelength `[nm]`"
-    wl        ::Array{FT,1}
+    WL        ::Array{FT,1}
     "Shortwave albedo"
     albedo_SW ::Array{FT,1}
     "Shortwave Emissivity"

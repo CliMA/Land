@@ -16,7 +16,7 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "Number of wave lengths"
     nWL   ::Int = 10
     "Number of wave lengths for SIF"
-    nWLf  ::Int = 10
+    nWLF  ::Int = 10
     "Number of canopy layers"
     nLayer::Int = 5
     "Number of azimuth angles"
@@ -42,7 +42,7 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "Net long-wave radiation of soil (shaded + sunlit) `[W m⁻²]`"
     RnSoilLW           ::FT = FT(0.0)
 
-    # Dim of nLayers
+    # Dim of nLayer
     "Net PAR of shaded leaves `[mol m⁻² s⁻¹]`"
     absPAR_shade   ::Array{FT,1} = zeros(FT, nLayer)
     "Net PAR by Cab+Car of shaded leaves `[moles m⁻² s⁻¹]`"
@@ -132,17 +132,17 @@ Base.@kwdef mutable struct CanopyRads{FT}
 
     # Fluorescence Output:
     "Hemispheric total outgoing SIF flux `[mW m⁻² nm⁻¹]`)"
-    SIF_hemi         ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_hemi         ::Array{FT,1} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance  (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs          ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_obs          ::Array{FT,1} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, sunlit leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs_sunlit   ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_obs_sunlit   ::Array{FT,1} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, shaded leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs_shaded   ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_obs_shaded   ::Array{FT,1} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, scattered   (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs_scattered::Array{FT,1} = zeros(FT, nWLf)
+    SIF_obs_scattered::Array{FT,1} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, soil-reflected  (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs_soil     ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_obs_soil     ::Array{FT,1} = zeros(FT, nWLF)
     "Total SIF sum of layer sources  `[mW m⁻² nm⁻¹]`)"
-    SIF_sum          ::Array{FT,1} = zeros(FT, nWLf)
+    SIF_sum          ::Array{FT,1} = zeros(FT, nWLF)
 end

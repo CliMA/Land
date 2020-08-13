@@ -4,14 +4,14 @@
 #
 ###############################################################################
 """
-    create_leaf_opticals(swl::Array, file::String)
+    create_leaf_opticals(sWL::Array, file::String)
 
 Create an `AbstractLeafOptiPara` struct, given
-- `swl` Standard wave length
+- `sWL` Standard wave length
 - `file` Input file name
 """
-function create_leaf_opticals(swl::Array{FT,1}, file::String=file_Opti) where {FT<:AbstractFloat}
-    N = length(swl)-1
+function create_leaf_opticals(sWL::Array{FT,1}, file::String=file_Opti) where {FT<:AbstractFloat}
+    N = length(sWL)-1
 
     # reading data
     _opti   = matread(file)["optipar"]
@@ -41,11 +41,11 @@ function create_leaf_opticals(swl::Array{FT,1}, file::String=file_Opti) where {F
     lambda = zeros(FT, N)
 
     # fill in the data arrays
-    # println("Reading Optical Parameters from ", swl[1], " to ", swl[end], " length: ", length(swl))
+    # println("Reading Optical Parameters from ", sWL[1], " to ", sWL[end], " length: ", length(sWL))
     @inbounds for i in 1:N
-        wo = findall( (_lambda.>=swl[i]) .& (_lambda.<swl[i+1]) )
+        wo = findall( (_lambda.>=sWL[i]) .& (_lambda.<sWL[i+1]) )
         if length(wo)==0
-            println("Warning, some wavelengths out of bounds ", swl[i])
+            println("Warning, some wavelengths out of bounds ", sWL[i])
         end
 
         nr[i]     = mean(    _nr[wo])

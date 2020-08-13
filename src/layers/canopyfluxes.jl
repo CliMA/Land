@@ -33,7 +33,7 @@ function canopy_fluxes!(
     # 1. unpack variables from structures
     @unpack LAI, nLayer, Ω = can;
     @unpack albedo_SW, emsvty_SW = soil_opt;
-    @unpack dwl, iPAR, wl = wl_set;
+    @unpack dWL, iPAR, WL = wl_set;
 
     # 2. compute some useful variables
     fac  = FT(1e-3);
@@ -43,9 +43,9 @@ function canopy_fluxes!(
     #    this is absolute fluxes now, for the entire soil
     last_ind_cr            = lastindex(can_rad.E_down,2);
     rt_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* emsvty_SW;
-    can_rad.RnSoil_diffuse = fac * fast∫!(rt_con.abs_wave, dwl);
+    can_rad.RnSoil_diffuse = fac * fast∫!(rt_con.abs_wave, dWL);
     rt_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* emsvty_SW;
-    can_rad.RnSoil_direct  = fac * fast∫!(rt_con.abs_wave, dwl);
+    can_rad.RnSoil_direct  = fac * fast∫!(rt_con.abs_wave, dWL);
     can_rad.RnSoil         = can_rad.RnSoil_direct + can_rad.RnSoil_diffuse;
 
     # 4. Normalization factor for leaf direct PAR
@@ -102,9 +102,9 @@ function canopy_fluxes!(
                                   can_rad.incomingPAR_direct;
     @inbounds for i in 1:nLayer
         rt_con.E_all .= view(can_rad.netSW_shade, :, i);
-        can_rad.intNetSW_shade[i]  = fast∫!(rt_con.E_all, dwl) * fac / iLAI;
+        can_rad.intNetSW_shade[i]  = fast∫!(rt_con.E_all, dWL) * fac / iLAI;
         rt_con.E_all .= view(can_rad.netSW_sunlit, :, i);
-        can_rad.intNetSW_sunlit[i] = fast∫!(rt_con.E_all, dwl) *
+        can_rad.intNetSW_sunlit[i] = fast∫!(rt_con.E_all, dWL) *
                                      fac / iLAI / lPs[i] +
                                      can_rad.intNetSW_shade[i];
     end

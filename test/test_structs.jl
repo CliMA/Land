@@ -4,7 +4,7 @@ println("\nTesting the structures...");
     for FT in [Float32, Float64]
         for data_set in [ Canopy4RT{FT}(nLayer=20, LAI=FT(3)),
                           create_canopy_opticals(FT, 10, 10, 10, 10),
-                          CanopyRads{FT}(nWL=10, nWLf=10, nLayer=10, nAzi=10, nIncl=9),
+                          CanopyRads{FT}(nWL=10, nWLF=10, nLayer=10, nAzi=10, nIncl=9),
                           create_incoming_radiation(FT[600,620,640]),
                           create_leaf_bios(FT, 10, 10, 10),
                           create_leaf_opticals(FT[600,620,640]),

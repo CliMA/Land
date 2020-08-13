@@ -30,12 +30,12 @@ function sif_fluxes!(
             Pso, sigb, vb, vf = can_opt;
     @unpack E_down, E_up,ϕ_shade,ϕ_sun = can_rad;
     @unpack soil_sif_albedo = rt_con;
-    @unpack dwl, Iwle, Iwlf, nWlF = wl_set;
+    @unpack dWL, iWLE, iWLF, nWLF = wl_set;
 
     # 2. calculate some useful parameters
     iLAI = Ω * LAI / nLayer;
-    rt_con.τ_dd_sif .= 1 .- view(a, Iwlf, :) .* iLAI;
-    rt_con.ρ_dd_sif .= view(sigb, Iwlf, :) .* iLAI;
+    rt_con.τ_dd_sif .= 1 .- view(a, iWLF, :) .* iLAI;
+    rt_con.ρ_dd_sif .= view(sigb, iWLF, :) .* iLAI;
     @unpack τ_dd_sif, ρ_dd_sif = rt_con;
 
     # 3. Compute mid layer Ps,Po,Pso
@@ -47,8 +47,8 @@ function sif_fluxes!(
     Qo  = view(Po , 1:nLayer);
 
     # 4.  reflectance, transmittance factors in a thin layer the following are
-    #     vectors with length [nl,nwl]
-    rt_con.sun_dwl_iWlE .= view(can_opt.Es_, Iwle, 1) .* rt_con.dλ_iWlE;
+    #     vectors with length [nl,nWL]
+    rt_con.sun_dwl_iWlE .= view(can_opt.Es_, iWLE, 1) .* rt_con.dλ_iWlE;
     @inbounds for i=1:nLayer
         if length(leaf_array)>1
             Mb = leaf_array[i].Mb;
@@ -61,17 +61,17 @@ function sif_fluxes!(
         rt_con.M⁻ .= (Mb .- Mf) ./ 2;
 
         # Need to normalize incoming radiation bin
-        # change from mSCOPE to enable different wl grids!
+        # change from mSCOPE to enable different WL grids!
         mul!(rt_con.M⁻_sun, rt_con.M⁻, rt_con.sun_dwl_iWlE);
         mul!(rt_con.M⁺_sun, rt_con.M⁺, rt_con.sun_dwl_iWlE);
 
-        rt_con.tmp_dwl_iWlE .= view(E_down, Iwle, i) .* rt_con.dλ_iWlE;
+        rt_con.tmp_dwl_iWlE .= view(E_down, iWLE, i) .* rt_con.dλ_iWlE;
         mul!(rt_con.M⁺⁻, rt_con.M⁺, rt_con.tmp_dwl_iWlE);
-        rt_con.tmp_dwl_iWlE .= view(E_up, Iwle, i+1) .* rt_con.dλ_iWlE;
+        rt_con.tmp_dwl_iWlE .= view(E_up, iWLE, i+1) .* rt_con.dλ_iWlE;
         mul!(rt_con.M⁺⁺, rt_con.M⁺, rt_con.tmp_dwl_iWlE);
-        rt_con.tmp_dwl_iWlE .= view(E_up, Iwle, i+1) .* rt_con.dλ_iWlE;
+        rt_con.tmp_dwl_iWlE .= view(E_up, iWLE, i+1) .* rt_con.dλ_iWlE;
         mul!(rt_con.M⁻⁺, rt_con.M⁻, rt_con.tmp_dwl_iWlE);
-        rt_con.tmp_dwl_iWlE .= view(E_down, Iwle, i) .* rt_con.dλ_iWlE;
+        rt_con.tmp_dwl_iWlE .= view(E_down, iWLE, i) .* rt_con.dλ_iWlE;
         mul!(rt_con.M⁻⁻, rt_con.M⁻, rt_con.tmp_dwl_iWlE);
 
         # Here comes the tedious part:
@@ -215,8 +215,8 @@ function sif_fluxes!(
     mul!(can_rad.SIF_obs_shaded, rt_con.piLd, rt_con.tmp_1d_nLayer);
 
     # 7. SIF from scattered internally and soil contribution
-    rt_con.tmp_2d_nWlF_nLayer .= view(vb, Iwlf, :) .* view(rt_con.F⁻, :, 1:nLayer) .+
-                                 view(vf, Iwlf, :) .* view(rt_con.F⁺, :, 1:nLayer);
+    rt_con.tmp_2d_nWlF_nLayer .= view(vb, iWLF, :) .* view(rt_con.F⁻, :, 1:nLayer) .+
+                                 view(vf, iWLF, :) .* view(rt_con.F⁺, :, 1:nLayer);
     mul!(can_rad.SIF_obs_scattered, rt_con.tmp_2d_nWlF_nLayer, Qo);
     can_rad.SIF_obs_scattered .= can_rad.SIF_obs_scattered .* _iLAI_pi;
     can_rad.SIF_obs_soil .= ( soil_sif_albedo .* view(rt_con.F⁻, :, nLayer+1) ) .* Po[end] ./ FT(pi);

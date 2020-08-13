@@ -76,11 +76,11 @@ Base.@kwdef mutable struct RTContainer{FT}
     λ_iPAR     ::Array{FT,1}
     "absorbed iPAR [same as iPAR]"
     dλ_iPAR    ::Array{FT,1}
-    "absorbed iPAR [same as iWlE]"
+    "absorbed iPAR [same as iWLE]"
     dλ_iWlE    ::Array{FT,1}
     "wave length energy [same as iPAR]"
     E_iPAR     ::Array{FT,1}
-    "wave length energy [same as dwl]"
+    "wave length energy [same as dWL]"
     E_all      ::Array{FT,1}
     "diffusive PAR [same as iPAR]"
     PAR_diff   ::Array{FT,1}

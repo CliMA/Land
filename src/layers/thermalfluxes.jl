@@ -30,7 +30,7 @@ function thermal_fluxes!(
     @unpack T_sun, T_shade = can_rad
     @unpack Ω,nLayer,LAI,lidf = can
     @unpack albedo_LW, soil_skinT = soil_opt
-    @unpack nwl = wl_set
+    @unpack nWL = wl_set
 
     # Number of layers
     nl      = nLayer
@@ -52,8 +52,8 @@ function thermal_fluxes!(
         # Compute layer properties:
         sigf = ddf*le.ρ_LW + ddb*le.τ_LW
         sigb = ddb*le.ρ_LW + ddf*le.τ_LW
-        τ_dd = (1 - (1-sigf)*iLAI)*ones(nwl,nl)
-        ρ_dd = (sigb*iLAI)*ones(nwl,nl)
+        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nl)
+        ρ_dd = (sigb*iLAI)*ones(nWL,nl)
         ϵ   .= (1 - τ_dd-ρ_dd);
     elseif length(leaf_array)==nLayer
         for i=1:nLayer
@@ -69,7 +69,7 @@ function thermal_fluxes!(
     end
 
     # Only one wavelength --> do Stefan Boltzmann:
-    #if length(wl)==1
+    #if length(WL)==1
     # Let's just do SB for now:
     if 1==1
         # Shaded leaves first, simple 1D array:

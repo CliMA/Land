@@ -25,9 +25,9 @@ function diffusive_S(
             rsoil::Array{FT}
 ) where {FT<:AbstractFloat}
     #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
-    nwl,nl = size(τ_dd);
+    nWL,nl = size(τ_dd);
     Xdd    = similar(τ_dd);
-    Rdd    = zeros(FT,nwl,nl+1)
+    Rdd    = zeros(FT,nWL,nl+1)
     # Create Y,U matrices (see mSCOPE paper, eqs 30-39)
     Y  = similar(τ_dd);
     U  = similar(Rdd);
@@ -90,9 +90,9 @@ function diffusive_S!(
             rsoil::Array{FT,1}
 ) where {FT<:AbstractFloat}
     #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
-    nwl,nl = size(τ_dd);
+    nWL,nl = size(τ_dd);
     Xdd    = similar(τ_dd);
-    Rdd    = zeros(FT,nwl,nl+1)
+    Rdd    = zeros(FT,nWL,nl+1)
     # Create Y,U matrices (see mSCOPE paper, eqs 30-39)
     Y  = similar(τ_dd);
     U  = similar(Rdd);

@@ -19,16 +19,16 @@ function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0)) where {FT}
     # to signal the difference, the variables from RT module has a postfix of _rt
     canopy_rt = Canopy4RT{FT}(nLayer=n_layer, LAI=LAI);
     wl_set    = create_wave_length(FT);
-    canRad_rt = CanopyRads{FT}(nWL=wl_set.nwl, nWLf=wl_set.nWlF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer);
-    canOpt_rt = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab));
-    sunRad_rt = create_incoming_radiation(wl_set.swl);
+    canRad_rt = CanopyRads{FT}(nWL=wl_set.nWL, nWLF=wl_set.nWLF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer);
+    canOpt_rt = create_canopy_opticals(FT, wl_set.nWL, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab));
+    sunRad_rt = create_incoming_radiation(wl_set.sWL);
     soil      = create_soil_opticals(wl_set);
     angles    = SolarAngles{FT}();
     rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
     # Create an array of standard leaves (needs to be in Module later on:
     #println("    create leaves...")
-    arrayOfLeaves = [create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nLayer];
+    arrayOfLeaves = [create_leaf_bios(FT, wl_set.nWL, wl_set.nWLE, wl_set.nWLF) for i in 1:canopy_rt.nLayer];
     for i in 1:canopy_rt.nLayer
         fluspect!(arrayOfLeaves[i], wl_set);
     end
