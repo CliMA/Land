@@ -49,6 +49,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     WLE ::Array{FT,1}  = WL[iWLE]
     "Fluorescence wave length `[nm]`"
     WLF ::Array{FT,1}  = WL[iWLF]
+
+    # local storage of dimension information
     "Length of WL"
     nWL ::Int = length(WL)
     "length of WLE"

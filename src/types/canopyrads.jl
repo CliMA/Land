@@ -12,17 +12,19 @@ A struct for canopy radiation information
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct CanopyRads{FT}
-    # Canopy information
-    "Number of wave lengths"
-    nWL   ::Int = 10
-    "Number of wave lengths for SIF"
-    nWLF  ::Int = 10
-    "Number of canopy layers"
-    nLayer::Int = 5
+    # local storage of dimension information
     "Number of azimuth angles"
     nAzi  ::Int = 36
     "Number of inclination agles"
     nIncl ::Int = 9
+    "Number of canopy layers"
+    nLayer::Int = 5
+    "Number of canopy levels"
+    nLevel::Int = nLayer+1
+    "Number of wave lengths"
+    nWL   ::Int = 10
+    "Number of wave lengths for SIF"
+    nWLF  ::Int = 10
 
     # Scalars
     "Integrated TOC outgoing flux `[W m⁻²]`"
@@ -93,9 +95,9 @@ Base.@kwdef mutable struct CanopyRads{FT}
 
     # Dimension of nLevel * nWavelengths
     "Upwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
-    E_up  ::Array{FT,2} = zeros(FT, (nWL,nLayer+1))
+    E_up  ::Array{FT,2} = zeros(FT, (nWL,nLevel))
     "Downwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
-    E_down::Array{FT,2} = zeros(FT, (nWL,nLayer+1))
+    E_down::Array{FT,2} = zeros(FT, (nWL,nLevel))
 
     # Dimension of nLayer * nWavelengths
     "Net absorbed direct radiation in each layer `[mW m⁻² nm⁻¹]`"

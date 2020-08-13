@@ -4,31 +4,37 @@
 #
 ###############################################################################
 """
-    initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0))
+    initialize_rt_module(FT; nLayer::Int=20, LAI::FT=FT(3.0))
 
 Initialize the RT module so as to interface with Plant, given
-- `n_layer` Number of canopy layers
+- `nLayer` Number of canopy layers
 - `LAI` Leaf area index
 
 Note it here that the struct_canopy is used in CanopyRT module.
 This function initializes `canopy_rt`, `canOpt_rt`, `canRad_rt`, `arrayOfLeaves` as local variables rather than global variables as in CanopyRT module.
 See CanopyRT module for further operations on these variables.
 """
-function initialize_rt_module(; n_layer::Int=20, LAI::FT=FT(3.0)) where {FT}
-    # create canopy struct
-    # to signal the difference, the variables from RT module has a postfix of _rt
-    canopy_rt = Canopy4RT{FT}(nLayer=n_layer, LAI=LAI);
+function initialize_rt_module(FT;
+            nLayer::Int = 20,
+            LAI::Number = FT(3.0)
+)
+    # 1. create wl_set and canopy_rt, which are rt_dims independent
+    canopy_rt = create_canopy_rt(FT, nLayer=nLayer);
     wl_set    = create_wave_length(FT);
-    canRad_rt = CanopyRads{FT}(nWL=wl_set.nWL, nWLF=wl_set.nWLF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer);
-    canOpt_rt = create_canopy_opticals(FT, wl_set.nWL, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab));
-    sunRad_rt = create_incoming_radiation(wl_set.sWL);
-    soil      = create_soil_opticals(wl_set);
+
+    # 2. create rt_dims from wl_set and canopy_rt
+    rt_dim    = create_rt_dims(canopy_rt, wl_set);
+
+    # 3. create canRad_rt, canOpt_rt, and etc from rt_dim and wl_set
+    canRad_rt = create_canopy_rads(FT, rt_dim);
+    canOpt_rt = create_canopy_opticals(FT, rt_dim);
+    sunRad_rt = create_incoming_radiation(wl_set);
+    soil      = create_soil_opticals(FT, rt_dim);
     angles    = SolarAngles{FT}();
     rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
-    # Create an array of standard leaves (needs to be in Module later on:
-    #println("    create leaves...")
-    arrayOfLeaves = [create_leaf_bios(FT, wl_set.nWL, wl_set.nWLE, wl_set.nWLF) for i in 1:canopy_rt.nLayer];
+    # Create an array of standard leaves
+    arrayOfLeaves = [create_leaf_bios(FT, rt_dim) for i in 1:canopy_rt.nLayer];
     for i in 1:canopy_rt.nLayer
         fluspect!(arrayOfLeaves[i], wl_set);
     end

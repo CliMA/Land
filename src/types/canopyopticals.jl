@@ -12,15 +12,15 @@ A struct for canopy optical properties using Array
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct CanopyOpticals{FT}
-    # Canopy information
-    "Number of wave lengths"
-    nWL   ::Int = 10
-    "Number of canopy layers"
-    nLayer::Int = 5
+    # local storage of dimension information
     "Number of azimuth angles"
     nAzi  ::Int = 36
     "Number of inclination agles"
     nIncl ::Int = 9
+    "Number of canopy layers"
+    nLayer::Int = 5
+    "Number of wave lengths"
+    nWL   ::Int = 10
 
     # Single value
     "Solar -> Diffuse backscatter weight"

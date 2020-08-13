@@ -12,8 +12,7 @@ Incoming radiation information.
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct IncomingRadiation{FT}
-    "Wavelength `[nm]`"
-    WL       ::Array{FT,1}
+    # these should match the WL in wl_set
     "Direct incoming radiation `[mW m⁻² nm⁻¹]`"
     E_direct ::Array{FT,1}
     "Diffuse incoming radiation `[mW m⁻² nm⁻¹]`"

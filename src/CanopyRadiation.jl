@@ -45,10 +45,13 @@ export big_leaf_partition,
        canopy_geometry!,
        canopy_matrices!,
        create_canopy_opticals,
+       create_canopy_rads,
+       create_canopy_rt,
        create_incoming_radiation,
        create_leaf_bios,
        create_leaf_opticals,
        create_rt_container,
+       create_rt_dims,
        create_soil_opticals,
        create_wave_length,
        diffusive_S,
@@ -76,15 +79,20 @@ include("types/container.jl"     )
 include("types/incomingrad.jl"   )
 include("types/leafbios.jl"      )
 include("types/leafopticals.jl"  )
+include("types/rtdims.jl"        )
 include("types/soilopticals.jl"  )
 include("types/solarangles.jl"   )
 include("types/wavelength.jl"    )
 
+include("initialize/all.jl"           )
+include("initialize/canopy4rt.jl"     )
 include("initialize/canopyopticals.jl")
+include("initialize/canopyrads.jl"    )
 include("initialize/container.jl"     )
 include("initialize/incomingrad.jl"   )
 include("initialize/leafbios.jl"      )
 include("initialize/leafopticals.jl"  )
+include("initialize/rtdims.jl"        )
 include("initialize/soilopticals.jl"  )
 include("initialize/wavelength.jl"    )
 
@@ -95,7 +103,6 @@ include("layers/canopygeometry.jl")
 include("layers/canopymatrices.jl")
 include("layers/diffusives.jl"    )
 include("layers/fluspect.jl"      )
-include("layers/initialize.jl"    )
 include("layers/shortwave.jl"     )
 include("layers/siffluxes.jl"     )
 include("layers/thermalfluxes.jl" )

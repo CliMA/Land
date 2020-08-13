@@ -14,6 +14,13 @@ Create a leaf biological parameters struct, given
 
 Returns a [`LeafBios`](@ref) type struct.
 """
-function create_leaf_bios(FT, nWL::Int, nWLE::Int, nWLF::Int)
-    return LeafBios{FT}(nWL=nWL, nWLE=nWLE, nWLF=nWLF)
+function create_leaf_bios(
+            FT,
+            rt_dim::RTDimentions
+)
+    @unpack nWL, nWLE, nWLF = rt_dim;
+
+    return LeafBios{FT}(nWL  = nWL ,
+                        nWLE = nWLE,
+                        nWLF = nWLF)
 end

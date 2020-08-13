@@ -12,7 +12,7 @@ A struct of leaf biological parameters
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct LeafBios{FT}
-    # Array size information
+    # local storage of dimension information
     "Number of wave length"
     nWL ::Int = 10
     "Number of wave length for excitation"

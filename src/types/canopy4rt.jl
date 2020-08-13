@@ -12,8 +12,11 @@ A canopy struct for the radiation transfer module
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
+    # local storage of dimension information
     "Number of canopy layers"
     nLayer::Int = 20
+
+    # canopy information
     "Leaf Area Index"
     LAI       ::FT  = FT(3.0 )
     "Clumping factor"
@@ -62,4 +65,10 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     xl_e::Array{FT,1} = exp.(xl)
     "1/nLayer"
     dx  ::FT = FT(1)/nLayer
+
+    # local storage of dimension information
+    "Number of azimuth angles"
+    nAzi ::Int = length(lazitab)
+    "Number of inclination angles"
+    nIncl::Int = length(litab)
 end

@@ -3,19 +3,18 @@
 using BenchmarkTools, CanopyRadiation, Profile, Revise
 
 FT = Float32;
+canopy_rt = create_canopy_rt(FT, nLayer=20);
 wl_set    = create_wave_length(FT);
-leaf_1    = create_leaf_bios(FT, wl_set.nWL, wl_set.nWLE, wl_set.nWLF);
-leaf_2    = create_leaf_bios(FT, wl_set.nWL, wl_set.nWLE, wl_set.nWLF);
-canopy_rt = Canopy4RT{FT}(nLayer=20, LAI=FT(3));
-canRad_rt = CanopyRads{FT}(nWL=wl_set.nWL, nWLF=wl_set.nWLF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer);
-canOpt_rt = create_canopy_opticals(FT, wl_set.nWL, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab));
-sunRad_rt = create_incoming_radiation(wl_set.sWL);
-soil      = create_soil_opticals(wl_set);
+rt_dim    = create_rt_dims(canopy_rt, wl_set);
+canRad_rt = create_canopy_rads(FT, rt_dim);
+canOpt_rt = create_canopy_opticals(FT, rt_dim);
+sunRad_rt = create_incoming_radiation(wl_set);
+soil      = create_soil_opticals(FT, rt_dim);
 angles    = SolarAngles{FT}();
 rt_con    = create_rt_container(canopy_rt, canOpt_rt, angles, soil, wl_set);
 
-arrayOfLeaves = [create_leaf_bios(FT, wl_set.nWL, wl_set.nWLE, wl_set.nWLF) for i in 1:canopy_rt.nLayer];
-for i in 1:canopy_rt.nLayer
+arrayOfLeaves = [create_leaf_bios(FT, rt_dim) for i in 1:rt_dim.nLayer];
+for i in 1:rt_dim.nLayer
     fluspect!(arrayOfLeaves[i], wl_set);
 end
 
