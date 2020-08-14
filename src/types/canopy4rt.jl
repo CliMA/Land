@@ -56,6 +56,18 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     "List of mean azimuth angles `[°]`"
     lazitab  ::Array{FT,1} = collect(FT,5:10:355)
 
+    # variables used for canopy_geometry!
+    "Cosine of lazitab"
+    cos_ttlo ::Array{FT,1} = cosd.(lazitab)
+    "Cosine of lazitab - psi (relative azimuth angle), update with time"
+    cos_philo::Array{FT,1} = cosd.(lazitab .- 0)
+    "Cosine of litab"
+    cos_ttli ::Array{FT,1} = cosd.(litab)
+    "Sine of litab"
+    sin_ttli ::Array{FT,1} = sind.(litab)
+    "Container for volome scatter function"
+    vol_scatt::Array{FT,1} = ones(FT, 4)
+
     # This is changed afterwards, ignore here.
     "Inclination angles weight distribution"
     lidf::Array{FT,1} = dladgen(LIDFa, LIDFb, litab_bnd)

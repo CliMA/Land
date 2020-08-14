@@ -33,7 +33,8 @@ function canopy_fluxes!(
     # 1. unpack variables from structures
     @unpack LAI, nLayer, Ω = can;
     @unpack albedo_SW, emsvty_SW = soil_opt;
-    @unpack dWL, iPAR, WL = wl_set;
+    @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wl_set;
+    cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
     fac  = FT(1e-3);
@@ -42,49 +43,49 @@ function canopy_fluxes!(
     # 3. Compute some fluxes, can be done separately if needed
     #    this is absolute fluxes now, for the entire soil
     last_ind_cr            = lastindex(can_rad.E_down,2);
-    rt_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* emsvty_SW;
-    can_rad.RnSoil_diffuse = fac * fast∫!(rt_con.abs_wave, dWL);
-    rt_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* emsvty_SW;
-    can_rad.RnSoil_direct  = fac * fast∫!(rt_con.abs_wave, dWL);
+    cf_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* emsvty_SW;
+    can_rad.RnSoil_diffuse = fac * fast∫!(cf_con.abs_wave, dWL);
+    cf_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* emsvty_SW;
+    can_rad.RnSoil_direct  = fac * fast∫!(cf_con.abs_wave, dWL);
     can_rad.RnSoil         = can_rad.RnSoil_direct + can_rad.RnSoil_diffuse;
 
     # 4. Normalization factor for leaf direct PAR
     #    weighted sum has to be 1 to conserve net SW direct
     #    Direct PAR is normalized by layer Ps value
-    mul!(rt_con.absfs_lidf, can_opt.absfs', can.lidf);
-    normi       = 1 / mean(rt_con.absfs_lidf);
-    rt_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+
+    mul!(cf_con.absfs_lidf, can_opt.absfs', can.lidf);
+    normi       = 1 / mean(cf_con.absfs_lidf);
+    cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+
                   view(can_opt.Ps, 2:nLayer+1)) ./ 2;
-    @unpack dλ_iPAR, lPs, λ_iPAR = rt_con;
+    @unpack lPs = cf_con;
 
     @inbounds for j in 1:nLayer
         if length(leaf_array)>1
-            rt_con.kChlrel .= view(leaf_array[j].kChlrel, iPAR);
+            cf_con.kChlrel .= view(leaf_array[j].kChlrel, iPAR);
         else
-            rt_con.kChlrel .= view(leaf_array[1].kChlrel, iPAR);
+            cf_con.kChlrel .= view(leaf_array[1].kChlrel, iPAR);
         end
         # for diffuse PAR
-        rt_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);
-        e2phot!(λ_iPAR, rt_con.E_iPAR, rt_con.PAR_diff);
-        rt_con.PAR_diff .*= fac / iLAI;
+        cf_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);
+        e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
+        cf_con.PAR_diff .*= fac / iLAI;
         # for direct PAR
-        rt_con.E_iPAR .= view(can_rad.netSW_sunlit, iPAR, j);
-        e2phot!(λ_iPAR, rt_con.E_iPAR, rt_con.PAR_dir);
-        rt_con.PAR_dir .*= fac / iLAI;
-        rt_con.PAR_dir .+= rt_con.PAR_diff;
+        cf_con.E_iPAR .= view(can_rad.netSW_sunlit, iPAR, j);
+        e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
+        cf_con.PAR_dir .*= fac / iLAI;
+        cf_con.PAR_dir .+= cf_con.PAR_diff;
         # for leaf absorbed
-        rt_con.PAR_diffCab .= rt_con.kChlrel .* rt_con.PAR_diff;
-        rt_con.PAR_dirCab  .= rt_con.kChlrel .* rt_con.PAR_dir;
+        cf_con.PAR_diffCab .= cf_con.kChlrel .* cf_con.PAR_diff;
+        cf_con.PAR_dirCab  .= cf_con.kChlrel .* cf_con.PAR_dir;
 
         # Absorbed PAR per leaf for shaded, PAR_diff and PAR_dir changed!
-        _dif = fast∫!(rt_con.PAR_diff, dλ_iPAR);
-        _dir = fast∫!(rt_con.PAR_dir, dλ_iPAR) * normi;
+        _dif = fast∫!(cf_con.PAR_diff, dWL_iPAR);
+        _dir = fast∫!(cf_con.PAR_dir, dWL_iPAR) * normi;
         can_rad.absPAR_shade[j] = _dif;
         can_rad.absPAR_sun[:,:,j] .= can_opt.absfs .* _dir;
 
         # absorbed PAR for photosynthesis
-        _difCab = fast∫!(rt_con.PAR_diffCab, dλ_iPAR);
-        _dirCab = fast∫!(rt_con.PAR_dirCab , dλ_iPAR) * normi;
+        _difCab = fast∫!(cf_con.PAR_diffCab, dWL_iPAR);
+        _dirCab = fast∫!(cf_con.PAR_dirCab , dWL_iPAR) * normi;
         can_rad.absPAR_shadeCab[j] = _difCab;
         can_rad.absPAR_sunCab[:,:,j] .= can_opt.absfs .* _dirCab;
     end
@@ -92,19 +93,19 @@ function canopy_fluxes!(
     # 5. Total PAR
     # TODO considering remove this part, if we are not using it
     #    re-use the PAR_dir and PAR_diff in the rt_con
-    rt_con.E_iPAR .= view(in_rad.E_direct, iPAR);
-    e2phot!(λ_iPAR, rt_con.E_iPAR, rt_con.PAR_dir);
-    rt_con.E_iPAR .= view(in_rad.E_diffuse, iPAR);
-    e2phot!(λ_iPAR, rt_con.E_iPAR, rt_con.PAR_diff);
-    can_rad.incomingPAR_direct  = fac * fast∫!(rt_con.PAR_dir , dλ_iPAR);
-    can_rad.incomingPAR_diffuse = fac * fast∫!(rt_con.PAR_diff, dλ_iPAR);
+    cf_con.E_iPAR .= view(in_rad.E_direct, iPAR);
+    e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
+    cf_con.E_iPAR .= view(in_rad.E_diffuse, iPAR);
+    e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
+    can_rad.incomingPAR_direct  = fac * fast∫!(cf_con.PAR_dir , dWL_iPAR);
+    can_rad.incomingPAR_diffuse = fac * fast∫!(cf_con.PAR_diff, dWL_iPAR);
     can_rad.incomingPAR         = can_rad.incomingPAR_diffuse +
                                   can_rad.incomingPAR_direct;
     @inbounds for i in 1:nLayer
-        rt_con.E_all .= view(can_rad.netSW_shade, :, i);
-        can_rad.intNetSW_shade[i]  = fast∫!(rt_con.E_all, dWL) * fac / iLAI;
-        rt_con.E_all .= view(can_rad.netSW_sunlit, :, i);
-        can_rad.intNetSW_sunlit[i] = fast∫!(rt_con.E_all, dWL) *
+        cf_con.E_all .= view(can_rad.netSW_shade, :, i);
+        can_rad.intNetSW_shade[i]  = fast∫!(cf_con.E_all, dWL) * fac / iLAI;
+        cf_con.E_all .= view(can_rad.netSW_sunlit, :, i);
+        can_rad.intNetSW_sunlit[i] = fast∫!(cf_con.E_all, dWL) *
                                      fac / iLAI / lPs[i] +
                                      can_rad.intNetSW_shade[i];
     end

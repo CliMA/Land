@@ -42,6 +42,6 @@ diffusive_S
 fluspect!
 initialize_rt_module
 short_wave!
-sif_fluxes!
+SIF_fluxes!
 thermal_fluxes!
 ```

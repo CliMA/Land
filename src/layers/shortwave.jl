@@ -26,6 +26,7 @@ function short_wave!(
     @unpack LAI, nLayer, Ω = can;
     @unpack ks, sb, sf, sigb = can_opt;
     @unpack albedo_SW = soil_opt;
+    sw_con = rt_con.sw_con;
 
     # 2. scattering and extinction coefficients to
     #    thin layer reflectances and transmittances
@@ -33,11 +34,11 @@ function short_wave!(
     # TODO change to LAI distribution later
     iLAI = LAI * Ω / nLayer;
     τ_ss = exp(-ks * iLAI);
-    rt_con.τ_dd .= 1 .- can_opt.a .* iLAI;
-    rt_con.τ_sd .= sf   .* iLAI;
-    rt_con.ρ_dd .= sigb .* iLAI;
-    rt_con.ρ_sd .= sb   .* iLAI;
-    @unpack ρ_dd, ρ_sd, τ_dd, τ_sd = rt_con;
+    sw_con.τ_dd .= 1 .- can_opt.a .* iLAI;
+    sw_con.τ_sd .= sf   .* iLAI;
+    sw_con.ρ_dd .= sigb .* iLAI;
+    sw_con.ρ_sd .= sb   .* iLAI;
+    @unpack ρ_dd, ρ_sd, τ_dd, τ_sd = sw_con;
 
     # 3. reflectance calculation
     # 3.1 Eq. 18 in mSCOPE paper
@@ -49,14 +50,14 @@ function short_wave!(
 
     # 3.3 reflectance for each layer from bottom to top
     @inbounds for j in nLayer:-1:1
-        rt_con.dnorm      .= 1 .-
+        sw_con.dnorm      .= 1 .-
                              view(ρ_dd, :, j) .*
                              view(can_opt.R_dd, :, j+1);
         can_opt.Xsd[:,j]  .= ( view(τ_sd, :, j) .+
                                Xss .* view(can_opt.R_sd, :, j+1) .*
                                       view(ρ_dd, :, j) ) ./
-                             rt_con.dnorm;
-        can_opt.Xdd[:,j]  .= view(τ_dd, :, j) ./ rt_con.dnorm;
+                             sw_con.dnorm;
+        can_opt.Xdd[:,j]  .= view(τ_dd, :, j) ./ sw_con.dnorm;
         can_opt.R_sd[:,j] .= view(ρ_sd, :, j) .+
                              view(τ_dd, :, j) .*
                                 ( view(can_opt.R_sd, :, j+1) .*
@@ -114,26 +115,26 @@ function short_wave!(
 
     # 4.6 outgoing in viewing direction
     # From Canopy
-    rt_con.piLoc2 .= can_opt.vb .* view(can_opt.Po       , 1:nLayer)' .*
+    sw_con.piLoc2 .= can_opt.vb .* view(can_opt.Po       , 1:nLayer)' .*
                                    view(can_rad.E_down, :, 1:nLayer)  .+
                      can_opt.vf .* view(can_opt.Po       , 1:nLayer)' .*
                                    view(can_rad.E_up  , :, 1:nLayer)  .+
                      can_opt.w  .* view(can_opt.Pso      , 1:nLayer)' .*
                                    in_rad.E_direct;
-    #rt_con.piLoc  .= iLAI .* view(sum(rt_con.piLoc2, dims=2), :, 1);
-    @inbounds for j in eachindex(rt_con.piLoc)
-        rt_con.piLoc[j] = iLAI * sum( view(rt_con.piLoc2, j, :) );
+    #sw_con.piLoc  .= iLAI .* view(sum(sw_con.piLoc2, dims=2), :, 1);
+    @inbounds for j in eachindex(sw_con.piLoc)
+        sw_con.piLoc[j] = iLAI * sum( view(sw_con.piLoc2, j, :) );
     end
 
     # 4.7 From Soil
-    rt_con.piLos .= view(can_rad.E_up, :, last_ind_co) .*
+    sw_con.piLos .= view(can_rad.E_up, :, last_ind_co) .*
                     can_opt.Po[end];
-    rt_con.piLo  .= rt_con.piLoc .+ rt_con.piLos;
-    can_rad.Lo   .= rt_con.piLo ./ pi;
+    sw_con.piLo  .= sw_con.piLoc .+ sw_con.piLos;
+    can_rad.Lo   .= sw_con.piLo ./ pi;
 
     # 4.8 Save albedos (hemispheric direct and diffuse and directional (obs))
     # rso and rdo are not computed separately
-    can_rad.alb_obs     .= rt_con.piLo ./ ( in_rad.E_direct .+
+    can_rad.alb_obs     .= sw_con.piLo ./ ( in_rad.E_direct .+
                                             in_rad.E_diffuse );
     can_rad.alb_direct  .= view(can_opt.R_sd, :, 1);
     can_rad.alb_diffuse .= view(can_opt.R_dd, :, 1);

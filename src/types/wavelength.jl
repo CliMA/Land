@@ -36,21 +36,30 @@ Base.@kwdef mutable struct WaveLengths{FT}
 
     "Leaf optical parameter set"
     optis::LeafOpticals = LeafOpticals{FT}()
-
     "Wave length `[nm]`"
     WL  ::Array{FT,1}  = optis.lambda
+
     "Index of WLE in WL"
     iWLE::Array{Int,1} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
     "Index of WLF in WL"
     iWLF::Array{Int,1} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
     "index of wlPAR in WL"
     iPAR::Array{Int,1} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
+
     "excitation wave length `[nm]`"
-    WLE ::Array{FT,1}  = WL[iWLE]
+    WLE     ::Array{FT,1} = WL[iWLE]
     "Fluorescence wave length `[nm]`"
-    WLF ::Array{FT,1}  = WL[iWLF]
+    WLF     ::Array{FT,1} = WL[iWLF]
+    "Wave length for PAR"
+    WL_iPAR ::Array{FT,1} = WL[iPAR];
+    "Differential wave length for PAR"
+    dWL_iPAR::Array{FT,1} = dWL[iPAR];
+    "Differential wave length for iWLE"
+    dWL_iWLE::Array{FT,1} = dWL[iWLE];
 
     # local storage of dimension information
+    "Length of WL_iPAR"
+    nPAR::Int = length(iPAR)
     "Length of WL"
     nWL ::Int = length(WL)
     "length of WLE"

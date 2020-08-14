@@ -74,8 +74,8 @@ function canopy_geometry!(
     @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, xl_e, Ω = can;
 
     # 4. update the RTContainer
-    rt_con.cos_philo .= cosd.(lazitab .- psi);
-    @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = rt_con;
+    can.cos_philo .= cosd.(lazitab .- psi);
+    @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = can;
 
     # 5. calculate geometric factors associated with extinction and scattering
     can_opt.ks  = 0;
@@ -89,8 +89,8 @@ function canopy_geometry!(
         _ctl = cos_ttli[i];
 
         # interception parameters and ref/trans multipliers
-        volscatt!(rt_con.vol_scatt, tts, tto, psi_vol, _lit);
-        chi_s, chi_o, frho, ftau = rt_con.vol_scatt;
+        volscatt!(can.vol_scatt, tts, tto, psi_vol, _lit);
+        chi_s, chi_o, frho, ftau = can.vol_scatt;
 
         # Extinction coefficients
         ksli = abs(chi_s / cos_tts);
@@ -123,26 +123,27 @@ function canopy_geometry!(
     can_opt.ddf = (1  - bf) / 2;
 
     # 7. eq 19 in vdT 2009 page 305 modified by Joris
-    rt_con._Cs .= cos_ttli .* cos_tts; # [nli]
-    rt_con._Ss .= sin_ttli .* sin_tts; # [nli]
-    rt_con._Co .= cos_ttli .* cos_tto; # [nli]
-    rt_con._So .= sin_ttli .* sin_tto; # [nli]
-    @unpack _Co, _Cs, _So, _Ss, _1s = rt_con;
-    # rt_con.cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
-    # rt_con.cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
-    mul!(rt_con.cds, _Cs, _1s);
-    mul!(rt_con._2d, _Ss, cos_ttlo' );
-    rt_con.cds .+= rt_con._2d;
-    mul!(rt_con.cdo, _Co, _1s);
-    mul!(rt_con._2d, _So, cos_philo');
-    rt_con.cdo .+= rt_con._2d;
-    @unpack cdo, cds = rt_con;
+    cg_con = rt_con.cg_con;
+    cg_con._Cs .= cos_ttli .* cos_tts; # [nli]
+    cg_con._Ss .= sin_ttli .* sin_tts; # [nli]
+    cg_con._Co .= cos_ttli .* cos_tto; # [nli]
+    cg_con._So .= sin_ttli .* sin_tto; # [nli]
+    @unpack _Co, _Cs, _So, _Ss, _1s = cg_con;
+    # cg_con._cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
+    # cg_con._cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
+    mul!(cg_con._cds, _Cs, _1s       );
+    mul!(cg_con._2d , _Ss, cos_ttlo' );
+    cg_con._cds .+= cg_con._2d;
+    mul!(cg_con._cdo, _Co, _1s       );
+    mul!(cg_con._2d , _So, cos_philo');
+    cg_con._cdo .+= cg_con._2d;
+    @unpack _cdo, _cds = cg_con;
 
     # 8. update fs and fo
     # This is basically equivalent to Kb in Bonan, eq. 14.21
     # TOD reduce allocations
-    can_opt.fs      .= cds ./ cos_tts;
-    can_opt.fo      .= cdo ./ cos_tto;
+    can_opt.fs      .= _cds ./ cos_tts;
+    can_opt.fo      .= _cdo ./ cos_tto;
     can_opt.absfs   .= abs.( can_opt.fs );
     can_opt.absfo   .= abs.( can_opt.fo );
     can_opt.cosΘ_l  .= cos_ttli .* _1s;

@@ -20,6 +20,8 @@ Base.@kwdef mutable struct RTDimentions
     nLayer::Int = 5
     "Number of canopy layer boundaries nLayer+1"
     nLevel::Int = nLayer+1
+    "Number of PAR wave lengths"
+    nPAR  ::Int = 10
     "Number of wave lengths"
     nWL   ::Int = 10
     "Number of wave length for excitation"

@@ -58,7 +58,7 @@ export big_leaf_partition,
        fluspect!,
        initialize_rt_module,
        short_wave!,
-       sif_fluxes!,
+       SIF_fluxes!,
        thermal_fluxes!
 
 
@@ -75,7 +75,7 @@ include("utils/volscatt.jl"   )
 include("types/canopy4rt.jl"     )
 include("types/canopyopticals.jl")
 include("types/canopyrads.jl"    )
-include("types/container.jl"     )
+include("types/containers.jl"    )
 include("types/incomingrad.jl"   )
 include("types/leafbios.jl"      )
 include("types/leafopticals.jl"  )
