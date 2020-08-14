@@ -2,8 +2,6 @@ using BenchmarkTools
 using Test
 using WaterPhysics
 
-WP = WaterPhysics
-
 
 
 
