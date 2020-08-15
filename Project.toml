@@ -12,4 +12,5 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
+CLIMAParameters = "0.1"
 DocStringExtensions = "0.8"
