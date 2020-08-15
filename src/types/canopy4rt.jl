@@ -18,23 +18,25 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
 
     # canopy information
     "Leaf Area Index"
-    LAI       ::FT  = FT(3.0 )
+    LAI       ::FT = FT(3.0 )
     "Clumping factor"
-    Ω         ::FT  = FT(1.0 )
+    Ω         ::FT = FT(1.0 )
     "Structure factor a"
-    clump_a   ::FT  = FT(1.0 )
+    clump_a   ::FT = FT(1.0 )
     "Structure factor b"
-    clump_b   ::FT  = FT(0.0 )
+    clump_b   ::FT = FT(0.0 )
     "Leaf width"
-    leaf_width::FT  = FT(0.1 )
+    leaf_width::FT = FT(0.1 )
     "Vegetation height"
-    hc        ::FT  = FT(2.0 )
+    hc        ::FT = FT(2.0 )
     "Leaf Inclination"
-    LIDFa     ::FT  = FT(0.0 )
+    LIDFa     ::FT = FT(0.0 )
     "Variation in leaf inclination"
-    LIDFb     ::FT  = FT(0.0 )
+    LIDFb     ::FT = FT(0.0 )
     "HotSpot parameter (still need to check!)"
-    hot       ::FT  = FT(0.05)
+    hot       ::FT = FT(0.05)
+    "LAI in the ith layer"
+    iLAI      ::FT = LAI * Ω / nLayer;
 
     # tree/canopy/leaf traits
     "Canopy height `[m]`"

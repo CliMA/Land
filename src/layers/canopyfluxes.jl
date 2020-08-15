@@ -31,14 +31,13 @@ function canopy_fluxes!(
             rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
-    @unpack LAI, nLayer, Ω = can;
+    @unpack iLAI, nLayer = can;
     @unpack albedo_SW, emsvty_SW = soil_opt;
     @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wl_set;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
     fac  = FT(1e-3);
-    iLAI = LAI * Ω / nLayer;
 
     # 3. Compute some fluxes, can be done separately if needed
     #    this is absolute fluxes now, for the entire soil

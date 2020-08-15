@@ -28,13 +28,11 @@ function thermal_fluxes!(
 ) where {FT<:AbstractFloat}
     @unpack Ps, Po, Pso,ddf,ddb = can_opt
     @unpack T_sun, T_shade = can_rad
-    @unpack Ω,nLayer,LAI,lidf = can
+    @unpack iLAI, nLayer, lidf = can
     @unpack albedo_LW, soil_skinT = soil_opt
     @unpack nWL = wl_set
 
     # Number of layers
-    nl      = nLayer
-    iLAI    = Ω*LAI/nLayer;
 
     # Sunlit fraction at mid layer:
     fSun    = (Ps[1:nLayer] + Ps[2:nLayer+1])/2;
@@ -52,8 +50,8 @@ function thermal_fluxes!(
         # Compute layer properties:
         sigf = ddf*le.ρ_LW + ddb*le.τ_LW
         sigb = ddb*le.ρ_LW + ddf*le.τ_LW
-        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nl)
-        ρ_dd = (sigb*iLAI)*ones(nWL,nl)
+        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nLayer)
+        ρ_dd = (sigb*iLAI)*ones(nWL,nLayer)
         ϵ   .= (1 - τ_dd-ρ_dd);
     elseif length(leaf_array)==nLayer
         for i=1:nLayer

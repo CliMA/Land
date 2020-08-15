@@ -23,7 +23,7 @@ function short_wave!(
             rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack values from can and soil_opt
-    @unpack LAI, nLayer, Ω = can;
+    @unpack iLAI, nLayer = can;
     @unpack ks, sb, sf, sigb = can_opt;
     @unpack albedo_SW = soil_opt;
     sw_con = rt_con.sw_con;
@@ -31,8 +31,6 @@ function short_wave!(
     # 2. scattering and extinction coefficients to
     #    thin layer reflectances and transmittances
     # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
-    # TODO change to LAI distribution later
-    iLAI = LAI * Ω / nLayer;
     τ_ss = exp(-ks * iLAI);
     sw_con.τ_dd .= 1 .- can_opt.a .* iLAI;
     sw_con.τ_sd .= sf   .* iLAI;

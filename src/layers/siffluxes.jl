@@ -26,7 +26,7 @@ function SIF_fluxes!(
             rt_dim::RTDimentions
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
-    @unpack LAI, lidf, nLayer, Ω = can;
+    @unpack iLAI, lidf, nLayer = can;
     @unpack a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps,
             Pso, sigb, vb, vf = can_opt;
     @unpack E_down, E_up, ϕ_shade, ϕ_sun = can_rad;
@@ -35,7 +35,6 @@ function SIF_fluxes!(
     sf_con = rt_con.sf_con;
 
     # 2. calculate some useful parameters
-    iLAI = Ω * LAI / nLayer;
     sf_con.τ_dd .= 1 .- view(a, iWLF, :) .* iLAI;
     sf_con.ρ_dd .= view(sigb, iWLF, :) .* iLAI;
     @unpack τ_dd, ρ_dd = sf_con;
