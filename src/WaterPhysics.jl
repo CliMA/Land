@@ -3,7 +3,6 @@ module WaterPhysics
 using BenchmarkTools
 using CLIMAParameters
 using CLIMAParameters.Planet
-using Parameters
 
 
 
