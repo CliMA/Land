@@ -10,11 +10,5 @@ println("\nTesting and Benchmarking viscosity* functions...");
         end
 
         @test relative_viscosity(FT(298.15)) ≈ 1;
-
-        if benchmarking
-            @show FT;
-            @btime viscosity($rand_T);
-            @btime relative_viscosity($rand_T);
-        end
     end
 end

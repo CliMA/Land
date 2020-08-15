@@ -7,10 +7,5 @@ println("\nTesting and Benchmarking latent_heat_vapor functions...");
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
-
-        if benchmarking
-            @show FT;
-            @btime latent_heat_vapor($rand_T);
-        end
     end
 end

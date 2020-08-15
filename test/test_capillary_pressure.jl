@@ -10,11 +10,5 @@ println("\nTesting and Benchmarking capillary_pressure functions...");
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
-
-        if benchmarking
-            @show FT;
-            @btime capillary_pressure($rand_r, $rand_T);
-            @btime capillary_pressure($rand_r, $rand_T, $rand_α);
-        end
     end
 end

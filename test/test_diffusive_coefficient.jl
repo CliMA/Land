@@ -9,10 +9,5 @@ println("\nTesting and Benchmarking relative_diffusive_coefficient functions..."
         end
 
         @test relative_diffusive_coefficient(FT(298.15)) ≈ 1;
-
-        if benchmarking
-            @show FT;
-            @btime relative_diffusive_coefficient($rand_T);
-        end
     end
 end

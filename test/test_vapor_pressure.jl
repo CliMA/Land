@@ -12,14 +12,5 @@ println("\nTesting and Benchmarking saturation_vapor_pressure* functions...");
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
-
-        if benchmarking
-            @show FT;
-            @btime pressure_correction($rand_T, $rand_Ψ);
-            @btime saturation_vapor_pressure($rand_T);
-            @btime saturation_vapor_pressure($rand_T, $rand_Ψ);
-            @btime saturation_vapor_pressure_slope($rand_T);
-            @btime saturation_vapor_pressure_slope($rand_T, $rand_Ψ);
-        end
     end
 end

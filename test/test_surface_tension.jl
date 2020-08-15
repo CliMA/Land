@@ -10,11 +10,5 @@ println("\nTesting and Benchmarking surface_tension* functions...");
         end
 
         @test relative_surface_tension(FT(298.15)) ≈ 1;
-
-        if benchmarking
-            @show FT;
-            @btime surface_tension($rand_T);
-            @btime relative_surface_tension($rand_T);
-        end
     end
 end
