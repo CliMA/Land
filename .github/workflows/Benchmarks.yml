@@ -15,6 +15,6 @@ jobs:
         with:
           version: '1.5'
       - name: Install Dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate();'
+        run: julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Benchmark Package
-        run: julia --project -e 'using WaterPhysics; benchmark_WaterPhysics(Float32); benchmark_WaterPhysics(Float64);'
+        run: julia --project test/benchmarking.jl

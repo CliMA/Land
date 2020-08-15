@@ -9,12 +9,6 @@ git-tree-sha1 = "9e62e66db34540a0c919d72172cc2f642ac71260"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 version = "0.5.0"
 
-[[CLIMAParameters]]
-deps = ["Test"]
-git-tree-sha1 = "314f0bdd5817abb2df61cc8d3e857c496d421109"
-uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
-version = "0.1.6"
-
 [[Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
