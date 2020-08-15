@@ -2,10 +2,8 @@
 println("\nTesting and Benchmarking relative_diffusive_coefficient functions...");
 @testset "Testing + Benchmarking --- relative_diffusive_coefficient" begin
     for FT in [Float32, Float64]
-        rand_T  = rand(FT) + 298
-        rand_Tl = rand(FT,10) .+ 298
-        for result in [ relative_diffusive_coefficient(rand_T),
-                        relative_diffusive_coefficient.(rand_Tl) ]
+        rand_T = rand(FT) + 298
+        for result in [ relative_diffusive_coefficient(rand_T) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end
@@ -15,7 +13,6 @@ println("\nTesting and Benchmarking relative_diffusive_coefficient functions..."
         if benchmarking
             @show FT;
             @btime relative_diffusive_coefficient($rand_T);
-            @btime relative_diffusive_coefficient.($rand_Tl);
         end
     end
 end

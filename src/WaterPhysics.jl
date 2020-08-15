@@ -10,20 +10,27 @@ using Parameters
 # Define a local struct inherited from AbstractEarthParameterSet
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const EARTH      = EarthParameterSet();
-CP_I(FT)         = FT( cp_i(EARTH) );
-CP_L(FT)         = FT( cp_l(EARTH) );
-CP_V(FT)         = FT( cp_v(EARTH) );
-K_25(FT)         = FT( T_freeze(EARTH) ) + 25;
-LH_S0(FT)        = FT( LH_s0(EARTH) );
-LH_V0(FT)        = FT( LH_v0(EARTH) );
-PRESS_TRIPLE(FT) = FT( press_triple(EARTH) );
-R_V(FT)          = FT( R_v(EARTH) );
-T_TRIPLE(FT)     = FT( T_triple(EARTH) );
+CP_I(FT)         = FT( cp_i(EARTH)           );
+CP_L(FT)         = FT( cp_l(EARTH)           );
+CP_V(FT)         = FT( cp_v(EARTH)           );
+GAS_R(FT)        = FT( gas_constant()        );
+K_25(FT)         = FT( T_freeze(EARTH) + 25  );
+LH_S0(FT)        = FT( LH_s0(EARTH)          );
+LH_V0(FT)        = FT( LH_v0(EARTH)          );
+MOLMASS_H₂O(FT)  = FT( molmass_water(EARTH)  );
+PRESS_TRIPLE(FT) = FT( press_triple(EARTH)   );
+R_V(FT)          = FT( R_v(EARTH)            );
+T_TRIPLE(FT)     = FT( T_triple(EARTH)       );
+ρ_H₂O(FT)        = FT( ρ_cloud_liq(EARTH)    );
+
+MOLVOL_H₂O(FT)   = MOLMASS_H₂O(FT) / ρ_H₂O(FT);
 
 
 
 
-export latent_heat_vapor,
+export capillary_pressure,
+       latent_heat_vapor,
+       pressure_correction,
        relative_diffusive_coefficient,
        relative_surface_tension,
        relative_viscosity,
@@ -37,16 +44,54 @@ export latent_heat_vapor,
 
 ###############################################################################
 #
+# Capillary pressure
+#
+###############################################################################
+"""
+    capillary_pressure(r::FT, T::FT) where {FT<:AbstractFloat}
+    capillary_pressure(r::FT, T::FT, α::FT) where {FT<:AbstractFloat}
+
+Compute the capillary pressure in `[Pa]`, given
+- `r` Curvature radius in `[m]`
+- `T` Water vapor temperature in `[K]`
+- `α` Contact angle in `[°]`
+"""
+function capillary_pressure(
+            r::FT,
+            T::FT
+) where {FT<:AbstractFloat}
+     return 2 * surface_tension(T) / r
+end
+
+
+
+
+function capillary_pressure(
+            r::FT,
+            T::FT,
+            α::FT
+) where {FT<:AbstractFloat}
+     return cosd(α) * capillary_pressure(r, T)
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
 # Latent heat
 # Adapted from the ClimateMachine/Common/ThermoDynamics/relations.jl
 #
 ###############################################################################
 """
     latent_heat_vapor(T::FT) where {FT<:AbstractFloat}
-    latent_heat_vapor(T::Array{FT}) where {FT<:AbstractFloat}
 
 The specific latent heat of vaporization, given
- - `T` (Array of) temperature
+- `T` Liquid water temperature in `[K]`
 """
 function latent_heat_vapor(
             T::FT
@@ -72,11 +117,37 @@ end
 #
 ###############################################################################
 """
-    saturation_vapor_pressure(T::FT) where {FT<:AbstractFloat}
-    saturation_vapor_pressure(T::Array{FT}) where {FT<:AbstractFloat}
+    pressure_correction(T::FT, Ψ::FT) where {FT<:AbstractFloat}
 
-Return the saturation vapor pressure over a plane liquid surface given
- - `T` (Array of) temperature
+Make Kelvin correction to saturation vapor pressure, given
+- `T` Liquid water temperature in `[K]`
+- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
+    interface
+
+The Kelvin equation is
+```math
+\\log \\left( \\dfrac{P_{sat}}{P_{sat}^{*}} \\right) =
+\\dfrac{Ψ ⋅ V_{m}}{R ⋅ T}
+```
+"""
+function pressure_correction(
+            T::FT,
+            Ψ::FT
+) where {FT<:AbstractFloat}
+    return exp((Ψ * MOLVOL_H₂O(FT)) / (GAS_R(FT) * T))
+end
+
+
+
+
+"""
+    saturation_vapor_pressure(T::FT) where {FT<:AbstractFloat}
+    saturation_vapor_pressure(T::FT, Ψ::FT) where {FT<:AbstractFloat}
+
+Return the saturation vapor pressure, given
+- `T` Liquid water temperature in `[K]`
+- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
+    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 """
 function saturation_vapor_pressure(
             T::FT
@@ -98,20 +169,31 @@ end
 
 
 
+function saturation_vapor_pressure(
+            T::FT,
+            Ψ::FT
+) where {FT<:AbstractFloat}
+    return saturation_vapor_pressure(T) * pressure_correction(T, Ψ)
+end
+
+
+
+
 """
     saturation_vapor_pressure_slope(T::FT) where {FT<:AbstractFloat}
-    saturation_vapor_pressure_slope(T::Array{FT}) where {FT<:AbstractFloat}
+    saturation_vapor_pressure_slope(T::FT, Ψ::FT) where {FT<:AbstractFloat}
 
-Return the 1st order derivative of saturation vapor pressure over a plane
-liquid surface, given
- - `T` (Array of) temperature
+Return the 1st order derivative of saturation vapor pressure, given
+- `T` Liquid water temperature in `[K]`
+- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
+    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 
 Compute the the 1st order derivative of saturation vapor pressure over a plane
-surface by integration of the Clausius-Clapeyron relation.
+    surface by integration of the Clausius-Clapeyron relation.
 
 The re-arranged Clausius-Clapeyron relation
 ```math
-\\frac{∂P_{sat}}{∂T} = P_{sat} ⋅ \\dfrac{ LH_0 + Δc_p ⋅ (T - T_{triple})}
+\\frac{∂P_{sat}^{*}}{∂T} = P_{sat} ⋅ \\dfrac{ LH_0 + Δc_p ⋅ (T - T_{triple})}
                                         { R_v ⋅ T^2 }
 ```
 """
@@ -131,6 +213,16 @@ end
 
 
 
+function saturation_vapor_pressure_slope(
+            T::FT,
+            Ψ::FT
+) where {FT<:AbstractFloat}
+    return saturation_vapor_pressure_slope(T) * pressure_correction(T, Ψ)
+end
+
+
+
+
 
 
 
@@ -142,10 +234,9 @@ end
 ###############################################################################
 """
     relative_diffusive_coefficient(T::FT) where {FT<:AbstractFloat}
-    relative_diffusive_coefficient(T::Array{FT}) where {FT<:AbstractFloat}
 
 Returns the relative diffusive coefficient of water vapor in air, given
-- `T` Water vapor temperature
+- `T` Water vapor temperature in `[K]`
 """
 function relative_diffusive_coefficient(
             T::FT
@@ -173,10 +264,9 @@ const ST_ref    = 0.07197220523
 
 """
     surface_tension(T::FT) where {FT<:AbstractFloat}
-    surface_tension(T::Array{FT}) where {FT<:AbstractFloat}
 
 Surface tension `[N m⁻¹]` of water against air, given
-- `T` (Array of) temperature
+- `T` Liquid water temperature in `[K]`
 
 The equation used is
 ```math
@@ -203,10 +293,9 @@ end
 
 """
     relative_surface_tension(T::FT) where {FT<:AbstractFloat}
-    relative_surface_tension(T::Array{FT}) where {FT<:AbstractFloat}
 
 Relative surface tension of water against air relative to 298.15 K, given
-- `T` (Array of) temperature
+- `T` Liquid water temperature in `[K]`
 
 The equation used is
 ```math
@@ -246,10 +335,9 @@ const VIS_D = -3.376e-5     # K⁻²  | Used for viscosity
 
 """
     viscosity(T::FT) where {FT<:AbstractFloat}
-    viscosity(T::Array{FT}) where {FT<:AbstractFloat}
 
-Viscosity of water `[Pa s]`, given
-- `T` (Array of) temperature
+Viscosity of water in `[Pa s]`, given
+- `T` Liquid water temperature in `[K]`
 
 Equation used is
 ```math
@@ -280,10 +368,9 @@ end
 
 """
     relative_viscosity(T::FT) where {FT<:AbstractFloat}
-    relative_viscosity(T::Array{FT}) where {FT<:AbstractFloat}
 
 Viscosity relative to 25 degree C (298.15 K), given
-- `T` Water temperature
+- `T` Liquid water temperature in `[K]`
 
 Equation used is
 ```math

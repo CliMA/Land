@@ -6,6 +6,21 @@ CurrentModule = WaterPhysics
 
 
 
+## Capillary pressure
+Capillary pressure of liquid water in a pipe is a function of surface tension
+    (``\gamma``), pipe raduis (``r``), and contact angle (``\alpha``):
+
+```math
+P_{c} = \dfrac{\gamma \cdot \text{cos}(\alpha)}{r}
+```
+
+```@docs
+capillary_pressure
+```
+
+
+
+
 ## Diffusive coefficient of water vapor
 Diffusive coefficient of water vapor is a temperature-dependent function, this
     dependence impact leaf gas exchange via change the maximal stomatal
@@ -61,6 +76,15 @@ When temperature increases, liquid water vapor pressure increases
 ```@docs
 saturation_vapor_pressure
 saturation_vapor_pressure_slope
+```
+
+Yet, the saturation vapor pressure is not only a function of temperature, but
+    also a function of the air-water interface curvature, known as the Kelvin
+    equation. The package provide [`pressure_correction`](@ref) to make the
+    correction.
+
+```@docs
+pressure_correction
 ```
 
 
