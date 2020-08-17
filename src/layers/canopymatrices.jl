@@ -4,19 +4,20 @@
 #
 ###############################################################################
 """
-    canopy_matrices!(leaf_array::Array{LeafBios{FT},1}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
+    canopy_matrices!(
+                leaves::Array{LeafBios{FT},1},
+                can_opt::CanopyOpticals{FT}
+    ) where {FT<:AbstractFloat}
 
 Compute scattering coefficient matrices for direct and diffuse light given
     geometry dependent overall extinction coefficients and pigment dependent
     leaf reflectance and transmission (computed via fluspect). This function
-    has to be called before `simulate_short_wave!` can be used.
-- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical
-    properties can change with canopy height)
-- `can_opt` An [`CanopyOpticals`](@ref) type struct, will be updated within
-    this function call.
+    has to be called before [`short_wave!`](@ref) can be used.
+- `leaves` Array of [`LeafBios`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
 """
 function canopy_matrices!(
-            leaf_array::Array{LeafBios{FT},1},
+            leaves::Array{LeafBios{FT},1},
             can_opt::CanopyOpticals{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack values
@@ -25,12 +26,12 @@ function canopy_matrices!(
     # 2. Calculation of reflectance
     nLayer = size(can_opt.sigb)[2];
     @inbounds for i=1:nLayer
-        if length(leaf_array)>1
-            τ_SW = leaf_array[i].τ_SW;
-            ρ_SW = leaf_array[i].ρ_SW;
+        if length(leaves)>1
+            τ_SW = leaves[i].τ_SW;
+            ρ_SW = leaves[i].ρ_SW;
         else
-            τ_SW = leaf_array[1].τ_SW;
-            ρ_SW = leaf_array[1].ρ_SW;
+            τ_SW = leaves[1].τ_SW;
+            ρ_SW = leaves[1].ρ_SW;
         end
 
         #CF: Right now, canopy geometry is the same everywhere,

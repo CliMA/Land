@@ -4,33 +4,44 @@
 #
 ###############################################################################
 """
-    thermal_fluxes!(leaf_array::Array{LeafBios{FT},1}, can_opt::CanopyOpticals{FT}, can_rad::CanopyRads{FT}, can::Canopy4RT{FT}, soil_opt::SoilOpticals{FT}, incLW::Array{FT}, wl_set::WaveLengths{FT}) where {FT<:AbstractFloat}
+    thermal_fluxes!(
+                leaves::Array{LeafBios{FT},1},
+                can_opt::CanopyOpticals{FT},
+                can_rad::CanopyRads{FT},
+                can::Canopy4RT{FT},
+                soil::SoilOpticals{FT},
+                incLW::Array{FT},
+                wls::WaveLengths{FT}
+    ) where {FT<:AbstractFloat}
 
-Computes 2-stream diffusive radiation transport for thermal radiation (calls `compute_diffusive_S` internally).
-Layer reflectance and transmission is computed from LW optical properties, layer sources from temperature and Planck law, boundary conditions from the atmosphere and soil emissivity and temperature.
-Currently only uses Stefan Boltzmann law to compute spectrally integrated LW but can be easily adjusted to be spectrally resolved.
-- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
-- `can_opt` A [`CanopyOpticals`](@ref) struct for providing optical layer properties
-- `can_rad` A [`CanopyRads`](@ref) struct
-- `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
-- `sO` A [`SoilOpticals`](@ref) type struct for soil optical properties
+Computes 2-stream diffusive radiation transport for thermal radiation (calls
+    [`diffusive_S`] internally). Layer reflectance and transmission is computed
+    from LW optical properties, layer sources from temperature and Planck law,
+    boundary conditions from the atmosphere and soil emissivity and
+    temperature. Currently only uses Stefan Boltzmann law to compute spectrally
+    integrated LW but can be easily adjusted to be spectrally resolved.
+- `leaves` Array of [`LeafBios`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `can` [`Canopy4RT`](@ref) type struct
+- `soil` [`SoilOpticals`](@ref) type struct
 - `incLW` A 1D array with incoming long-wave radiation
-- `wl_set` An [`WaveLengths`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
 """
 function thermal_fluxes!(
-            leaf_array::Array{LeafBios{FT},1},
+            leaves::Array{LeafBios{FT},1},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},
-            soil_opt::SoilOpticals{FT},
+            soil::SoilOpticals{FT},
             incLW::Array{FT},
-            wl_set::WaveLengths{FT}
+            wls::WaveLengths{FT}
 ) where {FT<:AbstractFloat}
     @unpack Ps, Po, Pso,ddf,ddb = can_opt
     @unpack T_sun, T_shade = can_rad
     @unpack iLAI, nLayer, lidf = can
-    @unpack albedo_LW, soil_skinT = soil_opt
-    @unpack nWL = wl_set
+    @unpack albedo_LW, soil_skinT = soil
+    @unpack nWL = wls
 
     # Number of layers
 
@@ -45,17 +56,17 @@ function thermal_fluxes!(
     S_sun   = similar(ρ_dd)
 
     # If we just have the same leaf everywhere, compute emissivities:
-    if length(leaf_array)==1
-        le   = leaf_array[1]
+    if length(leaves)==1
+        le   = leaves[1]
         # Compute layer properties:
         sigf = ddf*le.ρ_LW + ddb*le.τ_LW
         sigb = ddb*le.ρ_LW + ddf*le.τ_LW
         τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nLayer)
         ρ_dd = (sigb*iLAI)*ones(nWL,nLayer)
         ϵ   .= (1 - τ_dd-ρ_dd);
-    elseif length(leaf_array)==nLayer
+    elseif length(leaves)==nLayer
         for i=1:nLayer
-            le      = leaf_array[i]
+            le      = leaves[i]
             sigf    = ddf*le.ρ_LW + ddb*le.τ_LW
             sigb    = ddb*le.ρ_LW + ddf*le.τ_LW
             τ_dd[i] = (1 - (1-sigf)*iLAI)

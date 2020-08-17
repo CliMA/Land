@@ -3,35 +3,62 @@
 # Calculate SIF fluxes
 #
 ###############################################################################
-"""
-    SIF_fluxes!(leaf_array::Array{LeafBios{FT},1}, can_opt::CanopyOpticals{FT}, can_rad::CanopyRads{FT}, can::Canopy4RT{FT}, soil_opt::SoilOpticals{FT}, wl_set::WaveLengths{FT}) where {FT<:AbstractFloat}
+#
 
-Computes 2-stream diffusive radiation transport for SIF radiation (calls `compute_diffusive_S` internally).
-Layer reflectance and transmission is computed from SW optical properties, layer sources from absorbed light and SIF efficiencies. Boundary conditions are zero SIF incoming from atmosphere or soil.
-- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical properties can change with canopy height)
-- `can_opt` A [`CanopyOpticals`](@ref) struct for providing optical layer properties
-- `can_rad` A [`CanopyRads`](@ref) struct
-- `can` A [`Canopy4RT`](@ref) type struct for providing LAI and nLayer and clumping
-- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
-- `wl_set` An [`WaveLengths`](@ref) type struct
+
+
+
+
+
+
+###############################################################################
+#
+# Calculate SIF fluxes
+#
+###############################################################################
+"""
+    SIF_fluxes!(
+                leaves::Array{LeafBios{FT},1},
+                can_opt::CanopyOpticals{FT},
+                can_rad::CanopyRads{FT},
+                can::Canopy4RT{FT},
+                soil::SoilOpticals{FT},
+                wls::WaveLengths{FT},
+                rt_con::RTContainer{FT},
+                rt_dim::RTDimensions
+    ) where {FT<:AbstractFloat}
+
+Computes 2-stream diffusive radiation transport for SIF radiation (calls
+    [`diffusive_S!`] internally). Layer reflectance and transmission is
+    computed from SW optical properties, layer sources from absorbed light and
+    SIF efficiencies. Boundary conditions are zero SIF incoming from atmosphere
+    or soil.
+- `leaves` Array of [`LeafBios`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `can` [`Canopy4RT`](@ref) type struct
+- `soil` [`SoilOpticals`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
+- `rt_con` [`RTContainer`](@ref) type container
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function SIF_fluxes!(
-            leaf_array::Array{LeafBios{FT},1},
+            leaves::Array{LeafBios{FT},1},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},
-            soil_opt::SoilOpticals{FT},
-            wl_set::WaveLengths{FT},
+            soil::SoilOpticals{FT},
+            wls::WaveLengths{FT},
             rt_con::RTContainer{FT},
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
     @unpack iLAI, lidf, nLayer = can;
     @unpack a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps,
             Pso, sigb, vb, vf = can_opt;
     @unpack E_down, E_up, ϕ_shade, ϕ_sun = can_rad;
-    @unpack albedo_SW_SIF = soil_opt;
-    @unpack dWL, dWL_iWLE, iWLE, iWLF, nWLF = wl_set;
+    @unpack albedo_SW_SIF = soil;
+    @unpack dWL, dWL_iWLE, iWLE, iWLF, nWLF = wls;
     sf_con = rt_con.sf_con;
 
     # 2. calculate some useful parameters
@@ -51,12 +78,12 @@ function SIF_fluxes!(
     #     vectors with length [nl,nWL]
     sf_con.sun_dwl_iWlE .= view(can_opt.Es_, iWLE, 1) .* dWL_iWLE;
     @inbounds for i=1:nLayer
-        if length(leaf_array)>1
-            Mb = leaf_array[i].Mb;
-            Mf = leaf_array[i].Mf;
+        if length(leaves)>1
+            Mb = leaves[i].Mb;
+            Mf = leaves[i].Mf;
         else
-            Mb = leaf_array[1].Mb;
-            Mf = leaf_array[1].Mf;
+            Mb = leaves[1].Mb;
+            Mf = leaves[1].Mf;
         end
         sf_con.M⁺ .= (Mb .+ Mf) ./ 2;
         sf_con.M⁻ .= (Mb .- Mf) ./ 2;
@@ -68,10 +95,13 @@ function SIF_fluxes!(
 
         sf_con.tmp_dwl_iWlE .= view(E_down, iWLE, i) .* dWL_iWLE;
         mul!(sf_con.M⁺⁻, sf_con.M⁺, sf_con.tmp_dwl_iWlE);
+
         sf_con.tmp_dwl_iWlE .= view(E_up, iWLE, i+1) .* dWL_iWLE;
         mul!(sf_con.M⁺⁺, sf_con.M⁺, sf_con.tmp_dwl_iWlE);
+
         sf_con.tmp_dwl_iWlE .= view(E_up, iWLE, i+1) .* dWL_iWLE;
         mul!(sf_con.M⁻⁺, sf_con.M⁻, sf_con.tmp_dwl_iWlE);
+
         sf_con.tmp_dwl_iWlE .= view(E_down, iWLE, i) .* dWL_iWLE;
         mul!(sf_con.M⁻⁻, sf_con.M⁻, sf_con.tmp_dwl_iWlE);
 
@@ -80,15 +110,19 @@ function SIF_fluxes!(
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* cosΘ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         sunCos = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* cosΘ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         shadeCos = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* cos2Θ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         sunCos2 = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* cos2Θ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         shadeCos2 = mean(sf_con.ϕ_cosΘ_lidf);
+
         mul!(sf_con.ϕ_cosΘ_lidf, view(ϕ_sun, :, :, i)', lidf);
         sunLidf = mean(sf_con.ϕ_cosΘ_lidf);
         shadeLidf = mean(lidf) * ϕ_shade[i];
@@ -96,18 +130,22 @@ function SIF_fluxes!(
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfsfo;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_absfsfo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fsfo;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_fsfo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+
                        _mean_fsfo    .* sf_con.M⁻_sun;
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfs;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_absfs = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fs .* cosΘ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_fs = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.sfEs .= _mean_absfs .* sf_con.M⁺_sun .-
                        _mean_fs    .* sf_con.M⁻_sun;
         sf_con.sbEs .= _mean_absfs .* sf_con.M⁺_sun .+
@@ -116,9 +154,11 @@ function SIF_fluxes!(
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* absfo;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_absfo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* fo .* cosΘ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_fo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.vfEplu_shade .= _mean_absfo .* sf_con.M⁺⁺ .-
                                _mean_fo    .* sf_con.M⁻⁺;
         sf_con.vbEmin_shade .= _mean_absfo .* sf_con.M⁺⁻ .+
@@ -127,9 +167,11 @@ function SIF_fluxes!(
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfo;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_absfo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fo .* cosΘ_l;
         mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
         _mean_fo = mean(sf_con.ϕ_cosΘ_lidf);
+
         sf_con.vfEplu_sun .= _mean_absfo .* sf_con.M⁺⁺ .- _mean_fo .* sf_con.M⁻⁺;
         sf_con.vbEmin_sun .= _mean_absfo .* sf_con.M⁺⁻ .+ _mean_fo .* sf_con.M⁻⁻;
 
@@ -191,7 +233,7 @@ function SIF_fluxes!(
     # 5. Compute diffusive fluxes within canopy
     #    Use Zero SIF fluxes as top and bottom boundary:
     # TODO pre-allocate these!
-    diffusive_S!(sf_con, soil_opt, rt_dim);
+    diffusive_S!(sf_con, soil, rt_dim);
 
 
 

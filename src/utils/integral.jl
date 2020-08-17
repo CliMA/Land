@@ -44,6 +44,7 @@ function fast∫!(
 ) where {FT<:AbstractFloat}
     if length(dx) == length(f)
         f .*= dx;
+
         return sum( f )
     else
         N = length(f);
@@ -51,6 +52,7 @@ function fast∫!(
         @inbounds for i=1:N
             result += f[i] * dx[i];
         end
+
         return result
     end
 end

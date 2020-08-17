@@ -1,18 +1,18 @@
 ###############################################################################
 #
-# Create CFContainer
+# Initialize CFContainer
 #
 ###############################################################################
 """
-    create_cf_container(FT, rt_dim::RTDimentions)
+    create_cf_container(FT, rt_dim::RTDimensions)
 
-Create a [`CFContainer`](@ref) type struct to speed up canopy_fluxes!, given
+Create a [`CFContainer`](@ref) type struct, given
 - `FT` Floating number type
-- `rt_dim` [`RTDimentions`] type struct for matrix dimensions
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_cf_container(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nAzi, nLayer, nPAR, nWL = rt_dim;
 
@@ -48,19 +48,19 @@ end
 
 ###############################################################################
 #
-# Create CGContainer
+# Initialize CGContainer
 #
 ###############################################################################
 """
-    create_cg_container(FT, rt_dim::RTDimentions)
+    create_cg_container(FT, rt_dim::RTDimensions)
 
-Create a [`CGContainer`](@ref) type struct to speed up canopy_geometry!, given
+Create a [`CGContainer`](@ref) type struct, given
 - `FT` Floating number type
-- `rt_dim` [`RTDimentions`] type struct for matrix dimensions
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_cg_container(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nAzi, nIncl = rt_dim;
 
@@ -93,14 +93,19 @@ end
 
 ###############################################################################
 #
-# Create SWContainer
+# Initialize SWContainer
 #
 ###############################################################################
 """
+    create_sf_container(FT, rt_dim::RTDimensions)
+
+Create a [`SFContainer`](@ref) type struct, given
+- `FT` Floating number type
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_sf_container(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nAzi, nIncl, nLayer, nLevel, nWLE, nWLF = rt_dim;
 
@@ -218,14 +223,19 @@ end
 
 ###############################################################################
 #
-# Create SWContainer
+# Initialize SWContainer
 #
 ###############################################################################
 """
+    create_sw_container(FT, rt_dim::RTDimensions)
+
+Create a [`CGContainer`](@ref) type struct, given
+- `FT` Floating number type
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_sw_container(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nLayer, nWL = rt_dim;
 
@@ -260,22 +270,19 @@ end
 
 ###############################################################################
 #
-# Create RTContainer
+# Initialize RTContainer
 #
 ###############################################################################
 """
-    create_rt_container(FT, rt_dim::RTDimentions)
+    create_rt_container(FT, rt_dim::RTDimensions)
 
 Create an [`RTContainer`](@ref), given
-- `can` [`Canopy4RT`](@ref) type struct, providing canopy structure information
-- `can_opt` [`CanopyOpticals`](@ref) type, where optical properties is stored
-- `angles` [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
-- `soil_opt` [`SoilOpticals`](@ref) type struct for soil optical properties
-- `wl_set` [`WaveLengths`](@ref) type struct
+- `FT` Floating number type
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_rt_container(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     cf_con = create_cf_container(FT, rt_dim);
     cg_con = create_cg_container(FT, rt_dim);

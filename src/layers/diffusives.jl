@@ -4,7 +4,15 @@
 #
 ###############################################################################
 """
-    diffusive_S(τ_dd::Array{FT}, ρ_dd::Array{FT}, S⁻::Array{FT}, S⁺::Array{FT}, boundary_top::Array{FT}, boundary_bottom::Array{FT}, rsoil::Array{FT}) where {FT<:AbstractFloat}
+    diffusive_S(
+                τ_dd::Array{FT},
+                ρ_dd::Array{FT},
+                S⁻::Array{FT},
+                S⁺::Array{FT},
+                boundary_top::Array{FT},
+                boundary_bottom::Array{FT},
+                rsoil::Array{FT}
+    ) where {FT<:AbstractFloat}
 
 Computes 2-stream diffusive radiation transport (used for thermal and SIF) given:
 - `τ_dd` A 2D Array with layer reflectances
@@ -24,7 +32,8 @@ function diffusive_S(
             boundary_bottom::Array{FT},
             rsoil::Array{FT}
 ) where {FT<:AbstractFloat}
-    #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
+    # Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann
+    # just one effective wavelength
     nWL,nl = size(τ_dd);
     Xdd    = similar(τ_dd);
     Rdd    = zeros(FT,nWL,nl+1)
@@ -66,29 +75,31 @@ end
 
 
 """
-    diffusive_S!(τ_dd::Array{FT}, ρ_dd::Array{FT}, S⁻::Array{FT}, S⁺::Array{FT}, boundary_top::Array{FT}, boundary_bottom::Array{FT}, rsoil::Array{FT}) where {FT<:AbstractFloat}
+    diffusive_S!(
+                sf_con::SFContainer{FT},
+                soil::SoilOpticals{FT},
+                rt_dim::RTDimensions
+    ) where {FT<:AbstractFloat}
 
-Computes 2-stream diffusive radiation transport (used for thermal and SIF) given:
-- `τ_dd` A 2D Array with layer reflectances
-- `ρ_dd` A 2D Array with layer transmissions
-- `S⁻` A 2D Array with layer source terms in the downwelling direction
-- `S⁺` A 2D Array with layer source terms in the upwelling direction
-- `boundary_top` A 1D array with downwelling radiation at the top (top of canopy)
-- `boundary_bottom` A 1D array with upwnwelling radiation at the bottom (soil)
-- `rsoil` A 1D array with soil reflectance
+Computes 2-stream diffusive radiation transport (used for thermal and SIF),
+    given
+- `sf_con` [`SFContainer`](@ref) type container
+- `soil` [`SoilOpticals`](@ref) type struct
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function diffusive_S!(
             sf_con::SFContainer{FT},
-            soil_opt::SoilOpticals{FT},
-            rt_dim::RTDimentions
+            soil::SoilOpticals{FT},
+            rt_dim::RTDimensions
 ) where {FT<:AbstractFloat}
     # 1. unpack values from sf_con
     @unpack dnorm,  F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd,
             τ_dd = sf_con;
-    @unpack albedo_SW_SIF = soil_opt;
+    @unpack albedo_SW_SIF = soil;
     @unpack nLayer, nLevel = rt_dim;
 
-    #Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann, just one effective wavelength
+    # Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann
+    # just one effective wavelength
     dnorm .= 1 .- view(ρ_dd, :, 1);
 
     Rdd[:,end] .= albedo_SW_SIF;

@@ -4,9 +4,16 @@
 #
 ###############################################################################
 """
-    volscatt(tts::FT, tto::FT, psi::FT, ttl::FT)
+    volscatt!(
+                container::Array{FT,1},
+                tts::FT,
+                tto::FT,
+                psi::FT,
+                ttl::FT
+    ) where {FT<:AbstractFloat}
 
-Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance multiplier (`frho`) and transmittance multiplier (`ftau`), given
+Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
+    multiplier (`frho`) and transmittance multiplier (`ftau`), given
 - `container` Array container for results
 - `tts` Solar zenith angle
 - `tto` Viewing zenith angle
@@ -19,7 +26,7 @@ function volscatt!(
             tto::FT,
             psi::FT,
             ttl::FT
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     psi_rad = deg2rad(psi);
     cos_psi = cosd(psi);
     cos_ttl = cosd(ttl);

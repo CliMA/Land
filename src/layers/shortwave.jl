@@ -4,14 +4,21 @@
 #
 ###############################################################################
 """
-    short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals, can_rad::CanopyRads{FT}, in_rad::IncomingRadiation{FT}, soil_opt::SoilOpticals{FT}, rt_con::RTContainer{FT}) where {FT<:AbstractFloat}
+    short_wave!(
+                can::Canopy4RT{FT},
+                can_opt::CanopyOpticals{FT},
+                can_rad::CanopyRads{FT},
+                in_rad::IncomingRadiation{FT},
+                soil::SoilOpticals{FT},
+                rt_con::RTContainer{FT}
+    ) where {FT<:AbstractFloat}
 
 Simulate the short wave radiation through the canopy, given
-- `can` [`Canopy4RT`](@ref) type struct of canopy information
-- `can_opt` [`CanopyOpticals`](@ref) struct of optical layer properties
-- `can_rad` A [`CanopyRads`](@ref) struct
-- `in_rad` An [`IncomingRadiation`](@ref) struct
-- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
+- `can` [`Canopy4RT`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `in_rad` [`IncomingRadiation`](@ref) type struct
+- `soil` [`SoilOpticals`](@ref) type struct
 - `rt_con` [`RTContainer`](@ref) type container
 """
 function short_wave!(
@@ -19,13 +26,13 @@ function short_wave!(
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             in_rad::IncomingRadiation{FT},
-            soil_opt::SoilOpticals{FT},
+            soil::SoilOpticals{FT},
             rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
-    # 1. unpack values from can and soil_opt
+    # 1. unpack values from can and soil
     @unpack iLAI, nLayer = can;
     @unpack ks, sb, sf, sigb = can_opt;
-    @unpack albedo_SW = soil_opt;
+    @unpack albedo_SW = soil;
     sw_con = rt_con.sw_con;
 
     # 2. scattering and extinction coefficients to

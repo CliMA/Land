@@ -5,16 +5,21 @@
 #
 ###############################################################################
 """
-    fluspect!(leaf::LeafBios{FT}, wl_set::WaveLengths{FT}) where {FT<:AbstractFloat}
+    fluspect!(
+                leaf::LeafBios{FT},
+                wls::WaveLengths{FT}
+    ) where {FT<:AbstractFloat}
 
-Computes leaf optical properties (reflectance and transittance) based on pigment concentrations. Also computes Fluorescence excitation matrices.
-Mostly based on PROSPECT-D for leaf reflectance/transmission and FluSpec for fluorescence.
-- `leaf` [`LeafBios`](@ref) type struct (includes pigment concentrations, water content, leaf structure)
-- `wl_set` An [`WaveLengths`](@ref) type struct, which defines fluoresence excitation and emission wavelengths
+Computes leaf optical properties (reflectance and transittance) based on
+    pigment concentrations. Also computes Fluorescence excitation matrices.
+    Mostly based on PROSPECT-D for leaf reflectance/transmission and FluSpec
+    for fluorescence.
+- `leaf` [`LeafBios`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
 """
 function fluspect!(
             leaf::LeafBios{FT},
-            wl_set::WaveLengths{FT}
+            wls::WaveLengths{FT}
 ) where {FT<:AbstractFloat}
     # ***********************************************************************
     # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
@@ -30,7 +35,7 @@ function fluspect!(
     # ***********************************************************************
 
     @unpack N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx, ndub = leaf;
-    @unpack iWLE, iWLF, optis, WLE, WLF = wl_set;
+    @unpack iWLE, iWLF, optis, WLE, WLF = wls;
     @unpack Kab, Kant, KBrown, Kcar, KcaV, KcaZ, Km, Kw, nr, phi = optis;
 
     #println(N, " ", Cab, " ", Car," ",  Ant, " ", Cs, " ", Cw, " ", Cm)

@@ -6,7 +6,7 @@
 """
     mutable struct LeafOpticals{FT}
 
-Struct for leaf optical properties using Array
+Struct for leaf optical properties
 
 # Fields
 $(DocStringExtensions.FIELDS)
@@ -23,5 +23,6 @@ Base.@kwdef mutable struct LeafOpticals{FT}
     phi   ::Array{FT,1} = zeros(FT, 2)
     KcaV  ::Array{FT,1} = zeros(FT, 2)
     KcaZ  ::Array{FT,1} = zeros(FT, 2)
+    "Wave length `[nm]`, same as `WL` in [`WaveLengths`](@ref)`"
     lambda::Array{FT,1} = zeros(FT, 2)
 end

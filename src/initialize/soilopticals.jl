@@ -1,18 +1,18 @@
 ###############################################################################
 #
-# Create SoilOpticals
+# Initialize SoilOpticals
 #
 ###############################################################################
 """
-    create_soil_opticals(wl_set::WaveLengths{FT}) where {FT<:AbstractFloat}
+    create_soil_opticals(wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Create [`SoilOpticals`](@ref) struct, given
-- `rt_dim` [`WaveLengths`](@ref) type wave length parameter set
+- `wls` [`WaveLengths`](@ref) type struct
 """
 function create_soil_opticals(
-            wl_set::WaveLengths{FT}
+            wls::WaveLengths{FT}
 ) where {FT<:AbstractFloat}
-    @unpack iWLF, nWL = wl_set;
+    @unpack iWLF, nWL = wls;
 
     albedo_SW     = FT(0.2) * ones(FT, nWL);
     albedo_SW_SIF = albedo_SW[iWLF];
@@ -22,5 +22,5 @@ return SoilOpticals{FT}(albedo_SW,
                         albedo_SW_SIF,
                         emsvty_SW,
                         FT[0.1],
-                        FT(290.0));;
+                        FT(290.0))
 end

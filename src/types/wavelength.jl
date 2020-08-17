@@ -4,9 +4,9 @@
 #
 ###############################################################################
 """
-    struct WaveLengths{FT}
+    mutable struct WaveLengths{FT}
 
-Struct for pre-set wave length parameters.
+Struct for pre-set wave length parameters
 
 # Fields
 $(DocStringExtensions.FIELDS)

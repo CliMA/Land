@@ -4,14 +4,14 @@
 #
 ###############################################################################
 """
-    mutable struct RTDimentions
+    mutable struct RTDimensions
 
-Struct for leaf optical properties using Array
+Struct that stores matrix dimension information
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct RTDimentions
+Base.@kwdef mutable struct RTDimensions
     "Number of azimuth angles"
     nAzi  ::Int = 36
     "Number of inclination agles"

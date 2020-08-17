@@ -1,21 +1,18 @@
 ###############################################################################
 #
-# Create CanopyOpticals
+# Initialize CanopyOpticals
 #
 ###############################################################################
 """
-create_canopy_opticals(FT, nWL::Int, nLayer::Int, nAzi::Int, nIncl::Int)
+    create_canopy_opticals( FT, rt_dim::RTDimensions)
 
-Create a canopy optical properties struct, given
+Create a [`CanopyOpticals`](@ref) struct, given
 - `FT` Floating number type
-- `nWL` Number of wave length
-- `nLayer` Number of canopy layers
-- `nAzi` Number of arimuth angles
-- `AIncl` Number of inclination angles
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_canopy_opticals(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nAzi, nIncl, nLayer, nWL = rt_dim;
 

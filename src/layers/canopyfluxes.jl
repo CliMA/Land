@@ -4,20 +4,28 @@
 #
 ###############################################################################
 """
-    canopy_fluxes!(can::Canopy4RT{FT}, can_opt::CanopyOpticals{FT}, can_rad::CanopyRads{FT}, in_rad::IncomingRadiation{FT}, soil_opt::SoilOpticals{FT}, leaf_array::Array{LeafBios{FT},1}, wl_set::WaveLengths{FT}, rt_con::RTContainer) where {FT<:AbstractFloat}
+    canopy_fluxes!(
+                can::Canopy4RT{FT},
+                can_opt::CanopyOpticals{FT},
+                can_rad::CanopyRads{FT},
+                in_rad::IncomingRadiation{FT},
+                soil::SoilOpticals{FT},
+                leaves::Array{LeafBios{FT},1},
+                wls::WaveLengths{FT},
+                rt_con::RTContainer{FT}
+    ) where {FT<:AbstractFloat}
 
 Computes a variety of integrated fluxes from the spectrally resolved
     computations in the short-wave Canopy RT (e.g. absorbed soil radiation,
     absorbed direct and diffuse PAR by layer (and angles for direct), net
     direct and diffuse energy balance per layer), given
-- `can` A [`Canopy4RT`](@ref) struct
-- `can_opt` A [`CanopyOpticals`](@ref) struct
-- `can_rad` A [`CanopyRads`](@ref) struct
-- `in_rad` An [`IncomingRadiation`](@ref) struct
-- `soil_opt` A [`SoilOpticals`](@ref) type struct for soil optical properties
-- `leaf_array` An array of [`LeafBios`](@ref) type struct (i.e. leaf optical
-    properties can change with canopy height)
-- `wl_set` An [`WaveLengths`](@ref) type struct
+- `can` [`Canopy4RT`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `in_rad` [`IncomingRadiation`](@ref) type struct
+- `soil` [`SoilOpticals`](@ref) type struct
+- `leaves` Array of [`LeafBios`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
 - `rt_con` [`RTContainer`](@ref) type container
 """
 function canopy_fluxes!(
@@ -25,15 +33,15 @@ function canopy_fluxes!(
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             in_rad::IncomingRadiation{FT},
-            soil_opt::SoilOpticals{FT},
-            leaf_array::Array{LeafBios{FT},1},
-            wl_set::WaveLengths{FT},
+            soil::SoilOpticals{FT},
+            leaves::Array{LeafBios{FT},1},
+            wls::WaveLengths{FT},
             rt_con::RTContainer{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
     @unpack iLAI, nLayer = can;
-    @unpack albedo_SW, emsvty_SW = soil_opt;
-    @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wl_set;
+    @unpack albedo_SW, emsvty_SW = soil;
+    @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
@@ -58,10 +66,10 @@ function canopy_fluxes!(
     @unpack lPs = cf_con;
 
     @inbounds for j in 1:nLayer
-        if length(leaf_array)>1
-            cf_con.kChlrel .= view(leaf_array[j].kChlrel, iPAR);
+        if length(leaves)>1
+            cf_con.kChlrel .= view(leaves[j].kChlrel, iPAR);
         else
-            cf_con.kChlrel .= view(leaf_array[1].kChlrel, iPAR);
+            cf_con.kChlrel .= view(leaves[1].kChlrel, iPAR);
         end
         # for diffuse PAR
         cf_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);

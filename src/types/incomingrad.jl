@@ -4,9 +4,9 @@
 #
 ###############################################################################
 """
-    struct IncomingRadiation{FT}
+    mutable struct IncomingRadiation{FT}
 
-Incoming radiation information.
+Incoming radiation information
 
 # Fields
 $(DocStringExtensions.FIELDS)

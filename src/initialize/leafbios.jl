@@ -4,19 +4,15 @@
 #
 ###############################################################################
 """
-    create_leaf_bios(FT, nWL::Int, nWLE::Int, nWLF::Int)
+    create_leaf_bios(FT, rt_dim::RTDimensions)
 
-Create a leaf biological parameters struct, given
-- `FType` Floating number type
-- `nWL` Number of wave length
-- `nWLE` Number of excitation wave length
-- `nWLF` Number of fluorescence wave length
-
-Returns a [`LeafBios`](@ref) type struct.
+Create a [`LeafBios`](@ref) type struct, given
+- `FT` Floating number type
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_leaf_bios(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nWL, nWLE, nWLF = rt_dim;
 

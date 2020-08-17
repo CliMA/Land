@@ -1,21 +1,18 @@
 ###############################################################################
 #
-# Create CanopyOpticals
+# Initialize CanopyOpticals
 #
 ###############################################################################
 """
-    create_canopy_rads(FT, nWL::Int, nLayer::Int, nAzi::Int, nIncl::Int)
+    create_canopy_rads(FT, rt_dim::RTDimensions)
 
-Create a canopy radiaitons struct, given
+Create a [`CanopyRads`](@ref) struct, given
 - `FT` Floating number type
-- `nWL` Number of wave length
-- `nLayer` Number of canopy layers
-- `nAzi` Number of arimuth angles
-- `AIncl` Number of inclination angles
+- `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_canopy_rads(
             FT,
-            rt_dim::RTDimentions
+            rt_dim::RTDimensions
 )
     @unpack nAzi, nIncl, nLayer, nLevel, nWL, nWLF = rt_dim;
 

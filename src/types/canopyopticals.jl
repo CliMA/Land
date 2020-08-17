@@ -4,9 +4,9 @@
 #
 ###############################################################################
 """
-    struct CanopyOpticals{FT}
+    mutable struct CanopyOpticals{FT}
 
-A struct for canopy optical properties using Array
+A struct for canopy optical properties
 
 # Fields
 $(DocStringExtensions.FIELDS)

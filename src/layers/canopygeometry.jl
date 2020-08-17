@@ -4,11 +4,14 @@
 #
 ###############################################################################
 """
-    clumping_factor!(can::Canopy4RT{FT}, angles::SolarAngles{FT}) where {FT<:AbstractFloat}
+    clumping_factor!(
+                can::Canopy4RT{FT},
+                angles::SolarAngles{FT}
+    ) where {FT<:AbstractFloat}
 
 Calculate the clumping factor, given
-- `can` [`Canopy4RT`](@ref) type struct, providing canopy structure information
-- `angles` [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
+- `can` [`Canopy4RT`](@ref) type struct
+- `angles` [`SolarAngles`](@ref) type struct
 """
 function clumping_factor!(
             can::Canopy4RT{FT},
@@ -37,15 +40,20 @@ end
 #
 ###############################################################################
 """
-    canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::CanopyOpticals{FT}, rt_con::RTContainer{FT}) where {FT<:AbstractFloat}
+    canopy_geometry!(
+                can::Canopy4RT{FT},
+                angles::SolarAngles{FT},
+                can_opt::CanopyOpticals{FT},
+                rt_con::RTContainer{FT}
+    ) where {FT<:AbstractFloat}
 
 Computes canopy optical properties (extinction coefficients for direct and
     diffuse light) based on the SAIL model. Most important input parameters are
     leaf inclination and azimuth distribution functions and sun-sensor
     geometry . Canopy clumping Ω is implemented as in Pinty et al (2015), given
-- `can` [`Canopy4RT`](@ref) type struct, providing canopy structure information
-- `angles` [`SolarAngles`](@ref) type struct, defining sun-sensor geometry
-- `can_opt` [`CanopyOpticals`](@ref) type, where optical properties is stored
+- `can` [`Canopy4RT`](@ref) type struct
+- `angles` [`SolarAngles`](@ref) type struct
+- `can_opt` [`CanopyOpticals`](@ref) type struct
 - `rt_con` [`RTContainer`](@ref) type container
 """
 function canopy_geometry!(

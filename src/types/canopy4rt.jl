@@ -1,10 +1,10 @@
 ###############################################################################
 #
-# Canopy for RT calculations
+# Canopy4RT structure
 #
 ###############################################################################
 """
-    struct Canopy4RT
+    mutable struct Canopy4RT
 
 A canopy struct for the radiation transfer module
 

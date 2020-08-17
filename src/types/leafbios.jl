@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    struct LeafBios{FT}
+    mutable struct LeafBios{FT}
 
 A struct of leaf biological parameters
 

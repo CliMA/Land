@@ -3,6 +3,14 @@
 # Container of values to speed the canopy_fluxes!
 #
 ###############################################################################
+"""
+    mutable struct CFContainer{FT}
+
+Container to speed [`canopy_fluxes!`](@ref) by pre-allocating arrays
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
 Base.@kwdef mutable struct CFContainer{FT}
     "absorbed energy from wave lengths"
     abs_wave   ::Array{FT,1}
@@ -41,7 +49,7 @@ end
 """
     mutable struct CGContainer{FT}
 
-Container to speed canopy_geometry! function by pre-allocating arrays
+Container to speed [`canopy_geometry!`](@ref) by pre-allocating arrays
 
 # Fields
 $(DocStringExtensions.FIELDS)
@@ -83,7 +91,10 @@ end
 """
     mutable struct SFContainer{FT}
 
-Container to speed SIF_fluxes! by pre-allocating arrays
+Container to speed [`SIF_fluxes!`](@ref) by pre-allocating arrays
+
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct SFContainer{FT}
     # 1D array
@@ -159,7 +170,10 @@ end
 """
     mutable struct SWContainer{FT}
 
-Container to speed short_wave! by pre-allocating arrays
+Container to speed [`short_wave!`](@ref) by pre-allocating arrays
+
+# Fields
+$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct SWContainer{FT}
     # 1D arrays

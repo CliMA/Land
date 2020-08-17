@@ -12,12 +12,23 @@ const _ALPAR_SQ_KD = _ALPAR_SQ * _K_D
 const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
 
 """
-    big_leaf_partition(lai::FT, zenith::FT, r_all::FT) where {FT <:AbstractFloat}
+    big_leaf_partition(
+                lai::FT,
+                zenith::FT,
+                r_all::FT
+    ) where {FT<:AbstractFloat}
 
 Partition the big-leaf canopy into sunlit and shaded layers, given
-- `partition` Container for partition
+- `lai` Leaf area index
 - `zenith` Zenith angle in degree
 - `r_all` Total radiation in `[W m⁻²]`
+
+The function returns
+- `ratio` ratio of sunlit leaves out of all leaves
+- `q_slm` Mean sunlit layer PAR
+- `q_shm` Mean shaded layer PAR
+- `e_sl` Mean sunlit layer absorbed total energy
+- `e_sh` Mean shaded layer absorbed total energy
 """
 function big_leaf_partition(
             lai::FT,

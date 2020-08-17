@@ -4,21 +4,23 @@
 #
 ###############################################################################
 """
-    create_incoming_radiation(sWL:Array, file)
+    create_incoming_radiation(
+                wls::WaveLengths{FT},
+                wlfn::String
+    ) where {FT<:AbstractFloat}
 
 Create an `AbstractIncomingRadiation` struct, given
-- `FType` Floating number type
-- `sWL` Standard wave length
-- `file` Input file name
+- `wls` [`WaveLengths`](@ref) type struct
+- `wlfn` File that saves incoming wave information
 """
 function create_incoming_radiation(
-            wl_set::WaveLengths{FT},
-            file::String = file_Sun
+            wls::WaveLengths{FT},
+            wlfn::String = FILE_SUN
 ) where {FT<:AbstractFloat}
-    @unpack sWL, nWL = wl_set;
+    @unpack sWL, nWL = wls;
 
     # Read data
-    _suni  = matread(file)["sun"]
+    _suni  = matread(wlfn)["sun"]
     _wl    = _suni["wl"      ]
     _Edir  = _suni["Edirect" ]
     _Ediff = _suni["Ediffuse"]
@@ -29,7 +31,7 @@ function create_incoming_radiation(
     Ediff = zeros(FT, nWL)
 
     # fill in the arrays
-    # println("Reading Optical Parameters from ", sWL[1], " to ", sWL[end], " length: ", length(sWL))
+    # println("Reading Optical Parameters from ", sWL[1], " to ", sWL[end])
     for i in 1:nWL
         wo = findall( (_wl.>=sWL[i]) .& (_wl.<sWL[i+1]) )
         if length(wo)==0

@@ -6,7 +6,9 @@
 """
     calctav(α::FT, nr::FT) where {FT<:AbstractFloat}
 
-Computes transmission of isotropic radiation across an interface between two dielectrics (Stern F. (1964), Allen W.A. (1973)). From calctav.m in PROSPECT-D
+Computes transmission of isotropic radiation across an interface between two
+    dielectrics (Stern F., 1964; Allen W.A., 1973)). From calctav.m in
+    PROSPECT-D
 - `α` angle of incidence
 - `nr` Index of refraction
 """
