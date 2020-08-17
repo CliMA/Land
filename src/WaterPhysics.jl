@@ -1,11 +1,12 @@
 module WaterPhysics
 
+using CLIMAParameters
+using CLIMAParameters.Planet
+
 
 
 
 # Define a local struct inherited from AbstractEarthParameterSet
-# Remove CLIMAParameters to make it compatible with Julia 1.0.5
-#=
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const EARTH      = EarthParameterSet();
 CP_I(FT)         = FT( cp_i(EARTH)           );
@@ -22,20 +23,6 @@ T_TRIPLE(FT)     = FT( T_triple(EARTH)       );
 ρ_H₂O(FT)        = FT( ρ_cloud_liq(EARTH)    );
 
 MOLVOL_H₂O(FT)   = MOLMASS_H₂O(FT) / ρ_H₂O(FT);
-=#
-
-# Define a local struct inherited from AbstractEarthParameterSet
-CP_L(FT)         = FT( 4181        );
-CP_V(FT)         = FT( 1859        );
-GAS_R(FT)        = FT( 8.3144598   );
-K_25(FT)         = FT( 298.15      );
-LH_V0(FT)        = FT( 2.5008e6    );
-MOLMASS_H₂O(FT)  = FT( 18.01528e-3 );
-MOLVOL_H₂O(FT)   = FT( 18.01528e-6 );
-PRESS_TRIPLE(FT) = FT( 611.657     );
-R_V(FT)          = FT( 461.5226519 );
-T_TRIPLE(FT)     = FT( 273.16      );
-ρ_H₂O(FT)        = FT( 1000        );
 
 
 
