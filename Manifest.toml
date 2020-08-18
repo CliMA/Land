@@ -127,9 +127,7 @@ version = "1.0.2"
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "Test"]
-git-tree-sha1 = "36fbee0c6feb5a746f35b341eda5f4345e7531bc"
-repo-rev = "master"
-repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
+deps = ["BenchmarkTools", "CLIMAParameters", "Parameters", "Test"]
+git-tree-sha1 = "17da4ac8fbc5459e4373cf31ac548faa78139508"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 version = "0.0.1"

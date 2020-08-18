@@ -15,7 +15,7 @@ function rubisco_limited_rate!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    @unpack Km, p_i, Vcmax, Γ_star = leaf
+    @unpack Km, p_i, Vcmax, Γ_star = leaf;
 
     leaf.Ac = Vcmax * (p_i - Γ_star) / (p_i + Km);
 
