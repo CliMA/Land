@@ -23,9 +23,7 @@ version = "0.5.11"
 
 [[ConstrainedRootSolvers]]
 deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
-git-tree-sha1 = "53f415ac487c3b9a892532e17650119cc4614370"
-repo-rev = "release-0.0.1"
-repo-url = "https://github.com/Yujie-W/ConstrainedRootSolvers.jl.git"
+git-tree-sha1 = "15f11285f91d40eefddeb14155e598fe495e1c2d"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
 version = "0.0.1"
 
@@ -114,8 +112,8 @@ version = "1.0.10"
 
 [[Photosynthesis]]
 deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
-git-tree-sha1 = "6d92a11ec95965b1ef5fb3768737fd194a0fee3d"
-repo-rev = "release-0.0.1"
+git-tree-sha1 = "101fe076237e2632d22eeb04c43679aa2cfe1296"
+repo-rev = "master"
 repo-url = "https://github.com/Yujie-W/Photosynthesis.jl.git"
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 version = "0.0.1"
@@ -126,8 +124,8 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Revise", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "0c01f2b94e352a7a0c464db487fc4aef9053e752"
-repo-rev = "release-0.0.1"
+git-tree-sha1 = "5ab97c888e004f868eb82456a7f669e0c30b7379"
+repo-rev = "master"
 repo-url = "https://github.com/Yujie-W/PlantHydraulics.jl.git"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 version = "0.0.1"
@@ -168,7 +166,7 @@ deps = ["LinearAlgebra", "SparseArrays"]
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[StomataModels]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
+deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "WaterPhysics"]
 path = ".."
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 version = "0.0.1"
@@ -182,17 +180,15 @@ deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[UnPack]]
-git-tree-sha1 = "d4bfa022cd30df012700cf380af2141961bb3bfb"
+git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
 uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
-version = "1.0.1"
+version = "1.0.2"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "Parameters", "Test"]
-git-tree-sha1 = "a9d2ba2d25193745b081a87d9852680bef380a8f"
-repo-rev = "release-0.0.1"
-repo-url = "https://github.com/Yujie-W/WaterPhysics.jl.git"
+deps = ["BenchmarkTools", "CLIMAParameters", "Test"]
+git-tree-sha1 = "58ec1ddcb37b21f92b3588dc28a17e538e7762c1"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
-version = "0.0.1"
+version = "0.0.2"
