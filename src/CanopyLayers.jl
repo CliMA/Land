@@ -1,4 +1,4 @@
-module CanopyRadiation
+module CanopyLayers
 
 using CLIMAParameters
 using DocStringExtensions

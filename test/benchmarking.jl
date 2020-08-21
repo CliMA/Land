@@ -1,7 +1,7 @@
 using BenchmarkTools
-using CanopyRadiation
+using CanopyLayers
 
-function benchmark_CanopyRadiation(FT)
+function benchmark_CanopyLayers(FT)
     println("\nBenchmarking the big_leaf_partition");
     _lai  = FT(2.0);
     _zen  = FT(30.0);
@@ -9,5 +9,5 @@ function benchmark_CanopyRadiation(FT)
     @btime big_leaf_partition($_lai, $_zen, $_rall);
 end
 
-benchmark_CanopyRadiation(Float32);
-benchmark_CanopyRadiation(Float64);
+benchmark_CanopyLayers(Float32);
+benchmark_CanopyLayers(Float64);

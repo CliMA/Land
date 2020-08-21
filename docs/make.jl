@@ -1,5 +1,5 @@
 using Documenter
-using CanopyRadiation
+using CanopyLayers
 
 pages = Any[
     "Home" => "index.md",
@@ -21,16 +21,16 @@ format = Documenter.HTML(
 )
 
 makedocs(
-    sitename = "CanopyRadiation",
+    sitename = "CanopyLayers",
     format = format,
 
     clean = false,
-    modules = [CanopyRadiation],
+    modules = [CanopyLayers],
     pages = pages,
 )
 
 deploydocs(
-    repo = "github.com/Yujie-W/CanopyRadiation.jl.git",
+    repo = "github.com/Yujie-W/CanopyLayers.jl.git",
     target = "build",
     push_preview = true,
 )

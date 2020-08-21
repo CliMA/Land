@@ -1,6 +1,6 @@
 # Function tests adapted from experiments/Radiation_test_BRDF
 println("\nTesting the layered model...");
-@testset "CanopyRadiation --- RT function test" begin
+@testset "CanopyLayers --- RT function test" begin
     for FT in [Float32, Float64]
         canopy_rt = create_canopy_rt(FT, nLayer=20);
         wl_set    = create_wave_length(FT);

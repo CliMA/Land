@@ -1,4 +1,4 @@
-
+.vscode/*
 docs/build/*
 
 *.mem

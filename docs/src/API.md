@@ -1,6 +1,6 @@
-# CanopyRadiation
+# CanopyLayers
 ```@meta
-CurrentModule = CanopyRadiation
+CurrentModule = CanopyLayers
 ```
 
 
