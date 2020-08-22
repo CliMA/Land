@@ -5,75 +5,62 @@ using WaterPhysics
 
 
 
-# Test the variable FT recursively
-function recursive_FT_test(para, FT)
-    # if the type is AbstractFloat
-    if typeof(para) <: AbstractFloat
-        try
-            @test typeof(para) == FT
-        catch e
-            println("The not NaN test failed for ", para, " and ", FT)
+include("recursive_test.jl");
+
+
+
+
+@testset "WaterPhysics --- functions" begin
+    for FT in [Float32, Float64]
+        rand_r = (rand(FT) + 20) * FT(1e-6);
+        rand_T = rand(FT) + 298;
+        rand_α = rand(FT) * 50;
+        rand_Ψ = rand(FT) - 3;
+
+        # capillary_pressure
+        for result in [ capillary_pressure(rand_r, rand_T),
+                        capillary_pressure(rand_r, rand_T, rand_α) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
         end
-    # if the type is array
-    elseif typeof(para) <: AbstractArray
-        if eltype(para) <: AbstractFloat
-            try
-                @test eltype(para) == FT
-            catch e
-                println("The not NaN test failed for ", para, " and ", FT)
-            end
-        else
-            for ele in para
-                recursive_FT_test(ele, FT)
-            end
+
+        # relative_diffusive_coefficient
+        for result in [ relative_diffusive_coefficient(rand_T) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
         end
-    else
-        # try if the parameter is a struct
-        try
-            for fn in fieldnames( typeof(para) )
-                recursive_FT_test( getfield(para, fn), FT )
-            end
-        catch e
-            println(typeof(para), "is not supprted by recursive_FT_test.")
+        @test relative_diffusive_coefficient(FT(298.15)) ≈ 1;
+
+        # latent_heat_vapor
+        for result in [ latent_heat_vapor(rand_T) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
         end
+
+        # surface_tension and relative_surface_tension
+        for result in [ surface_tension(rand_T),
+                        relative_surface_tension(rand_T) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+        @test relative_surface_tension(FT(298.15)) ≈ 1;
+
+        # saturation_vapor_pressure
+        for result in [ pressure_correction(rand_T, rand_Ψ),
+                        saturation_vapor_pressure(rand_T),
+                        saturation_vapor_pressure(rand_T, rand_Ψ),
+                        saturation_vapor_pressure_slope(rand_T),
+                        saturation_vapor_pressure_slope(rand_T, rand_Ψ) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+
+        # viscosity and relative_viscosity
+        for result in [ viscosity(rand_T),
+                        relative_viscosity(rand_T) ]
+            recursive_FT_test(result, FT);
+            recursive_NaN_test(result);
+        end
+        @test relative_viscosity(FT(298.15)) ≈ 1;
     end
 end
-
-
-
-
-# Test the variable NaN recursively
-function recursive_NaN_test(para)
-    # if the type is Number
-    if typeof(para) <: Number
-        try
-            @test !isnan(para)
-        catch e
-            println("The not NaN test failed for", para)
-        end
-    # if the type is array
-    elseif typeof(para) <: AbstractArray
-        for ele in para
-            recursive_NaN_test(ele)
-        end
-    else
-        # try if the parameter is a struct
-        try
-            for fn in fieldnames( typeof(para) )
-                recursive_NaN_test( getfield(para, fn) )
-            end
-        catch e
-            println(typeof(para), "is not supprted by recursive_NaN_test.")
-        end
-    end
-end
-
-
-
-
-include("test_capillary_pressure.jl"   );
-include("test_diffusive_coefficient.jl");
-include("test_latent_heat.jl"          );
-include("test_surface_tension.jl"      );
-include("test_vapor_pressure.jl"       );
-include("test_viscosity.jl"            );

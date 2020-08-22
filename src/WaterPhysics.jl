@@ -82,6 +82,30 @@ end
 
 ###############################################################################
 #
+# Diffusive coefficient vs T
+#
+###############################################################################
+"""
+    relative_diffusive_coefficient(T::FT) where {FT<:AbstractFloat}
+
+Returns the relative diffusive coefficient of water vapor in air, given
+- `T` Water vapor temperature in `[K]`
+"""
+function relative_diffusive_coefficient(
+            T::FT
+) where {FT<:AbstractFloat}
+    return (T / K_25(FT)) ^ FT(1.8)
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
 # Latent heat
 # Adapted from the ClimateMachine/Common/ThermoDynamics/relations.jl
 #
@@ -217,30 +241,6 @@ function saturation_vapor_pressure_slope(
             Ψ::FT
 ) where {FT<:AbstractFloat}
     return saturation_vapor_pressure_slope(T) * pressure_correction(T, Ψ)
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
-# Diffusive coefficient vs T
-#
-###############################################################################
-"""
-    relative_diffusive_coefficient(T::FT) where {FT<:AbstractFloat}
-
-Returns the relative diffusive coefficient of water vapor in air, given
-- `T` Water vapor temperature in `[K]`
-"""
-function relative_diffusive_coefficient(
-            T::FT
-) where {FT<:AbstractFloat}
-    return (T / K_25(FT)) ^ FT(1.8)
 end
 
 
