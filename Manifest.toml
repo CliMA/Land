@@ -17,15 +17,15 @@ version = "0.1.6"
 
 [[CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "cab4da992adc0a64f63fa30d2db2fd8bec40cab4"
+git-tree-sha1 = "ccc043a0df446cac279dca29d13e2827b40aceb5"
 uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "0.5.11"
+version = "0.5.12"
 
 [[ConstrainedRootSolvers]]
 deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
-git-tree-sha1 = "15f11285f91d40eefddeb14155e598fe495e1c2d"
+git-tree-sha1 = "2c1917b17a196422607d635f458c3a063a41a292"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
-version = "0.0.1"
+version = "0.0.2"
 
 [[Dates]]
 deps = ["Printf"]
@@ -56,9 +56,9 @@ version = "0.21.0"
 
 [[JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "79e4496b79e8af45198f8c291f26d4514d6b06d6"
+git-tree-sha1 = "e4057be815219e5a5878c5c95a25de9d488d376a"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.7.24"
+version = "0.7.25"
 
 [[LibGit2]]
 deps = ["Printf"]
@@ -76,9 +76,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[LoweredCodeUtils]]
 deps = ["JuliaInterpreter"]
-git-tree-sha1 = "5bca4f43cb522596be4496d849de670090af3a55"
+git-tree-sha1 = "41b448dcb53258645cd5e4f9447409e1928ad4eb"
 uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
-version = "0.4.7"
+version = "0.4.8"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -161,6 +161,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "Test"]
-git-tree-sha1 = "58ec1ddcb37b21f92b3588dc28a17e538e7762c1"
+git-tree-sha1 = "1bcae71dcda545e6e007ef05105aceb18be41d69"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
-version = "0.0.2"
+version = "0.1.0"
