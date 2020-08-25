@@ -1,7 +1,7 @@
-# Plants.jl
-Plants module for Land model
+# SPAC.jl
+SPAC module for Land model
 
 ## Usage
 ```julia
-using Plants
+using SPAC
 ```

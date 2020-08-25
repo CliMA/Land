@@ -1,7 +1,7 @@
 using BenchmarkTools
 using CSV
 using DataFrames
-using Plants
+using SPAC
 using Photosynthesis
 using Test
 

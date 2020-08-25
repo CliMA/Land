@@ -94,8 +94,7 @@ function annual_profit(
     gscp *= laba * FT(1e-6) * 3600;
 
     # 4. compute the construction costs
-    tmpv  = ( maxv * log(maxv/(maxv-node.ps.Vcmax25)) + node.ps.Vcmax25 ) / 2;
-    cons  = laba * c_cons + laba * tmpv * c_vmax;
+    cons  = laba * c_cons + laba * node.ps.Vcmax25 * c_vmax;
     gscp -= cons;
 
     return gscp

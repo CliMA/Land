@@ -22,7 +22,8 @@ function test_diurnal(
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # 0.1 create variables required
-    @unpack canopy_rt, n_canopy, wl_set = node;
+    @unpack n_canopy, wl_set = node;
+    canopy_rt = node.canopy_rt;
     fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[ length(canopy_rt.lazitab) ]) / length(canopy_rt.lazitab);
     n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
 
@@ -82,12 +83,12 @@ function test_diurnal(
         zenith = zenith_angle(node.latitude, 180 + t[i_tim]/86400 );
         zenith = min(88, zenith);
         node.angles.tts = zenith;
-        canopy_geometry!(node.canopy_rt, node.angles, node.can_opt);
+        canopy_geometry!(canopy_rt, node.angles, node.can_opt, node.rt_con);
         canopy_matrices!(node.leaves_rt, node.can_opt);
-        short_wave!(node.canopy_rt, node.can_opt, node.can_rad, node.in_rad, node.soil_opt);
-        canopy_fluxes!(node.canopy_rt, node.can_opt, node.can_rad, node.in_rad, node.soil_opt, node.leaves_rt, wl_set);
-        thermal_fluxes!(node.leaves_rt, node.can_opt, node.can_rad, node.canopy_rt, node.soil_opt, [FT(400.0)], wl_set);
-        sif_fluxes!(node.leaves_rt, node.can_opt, node.can_rad, node.canopy_rt, node.soil_opt, wl_set);
+        short_wave!(canopy_rt, node.can_opt, node.can_rad, node.in_rad, node.soil_opt, node.rt_con);
+        canopy_fluxes!(canopy_rt, node.can_opt, node.can_rad, node.in_rad, node.soil_opt, node.leaves_rt, wl_set, node.rt_con);
+        thermal_fluxes!(node.leaves_rt, node.can_opt, node.can_rad, canopy_rt, node.soil_opt, [FT(400.0)], wl_set);
+        SIF_fluxes!(node.leaves_rt, node.can_opt, node.can_rad, canopy_rt, node.soil_opt, wl_set, node.rt_con, node.rt_dim);
 
         # 2. Update transpiration rate
         a_gpp = FT(0);

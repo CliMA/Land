@@ -1,4 +1,5 @@
 data/*
+docs/build/*
 
 *.csv
 *.mem

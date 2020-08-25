@@ -1,5 +1,5 @@
 using Documenter
-using Plants
+using SPAC
 
 pages = Any[
     "Home" => "index.md",
@@ -21,16 +21,16 @@ format = Documenter.HTML(
 )
 
 makedocs(
-    sitename = "Plants",
+    sitename = "SPAC",
     format = format,
 
     clean = false,
-    modules = [Plants],
+    modules = [SPAC],
     pages = pages,
 )
 
 deploydocs(
-    repo = "github.com/Yujie-W/Plants.jl.git",
+    repo = "github.com/Yujie-W/SPAC.jl.git",
     target = "build",
     push_preview = true,
 )

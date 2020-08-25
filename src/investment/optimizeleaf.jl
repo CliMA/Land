@@ -22,10 +22,11 @@ function optimize_leaf!(
                     tmp_prof = annual_profit(tmp_node, photo_set, weather);
                     return tmp_prof);
 
-    ms = ReduceStepMethodND{FT}(FT[0,0],
-                                FT[1e10, node.maxv],
-                                FT[node.opt_laba, node.opt_vmax],
-                                FT[100,10]);
+    ms = ReduceStepMethodND{FT}(
+                x_mins=FT[0,0],
+                x_maxs=FT[1e10, node.maxv],
+                x_inis=FT[node.opt_laba, node.opt_vmax],
+                Δ_inis=FT[100,10]);
     st = SolutionToleranceND{FT}(FT[0.9, 0.09], 50);
     lv = find_peak(f, ms, st);
 

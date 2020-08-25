@@ -19,7 +19,7 @@ function annual_simulation!(
             output::DataFrame
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
-    @unpack c_cons, elevation, gaba, laba, latitude, maxv, vtoj = node;
+    @unpack elevation, gaba, laba, latitude, maxv, vtoj = node;
 
     # 1. update the environmental constants based on the node geographycal info
     ratio            = atmospheric_pressure_ratio(elevation);

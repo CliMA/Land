@@ -1,6 +1,6 @@
-module Plants
+module SPAC
 
-using CanopyRadiation
+using CanopyLayers
 using CLIMAParameters
 using CLIMAParameters.Planet
 using ConstrainedRootSolvers

@@ -12,7 +12,7 @@ function create_dataframe(
     df    = DataFrame();
 
     # climatic info
-    df[!, "Time"  ]  = weather.Day + weather.Hour / FT(24);
+    df[!, "Time"  ]  = (weather).Day + (weather).Hour / FT(24);
     df[!, "T_air" ] .= FT(0);
     df[!, "D_air" ] .= FT(0);
     df[!, "Wind"  ] .= FT(0);

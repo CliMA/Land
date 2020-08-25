@@ -1,6 +1,6 @@
-# Plants
+# SPAC
 ```@meta
-CurrentModule = Plants
+CurrentModule = SPAC
 ```
 
 ## Types
@@ -43,10 +43,12 @@ leaf_temperature_shaded
 annual_profit
 annual_simulation!
 create_dataframe
+initialize_spac_canopy!
 ```
 
 ## Optimal investment
 ```@docs
 leaf_allocation!
 optimize_leaf!
+optimize_hs!
 ```

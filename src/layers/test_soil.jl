@@ -8,13 +8,13 @@ function test_soil_from_psoil(
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack canopy_rt, n_canopy, wl_set = node;
-    n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
+    @unpack n_canopy = node;
+    n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer
     for i_root in 1:node.n_root
         node.swc[i_root] = max(node.mswc[i_root], soil_swc(node.plant_hs.roots[i_root].sh, psoils[i_root]));
-        node.plant_hs.roots[i_root].p_ups = psoils[iroot];
+        node.plant_hs.roots[i_root].p_ups = psoils[i_root];
     end
 
     e_sum = FT(0);
@@ -67,8 +67,8 @@ function test_soil_from_swc(
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack canopy_rt, n_canopy, wl_set = node;
-    n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
+    @unpack n_canopy = node;
+    n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer
     for i_root in 1:node.n_root

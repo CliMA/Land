@@ -70,17 +70,21 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Solar angle container"
     angles::SolarAngles{FT} = SolarAngles{FT}()
     "Canopy4RT container"
-    canopy_rt::Canopy4RT{FT} = Canopy4RT{FT}(nLayer=n_canopy, LAI=la/ga)
+    canopy_rt::Canopy4RT{FT} = create_canopy_rt(FT, nLayer=n_canopy, LAI=la/ga)
     "Wave length container"
-    wl_set::WaveLengths{FT} = WaveLengths{FT}()
+    wl_set::WaveLengths{FT} = create_wave_length(FT)
+    "RT dimensions"
+    rt_dim::CanopyLayers.RTDimensions = create_rt_dims(canopy_rt, wl_set);
     "CanopyRads container"
-    can_rad::CanopyRads{FT} = CanopyRads{FT}(nWL=wl_set.nwl, nWLf=wl_set.nWlF, nIncl=length(canopy_rt.litab), nAzi=length(canopy_rt.lazitab), nLayer=canopy_rt.nLayer)
+    can_rad::CanopyRads{FT} = create_canopy_rads(FT, rt_dim)
     "CanopyOpticals container"
-    can_opt::CanopyOpticals{FT} = create_canopy_opticals(FT, wl_set.nwl, canopy_rt.nLayer, length(canopy_rt.lazitab), length(canopy_rt.litab))
+    can_opt::CanopyOpticals{FT} = create_canopy_opticals(FT, rt_dim)
     "Array of LeafBios container"
-    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, wl_set.nwl, wl_set.nWlE, wl_set.nWlF) for i in 1:canopy_rt.nLayer]
+    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for i in 1:n_canopy]
     "SoilOpticals container"
-    soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set.wl, FT(0.2)*ones(FT, length(wl_set.wl)), FT[0.1], FT(290.0))
+    soil_opt::SoilOpticals{FT} = create_soil_opticals(wl_set)
     "Incoming radiation container"
-    in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set.swl)
+    in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
+    "RT container"
+    rt_con::RTContainer{FT} = create_rt_container(FT, rt_dim)
 end
