@@ -29,8 +29,8 @@ function optimize_hs!(
                     return tmp_prof);
 
     ms = ReduceStepMethodND{FT}(
-                x_mins=FT[0.001,0,0],
-                x_maxs=FT[1e10, 1e10, node.maxv],
+                x_mins=FT[0.001,1,5],
+                x_maxs=FT[1e10, node.gaba*10, 200],
                 x_inis=FT[node.hs.root.k_max/node.containerKS[1],
                           node.opt_laba,
                           node.opt_vmax],

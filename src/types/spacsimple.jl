@@ -21,8 +21,6 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     # Photosynthesis parameters
     "Photosynthesis system"
     ps::Leaf{FT} = Leaf{FT}()
-    "Structure limit for maximal caboxylation rate"
-    maxv::FT = FT(100)
     "Ratio between Vcmax25 and Jmax25"
     vtoj::FT = FT(1.67)
 
@@ -44,9 +42,9 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     "Container for optimal shaded layer flow rate"
     opt_f_sh   ::FT = FT(0)
     "Container for optimal leaf area per basal area"
-    opt_laba   ::FT = FT(1500)
+    opt_laba   ::FT = FT(2000)
     "Container for optimal Vcmax25"
-    opt_vmax   ::FT = maxv * FT(0.9)
+    opt_vmax   ::FT = FT(5)
 
     # leaf related
     "Leaf area index"
