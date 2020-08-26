@@ -6,7 +6,7 @@
 """
     optimize_leaf!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::Array{FT,2}) where {FT<:AbstractFloat}
 
-Optimize leaf area and photosynthetic capacity, given
+Optimize leaf area (LAI limited to 20) and photosynthetic capacity, given
 - `node` [`SPACSimple`] type struct
 - `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `weather` Weather profile in a growing season
@@ -24,7 +24,7 @@ function optimize_leaf!(
 
     ms = ReduceStepMethodND{FT}(
                 x_mins=FT[0,0],
-                x_maxs=FT[1e10, node.maxv],
+                x_maxs=FT[node.gaba*20, node.maxv],
                 x_inis=FT[node.opt_laba, node.opt_vmax],
                 Δ_inis=FT[100,10]);
     st = SolutionToleranceND{FT}(FT[0.9, 0.09], 50);

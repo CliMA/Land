@@ -66,7 +66,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Stomatal behavior scheme"
     stomata_model::AbstractStomatalModel{FT} = ESMBallBerry{FT}()
 
-    # For CanopyRadiation module
+    # For CanopyLayers module
     "Solar angle container"
     angles::SolarAngles{FT} = SolarAngles{FT}()
     "Canopy4RT container"
