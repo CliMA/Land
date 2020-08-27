@@ -51,8 +51,8 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     lai  ::FT = FT(3)
     "Leaf area per basal area"
     laba ::FT = 1500
-    "Maximal diffusive conductance limit at 25 °C"
-    g_sla::FT = 0.8
+    "Maximal stomatal conductance limit at 25 °C"
+    g_max::FT = 0.8
     "Ground area per basal area"
     gaba ::FT = 500
     "Leaf width"
