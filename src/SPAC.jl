@@ -66,6 +66,7 @@ export annual_profit,
        ppm_to_Pa,
        test_soil_from_psoil,
        test_soil_from_swc,
+       vary_spac!,
        zenith_angle
 
 
@@ -75,15 +76,15 @@ include("types/container.jl" )
 include("types/spacmono.jl"  )
 include("types/spacsimple.jl")
 
-include("bigleaf/gainriskmap.jl" )
-include("bigleaf/gasexchange.jl" )
-include("bigleaf/optimizeflow.jl")
-include("bigleaf/partition.jl"   )
-include("bigleaf/temperature.jl" )
-
-include("investment/leafallocation.jl")
-include("investment/optimizehs.jl"    )
-include("investment/optimizeleaf.jl"  )
+include("bigleaf/gainriskmap.jl"   )
+include("bigleaf/gasexchange.jl"   )
+include("bigleaf/leafallocation.jl")
+include("bigleaf/optimizeflow.jl"  )
+include("bigleaf/optimizehs.jl"    )
+include("bigleaf/optimizeleaf.jl"  )
+include("bigleaf/partition.jl"     )
+include("bigleaf/temperature.jl"   )
+include("bigleaf/varytrait.jl"     )
 
 include("layers/initializert.jl")
 include("layers/test_diurnal.jl")

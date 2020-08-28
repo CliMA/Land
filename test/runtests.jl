@@ -98,8 +98,8 @@ end
 
 
 # test and benchmark the big_leaf_partition!
-println("\nTesting and Benchmarking the big_leaf_partition!...")
-@testset "Testing + Benchmarking --- big_leaf_partition!" begin
+println("\nTesting the big_leaf_partition!...")
+@testset "SPAC --- big_leaf_partition!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         zenith = FT(30);
@@ -120,7 +120,7 @@ end
 
 # test the gain_risk_map
 println("\nTesting the gain_risk_map Function...")
-@testset "Testing --- gain_risk_map" begin
+@testset "SPAC --- gain_risk_map" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -138,8 +138,8 @@ end
 
 
 # test and benchmark the leaf_gas_exchange_nonopt!
-println("\nTesting and Benchmarking the leaf_gas_exchange_nonopt! Functions...")
-@testset "Testing + Benchmarking --- leaf_gas_exchange_nonopt!" begin
+println("\nTesting the leaf_gas_exchange_nonopt! Functions...")
+@testset "SPAC --- leaf_gas_exchange_nonopt!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -168,8 +168,8 @@ end
 
 
 # test and benchmark the leaf_gas_exchange!
-println("\nTesting and Benchmarking the leaf_gas_exchange! Functions...")
-@testset "Testing + Benchmarking --- leaf_gas_exchange!" begin
+println("\nTesting the leaf_gas_exchange! Functions...")
+@testset "SPAC --- leaf_gas_exchange!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -198,8 +198,8 @@ end
 
 
 # test and benchmark the leaf_temperature*
-println("\nTesting and Benchmarking the leaf_temperature* Functions...")
-@testset "Testing + Benchmarking --- leaf_temperature*" begin
+println("\nTesting the leaf_temperature* Functions...")
+@testset "SPAC --- leaf_temperature*" begin
     for FT in [Float32, Float64]
         node = SPACSimple{FT}();
         rad  = FT(300);
@@ -224,8 +224,8 @@ end
 
 
 # test and benchmark the optimize_flows!
-println("\nTesting and Benchmarking the optimize_flows! Functions...")
-@testset "Testing + Benchmarking --- optimize_flows!" begin
+println("\nTesting the optimize_flows! Functions...")
+@testset "SPAC --- optimize_flows!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -249,8 +249,8 @@ end
 
 
 # test and benchmark the atmosheric* functions
-println("\nTesting and Benchmarking the atmosheric* Functions...")
-@testset "Testing + Benchmarking --- atmosheric*" begin
+println("\nTesting the atmosheric* Functions...")
+@testset "SPAC --- atmosheric*" begin
     for FT in [Float32, Float64]
         h = FT(1000);
 
@@ -273,8 +273,8 @@ end
 
 
 # test and benchmark the zenith_angle
-println("\nTesting and Benchmarking the zenith_angle Functions...")
-@testset "Testing + Benchmarking --- zenith_angle" begin
+println("\nTesting the zenith_angle Functions...")
+@testset "SPAC --- zenith_angle" begin
     for FT in [Float32, Float64]
         latd = FT(10);
         decd = FT(10);
@@ -302,8 +302,8 @@ end
 
 
 # test and benchmark the annual_profit
-println("\nTesting and Benchmarking the annual_profit Functions...")
-@testset "Testing + Benchmarking --- annual_profit" begin
+println("\nTesting the annual_profit Functions...")
+@testset "SPAC --- annual_profit" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
@@ -327,7 +327,7 @@ end
 
 # test and benchmark the annual_simulation!
 println("\nTesting annual_simulation! Functions...")
-@testset "Testing + Benchmarking --- annual_simulation!" begin
+@testset "SPAC --- annual_simulation!" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
@@ -344,8 +344,8 @@ end
 
 
 # test and benchmark the leaf_allocation!
-println("\nTesting and Benchmarking the leaf_allocation! Functions...")
-@testset "Testing + Benchmarking --- leaf_allocation!" begin
+println("\nTesting the leaf_allocation! Functions...")
+@testset "SPAC --- leaf_allocation!" begin
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
         photo = C3CLM(FT);
@@ -374,8 +374,8 @@ end
 
 
 # test and benchmark the optimize_leaf
-println("\nTesting and Benchmarking the optimize_leaf! Functions...")
-@testset "Testing + Benchmarking --- optimize_leaf!" begin
+println("\nTesting the optimize_leaf! Functions...")
+@testset "SPAC --- optimize_leaf!" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
@@ -390,6 +390,26 @@ println("\nTesting and Benchmarking the optimize_leaf! Functions...")
             # reset the node before benchmarking
             node = SPACSimple{FT}();
             @btime optimize_leaf!($node, $photo, $weatmat);
+        end
+    end
+end
+
+
+
+
+# test the function to vary SPACSimple
+println("\nTesting the vary_spac! Functions...")
+@testset "SPAC --- vary_spac!" begin
+    weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
+    facs = ["kl", "kw", "wb", "wc", "wk",
+            "cc", "cv", "gm",
+            "ga", "sd",
+            "ta", "rh", "ca"];
+    for FT in [Float32, Float64]
+        node = SPACSimple{FT}();
+        for _fac in facs
+            vary_spac!(node, weat, _fac, FT(1.5));
+            @test true;
         end
     end
 end
