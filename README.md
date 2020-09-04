@@ -3,9 +3,9 @@
 Canopy layering model including big leaf model and mSCOPE model reactored from
     CliMA Land model. See documentation for more details about the package.
 
-| Documentation                                   | CI Status             | Benchmarks            |
-|:-----------------------------------------------:|:---------------------:|:---------------------:|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] |
+| Documentation                                   | CI Status             | Benchmarks            | Compatibility           |
+|:-----------------------------------------------:|:---------------------:|:---------------------:|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] |
 
 [dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [dev-url]: https://Yujie-W.github.io/CanopyLayers.jl/dev/
@@ -18,3 +18,6 @@ Canopy layering model including big leaf model and mSCOPE model reactored from
 
 [bm-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Benchmarks/badge.svg?branch=master
 [bm-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"master"++workflow%3A"Benchmarks"
+
+[min-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Julia-1.3/badge.svg?branch=master
+[min-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"master"++workflow%3A"Julia-1.3"

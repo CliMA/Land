@@ -32,6 +32,7 @@ export Canopy4RT,
        LeafBios,
        LeafOpticals,
        RTContainer,
+       RTDimensions,
        SoilOpticals,
        SolarAngles,
        WaveLengths
