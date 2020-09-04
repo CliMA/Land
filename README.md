@@ -17,20 +17,17 @@
 [bm-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Benchmarks/badge.svg?branch=master
 [bm-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"master"++workflow%3A"Benchmarks"
 
-[v13-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.3/badge.svg?branch=master
-[v13-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"master"++workflow%3A"Julia-1.3"
-
-[v14-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.4/badge.svg?branch=master
-[v14-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"master"++workflow%3A"Julia-1.4"
+[min-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.3/badge.svg?branch=master
+[min-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"master"++workflow%3A"Julia-1.3"
 
 
 ## About
 
 [`WaterPhysics.jl`][wp-url] includes a collection of temperature dependencies of physical properties of water. Due to its dependency on [`CLIMAParameters.jl`][cp-url], [`WaterPhysics.jl`][wp-url] only supports Julia 1.3 and above.
 
-| Documentation                                   | CI Status             | Benchmarks            | Compatibility                                   |
-|:------------------------------------------------|:----------------------|:----------------------|:------------------------------------------------|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][v14-img]][v14-url] [![][v13-img]][v13-url] |
+| Documentation                                   | CI Status             | Benchmarks            | Compatibility           |
+|:------------------------------------------------|:----------------------|:----------------------|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] |
 
 
 
@@ -55,4 +52,4 @@ julia> Pkg.add("WaterPhysics");
 
 
 ## API
-See [`API`](wp-api) for more detailed information about how to use [`WaterPhysics.jl`][wp-url].
+See [`API`][wp-api] for more detailed information about how to use [`WaterPhysics.jl`][wp-url].
