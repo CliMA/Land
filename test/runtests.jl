@@ -5,36 +5,22 @@ using Test
 
 
 
-# Test the variable FT recursively
-function recursive_FT_test(para, FT)
-    # if the type is AbstractFloat
-    if typeof(para) <: AbstractFloat
-        try
-            @test typeof(para) == FT
-        catch e
-            println("The not NaN test failed for ", para, " and ", FT)
-        end
-    # if the type is array
-    elseif typeof(para) <: AbstractArray
-        if eltype(para) <: AbstractFloat
-            try
-                @test eltype(para) == FT
-            catch e
-                println("The not NaN test failed for ", para, " and ", FT)
-            end
-        else
-            for ele in para
-                recursive_FT_test(ele, FT)
-            end
-        end
-    else
-        # try if the parameter is a struct
-        try
-            for fn in fieldnames( typeof(para) )
-                recursive_FT_test( getfield(para, fn), FT )
-            end
-        catch e
-            println(typeof(para), "is not supprted by recursive_FT_test.")
+include("recursive_test.jl")
+
+
+
+
+# FT and NaN test for the structs
+@testset "Photosynthesis --- structures" begin
+    for FT in [Float32, Float64]
+        for data_set in [ KcTDBernacchi(FT),
+                          VpmaxTDBoyd(FT),
+                          C3CLM(FT),
+                          C4CLM(FT),
+                          AirLayer{FT}(),
+                          Leaf{FT}() ]
+            recursive_FT_test(data_set, FT);
+            recursive_NaN_test(data_set);
         end
     end
 end
@@ -42,42 +28,62 @@ end
 
 
 
-# Test the variable NaN recursively
-function recursive_NaN_test(para)
-    # if the type is Number
-    if typeof(para) <: Number
-        try
-            @test !isnan(para)
-        catch e
-            println("The not NaN test failed for", para)
-        end
-    # if the type is array
-    elseif typeof(para) <: AbstractArray
-        for ele in para
-            recursive_NaN_test(ele)
-        end
-    else
-        # try if the parameter is a struct
-        try
-            for fn in fieldnames( typeof(para) )
-                recursive_NaN_test( getfield(para, fn) )
-            end
-        catch e
-            println(typeof(para), "is not supprted by recursive_NaN_test.")
-        end
+# FT and NaN test for the structs
+@testset "Photosynthesis --- functions" begin
+    for FT in [Float32, Float64]
+        c3_set   = C3CLM(FT);
+        c4_set   = C4CLM(FT);
+        leaf_3   = Leaf{FT}();
+        leaf_4   = Leaf{FT}();
+        envir    = AirLayer{FT}();
+        fluo_set = c3_set.Flu;
+        T        = rand(FT) + 298;
+        glc      = FT(0.1);
+        p_i      = rand(FT) + 20;
+
+        # rubisco limited rates
+        rubisco_limited_rate!(c3_set, leaf_3);
+        rubisco_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        rubisco_limited_rate_glc!(c3_set, leaf_3, envir);
+        recursive_NaN_test(leaf_3);
+
+        # light limited rates
+        leaf_ETR!(c3_set, leaf_3);
+        leaf_ETR!(c4_set, leaf_4);
+        light_limited_rate!(c3_set, leaf_3);
+        light_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        light_limited_rate_glc!(c3_set, leaf_3, envir);
+        recursive_NaN_test(leaf_3);
+
+        # product limited rates
+        product_limited_rate!(c3_set, leaf_3);
+        product_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        product_limited_rate_glc!(c4_set, leaf_4, envir);
+        recursive_NaN_test(leaf_4);
+
+        # fluorescence
+        leaf_photo_from_glc!(c3_set, leaf_3, envir);
+        leaf_fluorescence!(fluo_set, leaf_3);
+        recursive_NaN_test(leaf_3);
+
+        # leaf photo from glc
+        leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
+        leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
+        leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
+        leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+
+        # leaf photo from p_i
+        leaf_photo_from_pi!(c3_set, leaf_3, p_i);
+        leaf_photo_from_pi!(c4_set, leaf_4, p_i);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
     end
 end
-
-
-
-
-benchmarking = true
-include("test_struct.jl")
-include("test_TD.jl")
-include("test_ETR.jl")
-include("test_Ac.jl")
-include("test_Aj.jl")
-include("test_Ap.jl")
-include("test_photo_pi.jl")
-include("test_photo_glc.jl")
-include("test_fluorescence.jl")
