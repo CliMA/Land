@@ -1,12 +1,12 @@
 ###############################################################################
 #
-# SPAC system for simple mono species system
+# SoilPlantAirContinuum system for simple mono species system
 #
 ###############################################################################
 """
     mutable struct SPACSimple{FT}
 
-Struct that simplest mono species SPAC system, with 1 root, stem, and leaf.
+Struct that simplest mono species SoilPlantAirContinuum system, with 1 root, stem, and leaf.
 
 # Fields
 $(DocStringExtensions.FIELDS)

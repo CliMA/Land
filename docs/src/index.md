@@ -1,7 +1,7 @@
-# SPAC.jl
-SPAC module for Land model
+# SoilPlantAirContinuum.jl
+SoilPlantAirContinuum module for Land model
 
 ## Usage
 ```julia
-using SPAC
+using SoilPlantAirContinuum
 ```

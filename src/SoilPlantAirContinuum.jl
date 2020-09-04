@@ -1,4 +1,4 @@
-module SPAC
+module SoilPlantAirContinuum
 
 using CanopyLayers
 using CLIMAParameters

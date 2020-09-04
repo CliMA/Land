@@ -1,5 +1,5 @@
 using Documenter
-using SPAC
+using SoilPlantAirContinuum
 
 pages = Any[
     "Home" => "index.md",
@@ -21,16 +21,16 @@ format = Documenter.HTML(
 )
 
 makedocs(
-    sitename = "SPAC",
+    sitename = "SoilPlantAirContinuum",
     format = format,
 
     clean = false,
-    modules = [SPAC],
+    modules = [SoilPlantAirContinuum],
     pages = pages,
 )
 
 deploydocs(
-    repo = "github.com/Yujie-W/SPAC.jl.git",
+    repo = "github.com/Yujie-W/SoilPlantAirContinuum.jl.git",
     target = "build",
     push_preview = true,
 )

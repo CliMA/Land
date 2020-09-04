@@ -329,7 +329,7 @@ version = "2.7.5"
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
-[[SPAC]]
+[[SoilPlantAirContinuum]]
 deps = ["BenchmarkTools", "CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Revise", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"

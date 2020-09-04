@@ -1,7 +1,7 @@
 using BenchmarkTools
 using CSV
 using DataFrames
-using SPAC
+using SoilPlantAirContinuum
 using Photosynthesis
 using Test
 
@@ -99,7 +99,7 @@ end
 
 # test and benchmark the big_leaf_partition!
 println("\nTesting the big_leaf_partition!...")
-@testset "SPAC --- big_leaf_partition!" begin
+@testset "SoilPlantAirContinuum --- big_leaf_partition!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         zenith = FT(30);
@@ -120,7 +120,7 @@ end
 
 # test the gain_risk_map
 println("\nTesting the gain_risk_map Function...")
-@testset "SPAC --- gain_risk_map" begin
+@testset "SoilPlantAirContinuum --- gain_risk_map" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -139,7 +139,7 @@ end
 
 # test and benchmark the leaf_gas_exchange_nonopt!
 println("\nTesting the leaf_gas_exchange_nonopt! Functions...")
-@testset "SPAC --- leaf_gas_exchange_nonopt!" begin
+@testset "SoilPlantAirContinuum --- leaf_gas_exchange_nonopt!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -169,7 +169,7 @@ end
 
 # test and benchmark the leaf_gas_exchange!
 println("\nTesting the leaf_gas_exchange! Functions...")
-@testset "SPAC --- leaf_gas_exchange!" begin
+@testset "SoilPlantAirContinuum --- leaf_gas_exchange!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -199,7 +199,7 @@ end
 
 # test and benchmark the leaf_temperature*
 println("\nTesting the leaf_temperature* Functions...")
-@testset "SPAC --- leaf_temperature*" begin
+@testset "SoilPlantAirContinuum --- leaf_temperature*" begin
     for FT in [Float32, Float64]
         node = SPACSimple{FT}();
         rad  = FT(300);
@@ -225,7 +225,7 @@ end
 
 # test and benchmark the optimize_flows!
 println("\nTesting the optimize_flows! Functions...")
-@testset "SPAC --- optimize_flows!" begin
+@testset "SoilPlantAirContinuum --- optimize_flows!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
         photo  = C3CLM(FT);
@@ -250,7 +250,7 @@ end
 
 # test and benchmark the atmosheric* functions
 println("\nTesting the atmosheric* Functions...")
-@testset "SPAC --- atmosheric*" begin
+@testset "SoilPlantAirContinuum --- atmosheric*" begin
     for FT in [Float32, Float64]
         h = FT(1000);
 
@@ -274,7 +274,7 @@ end
 
 # test and benchmark the zenith_angle
 println("\nTesting the zenith_angle Functions...")
-@testset "SPAC --- zenith_angle" begin
+@testset "SoilPlantAirContinuum --- zenith_angle" begin
     for FT in [Float32, Float64]
         latd = FT(10);
         decd = FT(10);
@@ -303,7 +303,7 @@ end
 
 # test and benchmark the annual_profit
 println("\nTesting the annual_profit Functions...")
-@testset "SPAC --- annual_profit" begin
+@testset "SoilPlantAirContinuum --- annual_profit" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
@@ -327,7 +327,7 @@ end
 
 # test and benchmark the annual_simulation!
 println("\nTesting annual_simulation! Functions...")
-@testset "SPAC --- annual_simulation!" begin
+@testset "SoilPlantAirContinuum --- annual_simulation!" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
@@ -345,7 +345,7 @@ end
 
 # test and benchmark the leaf_allocation!
 println("\nTesting the leaf_allocation! Functions...")
-@testset "SPAC --- leaf_allocation!" begin
+@testset "SoilPlantAirContinuum --- leaf_allocation!" begin
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
         photo = C3CLM(FT);
@@ -375,7 +375,7 @@ end
 
 # test and benchmark the optimize_leaf
 println("\nTesting the optimize_leaf! Functions...")
-@testset "SPAC --- optimize_leaf!" begin
+@testset "SoilPlantAirContinuum --- optimize_leaf!" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
@@ -399,7 +399,7 @@ end
 
 # test the function to vary SPACSimple
 println("\nTesting the vary_spac! Functions...")
-@testset "SPAC --- vary_spac!" begin
+@testset "SoilPlantAirContinuum --- vary_spac!" begin
     weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
     facs = ["kl", "kw", "wb", "wc", "wk",
             "cc", "cv", "gm",

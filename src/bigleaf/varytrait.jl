@@ -6,7 +6,7 @@
 """
     vary_spac!(node::SPACSimple{FT}, weat_years::DataFrame, factor_to_vary::String, ratio_to_vary::FT) where {FT<:AbstractFloat}
 
-Generalized function to vary the SPAC to run sensitivity analysis, given
+Generalized function to vary the SoilPlantAirContinuum to run sensitivity analysis, given
 - `node` SPACSimple type struct
 - `weat_years` Weather data
 - `factor_to_vary` Which parameter to vary

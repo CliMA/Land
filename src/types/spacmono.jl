@@ -1,12 +1,12 @@
 ###############################################################################
 #
-# SPAC system for mono species system
+# SoilPlantAirContinuum system for mono species system
 #
 ###############################################################################
 """
     mutable struct SPACMono{FT}
 
-Struct that mono species SPAC system.
+Struct that mono species SoilPlantAirContinuum system.
 
 # Fields
 $(DocStringExtensions.FIELDS)
