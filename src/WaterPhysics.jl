@@ -9,12 +9,10 @@ using CLIMAParameters.Planet
 # Define a local struct inherited from AbstractEarthParameterSet
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const EARTH      = EarthParameterSet();
-CP_I(FT)         = FT( cp_i(EARTH)           );
 CP_L(FT)         = FT( cp_l(EARTH)           );
 CP_V(FT)         = FT( cp_v(EARTH)           );
 GAS_R(FT)        = FT( gas_constant()        );
 K_25(FT)         = FT( T_freeze(EARTH) + 25  );
-LH_S0(FT)        = FT( LH_s0(EARTH)          );
 LH_V0(FT)        = FT( LH_v0(EARTH)          );
 MOLMASS_H₂O(FT)  = FT( molmass_water(EARTH)  );
 PRESS_TRIPLE(FT) = FT( press_triple(EARTH)   );

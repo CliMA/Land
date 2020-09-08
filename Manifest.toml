@@ -11,9 +11,9 @@ version = "0.5.0"
 
 [[CLIMAParameters]]
 deps = ["Test"]
-git-tree-sha1 = "314f0bdd5817abb2df61cc8d3e857c496d421109"
+git-tree-sha1 = "c4bb1cd81ca49233fc7c829357171344b406900a"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
-version = "0.1.6"
+version = "0.1.8"
 
 [[Dates]]
 deps = ["Printf"]
@@ -29,9 +29,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
-git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
+git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.21.0"
+version = "0.21.1"
 
 [[Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"

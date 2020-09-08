@@ -20,14 +20,16 @@
 [min-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.3/badge.svg?branch=master
 [min-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"master"++workflow%3A"Julia-1.3"
 
+[cov-img]: https://codecov.io/gh/Yujie-W/WaterPhysics.jl/branch/master/graph/badge.svg
+[cov-url]: https://codecov.io/gh/Yujie-W/WaterPhysics.jl
 
 ## About
 
 [`WaterPhysics.jl`][wp-url] includes a collection of temperature dependencies of physical properties of water. Due to its dependency on [`CLIMAParameters.jl`][cp-url], [`WaterPhysics.jl`][wp-url] only supports Julia 1.3 and above.
 
-| Documentation                                   | CI Status             | Benchmarks            | Compatibility           |
-|:------------------------------------------------|:----------------------|:----------------------|:------------------------|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] |
+| Documentation                                   | CI Status             | Benchmarks            | Compatibility           | Code Coverage           |
+|:------------------------------------------------|:----------------------|:----------------------|:------------------------|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
 
 
 
