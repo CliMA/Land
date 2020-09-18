@@ -66,3 +66,26 @@ struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Correction factor C = 1 + exp( Sv/R + Hd/(RT0) )"
     C          ::FT
 end
+
+
+
+
+"""
+    struct Q10TD{FT}
+
+An [`AbstractTDParameterSet`](@ref) type struct using
+```math
+VAL = VAL_{REF} \\left( \\dfrac{T_1 - T_{REF}}}{10} \\right)^{Q_{10}}
+```
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+struct Q10TD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
+    "Uncorrected value at reference temperature"
+    VAL_REF::FT
+    "Reference temperature `[K]`"
+    T_REF  ::FT
+    "Power of Q10 correction"
+    Q_10   ::FT
+end

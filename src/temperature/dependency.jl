@@ -16,7 +16,17 @@ function photo_TD_from_set(
             td_set::ArrheniusTD{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    return td_set.VAL_25 * arrhenius_correction(td_set, T)
+    return td_set.VAL_25 * temperature_correction(td_set, T)
+end
+
+
+
+
+function photo_TD_from_set(
+            td_set::Q10TD{FT},
+            T::FT
+) where {FT<:AbstractFloat}
+    return td_set.VAL_REF * temperature_correction(td_set, T)
 end
 
 
@@ -37,7 +47,7 @@ function photo_TD_from_val(
             val::FT,
             T::FT
 ) where {FT<:AbstractFloat}
-    return val * arrhenius_correction(td_set, T)
+    return val * temperature_correction(td_set, T)
 end
 
 

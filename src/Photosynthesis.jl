@@ -61,7 +61,7 @@ export C3Bernacchi,
 
 
 # export functions
-export arrhenius_correction,
+export temperature_correction,
        leaf_ETR!,
        leaf_fluorescence!,
        leaf_jmax!,
@@ -97,7 +97,7 @@ include("types/temperature.jl" )
 include("types/photomodel.jl"  )
 include("types/parasets.jl"    )
 
-include("temperature/arrhenius.jl" )
+include("temperature/correction.jl")
 include("temperature/dependency.jl")
 
 include("photosynthesis/etr.jl"           )

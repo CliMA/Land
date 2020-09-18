@@ -56,13 +56,15 @@ The temperature-dependent (TD) photosynthetic parameters include
 - ``Γ^{*}`` CO₂ compensation point with the absence of dark respiration
 
 There are two typical types of temperature dependencies using the classic
-    Arrhenius equation. We define the two types as [`ArrheniusTD`](@ref) and
-    [`ArrheniusPeakTD`](@ref) subject to [`AbstractTDParameterSet`](@ref) type:
+    Arrhenius equation. We define the three types as [`ArrheniusTD`](@ref),
+    [`ArrheniusPeakTD`](@ref), and [`Q10TD](@ref) subject to
+    [`AbstractTDParameterSet`](@ref) type:
 
 ```@docs
 AbstractTDParameterSet
 ArrheniusTD
 ArrheniusPeakTD
+Q10TD
 ```
 
 There are many published parameter sets for the various temperature
@@ -160,10 +162,10 @@ As mentioned above, temperature corrections only need to be done once per
     temperature change, and storing the temperature corrected values will
     significantly boost the code speed. Here we provide a few functions to
     change the stored values. First of all, all the temperature corrections are
-    made with [`arrhenius_correction`](@ref):
+    made with [`temperature_correction`](@ref):
 
 ```@docs
-arrhenius_correction
+temperature_correction
 ```
 
 Second, depending on which physiological parameter to correct, some corrections
