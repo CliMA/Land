@@ -84,6 +84,16 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "CO₂ compensation point with the absence of Rd `[Pa]`"
     Γ_star ::FT = FT(0)
 
+    # Well watered condition values (to use with β function over PS)
+    "Well watered maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    Jmax25WW ::FT = Jmax25
+    "Well watered respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    Rd25WW   ::FT = Rd25
+    "Well watered maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    Vcmax25WW::FT = Vcmax25
+    "Well watered maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    Vpmax25WW::FT = Vpmax25
+
     # Fluorescence related
     "Total efficiency, incl. photorespiration `[mol CO₂ mol⁻¹ e-]`"
     CO₂_per_electron::FT = FT(1/6)

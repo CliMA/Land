@@ -57,7 +57,7 @@ The temperature-dependent (TD) photosynthetic parameters include
 
 There are two typical types of temperature dependencies using the classic
     Arrhenius equation. We define the three types as [`ArrheniusTD`](@ref),
-    [`ArrheniusPeakTD`](@ref), and [`Q10TD](@ref) subject to
+    [`ArrheniusPeakTD`](@ref), and [`Q10TD`](@ref) subject to
     [`AbstractTDParameterSet`](@ref) type:
 
 ```@docs
