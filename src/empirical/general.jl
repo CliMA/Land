@@ -47,7 +47,7 @@ function envir_diff!(
             swc::FT,
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel{FT},
-            bt::BetaGLinearPleaf{FT},
+            bt::AbstractBetaG{FT},
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -60,7 +60,7 @@ function envir_diff!(
     leaf_photo_from_glc!(photo_set, ps, envir);
 
     # calculate g_sw from stomatal model
-    β    = β_factor(bt, hs.p_element[end]);
+    β    = β_factor(bt, hs.p_element[end], psoil, swc);
     g_md = empirical_gsw_from_model(sm, ps, envir, β);
     g_md = min(canopyi.g_max, g_md);
 
@@ -82,56 +82,34 @@ function envir_diff!(
             swc::FT,
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel{FT},
-            bt::BetaGLinearPsoil{FT},
+            bt::AbstractBetaV{FT},
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack ps = canopyi;
-    g_bc  = canopyi.g_bc[ind];
-    g_m   = canopyi.g_m[ind];
+    ps   = canopyi.ps;
+    g_bc = canopyi.g_bc[ind];
+    g_m  = canopyi.g_m[ind];
 
     # update photosynthesis for ps
     ps.g_lc = x;
     leaf_photo_from_glc!(photo_set, ps, envir);
 
-    # calculate g_sw from stomatal model
-    β    = β_factor(bt, psoil);
-    g_md = empirical_gsw_from_model(sm, ps, envir, β);
-    g_md = min(canopyi.g_max, g_md);
-
-    # calculate model predicted g_lc
-    g_lm = 1 / (FT(1.6)/g_md + 1/g_bc + 1/g_m);
-
-    return g_lm - x
-end
-
-
-
-
-function envir_diff!(
-            x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
-            canopyi::CanopyLayer{FT},
-            hs::LeafHydraulics{FT},
-            psoil::FT,
-            swc::FT,
-            envir::AirLayer{FT},
-            sm::EmpiricalStomatalModel{FT},
-            bt::BetaGLinearSWC{FT},
-            ind::Int
-) where {FT<:AbstractFloat}
-    # unpack variables
-    @unpack ps = canopyi;
-    g_bc  = canopyi.g_bc[ind];
-    g_m   = canopyi.g_m[ind];
-
-    # update photosynthesis for ps
-    ps.g_lc = x;
-    leaf_photo_from_glc!(photo_set, ps, envir);
+    # make beta correction over the photosynthesis system
+    β    = β_factor(bt, hs.p_element[end], psoil, swc);
+    _rat = ps.Vcmax25WW * β / ps.Vcmax25;
+    if _rat != 1
+        ps.Jmax25  *= _rat;
+        ps.Jmax    *= _rat;
+        ps.Rd25    *= _rat;
+        ps.Rd      *= _rat;
+        ps.Vcmax25 *= _rat;
+        ps.Vcmax   *= _rat;
+        ps.Vpmax25 *= _rat;
+        ps.Vpmax   *= _rat;
+    end
 
     # calculate g_sw from stomatal model
-    β    = β_factor(bt, swc);
-    g_md = empirical_gsw_from_model(sm, ps, envir, β);
+    g_md = empirical_gsw_from_model(sm, ps, envir, FT(1));
     g_md = min(canopyi.g_max, g_md);
 
     # calculate model predicted g_lc

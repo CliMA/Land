@@ -41,24 +41,6 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     "Leaf width `[m]`"
     width::FT = FT(0.05)
 
-    # Photosynthesis system, different for each leaf
-    "NPQ rate constant (initially zero)"
-    Kn     ::Array{FT,1} = zeros(FT, n_leaf)
-    "Rate constant for photochemistry (all reaction centers open)"
-    Kp     ::Array{FT,1} = zeros(FT, n_leaf) .+ 4
-
-    # Photosynthesis system, same for all leaves
-    "Rate constant for thermal dissipation"
-    Kd       ::FT = FT(0.85)
-    "Rate constant for fluorescence (const)"
-    Kf       ::FT = FT(0.05)
-    "Maximal rate constant for photochemistry (all reaction centers open)"
-    Kpmax    ::FT = FT(4)
-    "max PSII yield (Kn=0, all RC open)"
-    maxPSII  ::FT = Kpmax / (Kpmax + Kf +Kd)
-    "Fraction of absorbed light used by PSII ETR"
-    PSII_frac::FT = FT(0.5)
-
     # Diffusive conductances, same for all leaves
     "Boundary layer conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_bc::Array{FT,1} = zeros(FT, n_leaf) .+ FT(3/1.35)
@@ -116,34 +98,6 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     J    ::Array{FT,1} = zeros(FT, n_leaf)
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
     J_pot::Array{FT,1} = zeros(FT, n_leaf)
-
-    # Photosynthesis related, same for all leaves
-    "Maximal electron transport rate `[μmol m⁻² s⁻¹]`"
-    Jmax   ::FT = FT(120)
-    "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Jmax25 ::FT = FT(120)
-    "RubisCO coefficient Kc `[Pa]`"
-    Kc     ::FT = FT(0)
-    "RubisCO coefficient Ko `[Pa]`"
-    Ko     ::FT = FT(0)
-    "PEP coefficient Ko `[Pa]`"
-    Kpep   ::FT = FT(0)
-    "Michaelis-Menten's coefficient `[Pa]`"
-    Km     ::FT = FT(0)
-    "Respiration rate `[μmol m⁻² s⁻¹]`"
-    Rd     ::FT = FT(1)
-    "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Rd25   ::FT = FT(1)
-    "Maximal carboxylation rate `[μmol m⁻² s⁻¹]`"
-    Vcmax  ::FT = FT(60)
-    "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Vcmax25::FT = FT(60)
-    "Maximal PEP carboxylation rate `[μmol m⁻² s⁻¹]`"
-    Vpmax  ::FT = FT(120)
-    "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    Vpmax25::FT = FT(120)
-    "CO₂ compensation point with the absence of Rd `[Pa]`"
-    Γ_star ::FT = FT(0)
 
     # Fluorescence related, different for each leaf
     "Total efficiency, incl. photorespiration `[mol CO₂ mol⁻¹ e-]`"

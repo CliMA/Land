@@ -4,12 +4,10 @@
 #
 ###############################################################################
 """
-    β_factor(bt::BetaGLinearPleaf{FT}, pl::FT) where {FT<:AbstractFloat}
-    β_factor(bt::BetaGLinearPsoil{FT}, ps::FT) where {FT<:AbstractFloat}
-    β_factor(bt::BetaGLinearSWC{FT}, swc::FT) where {FT<:AbstractFloat}
-    β_factor(bt::BetaVLinearPleaf{FT}, pl::FT) where {FT<:AbstractFloat}
-    β_factor(bt::BetaVLinearPsoil{FT}, ps::FT) where {FT<:AbstractFloat}
-    β_factor(bt::BetaVLinearSWC{FT}, swc::FT) where {FT<:AbstractFloat}
+    β_factor(bt::AbstractBetaFunction{FT},
+             pl::FT,
+             ps::FT,
+             swc::FT) where {FT<:AbstractFloat}
 
 Calculate the β correction factor, given
 - `bt` [`AbstractBetaFunction`](@ref) type struct
@@ -17,7 +15,12 @@ Calculate the β correction factor, given
 - `ps` Soil water potential `[MPa]`
 - `swc` Soil water content
 """
-function β_factor(bt::BetaGLinearPleaf{FT}, pl::FT) where {FT<:AbstractFloat}
+function β_factor(
+            bt::BetaGLinearPleaf{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack p_max, p_min = bt;
 
     if pl >= p_max
@@ -32,7 +35,12 @@ end
 
 
 
-function β_factor(bt::BetaGLinearPsoil{FT}, ps::FT) where {FT<:AbstractFloat}
+function β_factor(
+            bt::BetaGLinearPsoil{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack p_max, p_min = bt;
 
     if ps >= p_max
@@ -47,7 +55,12 @@ end
 
 
 
-function β_factor(bt::BetaGLinearSWC{FT}, swc::FT) where {FT<:AbstractFloat}
+function β_factor(
+            bt::BetaGLinearSWC{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack swc_max, swc_min = bt;
 
     if swc >= swc_max
@@ -60,7 +73,14 @@ function β_factor(bt::BetaGLinearSWC{FT}, swc::FT) where {FT<:AbstractFloat}
 end
 
 
-function β_factor(bt::BetaVLinearPleaf{FT}, pl::FT) where {FT<:AbstractFloat}
+
+
+function β_factor(
+            bt::BetaVLinearPleaf{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack p_max, p_min = bt;
 
     if pl >= p_max
@@ -75,7 +95,12 @@ end
 
 
 
-function β_factor(bt::BetaVLinearPsoil{FT}, ps::FT) where {FT<:AbstractFloat}
+function β_factor(
+            bt::BetaVLinearPsoil{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack p_max, p_min = bt;
 
     if ps >= p_max
@@ -90,7 +115,12 @@ end
 
 
 
-function β_factor(bt::BetaVLinearSWC{FT}, swc::FT) where {FT<:AbstractFloat}
+function β_factor(
+            bt::BetaVLinearSWC{FT},
+            pl::FT,
+            ps::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
     @unpack swc_max, swc_min = bt;
 
     if swc >= swc_max

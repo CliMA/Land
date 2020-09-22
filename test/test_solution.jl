@@ -26,7 +26,11 @@ println("\nTesting and benchmarking stomatal models...")
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 for result in [ envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1),
                                 envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1)]
+                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1),
+                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1),
+                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1),
+                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1),
+                                ]
                     recursive_FT_test(result, FT);
                     recursive_NaN_test(result);
                 end
@@ -47,6 +51,12 @@ println("\nTesting and benchmarking stomatal models...")
                 recursive_NaN_test(can);
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
                 recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
+                recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
+                recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
+                recursive_NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
                 leaf_photo_from_envir!(mod, can, hs, envir, sm, 1);
@@ -57,8 +67,16 @@ println("\nTesting and benchmarking stomatal models...")
         for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
+                recursive_NaN_test(can);
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
+                recursive_NaN_test(can);
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
+                recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
+                recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
+                recursive_NaN_test(can);
+                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
                 recursive_NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
