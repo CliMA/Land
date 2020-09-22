@@ -53,9 +53,11 @@ export empirical_gsw_from_model,
 
 
 
+include("types/beta.jl"         )
 include("types/canopylayer.jl"  )
 include("types/stomatalmodel.jl")
 
+include("empirical/beta.jl"     )
 include("empirical/general.jl"  )
 include("empirical/ballberry.jl")
 include("empirical/gentine.jl"  )

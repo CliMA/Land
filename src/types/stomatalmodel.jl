@@ -120,7 +120,7 @@ end
 An empirical model parameter set type for Medlyn type model.
 The equation used in Medlyn type model is
 ```math
-gs = g0 + \\left( 1 + \\dfrac{g1}{\\sqrt{VPD}} ⋅ \\dfrac{A}{Ca} \\right)
+gs = g0 + 1.6 ⋅ \\left( 1 + \\dfrac{g1}{\\sqrt{VPD}} \\right) ⋅ \\dfrac{A}{Ca}
 ```
 
 # Fields
