@@ -23,7 +23,16 @@ MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 
 
 # export public types and structs
-export AbstractStomatalModel,
+export AbstractBetaFunction,
+       AbstractBetaG,
+       AbstractBetaV,
+       AbstractStomatalModel,
+       BetaGLinearPleaf,
+       BetaGLinearPsoil,
+       BetaGLinearSWC,
+       BetaVLinearPleaf,
+       BetaVLinearPsoil,
+       BetaVLinearSWC,
        CanopyLayer,
        EmpiricalStomatalModel,
        ESMBallBerry,

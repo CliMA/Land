@@ -27,6 +27,40 @@ ESMLeuning
 ESMMedlyn
 ```
 
+All the empirical models rely on beta functions to make corrections over
+    stomatal conductance to account for the stomatal closure with drier soil.
+    We have the following prescribed beta function types, and they are:
+
+```@docs
+AbstractBetaFunction
+```
+
+Some beta functions make correction over the `g1` parameter as in the empitical
+    models, and they are:
+
+```@docs
+AbstractBetaG
+BetaGLinearPleaf
+BetaGLinearPsoil
+BetaGLinearSWC
+```
+
+Some beta functions make correction over the photosynthetic capacity as in the
+    Photosynthesis module, and they are:
+
+```@docs
+AbstractBetaV
+BetaVLinearPleaf
+BetaVLinearPsoil
+BetaVLinearSWC
+```
+
+The beta functions are generalized with
+
+```@docs
+β_factor
+```
+
 The StomataModels module also contains five optimization model schemes:
 
 ```@docs
