@@ -75,8 +75,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     lidf::Array{FT,1} = dladgen(LIDFa, LIDFb, litab_bnd)
     "List of level location (level = layer + 1)"
     xl  ::Array{FT,1} = collect(FT, 0:-1.0/nLayer:-1)
-    "Exp(xl)"
-    xl_e::Array{FT,1} = exp.(xl)
     "1/nLayer"
     dx  ::FT = FT(1)/nLayer
 

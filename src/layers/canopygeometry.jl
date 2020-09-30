@@ -79,7 +79,7 @@ function canopy_geometry!(
     psi_vol = abs( psi - 360*round(psi/360) );
 
     # 3. unpack canopy parameters
-    @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, xl_e, Ω = can;
+    @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, Ω = can;
 
     # 4. update the RTContainer
     can.cos_philo .= cosd.(lazitab .- psi);
@@ -160,10 +160,10 @@ function canopy_geometry!(
     can_opt.absfsfo .= abs.( can_opt.fsfo );
 
     # 9. probabilities Ps, Po, Pso
-    _fac_s = exp(ks*Ω*LAI) * (1 - exp(-ks*Ω*LAI*dx)) / (ks*Ω*LAI*dx);
-    _fac_o = exp(ko*Ω*LAI) * (1 - exp(-ko*Ω*LAI*dx)) / (ko*Ω*LAI*dx);
-    can_opt.Ps  .= xl_e .* _fac_s;
-    can_opt.Po  .= xl_e .* _fac_o;
+    _fac_s = (1 - exp(-ks*Ω*LAI*dx)) / (ks*Ω*LAI*dx);
+    _fac_o = (1 - exp(-ko*Ω*LAI*dx)) / (ko*Ω*LAI*dx);
+    can_opt.Ps  .= exp.(xl.*ks.*Ω.*LAI) .* _fac_s;
+    can_opt.Po  .= exp.(xl.*ko.*Ω.*LAI) .* _fac_o;
     @inline f(x) = psofunction(ko, ks, Ω, LAI, hot, dso, x);
 
     # TODO minimize the allocations here

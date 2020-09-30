@@ -3,19 +3,6 @@
 # Calculate SIF fluxes
 #
 ###############################################################################
-#
-
-
-
-
-
-
-
-###############################################################################
-#
-# Calculate SIF fluxes
-#
-###############################################################################
 """
     SIF_fluxes!(
                 leaves::Array{LeafBios{FT},1},
@@ -215,10 +202,6 @@ function SIF_fluxes!(
         sf_con.Fdplu[:,i] .= sf_con.sigbEmin_shade .+
                              sf_con.sigfEplu_shade;
 
-
-
-
-
         # Total weighted fluxes
         _qs_iLAI   = Qs[i] * iLAI;
         _1_qs_iLAI = (1 - Qs[i]) * iLAI;
@@ -234,8 +217,6 @@ function SIF_fluxes!(
     #    Use Zero SIF fluxes as top and bottom boundary:
     # TODO pre-allocate these!
     diffusive_S!(sf_con, soil, rt_dim);
-
-
 
     # 6. Save in output structures!
     #    direct Sunlit leaves

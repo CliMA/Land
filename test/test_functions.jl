@@ -48,10 +48,11 @@ println("\nTesting the layered model...");
         reflVIS = FT[];
         reflNIR = FT[];
 
-        angles.tts    = 30;
-        angles.psi    = 0;
-        canopy_rt.LAI = 3;
-        VZA           = collect(FT, -89.5:0.5:89.5);
+        angles.tts     = 30;
+        angles.psi     = 0;
+        canopy_rt.LAI  = 3;
+        canopy_rt.iLAI = 3 / rt_dim.nLayer;
+        VZA            = collect(FT, -89.5:0.5:89.5);
 
         for VZA_ in VZA
             angles.tto = VZA_;
@@ -71,9 +72,10 @@ println("\nTesting the layered model...");
         SIF_FR  = FT[];
         SIF_R   = FT[];
 
-        angles.tts    = 48;
-        angles.psi    = 0;
-        canopy_rt.LAI = FT(3.22);
+        angles.tts     = 48;
+        angles.psi     = 0;
+        canopy_rt.LAI  = FT(3.22);
+        canopy_rt.iLAI = FT(3.22) / rt_dim.nLayer;
 
         for psi in 0:5:360
             angles.psi = psi;

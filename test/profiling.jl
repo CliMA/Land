@@ -1,6 +1,6 @@
 # Benchmark the CanopyLayers model
 
-using BenchmarkTools, CanopyLayers, Profile, Revise
+using BenchmarkTools, CanopyLayers, Profile
 
 FT = Float32;
 canopy_rt = create_canopy_rt(FT, nLayer=20);

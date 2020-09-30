@@ -7,7 +7,6 @@ using MAT
 using Parameters
 using Polynomials
 using QuadGK
-using Revise
 using Statistics
 
 
