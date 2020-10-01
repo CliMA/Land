@@ -5,7 +5,6 @@ using CLIMAParameters.Planet
 using ConstrainedRootSolvers
 using DocStringExtensions
 using Parameters
-using Revise
 using Statistics
 using WaterPhysics
 

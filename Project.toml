@@ -1,7 +1,7 @@
 name = "PlantHydraulics"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
@@ -9,7 +9,6 @@ CLIMAParameters = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
@@ -20,6 +19,5 @@ CLIMAParameters = "0.1.6"
 ConstrainedRootSolvers = "0.1"
 DocStringExtensions = "0.8"
 Parameters = "0.12"
-Revise = "2.7"
 WaterPhysics = "0.1"
 julia = "1.3"
