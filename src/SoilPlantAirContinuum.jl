@@ -3,13 +3,13 @@ module SoilPlantAirContinuum
 using CanopyLayers
 using CLIMAParameters
 using CLIMAParameters.Planet
+using CLIMAParameters.SubgridScale
 using ConstrainedRootSolvers
 using DataFrames
 using DocStringExtensions
 using Parameters
 using Photosynthesis
 using PlantHydraulics
-using Revise
 using Statistics
 using StomataModels
 using WaterPhysics
@@ -25,6 +25,7 @@ GRAVITY(FT)       = FT( grav(EARTH) );
 K_0(FT)           = FT( T_freeze(EARTH) );
 K_25(FT)          = K_0(FT) + 25;
 K_BOLTZMANN(FT)   = FT( k_Boltzmann() );
+K_VON_KARMAN(FT)  = FT( von_karman_const(EARTH) );
 MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 P_ATM(FT)         = FT( MSLP(EARTH) );
 RK_25(FT)         = GAS_R(FT) * K_25(FT);
@@ -89,6 +90,7 @@ include("bigleaf/varytrait.jl"     )
 include("layers/initializert.jl")
 include("layers/test_diurnal.jl")
 include("layers/test_soil.jl"   )
+include("layers/windspeed.jl"   )
 
 include("planet/atmpressure.jl")
 include("planet/solarangle.jl" )

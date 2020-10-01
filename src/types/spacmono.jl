@@ -41,6 +41,16 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Air layers"
     envirs::Array{AirLayer{FT},1} = [AirLayer{FT}() for i in 1:n_canopy]
 
+    # Wind related
+    "Aerodynamic roughness `[m]`"
+    wind_z0::FT = z_canopy * FT(0.07)
+    "Zero plane displacement `[m]`"
+    wind_d ::FT = z_canopy * 2/3
+    "Mean layer height `[m]`"
+    wind_zs::Array{FT,1} = [(air_bounds[i]+air_bounds[i+1])/2 for i in 1:length(air_bounds)-1]
+    "Wind speed per layer `[m s⁻¹]`"
+    winds::Array{FT,1} = [FT(1) for i in 1:length(air_bounds)-1]
+
     # Soil layers information
     # TODO bridge Soil module later
     "Maximal soil water content"
