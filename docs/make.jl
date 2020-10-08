@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "WaterPhysics",
     format = format,
-
     clean = false,
     modules = [WaterPhysics],
     pages = pages,

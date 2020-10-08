@@ -6,6 +6,35 @@ CurrentModule = WaterPhysics
 
 
 
+## Trace molecule
+A multiple dispatch approach is used to calculate the temperature and pressure
+    dependent physical properties of water and other molecules such as CO₂. The
+    trace molecules and mediums are catergorized to `Gas` or `Liquid` subject
+    to a general type:
+
+```@docs
+AbstractTraceMolecule
+AbstractTraceGas
+AbstractTraceLiquid
+```
+
+The supported gasses include
+
+```@docs
+TraceGasAir
+TraceGasCO₂
+TraceGasH₂O
+```
+
+The supported liquid includes
+
+```@docs
+TraceLiquidH₂O
+```
+
+
+
+
 ## Capillary pressure
 Capillary pressure of liquid water in a pipe is a function of surface tension
     (``\gamma``), pipe raduis (``r``), and contact angle (``\alpha``):
@@ -21,10 +50,18 @@ capillary_pressure
 
 
 
-## Diffusive coefficient of water vapor
+## Diffusive coefficient
+Diffusion of trace molecules in medium is temperature dependent, to calculate
+    this temperature dependency, we provided a function to quick estimate this
+    value for different trace molecules
+
+```@docs
+diffusive_coefficient
+```
+
 Diffusive coefficient of water vapor is a temperature-dependent function, this
     dependence impact leaf gas exchange via change the maximal stomatal
-    conductance to water vapor as the stomatal conductance should nto exceed
+    conductance to water vapor as the stomatal conductance should not exceed
     its structural limit. To account for this effect, we provided a function to
     calculate the diffusive coefficient relative to 25 Celcius.
 

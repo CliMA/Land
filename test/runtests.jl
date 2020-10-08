@@ -1,4 +1,3 @@
-using BenchmarkTools
 using Test
 using WaterPhysics
 
@@ -17,6 +16,9 @@ include("recursive_test.jl");
         rand_α = rand(FT) * 50;
         rand_Ψ = rand(FT) - 3;
 
+        gas_air = TraceGasAir();
+        gas_CO₂ = TraceGasCO₂();
+
         # capillary_pressure
         for result in [ capillary_pressure(rand_r, rand_T),
                         capillary_pressure(rand_r, rand_T, rand_α) ]
@@ -24,8 +26,9 @@ include("recursive_test.jl");
             recursive_NaN_test(result);
         end
 
-        # relative_diffusive_coefficient
-        for result in [ relative_diffusive_coefficient(rand_T) ]
+        # diffusive_coefficient
+        for result in [ diffusive_coefficient(rand_T, gas_CO₂, gas_air),
+                        relative_diffusive_coefficient(rand_T) ]
             recursive_FT_test(result, FT);
             recursive_NaN_test(result);
         end

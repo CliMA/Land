@@ -8,6 +8,9 @@ function benchmark_WaterPhysics(FT)
     rand_α = rand(FT) * 50;
     rand_Ψ = rand(FT) - 3;
 
+    gas_air = TraceGasAir();
+    gas_CO₂ = TraceGasCO₂();
+
     # benchmarking the functions
     println("\nUsing ", FT);
     println("\nBenchmarking capillary_pressure functions...");
@@ -15,6 +18,7 @@ function benchmark_WaterPhysics(FT)
     @btime capillary_pressure($rand_r, $rand_T, $rand_α);
 
     println("\nBenchmarking diffusive_coefficient functions...");
+    @btime diffusive_coefficient($rand_T, $gas_CO₂, $gas_air);
     @btime relative_diffusive_coefficient($rand_T);
 
     println("\nBenchmarking latent_heat_vapor functions...");
