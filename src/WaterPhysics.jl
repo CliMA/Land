@@ -184,7 +184,7 @@ end
 # Diffusive coefficient vs T
 #
 ###############################################################################
-const D_CO2_IN_AIR = 1.4e-5;
+const D_CO2_IN_AIR = 1.6e-5;
 """
     diffusive_coefficient(
             T::FT,
