@@ -1,21 +1,24 @@
-using Land, Documenter, Literate
+using Documenter
+using Land
 
 generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
 rm(generated_dir, force = true, recursive = true)
 mkpath(generated_dir)
 
-include("list_of_tutorials.jl")          # defines a dict `tutorials`
+#include("list_of_tutorials.jl")          # defines a dict `tutorials`
 
 pages = Any[
-    "Home"           => "index.md",
-    "Tips"           => "pages/Tips.md",
-    "Hydraulics"     => "pages/Hydraulics.md",
-    "Photosynthesis" => "pages/Photosynthesis.md",
-    "CanopyRT"       => "pages/CanopyRT.md",
-    "Utils"          => "pages/Utils.md",
-    "Tutorials"      => tutorials,
+    "Home" => "index.md",
+    "Tips" => "tips.md" ,
+    "APIs" => [
+              "CanopyLayers"          => "CanopyLayers.md"         ,
+              "Photosynthesis"        => "Photosynthesis.md"       ,
+              "PlantHydraulics"       => "PlantHydraulics.md"      ,
+              "StomataModels"         => "StomataModels.md"        ,
+              "SoilPlantAirContinuum" => "SoilPlantAirContinuum.md",
+              "Land"                  => "Land.md"
     ]
-
+]
 
 mathengine = MathJax(Dict(
     :TeX => Dict(
@@ -33,10 +36,8 @@ format = Documenter.HTML(
 makedocs(
     sitename = "Land",
     format = format,
-
     clean = false,
-    #modules = [Documenter, Land],
-    modules = [Land],    # remove Documenter to avoid tons of WARNINGS associated
+    modules = [Land],
     pages = pages,
 )
 
