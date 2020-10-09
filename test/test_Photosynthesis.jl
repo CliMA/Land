@@ -1,105 +1,77 @@
-# FT and NaN test
-@testset "Photosynthesis --- FT consistency and not NaN" begin
+# FT and NaN test for the structs
+@testset "Photosynthesis --- structures" begin
     for FT in [Float32, Float64]
-        envir  = PM.AirLayer{FT}();
-        leaf   = PM.Leaf{FT}();
-        mod_b  = PM.C3Bernacchi(FT);
-        mod_3  = PM.C3CLM(FT);
-        mod_4  = PM.C3CLM(FT);
-        rand_T = rand(FT) + 298;
-
-        leaf_b = deepcopy(leaf);
-        leaf_3 = deepcopy(leaf);
-        leaf_4 = deepcopy(leaf);
-
-        for data_set in [ envir,
-                          leaf,
-                          mod_b,
-                          mod_3,
-                          mod_4,
-                          PM.JmaxTDLeuning(FT),
-                          PM.KpepTDBoyd(FT),
-                          PM.VcmaxTDLeuning(FT),
-                          PM.VtoRCollatz(FT)]
+        for data_set in [ KcTDBernacchi(FT),
+                          VpmaxTDBoyd(FT),
+                          C3CLM(FT),
+                          C4CLM(FT),
+                          AirLayer{FT}(),
+                          Leaf{FT}() ]
             recursive_FT_test(data_set, FT);
             recursive_NaN_test(data_set);
         end
+    end
+end
 
-        for result in [ PM.arrhenius_correction(mod_3.KcT, rand_T),
-                        PM.arrhenius_correction(mod_3.VcT, rand_T),
-                        PM.glc_diff!(FT(20), mod_b, leaf_b, envir, FT(1)),
-                        PM.glc_diff!(FT(20), mod_3, leaf_3, envir, FT(1)),
-                        PM.glc_diff!(FT(20), mod_4, leaf_4, envir, FT(1)),
-                        PM.photo_TD_from_set(mod_3.KcT, rand_T ),
-                        PM.photo_TD_from_val(mod_3.VcT, leaf.Vcmax25 , rand_T)]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
 
-        PM.leaf_photo_from_pi!(mod_b, leaf_b, envir);
-        PM.leaf_photo_from_pi!(mod_3, leaf_3, envir);
-        PM.leaf_photo_from_pi!(mod_4, leaf_4, envir);
-        recursive_FT_test(leaf_b, FT);
-        recursive_FT_test(leaf_3, FT);
-        recursive_FT_test(leaf_4, FT);
-        recursive_NaN_test(leaf_b);
+
+
+# FT and NaN test for the structs
+@testset "Photosynthesis --- functions" begin
+    for FT in [Float32, Float64]
+        c3_set   = C3CLM(FT);
+        c4_set   = C4CLM(FT);
+        leaf_3   = Leaf{FT}();
+        leaf_4   = Leaf{FT}();
+        envir    = AirLayer{FT}();
+        fluo_set = c3_set.Flu;
+        T        = rand(FT) + 298;
+        glc      = FT(0.1);
+        p_i      = rand(FT) + 20;
+
+        # rubisco limited rates
+        rubisco_limited_rate!(c3_set, leaf_3);
+        rubisco_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        rubisco_limited_rate_glc!(c3_set, leaf_3, envir);
+        recursive_NaN_test(leaf_3);
+
+        # light limited rates
+        leaf_ETR!(c3_set, leaf_3);
+        leaf_ETR!(c4_set, leaf_4);
+        light_limited_rate!(c3_set, leaf_3);
+        light_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        light_limited_rate_glc!(c3_set, leaf_3, envir);
+        recursive_NaN_test(leaf_3);
+
+        # product limited rates
+        product_limited_rate!(c3_set, leaf_3);
+        product_limited_rate!(c4_set, leaf_4);
+        recursive_NaN_test(leaf_3);
+        recursive_NaN_test(leaf_4);
+        product_limited_rate_glc!(c4_set, leaf_4, envir);
+        recursive_NaN_test(leaf_4);
+
+        # fluorescence
+        leaf_photo_from_glc!(c3_set, leaf_3, envir);
+        leaf_fluorescence!(fluo_set, leaf_3);
+        recursive_NaN_test(leaf_3);
+
+        # leaf photo from glc
+        leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
+        leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
+        leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
+        leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
         recursive_NaN_test(leaf_3);
         recursive_NaN_test(leaf_4);
 
-        PM.leaf_photo_from_glc!(mod_b, leaf_b, envir);
-        PM.leaf_photo_from_glc!(mod_3, leaf_3, envir);
-        PM.leaf_photo_from_glc!(mod_4, leaf_4, envir);
-        recursive_FT_test(leaf_b, FT);
-        recursive_FT_test(leaf_3, FT);
-        recursive_FT_test(leaf_4, FT);
-        recursive_NaN_test(leaf_b);
+        # leaf photo from p_i
+        leaf_photo_from_pi!(c3_set, leaf_3, p_i);
+        leaf_photo_from_pi!(c4_set, leaf_4, p_i);
         recursive_NaN_test(leaf_3);
         recursive_NaN_test(leaf_4);
-
-        for esm in [PM.ESMBallBerry{FT}(),
-                    PM.ESMGentine{FT}(),
-                    PM.ESMLeuning{FT}(),
-                    PM.ESMMedlyn{FT}()]
-            mod_b.Sto = esm;
-            mod_3.Sto = esm;
-            mod_4.Sto = esm;
-            for res in [PM.empirical_gsw_from_model(esm, leaf_b, envir, FT(1)),
-                        PM.empirical_gsw_from_model(esm, leaf_3, envir, FT(1)),
-                        PM.empirical_gsw_from_model(esm, leaf_4, envir, FT(1))]
-                recursive_FT_test(res, FT);
-                recursive_NaN_test(res);
-            end
-        end
-
-        for sm in [PM.ESMBallBerry{FT}(),
-                   PM.ESMGentine{FT}(),
-                   PM.ESMLeuning{FT}(),
-                   PM.ESMMedlyn{FT}(),
-                   PM.OSMEller(),
-                   PM.OSMSperry(),
-                   PM.OSMWang(),
-                   PM.OSMWAP{FT}()]
-            mod_b.Sto = sm;
-            mod_3.Sto = sm;
-            mod_4.Sto = sm;
-            for res in [PM.envir_diff!(FT(20), mod_b, leaf_b, envir, mod_b.Sto),
-                        PM.envir_diff!(FT(20), mod_3, leaf_3, envir, mod_3.Sto),
-                        PM.envir_diff!(FT(20), mod_4, leaf_4, envir, mod_4.Sto)]
-                recursive_FT_test(res, FT);
-                recursive_NaN_test(res);
-            end
-            PM.leaf_photo_from_envir!(mod_b, leaf_b, envir, mod_b.Sto);
-            PM.leaf_photo_from_envir!(mod_3, leaf_3, envir, mod_3.Sto);
-            PM.leaf_photo_from_envir!(mod_4, leaf_4, envir, mod_4.Sto);
-            PM.leaf_heat_flux!(leaf_b, envir);
-            PM.leaf_heat_flux!(leaf_3, envir);
-            PM.leaf_heat_flux!(leaf_4, envir);
-            recursive_FT_test(leaf_b, FT);
-            recursive_FT_test(leaf_3, FT);
-            recursive_FT_test(leaf_4, FT);
-            recursive_NaN_test(leaf_b);
-            recursive_NaN_test(leaf_3);
-            recursive_NaN_test(leaf_4);
-        end
     end
 end

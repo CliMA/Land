@@ -1,17 +1,41 @@
 module Land
 
-# load constants and tools
-include("Utils/LandParameters.jl")
-include("Utils/MathTools.jl"     )
-include("Utils/WaterPhysics.jl"  )
+using DiffEqOperators
+using DocStringExtensions
+using OrdinaryDiffEq
+using Parameters
+using WaterPhysics
 
-# load the feature modules
-include("Hydraulics/Hydraulics.jl"        )
-include("Photosynthesis/Photosynthesis.jl")
-include("Radiation/CanopyRT.jl")
 
-#include("Plant/Plant.jl")
-#include("Leaf/Leaf.jl")
-#include("SPAC/SPAC.jl")
+
+
+# export public types
+export VerticalLayers
+
+
+
+
+# export public functions
+export vertical_layers!
+
+
+
+
+# include sub modules
+include("CanopyLayers/CanopyLayers.jl"                  )
+include("Photosynthesis/Photosynthesis.jl"              )
+include("PlantHydraulics/PlantHydraulics.jl"            )
+include("StomataModels/StomataModels.jl"                )
+include("SoilPlantAirContinuum/SoilPlantAirContinuum.jl")
+
+
+
+
+# include types
+include("Land/Types.jl"    )
+include("Land/AirLayers.jl")
+
+
+
 
 end # module

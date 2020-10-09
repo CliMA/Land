@@ -1,5 +1,18 @@
-using Statistics
+using BenchmarkTools
+using CSV
+using DataFrames
+using Land
+using Land.CanopyLayers
+using Land.Photosynthesis
+using Land.PlantHydraulics
+using Land.SoilPlantAirContinuum
+using Land.StomataModels
 using Test
+
+
+
+
+benchmarking = false
 
 ENV["JULIA_LOG_LEVEL"] = "WARN"
 
@@ -72,28 +85,10 @@ end
 
 
 
-# When moving any function from developing.jl to stable files,
-# add corresponding test and docs
-using Land
-
-MT   = Land.MathTools
-WP   = Land.WaterPhysics
-PH   = Land.Hydraulics
-PM   = Land.Photosynthesis
-RT   = Land.CanopyRT
-
-include("test_MathTools.jl"     )
-include("test_WaterPhysics.jl"  )
-include("test_Hydraulics.jl"    )
-include("test_Photosynthesis.jl")
-include("test_CanopyRT.jl"      )
-
-# Deprecated, to be remove
-#LF   = Land.Leaf
-#PT   = Land.Plant
-#SPAC = Land.SPAC
-#include("test_Leaf.jl"          )
-#include("test_Plant.jl"         )
-#include("test_SPAC.jl"          )
-
-println("All tests finished.")
+# include all tests
+include("test_CanopyLayers.jl"         )
+include("test_Photosynthesis.jl"       )
+include("test_PlantHydraulics.jl"      )
+include("test_StomataModels.jl"        )
+include("test_SoilPlantAirContinuum.jl")
+include("test_Land.jl"                 )

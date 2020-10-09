@@ -1,5 +1,7 @@
 status = [
-  "CliMA.Land",
+  "linux-test",
+  "windows-test",
+  "macos-test",
   "docs-build"
 ]
 delete_merged_branches = true
