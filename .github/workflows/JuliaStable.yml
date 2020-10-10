@@ -2,7 +2,9 @@ name: JuliaStable
 on:
   push:
     branches:
-      - master
+      - main
+      - staging
+      - trying
   pull_request:
 
 jobs:
