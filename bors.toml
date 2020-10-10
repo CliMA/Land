@@ -1,0 +1,6 @@
+status = [
+    "build",
+    "stable-test",
+    "version-test"
+]
+timeout_sec = 7200
