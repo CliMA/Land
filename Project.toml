@@ -1,7 +1,7 @@
 name = "SoilPlantAirContinuum"
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
