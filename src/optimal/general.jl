@@ -23,6 +23,8 @@ function leaf_photo_from_envir!(
         leaf_ETR!(photo_set, canopyi.ps);
         leaf_photo_from_envir!(photo_set, canopyi, hs, envir, sm, ind);
     end
+
+    return nothing
 end
 
 
