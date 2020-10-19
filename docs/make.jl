@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "CanopyLayers",
     format = format,
-
     clean = false,
     modules = [CanopyLayers],
     pages = pages,
@@ -32,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/CanopyLayers.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
