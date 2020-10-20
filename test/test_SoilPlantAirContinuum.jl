@@ -184,7 +184,8 @@ end
 # test and benchmark the annual_profit
 println("\nTesting the annual_profit Functions...")
 @testset "SoilPlantAirContinuum --- annual_profit" begin
-    weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
+    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
+    weat = DataFrame!(CSV.File(arti));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -208,7 +209,8 @@ end
 # test and benchmark the annual_simulation!
 println("\nTesting annual_simulation! Functions...")
 @testset "SoilPlantAirContinuum --- annual_simulation!" begin
-    weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
+    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
+    weat = DataFrame!(CSV.File(arti));
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
         photo = C3CLM(FT);
@@ -256,7 +258,8 @@ end
 # test and benchmark the optimize_leaf
 println("\nTesting the optimize_leaf! Functions...")
 @testset "SoilPlantAirContinuum --- optimize_leaf!" begin
-    weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
+    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
+    weat = DataFrame!(CSV.File(arti));
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -280,7 +283,8 @@ end
 # test the function to vary SPACSimple
 println("\nTesting the vary_spac! Functions...")
 @testset "SoilPlantAirContinuum --- vary_spac!" begin
-    weat = DataFrame!(CSV.File("../data/gs_sample.csv"));
+    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
+    weat = DataFrame!(CSV.File(arti));
     facs = ["kl", "kw", "wb", "wc", "wk",
             "cc", "cv", "gm",
             "ga", "sd",
