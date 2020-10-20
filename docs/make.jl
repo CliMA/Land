@@ -44,5 +44,6 @@ makedocs(
 deploydocs(
     repo = "github.com/CliMA/Land.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )

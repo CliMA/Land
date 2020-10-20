@@ -1,8 +1,9 @@
 status = [
+  "clean-notebooks",
+  "docs-build",
   "linux-test",
-  "windows-test",
   "macos-test",
-  "docs-build"
+  "windows-test"
 ]
 delete_merged_branches = true
 timeout_sec = 86400
