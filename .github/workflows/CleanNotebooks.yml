@@ -20,7 +20,5 @@ jobs:
           version: "1.5"
       - name: Install Dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate();'
-      - name: Build and deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test Clean Notebooks
         run: julia --project test/clean_notebooks.jl
