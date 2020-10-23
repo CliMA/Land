@@ -41,7 +41,7 @@ Return the energy been radiated out, given
 function black_body_emittance(
             T::FT
 ) where {FT<:AbstractFloat}
-    return K_BOLTZMANN(FT) * T^4
+    return K_STEFAN(FT) * T^4
 end
 
 

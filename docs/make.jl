@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "SoilPlantAirContinuum",
     format = format,
-
     clean = false,
     modules = [SoilPlantAirContinuum],
     pages = pages,
@@ -32,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/SoilPlantAirContinuum.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
