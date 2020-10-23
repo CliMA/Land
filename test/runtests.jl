@@ -18,7 +18,18 @@ include("recursive_test.jl")
                           C3CLM(FT),
                           C4CLM(FT),
                           AirLayer{FT}(),
-                          Leaf{FT}() ]
+                          Leaf{FT}(),
+                          KoTDBernacchi(FT),
+                          RespirationTDBernacchi(FT),
+                          VcmaxTDBernacchi(FT),
+                          VomaxTDBernacchi(FT),
+                          ΓStarTDBernacchi(FT),
+                          KpepTDBoyd(FT),
+                          JmaxTDLeuning(FT),
+                          VcmaxTDLeuning(FT),
+                          JmaxTDBernacchi(FT),
+                          VtoRCollatz(FT),
+                          C3Bernacchi(FT) ]
             recursive_FT_test(data_set, FT);
             recursive_NaN_test(data_set);
         end
@@ -35,11 +46,17 @@ end
         c4_set   = C4CLM(FT);
         leaf_3   = Leaf{FT}();
         leaf_4   = Leaf{FT}();
+        td_q10   = Q10TD{FT}(1, 273.15, 1.7);
         envir    = AirLayer{FT}();
         fluo_set = c3_set.Flu;
         T        = rand(FT) + 298;
         glc      = FT(0.1);
         p_i      = rand(FT) + 20;
+
+        # temperature corrections
+        photo_TD_from_set(td_q10, T);
+        leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
+        leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
 
         # rubisco limited rates
         rubisco_limited_rate!(c3_set, leaf_3);
@@ -73,8 +90,6 @@ end
         recursive_NaN_test(leaf_3);
 
         # leaf photo from glc
-        leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
-        leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
         leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
         leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
         recursive_NaN_test(leaf_3);

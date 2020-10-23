@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-  stable-test:
+  linux-test:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Actions
@@ -23,3 +23,25 @@ jobs:
         run: julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder());'
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  macos-test:
+    runs-on: macos-latest
+    steps:
+      - name: Set up Actions
+        uses: actions/checkout@v1
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.5"
+      - name: Test package
+        run: julia --project -e 'using Pkg; Pkg.test();'
+  windows-test:
+    runs-on: windows-latest
+    steps:
+      - name: Set up Actions
+        uses: actions/checkout@v1
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.5"
+      - name: Test package
+        run: julia --project -e 'using Pkg; Pkg.test();'

@@ -4,8 +4,9 @@
 #
 ###############################################################################
 """
-    temperature_correction(td_set::AbstractTDParameterSet{FT},
-                           T::FT) where {FT<:AbstractFloat}
+    temperature_correction(
+                td_set::AbstractTDParameterSet{FT},
+                T::FT) where {FT<:AbstractFloat}
 
 A correction factor based on arrhenius's fitting procedure, given
 - `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type struct
@@ -59,5 +60,5 @@ function temperature_correction(
             td_set::Q10TD{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    return ( (T - td_set.T_REF) / 10 ) ^ (td_set.Q_10)
+    return (td_set.Q_10) ^ ( (T - td_set.T_REF) / 10 )
 end

@@ -22,6 +22,9 @@
 [cov-img]: https://codecov.io/gh/Yujie-W/Photosynthesis.jl/branch/main/graph/badge.svg
 [cov-url]: https://codecov.io/gh/Yujie-W/Photosynthesis.jl
 
+
+
+
 ## About
 
 Photosynthesis models for C3 and C4 photosynthesis.
@@ -29,19 +32,6 @@ Photosynthesis models for C3 and C4 photosynthesis.
 | Documentation                                   | CI Status             | Benchmarks            | Compatibility           | Code Coverage           |
 |:-----------------------------------------------:|:---------------------:|:---------------------:|:------------------------|:------------------------|
 | [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
-
-
-
-
-## Dependencies
-
-| Dependency          | Version  | Requirements |
-|:--------------------|:---------|:-------------|
-| BenchmarkTools      | 0.5.0 +  | Julia 1.0 +  |
-| CLIMAParameters     | 0.1.6 +  | Julia 1.3 +  |
-| DocStringExtensions | 0.8.3 +  | Julia 0.7 +  |
-| Parameters          | 0.12.1 + | Julia 1.0 +  |
-| WaterPhysics        | 0.1.0 +  | Julia 1.3 +  |
 
 
 
