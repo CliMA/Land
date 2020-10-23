@@ -13,8 +13,8 @@ using WaterPhysics
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const EARTH = EarthParameterSet()
 
-T_25(FT)  = FT(T_freeze(EARTH)) + 25;
-RT_25(FT) = FT(gas_constant()) * T_25(FT);
+T_25(FT=Float64)  = FT(T_freeze(EARTH)) + 25;
+RT_25(FT=Float64) = FT(gas_constant()) * T_25(FT);
 
 
 
@@ -29,7 +29,8 @@ export AbstractFluoModelParaSet,
        C3ParaSet,
        C4ParaSet,
        FluoParaSet,
-       Leaf
+       Leaf,
+       Q10TD
 
 
 
@@ -54,6 +55,7 @@ export C3Bernacchi,
        VcmaxTDLeuning,
        VomaxTDBernacchi,
        VpmaxTDBoyd,
+       VtoRCollatz,
        ΓStarTDBernacchi,
        ΓStarTDCLM
 

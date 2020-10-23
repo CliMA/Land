@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "Photosynthesis",
     format = format,
-
     clean = false,
     modules = [Photosynthesis],
     pages = pages,
@@ -32,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/Photosynthesis.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
