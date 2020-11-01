@@ -1,0 +1,10 @@
+[land_model_spectrum]
+git-tree-sha1 = "5f60e2aba2640828adf889f3070d064b602386ed"
+lazy = true
+
+    [[land_model_spectrum.download]]
+    sha256 = "d9e93d13529ec35872a4849d346efd94580788a8e62dfc1c65e3c2f31c582589"
+    url = "ftp://fluo.gps.caltech.edu/XYZT_CLIMA_LUT/LandModel/land_model_spectrum.tar.gz"
+    [[land_model_spectrum.download]]
+    sha256 = "d9e93d13529ec35872a4849d346efd94580788a8e62dfc1c65e3c2f31c582589"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/CliMA_LUT/land_model_spectrum.tar.gz"
