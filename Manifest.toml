@@ -11,9 +11,9 @@ version = "0.5.0"
 
 [[CLIMAParameters]]
 deps = ["Test"]
-git-tree-sha1 = "c4bb1cd81ca49233fc7c829357171344b406900a"
+git-tree-sha1 = "ee428f34aa7357ef2c91fc5ccbc74dc366b87b9b"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
-version = "0.1.8"
+version = "0.1.9"
 
 [[ConstrainedRootSolvers]]
 deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
@@ -78,10 +78,10 @@ uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 version = "0.12.1"
 
 [[Parsers]]
-deps = ["Dates", "Test"]
-git-tree-sha1 = "8077624b3c450b15c087944363606a6ba12f925e"
+deps = ["Dates"]
+git-tree-sha1 = "6fa4202675c05ba0f8268a6ddf07606350eda3ce"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.0.10"
+version = "1.0.11"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -134,6 +134,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "Test"]
-git-tree-sha1 = "1bcae71dcda545e6e007ef05105aceb18be41d69"
+git-tree-sha1 = "488e8268459e3314435153107e507fe1c3f2cb91"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
-version = "0.1.0"
+version = "0.1.1"

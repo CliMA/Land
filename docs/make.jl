@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "PlantHydraulics",
     format = format,
-
     clean = false,
     modules = [PlantHydraulics],
     pages = pages,
@@ -32,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/PlantHydraulics.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
