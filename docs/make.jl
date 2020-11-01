@@ -23,7 +23,6 @@ format = Documenter.HTML(
 makedocs(
     sitename = "StomataModels",
     format = format,
-
     clean = false,
     modules = [StomataModels],
     pages = pages,
@@ -32,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/StomataModels.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
