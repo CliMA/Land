@@ -5,6 +5,7 @@ using DocStringExtensions
 using LinearAlgebra
 using MAT
 using Parameters
+using Pkg.Artifacts
 using Polynomials
 using QuadGK
 using Statistics
@@ -17,8 +18,8 @@ AVOGADRO(FT)    = FT( avogad() );
 H_PLANCK(FT)    = FT( h_Planck() );
 K_STEFAN(FT)    = FT( Stefan() );
 LIGHT_SPEED(FT) = FT( light_speed() );
-const FILE_OPTI = joinpath(@__DIR__, "../data/Optipar2017_ProspectD.mat");
-const FILE_SUN  = joinpath(@__DIR__, "../data/sun.mat");
+const FILE_OPTI = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
+const FILE_SUN  = artifact"land_model_spectrum" * "/sun.mat";
 
 
 
