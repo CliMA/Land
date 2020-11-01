@@ -33,7 +33,7 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Tempearture related, same for all leaves
     "Latent Heat of evaporation `[J mol⁻¹]`"
-    LV   ::FT = latent_heat_vapor(K_25(FT)) * 1000 / MOLMASS_WATER(FT)
+    LV   ::FT = latent_heat_vapor(K_25(FT)) * MOLMASS_WATER(FT)
     "Temperature `[K]`"
     T    ::FT = K_25(FT)
     "Old temperature `[K]`"
