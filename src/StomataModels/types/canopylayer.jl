@@ -17,7 +17,7 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     ps ::Leaf{FT} = Leaf{FT}()
     "Total leaf area `[m²]`"
     LA ::FT = FT(150)
-    "Total leaf area index"
+    "Total leaf area index in the layer"
     LAI::FT = FT(3)
 
     # Number of leaves per canopy layer
