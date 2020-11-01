@@ -37,12 +37,25 @@ export AbstractXylemVC,
        GrassLikeHS,
        PalmLikeHS,
        TreeLikeHS,
-       TreeSimple
+       TreeSimple,
+       VGClay,
+       VGClayLoam,
+       VGLoamySand,
+       VGLoamySand2,
+       VGSand,
+       VGSandyClayLoam,
+       VGSandyClayLoam2,
+       VGSandyLoam,
+       VGSilt,
+       VGSiltyClay,
+       VGSiltyClayLoam,
+       VGSiltyLoam
 
 # export public functions
 export create_grass_like_hs,
        create_palm_like_hs,
        create_tree_like_hs,
+       create_VanGenuchten,
        hydraulic_p_profile!,
        inititialize_legacy!,
        leaf_e_crit,
@@ -74,6 +87,7 @@ include("types/vulnerability.jl"   )
 include("types/hydraulics_organ.jl")
 include("types/hydraulics_plant.jl")
 include("types/initialize_plant.jl")
+include("types/parasets.jl"        )
 
 include("vulnerability/pcrit.jl")
 include("vulnerability/soil.jl" )

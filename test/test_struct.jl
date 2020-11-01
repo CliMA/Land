@@ -15,7 +15,19 @@ println("\nTesting the structures...")
         _sh2  = VanGenuchten{FT}();
 
         # Test the struct
-        for data_set in [ leaf, root, stem, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2 ]
+        for data_set in [ leaf, root, stem, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2,
+                          VGClay(FT),
+                          VGClayLoam(FT),
+                          VGLoamySand(FT),
+                          VGLoamySand2(FT),
+                          VGSand(FT),
+                          VGSandyClayLoam(FT),
+                          VGSandyClayLoam2(FT),
+                          VGSandyLoam(FT),
+                          VGSilt(FT),
+                          VGSiltyClay(FT),
+                          VGSiltyClayLoam(FT),
+                          VGSiltyLoam(FT) ]
             recursive_FT_test(data_set, FT)
             recursive_NaN_test(data_set)
         end

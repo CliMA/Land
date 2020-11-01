@@ -212,6 +212,25 @@ BrooksCorey
 VanGenuchten
 ```
 
+Pre-defined parameter sets are avialble, and you may quick create a soil type
+    struct using
+
+```@docs
+create_VanGenuchten
+VGClay
+VGClayLoam
+VGLoamySand
+VGLoamySand2
+VGSand
+VGSandyClayLoam
+VGSandyClayLoam2
+VGSandyLoam
+VGSilt
+VGSiltyClay
+VGSiltyClayLoam
+VGSiltyLoam
+```
+
 Correlations among soil relative water content, relative hydraulic conductance,
     and soil matrix potential are
 
