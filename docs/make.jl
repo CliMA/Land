@@ -31,5 +31,6 @@ makedocs(
 deploydocs(
     repo = "github.com/Yujie-W/WaterPhysics.jl.git",
     target = "build",
+    devbranch = "main",
     push_preview = true,
 )
