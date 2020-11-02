@@ -4,8 +4,9 @@
 #
 ###############################################################################
 """
-    product_limited_rate!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
-    product_limited_rate!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    product_limited_rate!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                leaf::Leaf{FT}) where {FT<:AbstractFloat}
 
 Calculate the Product limited photosynthetic rate, given
 - `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
@@ -36,10 +37,13 @@ end
 
 
 """
-    product_limited_rate_glc!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    product_limited_rate_glc!(
+                photo_set::C4ParaSet{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT}) where {FT<:AbstractFloat}
 
 Calculate the Product limited photosynthetic rate from glc, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `photo_set` [`C4ParaSet`](@ref) type struct
 - `leaf` [`Leaf`](@ref) type struct
 - `envir` [`AirLayer`](@ref) type struct
 """

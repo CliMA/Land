@@ -1,3 +1,38 @@
+# test the structs
+println("\nTesting the FT and NaN of the structs...")
+@testset "FT and NaN --- Types" begin
+    for FT in [Float32, Float64]
+        node   = SPACSimple{FT}();
+        cont1L = SPACContainer1L{FT}();
+        cont2L = SPACContainer2L{FT}();
+
+        for data in [node, cont1L, cont2L]
+            @test FT_test(data, FT);
+            @test NaN_test(data);
+        end
+    end
+end
+
+
+
+
+# test and benchmark the big_leaf_partition!
+println("\nTesting the big_leaf_partition!...")
+@testset "SoilPlantAirContinuum --- big_leaf_partition!" begin
+    for FT in [Float32, Float64]
+        node   = SPACSimple{FT}();
+        zenith = FT(30);
+        r_all  = FT(1000);
+
+        big_leaf_partition!(node, zenith, r_all);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
+    end
+end
+
+
+
+
 # test the gain_risk_map
 println("\nTesting the gain_risk_map Function...")
 @testset "SoilPlantAirContinuum --- gain_risk_map" begin
@@ -9,8 +44,8 @@ println("\nTesting the gain_risk_map Function...")
 
         big_leaf_partition!(node, zenith, r_all);
         mat = gain_risk_map(node, photo);
-        recursive_FT_test(mat, FT);
-        recursive_NaN_test(mat);
+        @test FT_test(mat, FT);
+        @test NaN_test(mat);
     end
 end
 
@@ -31,16 +66,11 @@ println("\nTesting the leaf_gas_exchange_nonopt! Functions...")
 
         big_leaf_partition!(node, zenith, r_all);
         leaf_gas_exchange_nonopt!(node, photo, flow);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
         leaf_gas_exchange_nonopt!(node, photo, f_sl, f_sh);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
-
-        if benchmarking
-            @btime leaf_gas_exchange_nonopt!($node, $photo, $flow);
-            @btime leaf_gas_exchange_nonopt!($node, $photo, $f_sl, $f_sh);
-        end
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -61,16 +91,11 @@ println("\nTesting the leaf_gas_exchange! Functions...")
 
         big_leaf_partition!(node, zenith, r_all);
         leaf_gas_exchange!(node, photo, flow);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
         leaf_gas_exchange!(node, photo, f_sl, f_sh);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
-
-        if benchmarking
-            @btime leaf_gas_exchange!($node, $photo, $flow);
-            @btime leaf_gas_exchange!($node, $photo, $f_sl, $f_sh);
-        end
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -88,14 +113,8 @@ println("\nTesting the leaf_temperature* Functions...")
         for result in [ leaf_temperature(node, rad, flow),
                         leaf_temperature_shaded(node, rad, flow),
                         leaf_temperature_sunlit(node, rad, flow) ]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
-
-        if benchmarking
-            @btime leaf_temperature($node, $rad, $flow);
-            @btime leaf_temperature_shaded($node, $rad, $flow);
-            @btime leaf_temperature_sunlit($node, $rad, $flow);
+            @test FT_test(result, FT);
+            @test NaN_test(result);
         end
     end
 end
@@ -114,14 +133,8 @@ println("\nTesting the optimize_flows! Functions...")
 
         big_leaf_partition!(node, zenith, r_all);
         optimize_flows!(node, photo);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
-
-        if benchmarking
-            # reset the node before benchmarking
-            node = SPACSimple{FT}();
-            @btime optimize_flows!($node, $photo);
-        end
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -137,14 +150,8 @@ println("\nTesting the atmosheric* Functions...")
         for result in [ atmospheric_pressure(h),
                         atmospheric_pressure_ratio(h),
                         ppm_to_Pa(h) ]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
-
-        if benchmarking
-            @btime atmospheric_pressure($h);
-            @btime atmospheric_pressure_ratio($h);
-            @btime ppm_to_Pa($h);
+            @test FT_test(result, FT);
+            @test NaN_test(result);
         end
     end
 end
@@ -166,14 +173,8 @@ println("\nTesting the zenith_angle Functions...")
         for result in [ zenith_angle(latd, decd, lhad),
                         zenith_angle(latd, day, hour),
                         zenith_angle(latd, day, hour, minu) ]
-            recursive_FT_test(result, FT);
-            recursive_NaN_test(result);
-        end
-
-        if benchmarking
-            @btime zenith_angle($latd, $decd, $lhad);
-            @btime zenith_angle($latd, $day, $hour);
-            @btime zenith_angle($latd, $day, $hour, $minu);
+            @test FT_test(result, FT);
+            @test NaN_test(result);
         end
     end
 end
@@ -192,14 +193,8 @@ println("\nTesting the annual_profit Functions...")
         weatmat = Matrix{FT}(weat);
 
         gscp = annual_profit(node, photo, weatmat);
-        recursive_FT_test(gscp, FT);
-        recursive_NaN_test(gscp);
-
-        if benchmarking
-            # reset the node before benchmarking
-            node = SPACSimple{FT}();
-            @btime annual_profit($node, $photo, $weatmat);
-        end
+        @test FT_test(gscp, FT);
+        @test NaN_test(gscp);
     end
 end
 
@@ -217,8 +212,8 @@ println("\nTesting annual_simulation! Functions...")
         df    = create_dataframe(FT, weat);
 
         annual_simulation!(node, photo, weat, df);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -235,20 +230,14 @@ println("\nTesting the leaf_allocation! Functions...")
         vmax  = FT(80);
 
         leaf_allocation!(node, laba);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
         leaf_allocation!(node, photo, vmax);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
+        @test FT_test(node, FT);
+        @test NaN_test(node);
         leaf_allocation!(node, photo, laba, vmax);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
-
-        if benchmarking
-            @btime leaf_allocation!($node, $laba);
-            @btime leaf_allocation!($node, $photo, $vmax);
-            @btime leaf_allocation!($node, $photo, $laba, $vmax);
-        end
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -266,14 +255,8 @@ println("\nTesting the optimize_leaf! Functions...")
         weatmat = Matrix{FT}(weat);
 
         optimize_leaf!(node, photo, weatmat);
-        recursive_FT_test(node, FT);
-        recursive_NaN_test(node);
-
-        if benchmarking
-            # reset the node before benchmarking
-            node = SPACSimple{FT}();
-            @btime optimize_leaf!($node, $photo, $weatmat);
-        end
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 

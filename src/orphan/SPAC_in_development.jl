@@ -213,7 +213,7 @@ function LeafEnergyWaterBalance(mod::AbstractPhotosynthesis, Tleaf, psileaf, Cc,
     l.Cleaf = l.LMA* ( (1.0-l.RWC)*physcon.Cdryleaf + l.RWC* CP_L )/(1.0-l.RWC); # leaf conductivity
     # println("Cleaf=",l.Cleaf)
     lv           =   latent_heat_vapor(Tleaf);
-    l.Rn      =   (1-l.α)*met.S_down +  2 * (met.L_down - l.ε* K_BOLTZMANN *Tleaf^4); # 2 is for two sides of the leaves
+    l.Rn      =   (1-l.α)*met.S_down +  2 * (met.L_down - l.ε* K_STEFAN *Tleaf^4); # 2 is for two sides of the leaves
     #println("S_down=",met.S_down," , Ldown=",met.L_down," Tleaf=",Tleaf)
     #dRn_dTs = - 4*l.ε*physcon.σ*Tleaf^3;
     setkx!(l,psi_s, psileaf) ;# set hydraulic conductivity as a function of psis and psi_l

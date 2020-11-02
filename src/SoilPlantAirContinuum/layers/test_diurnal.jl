@@ -107,9 +107,8 @@ function test_diurnal(
             #node.plant_ps[i_can].LAIx .= la_new;
             ##=
             for i_leaf in 1:n_sl
-                node.plant_ps[i_can].APAR[i_leaf]  = PARr_t[i_tim] * node.can_rad.absPAR_shadeCab[rt_layer] * FT(1e6);
-                node.plant_ps[i_can].APAR[i_leaf] += PARr_t[i_tim] * node.can_rad.absPAR_sunCab[(rt_layer-1)*n_sl + i_leaf] * FT(1e6);
-                node.plant_ps[i_can].LAIx[i_leaf]  = f_view * fraction_sl[i_leaf];
+                node.plant_ps[i_can].APAR[i_leaf] = PARr_t[i_tim] * node.can_rad.absPAR_sunCab[(rt_layer-1)*n_sl + i_leaf] * FT(1e6);
+                node.plant_ps[i_can].LAIx[i_leaf] = f_view * fraction_sl[i_leaf];
             end
             node.plant_ps[i_can].APAR[end] = PARr_t[i_tim] * node.can_rad.absPAR_shadeCab[rt_layer] * FT(1e6);
             node.plant_ps[i_can].LAIx[end] = 1 - f_view;
