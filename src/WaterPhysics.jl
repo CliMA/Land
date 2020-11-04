@@ -250,7 +250,7 @@ end
             med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
-The specific latent heat of vaporization, given
+The specific latent heat of vaporization `[J kg⁻¹]`, given
 - `T` Medium temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
 """
