@@ -12,6 +12,47 @@ Test the the floating point type of para is FT, given
 
 If data type is not supported, use pass!
 """
+function FT_test(para::Array, FT)
+    passed = true;
+
+    # fail if para is float but not FT
+    if eltype(para) <: AbstractFloat
+        if eltype(para) != FT
+            passed = false;
+        end
+    else
+        if !all(FT_test.(para, FT))
+            passed = false;
+        end
+    end
+
+    return passed
+end
+
+
+
+
+function FT_test(para::DataType)
+    return true
+end
+
+
+
+
+function FT_test(para::Function)
+    return true
+end
+
+
+
+
+function FT_test(para::Module)
+    return true
+end
+
+
+
+
 function FT_test(para::Number, FT)
     passed = true;
 
@@ -28,21 +69,8 @@ end
 
 
 
-function FT_test(para::Array, FT)
-    passed = true;
-
-    # fail if para is float but not FT
-    if eltype(para) <: AbstractFloat
-        if eltype(para) != FT
-            passed = false;
-        end
-    else
-        if !all(FT_test.(para, FT))
-            passed = false;
-        end
-    end
-
-    return passed
+function FT_test(para::Symbol)
+    return true
 end
 
 
@@ -87,20 +115,6 @@ Test the the floating point type of para is not NaN, given
 
 If data type is not supported, use pass!
 """
-function NaN_test(para::Number)
-    passed = true;
-
-    # fail if para is NaN
-    if isnan(para)
-        passed = false;
-    end
-
-    return passed
-end
-
-
-
-
 function NaN_test(para::Array)
     passed = true;
 
@@ -116,6 +130,48 @@ function NaN_test(para::Array)
     end
 
     return passed
+end
+
+
+
+
+function NaN_test(para::DataType)
+    return true
+end
+
+
+
+
+function NaN_test(para::Function)
+    return true
+end
+
+
+
+
+function NaN_test(para::Module)
+    return true
+end
+
+
+
+
+function NaN_test(para::Number)
+    passed = true;
+
+    # fail if para is NaN
+    if isnan(para)
+        passed = false;
+    end
+
+    return passed
+end
+
+
+
+
+function NaN_test(para::Symbol)
+    return true
 end
 
 
