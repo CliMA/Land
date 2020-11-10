@@ -1,12 +1,10 @@
 using Documenter
 using Land
 
-generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
-rm(generated_dir, force = true, recursive = true)
-mkpath(generated_dir)
 
-#include("list_of_tutorials.jl")          # defines a dict `tutorials`
 
+
+# define default docs pages
 pages = Any[
     "Home" => "index.md",
     "Tips" => "tips.md" ,
@@ -20,6 +18,20 @@ pages = Any[
     ]
 ]
 
+
+
+
+# add example and tutorial pages
+# currently unavailable
+generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
+rm(generated_dir, force = true, recursive = true)
+mkpath(generated_dir)
+#include("list_of_tutorials.jl")          # defines a dict `tutorials`
+
+
+
+
+# format the docs
 mathengine = MathJax(Dict(
     :TeX => Dict(
         :equationNumbers => Dict(:autoNumber => "AMS"),
@@ -31,8 +43,13 @@ format = Documenter.HTML(
     prettyurls = get(ENV, "CI", nothing) == "true",
     mathengine = mathengine,
     collapselevel = 1,
+    assets = ["assets/favicon.ico"]
 )
 
+
+
+
+# build the docs
 makedocs(
     sitename = "Land",
     format = format,
@@ -41,6 +58,10 @@ makedocs(
     pages = pages,
 )
 
+
+
+
+# deploy the docs to Github gh-pages
 deploydocs(
     repo = "github.com/CliMA/Land.git",
     target = "build",
