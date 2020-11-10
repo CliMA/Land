@@ -2,17 +2,25 @@ using Documenter
 using Literate
 using WaterPhysics
 
+
+
+
+# define default docs pages
 pages = Any[
     "Home" => "index.md",
     "API"  => "API.md"
 ]
 
-gen_preview = true;
+
+
+
+# add example pages
+gen_example = true;
 gen_dir     = joinpath(@__DIR__, "src/generated");
 rm(gen_dir, force=true, recursive=true);
 mkpath(gen_dir);
 
-if gen_preview
+if gen_example
     filename    = joinpath(@__DIR__, "src/examples.jl");
     script      = Literate.script(filename, gen_dir);
     code        = strip(read(script, String));
@@ -23,6 +31,10 @@ end
 
 @show pages;
 
+
+
+
+# format the docs
 mathengine = MathJax(Dict(
     :TeX => Dict(
         :equationNumbers => Dict(:autoNumber => "AMS"),
@@ -36,6 +48,10 @@ format = Documenter.HTML(
     collapselevel = 1,
 )
 
+
+
+
+# build the docs
 makedocs(
     sitename = "WaterPhysics",
     format = format,
@@ -44,6 +60,10 @@ makedocs(
     pages = pages,
 )
 
+
+
+
+# deploy the docs to Github gh-pages
 deploydocs(
     repo = "github.com/Yujie-W/WaterPhysics.jl.git",
     target = "build",
