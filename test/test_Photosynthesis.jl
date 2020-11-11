@@ -17,7 +17,9 @@
                           VcmaxTDLeuning(FT),
                           JmaxTDBernacchi(FT),
                           VtoRCollatz(FT),
-                          C3Bernacchi(FT) ]
+                          C3Bernacchi(FT),
+                          Q10TDAngiosperm(FT),
+                          Q10TDGymnosperm(FT) ]
             @test FT_test(data_set, FT);
             @test NaN_test(data_set);
         end
@@ -73,6 +75,8 @@ end
         @test NaN_test(leaf_4);
 
         # fluorescence
+        leaf_photo_from_pi!(c3_set, leaf_3, FT(2));
+        leaf_fluorescence!(fluo_set, leaf_3);
         leaf_photo_from_glc!(c3_set, leaf_3, envir);
         leaf_fluorescence!(fluo_set, leaf_3);
         @test NaN_test(leaf_3);
@@ -88,5 +92,10 @@ end
         leaf_photo_from_pi!(c4_set, leaf_4, p_i);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
+
+        # text lower quadratic function
+        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(3), FT(1)));
+        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(1)));
+        @test isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(5)));
     end
 end
