@@ -25,9 +25,9 @@
    - `cd .../Land` to the home directory of the project
    - `julia --project`
    - `using Land` to make sure the project can be loaded
-2. Optional: disable the tutorial to save some time
-   - change `generate_tutorials = true` to `generate_tutorials = false` in file `docs/list_of_tutorials.jl`
-   - change the line back to `generate_tutorials = true` before commiting the changes
+2. Optional: disable the example to save some time
+   - change `generate_examples = true` to `generate_examples = false` in file `docs/examples.jl`
+   - change the line back to `generate_examples = true` before commiting the changes
 3. Optional: initialize the project
    - `cd .../Land` to the home directory of the project
    - `julia --project -e "using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.precompile();"`

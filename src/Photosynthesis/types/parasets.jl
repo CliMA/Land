@@ -100,6 +100,27 @@ end
 ###############################################################################
 #
 # Temperature Dedenpdency Parameter sets
+# Data source: Lavigne and Ryan (1997)
+# Growth and maintenance respiration rates of aspen, blackspruce and jack pine
+#     stems at northern and southern BOREAS sites
+#
+###############################################################################
+""" [`Q10TD`](@ref) type Respiration TD for angiosperms per biomass """
+Q10TDAngiosperm(FT) = Q10TD{FT}(0.014/8760, 298.15, 1.4)
+
+""" [`Q10TD`](@ref) type Respiration TD for symnosperms per biomass """
+Q10TDGymnosperm(FT) = Q10TD{FT}(0.0425/8760, 298.15, 1.7)
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Temperature Dedenpdency Parameter sets
 # Data source missing
 #
 ###############################################################################
