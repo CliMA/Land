@@ -6,11 +6,13 @@
 """
     leaf_photo_from_pi!(
                 photo_set::AbstractPhotoModelParaSet{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
     leaf_photo_from_pi!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
-                p_i::FT) where {FT<:AbstractFloat}
+                p_i::FT
+    ) where {FT<:AbstractFloat}
 
 Compute leaf photosynthetic rates, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
@@ -67,12 +69,14 @@ end
     leaf_photo_from_glc!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}) where {FT<:AbstractFloat}
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
     leaf_photo_from_glc!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
                 envir::AirLayer{FT},
-                g_lc::FT) where {FT<:AbstractFloat}
+                g_lc::FT
+    ) where {FT<:AbstractFloat}
 
 Update leaf photosynthetic rates from a known leaf diffusive conductance, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
