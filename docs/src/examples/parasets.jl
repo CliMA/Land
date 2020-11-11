@@ -1,4 +1,4 @@
-# # Predefined datasets
+# # Predefined parameter sets
 
 ## load packages
 using Photosynthesis
@@ -95,14 +95,20 @@ _fig
 # ## Respiration
 _td_1 = RespirationTDBernacchi(FT);
 _td_2 = RespirationTDCLM(FT);
+_td_3 = Q10TDAngiosperm(FT);
+_td_4 = Q10TDGymnosperm(FT);
 _ts   = collect(FT, 273:1:323);
 _rd_1 = photo_TD_from_val.([_td_1], FT(1), _ts);
 _rd_2 = photo_TD_from_val.([_td_2], FT(1), _ts);
+_rd_3 = photo_TD_from_val.([_td_3], FT(1), _ts);
+_rd_4 = photo_TD_from_val.([_td_4], FT(1), _ts);
 
 _fig,_axes = create_canvas("Respiration");
 _ax1 = _axes[1];
 _ax1.plot(_ts .- 273.15, _rd_1, "k-", label="Bernacchi");
 _ax1.plot(_ts .- 273.15, _rd_2, "k:", label="CLM");
+_ax1.plot(_ts .- 273.15, _rd_3, "r-", label="Q10 Angiosperm");
+_ax1.plot(_ts .- 273.15, _rd_4, "r:", label="Q10 Gymnosperm");
 _ax1.set_xlabel("Leaf temperature (°C)");
 _ax1.set_ylabel("Respiration (μmol m⁻² s⁻¹)");
 _ax1.legend(loc="upper left");

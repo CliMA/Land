@@ -23,7 +23,7 @@ mkpath(gen_dir);
 if gen_example
     # array of example pages
     ex_pages = Any[];
-    for _ex in ["temperature", "datasets", "photosynthesis"]
+    for _ex in ["temperature", "parasets", "photosynthesis"]
         filename    = joinpath(@__DIR__, "src/examples/$(_ex).jl");
         script      = Literate.script(filename, gen_dir);
         code        = strip(read(script, String));

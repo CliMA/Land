@@ -17,7 +17,9 @@
                           VcmaxTDLeuning(FT),
                           JmaxTDBernacchi(FT),
                           VtoRCollatz(FT),
-                          C3Bernacchi(FT) ]
+                          C3Bernacchi(FT),
+                          Q10TDAngiosperm(FT),
+                          Q10TDGymnosperm(FT) ]
             @test FT_test(data_set, FT);
             @test NaN_test(data_set);
         end

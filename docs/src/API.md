@@ -79,6 +79,8 @@ KoTDBernacchi
 KoTDCLM
 KpepTDBoyd
 KpepTDCLM
+Q10TDAngiosperm
+Q10TDGymnosperm
 RespirationTDBernacchi
 RespirationTDCLM
 VcmaxTDBernacchi
