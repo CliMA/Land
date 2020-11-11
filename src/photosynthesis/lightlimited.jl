@@ -6,7 +6,8 @@
 """
     light_limited_rate!(
                 photo_set::AbstractPhotoModelParaSet{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Calculate the Light limited photosynthetic rate, given
 - `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
@@ -45,7 +46,8 @@ end
     light_limited_rate_glc!(
                 photo_set::C3ParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}) where {FT<:AbstractFloat}
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Calculate the Light limited photosynthetic rate from glc, given
 - `photo_set` [`C3ParaSet`](@ref) type struct

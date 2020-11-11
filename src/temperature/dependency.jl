@@ -37,7 +37,8 @@ end
     photo_TD_from_val(
                 td_set::AbstractTDParameterSet{FT},
                 val::FT,
-                T::FT) where {FT<:AbstractFloat}
+                T::FT
+    ) where {FT<:AbstractFloat}
 
 Make temperature correction from a given value, given
 - `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type struct
@@ -68,7 +69,8 @@ end
 ###############################################################################
 """
     leaf_jmax!(td_set::AbstractTDParameterSet{FT},
-               leaf::Leaf{FT}) where {FT<:AbstractFloat}
+               leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update maximal electron transport rate at leaf temperature, given
 - `td_set` [`AbstractTDParameterSet`](@ref) type TD parameter set
@@ -108,7 +110,8 @@ end
 """
     leaf_km!(photo_set::C3ParaSet{FT},
              leaf::Leaf{FT},
-             envir::AirLayer{FT}) where {FT<:AbstractFloat}
+             envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Update Ko at leaf temperature, given
 - `photo_set` [`C3ParaSet`](@ref) type photosynthesis parameter set
@@ -149,7 +152,8 @@ end
 
 """
     leaf_kpep!(td_set::ArrheniusTD{FT},
-               leaf::Leaf{FT}) where {FT<:AbstractFloat}
+               leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update Kpep at leaf temperature, given
 - `td_set` [`ArrheniusTD`](@ref) type TD parameter set
@@ -169,7 +173,8 @@ end
 
 """
     leaf_rd!(td_set::AbstractTDParameterSet{FT},
-             leaf::Leaf{FT}) where {FT<:AbstractFloat}
+             leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update leaf dark respiration rate at leaf temperature, given
 - `td_set` [`AbstractTDParameterSet`](@ref) type TD parameter set
@@ -189,7 +194,8 @@ end
 
 """
     leaf_vcmax!(td_set::AbstractTDParameterSet{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update leaf maximal carboxylation rate at leaf temperature, given
 - `td_set` [`AbstractTDParameterSet`](@ref) type TD parameter set
@@ -209,7 +215,8 @@ end
 
 """
     leaf_vpmax!(td_set::AbstractTDParameterSet{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update leaf maximal PEP carboxylation rate at leaf temperature, given
 - `td_set` [`AbstractTDParameterSet`](@ref) type TD parameter set
@@ -229,7 +236,8 @@ end
 
 """
     leaf_Γstar!(td_set::ArrheniusTD{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Update ``Γ^{*}`` at leaf temperature, given
 - `td_set` [`ArrheniusTD`](@ref) type TD parameter set
@@ -260,12 +268,14 @@ end
     leaf_temperature_dependence!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}) where {FT<:AbstractFloat}
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
     leaf_temperature_dependence!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
                 envir::AirLayer{FT},
-                T::FT) where {FT<:AbstractFloat}
+                T::FT
+    ) where {FT<:AbstractFloat}
 
 Update the temperature dependent photosynthesis only, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
