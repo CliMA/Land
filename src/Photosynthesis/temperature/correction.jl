@@ -6,7 +6,8 @@
 """
     temperature_correction(
                 td_set::AbstractTDParameterSet{FT},
-                T::FT) where {FT<:AbstractFloat}
+                T::FT
+    ) where {FT<:AbstractFloat}
 
 A correction factor based on arrhenius's fitting procedure, given
 - `td_set` [`ArrheniusTD`](@ref) or [`ArrheniusPeakTD`](@ref) type struct

@@ -11,11 +11,12 @@ Return the lower quadratic solution or NaN, given
 - `b` Parameter in `a*x^2 + b*x + c = 0`
 - `c` Parameter in `a*x^2 + b*x + c = 0`
 """
-function lower_quadratic(
-            a::FT,
-            b::FT,
-            c::FT
-) where {FT<:AbstractFloat}
+function lower_quadratic(a::FT, b::FT, c::FT) where {FT<:AbstractFloat}
     discr = b^2 - 4*a*c;
-    discr >= 0 ? (-b - sqrt(discr))/2a : FT(NaN)
+
+    if discr >= 0
+        return (-b - sqrt(discr))/2a
+    else
+        return FT(NaN)
+    end
 end

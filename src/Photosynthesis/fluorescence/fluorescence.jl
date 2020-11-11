@@ -6,7 +6,8 @@
 """
     leaf_fluorescence!(
                 fluo_set::FluoParaSet{FT},
-                leaf::Leaf{FT}) where {FT<:AbstractFloat}
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
 
 Compute fluorescence yield, Kn, and Kp for leaf, given
 - `fluo_set` [`FluoParaSet`](@ref) type parameter set
