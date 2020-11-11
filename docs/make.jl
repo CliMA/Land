@@ -9,24 +9,23 @@ pages = Any[
     "Home" => "index.md",
     "Tips" => "tips.md" ,
     "APIs" => [
-              "CanopyLayers"          => "CanopyLayers.md"         ,
-              "Photosynthesis"        => "Photosynthesis.md"       ,
-              "PlantHydraulics"       => "PlantHydraulics.md"      ,
-              "StomataModels"         => "StomataModels.md"        ,
-              "SoilPlantAirContinuum" => "SoilPlantAirContinuum.md",
-              "Land"                  => "Land.md"
-    ]
+              "CanopyLayers"    => "submodules/CanopyLayers.md"         ,
+              "Photosynthesis"  => "submodules/Photosynthesis.md"       ,
+              "PlantHydraulics" => "submodules/PlantHydraulics.md"      ,
+              "StomataModels"   => "submodules/StomataModels.md"        ,
+              "SPAC"            => "submodules/SoilPlantAirContinuum.md",
+              "Land"            => "submodules/Land.md"                 ,
+    ],
 ]
 
 
 
 
-# add example and tutorial pages
-# currently unavailable
-generated_dir = joinpath(@__DIR__, "src", "generated") # generated files directory
+# add example pages
+generated_dir = joinpath(@__DIR__, "src", "generated")
 rm(generated_dir, force = true, recursive = true)
 mkpath(generated_dir)
-#include("list_of_tutorials.jl")          # defines a dict `tutorials`
+include("examples.jl")
 
 
 

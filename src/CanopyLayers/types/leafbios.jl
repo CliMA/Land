@@ -36,12 +36,12 @@ Base.@kwdef mutable struct LeafBios{FT}
     Cm  ::FT = FT(0.012)
     "Fractionation between Zeaxanthin and Violaxanthin in Car (1=all Zeaxanthin) (-)"
     Cx  ::FT = FT(0.0  )
+    "Leaf fluorescence efficiency (Fo standard)"
+    fqe ::FT = FT(1.0  )
     "Broadband thermal reflectance (-)"
     ρ_LW::FT = FT(0.01 )
     "Broadband thermal transmission (-)"
     τ_LW::FT = FT(0.01 )
-    "Leaf fluorescence efficiency (Fo standard)"
-    fqe ::FT = FT(1.0  )
 
     "Shortwave leaf reflectance"
     ρ_SW       ::Array{FT,1} = zeros(FT, nWL)
@@ -56,5 +56,5 @@ Base.@kwdef mutable struct LeafBios{FT}
     "Fluorescence excitation matrix forwards"
     Mf         ::Array{FT,2} = zeros(FT,(nWLF,nWLE))
     "Doubling adding layers"
-    ndub      ::Int = 10
+    ndub       ::Int = 10
 end
