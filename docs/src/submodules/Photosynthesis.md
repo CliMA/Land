@@ -32,7 +32,7 @@ AirLayer
 
 See exmaples below for how to create the structs
 ```julia
-using Photosynthesis
+using Land.Photosynthesis
 
 FT = Float32;
 leaf = Leaf{FT}();
@@ -79,6 +79,8 @@ KoTDBernacchi
 KoTDCLM
 KpepTDBoyd
 KpepTDCLM
+Q10TDAngiosperm
+Q10TDGymnosperm
 RespirationTDBernacchi
 RespirationTDCLM
 VcmaxTDBernacchi
@@ -93,7 +95,7 @@ VpmaxTDBoyd
 The TDs can be easily created using commands like
 
 ```julia
-using Photosynthesis
+using Land.Photosynthesis
 
 FT = Float32;
 _td_1 = JmaxTDBernacchi(FT);
@@ -104,7 +106,7 @@ However, be aware that these pre-defined TD structs are not mutable, to create
     customized TD struct, code like this will be useful
 
 ```julia
-using Photosynthesis
+using Land.Photosynthesis
 
 FT = Float32;
 _td_1 = ArrheniusTD{FT}(1, 10000, 30);
@@ -135,7 +137,7 @@ C4CLM
 
 Examples:
 ```julia
-using Photosynthesis
+using Land.Photosynthesis
 
 FT = Float32;
 set_b = C3Bernacchi(FT);
@@ -210,7 +212,7 @@ Note it here that function [`leaf_temperature_dependence!`](@ref) updates
 Example:
 
 ```julia
-using Photosynthesis
+using Land.Photosynthesis
 
 FT = Float32;
 leaf = Leaf{FT}();
