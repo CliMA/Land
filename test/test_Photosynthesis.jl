@@ -73,6 +73,8 @@ end
         @test NaN_test(leaf_4);
 
         # fluorescence
+        leaf_photo_from_pi!(c3_set, leaf_3, FT(2));
+        leaf_fluorescence!(fluo_set, leaf_3);
         leaf_photo_from_glc!(c3_set, leaf_3, envir);
         leaf_fluorescence!(fluo_set, leaf_3);
         @test NaN_test(leaf_3);
