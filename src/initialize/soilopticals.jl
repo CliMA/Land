@@ -9,9 +9,7 @@
 Create [`SoilOpticals`](@ref) struct, given
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function create_soil_opticals(
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function create_soil_opticals(wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     @unpack iWLF, nWL = wls;
 
     albedo_SW     = FT(0.2) * ones(FT, nWL);

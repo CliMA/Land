@@ -17,9 +17,9 @@ function fast∫(
     if length(dx) == length(f)
         return sum( f .* dx )
     else
-        N = length(f);
+        N = min(length(f), length(dx));
         result::FT = 0.0;
-        @inbounds for i=1:N
+        for i=1:N
             result += f[i] * dx[i];
         end
         return result
@@ -47,9 +47,9 @@ function fast∫!(
 
         return sum( f )
     else
-        N = length(f);
+        N = min(length(f), length(dx));
         result::FT = 0.0;
-        @inbounds for i=1:N
+        for i=1:N
             result += f[i] * dx[i];
         end
 

@@ -4,12 +4,11 @@
 #
 ###############################################################################
 """
-    volscatt!(
-                container::Array{FT,1},
-                tts::FT,
-                tto::FT,
-                psi::FT,
-                ttl::FT
+    volscatt!(container::Array{FT,1},
+              tts::FT,
+              tto::FT,
+              psi::FT,
+              ttl::FT
     ) where {FT<:AbstractFloat}
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
@@ -57,10 +56,10 @@ function volscatt!(
     	ds  = Cs;
     end
 
-    if (abs(cosbto)<1)
+    if abs(cosbto)<1
     	bto = acos(cosbto);
     	doo = So;
-    elseif(tto<90)
+    elseif tto<90
     	bto = FT(pi);
     	doo = Co;
     else

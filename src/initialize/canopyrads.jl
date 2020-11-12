@@ -10,10 +10,7 @@ Create a [`CanopyRads`](@ref) struct, given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_canopy_rads(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_canopy_rads(FT, rt_dim::RTDimensions)
     @unpack nAzi, nIncl, nLayer, nLevel, nWL, nWLF = rt_dim;
 
     return CanopyRads{FT}(nAzi   = nAzi  ,
