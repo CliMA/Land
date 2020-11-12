@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    initialize_rt_module(FT; nLayer::Int, LAI::Number)
+    initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
 
 Initialize the RT module and return the sturctures, given
 - `FT` Floating number type
@@ -23,11 +23,7 @@ This function initializes and returns
 - `soil` [`SoilOpticals`](@ref)
 - `wls` [`WaveLengths`](@ref)
 """
-function initialize_rt_module(
-            FT;
-            nLayer::Int = 20,
-            LAI::Number = FT(3)
-)
+function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     # 1. create wls and can, which are rt_dims independent
     can = create_canopy_rt(FT, nLayer=nLayer, LAI=LAI);
     wls = create_wave_length(FT);

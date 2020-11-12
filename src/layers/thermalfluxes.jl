@@ -74,15 +74,30 @@ function thermal_fluxes!(
             ϵ[i]    = (1 - τ_dd[i]-ρ_dd[i]);
         end
     else
-        println("Complain, Array of leaves is neither 1 nor nLayer ")
+        @warn "Array of leaves is neither 1 nor nLayer, use fist leaf here!";
+        le   = leaves[1]
+        sigf = ddf*le.ρ_LW + ddb*le.τ_LW
+        sigb = ddb*le.ρ_LW + ddf*le.τ_LW
+        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nLayer)
+        ρ_dd = (sigb*iLAI)*ones(nWL,nLayer)
+        ϵ   .= (1 - τ_dd-ρ_dd);
     end
 
+    #
+    #
+    #
+    #
+    # TODO: redo part of these lines to address T_sun3D and T_sun
+    #
+    #
+    #
+    #
     # Only one wavelength --> do Stefan Boltzmann:
     #if length(WL)==1
     # Let's just do SB for now:
     if 1==1
         # Shaded leaves first, simple 1D array:
-        S_shade= K_STEFAN(FT) .* ϵ .* (T_shade.^4)
+        S_shade .= K_STEFAN(FT) .* ϵ .* (T_shade.^4)
         # Sunlit leaves:
         if ndims(T_sun)>1
             @inbounds for i=1:length(T_shade)
@@ -92,9 +107,9 @@ function thermal_fluxes!(
             end
         else
             # Sunlit, simple 1D array:
-            S_sun = K_STEFAN(FT) .* ϵ .* T_sun.^4
+            S_sun .= K_STEFAN(FT) .* ϵ .* T_sun.^4
         end
-    else
+        # else
         # Do Planck curve, tbd
     end
     S⁺[:] = iLAI*(fSun.*S_sun+(1 .-fSun).*S_shade)

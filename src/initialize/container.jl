@@ -10,10 +10,7 @@ Create a [`CFContainer`](@ref) type struct, given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_cf_container(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_cf_container(FT, rt_dim::RTDimensions)
     @unpack nAzi, nLayer, nPAR, nWL = rt_dim;
 
     abs_wave    = zeros(FT, nWL   );
@@ -58,10 +55,7 @@ Create a [`CGContainer`](@ref) type struct, given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_cg_container(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_cg_container(FT, rt_dim::RTDimensions)
     @unpack nAzi, nIncl = rt_dim;
 
     _Co  = zeros(FT, nIncl);
@@ -103,10 +97,7 @@ Create a [`SFContainer`](@ref) type struct, given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_sf_container(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_sf_container(FT, rt_dim::RTDimensions)
     @unpack nAzi, nIncl, nLayer, nLevel, nWLE, nWLF = rt_dim;
 
     τ_dd            = zeros(FT, (nWLF,nLayer));
@@ -233,10 +224,7 @@ Create a [`CGContainer`](@ref) type struct, given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_sw_container(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_sw_container(FT, rt_dim::RTDimensions)
     @unpack nLayer, nWL = rt_dim;
 
     dnorm  = zeros(FT, nWL);
@@ -280,10 +268,7 @@ Create an [`RTContainer`](@ref), given
 - `FT` Floating number type
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
-function create_rt_container(
-            FT,
-            rt_dim::RTDimensions
-)
+function create_rt_container(FT, rt_dim::RTDimensions)
     cf_con = create_cf_container(FT, rt_dim);
     cg_con = create_cg_container(FT, rt_dim);
     sf_con = create_sf_container(FT, rt_dim);

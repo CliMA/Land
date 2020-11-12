@@ -5,9 +5,8 @@
 #
 ###############################################################################
 """
-    fluspect!(
-                leaf::LeafBios{FT},
-                wls::WaveLengths{FT}
+    fluspect!(leaf::LeafBios{FT},
+              wls::WaveLengths{FT}
     ) where {FT<:AbstractFloat}
 
 Computes leaf optical properties (reflectance and transittance) based on
@@ -114,7 +113,8 @@ function fluspect!(
     ρ_SW    = leaf.ρ_SW
     #RT     = [refl tran]
     if leaf.fqe ==0.0
-        return
+        # do something?
+        nothing
     end
     # FROM SCOPE notes:
     # From here a new path is taken: The doubling method used to calculate

@@ -4,8 +4,7 @@
 #
 ###############################################################################
 """
-    diffusive_S(
-                τ_dd::Array{FT},
+    diffusive_S(τ_dd::Array{FT},
                 ρ_dd::Array{FT},
                 S⁻::Array{FT},
                 S⁺::Array{FT},

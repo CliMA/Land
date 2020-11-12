@@ -4,8 +4,7 @@
 #
 ###############################################################################
 """
-    short_wave!(
-                can::Canopy4RT{FT},
+    short_wave!(can::Canopy4RT{FT},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 in_rad::IncomingRadiation{FT},
