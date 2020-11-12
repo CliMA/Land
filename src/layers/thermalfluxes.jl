@@ -43,6 +43,15 @@ function thermal_fluxes!(
     @unpack albedo_LW, soil_skinT = soil
     @unpack nWL = wls
 
+    #
+    #
+    #
+    #
+    # TODO: refactor this code to speed it up
+    #
+    #
+    #
+    #
     # Number of layers
 
     # Sunlit fraction at mid layer:
@@ -57,13 +66,15 @@ function thermal_fluxes!(
 
     # If we just have the same leaf everywhere, compute emissivities:
     if length(leaves)==1
-        le   = leaves[1]
+        le = leaves[1]
         # Compute layer properties:
-        sigf = ddf*le.ρ_LW + ddb*le.τ_LW
-        sigb = ddb*le.ρ_LW + ddf*le.τ_LW
-        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nLayer)
-        ρ_dd = (sigb*iLAI)*ones(nWL,nLayer)
-        ϵ   .= (1 - τ_dd-ρ_dd);
+        for i=1:nLayer
+            sigf    = ddf*le.ρ_LW + ddb*le.τ_LW
+            sigb    = ddb*le.ρ_LW + ddf*le.τ_LW
+            τ_dd[i] = (1 - (1-sigf)*iLAI)
+            ρ_dd[i] = (sigb*iLAI)
+            ϵ[i]    = (1 - τ_dd[i] - ρ_dd[i]);
+        end
     elseif length(leaves)==nLayer
         for i=1:nLayer
             le      = leaves[i]
@@ -71,16 +82,18 @@ function thermal_fluxes!(
             sigb    = ddb*le.ρ_LW + ddf*le.τ_LW
             τ_dd[i] = (1 - (1-sigf)*iLAI)
             ρ_dd[i] = (sigb*iLAI)
-            ϵ[i]    = (1 - τ_dd[i]-ρ_dd[i]);
+            ϵ[i]    = (1 - τ_dd[i] - ρ_dd[i]);
         end
     else
         @warn "Array of leaves is neither 1 nor nLayer, use fist leaf here!";
-        le   = leaves[1]
-        sigf = ddf*le.ρ_LW + ddb*le.τ_LW
-        sigb = ddb*le.ρ_LW + ddf*le.τ_LW
-        τ_dd = (1 - (1-sigf)*iLAI)*ones(nWL,nLayer)
-        ρ_dd = (sigb*iLAI)*ones(nWL,nLayer)
-        ϵ   .= (1 - τ_dd-ρ_dd);
+        le = leaves[1]
+        for i=1:nLayer
+            sigf    = ddf*le.ρ_LW + ddb*le.τ_LW
+            sigb    = ddb*le.ρ_LW + ddf*le.τ_LW
+            τ_dd[i] = (1 - (1-sigf)*iLAI)
+            ρ_dd[i] = (sigb*iLAI)
+            ϵ[i]    = (1 - τ_dd[i] - ρ_dd[i]);
+        end
     end
 
     #
@@ -96,8 +109,9 @@ function thermal_fluxes!(
     #if length(WL)==1
     # Let's just do SB for now:
     if 1==1
+        # Not yet refactored, speeding is required
         # Shaded leaves first, simple 1D array:
-        S_shade .= K_STEFAN(FT) .* ϵ .* (T_shade.^4)
+        S_shade = K_STEFAN(FT) .* ϵ .* (T_shade.^4)
         # Sunlit leaves:
         if ndims(T_sun)>1
             @inbounds for i=1:length(T_shade)
@@ -106,8 +120,9 @@ function thermal_fluxes!(
                 S_sun[i] = mean(emi'*lidf);
             end
         else
+            # Not yet refactored, speeding is required
             # Sunlit, simple 1D array:
-            S_sun .= K_STEFAN(FT) .* ϵ .* T_sun.^4
+            S_sun = K_STEFAN(FT) .* ϵ .* T_sun.^4
         end
         # else
         # Do Planck curve, tbd

@@ -132,10 +132,12 @@ println("\nTesting the layered model...");
         # add more tests
         canopy_rt.clump_a = 0.6;
         canopy_rt.clump_b = 0.1;
-        clumping_factor!(canopy_rt, angles);
+        CanopyLayers.clumping_factor!(canopy_rt, angles);
         canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves[1:1], wl_set, rt_con);
         canopy_matrices!(arrayOfLeaves[1:1], canOpt_rt);
         SIF_fluxes!(arrayOfLeaves[1:1], canOpt_rt, canRad_rt, canopy_rt, soil, wl_set, rt_con, rt_dim);
+        thermal_fluxes!(arrayOfLeaves[1:1], canOpt_rt, canRad_rt, canopy_rt, soil, [FT(400.0)], wl_set);
+        thermal_fluxes!(arrayOfLeaves[1:2], canOpt_rt, canRad_rt, canopy_rt, soil, [FT(400.0)], wl_set);
 
         # do something?
         @test true;
