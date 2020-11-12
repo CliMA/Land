@@ -19,6 +19,11 @@ if generate_examples
             "Parameter Sets" => "Photosynthesis/parasets.jl"      ,
             "Photosynthesis" => "Photosynthesis/photosynthesis.jl",
         ],
+        "Canopy Radiation" => [
+            "Big Leaf Model" => "CanopyLayers/bigleaf.jl" ,
+            "Leaf Spectrum"  => "CanopyLayers/fluspect.jl",
+            "SCOPE Model"    => "CanopyLayers/scope.jl"   ,
+        ],
         #=
         "Canopy Radiative Transfer" => [
             "Reflected and Emitted Radiance" => "Radiation_Test_BRDF.jl",
