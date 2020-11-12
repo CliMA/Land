@@ -40,7 +40,7 @@ To initialize a hydraulics system, one needs to provide the floating type, for
     example:
 
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 hs_leaf = LeafHydraulics{FT}();
@@ -110,7 +110,7 @@ What these functions do are to determine how many root layers and branch/canopy
 To initialize a whole-plant hydraulic system, checkout the example below:
 
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
@@ -185,7 +185,7 @@ xylem_p_crit
 Examples:
 
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 vc_1 = WeibullSingle{FT}();
@@ -210,6 +210,25 @@ As mentioned above, there is a rhizosphere component in the root hydraulic
 AbstractSoilVC
 BrooksCorey
 VanGenuchten
+```
+
+Pre-defined parameter sets are avialble, and you may quick create a soil type
+    struct using
+
+```@docs
+create_VanGenuchten
+VGClay
+VGClayLoam
+VGLoamySand
+VGLoamySand2
+VGSand
+VGSandyClayLoam
+VGSandyClayLoam2
+VGSandyLoam
+VGSilt
+VGSiltyClay
+VGSiltyClayLoam
+VGSiltyLoam
 ```
 
 Correlations among soil relative water content, relative hydraulic conductance,
@@ -268,7 +287,7 @@ inititialize_legacy!
 
 Examples:
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();
@@ -336,7 +355,7 @@ roots_flow!
 Example:
 
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
@@ -376,7 +395,7 @@ Note that function [`leaf_xylem_risk`](@ref) can work on its own without having
 Examples
 
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();
@@ -399,7 +418,7 @@ leaf_e_crit
 
 Examples
 ```julia
-using PlantHydraulics
+using Land.PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();

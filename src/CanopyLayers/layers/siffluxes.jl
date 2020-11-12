@@ -4,8 +4,7 @@
 #
 ###############################################################################
 """
-    SIF_fluxes!(
-                leaves::Array{LeafBios{FT},1},
+    SIF_fluxes!(leaves::Array{LeafBios{FT},1},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 can::Canopy4RT{FT},

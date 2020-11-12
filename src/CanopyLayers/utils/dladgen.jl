@@ -8,29 +8,25 @@
 
 TODO Add function description
 """
-function dcum(
-            a::FT,
-            b::FT,
-            t::FT
-) where {FT<:AbstractFloat}
-    y = FT(0);
+function dcum(a::FT, b::FT, t::FT) where {FT<:AbstractFloat}
     if a >= 1
-        f = 1 - cosd(t)
+        f = 1 - cosd(t);
     else
-        epsi = 1e-8
-        delx = FT(1.0)
-        x    = 2 * deg2rad(t)
-        p    = x
-        # add a iteration number (n) control to avoid rounding issue in Float32
-        n    = 0
+        y    = 0;
+        epsi = FT(1e-8);
+        delx = 1;
+        x    = 2 * deg2rad(t);
+        p    = x;
+        # add a iteration number (n) control to avoid presicion issues
+        n    = 0;
         while (delx >= epsi) && (n<50)
-            n   += 1
-            y    = a*sin(x) + b*sin(2x)/2
-            dx   = (y - x + p) / 2
-            x   += dx
-            delx = abs(dx)
+            n   += 1;
+            y    = a*sin(x) + b*sin(2x)/2;
+            dx   = (y - x + p) / 2;
+            x   += dx;
+            delx = abs(dx);
         end
-    	f = (2*y + p) / pi
+        f = (2*y + p) / FT(pi);
     end
 
     return f
@@ -49,10 +45,10 @@ function dladgen(
             b::FT,
             litab_bnd::Array{FT,2}
 ) where {FT<:AbstractFloat}
-    @assert a+b< 1
-    freq = similar(litab_bnd[:,1])
+    @assert a+b< 1;
+    freq = similar(litab_bnd[:,1]);
     for i in eachindex(freq)
-        freq[i] = dcum(a, b, litab_bnd[i,2]) - dcum(a, b, litab_bnd[i,1])
+        freq[i] = dcum(a, b, litab_bnd[i,2]) - dcum(a, b, litab_bnd[i,1]);
     end
 
     return freq

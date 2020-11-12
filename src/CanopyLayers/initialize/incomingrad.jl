@@ -6,7 +6,7 @@
 """
     create_incoming_radiation(
                 wls::WaveLengths{FT},
-                wlfn::String
+                wlfn::String = FILE_SUN
     ) where {FT<:AbstractFloat}
 
 Create an `AbstractIncomingRadiation` struct, given
@@ -35,7 +35,7 @@ function create_incoming_radiation(
     for i in 1:nWL
         wo = findall( (_wl.>=sWL[i]) .& (_wl.<sWL[i+1]) )
         if length(wo)==0
-            println("Warning, some wavelengths out of bounds ", sWL[i])
+            @warn "Some wavelengths out of bounds $(string(sWL[i]))";
         end
         # remove WL to avoid duplication
         # WL[i]  = mean(   _wl[wo])
