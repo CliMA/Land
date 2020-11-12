@@ -12,7 +12,7 @@ A struct of soil optical parameters
 $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct SoilOpticals{FT}
-    # these arrays should match the WL in wl_set
+    # these arrays should match the WL in wls
     "Shortwave albedo"
     albedo_SW    ::Array{FT,1}
     "Shortwave albedo for SIF"

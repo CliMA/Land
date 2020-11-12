@@ -26,7 +26,7 @@ function dcum(a::FT, b::FT, t::FT) where {FT<:AbstractFloat}
             x   += dx;
             delx = abs(dx);
         end
-    	f = (2*y + p) / FT(pi);
+        f = (2*y + p) / FT(pi);
     end
 
     return f
