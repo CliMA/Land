@@ -2,32 +2,31 @@
 
 using BenchmarkTools, CanopyLayers, Profile
 
-FT = Float32;
-canopy_rt = create_canopy_rt(FT, nLayer=20);
-wl_set    = create_wave_length(FT);
-rt_dim    = create_rt_dims(canopy_rt, wl_set);
-canRad_rt = create_canopy_rads(FT, rt_dim);
-canOpt_rt = create_canopy_opticals(FT, rt_dim);
-sunRad_rt = create_incoming_radiation(wl_set);
-soil      = create_soil_opticals(wl_set);
-angles    = SolarAngles{FT}();
-rt_con    = create_rt_container(FT, rt_dim);
-
-arrayOfLeaves = [create_leaf_bios(FT, rt_dim) for i in 1:rt_dim.nLayer];
+FT      = Float32;
+can     = create_canopy_rt(FT, nLayer=20);
+wls     = create_wave_length(FT);
+rt_dim  = create_rt_dims(can, wls);
+can_rad = create_canopy_rads(FT, rt_dim);
+can_opt = create_canopy_opticals(FT, rt_dim);
+in_rad  = create_incoming_radiation(wls);
+soil    = create_soil_opticals(wls);
+angles  = SolarAngles{FT}();
+rt_con  = create_rt_container(FT, rt_dim);
+leaves  = [create_leaf_bios(FT, rt_dim) for i in 1:rt_dim.nLayer];
 for i in 1:rt_dim.nLayer
-    fluspect!(arrayOfLeaves[i], wl_set);
+    fluspect!(leaves[i], wls);
 end
 
-canopy_geometry!(canopy_rt, angles, canOpt_rt, rt_con);
-canopy_matrices!(arrayOfLeaves, canOpt_rt);
-short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, rt_con);
-canopy_fluxes!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil, arrayOfLeaves, wl_set, rt_con);
-SIF_fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set, rt_con, rt_dim);
+canopy_geometry!(can, angles, can_opt, rt_con);
+canopy_matrices!(leaves, can_opt);
+short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
+canopy_fluxes!(can, can_opt, can_rad, in_rad, soil, leaves, wls, rt_con);
+SIF_fluxes!(leaves, can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
 
 Profile.clear_malloc_data();
 
-#@btime canopy_geometry!($canopy_rt, $angles, $canOpt_rt, $rt_con);
-#@btime canopy_matrices!($arrayOfLeaves, $canOpt_rt);
-#@btime short_wave!($canopy_rt, $canOpt_rt, $canRad_rt, $sunRad_rt, $soil, $rt_con);
-#@btime canopy_fluxes!($canopy_rt, $canOpt_rt, $canRad_rt, $sunRad_rt, $soil, $arrayOfLeaves, $wl_set, $rt_con);
-#@btime SIF_fluxes!($arrayOfLeaves, $canOpt_rt, $canRad_rt, $canopy_rt, $soil, $wl_set, $rt_con, $rt_dim);
+#@btime canopy_geometry!($can, $angles, $can_opt, $rt_con);
+#@btime canopy_matrices!($leaves, $can_opt);
+#@btime short_wave!($can, $can_opt, $can_rad, $in_rad, $soil, $rt_con);
+#@btime canopy_fluxes!($can, $can_opt, $can_rad, $in_rad, $soil, $leaves, $wls, $rt_con);
+#@btime SIF_fluxes!($leaves, $can_opt, $can_rad, $can, $soil, $wls, $rt_con, $rt_dim);

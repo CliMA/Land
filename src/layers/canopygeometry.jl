@@ -73,9 +73,9 @@ function canopy_geometry!(
     sin_tto = sind(tto);
     cos_tts = cosd(tts);
     sin_tts = sind(tts);
-    tan_tts	= tand(tts);
+    tan_tts = tand(tts);
     cts_cto = cos_tts * cos_tto;
-    dso		= sqrt( tan_tts^2 + tan_tto^2 - 2*tan_tts*tan_tto*cos_psi );
+    dso     = sqrt( tan_tts^2 + tan_tto^2 - 2*tan_tts*tan_tto*cos_psi );
     psi_vol = abs( psi - 360*round(psi/360) );
 
     # 3. unpack canopy parameters

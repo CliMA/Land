@@ -103,7 +103,7 @@ function fluspect!(
     # Case of zero absorption
     j       = findall(r.+t .>= 1)
     Tsub[j] = t[j]./(t[j]+(1 .-t[j])*(leaf.N-1))
-    Rsub[j]	= 1 .-Tsub[j]
+    Rsub[j] = 1 .-Tsub[j]
 
     # Reflectance & transmittance of the leaf: combine top layer with next N-1 layers
     denom   = 1 .-Rsub.*r
@@ -112,10 +112,18 @@ function fluspect!(
     τ_SW    = leaf.τ_SW
     ρ_SW    = leaf.ρ_SW
     #RT     = [refl tran]
-    if leaf.fqe ==0.0
-        # do something?
-        nothing
-    end
+    #
+    #
+    #
+    #
+    # a place holder
+    #if leaf.fqe ==0.0
+    #    # do something?
+    #end
+    #
+    #
+    #
+    #
     # FROM SCOPE notes:
     # From here a new path is taken: The doubling method used to calculate
     # fluoresence is now only applied to the part of the leaf where absorption
