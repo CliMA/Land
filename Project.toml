@@ -25,7 +25,7 @@ WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 [compat]
 BenchmarkTools = "0.5"
 CLIMAParameters = "0.1"
-CSV = "0.7"
+CSV = "0.7, 0.8"
 ConstrainedRootSolvers = "0.1"
 DataFrames = "0.21"
 DiffEqOperators = "4.14"
