@@ -60,9 +60,9 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
 
     # soil related
     "Maximal soil water content"
-    mswc  ::FT = hs.root.sh.Θs
+    mswc  ::FT = (hs.root.sh).Θs
     "Current soil water content"
-    swc   ::FT = hs.root.sh.Θs
+    swc   ::FT = (hs.root.sh).Θs
     "Soil matrical water potential"
     p_soil::FT = 0.0
     "Soil depth, 2X mean root depth"

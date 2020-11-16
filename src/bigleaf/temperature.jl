@@ -104,7 +104,7 @@ function leaf_temperature(
 ) where {FT<:AbstractFloat}
     @unpack t_air,wind = node.envir;
 
-    lambda = latent_heat_vapor(t_air) / KG_2_MOL(FT);
+    lambda = latent_heat_vapor(t_air) * MOLMASS_WATER(FT);
     Gr     = radiative_conductance(t_air);
     GHa    = boundary_layer_conductance(wind, node.width);
     e_lat  = lambda * epla;
