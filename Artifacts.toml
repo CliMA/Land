@@ -1,0 +1,12 @@
+###############################################################################
+#
+# 2020_leaf_invest_weather --- gs_sample.csv
+#
+###############################################################################
+[2020_leaf_invest_weather]
+git-tree-sha1 = "457f3a77001a4801f9344bb05666267484b36edf"
+lazy = true
+
+    [[2020_leaf_invest_weather.download]]
+    sha256 = "5073edf5b7a3713f65ba0a2ee6801323570250ce6e46faa7cd45bb84fda487c5"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/2020_leaf_invest/2020_leaf_invest_weather.tar.gz"
