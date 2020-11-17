@@ -36,7 +36,7 @@ A fast way of integrating functions, given
 - `f` f(x) for each x
 - `dx` Delta x for each x
 
-Note that `f` is a local container, and its values change in this operation.
+Note that `f` is a local cache, and its values change in this operation.
 """
 function fast∫!(
             f::Array{FT,1},

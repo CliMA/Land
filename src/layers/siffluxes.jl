@@ -10,7 +10,7 @@
                 can::Canopy4RT{FT},
                 soil::SoilOpticals{FT},
                 wls::WaveLengths{FT},
-                rt_con::RTContainer{FT},
+                rt_con::RTCache{FT},
                 rt_dim::RTDimensions
     ) where {FT<:AbstractFloat}
 
@@ -25,7 +25,7 @@ Computes 2-stream diffusive radiation transport for SIF radiation (calls
 - `can` [`Canopy4RT`](@ref) type struct
 - `soil` [`SoilOpticals`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
-- `rt_con` [`RTContainer`](@ref) type container
+- `rt_con` [`RTCache`](@ref) type cache
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function SIF_fluxes!(
@@ -35,7 +35,7 @@ function SIF_fluxes!(
             can::Canopy4RT{FT},
             soil::SoilOpticals{FT},
             wls::WaveLengths{FT},
-            rt_con::RTContainer{FT},
+            rt_con::RTCache{FT},
             rt_dim::RTDimensions
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures

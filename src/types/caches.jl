@@ -1,17 +1,17 @@
 ###############################################################################
 #
-# Container of values to speed the canopy_fluxes!
+# Cache of values to speed the canopy_fluxes!
 #
 ###############################################################################
 """
-    mutable struct CFContainer{FT}
+    mutable struct CFCache{FT}
 
-Container to speed [`canopy_fluxes!`](@ref) by pre-allocating arrays
+Cache to speed [`canopy_fluxes!`](@ref) by pre-allocating arrays
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct CFContainer{FT}
+Base.@kwdef mutable struct CFCache{FT}
     "absorbed energy from wave lengths"
     abs_wave   ::Array{FT,1}
     "absfs' * lidf [nAzi]"
@@ -43,18 +43,18 @@ end
 
 ###############################################################################
 #
-# Container of values to speed the canopy_geometry!
+# Cache of values to speed the canopy_geometry!
 #
 ###############################################################################
 """
-    mutable struct CGContainer{FT}
+    mutable struct CGCache{FT}
 
-Container to speed [`canopy_geometry!`](@ref) by pre-allocating arrays
+Cache to speed [`canopy_geometry!`](@ref) by pre-allocating arrays
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct CGContainer{FT}
+Base.@kwdef mutable struct CGCache{FT}
     # 1D arrays
     "cos_ttli .* cos(tto) dim: nIncl"
     _Co ::Array{FT,1}
@@ -85,18 +85,18 @@ end
 
 ###############################################################################
 #
-# Container of values to speed the short_wave!
+# Cache of values to speed the short_wave!
 #
 ###############################################################################
 """
-    mutable struct SFContainer{FT}
+    mutable struct SFCache{FT}
 
-Container to speed [`SIF_fluxes!`](@ref) by pre-allocating arrays
+Cache to speed [`SIF_fluxes!`](@ref) by pre-allocating arrays
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct SFContainer{FT}
+Base.@kwdef mutable struct SFCache{FT}
     # 1D array
     M⁻_sun        ::Array{FT,1}
     M⁺_sun        ::Array{FT,1}
@@ -164,18 +164,18 @@ end
 
 ###############################################################################
 #
-# Container of values to speed the short_wave!
+# Cache of values to speed the short_wave!
 #
 ###############################################################################
 """
-    mutable struct SWContainer{FT}
+    mutable struct SWCache{FT}
 
-Container to speed [`short_wave!`](@ref) by pre-allocating arrays
+Cache to speed [`short_wave!`](@ref) by pre-allocating arrays
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct SWContainer{FT}
+Base.@kwdef mutable struct SWCache{FT}
     # 1D arrays
     "dnorm?"
     dnorm ::Array{FT,1}
@@ -208,24 +208,24 @@ end
 
 ###############################################################################
 #
-# Container of values to speed up the calculations
+# Cache of values to speed up the calculations
 #
 ###############################################################################
 """
-    mutable struct RTContainer{FT}
+    mutable struct RTCache{FT}
 
-Collection of containers to speed up RT module
+Collection of caches to speed up RT module
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct RTContainer{FT}
-    "[`CFContainer`](@ref) type container"
-    cf_con::CFContainer{FT}
-    "[`CGContainer`](@ref) type container"
-    cg_con::CGContainer{FT}
-    "[`SFContainer`](@ref) type container"
-    sf_con::SFContainer{FT}
-    "[`SWContainer`](@ref) type container"
-    sw_con::SWContainer{FT}
+Base.@kwdef mutable struct RTCache{FT}
+    "[`CFCache`](@ref) type cache"
+    cf_con::CFCache{FT}
+    "[`CGCache`](@ref) type cache"
+    cg_con::CGCache{FT}
+    "[`SFCache`](@ref) type cache"
+    sf_con::SFCache{FT}
+    "[`SWCache`](@ref) type cache"
+    sw_con::SWCache{FT}
 end

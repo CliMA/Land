@@ -18,7 +18,7 @@ This function initializes and returns
 - `can_rad` [`CanopyRads`](@ref)
 - `in_rad` [`IncomingRadiation`](@ref)
 - `leaves` Array{[`LeafBios`](@ref),1}
-- `rt_con` [`RTContainer`](@ref)
+- `rt_con` [`RTCache`](@ref)
 - `rt_dim` [`RTDimensions`](@ref)
 - `soil` [`SoilOpticals`](@ref)
 - `wls` [`WaveLengths`](@ref)
@@ -37,7 +37,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     in_rad  = create_incoming_radiation(wls);
     soil    = create_soil_opticals(wls);
     angles  = SolarAngles{FT}();
-    rt_con  = create_rt_container(FT, rt_dim);
+    rt_con  = create_rt_cache(FT, rt_dim);
 
     # Create an array of standard leaves
     leaves = [create_leaf_bios(FT, rt_dim) for i in 1:nLayer];

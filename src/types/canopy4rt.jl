@@ -67,7 +67,7 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     cos_ttli ::Array{FT,1} = cosd.(litab)
     "Sine of litab"
     sin_ttli ::Array{FT,1} = sind.(litab)
-    "Container for volome scatter function"
+    "Cache for volome scatter function"
     vol_scatt::Array{FT,1} = ones(FT, 4)
 
     # This is changed afterwards, ignore here.
