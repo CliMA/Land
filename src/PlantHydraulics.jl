@@ -49,7 +49,9 @@ export AbstractXylemVC,
        VGSilt,
        VGSiltyClay,
        VGSiltyClayLoam,
-       VGSiltyLoam
+       VGSiltyLoam,
+       AbstractPressureVolumeCurve,
+       PVCurveLinear
 
 # export public functions
 export create_grass_like_hs,
@@ -60,6 +62,7 @@ export create_grass_like_hs,
        inititialize_legacy!,
        leaf_e_crit,
        leaf_xylem_risk,
+       p_from_volume,
        plant_conductances!,
        recalculate_roots_flow!,
        root_q_from_pressure,
@@ -75,6 +78,7 @@ export create_grass_like_hs,
        soil_rwc,
        soil_swc,
        tree_e_crit,
+       update_PVF!,
        vc_temperature_effects!,
        xylem_k_ratio,
        xylem_p_crit,
@@ -89,10 +93,12 @@ include("types/hydraulics_plant.jl")
 include("types/initialize_plant.jl")
 include("types/parasets.jl"        )
 
-include("vulnerability/pcrit.jl")
-include("vulnerability/soil.jl" )
-include("vulnerability/vc.jl"   )
+include("vulnerability/capacitance.jl")
+include("vulnerability/pcrit.jl"      )
+include("vulnerability/soil.jl"       )
+include("vulnerability/xylem.jl"      )
 
+include("hydraulics/capacitance.jl")
 include("hydraulics/leaf.jl"       )
 include("hydraulics/legacy.jl"     )
 include("hydraulics/plant.jl"      )
