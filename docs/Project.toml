@@ -1,3 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
+PlotPlants = "62700b34-1872-4917-b6af-4f42ae699f38"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
