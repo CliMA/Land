@@ -4,7 +4,12 @@
 #
 ###############################################################################
 """
-    create_grass_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_grass_like_hs(
+                z_root::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
 Create a [`GrassLikeHS`](@ref), given
 - `z_root` Maximal root depth (negative value)
@@ -46,7 +51,7 @@ function create_grass_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
@@ -74,7 +79,13 @@ end
 
 
 """
-    create_palm_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_palm_like_hs(
+                z_root::FT,
+                z_trunk::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
 Create a [`PalmLikeHS`](@ref), given
 - `z_root` Maximal root depth (negative value)
@@ -130,7 +141,7 @@ function create_palm_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
@@ -164,7 +175,13 @@ end
 
 
 """
-    create_tree_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_tree_like_hs(
+                z_root::FT,
+                z_trunk::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
 Create a [`TreeLikeHS`](@ref), given
 - `z_root` Maximal root depth (negative value)
@@ -220,7 +237,7 @@ function create_tree_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
