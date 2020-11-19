@@ -1,5 +1,5 @@
 status = [
-    "build",
+    "docs-build",
     "linux-test",
     "macos-test",
     "version-test",
