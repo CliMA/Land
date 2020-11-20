@@ -74,7 +74,7 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
 
     # capacitance
     "Pressure volume curve for storage"
-    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
     "Pressure of storage"
     p_storage::FT = 0
     "Total capaciatance at Ψ = 0 `[mol m⁻²]`"
@@ -151,7 +151,7 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
 
     # capacitance
     "Pressure volume curve for storage"
-    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
     "Pressure of storage per element"
     p_storage::Array{FT,1} = zeros(FT,10)
     "Maximal storage per element `[mol]`"
@@ -224,7 +224,7 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
 
     # capacitance
     "Pressure volume curve for storage"
-    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
     "Pressure of storage per element"
     p_storage::Array{FT,1} = zeros(FT,10)
     "Maximal storage per element `[mol]`"

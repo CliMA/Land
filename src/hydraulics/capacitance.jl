@@ -4,10 +4,10 @@
 #
 ###############################################################################
 """
-    buffer_rate(pv::AbstractPressureVolumeCurve{FT}) where {FT<:AbstractFloat}
+    buffer_rate(pv::AbstractCapacity{FT}) where {FT<:AbstractFloat}
 
 Return the buffer rate, given
-- `pv` [`AbstractPressureVolumeCurve`](@ref type struct)
+- `pv` [`AbstractCapacity`](@ref type struct)
 """
 function buffer_rate(
             pv::PVCurveLinear{FT}

@@ -1,14 +1,14 @@
 ###############################################################################
 #
-# Pressure volume curves for plants
+# Capacitance for plants
 #
 ###############################################################################
 """
-    abstract type AbstractPressureVolumeCurve{FT}
+    abstract type AbstractCapacity{FT}
 
-Hierachy of AbstractPressureVolumeCurve
+Hierachy of AbstractCapacity
 """
-abstract type AbstractPressureVolumeCurve{FT<:AbstractFloat} end
+abstract type AbstractCapacity{FT<:AbstractFloat} end
 
 
 
@@ -21,7 +21,7 @@ Struct that contains information for linear PV curve
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct PVCurveLinear{FT} <: AbstractPressureVolumeCurve{FT}
+Base.@kwdef mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
     "Slope of the linear PV curve (relative to maximum) `[MPa⁻¹]`"
     slope    ::FT = 0.2
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"

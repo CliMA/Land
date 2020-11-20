@@ -33,7 +33,7 @@ export AbstractXylemVC,
        WeibullSingle
 
 # export public types --- pressure volume curve
-export AbstractPressureVolumeCurve,
+export AbstractCapacity,
        PVCurveLinear
 
 # export public types --- flow mode
@@ -74,16 +74,8 @@ export create_grass_like_hs,
        create_palm_like_hs,
        create_tree_like_hs
 
-# export public functions
-export hydraulic_p_profile!,
-       inititialize_legacy!,
-       leaf_e_crit,
-       leaf_xylem_risk,
-       p_from_volume,
-       plant_conductances!,
-       recalculate_roots_flow!,
-       root_q_from_pressure,
-       roots_flow!,
+# export public functions --- curves related
+export p_from_volume,
        soil_erwc,
        soil_k_ratio_erwc,
        soil_k_ratio_p25,
@@ -94,11 +86,21 @@ export hydraulic_p_profile!,
        soil_p_25_swc,
        soil_rwc,
        soil_swc,
+       xylem_k_ratio,
+       xylem_p_crit
+
+# export public functions
+export hydraulic_p_profile!,
+       inititialize_legacy!,
+       leaf_e_crit,
+       leaf_xylem_risk,
+       plant_conductances!,
+       recalculate_roots_flow!,
+       root_q_from_pressure,
+       roots_flow!,
        tree_e_crit,
        update_PVF!,
        vc_temperature_effects!,
-       xylem_k_ratio,
-       xylem_p_crit,
        xylem_p_from_flow
 
 
@@ -112,10 +114,9 @@ include("types/plant.jl" )
 include("initialize/soil.jl" )
 include("initialize/plant.jl")
 
-include("vulnerability/capacitance.jl")
-include("vulnerability/pcrit.jl"      )
-include("vulnerability/soil.jl"       )
-include("vulnerability/xylem.jl"      )
+include("curves/capacity.jl")
+include("curves/soil.jl"    )
+include("curves/xylem.jl"   )
 
 include("hydraulics/capacitance.jl")
 include("hydraulics/leaf.jl"       )
