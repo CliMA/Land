@@ -101,7 +101,7 @@ export hydraulic_p_profile!,
        tree_e_crit,
        update_PVF!,
        vc_temperature_effects!,
-       xylem_p_from_flow
+       xylem_pressure
 
 
 
@@ -117,6 +117,8 @@ include("initialize/plant.jl")
 include("curves/capacity.jl")
 include("curves/soil.jl"    )
 include("curves/xylem.jl"   )
+
+include("hydraulics/xylem.jl")
 
 include("hydraulics/capacitance.jl")
 include("hydraulics/leaf.jl"       )

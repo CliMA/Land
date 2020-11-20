@@ -4,15 +4,15 @@
 #
 ###############################################################################
 """
-    xylem_p_from_flow(
+    xylem_pressure(
                 leaf::AbstractHydraulicSystem{FT},
                 flow::FT
     ) where {FT<:AbstractFloat}
-    xylem_p_from_flow(
+    xylem_pressure(
                 tree::AbstractPlantHS{FT},
                 flow::FT
     ) where {FT<:AbstractFloat}
-    xylem_p_from_flow(
+    xylem_pressure(
                 tree::TreeSimple{FT},
                 f_sl::FT,
                 f_sh::FT,
@@ -33,7 +33,7 @@ Note, gravity is accounted for in root and stem; rhizosphere conductance is
     accounted for in root; extra-xylary conductance is not accounted for in
     leaf here because it calculates xylem end pressure.
 """
-function xylem_p_from_flow(
+function xylem_pressure(
             leaf::LeafHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -58,7 +58,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             root::RootHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -97,7 +97,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             stem::StemHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -123,7 +123,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             tree::GrassLikeHS{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -141,7 +141,7 @@ function xylem_p_from_flow(
         tree.leaves[1].p_ups = mean(tree.container_p);
 
         # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
+        p_dos = xylem_pressure(tree.leaves[1], flow/tla);
 
         return p_dos
     else
@@ -153,7 +153,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             tree::PalmLikeHS{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -171,11 +171,11 @@ function xylem_p_from_flow(
         (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk
-        p_dos = xylem_p_from_flow(tree.trunk, flow);
+        p_dos = xylem_pressure(tree.trunk, flow);
         tree.leaves[1].p_ups = p_dos;
 
         # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
+        p_dos = xylem_pressure(tree.leaves[1], flow/tla);
 
         return p_dos
     else
@@ -187,7 +187,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             tree::TreeLikeHS{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
@@ -205,15 +205,15 @@ function xylem_p_from_flow(
         (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk
-        p_dos = xylem_p_from_flow(tree.trunk, flow);
+        p_dos = xylem_pressure(tree.trunk, flow);
         tree.branch[1].p_ups = p_dos;
 
         # calculate the p_dos for branch
-        p_dos = xylem_p_from_flow(tree.branch[1], flow);
+        p_dos = xylem_pressure(tree.branch[1], flow);
         tree.leaves[1].p_ups = p_dos;
 
         # calculate the p_dos for leaves
-        p_dos = xylem_p_from_flow(tree.leaves[1], flow/tla);
+        p_dos = xylem_pressure(tree.leaves[1], flow/tla);
 
         return p_dos
     else
@@ -225,20 +225,20 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             tree::TreeSimple{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     # calculate the p_dos for roots
-    p_dos = xylem_p_from_flow(tree.root, flow);
+    p_dos = xylem_pressure(tree.root, flow);
     (tree.stem).p_ups = p_dos;
 
     # calculate the p_dos for stem
-    p_dos = xylem_p_from_flow(tree.stem, flow);
+    p_dos = xylem_pressure(tree.stem, flow);
     (tree.leaf).p_ups = p_dos;
 
     # calculate the p_dos for leaves
-    p_dos = xylem_p_from_flow(tree.leaf, flow / (tree.leaf).area);
+    p_dos = xylem_pressure(tree.leaf, flow / (tree.leaf).area);
 
     return p_dos
 end
@@ -246,7 +246,7 @@ end
 
 
 
-function xylem_p_from_flow(
+function xylem_pressure(
             tree::TreeSimple{FT},
             f_sl::FT,
             f_sh::FT,
@@ -255,16 +255,16 @@ function xylem_p_from_flow(
     flow = f_sl + f_sh;
 
     # calculate the p_dos for roots
-    p_dos = xylem_p_from_flow(tree.root, flow);
+    p_dos = xylem_pressure(tree.root, flow);
     (tree.stem).p_ups = p_dos;
 
     # calculate the p_dos for stem
-    p_dos = xylem_p_from_flow(tree.stem, flow);
+    p_dos = xylem_pressure(tree.stem, flow);
     (tree.leaf).p_ups = p_dos;
 
     # calculate the p_dos for leaves
-    p_sl = xylem_p_from_flow(tree.leaf, f_sl / (tree.leaf).area / r_sl);
-    p_sh = xylem_p_from_flow(tree.leaf, f_sh / (tree.leaf).area / (1-r_sl));
+    p_sl = xylem_pressure(tree.leaf, f_sl / (tree.leaf).area / r_sl);
+    p_sh = xylem_pressure(tree.leaf, f_sh / (tree.leaf).area / (1-r_sl));
 
     return p_sl,p_sh
 end

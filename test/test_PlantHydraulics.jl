@@ -244,28 +244,28 @@ println("\nTesting the pressure functions...")
         tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
-        # test the xylem_p_from_flow function
+        # test the xylem_pressure function
         _f_1 = FT(0.001)
         _f_2 = FT(1)
-        for result in [ xylem_p_from_flow(leaf, _f_1),
-                        xylem_p_from_flow(leaf, _f_2),
-                        xylem_p_from_flow(root, _f_1),
-                        xylem_p_from_flow(root, _f_2),
-                        xylem_p_from_flow(stem, _f_1),
-                        xylem_p_from_flow(stem, _f_2) ]
+        for result in [ xylem_pressure(leaf, _f_1),
+                        xylem_pressure(leaf, _f_2),
+                        xylem_pressure(root, _f_1),
+                        xylem_pressure(root, _f_2),
+                        xylem_pressure(stem, _f_1),
+                        xylem_pressure(stem, _f_2) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
 
-        # test the xylem_p_from_flow function for plants
-        for result in [ xylem_p_from_flow(grass, _f_1),
-                        xylem_p_from_flow(grass, _f_2),
-                        xylem_p_from_flow(palm, _f_1),
-                        xylem_p_from_flow(palm, _f_2),
-                        xylem_p_from_flow(tree, _f_1),
-                        xylem_p_from_flow(tree, _f_2),
-                        xylem_p_from_flow(treet, _f_1),
-                        xylem_p_from_flow(treet, _f_2) ]
+        # test the xylem_pressure function for plants
+        for result in [ xylem_pressure(grass, _f_1),
+                        xylem_pressure(grass, _f_2),
+                        xylem_pressure(palm, _f_1),
+                        xylem_pressure(palm, _f_2),
+                        xylem_pressure(tree, _f_1),
+                        xylem_pressure(tree, _f_2),
+                        xylem_pressure(treet, _f_1),
+                        xylem_pressure(treet, _f_2) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
