@@ -95,7 +95,7 @@ export pressure_profile!,
        critical_flow,
        xylem_risk,
        plant_conductances!,
-       recalculate_roots_flow!,
+       roots_flow!,
        xylem_flow,
        roots_flow!,
        critical_flow,
@@ -125,8 +125,6 @@ include("hydraulics/pressure.jl"   )
 include("hydraulics/temperature.jl")
 
 include("hydraulics/capacitance.jl")
-include("hydraulics/plant.jl"      )
-include("hydraulics/root.jl"       )
 
 
 

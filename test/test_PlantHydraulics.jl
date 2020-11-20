@@ -225,7 +225,7 @@ println("\nTesting the root-related functions...")
         _ks = zeros(FT, 5);
         _ps = zeros(FT, 5);
         _qs = zeros(FT, 5);
-        recalculate_roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
+        roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
         @test NaN_test(grass);
     end
 end

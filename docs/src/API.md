@@ -336,17 +336,17 @@ In the plant hydraulic module design, flow rate is computed for each canopy
 The functions provided by PlantHydraulics module are
 
 ```@docs
-root_pk_from_flow
-recalculate_roots_flow!
+root_pk
+roots_flow!
 ```
 
 However, the steps above are only 1 iteration, and can only be used for the
     non-steady state version of model. For the steady-state flow rates,
     function [`roots_flow!`](@ref) does thw work. What the function does is to
-    iterate [`recalculate_roots_flow!`](@ref) till the difference among the
+    iterate [`roots_flow!`](@ref) till the difference among the
     calculated end pressures is small enough. I also emphasize that to speed up
     the code, 3 containers are added to the [`AbstractPlantHS`](@ref) structs,
-    and they are `container_k`, `container_p`, and `container_q`.
+    and they are `cache_k`, `cache_p`, and `cache_q`.
 
 ```@docs
 roots_flow!
@@ -359,7 +359,7 @@ using PlantHydraulics
 
 FT = Float32;
 palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
-roots_flow!(palm.roots, palm.container_k, palm.container_p, palm.container_q, FT(1));
+roots_flow!(palm.roots, palm.cache_k, palm.cache_p, palm.cache_q, FT(1));
 ```
 
 
