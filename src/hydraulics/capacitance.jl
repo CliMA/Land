@@ -206,7 +206,7 @@ function update_PVF!(tree::GrassLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
     update_PVF!(roots, container_k, container_p, container_q, f_sum, Δt);
 
     # 3. update pressure profiles
-    hydraulic_p_profile!(tree; update=false);
+    pressure_profile!(tree; update=false);
 
     return nothing
 end
@@ -233,7 +233,7 @@ function update_PVF!(tree::PalmLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
     update_PVF!(roots, container_k, container_p, container_q, trunk.q_in, Δt);
 
     # 4. update pressure profiles
-    hydraulic_p_profile!(tree; update=false);
+    pressure_profile!(tree; update=false);
 
     return nothing
 end
@@ -265,7 +265,7 @@ function update_PVF!(tree::TreeLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
     update_PVF!(roots, container_k, container_p, container_q, trunk.q_in, Δt);
 
     # 4. update pressure profiles
-    hydraulic_p_profile!(tree; update=false);
+    pressure_profile!(tree; update=false);
 
     return nothing
 end

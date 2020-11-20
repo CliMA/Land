@@ -264,24 +264,24 @@ The PlantHydraulics module is designed to run numerically for the following
 - Temperature may change along the flow path. The `f_st` and `f_vis` in the
     structs help deal with these effects.
 
-Function [`xylem_pressure`](@ref) calculates the xylem end pressure for an
+Function [`end_pressure`](@ref) calculates the xylem end pressure for an
     organ-level hysraulic system. As mentioned above, the
     [`RootHydraulics`](@ref) and [`StemHydraulics`](@ref) has a gravity
     component, and the [`RootHydraulics`](@ref) has a rhizosphere component.
-    Also be aware that [`xylem_pressure`](@ref) accounts for temperature
+    Also be aware that [`end_pressure`](@ref) accounts for temperature
     effects on surface tension and viscosity.
 
 ```@docs
-xylem_pressure
+end_pressure
 ```
 
-Noe that function [`xylem_pressure`](@ref) does not update the pressure
+Noe that function [`end_pressure`](@ref) does not update the pressure
     profiles or history in the xylem. To update these profiles, use
-    [`hydraulic_p_profile!`](@ref), and to remove these legacy profiles, use
+    [`pressure_profile!`](@ref), and to remove these legacy profiles, use
     [`inititialize_legacy!`](@ref):
 
 ```@docs
-hydraulic_p_profile!
+pressure_profile!
 inititialize_legacy!
 ```
 
@@ -291,9 +291,9 @@ using PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();
-p = xylem_pressure(leaf, FT(0.01));
+p = end_pressure(leaf, FT(0.01));
 @show leaf.p_element;
-hydraulic_p_profile!(leaf, FT(0.01));
+pressure_profile!(leaf, FT(0.01));
 @show leaf.p_element;
 ```
 
@@ -301,9 +301,9 @@ hydraulic_p_profile!(leaf, FT(0.01));
 
 
 ## Root Hydraulics
-Function [`xylem_pressure`](@ref) works for the case of only 1 root layer if
+Function [`end_pressure`](@ref) works for the case of only 1 root layer if
     one needs the plant base xylem water pressure. However, when there are
-    multiple root layers, [`xylem_pressure`](@ref) does not apply. In this
+    multiple root layers, [`end_pressure`](@ref) does not apply. In this
     case, iterations are required to calculate the xylem end pressure for each
     root layers, and then make sure all root layers have the same xylem end
     pressure. A few functions are provided to realize this.
@@ -438,7 +438,7 @@ Though [`leaf_xylem_risk`](@ref) and [`leaf_e_crit`](@ref) can work on their
     the risk and overestimate the critical flow rate. To overcome this problem,
     whole-plant level plant hydraulics are provided.
 
-Function [`xylem_pressure`](@ref) calculates the leaf xylem end pressure for
+Function [`end_pressure`](@ref) calculates the leaf xylem end pressure for
     a whole-plant struct using these steps:
 
 - calculate the plant base pressure from a given total flow rate
@@ -448,7 +448,7 @@ Function [`xylem_pressure`](@ref) calculates the leaf xylem end pressure for
 
 Accordingly, there is a function [`tree_e_crit`](@ref) to calculate the
     critical flow rate for the whole plant. Be aware that Plant-level function
-    [`xylem_pressure`](@ref) and [`tree_e_crit`](@ref) only applies to the
+    [`end_pressure`](@ref) and [`tree_e_crit`](@ref) only applies to the
     case of only one canopy layer (or big-leaf model). As to the case of
     multiple canopy layer, more functions are pending.
 

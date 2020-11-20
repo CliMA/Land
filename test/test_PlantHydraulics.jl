@@ -150,12 +150,12 @@ println("\nTesting the legacy functions...")
 
         # Test the struct
         treet = TreeSimple{FT}();
-        hydraulic_p_profile!(treet, _ps, _ft);
+        pressure_profile!(treet, _ps, _ft);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
         treet = TreeSimple{FT}();
-        hydraulic_p_profile!(treet, _ps, _fsl, _fsh, _rsl);
+        pressure_profile!(treet, _ps, _fsl, _fsh, _rsl);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
@@ -244,28 +244,28 @@ println("\nTesting the pressure functions...")
         tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
-        # test the xylem_pressure function
+        # test the end_pressure function
         _f_1 = FT(0.001)
         _f_2 = FT(1)
-        for result in [ xylem_pressure(leaf, _f_1),
-                        xylem_pressure(leaf, _f_2),
-                        xylem_pressure(root, _f_1),
-                        xylem_pressure(root, _f_2),
-                        xylem_pressure(stem, _f_1),
-                        xylem_pressure(stem, _f_2) ]
+        for result in [ end_pressure(leaf, _f_1),
+                        end_pressure(leaf, _f_2),
+                        end_pressure(root, _f_1),
+                        end_pressure(root, _f_2),
+                        end_pressure(stem, _f_1),
+                        end_pressure(stem, _f_2) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
 
-        # test the xylem_pressure function for plants
-        for result in [ xylem_pressure(grass, _f_1),
-                        xylem_pressure(grass, _f_2),
-                        xylem_pressure(palm, _f_1),
-                        xylem_pressure(palm, _f_2),
-                        xylem_pressure(tree, _f_1),
-                        xylem_pressure(tree, _f_2),
-                        xylem_pressure(treet, _f_1),
-                        xylem_pressure(treet, _f_2) ]
+        # test the end_pressure function for plants
+        for result in [ end_pressure(grass, _f_1),
+                        end_pressure(grass, _f_2),
+                        end_pressure(palm, _f_1),
+                        end_pressure(palm, _f_2),
+                        end_pressure(tree, _f_1),
+                        end_pressure(tree, _f_2),
+                        end_pressure(treet, _f_1),
+                        end_pressure(treet, _f_2) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end

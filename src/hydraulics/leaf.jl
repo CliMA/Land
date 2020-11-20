@@ -16,7 +16,7 @@ function leaf_xylem_risk(
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, vc = hs;
 
-    p_25 = xylem_pressure(hs, flow) / hs.f_st;
+    p_25 = end_pressure(hs, flow) / hs.f_st;
     k_25 = xylem_k_ratio(vc, p_25, f_vis);
 
     return k_25
@@ -55,7 +55,7 @@ function leaf_e_crit(
     _fx     = min((_fh+_fl)/2, ini);
     _ms     = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _rt     = SolutionTolerance{FT}(1e-5, 50);
-    @inline f(x) = xylem_pressure(hs, x) - hs.p_crt;
+    @inline f(x) = end_pressure(hs, x) - hs.p_crt;
     _solut  = find_zero(f, _ms, _rt);
     _ec::FT = _solut;
 

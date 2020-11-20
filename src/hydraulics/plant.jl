@@ -27,7 +27,7 @@ function tree_e_crit(
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _rt = SolutionTolerance{FT}(1e-3, 50);
-    @inline f(x) = xylem_pressure(tree, x) - (tree.leaf).p_crt;
+    @inline f(x) = end_pressure(tree, x) - (tree.leaf).p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
     return _solut
@@ -47,7 +47,7 @@ function tree_e_crit(
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _rt = SolutionTolerance{FT}(1e-3, 50);
-    @inline f(x) = xylem_pressure(tree, x) - tree.leaves[1].p_crt;
+    @inline f(x) = end_pressure(tree, x) - tree.leaves[1].p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
     return _solut

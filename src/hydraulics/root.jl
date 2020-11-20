@@ -25,7 +25,7 @@ function root_q_from_pressure(
     _fx    = min(_fh, ini);
     _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
     _st    = SolutionTolerance{FT}(1e-4, 50);
-    @inline f(x) = xylem_pressure(root, x) - pressure;
+    @inline f(x) = end_pressure(root, x) - pressure;
     _solut = find_zero(f, _ms, _st);
 
     return _solut
