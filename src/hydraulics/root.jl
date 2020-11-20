@@ -3,33 +3,6 @@
 # Calculate root flow rates and pressure from total flow rate
 #
 ###############################################################################
-"""
-    root_q_from_pressure(
-                root::RootHydraulics{FT},
-                pressure::FT,
-                ini::FT
-    ) where {FT<:AbstractFloat}
-
-Calculate the flow rate from a given tree base pressure, given
-- `root` [`RootHydraulics`](@ref) type struct
-- `pressure` Given tree base pressure in `[MPa]`
-- `ini` Initial guess
-"""
-function root_q_from_pressure(
-            root::RootHydraulics{FT},
-            pressure::FT,
-            ini::FT = FT(1)
-) where {FT<:AbstractFloat}
-    _fh    = (root.p_ups - pressure) * root.k_max / root.f_vis;
-    _fl    = -_fh;
-    _fx    = min(_fh, ini);
-    _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _st    = SolutionTolerance{FT}(1e-4, 50);
-    @inline f(x) = end_pressure(root, x) - pressure;
-    _solut = find_zero(f, _ms, _st);
-
-    return _solut
-end
 
 
 

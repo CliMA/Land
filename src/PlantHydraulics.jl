@@ -92,15 +92,15 @@ export p_from_volume,
 # export public functions
 export pressure_profile!,
        inititialize_legacy!,
-       leaf_e_crit,
-       leaf_xylem_risk,
+       critical_flow,
+       xylem_risk,
        plant_conductances!,
        recalculate_roots_flow!,
-       root_q_from_pressure,
+       xylem_flow,
        roots_flow!,
-       tree_e_crit,
+       critical_flow,
        update_PVF!,
-       vc_temperature_effects!,
+       temperature_effects!,
        end_pressure
 
 
@@ -119,13 +119,14 @@ include("curves/capacity.jl")
 include("curves/soil.jl"    )
 include("curves/xylem.jl"   )
 
-include("hydraulics/pressure.jl")
+include("hydraulics/conductance.jl")
+include("hydraulics/flow.jl"       )
+include("hydraulics/pressure.jl"   )
+include("hydraulics/temperature.jl")
 
 include("hydraulics/capacitance.jl")
-include("hydraulics/leaf.jl"       )
 include("hydraulics/plant.jl"      )
 include("hydraulics/root.jl"       )
-include("hydraulics/temperature.jl")
 
 
 

@@ -4,17 +4,17 @@
 #
 ###############################################################################
 """
-    vc_temperature_effects!(
+    temperature_effects!(
                 hs::LeafHydraulics{FT}
     ) where {FT<:AbstractFloat}
-    vc_temperature_effects!(
+    temperature_effects!(
                 hs::AbstractHydraulicSystem{FT}
     ) where {FT<:AbstractFloat}
-    vc_temperature_effects!(
+    temperature_effects!(
                 hs::AbstractHydraulicSystem{FT},
                 T::FT
     ) where {FT<:AbstractFloat}
-    vc_temperature_effects!(
+    temperature_effects!(
                 tree::TreeSimple{FT}
     ) where {FT<:AbstractFloat}
 
@@ -23,9 +23,7 @@ Update temperature effetcs on hydralic system, given
 - `T` Given temperature
 - `tree` [`TreeSimple`](@ref) type struct
 """
-function vc_temperature_effects!(
-            hs::LeafHydraulics{FT}
-) where {FT<:AbstractFloat}
+function temperature_effects!(hs::LeafHydraulics)
     if hs.T_sap != hs.T_old
         hs.f_st  = relative_surface_tension(hs.T_sap);
         hs.f_vis = relative_viscosity(hs.T_sap);
@@ -39,9 +37,7 @@ end
 
 
 
-function vc_temperature_effects!(
-            hs::AbstractHydraulicSystem{FT}
-) where {FT<:AbstractFloat}
+function temperature_effects!(hs::Union{RootHydraulics,StemHydraulics})
     if hs.T_sap != hs.T_old
         hs.f_st  = relative_surface_tension(hs.T_sap);
         hs.f_vis = relative_viscosity(hs.T_sap);
@@ -54,13 +50,15 @@ end
 
 
 
-function vc_temperature_effects!(
-            hs::AbstractHydraulicSystem{FT},
+function temperature_effects!(
+            hs::Union{LeafHydraulics{FT},
+                      RootHydraulics{FT},
+                      StemHydraulics{FT}},
             T::FT
 ) where {FT<:AbstractFloat}
     if T != hs.T_sap
         hs.T_sap = T;
-        vc_temperature_effects!(hs);
+        temperature_effects!(hs);
     end
 
     return nothing
@@ -69,12 +67,57 @@ end
 
 
 
-function vc_temperature_effects!(
-            tree::TreeSimple{FT}
-) where {FT<:AbstractFloat}
-    vc_temperature_effects!(tree.root);
-    vc_temperature_effects!(tree.stem);
-    vc_temperature_effects!(tree.leaf);
+function temperature_effects!(tree::GrassLikeHS)
+    for root in tree.roots
+        temperature_effects!(root);
+    end
+    for leaf in tree.leaves
+        temperature_effects!(leaf);
+    end
+
+    return nothing
+end
+
+
+
+
+function temperature_effects!(tree::PalmLikeHS)
+    for root in tree.roots
+        temperature_effects!(root);
+    end
+    temperature_effects!(tree.trunk);
+    for leaf in tree.leaves
+        temperature_effects!(leaf);
+    end
+
+    return nothing
+end
+
+
+
+
+function temperature_effects!(tree::TreeLikeHS)
+    for root in tree.roots
+        temperature_effects!(root);
+    end
+    temperature_effects!(tree.trunk);
+    for stem in tree.branch
+        temperature_effects!(stem);
+    end
+    for leaf in tree.leaves
+        temperature_effects!(leaf);
+    end
+
+    return nothing
+end
+
+
+
+
+function temperature_effects!(tree::TreeSimple)
+    temperature_effects!(tree.root);
+    temperature_effects!(tree.stem);
+    temperature_effects!(tree.leaf);
 
     return nothing
 end

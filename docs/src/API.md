@@ -308,20 +308,20 @@ Function [`end_pressure`](@ref) works for the case of only 1 root layer if
     root layers, and then make sure all root layers have the same xylem end
     pressure. A few functions are provided to realize this.
 
-Function [`root_q_from_pressure`](@ref) uses Root Solving method to calculate
+Function [`xylem_flow`](@ref) uses Root Solving method to calculate
     the flow rate through the [`RootHydraulics`](@ref) struct that yields the
     given xylem end pressure. The `ini` in the function is optional. However,
     using the flow rate from last instant when pressure does not differ much
     will speed up the calculation.
 
 ```@docs
-root_q_from_pressure
+xylem_flow
 ```
 
 In the plant hydraulic module design, flow rate is computed for each canopy
     layer, and thus computing flow rate for each root layer is required for a
     multiple layered root system. One feasible way is to do iterations using
-    [`root_q_from_pressure`](@ref) function, i.e., iterate the xylem end
+    [`xylem_flow`](@ref) function, i.e., iterate the xylem end
     pressure til the total flow rate equals the given value. However, this
     method is too inefficient. What I did is
 
@@ -371,24 +371,24 @@ The stomatal models often require plant hydraulics either as a correction
     stomatal models). To facilitate the calculations, a few specific functions
     are provided.
 
-Function [`leaf_xylem_risk`](@ref) returns the risk in xylem hydraulic function
+Function [`xylem_risk`](@ref) returns the risk in xylem hydraulic function
     based on the most downstream end of the xylem. The risk of plant hydraulic
     system is not only on current system, but also potential new growth (plants
     don't want to risk new growth either). Thus, function
-    [`leaf_xylem_risk`](@ref) evaluates the risk from the xylem pressure
+    [`xylem_risk`](@ref) evaluates the risk from the xylem pressure
     calculated from current system (with drought history), and then compute the
     risk from the pressure (the severer the srought history, the higher the
     risk):
 
 ```@docs
-leaf_xylem_risk
+xylem_risk
 ```
 
-Note that function [`leaf_xylem_risk`](@ref) can work on its own without having
+Note that function [`xylem_risk`](@ref) can work on its own without having
     other organ-level components. For example, by changing the `p_ups` of a
     [`LeafHydraulics`](@ref), one can simulate the case of drought without
     caring about other hydraulic systems. Same for function
-    [`leaf_e_crit`](@ref) below. However, these functions are only useful for
+    [`critical_flow`](@ref) below. However, these functions are only useful for
     sensitivity analysis or when `p_ups` in the [`LeafHydraulics`](@ref) is
     accurate.
 
@@ -399,21 +399,21 @@ using PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();
-risk = leaf_xylem_risk(leaf, FT(0.01));
+risk = xylem_risk(leaf, FT(0.01));
 @show risk;
 leaf.p_ups = FT(-1.0);
-risk = leaf_xylem_risk(leaf, FT(0.01));
+risk = xylem_risk(leaf, FT(0.01));
 @show risk;
 ```
 
-Function [`leaf_e_crit`](@ref) calculates critical leaf transpiration rate,
-    beyond which leaf will desicate. Function [`leaf_e_crit`](@ref) accounts
+Function [`critical_flow`](@ref) calculates critical leaf transpiration rate,
+    beyond which leaf will desicate. Function [`critical_flow`](@ref) accounts
     for drought legacy effect by design, and the more severe the drought
-    history, the lower the `e_crit`. Again, `ini` in the function is also
+    history, the lower the `critical_flow`. Again, `ini` in the function is also
     optional, but a good guess will speed up the calculations.
 
 ```@docs
-leaf_e_crit
+critical_flow
 ```
 
 Examples
@@ -422,19 +422,19 @@ using PlantHydraulics
 
 FT = Float32;
 leaf = LeafHydraulics{FT}();
-risk = leaf_e_crit(leaf);
+risk = critical_flow(leaf);
 @show risk;
 leaf.p_ups = FT(-1.0);
-risk = leaf_e_crit(leaf);
+risk = critical_flow(leaf);
 @show risk;
 ```
 
 ## Whole-plant Hydraulics
-Though [`leaf_xylem_risk`](@ref) and [`leaf_e_crit`](@ref) can work on their
+Though [`xylem_risk`](@ref) and [`critical_flow`](@ref) can work on their
     own, the functions only evaluate the risks on leaf level. The more
     realistic case is that when leaf transpiration rate increases, `p_ups` in
     the [`LeafHydraulics`](@ref) gets more negative. Thus, the
-    [`leaf_xylem_risk`](@ref) and [`leaf_e_crit`](@ref) tends to underestimate
+    [`xylem_risk`](@ref) and [`critical_flow`](@ref) tends to underestimate
     the risk and overestimate the critical flow rate. To overcome this problem,
     whole-plant level plant hydraulics are provided.
 
@@ -446,14 +446,14 @@ Function [`end_pressure`](@ref) calculates the leaf xylem end pressure for
 - calculate the branch end pressure (if present)
 - calculate the leaf end pressure (if present)
 
-Accordingly, there is a function [`tree_e_crit`](@ref) to calculate the
+Accordingly, there is a function [`critical_flow`](@ref) to calculate the
     critical flow rate for the whole plant. Be aware that Plant-level function
-    [`end_pressure`](@ref) and [`tree_e_crit`](@ref) only applies to the
+    [`end_pressure`](@ref) and [`critical_flow`](@ref) only applies to the
     case of only one canopy layer (or big-leaf model). As to the case of
     multiple canopy layer, more functions are pending.
 
 ```@docs
-tree_e_crit
+critical_flow
 ```
 
 Note that the organ level or whole-plant level conductances are different from
@@ -480,11 +480,11 @@ Plant hydraulic properties changes with temperature, due to its impacts on
     conduit resistance to cavitation decreases (bad for plants!). As to
     viscosity, when temperature increases, viscosity decreases, meaning that
     pressure drop decreases at the same flow rate (good for plants!). To
-    account for these effects, we provided [`vc_temperature_effects!`](@ref)
+    account for these effects, we provided [`temperature_effects!`](@ref)
     function:
 
 ```@docs
-vc_temperature_effects!
+temperature_effects!
 ```
 
 Keep in mind that, leaf critical pressure changes due to surface tension,

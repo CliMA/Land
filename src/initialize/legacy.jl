@@ -5,37 +5,19 @@
 ###############################################################################
 """
     inititialize_legacy!(
-                hs::AbstractHydraulicSystem{FT}
-    ) where {FT<:AbstractFloat}
-    inititialize_legacy!(
-                tree::TreeSimple{FT}
-    ) where {FT<:AbstractFloat}
+                hs::Union{LeafHydraulics,RootHydraulics,StemHydraulics})
+    inititialize_legacy!(tree::GrassLikeHS)
+    inititialize_legacy!(tree::PalmLikeHS)
+    inititialize_legacy!(tree::TreeLikeHS)
+    inititialize_legacy!(tree::TreeSimple)
 
 Initialize the drought legacy effects in the xylem, given
 - `hs` [`AbstractHydraulicSystem`] type struct
 - `tree` [`TreeSimple`](@ref) type struct
 """
-function inititialize_legacy!(hs::LeafHydraulics)
-    hs.k_history .= 1;
-    hs.p_history .= 0;
-
-    return nothing
-end
-
-
-
-
-function inititialize_legacy!(hs::RootHydraulics)
-    hs.k_history .= 1;
-    hs.p_history .= 0;
-
-    return nothing
-end
-
-
-
-
-function inititialize_legacy!(hs::StemHydraulics)
+function inititialize_legacy!(
+            hs::Union{LeafHydraulics,RootHydraulics,StemHydraulics}
+)
     hs.k_history .= 1;
     hs.p_history .= 0;
 
