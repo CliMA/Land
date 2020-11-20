@@ -320,14 +320,20 @@ end
 
 function hydraulic_p_profile!(
             tree::GrassLikeHS{FT};
-            update::Bool = false
+            update::Bool = false,
+            nss::Bool = true
 ) where {FT<:AbstractFloat}
     @unpack leaves, roots = tree;
 
     # update the profile in roots
     p_mean::FT = 0;
     for root in roots
-        hydraulic_p_profile!(root, root.q_in, root.q_element; update=update);
+        if nss
+            hydraulic_p_profile!(root, root.q_in, root.q_element;
+                                 update=update);
+        else
+            hydraulic_p_profile!(root, root.flow; update=update);
+        end
         p_mean += root.p_dos;
     end
     p_mean /= length(roots);
@@ -335,7 +341,11 @@ function hydraulic_p_profile!(
     # update the profile in leaf
     for leaf in leaves
         leaf.p_ups = p_mean;
-        hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        if nss
+            hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        else
+            hydraulic_p_profile!(leaf, leaf.flow; update=update);
+        end
     end
 
     return nothing
@@ -346,26 +356,40 @@ end
 
 function hydraulic_p_profile!(
             tree::PalmLikeHS{FT};
-            update::Bool = false
+            update::Bool = false,
+            nss::Bool = true
 ) where {FT<:AbstractFloat}
     @unpack leaves, roots, trunk = tree;
 
     # update the profile in roots
     p_mean::FT = 0;
     for root in roots
-        hydraulic_p_profile!(root, root.q_in, root.q_element; update=update);
+        if nss
+            hydraulic_p_profile!(root, root.q_in, root.q_element;
+                                 update=update);
+        else
+            hydraulic_p_profile!(root, root.flow; update=update);
+        end
         p_mean += root.p_dos;
     end
     p_mean /= length(roots);
 
     # update the profile in trunk
     trunk.p_ups = p_mean;
-    hydraulic_p_profile!(trunk, trunk.q_element; update=update);
+    if nss
+        hydraulic_p_profile!(trunk, trunk.q_element; update=update);
+    else
+        hydraulic_p_profile!(trunk, trunk.flow; update=update);
+    end
 
     # update the profile in leaf
     for leaf in leaves
         leaf.p_ups = trunk.p_dos;
-        hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        if nss
+            hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        else
+            hydraulic_p_profile!(leaf, leaf.flow; update=update);
+        end
     end
 
     return nothing
@@ -376,30 +400,48 @@ end
 
 function hydraulic_p_profile!(
             tree::TreeLikeHS{FT};
-            update::Bool = false
+            update::Bool = false,
+            nss::Bool = true
 ) where {FT<:AbstractFloat}
     @unpack branch, leaves, roots, trunk = tree;
 
     # update the profile in roots
     p_mean::FT = 0;
     for root in roots
-        hydraulic_p_profile!(root, root.q_in, root.q_element; update=update);
+        if nss
+            hydraulic_p_profile!(root, root.q_in, root.q_element;
+                                 update=update);
+        else
+            hydraulic_p_profile!(root, root.flow; update=update);
+        end
         p_mean += root.p_dos;
     end
     p_mean /= length(roots);
 
     # update the profile in trunk
     trunk.p_ups = p_mean;
-    hydraulic_p_profile!(trunk, trunk.q_element; update=update);
+    if nss
+        hydraulic_p_profile!(trunk, trunk.q_element; update=update);
+    else
+        hydraulic_p_profile!(trunk, trunk.flow; update=update);
+    end
 
     # update the profile in leaf
     for i in eachindex(leaves)
         stem = branch[i];
         leaf = leaves[i];
         stem.p_ups = trunk.p_dos;
-        hydraulic_p_profile!(stem, stem.q_element; update=update);
+        if nss
+            hydraulic_p_profile!(stem, stem.q_element; update=update);
+        else
+            hydraulic_p_profile!(stem, stem.flow; update=update);
+        end
         leaf.p_ups = stem.p_dos;
-        hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        if nss
+            hydraulic_p_profile!(leaf, leaf.q_in; update=update);
+        else
+            hydraulic_p_profile!(leaf, leaf.flow; update=update);
+        end
     end
 
     return nothing

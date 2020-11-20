@@ -22,22 +22,40 @@ K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
 
 
 
-# export public types
+# export public types --- soil vulnerability
+export AbstractSoilVC,
+       BrooksCorey,
+       VanGenuchten
+
+# export public types --- xylem vulnerability
 export AbstractXylemVC,
        WeibullDual,
-       WeibullSingle,
-       AbstractSoilVC,
-       BrooksCorey,
-       VanGenuchten,
-       AbstractHydraulicSystem,
+       WeibullSingle
+
+# export public types --- pressure volume curve
+export AbstractPressureVolumeCurve,
+       PVCurveLinear
+
+# export public types --- flow mode
+export AbstractFlowMode,
+       NonSteadyStateMode,
+       SteadyStateMode
+
+# export public types --- hydraulic tissue
+export AbstractHydraulicSystem,
        LeafHydraulics,
        RootHydraulics,
-       StemHydraulics,
-       AbstractPlantHS,
+       StemHydraulics
+
+# export public types --- hydraulic system
+export AbstractPlantHS,
        GrassLikeHS,
        PalmLikeHS,
        TreeLikeHS,
-       TreeSimple,
+       TreeSimple
+
+# export public functions --- initialize soil type
+export create_VanGenuchten,
        VGClay,
        VGClayLoam,
        VGLoamySand,
@@ -49,16 +67,15 @@ export AbstractXylemVC,
        VGSilt,
        VGSiltyClay,
        VGSiltyClayLoam,
-       VGSiltyLoam,
-       AbstractPressureVolumeCurve,
-       PVCurveLinear
+       VGSiltyLoam
 
-# export public functions
+# export public functions --- initialize plant
 export create_grass_like_hs,
        create_palm_like_hs,
-       create_tree_like_hs,
-       create_VanGenuchten,
-       hydraulic_p_profile!,
+       create_tree_like_hs
+
+# export public functions
+export hydraulic_p_profile!,
        inititialize_legacy!,
        leaf_e_crit,
        leaf_xylem_risk,
@@ -87,11 +104,13 @@ export create_grass_like_hs,
 
 
 
-include("types/vulnerability.jl"   )
-include("types/hydraulics_organ.jl")
-include("types/hydraulics_plant.jl")
-include("types/initialize_plant.jl")
-include("types/parasets.jl"        )
+include("types/curves.jl")
+include("types/flow.jl"  )
+include("types/tissue.jl")
+include("types/plant.jl" )
+
+include("initialize/soil.jl" )
+include("initialize/plant.jl")
 
 include("vulnerability/capacitance.jl")
 include("vulnerability/pcrit.jl"      )
