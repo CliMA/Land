@@ -230,7 +230,7 @@ function update_PVF!(tree::PalmLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, container_k, container_p, container_q, f_sum, Δt);
+    update_PVF!(roots, container_k, container_p, container_q, trunk.q_in, Δt);
 
     # 4. update pressure profiles
     hydraulic_p_profile!(tree; update=false);
@@ -262,7 +262,7 @@ function update_PVF!(tree::TreeLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, container_k, container_p, container_q, f_sum, Δt);
+    update_PVF!(roots, container_k, container_p, container_q, trunk.q_in, Δt);
 
     # 4. update pressure profiles
     hydraulic_p_profile!(tree; update=false);

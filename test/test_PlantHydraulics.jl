@@ -302,7 +302,7 @@ println("\nTesting the capacitance functions...")
     for FT in [Float32, Float64]
         grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
         palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 
         # test the tree_e_crit function
         update_PVF!(grass, FT(1)); @test true;

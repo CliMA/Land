@@ -78,9 +78,9 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Pressure of storage"
     p_storage::FT = 0
     "Total capaciatance at Ψ = 0 `[mol m⁻²]`"
-    v_maximum::FT = 30
+    v_maximum::FT = 20
     "Current capaciatance at Ψ_leaf `[mol m⁻²]`"
-    v_storage::FT = 30
+    v_storage::FT = 20
     "Flow rate into the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
     q_in     ::FT = 0
     "Flow rate out of the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
@@ -155,9 +155,9 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Pressure of storage per element"
     p_storage::Array{FT,1} = zeros(FT,10)
     "Maximal storage per element `[mol]`"
-    v_maximum::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    v_maximum::Array{FT,1} = area * Δh / 10 * 6000 * ones(FT,10)
     "Storage per element `[mol]`"
-    v_storage::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    v_storage::Array{FT,1} = area * Δh / 10 * 6000 * ones(FT,10)
     "List of xylem water flow `[mol m⁻²]`"
     q_element::Array{FT,1} = zeros(FT,10)
     "List of buffer water flow `[mol m⁻²]`"
@@ -228,9 +228,9 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Pressure of storage per element"
     p_storage::Array{FT,1} = zeros(FT,10)
     "Maximal storage per element `[mol]`"
-    v_maximum::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    v_maximum::Array{FT,1} = area * Δh / 10 * 6000 * ones(FT,10)
     "Storage per element `[mol]`"
-    v_storage::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    v_storage::Array{FT,1} = area * Δh / 10 * 6000 * ones(FT,10)
     "List of xylem water flow `[mol m⁻²]`"
     q_element::Array{FT,1} = zeros(FT,10)
     "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
