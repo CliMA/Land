@@ -4,14 +4,20 @@
 #
 ###############################################################################
 """
-    xylem_p_from_flow(leaf::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(root::RootHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(stem::StemHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(tree::GrassLikeHS{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(tree::PalmLikeHS{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(tree::TreeLikeHS{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(tree::TreeSimple{FT}, flow::FT) where {FT<:AbstractFloat}
-    xylem_p_from_flow(tree::TreeSimple{FT}, f_sl::FT, f_sh::FT, r_sl::FT) where {FT<:AbstractFloat}
+    xylem_p_from_flow(
+                leaf::AbstractHydraulicSystem{FT},
+                flow::FT
+    ) where {FT<:AbstractFloat}
+    xylem_p_from_flow(
+                tree::AbstractPlantHS{FT},
+                flow::FT
+    ) where {FT<:AbstractFloat}
+    xylem_p_from_flow(
+                tree::TreeSimple{FT},
+                f_sl::FT,
+                f_sh::FT,
+                r_sl::FT
+    ) where {FT<:AbstractFloat}
 
 Return the xylen end pressure(s) from flow rate(s), given
 - `leaf` [`LeafHydraulics`](@ref) type struct
@@ -130,7 +136,8 @@ function xylem_p_from_flow(
 
     if tree.n_canopy == 1
         # calculate the p_dos for roots
-        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        roots_flow!(tree.roots, tree.container_k, tree.container_p,
+                    tree.container_q, flow);
         tree.leaves[1].p_ups = mean(tree.container_p);
 
         # calculate the p_dos for leaves
@@ -159,7 +166,8 @@ function xylem_p_from_flow(
 
     if tree.n_canopy == 1
         # calculate the p_dos for roots
-        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        roots_flow!(tree.roots, tree.container_k, tree.container_p,
+                    tree.container_q, flow);
         (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk
@@ -192,7 +200,8 @@ function xylem_p_from_flow(
 
     if tree.n_canopy == 1
         # calculate the p_dos for roots
-        roots_flow!(tree.roots, tree.container_k, tree.container_p, tree.container_q, flow);
+        roots_flow!(tree.roots, tree.container_k, tree.container_p,
+                    tree.container_q, flow);
         (tree.trunk).p_ups = mean(tree.container_p);
 
         # calculate the p_dos for trunk

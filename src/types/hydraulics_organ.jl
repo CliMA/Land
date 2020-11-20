@@ -16,20 +16,20 @@ Hierarchy of AbstractHydraulicSystem
 - [`RootHydraulics`](@ref)
 - [`StemHydraulics`](@ref)
 """
-abstract type AbstractHydraulicSystem{FT} end
+abstract type AbstractHydraulicSystem{FT<:AbstractFloat} end
 
 
 
 
 """
-    mutable struct LeafHydraulics{FT<:AbstractFloat}
+    mutable struct LeafHydraulics{FT}
 
 A struct that contains leaf hydraulics information.
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
+Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # leaf hydraulic parameters
     "Leaf area `[m²]`"
     area ::FT = FT(1500)
@@ -71,20 +71,34 @@ Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
     T_sap::FT = K_25(FT)
+
+    # capacitance
+    "Pressure volume curve for storage"
+    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    "Pressure of storage"
+    p_storage::FT = 0
+    "Total capaciatance at Ψ = 0 `[mol m⁻²]`"
+    v_maximum::FT = 30
+    "Current capaciatance at Ψ_leaf `[mol m⁻²]`"
+    v_storage::FT = 30
+    "Flow rate into the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
+    q_in     ::FT = 0
+    "Flow rate out of the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
+    q_out    ::FT = 0
 end
 
 
 
 
 """
-    mutable struct RootHydraulics{FT<:AbstractFloat}
+    mutable struct RootHydraulics{FT}
 
 A struct that contains root hydraulics information.
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
+Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # root hydraulic parameters
     "Root cross-section area `[m²]`"
     area ::FT = FT(1)
@@ -134,20 +148,40 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
     T_sap::FT = K_25(FT)
+
+    # capacitance
+    "Pressure volume curve for storage"
+    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    "Pressure of storage per element"
+    p_storage::Array{FT,1} = zeros(FT,10)
+    "Maximal storage per element `[mol]`"
+    v_maximum::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    "Storage per element `[mol]`"
+    v_storage::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    "List of xylem water flow `[mol m⁻²]`"
+    q_element::Array{FT,1} = zeros(FT,10)
+    "List of buffer water flow `[mol m⁻²]`"
+    q_buffer ::Array{FT,1} = zeros(FT,10)
+    "List of diiferntial water flow `[mol m⁻²]`"
+    q_diff   ::Array{FT,1} = zeros(FT,10)
+    "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_in ::FT = 0
+    "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_out::FT = 0
 end
 
 
 
 
 """
-    mutable struct StemHydraulics{FT<:AbstractFloat}
+    mutable struct StemHydraulics{FT}
 
 A struct that contains stem hydraulics information.
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
+Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # stem hydraulic parameters
     "Stem cross-section area `[m²]`"
     area ::FT = FT(1)
@@ -187,4 +221,20 @@ Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     T_old::FT = K_25(FT)
     "Upstream sap temperature `[K]`"
     T_sap::FT = K_25(FT)
+
+    # capacitance
+    "Pressure volume curve for storage"
+    pv::AbstractPressureVolumeCurve{FT} = PVCurveLinear{FT}()
+    "Pressure of storage per element"
+    p_storage::Array{FT,1} = zeros(FT,10)
+    "Maximal storage per element `[mol]`"
+    v_maximum::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    "Storage per element `[mol]`"
+    v_storage::Array{FT,1} = area * Δh / 10 * 12000 * ones(FT,10)
+    "List of xylem water flow `[mol m⁻²]`"
+    q_element::Array{FT,1} = zeros(FT,10)
+    "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_in ::FT = 0
+    "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_out::FT = 0
 end

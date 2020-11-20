@@ -4,9 +4,19 @@
 #
 ###############################################################################
 """
-    vc_temperature_effects!(hs::AbstractHydraulicSystem{FT}, T::FT) where {FT<:AbstractFloat}
-    vc_temperature_effects!(hs::AbstractHydraulicSystem{FT}) where {FT<:AbstractFloat}
-    vc_temperature_effects!(tree::TreeSimple{FT}) where {FT<:AbstractFloat}
+    vc_temperature_effects!(
+                hs::LeafHydraulics{FT}
+    ) where {FT<:AbstractFloat}
+    vc_temperature_effects!(
+                hs::AbstractHydraulicSystem{FT}
+    ) where {FT<:AbstractFloat}
+    vc_temperature_effects!(
+                hs::AbstractHydraulicSystem{FT},
+                T::FT
+    ) where {FT<:AbstractFloat}
+    vc_temperature_effects!(
+                tree::TreeSimple{FT}
+    ) where {FT<:AbstractFloat}
 
 Update temperature effetcs on hydralic system, given
 - `hs` [`AbstractHydraulicSystem`](@ref) type struct

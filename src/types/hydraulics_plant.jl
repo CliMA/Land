@@ -11,13 +11,13 @@ Hierachy of AbstractPlantHS
 - [`PalmLikeHS`](@ref)
 - [`TreeLikeHS`](@ref)
 """
-abstract type AbstractPlantHS{FT} end
+abstract type AbstractPlantHS{FT<:AbstractFloat} end
 
 
 
 
 """
-    mutable struct GrassLikeHS{FT<:AbstractFloat}
+    mutable struct GrassLikeHS{FT}
 
 A plant hydraulic system like a grass, which contains multiple root layers, and
 multiple canopy layers. No trunk or branch system applies.
@@ -25,7 +25,7 @@ multiple canopy layers. No trunk or branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct GrassLikeHS{FT} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -57,7 +57,7 @@ end
 
 
 """
-    mutable struct PalmLikeHS{FT<:AbstractFloat}
+    mutable struct PalmLikeHS{FT}
 
 A plant hydraulic system like a palm, which contains multiple root layers, one
 trunk, and multiple canopy layers. No branch system applies.
@@ -65,7 +65,7 @@ trunk, and multiple canopy layers. No branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct PalmLikeHS{FT} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -99,7 +99,7 @@ end
 
 
 """
-    mutable struct TreeLikeHS{FT<:AbstractFloat}
+    mutable struct TreeLikeHS{FT}
 
 A plant hydraulic system like a tree, which contains multiple root layers, one
 trunk, and multiple branch and canopy layers.
@@ -107,7 +107,7 @@ trunk, and multiple branch and canopy layers.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct TreeLikeHS{FT} <: AbstractPlantHS{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -143,14 +143,15 @@ end
 
 
 """
-    mutable struct TreeSimple{FT<:AbstractFloat}
+    mutable struct TreeSimple{FT}
 
-A plant hydraulic system with one root, one stem, and one leaf for testing purpose
+A plant hydraulic system with one root, one stem, and one leaf for testing
+    purpose
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct TreeSimple{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantHS{FT}
     # Arrays of roots and leaves
     "Root"
     root::RootHydraulics{FT} = RootHydraulics{FT}()

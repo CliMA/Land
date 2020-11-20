@@ -35,7 +35,9 @@ end
 #
 ###############################################################################
 """
-    leaf_e_crit(hs::LeafHydraulics{FT}, ini::FT) where {FT<:AbstractFloat}
+    leaf_e_crit(hs::LeafHydraulics{FT},
+                ini::FT = FT(0.5)
+    ) where {FT<:AbstractFloat}
 
 Calculate the critical flow rate (K ≈ 0), given
 - `hs` [`LeafHydraulics`](@ref) type struct

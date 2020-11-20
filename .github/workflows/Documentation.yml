@@ -9,11 +9,13 @@ on:
   pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  docs-build:
+    runs-on: ubuntu-20.04
     steps:
       - name: Set up Actions
         uses: actions/checkout@v1
+      - name: Install matplotlib
+        run: sudo apt install python3-matplotlib
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:

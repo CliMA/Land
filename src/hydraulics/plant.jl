@@ -4,7 +4,9 @@
 #
 ###############################################################################
 """
-    tree_e_crit(tree::PalmLikeHS{FT}, ini::FT) where {FT<:AbstractFloat}
+    tree_e_crit(tree::AbstractPlantHS{FT},
+                ini::FT = FT(0.5)
+    ) where {FT<:AbstractFloat}
 
 Calculate the critical flow rate for the tree per LA, given
 - `tree` [`GrassLikeHS`](@ref) or [`PalmLikeHS`](@ref) or [`TreeLikeHS`](@ref)
