@@ -19,7 +19,7 @@ function optimize_flows!(
     @unpack frac_sh, frac_sl = node.container2L;
 
     # calculate the ecrit
-    node.ec = tree_e_crit(node.hs, node.ec);
+    node.ec = critical_flow(node.hs, node.ec);
     ec_sl   = node.ec * frac_sl;
     ec_sh   = node.ec * frac_sh;
 

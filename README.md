@@ -14,9 +14,6 @@
 [st-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[bm-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/Benchmarks/badge.svg?branch=main
-[bm-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"Benchmarks"
-
 [min-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/Julia-1.3/badge.svg?branch=main
 [min-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.3"
 
@@ -30,9 +27,9 @@
 
 [`SoilPlantAirContinuum.jl`][pk-url] simulates the Soil-Plant-Air Continuum with optimal stomatal models. [`SoilPlantAirContinuum.jl`][pk-url] only supports Julia 1.3 and above.
 
-| Documentation                                   | CI Status             | Benchmarks            | Compatibility           | Code Coverage           |
-|:------------------------------------------------|:----------------------|:----------------------|:------------------------|:------------------------|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
+| Documentation                                   | CI Status             | Compatibility           | Code Coverage           |
+|:------------------------------------------------|:----------------------|:------------------------|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
 
 
 

@@ -61,7 +61,7 @@ function annual_simulation!(
             anet = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
 
             # 2.2.3 update drought history
-            hydraulic_p_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
+            pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
 
             # 2.2.4 pass values to DataFrame
             output[i, "LAI_sl"] = (node.container2L).lai_sl
@@ -100,7 +100,7 @@ function annual_simulation!(
             flow = FT(0);
             # TODO morea reasonable functions need to be added
             # vc_temperature_effects!(node.hs.leaf, tlef);
-            plef = xylem_p_from_flow(node.hs, flow);
+            plef = end_pressure(node.hs, flow);
 
             # 2.3.4 pass values to DataFrame
             output[i, "LAI_sl"] = FT(0)
