@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  docs-build:
     runs-on: ubuntu-20.04
     steps:
       - name: Set up Actions

@@ -1,14 +1,11 @@
-# # Tutorial
+# # Examples
 
-
-
-
-# ## Initialization
+## load packages
 using PyPlot
 using WaterPhysics
-
 FT = Float32;
 
+## define preview_data function
 function preview_data(
             xs::Array{FT,1},
             ys::Array{FT,1},

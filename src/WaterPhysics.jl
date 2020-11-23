@@ -135,15 +135,15 @@ struct TraceLiquidH₂O <:AbstractTraceLiquid end
 ###############################################################################
 """
     capillary_pressure(
-            r::FT,
-            T::FT,
-            med::TraceLiquidH₂O
+                r::FT,
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
     capillary_pressure(
-            r::FT,
-            T::FT,
-            α::FT,
-            med::TraceLiquidH₂O
+                r::FT,
+                T::FT,
+                α::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Compute the capillary pressure in `[Pa]`, given
@@ -187,9 +187,9 @@ end
 const D_CO2_IN_AIR = 1.6e-5;
 """
     diffusive_coefficient(
-            T::FT,
-            mol::TraceGasCO₂,
-            med::TraceGasAir
+                T::FT,
+                mol::TraceGasCO₂,
+                med::TraceGasAir
     ) where {FT<:AbstractFloat}
 
 Return the diffusive coefficient of trace molecule in medium (unit: m² s⁻¹),
@@ -213,9 +213,9 @@ end
 
 """
     relative_diffusive_coefficient(
-            T::FT,
-            mol::TraceGasH₂O,
-            med::TraceGasAir
+                T::FT,
+                mol::TraceGasH₂O,
+                med::TraceGasAir
     ) where {FT<:AbstractFloat}
 
 Returns the relative diffusive coefficient of trace gas in medium, given
@@ -246,8 +246,8 @@ end
 ###############################################################################
 """
     latent_heat_vapor(
-            T::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 The specific latent heat of vaporization `[J kg⁻¹]`, given
@@ -280,9 +280,9 @@ end
 ###############################################################################
 """
     pressure_correction(
-            T::FT,
-            Ψ::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                Ψ::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Make Kelvin correction to saturation vapor pressure, given
@@ -310,13 +310,13 @@ end
 
 """
     saturation_vapor_pressure(
-            T::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
     saturation_vapor_pressure(
-            T::FT,
-            Ψ::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                Ψ::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Return the saturation vapor pressure, given
@@ -359,13 +359,13 @@ end
 
 """
     saturation_vapor_pressure_slope(
-            T::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
     saturation_vapor_pressure_slope(
-            T::FT,
-            Ψ::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                Ψ::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Return the 1st order derivative of saturation vapor pressure, given
@@ -463,8 +463,8 @@ end
 
 """
     relative_surface_tension(
-            T::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Relative surface tension of water against air relative to 298.15 K, given
@@ -509,9 +509,8 @@ const VIS_C =  0.04527      # K⁻¹  | Used for viscosity
 const VIS_D = -3.376e-5     # K⁻²  | Used for viscosity
 
 """
-    viscosity(
-            T::FT,
-            med::TraceLiquidH₂O
+    viscosity(T::FT,
+              med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Viscosity of water in `[Pa s]`, given
@@ -548,8 +547,8 @@ end
 
 """
     relative_viscosity(
-            T::FT,
-            med::TraceLiquidH₂O
+                T::FT,
+                med::TraceLiquidH₂O
     ) where {FT<:AbstractFloat}
 
 Viscosity relative to 25 degree C (298.15 K), given
