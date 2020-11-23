@@ -75,7 +75,7 @@ function annual_profit(
                 anet = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
 
                 # 2.2.3 update drought history
-                hydraulic_p_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
+                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
 
             # 2.3 if night time
             else

@@ -47,9 +47,9 @@ version = "0.1.9"
 
 [[CSV]]
 deps = ["Dates", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode"]
-git-tree-sha1 = "5f3ed063da881e9f309b0a8d543d8d1e4f5710fb"
+git-tree-sha1 = "6c45a4374774d1785830795c92e4f7dac354aa72"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.8.0"
+version = "0.8.1"
 
 [[CanopyLayers]]
 deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "LinearAlgebra", "MAT", "Parameters", "Polynomials", "QuadGK", "Statistics", "Test"]
@@ -93,9 +93,9 @@ version = "1.4.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "3bd2f94213ea7c5cc44c84f25f364a08207d9d71"
+git-tree-sha1 = "20159837c2e5e196793a313cd700b8199fd8f985"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.22.0"
+version = "0.22.1"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -128,9 +128,9 @@ version = "0.8.3"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "71e35e069daa9969b8af06cef595a1add76e0a11"
+git-tree-sha1 = "a4875e0763112d6d017126f3944f4133abb342ae"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.25.3"
+version = "0.25.5"
 
 [[ExprTools]]
 git-tree-sha1 = "10407a39b87f29d47ebaca8edbc75d7c302ff93e"
@@ -155,9 +155,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[HDF5]]
 deps = ["Blosc", "HDF5_jll", "Libdl", "Mmap", "Random"]
-git-tree-sha1 = "0713cbabdf855852dfab3ce6447c87145f3d9ea8"
+git-tree-sha1 = "0b812e7872e2199a5a04944f486b4048944f1ed8"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
-version = "0.13.6"
+version = "0.13.7"
 
 [[HDF5_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
@@ -289,15 +289,15 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "4a3d792d4bc5d82d3386b2156fa6c6a78271f1ad"
+git-tree-sha1 = "4e99531f5f30a303de9e8af61fa8bd5a479b8aad"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.1.1"
+version = "0.2.1"
 
 [[Polynomials]]
 deps = ["Intervals", "LinearAlgebra", "OffsetArrays", "RecipesBase"]
-git-tree-sha1 = "fc6db0a5d8689af73a139303ab956e418a11e116"
+git-tree-sha1 = "5c90f4837a70c126d8af3bc66cfb4da58dec9ce0"
 uuid = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-version = "1.1.11"
+version = "1.1.12"
 
 [[PooledArrays]]
 deps = ["DataAPI"]
@@ -363,7 +363,7 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 deps = ["BenchmarkTools", "CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "Parameters", "Photosynthesis", "Pkg", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
-version = "0.1.3"
+version = "0.1.4"
 
 [[SortingAlgorithms]]
 deps = ["DataStructures", "Random", "Test"]
@@ -381,9 +381,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[StomataModels]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
-git-tree-sha1 = "9759f3b5e04d2eadd48b6eac17ea2efac8123429"
+git-tree-sha1 = "69bfee4847239006ef06310404904089256bb811"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
-version = "0.1.1"
+version = "0.1.2"
 
 [[StructTypes]]
 deps = ["Dates", "UUIDs"]
@@ -409,9 +409,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[TimeZones]]
 deps = ["Dates", "EzXML", "Mocking", "Pkg", "Printf", "RecipesBase", "Serialization", "Unicode"]
-git-tree-sha1 = "e863e6524c2a8d703bbd59e7592c97537c94579f"
+git-tree-sha1 = "69f312cdb1b3145761d4e5866034efde4608735d"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "1.5.0"
+version = "1.5.1"
 
 [[TranscodingStreams]]
 deps = ["Random", "Test"]

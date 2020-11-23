@@ -19,7 +19,7 @@ function gain_risk_map(
     @unpack frac_sh, frac_sl = node.container2L;
 
     # 1. calculate the critical flow rate
-    node.ec = tree_e_crit(node.hs, node.ec);
+    node.ec = critical_flow(node.hs, node.ec);
 
     # 2. find the maximal rates
     max_f_sl = node.ec * frac_sl;
