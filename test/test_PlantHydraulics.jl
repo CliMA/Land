@@ -126,8 +126,8 @@ println("\nTesting the leaf functions...")
         _f    = FT(0.01);
 
         # Test the struct
-        _lr = leaf_xylem_risk(leaf, _f);
-        _ec = leaf_e_crit(leaf);
+        _lr = xylem_risk(leaf, _f);
+        _ec = critical_flow(leaf);
 
         for result in [_lr, _ec]
             @test FT_test(result, FT);
@@ -150,12 +150,12 @@ println("\nTesting the legacy functions...")
 
         # Test the struct
         treet = TreeSimple{FT}();
-        hydraulic_p_profile!(treet, _ps, _ft);
+        pressure_profile!(treet, _ps, _ft);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
         treet = TreeSimple{FT}();
-        hydraulic_p_profile!(treet, _ps, _fsl, _fsh, _rsl);
+        pressure_profile!(treet, _ps, _fsl, _fsh, _rsl);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
@@ -177,9 +177,9 @@ println("\nTesting the temperature functions...")
         T     = rand(FT) + 298;
 
         # test the temperature functions
-        vc_temperature_effects!(treet);
-        vc_temperature_effects!(leaf, T);
-        vc_temperature_effects!(root, T);
+        temperature_effects!(treet);
+        temperature_effects!(leaf, T);
+        temperature_effects!(root, T);
 
         for dataset in [leaf, root, treet]
             @test FT_test(dataset, FT);
@@ -201,9 +201,9 @@ println("\nTesting the root-related functions...")
         _p1 = FT(0)
         _p2 = FT(-0.5)
         _p3 = FT(-1.0)
-        for result in [ root_q_from_pressure(root, _p1),
-                        root_q_from_pressure(root, _p2),
-                        root_q_from_pressure(root, _p3) ]
+        for result in [ xylem_flow(root, _p1),
+                        xylem_flow(root, _p2),
+                        xylem_flow(root, _p3) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
@@ -225,7 +225,7 @@ println("\nTesting the root-related functions...")
         _ks = zeros(FT, 5);
         _ps = zeros(FT, 5);
         _qs = zeros(FT, 5);
-        recalculate_roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
+        roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
         @test NaN_test(grass);
     end
 end
@@ -244,28 +244,23 @@ println("\nTesting the pressure functions...")
         tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
-        # test the xylem_p_from_flow function
+        # test the end_pressure function
         _f_1 = FT(0.001)
         _f_2 = FT(1)
-        for result in [ xylem_p_from_flow(leaf, _f_1),
-                        xylem_p_from_flow(leaf, _f_2),
-                        xylem_p_from_flow(root, _f_1),
-                        xylem_p_from_flow(root, _f_2),
-                        xylem_p_from_flow(stem, _f_1),
-                        xylem_p_from_flow(stem, _f_2) ]
+        for result in [ end_pressure(leaf, _f_1),
+                        end_pressure(leaf, _f_2),
+                        end_pressure(root, _f_1),
+                        end_pressure(root, _f_2),
+                        end_pressure(stem, _f_1),
+                        end_pressure(stem, _f_2) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
 
-        # test the xylem_p_from_flow function for plants
-        for result in [ xylem_p_from_flow(grass, _f_1),
-                        xylem_p_from_flow(grass, _f_2),
-                        xylem_p_from_flow(palm, _f_1),
-                        xylem_p_from_flow(palm, _f_2),
-                        xylem_p_from_flow(tree, _f_1),
-                        xylem_p_from_flow(tree, _f_2),
-                        xylem_p_from_flow(treet, _f_1),
-                        xylem_p_from_flow(treet, _f_2) ]
+        # test the end_pressure function for plants
+        for result in [ end_pressure(treet, _f_1),
+                        end_pressure(treet, _f_2),
+                        end_pressure(treet, _f_1, _f_1, FT(0.5)) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
@@ -283,11 +278,8 @@ println("\nTesting the plant-level functions...")
         tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
-        # test the tree_e_crit function
-        for result in [ tree_e_crit(grass),
-                        tree_e_crit(palm),
-                        tree_e_crit(tree),
-                        tree_e_crit(treet) ]
+        # test the critical_flow function
+        for result in [ critical_flow(treet) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
@@ -302,9 +294,9 @@ println("\nTesting the capacitance functions...")
     for FT in [Float32, Float64]
         grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
         palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 
-        # test the tree_e_crit function
+        # test the critical_flow function
         update_PVF!(grass, FT(1)); @test true;
         update_PVF!(palm , FT(1)); @test true;
         update_PVF!(tree , FT(1)); @test true;

@@ -105,9 +105,9 @@ version = "1.4.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "3bd2f94213ea7c5cc44c84f25f364a08207d9d71"
+git-tree-sha1 = "20159837c2e5e196793a313cd700b8199fd8f985"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.22.0"
+version = "0.22.1"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -139,9 +139,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "StaticArrays", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "4474f7b2d475fbdb028faab4fdbd88d8d7a50e62"
+git-tree-sha1 = "6493eec6bfb1e578cff879b66844807e3625c83c"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.24.3"
+version = "0.24.4"
 
 [[DocStringExtensions]]
 deps = ["LibGit2", "Markdown", "Pkg", "Test"]
@@ -151,9 +151,9 @@ version = "0.8.3"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "e7b7acd1d25ffdc1fe6226a3c2fd807fe64f898d"
+git-tree-sha1 = "a4875e0763112d6d017126f3944f4133abb342ae"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.25.4"
+version = "0.25.5"
 
 [[FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "IntelOpenMP_jll", "Libdl", "LinearAlgebra", "MKL_jll", "Reexport"]
@@ -344,7 +344,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.0"
+version = "0.2.1"
 
 [[PlotPlants]]
 deps = ["DataFrames", "Distributed", "DocStringExtensions", "GLM", "KernelDensity", "NetCDF", "Pkg", "ProgressMeter", "PyCall", "PyPlot", "SharedArrays", "Statistics", "Test"]

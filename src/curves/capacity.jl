@@ -5,12 +5,12 @@
 ###############################################################################
 """
     p_from_volume(
-                pv::AbstractPressureVolumeCurve{FT},
+                pv::AbstractCapacity{FT},
                 rvol::FT
     ) where {FT<:AbstractFloat}
 
 Calculate equilibrium pressure from relative volume, given
-- `pv` [`AbstractPressureVolumeCurve`](@ref) type of struct
+- `pv` [`AbstractCapacity`](@ref) type of struct
 """
 function p_from_volume(
             pv::PVCurveLinear{FT},

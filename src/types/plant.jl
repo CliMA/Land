@@ -46,11 +46,11 @@ mutable struct GrassLikeHS{FT} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
@@ -88,11 +88,11 @@ mutable struct PalmLikeHS{FT} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
@@ -132,11 +132,11 @@ mutable struct TreeLikeHS{FT} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
