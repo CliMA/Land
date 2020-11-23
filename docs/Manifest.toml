@@ -360,7 +360,7 @@ uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [[SoilPlantAirContinuum]]
-deps = ["BenchmarkTools", "CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "Parameters", "Photosynthesis", "Pkg", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
+deps = ["CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "Parameters", "Photosynthesis", "Pkg", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 version = "0.1.4"

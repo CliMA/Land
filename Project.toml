@@ -4,7 +4,6 @@ authors = ["Yujie Wang <jesiner@gmail.com>"]
 version = "0.1.4"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CLIMAParameters = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CanopyLayers = "677f5362-5107-42e4-8e81-51d9c4a1f96c"
@@ -21,7 +20,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-BenchmarkTools = "0.5"
 CLIMAParameters = "0.1.6"
 CSV = "0.7, 0.8"
 CanopyLayers = "0.1"
