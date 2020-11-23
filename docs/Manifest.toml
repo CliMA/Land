@@ -344,7 +344,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.0"
+version = "0.2.1"
 
 [[PlotPlants]]
 deps = ["DataFrames", "Distributed", "DocStringExtensions", "GLM", "KernelDensity", "NetCDF", "Pkg", "ProgressMeter", "PyCall", "PyPlot", "SharedArrays", "Statistics", "Test"]
