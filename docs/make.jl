@@ -21,12 +21,18 @@ rm(gen_dir, force=true, recursive=true);
 mkpath(gen_dir);
 
 if gen_example
-    filename    = joinpath(@__DIR__, "src/examples.jl");
-    script      = Literate.script(filename, gen_dir);
-    code        = strip(read(script, String));
-    mdpost(str) = replace(str, "@__CODE__" => code);
-    Literate.markdown(filename, gen_dir, postprocess=mdpost);
-    push!(pages, "Examples" => "generated/examples.md");
+    # array of example pages
+    ex_pages = Any[];
+    for _ex in ["examples", "benchmarks"]
+        filename    = joinpath(@__DIR__, "src/examples/$(_ex).jl");
+        script      = Literate.script(filename, gen_dir);
+        code        = strip(read(script, String));
+        mdpost(str) = replace(str, "@__CODE__" => code);
+        Literate.markdown(filename, gen_dir, postprocess=mdpost);
+        push!(ex_pages, "$(uppercasefirst(_ex))" => "generated/$(_ex).md");
+    end
+    # add example pages to pages
+    push!(pages, "Examples" => ex_pages);
 end
 
 @show pages;
