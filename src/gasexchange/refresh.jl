@@ -33,13 +33,13 @@ function update_leaf_TP!(
         hs.f_st       = relative_surface_tension(T);
         hs.f_vis      = relative_viscosity(T);
         hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = leaf_e_crit(hs, canopyi.ec);
+        canopyi.ec    = critical_flow(hs, canopyi.ec);
         canopyi.T_old = canopyi.T;
         canopyi.p_old = canopyi.p_ups;
     # if only p_ups changes, update ec and p_old
     elseif p_ups != p_old
         hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = leaf_e_crit(hs, canopyi.ec);
+        canopyi.ec    = critical_flow(hs, canopyi.ec);
         canopyi.p_old = canopyi.p_ups;
     end
 

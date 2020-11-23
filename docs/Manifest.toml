@@ -37,9 +37,9 @@ version = "0.8.3"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "e7b7acd1d25ffdc1fe6226a3c2fd807fe64f898d"
+git-tree-sha1 = "a4875e0763112d6d017126f3944f4133abb342ae"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.25.4"
+version = "0.25.5"
 
 [[IOCapture]]
 deps = ["Logging"]
@@ -107,9 +107,9 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "4a3d792d4bc5d82d3386b2156fa6c6a78271f1ad"
+git-tree-sha1 = "4e99531f5f30a303de9e8af61fa8bd5a479b8aad"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.1.1"
+version = "0.2.1"
 
 [[Printf]]
 deps = ["Unicode"]

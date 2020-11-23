@@ -45,7 +45,7 @@ function envir_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = ps.An;
         e_1  = g_lw * (p_sat - p_H₂O) / p_atm;
-        k_1  = leaf_xylem_risk(hs, e_1);
+        k_1  = xylem_risk(hs, e_1);
 
         # update photosynthesis from x
         g_lc = x;
@@ -57,7 +57,7 @@ function envir_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = ps.An;
         e_2  = g_lw * (p_sat - p_H₂O) / p_atm;
-        k_2  = leaf_xylem_risk(hs, e_2);
+        k_2  = xylem_risk(hs, e_2);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (k_1 - k_2) / (e_2 - e_1) * a_2 / k_2;
