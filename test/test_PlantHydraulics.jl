@@ -258,14 +258,9 @@ println("\nTesting the pressure functions...")
         end
 
         # test the end_pressure function for plants
-        for result in [ end_pressure(grass, _f_1),
-                        end_pressure(grass, _f_2),
-                        end_pressure(palm, _f_1),
-                        end_pressure(palm, _f_2),
-                        end_pressure(tree, _f_1),
-                        end_pressure(tree, _f_2),
-                        end_pressure(treet, _f_1),
-                        end_pressure(treet, _f_2) ]
+        for result in [ end_pressure(treet, _f_1),
+                        end_pressure(treet, _f_2),
+                        end_pressure(treet, _f_1, _f_1, FT(0.5)) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
@@ -284,10 +279,7 @@ println("\nTesting the plant-level functions...")
         treet = TreeSimple{FT}();
 
         # test the critical_flow function
-        for result in [ critical_flow(grass),
-                        critical_flow(palm),
-                        critical_flow(tree),
-                        critical_flow(treet) ]
+        for result in [ critical_flow(treet) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end

@@ -97,8 +97,6 @@ export pressure_profile!,
        plant_conductances!,
        roots_flow!,
        xylem_flow,
-       roots_flow!,
-       critical_flow,
        update_PVF!,
        temperature_effects!,
        end_pressure

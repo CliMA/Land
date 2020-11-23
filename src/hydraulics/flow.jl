@@ -7,7 +7,7 @@
     buffer_rate(pv::AbstractCapacity{FT}) where {FT<:AbstractFloat}
 
 Return the buffer rate, given
-- `pv` [`AbstractCapacity`](@ref type struct)
+- `pv` [`AbstractCapacity`](@ref) type struct
 """
 function buffer_rate(
             pv::PVCurveLinear{FT}
@@ -40,7 +40,7 @@ end
 Calculate the critical flow rate (K ≈ 0), given
 - `hs` [`LeafHydraulics`](@ref) type struct
 - `ini` Initial guess
-- `tree` [`TreeSimple`](@refy type struct)
+- `tree` [`TreeSimple`](@ref) type struct
 
 Note, for the safety of no NaN, update critical_flow when ΔP >= -0.01
 """

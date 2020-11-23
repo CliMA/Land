@@ -297,6 +297,15 @@ pressure_profile!(leaf, FT(0.01));
 @show leaf.p_element;
 ```
 
+## Steady state and non-steady state mode
+
+```@docs
+AbstractFlowMode
+NonSteadyStateMode
+SteadyStateMode
+buffer_rate
+```
+
 
 
 
@@ -347,10 +356,6 @@ However, the steps above are only 1 iteration, and can only be used for the
     calculated end pressures is small enough. I also emphasize that to speed up
     the code, 3 containers are added to the [`AbstractPlantHS`](@ref) structs,
     and they are `cache_k`, `cache_p`, and `cache_q`.
-
-```@docs
-roots_flow!
-```
 
 Example:
 
@@ -411,10 +416,6 @@ Function [`critical_flow`](@ref) calculates critical leaf transpiration rate,
     for drought legacy effect by design, and the more severe the drought
     history, the lower the `critical_flow`. Again, `ini` in the function is also
     optional, but a good guess will speed up the calculations.
-
-```@docs
-critical_flow
-```
 
 Examples
 ```julia
@@ -492,3 +493,15 @@ Keep in mind that, leaf critical pressure changes due to surface tension,
     soil water content is still computed using the equivalent matrix potential
     at 25 Celcius because water content is only related to the air-water
     interface curvature.
+
+
+
+
+## Pressure-volume curve
+
+```@docs
+AbstractCapacity
+PVCurveLinear
+p_from_volume
+update_PVF!
+```
