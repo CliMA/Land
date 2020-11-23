@@ -87,7 +87,7 @@ function envir_diff!(
     g_sw = g_sc * FT(1.6);
     g_lw = 1 / (1/g_sw + 1/g_bw);
     e_lf = g_lw * (p_sat - p_H₂O) / p_atm;
-    k_lf = leaf_xylem_risk(hs, e_lf);
+    k_lf = xylem_risk(hs, e_lf);
 
     # calculate g_sw from stomatal model
     g_md = empirical_gsw_from_model(sm, ps, envir, k_lf);

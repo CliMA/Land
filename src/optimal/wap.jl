@@ -45,7 +45,7 @@ function envir_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = ps.An;
         e_1  = g_lw * (p_sat - p_H₂O) / p_atm;
-        p_1  = xylem_p_from_flow(hs, e_1);
+        p_1  = end_pressure(hs, e_1);
 
         # update photosynthesis from x
         g_lc = x;
@@ -57,7 +57,7 @@ function envir_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = ps.An;
         e_2  = g_lw * (p_sat - p_H₂O) / p_atm;
-        p_2  = xylem_p_from_flow(hs, e_2);
+        p_2  = end_pressure(hs, e_2);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (-2 * sm.a * p_2 + sm.b) / (e_2 - e_1) * (p_1 - p_2);
