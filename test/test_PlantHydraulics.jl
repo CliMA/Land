@@ -46,7 +46,8 @@ println("\nTesting the soil VC functions...")
         # test soil functions
         _rwc = FT(0.5);
         _p   = FT(-0.5);
-        for result in [ soil_rwc(_sh1, _p),
+        for result in [ soil_erwc(_sh2, FT(1)),
+                        soil_rwc(_sh1, _p),
                         soil_rwc(_sh2, _p),
                         soil_k_ratio_rwc(_sh1, _rwc),
                         soil_k_ratio_rwc(_sh2, _rwc),
@@ -54,6 +55,8 @@ println("\nTesting the soil VC functions...")
                         soil_k_ratio_swc(_sh2, _rwc*_sh2.Θs),
                         soil_k_ratio_p25(_sh1, _p),
                         soil_k_ratio_p25(_sh2, _p),
+                        soil_p_25_erwc(_sh1, FT(1)),
+                        soil_p_25_erwc(_sh2, FT(1)),
                         soil_p_25_rwc(_sh1, _rwc),
                         soil_p_25_rwc(_sh2, _rwc),
                         soil_p_25_swc(_sh1, _rwc*_sh1.Θs),
@@ -149,6 +152,9 @@ println("\nTesting the legacy functions...")
         _rsl  = FT(0.5);
 
         # Test the struct
+        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
         pressure_profile!(treet, _ps, _ft);
         @test FT_test(treet, FT);
@@ -159,6 +165,9 @@ println("\nTesting the legacy functions...")
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
+        inititialize_legacy!(grass);
+        inititialize_legacy!(palm);
+        inititialize_legacy!(tree);
         inititialize_legacy!(treet);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
@@ -293,12 +302,20 @@ println("\nTesting the capacitance functions...")
 @testset "Hydraulics --- capacitance" begin
     for FT in [Float32, Float64]
         grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
         tree  = create_tree_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 
         # test the critical_flow function
         update_PVF!(grass, FT(1)); @test true;
         update_PVF!(palm , FT(1)); @test true;
         update_PVF!(tree , FT(1)); @test true;
+        for leaf in tree.leaves
+            leaf.q_out = 2e-3;
+        end
+        update_PVF!(tree , FT(1)); @test true;
+        update_PVF!(tree.roots[1], FT(1e6));
+        update_PVF!(tree.roots[1], FT(1e6), true);
+        update_PVF!(tree.trunk, FT(1e6));
+        update_PVF!(tree.leaves[1], FT(1e6));
     end
 end
