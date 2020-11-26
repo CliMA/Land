@@ -12,7 +12,7 @@
     inititialize_legacy!(tree::TreeSimple)
 
 Initialize the drought legacy effects in the xylem, given
-- `hs` [`AbstractHydraulicSystem`] type struct
+- `hs` [`AbstractHydraulicOrgan`] type struct
 - `tree` [`TreeSimple`](@ref) type struct
 """
 function inititialize_legacy!(

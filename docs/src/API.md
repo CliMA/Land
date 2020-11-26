@@ -20,7 +20,7 @@ The PlantHydraulics module provides two levels of hydraulics system:
 Plant hydraulics is segmented to three organ-level systems/structs
     ([`LeafHydraulics`](@ref), [`RootHydraulics`](@ref), and
     [`StemHydraulics`](@ref)) subject to an Abstract type
-    ([`AbstractHydraulicSystem`](@ref)). The major differences among the three
+    ([`AbstractHydraulicOrgan`](@ref)). The major differences among the three
     structs are
 
 - [`LeafHydraulics`](@ref) has an extra-xylary component
@@ -30,7 +30,7 @@ Plant hydraulics is segmented to three organ-level systems/structs
 See the documentation for each struct for more details:
 
 ```@docs
-AbstractHydraulicSystem
+AbstractHydraulicOrgan
 LeafHydraulics
 RootHydraulics
 StemHydraulics

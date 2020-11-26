@@ -23,9 +23,9 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
     "Slope of the linear PV curve (relative to maximum) `[MPa⁻¹]`"
-    slope    ::FT = 0.2
+    slope   ::FT = 0.2
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
-    k_refill ::FT = 0.0001
+    k_refill::FT = 0.0001
 end
 
 

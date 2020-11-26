@@ -8,10 +8,10 @@
                 hs::LeafHydraulics{FT}
     ) where {FT<:AbstractFloat}
     temperature_effects!(
-                hs::AbstractHydraulicSystem{FT}
+                hs::AbstractHydraulicOrgan{FT}
     ) where {FT<:AbstractFloat}
     temperature_effects!(
-                hs::AbstractHydraulicSystem{FT},
+                hs::AbstractHydraulicOrgan{FT},
                 T::FT
     ) where {FT<:AbstractFloat}
     temperature_effects!(
@@ -19,7 +19,7 @@
     ) where {FT<:AbstractFloat}
 
 Update temperature effetcs on hydralic system, given
-- `hs` [`AbstractHydraulicSystem`](@ref) type struct
+- `hs` [`AbstractHydraulicOrgan`](@ref) type struct
 - `T` Given temperature
 - `tree` [`TreeSimple`](@ref) type struct
 """

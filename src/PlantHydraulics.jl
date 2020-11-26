@@ -42,7 +42,7 @@ export AbstractFlowMode,
        SteadyStateMode
 
 # export public types --- hydraulic tissue
-export AbstractHydraulicSystem,
+export AbstractHydraulicOrgan,
        LeafHydraulics,
        RootHydraulics,
        StemHydraulics
@@ -106,7 +106,7 @@ export pressure_profile!,
 
 include("types/curves.jl")
 include("types/flow.jl"  )
-include("types/tissue.jl")
+include("types/organ.jl" )
 include("types/plant.jl" )
 
 include("initialize/legacy.jl")

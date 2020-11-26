@@ -23,7 +23,7 @@
     update_PVF!(tree::TreeLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
 
 Update pressure, capacitance, and flow rates in hydraulic system, given
-- `hs` [`AbstractHydraulicSystem`](@ref) or [`AbstractPlantHS`](@ref) type
+- `hs` [`AbstractHydraulicOrgan`](@ref) or [`AbstractPlantHS`](@ref) type
     struct
 - `Δt` Time interval
 - `nss` NonSteadyStateMode placeholder (useless)
@@ -62,12 +62,12 @@ end
 
 function update_PVF!(hs::StemHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack q_element, p_element, p_storage, pv, q_out, v_maximum, v_storage =
+    @unpack N, q_element, p_element, p_storage, pv, q_out, v_maximum, v_storage =
             hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
-    for i in 10:-1:1
+    for i in N:-1:1
         f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
@@ -87,12 +87,12 @@ end
 
 function update_PVF!(hs::RootHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
+    @unpack N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
             v_maximum, v_storage = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
-    for i in 10:-1:1
+    for i in N:-1:1
         f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
@@ -118,12 +118,12 @@ function update_PVF!(
             nss::Bool
 ) where {FT<:AbstractFloat}
     # unpack values
-    @unpack p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
+    @unpack N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
             v_maximum, v_storage = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
-    for i in 10:-1:1
+    for i in N:-1:1
         f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
