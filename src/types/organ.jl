@@ -77,7 +77,7 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
 
     # capacitance
     "Pressure volume curve for storage"
-    pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
+    pv::AbstractCapacity{FT} = PVCurveSegmented{FT}()
     "Pressure of storage"
     p_storage::FT = 0
     "Total capaciatance at Ψ = 0 `[mol m⁻²]`"

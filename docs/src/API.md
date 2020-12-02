@@ -502,6 +502,7 @@ Keep in mind that, leaf critical pressure changes due to surface tension,
 ```@docs
 AbstractCapacity
 PVCurveLinear
+PVCurveSegmented
 p_from_volume
 update_PVF!
 ```
