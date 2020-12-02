@@ -46,7 +46,8 @@ println("\nTesting the soil VC functions...")
         # test soil functions
         _rwc = FT(0.5);
         _p   = FT(-0.5);
-        for result in [ soil_rwc(_sh1, _p),
+        for result in [ soil_erwc(_sh2, FT(1)),
+                        soil_rwc(_sh1, _p),
                         soil_rwc(_sh2, _p),
                         soil_k_ratio_rwc(_sh1, _rwc),
                         soil_k_ratio_rwc(_sh2, _rwc),
@@ -54,6 +55,8 @@ println("\nTesting the soil VC functions...")
                         soil_k_ratio_swc(_sh2, _rwc*_sh2.Θs),
                         soil_k_ratio_p25(_sh1, _p),
                         soil_k_ratio_p25(_sh2, _p),
+                        soil_p_25_erwc(_sh1, FT(1)),
+                        soil_p_25_erwc(_sh2, FT(1)),
                         soil_p_25_rwc(_sh1, _rwc),
                         soil_p_25_rwc(_sh2, _rwc),
                         soil_p_25_swc(_sh1, _rwc*_sh1.Θs),
@@ -149,6 +152,9 @@ println("\nTesting the legacy functions...")
         _rsl  = FT(0.5);
 
         # Test the struct
+        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
         pressure_profile!(treet, _ps, _ft);
         @test FT_test(treet, FT);
@@ -159,6 +165,15 @@ println("\nTesting the legacy functions...")
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
+        for _plant in [grass, palm, tree]
+            pressure_profile!(_plant, SteadyStateMode(); update=true);
+            @test FT_test(_plant, FT);
+            @test NaN_test(_plant);
+        end
+
+        inititialize_legacy!(grass);
+        inititialize_legacy!(palm);
+        inititialize_legacy!(tree);
         inititialize_legacy!(treet);
         @test FT_test(treet, FT);
         @test NaN_test(treet);
@@ -174,14 +189,20 @@ println("\nTesting the temperature functions...")
         leaf  = LeafHydraulics{FT}();
         root  = RootHydraulics{FT}();
         treet = TreeSimple{FT}();
+        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         T     = rand(FT) + 298;
 
         # test the temperature functions
         temperature_effects!(treet);
+        temperature_effects!(grass);
+        temperature_effects!(palm );
+        temperature_effects!(tree );
         temperature_effects!(leaf, T);
         temperature_effects!(root, T);
 
-        for dataset in [leaf, root, treet]
+        for dataset in [leaf, root, treet, grass, palm, tree]
             @test FT_test(dataset, FT);
             @test NaN_test(dataset);
         end
@@ -226,6 +247,7 @@ println("\nTesting the root-related functions...")
         _ps = zeros(FT, 5);
         _qs = zeros(FT, 5);
         roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
+        roots_flow!(grass, FT(0.5));
         @test NaN_test(grass);
     end
 end
@@ -283,6 +305,9 @@ println("\nTesting the plant-level functions...")
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
+
+        # test the plant conductances
+        plant_conductances!(treet);
     end
 end
 
@@ -293,12 +318,25 @@ println("\nTesting the capacitance functions...")
 @testset "Hydraulics --- capacitance" begin
     for FT in [Float32, Float64]
         grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
         tree  = create_tree_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 
         # test the critical_flow function
         update_PVF!(grass, FT(1)); @test true;
         update_PVF!(palm , FT(1)); @test true;
         update_PVF!(tree , FT(1)); @test true;
+        for leaf in tree.leaves
+            leaf.q_out = 2e-3;
+        end
+        update_PVF!(tree , FT(1)); @test true;
+        update_PVF!(tree.roots[1], FT(1e6));
+        update_PVF!(tree.roots[1], FT(1e6), true);
+        update_PVF!(tree.trunk, FT(1e6));
+        update_PVF!(tree.leaves[1], FT(1e6));
+
+        # extra tests
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.9), FT(300));
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.6), FT(300));
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.1), FT(300));
     end
 end

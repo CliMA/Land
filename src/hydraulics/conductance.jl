@@ -20,14 +20,18 @@ function plant_conductances!(tree::TreeSimple{FT}) where {FT<:AbstractFloat}
     r_root = FT(0);
     r_stem = FT(0);
     r_leaf = FT(0);
-    for i in 1:10
+    for i in 1:tree.root.N
         r_root += (tree.root).k_history[i];
+    end
+    for i in 1:tree.stem.N
         r_stem += (tree.stem).k_history[i];
+    end
+    for i in 1:tree.leaf.N
         r_leaf += (tree.leaf).k_history[i];
     end
-    r_root /= 10;
-    r_stem /= 10;
-    r_leaf /= 10;
+    r_root /= tree.root.N;
+    r_stem /= tree.stem.N;
+    r_leaf /= tree.leaf.N;
     r_tree  = r_root * r_m_root + r_stem * r_m_stem + r_leaf * r_m_leaf;
 
     # Update the kr info

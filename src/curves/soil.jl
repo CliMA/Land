@@ -7,7 +7,7 @@
     soil_erwc(sh::AbstractSoilVC{FT}, p_25::FT) where {FT<:AbstractFloat}
 
 Returns the Effective relative water content of the soil
-    ``\\frac{Θs - Θr}{Θs - Θ}``, given
+    ``\\frac{Θ - Θr}{Θs - Θr}``, given
 - `sh` [`BrooksCorey`](@ref) or [`VanGenuchten`](@ref) type soil hydraulics
 - `p_25` Matrix water potential equivalent to 25 degree C, with surface tension
 correction

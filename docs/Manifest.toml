@@ -139,9 +139,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
 deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "StaticArrays", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "6493eec6bfb1e578cff879b66844807e3625c83c"
+git-tree-sha1 = "3d85c955190e6133966df58d3088d88234b72d12"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.24.4"
+version = "0.24.6"
 
 [[DocStringExtensions]]
 deps = ["LibGit2", "Markdown", "Pkg", "Test"]
@@ -213,9 +213,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[Interpolations]]
 deps = ["AxisAlgorithms", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
-git-tree-sha1 = "d2ff0813f0f110918db2537201686575fcf8d345"
+git-tree-sha1 = "eb1dd6d5b2275faaaa18533e0fc5f9171cec25fa"
 uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-version = "0.13.0"
+version = "0.13.1"
 
 [[InvertedIndices]]
 deps = ["Test"]
@@ -340,11 +340,17 @@ version = "1.0.12"
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
+[[PkgUtility]]
+deps = ["Pkg", "Test"]
+git-tree-sha1 = "4fe612b1eecbb888fc39388cf651aa164a379798"
+uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
+version = "0.1.0"
+
 [[PlantHydraulics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
+deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "PkgUtility", "Statistics", "Test", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.1"
+version = "0.2.2"
 
 [[PlotPlants]]
 deps = ["DataFrames", "Distributed", "DocStringExtensions", "GLM", "KernelDensity", "NetCDF", "Pkg", "ProgressMeter", "PyCall", "PyPlot", "SharedArrays", "Statistics", "Test"]
@@ -459,9 +465,9 @@ version = "0.10.3"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "da4cf579416c81994afd6322365d00916c79b8ae"
+git-tree-sha1 = "794e88df12426adc7eb3370b4ec3aee12f8d6911"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.12.5"
+version = "1.0.0"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]

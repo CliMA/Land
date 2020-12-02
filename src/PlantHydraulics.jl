@@ -16,6 +16,7 @@ struct EarthParameterSet <: AbstractEarthParameterSet end
 const EARTH = EarthParameterSet()
 GRAVITY(FT) = FT( grav(EARTH) );
 K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
+R_GAS(FT)   = FT( gas_constant() );
 ρ_H₂O(FT)   = FT( ρ_cloud_liq(EARTH) );
 ρg_MPa(FT)  = ρ_H₂O(FT) * GRAVITY(FT) * FT(1e-6);
 
@@ -34,7 +35,8 @@ export AbstractXylemVC,
 
 # export public types --- pressure volume curve
 export AbstractCapacity,
-       PVCurveLinear
+       PVCurveLinear,
+       PVCurveSegmented
 
 # export public types --- flow mode
 export AbstractFlowMode,
@@ -42,7 +44,7 @@ export AbstractFlowMode,
        SteadyStateMode
 
 # export public types --- hydraulic tissue
-export AbstractHydraulicSystem,
+export AbstractHydraulicOrgan,
        LeafHydraulics,
        RootHydraulics,
        StemHydraulics
@@ -106,7 +108,7 @@ export pressure_profile!,
 
 include("types/curves.jl")
 include("types/flow.jl"  )
-include("types/tissue.jl")
+include("types/organ.jl" )
 include("types/plant.jl" )
 
 include("initialize/legacy.jl")
