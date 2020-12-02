@@ -87,6 +87,12 @@ version = "1.0.12"
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
+[[PkgUtility]]
+deps = ["Pkg", "Test"]
+git-tree-sha1 = "4fe612b1eecbb888fc39388cf651aa164a379798"
+uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
+version = "0.1.0"
+
 [[Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
