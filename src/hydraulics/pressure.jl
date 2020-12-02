@@ -247,6 +247,9 @@ function pressure_profile!(
             flow::FT;
             update::Bool = true
 ) where {FT<:AbstractFloat}
+    # update leaf flow
+    leaf.flow = flow;
+
     @unpack k_element, k_history, p_history, p_ups, f_st, f_vis, vc = leaf;
 
     p_end::FT = p_ups;
@@ -286,6 +289,9 @@ function pressure_profile!(
             flow::FT;
             update::Bool = true
 ) where {FT<:AbstractFloat}
+    # update root flow rate
+    root.flow = flow;
+
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
             p_ups, sh, vc = root;
 
@@ -391,6 +397,9 @@ function pressure_profile!(
             flow::FT;
             update::Bool = true
 ) where {FT<:AbstractFloat}
+    # update stem flow
+    stem.flow = flow;
+
     @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
             vc = stem;
 

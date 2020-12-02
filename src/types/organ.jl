@@ -204,6 +204,8 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     Δh   ::FT = FT(5.0)
 
     # flows and pressures (need to be updated with time)
+    "Flow rate in the xylem `[mol s⁻¹]`"
+    flow  ::FT = FT(0.0)
     "Xylem water pressure at the downstream end of xylem `[MPa]`"
     p_dos::FT = FT(0.0)
     "Xylem water pressure at the base (upstream) `[MPa]`"

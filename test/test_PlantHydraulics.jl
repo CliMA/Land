@@ -165,6 +165,12 @@ println("\nTesting the legacy functions...")
         @test FT_test(treet, FT);
         @test NaN_test(treet);
 
+        for _plant in [grass, palm, tree]
+            pressure_profile!(_plant, SteadyStateMode(); update=true);
+            @test FT_test(_plant, FT);
+            @test NaN_test(_plant);
+        end
+
         inititialize_legacy!(grass);
         inititialize_legacy!(palm);
         inititialize_legacy!(tree);
@@ -183,14 +189,20 @@ println("\nTesting the temperature functions...")
         leaf  = LeafHydraulics{FT}();
         root  = RootHydraulics{FT}();
         treet = TreeSimple{FT}();
+        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         T     = rand(FT) + 298;
 
         # test the temperature functions
         temperature_effects!(treet);
+        temperature_effects!(grass);
+        temperature_effects!(palm );
+        temperature_effects!(tree );
         temperature_effects!(leaf, T);
         temperature_effects!(root, T);
 
-        for dataset in [leaf, root, treet]
+        for dataset in [leaf, root, treet, grass, palm, tree]
             @test FT_test(dataset, FT);
             @test NaN_test(dataset);
         end
@@ -235,6 +247,7 @@ println("\nTesting the root-related functions...")
         _ps = zeros(FT, 5);
         _qs = zeros(FT, 5);
         roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
+        roots_flow!(grass, FT(0.5));
         @test NaN_test(grass);
     end
 end
@@ -292,6 +305,9 @@ println("\nTesting the plant-level functions...")
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
+
+        # test the plant conductances
+        plant_conductances!(treet);
     end
 end
 
@@ -317,5 +333,10 @@ println("\nTesting the capacitance functions...")
         update_PVF!(tree.roots[1], FT(1e6), true);
         update_PVF!(tree.trunk, FT(1e6));
         update_PVF!(tree.leaves[1], FT(1e6));
+
+        # extra tests
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.9), FT(300));
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.6), FT(300));
+        p_from_volume(PVCurveSegmented{FT}(), FT(0.1), FT(300));
     end
 end
