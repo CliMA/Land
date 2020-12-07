@@ -6,9 +6,9 @@
 """
     inititialize_legacy!(
                 hs::Union{LeafHydraulics,RootHydraulics,StemHydraulics})
-    inititialize_legacy!(tree::GrassLikeHS)
-    inititialize_legacy!(tree::PalmLikeHS)
-    inititialize_legacy!(tree::TreeLikeHS)
+    inititialize_legacy!(tree::GrassLikeOrganism)
+    inititialize_legacy!(tree::PalmLikeOrganism)
+    inititialize_legacy!(tree::TreeLikeOrganism)
     inititialize_legacy!(tree::TreeSimple)
 
 Initialize the drought legacy effects in the xylem, given
@@ -27,7 +27,7 @@ end
 
 
 
-function inititialize_legacy!(tree::GrassLikeHS)
+function inititialize_legacy!(tree::GrassLikeOrganism)
     for root in tree.roots
         inititialize_legacy!(root);
     end
@@ -41,7 +41,7 @@ end
 
 
 
-function inititialize_legacy!(tree::PalmLikeHS)
+function inititialize_legacy!(tree::PalmLikeOrganism)
     for root in tree.roots
         inititialize_legacy!(root);
     end
@@ -56,7 +56,7 @@ end
 
 
 
-function inititialize_legacy!(tree::TreeLikeHS)
+function inititialize_legacy!(tree::TreeLikeOrganism)
     for root in tree.roots
         inititialize_legacy!(root);
     end

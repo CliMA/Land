@@ -50,10 +50,10 @@ export AbstractHydraulicOrgan,
        StemHydraulics
 
 # export public types --- hydraulic system
-export AbstractPlantHS,
-       GrassLikeHS,
-       PalmLikeHS,
-       TreeLikeHS,
+export AbstractPlantOrganism,
+       GrassLikeOrganism,
+       PalmLikeOrganism,
+       TreeLikeOrganism,
        TreeSimple
 
 # export public functions --- initialize soil type

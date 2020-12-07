@@ -11,7 +11,7 @@
                 air_bounds::Array{FT,1}
     ) where {FT<:AbstractFloat}
 
-Create a [`GrassLikeHS`](@ref), given
+Create a [`GrassLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_canopy` Maximal canopy height (positive value)
 - `soil_bounds` Array of soil layer boundaries starting from 0
@@ -64,15 +64,15 @@ function create_grass_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return GrassLikeHS{FT}(_n_root,
-                           _n_canopy,
-                           _roots,
-                           _leaves,
-                           _r_index,
-                           _c_index,
-                           zeros(FT,_n_root),
-                           zeros(FT,_n_root),
-                           zeros(FT,_n_root))
+    return GrassLikeOrganism{FT}(_n_root,
+                                 _n_canopy,
+                                 _roots,
+                                 _leaves,
+                                 _r_index,
+                                 _c_index,
+                                 zeros(FT,_n_root),
+                                 zeros(FT,_n_root),
+                                 zeros(FT,_n_root))
 end
 
 
@@ -87,7 +87,7 @@ end
                 air_bounds::Array{FT,1}
     ) where {FT<:AbstractFloat}
 
-Create a [`PalmLikeHS`](@ref), given
+Create a [`PalmLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_trunk` Maximal trunk height (positive value)
 - `z_canopy` Maximal canopy height (positive value)
@@ -159,16 +159,16 @@ function create_palm_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return PalmLikeHS{FT}(_n_root,
-                          _n_canopy,
-                          _roots,
-                          _trunk,
-                          _leaves,
-                          _r_index,
-                          _c_index,
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root))
+    return PalmLikeOrganism{FT}(_n_root,
+                                _n_canopy,
+                                _roots,
+                                _trunk,
+                                _leaves,
+                                _r_index,
+                                _c_index,
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root))
 end
 
 
@@ -183,7 +183,7 @@ end
                 air_bounds::Array{FT,1}
     ) where {FT<:AbstractFloat}
 
-Create a [`TreeLikeHS`](@ref), given
+Create a [`TreeLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_trunk` Maximal trunk height (positive value)
 - `z_canopy` Maximal canopy height (positive value)
@@ -268,15 +268,15 @@ function create_tree_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return TreeLikeHS{FT}(_n_root,
-                          _n_canopy,
-                          _roots,
-                          _trunk,
-                          _branch,
-                          _leaves,
-                          _r_index,
-                          _c_index,
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root))
+    return TreeLikeOrganism{FT}(_n_root,
+                                _n_canopy,
+                                _roots,
+                                _trunk,
+                                _branch,
+                                _leaves,
+                                _r_index,
+                                _c_index,
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root))
 end

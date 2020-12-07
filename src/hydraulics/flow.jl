@@ -125,7 +125,9 @@ end
                 qs::Array{FT,1},
                 flow::FT
     ) where {FT<:AbstractFloat}
-    roots_flow!(plant::Union{GrassLikeHS{FT},PalmLikeHS{FT},TreeLikeHS{FT}},
+    roots_flow!(plant::Union{GrassLikeOrganism{FT},
+                             PalmLikeOrganism{FT},
+                             TreeLikeOrganism{FT}},
                 flow::FT
     ) where {FT<:AbstractFloat}
 
@@ -137,7 +139,7 @@ Recalculate the flow rates in the root from the pressure and conductance
 - `qs` Container for flow rate out of each layer
 - `flow` Total flow rate out of the roots
 - `recalculate` A paceholder indicator of recalculating root flow (useless)
-- `plant` [`AbstractPlantHS`](@ref) type struct
+- `plant` [`AbstractPlantOrganism`](@ref) type struct
 """
 function roots_flow!(
             roots::Array{RootHydraulics{FT},1},
@@ -203,7 +205,9 @@ end
 
 
 function roots_flow!(
-            plant::Union{GrassLikeHS{FT},PalmLikeHS{FT},TreeLikeHS{FT}},
+            plant::Union{GrassLikeOrganism{FT},
+                         PalmLikeOrganism{FT},
+                         TreeLikeOrganism{FT}},
             flow::FT
 ) where {FT<:AbstractFloat}
     roots_flow!(plant.roots,

@@ -18,12 +18,12 @@
                 q_sum::FT,
                 Δt::FT
     ) where {FT<:AbstractFloat}
-    update_PVF!(tree::GrassLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
-    update_PVF!(tree::PalmLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
-    update_PVF!(tree::TreeLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
+    update_PVF!(tree::GrassLikeOrganism{FT}, Δt::FT) where {FT<:AbstractFloat}
+    update_PVF!(tree::PalmLikeOrganism{FT}, Δt::FT) where {FT<:AbstractFloat}
+    update_PVF!(tree::TreeLikeOrganism{FT}, Δt::FT) where {FT<:AbstractFloat}
 
 Update pressure, capacitance, and flow rates in hydraulic system, given
-- `hs` [`AbstractHydraulicOrgan`](@ref) or [`AbstractPlantHS`](@ref) type
+- `hs` [`AbstractHydraulicOrgan`](@ref) or [`AbstractPlantOrganism`](@ref) type
     struct
 - `Δt` Time interval
 - `nss` NonSteadyStateMode placeholder (useless)
@@ -31,8 +31,8 @@ Update pressure, capacitance, and flow rates in hydraulic system, given
 - `ps` Container for end xylem pressure in each layer
 - `qs` Container for flow rate out of each layer
 - `q_sum` Total flow rate out of the roots
-- `tree` [`GrassLikeHS`](@ref), [`PalmLikeHS`](@ref), or [`TreeLikeHS`](@ref)
-    type struct
+- `tree` [`GrassLikeOrganism`](@ref), [`PalmLikeOrganism`](@ref), or
+    [`TreeLikeOrganism`](@ref) type struct
 
 Note that this function only updates the equilibrium pressure in the tissue,
     but not the xylem flow pressure. The difference between the two pressures
@@ -202,7 +202,10 @@ end
 
 
 
-function update_PVF!(tree::GrassLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
+function update_PVF!(
+            tree::GrassLikeOrganism{FT},
+            Δt::FT
+) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, leaves, roots = tree;
 
     # 0. note that leaf flow rates need to be updated outside this function
@@ -225,7 +228,10 @@ end
 
 
 
-function update_PVF!(tree::PalmLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
+function update_PVF!(
+            tree::PalmLikeOrganism{FT},
+            Δt::FT
+) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, leaves, roots, trunk = tree;
 
     # 0. note that leaf flow rates need to be updated outside this function
@@ -252,7 +258,10 @@ end
 
 
 
-function update_PVF!(tree::TreeLikeHS{FT}, Δt::FT) where {FT<:AbstractFloat}
+function update_PVF!(
+            tree::TreeLikeOrganism{FT},
+            Δt::FT
+) where {FT<:AbstractFloat}
     @unpack branch, cache_k, cache_p, cache_q, leaves, roots,
             trunk = tree;
 

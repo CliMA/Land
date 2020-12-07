@@ -67,7 +67,7 @@ end
 
 
 
-function temperature_effects!(tree::GrassLikeHS)
+function temperature_effects!(tree::GrassLikeOrganism)
     for root in tree.roots
         temperature_effects!(root);
     end
@@ -81,7 +81,7 @@ end
 
 
 
-function temperature_effects!(tree::PalmLikeHS)
+function temperature_effects!(tree::PalmLikeOrganism)
     for root in tree.roots
         temperature_effects!(root);
     end
@@ -96,7 +96,7 @@ end
 
 
 
-function temperature_effects!(tree::TreeLikeHS)
+function temperature_effects!(tree::TreeLikeOrganism)
     for root in tree.roots
         temperature_effects!(root);
     end
