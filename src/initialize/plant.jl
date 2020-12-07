@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    create_grass_like_hs(
+    create_grass(
                 z_root::FT,
                 z_canopy::FT,
                 soil_bounds::Array{FT,1},
@@ -17,7 +17,7 @@ Create a [`GrassLikeOrganism`](@ref), given
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_grass_like_hs(
+function create_grass(
             z_root::FT,
             z_canopy::FT,
             soil_bounds::Array{FT,1},
@@ -79,8 +79,7 @@ end
 
 
 """
-    create_palm_like_hs(
-                z_root::FT,
+    create_palm(z_root::FT,
                 z_trunk::FT,
                 z_canopy::FT,
                 soil_bounds::Array{FT,1},
@@ -94,7 +93,7 @@ Create a [`PalmLikeOrganism`](@ref), given
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_palm_like_hs(
+function create_palm(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,
@@ -175,8 +174,7 @@ end
 
 
 """
-    create_tree_like_hs(
-                z_root::FT,
+    create_tree(z_root::FT,
                 z_trunk::FT,
                 z_canopy::FT,
                 soil_bounds::Array{FT,1},
@@ -190,7 +188,7 @@ Create a [`TreeLikeOrganism`](@ref), given
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_tree_like_hs(
+function create_tree(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,

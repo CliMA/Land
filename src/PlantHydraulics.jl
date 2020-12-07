@@ -72,9 +72,9 @@ export create_VanGenuchten,
        VGSiltyLoam
 
 # export public functions --- initialize plant
-export create_grass_like_hs,
-       create_palm_like_hs,
-       create_tree_like_hs
+export create_grass,
+       create_palm,
+       create_tree
 
 # export public functions --- curves related
 export p_from_volume,
