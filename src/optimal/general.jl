@@ -33,6 +33,30 @@ end
 function leaf_photo_from_envir!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
+            hs::TreeSimple{FT},
+            envir::AirLayer{FT},
+            sm::OSMWang{FT}
+) where {FT<:AbstractFloat}
+    # update the temperature dependent parameters and maximal a and kr
+    update_leaf_TP!(photo_set, canopyi, hs, envir);
+    update_leaf_AK!(photo_set, canopyi, hs.leaf, envir);
+
+    # calculate optimal solution for each leaf
+    for ind in eachindex(canopyi.APAR)
+        canopyi.ps.APAR = canopyi.APAR[ind];
+        leaf_ETR!(photo_set, canopyi.ps);
+        leaf_photo_from_envir!(photo_set, canopyi, hs.leaf, envir, sm, ind);
+    end
+
+    return nothing
+end
+
+
+
+
+function leaf_photo_from_envir!(
+            photo_set::AbstractPhotoModelParaSet{FT},
+            canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OptimizationStomatalModel{FT},
