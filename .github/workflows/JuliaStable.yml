@@ -17,6 +17,8 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1.5"
+      - name: Force update registry
+        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Test package
         run: julia --project -e 'using Pkg; Pkg.test(coverage=true);'
       - name: Upload code coverage
@@ -32,6 +34,8 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1.5"
+      - name: Force update registry
+        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Test package
         run: julia --project -e 'using Pkg; Pkg.test();'
   windows-test:
@@ -43,5 +47,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1.5"
+      - name: Force update registry
+        run: julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
       - name: Test package
         run: julia --project -e 'using Pkg; Pkg.test();'
