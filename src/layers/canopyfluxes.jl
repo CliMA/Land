@@ -39,12 +39,13 @@ function canopy_fluxes!(
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
-    @unpack iLAI, nLayer = can;
+    @unpack LAI, nLayer, Ω = can;
     @unpack albedo_SW, emsvty_SW = soil;
     @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
+    iLAI = LAI * Ω / nLayer;
     fac  = FT(1e-3);
 
     # 3. Compute some fluxes, can be done separately if needed

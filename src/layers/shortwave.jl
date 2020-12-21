@@ -28,11 +28,14 @@ function short_wave!(
             soil::SoilOpticals{FT},
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
-    # 1. unpack values from can and soil
-    @unpack iLAI, nLayer = can;
+    # unpack values from can and soil
+    @unpack LAI, nLayer, Ω = can;
     @unpack ks, sb, sf, sigb = can_opt;
     @unpack albedo_SW = soil;
     sw_con = rt_con.sw_con;
+
+    # 1. define some useful parameters
+    iLAI = LAI * Ω / nLayer;
 
     # 2. scattering and extinction coefficients to
     #    thin layer reflectances and transmittances

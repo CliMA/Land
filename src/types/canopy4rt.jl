@@ -35,8 +35,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     LIDFb     ::FT = FT(0.0 )
     "HotSpot parameter (still need to check!)"
     hot       ::FT = FT(0.05)
-    "LAI in the ith layer"
-    iLAI      ::FT = LAI * Ω / nLayer;
 
     # tree/canopy/leaf traits
     "Canopy height `[m]`"
