@@ -12,7 +12,7 @@
                 soil::SoilOpticals{FT},
                 leaves::Array{LeafBios{FT},1},
                 wls::WaveLengths{FT},
-                rt_con::RTContainer{FT}
+                rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
 
 Computes a variety of integrated fluxes from the spectrally resolved
@@ -26,7 +26,7 @@ Computes a variety of integrated fluxes from the spectrally resolved
 - `soil` [`SoilOpticals`](@ref) type struct
 - `leaves` Array of [`LeafBios`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
-- `rt_con` [`RTContainer`](@ref) type container
+- `rt_con` [`RTCache`](@ref) type cache
 """
 function canopy_fluxes!(
             can::Canopy4RT{FT},
@@ -36,15 +36,16 @@ function canopy_fluxes!(
             soil::SoilOpticals{FT},
             leaves::Array{LeafBios{FT},1},
             wls::WaveLengths{FT},
-            rt_con::RTContainer{FT}
+            rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
-    @unpack iLAI, nLayer = can;
+    @unpack LAI, nLayer, Ω = can;
     @unpack albedo_SW, emsvty_SW = soil;
     @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
+    iLAI = LAI * Ω / nLayer;
     fac  = FT(1e-3);
 
     # 3. Compute some fluxes, can be done separately if needed

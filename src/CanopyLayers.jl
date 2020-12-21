@@ -31,7 +31,7 @@ export Canopy4RT,
        IncomingRadiation,
        LeafBios,
        LeafOpticals,
-       RTContainer,
+       RTCache,
        RTDimensions,
        SoilOpticals,
        SolarAngles,
@@ -51,7 +51,7 @@ export big_leaf_partition,
        create_incoming_radiation,
        create_leaf_bios,
        create_leaf_opticals,
-       create_rt_container,
+       create_rt_cache,
        create_rt_dims,
        create_soil_opticals,
        create_wave_length,
@@ -76,7 +76,7 @@ include("utils/volscatt.jl"   )
 include("types/canopy4rt.jl"     )
 include("types/canopyopticals.jl")
 include("types/canopyrads.jl"    )
-include("types/containers.jl"    )
+include("types/caches.jl"        )
 include("types/incomingrad.jl"   )
 include("types/leafbios.jl"      )
 include("types/leafopticals.jl"  )
@@ -89,7 +89,7 @@ include("initialize/all.jl"           )
 include("initialize/canopy4rt.jl"     )
 include("initialize/canopyopticals.jl")
 include("initialize/canopyrads.jl"    )
-include("initialize/container.jl"     )
+include("initialize/caches.jl"        )
 include("initialize/incomingrad.jl"   )
 include("initialize/leafbios.jl"      )
 include("initialize/leafopticals.jl"  )

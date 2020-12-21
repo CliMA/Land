@@ -23,18 +23,18 @@ WaveLengths
 
 
 
-## Containers
+## Caches
 ```@docs
-CFContainer
-create_cf_container
-CGContainer
-create_cg_container
-SFContainer
-create_sf_container
-SWContainer
-create_sw_container
-RTContainer
-create_rt_container
+CFCache
+create_cf_cache
+CGCache
+create_cg_cache
+SFCache
+create_sf_cache
+SWCache
+create_sw_cache
+RTCache
+create_rt_cache
 ```
 
 

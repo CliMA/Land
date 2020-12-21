@@ -39,9 +39,12 @@ function thermal_fluxes!(
 ) where {FT<:AbstractFloat}
     @unpack Ps, Po, Pso,ddf,ddb = can_opt
     @unpack T_sun, T_shade = can_rad
-    @unpack iLAI, nLayer, lidf = can
+    @unpack LAI, nLayer, lidf, Ω = can
     @unpack albedo_LW, soil_skinT = soil
     @unpack nWL = wls
+
+    # 1. define some useful parameters
+    iLAI = LAI * Ω / nLayer;
 
     #
     #

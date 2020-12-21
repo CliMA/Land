@@ -29,7 +29,6 @@ println("\nTesting the SCOPE model...");
         angles.tts = 30;
         angles.psi = 0;
         can.LAI    = 3;
-        can.iLAI   = 3 / rt_dim.nLayer;
         VZA        = collect(FT, -89.5:0.5:89.5);
         for VZA_ in VZA
             angles.tto = VZA_;
@@ -43,7 +42,6 @@ println("\nTesting the SCOPE model...");
         angles.tts = 48;
         angles.psi = 0;
         can.LAI    = FT(3.22);
-        can.iLAI   = FT(3.22) / rt_dim.nLayer;
         for psi in 0:5:360
             angles.psi = psi;
             for VZA in 0:5:85

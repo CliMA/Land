@@ -11,7 +11,7 @@ can_opt = create_canopy_opticals(FT, rt_dim);
 in_rad  = create_incoming_radiation(wls);
 soil    = create_soil_opticals(wls);
 angles  = SolarAngles{FT}();
-rt_con  = create_rt_container(FT, rt_dim);
+rt_con  = create_rt_cache(FT, rt_dim);
 leaves  = [create_leaf_bios(FT, rt_dim) for i in 1:rt_dim.nLayer];
 for i in 1:rt_dim.nLayer
     fluspect!(leaves[i], wls);
