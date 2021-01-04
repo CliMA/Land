@@ -65,7 +65,7 @@ function annual_profit(
             zenith = zenith_angle(latitude, day, hour, FT(0));
             if (r_all>0) & (zenith<=85)
                 # 2.2.1 update the leaf partitioning
-                big_leaf_partition!(node, zenith, r_all)
+                big_leaf_partition!(node, zenith, r_all);
                 @unpack frac_sh, frac_sl = node.container2L;
 
                 # 2.2.2 optimize flows in each layer
