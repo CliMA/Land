@@ -96,5 +96,5 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Incoming radiation container"
     in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
     "RT container"
-    rt_con::RTContainer{FT} = create_rt_container(FT, rt_dim)
+    rt_con::RTCache{FT} = create_rt_cache(FT, rt_dim)
 end
