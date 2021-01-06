@@ -65,6 +65,25 @@ export big_leaf_partition,
 
 
 
+# Vegetation indices
+export BLUE,
+       EVI,
+       EVI2,
+       LSWI,
+       NDVI,
+       NIR,
+       NIRv,
+       RED,
+       REF_WL,
+       SIF_740,
+       SIF_757,
+       SIF_771,
+       SIF_WL,
+       SWIR
+
+
+
+
 include("utils/calctav.jl"    )
 include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
@@ -104,6 +123,7 @@ include("layers/canopygeometry.jl")
 include("layers/canopymatrices.jl")
 include("layers/diffusives.jl"    )
 include("layers/fluspect.jl"      )
+include("layers/indicies.jl"      )
 include("layers/shortwave.jl"     )
 include("layers/siffluxes.jl"     )
 include("layers/thermalfluxes.jl" )
