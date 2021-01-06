@@ -96,10 +96,17 @@ println("\nTesting the Indicies...");
                     EVI2(can_rad, wls),
                     LSWI(can_rad, wls),
                     NDVI(can_rad, wls),
+                    NIRv(can_rad, wls),
                     SIF_740(can_rad, wls),
                     SIF_757(can_rad, wls),
                     SIF_771(can_rad, wls)];
         @test NaN_test(_indices);
         @test FT_test(_indices, FT);
+
+        # out bounds warnings
+        println("Expect warnings here!");
+        REF_WL(can_rad, wls, FT(3000));
+        SIF_WL(can_rad, wls, FT(3000));
+        @test true
     end
 end
