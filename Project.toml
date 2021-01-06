@@ -1,7 +1,7 @@
 name = "CanopyLayers"
 uuid = "677f5362-5107-42e4-8e81-51d9c4a1f96c"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
@@ -21,7 +21,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 BenchmarkTools = "0.5"
 CLIMAParameters = "0.1.6"
 DocStringExtensions = "0.8"
-MAT = "0.8, 0.9"
+MAT = "0.10"
 Parameters = "0.12"
 PkgUtility = "0.1.1"
 Polynomials = "1.1"

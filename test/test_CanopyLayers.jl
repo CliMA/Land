@@ -82,3 +82,31 @@ println("\nTesting the SCOPE model...");
         @test true;
     end
 end
+
+
+
+
+# indices test
+println("\nTesting the Indicies...");
+@testset "CanopyLayers --- Indicies" begin
+    for FT in [Float32, Float64]
+        collections = initialize_rt_module(FT; nLayer=20, LAI=3);
+        angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls = collections;
+        _indices = [EVI(can_rad, wls),
+                    EVI2(can_rad, wls),
+                    LSWI(can_rad, wls),
+                    NDVI(can_rad, wls),
+                    NIRv(can_rad, wls),
+                    SIF_740(can_rad, wls),
+                    SIF_757(can_rad, wls),
+                    SIF_771(can_rad, wls)];
+        @test NaN_test(_indices);
+        @test FT_test(_indices, FT);
+
+        # out bounds warnings
+        println("Expect warnings here!");
+        REF_WL(can_rad, wls, FT(3000));
+        SIF_WL(can_rad, wls, FT(3000));
+        @test true
+    end
+end

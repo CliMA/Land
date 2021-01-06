@@ -80,6 +80,27 @@ thermal_fluxes!
 
 
 
+## Indicies
+```@docs
+BLUE
+EVI
+EVI2
+LSWI
+NDVI
+NIR
+NIRv
+RED
+REF_WL
+SIF_740
+SIF_757
+SIF_771
+SIF_WL
+SWIR
+```
+
+
+
+
 ## Utils
 ```@docs
 calctav
