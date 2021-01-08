@@ -183,7 +183,7 @@ function leaf_gas_exchange!(
     # TODO do not account for temperature effects for flow now
     # More reasonable functions need to be added
     # vc_temperature_effects!(node.hs.leaf, t_leaf);
-    p_leaf = xylem_p_from_flow(node.hs, flow);
+    p_leaf = end_pressure(node.hs, flow);
 
     # 4. calculate photosynthesis
     g_lw = flow / la / d_leaf * p_atm;
