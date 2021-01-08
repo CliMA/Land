@@ -4,20 +4,20 @@
 #
 ###############################################################################
 """
-    abstract type AbstractPlantHS{FT}
+    abstract type AbstractPlantOrganism{FT}
 
-Hierachy of AbstractPlantHS
-- [`GrassLikeHS`](@ref)
-- [`PalmLikeHS`](@ref)
-- [`TreeLikeHS`](@ref)
+Hierachy of AbstractPlantOrganism
+- [`GrassLikeOrganism`](@ref)
+- [`PalmLikeOrganism`](@ref)
+- [`TreeLikeOrganism`](@ref)
 """
-abstract type AbstractPlantHS{FT<:AbstractFloat} end
+abstract type AbstractPlantOrganism{FT<:AbstractFloat} end
 
 
 
 
 """
-    mutable struct GrassLikeHS{FT}
+    mutable struct GrassLikeOrganism{FT}
 
 A plant hydraulic system like a grass, which contains multiple root layers, and
 multiple canopy layers. No trunk or branch system applies.
@@ -25,7 +25,7 @@ multiple canopy layers. No trunk or branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct GrassLikeHS{FT} <: AbstractPlantHS{FT}
+mutable struct GrassLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -57,7 +57,7 @@ end
 
 
 """
-    mutable struct PalmLikeHS{FT}
+    mutable struct PalmLikeOrganism{FT}
 
 A plant hydraulic system like a palm, which contains multiple root layers, one
 trunk, and multiple canopy layers. No branch system applies.
@@ -65,7 +65,7 @@ trunk, and multiple canopy layers. No branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct PalmLikeHS{FT} <: AbstractPlantHS{FT}
+mutable struct PalmLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -99,7 +99,7 @@ end
 
 
 """
-    mutable struct TreeLikeHS{FT}
+    mutable struct TreeLikeOrganism{FT}
 
 A plant hydraulic system like a tree, which contains multiple root layers, one
 trunk, and multiple branch and canopy layers.
@@ -107,7 +107,7 @@ trunk, and multiple branch and canopy layers.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct TreeLikeHS{FT} <: AbstractPlantHS{FT}
+mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -151,7 +151,7 @@ A plant hydraulic system with one root, one stem, and one leaf for testing
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantHS{FT}
+Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantOrganism{FT}
     # Arrays of roots and leaves
     "Root"
     root::RootHydraulics{FT} = RootHydraulics{FT}()

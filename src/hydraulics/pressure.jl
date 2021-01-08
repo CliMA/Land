@@ -529,7 +529,7 @@ end
 
 
 function pressure_profile!(
-            tree::GrassLikeHS{FT},
+            tree::GrassLikeOrganism{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -556,7 +556,7 @@ end
 
 
 function pressure_profile!(
-            tree::GrassLikeHS{FT},
+            tree::GrassLikeOrganism{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -583,7 +583,7 @@ end
 
 
 function pressure_profile!(
-            tree::PalmLikeHS{FT},
+            tree::PalmLikeOrganism{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -614,7 +614,7 @@ end
 
 
 function pressure_profile!(
-            tree::PalmLikeHS{FT},
+            tree::PalmLikeOrganism{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -644,7 +644,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeLikeHS{FT},
+            tree::TreeLikeOrganism{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -679,7 +679,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeLikeHS{FT},
+            tree::TreeLikeOrganism{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}

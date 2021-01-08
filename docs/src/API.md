@@ -16,7 +16,7 @@ The PlantHydraulics module provides two levels of hydraulics system:
 
 
 
-## Leaf, Root, and Stem HS
+## Leaf, Root, and Stem organs
 Plant hydraulics is segmented to three organ-level systems/structs
     ([`LeafHydraulics`](@ref), [`RootHydraulics`](@ref), and
     [`StemHydraulics`](@ref)) subject to an Abstract type
@@ -51,44 +51,44 @@ hs_stem = StemHydraulics{FT}();
 
 
 
-## Whole-plant HS
+## Whole-plant organism
 Plants differ in their structures, for example, some plants have a canopy far
     above the ground elevated by a trunk, some plants have a structured canopy
     supported by branch systems, and some plant has no trunk at all. To
     represent the structural differences, several types of plant hydraulics
-    systems are pre-defined, and they are [`GrassLikeHS`](@ref),
-    [`PalmLikeHS`](@ref), [`TreeLikeHS`](@ref), and [`TreeSimple`](@ref)
-    structs subject to a [`AbstractPlantHS`](@ref) type, where `HS` stands for
-    hydraulic system. The major difference between the `HS`s are
+    systems are pre-defined, and they are [`GrassLikeOrganism`](@ref),
+    [`PalmLikeOrganism`](@ref), [`TreeLikeOrganism`](@ref), and
+    [`TreeSimple`](@ref) structs subject to a [`AbstractPlantOrganism`](@ref)
+    type. The major difference between the `HS`s are
 
-- [`GrassLikeHS`](@ref) has only mutiple root and canopy layers, no trunk or
-    branch
-- [`PalmLikeHS`](@ref) has multiple root layers, a trunk, and multiple canopy
-    layers, no branch system
-- [`TreeLikeHS`](@ref) has multiple root layers, a trunk, and multiple branch +
-    canopy layers, and each branch corresponds to a canopy layer
+- [`GrassLikeOrganism`](@ref) has only mutiple root and canopy layers, no trunk
+    or branch
+- [`PalmLikeOrganism`](@ref) has multiple root layers, a trunk, and multiple
+    canopy layers, no branch system
+- [`TreeLikeOrganism`](@ref) has multiple root layers, a trunk, and multiple
+    branch + canopy layers, and each branch corresponds to a canopy layer
 - [`TreeSimple`](@ref) has one root, one stem, and one leaf for testing purpose
 
 See the documentation for each struct for more details:
 
 ```@docs
-AbstractPlantHS
-GrassLikeHS
-PalmLikeHS
-TreeLikeHS
+AbstractPlantOrganism
+GrassLikeOrganism
+PalmLikeOrganism
+TreeLikeOrganism
 TreeSimple
 ```
 
 To ease the initialization of a plant hydraulics system, a few customized
     functions are provided for quick initialization. More importantly,
     modifications to each field in the struct are always allowed. The quick
-    functions are [`create_grass_like_hs`](@ref), [`create_palm_like_hs`](@ref)
-    , and [`create_tree_like_hs`](@ref):
+    functions are [`create_grass`](@ref), [`create_palm`](@ref), and
+    [`create_tree`](@ref):
 
 ```@docs
-create_grass_like_hs
-create_palm_like_hs
-create_tree_like_hs
+create_grass
+create_palm
+create_tree
 ```
 
 What these functions do are to determine how many root layers and branch/canopy
@@ -113,9 +113,9 @@ To initialize a whole-plant hydraulic system, checkout the example below:
 using PlantHydraulics
 
 FT = Float32;
-grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
-palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
-tree  =  create_tree_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+grass = create_grass(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+palm  =  create_palm(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+tree  =  create_tree(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 treet = TreeSimple{FT}();
 ```
 
@@ -354,8 +354,8 @@ However, the steps above are only 1 iteration, and can only be used for the
     function [`roots_flow!`](@ref) does thw work. What the function does is to
     iterate [`roots_flow!`](@ref) till the difference among the
     calculated end pressures is small enough. I also emphasize that to speed up
-    the code, 3 containers are added to the [`AbstractPlantHS`](@ref) structs,
-    and they are `cache_k`, `cache_p`, and `cache_q`.
+    the code, 3 containers are added to the [`AbstractPlantOrganism`](@ref)
+    structs, and they are `cache_k`, `cache_p`, and `cache_q`.
 
 Example:
 
@@ -363,7 +363,7 @@ Example:
 using PlantHydraulics
 
 FT = Float32;
-palm  =  create_palm_like_hs(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+palm = create_palm(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 roots_flow!(palm.roots, palm.cache_k, palm.cache_p, palm.cache_q, FT(1));
 ```
 

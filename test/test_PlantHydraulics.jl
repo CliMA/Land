@@ -5,9 +5,9 @@ println("\nTesting the structures...")
         leaf  = LeafHydraulics{FT}();
         root  = RootHydraulics{FT}();
         stem  = StemHydraulics{FT}();
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
         _vc1  = WeibullSingle{FT}();
         _vc2  = WeibullDual{FT}();
@@ -152,9 +152,9 @@ println("\nTesting the legacy functions...")
         _rsl  = FT(0.5);
 
         # Test the struct
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
         pressure_profile!(treet, _ps, _ft);
         @test FT_test(treet, FT);
@@ -189,9 +189,9 @@ println("\nTesting the temperature functions...")
         leaf  = LeafHydraulics{FT}();
         root  = RootHydraulics{FT}();
         treet = TreeSimple{FT}();
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         T     = rand(FT) + 298;
 
         # test the temperature functions
@@ -216,7 +216,7 @@ println("\nTesting the root-related functions...")
 @testset "Hydraulics --- root-related functions" begin
     for FT in [Float32, Float64]
         root  = RootHydraulics{FT}();
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), collect(FT,0:-0.5:-3.0), collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), collect(FT,0:-0.5:-3.0), collect(FT,0:1:20));
 
         # test the root q functions
         _p1 = FT(0)
@@ -261,9 +261,9 @@ println("\nTesting the pressure functions...")
         leaf  = LeafHydraulics{FT}();
         root  = RootHydraulics{FT}();
         stem  = StemHydraulics{FT}();
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
         # test the end_pressure function
@@ -295,9 +295,9 @@ end
 println("\nTesting the plant-level functions...")
 @testset "Hydraulics --- plant-level" begin
     for FT in [Float32, Float64]
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
 
         # test the critical_flow function
@@ -317,9 +317,9 @@ end
 println("\nTesting the capacitance functions...")
 @testset "Hydraulics --- capacitance" begin
     for FT in [Float32, Float64]
-        grass = create_grass_like_hs(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        palm  = create_palm_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
-        tree  = create_tree_like_hs(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        grass = create_grass(FT(-2.1), FT(0.5), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        palm  = create_palm(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
+        tree  = create_tree(FT(-2.1), FT(5.4), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 
         # test the critical_flow function
         update_PVF!(grass, FT(1)); @test true;
