@@ -472,7 +472,7 @@ uuid = "2ee39098-c373-598a-b85f-a56591580800"
 version = "1.4.0"
 
 [[Land]]
-deps = ["BenchmarkTools", "CLIMAParameters", "CSV", "ConstrainedRootSolvers", "DataFrames", "DiffEqOperators", "DocStringExtensions", "LinearAlgebra", "MAT", "OrdinaryDiffEq", "Parameters", "Pkg", "Polynomials", "QuadGK", "Statistics", "Test", "WaterPhysics"]
+deps = ["BenchmarkTools", "CLIMAParameters", "CSV", "ConstrainedRootSolvers", "DataFrames", "DiffEqOperators", "DocStringExtensions", "LinearAlgebra", "MAT", "OrdinaryDiffEq", "Parameters", "Pkg", "PkgUtility", "Polynomials", "QuadGK", "Statistics", "Test", "WaterPhysics"]
 path = ".."
 uuid = "27e3c115-2cb8-4114-b7a5-cd9f011f9dcc"
 version = "0.1.0"
@@ -701,6 +701,12 @@ version = "1.0.15"
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+
+[[PkgUtility]]
+deps = ["Pkg", "Test"]
+git-tree-sha1 = "f2ef118ced3906dcf521cc859fd13515c8c1f262"
+uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
+version = "0.1.1"
 
 [[PlotPlants]]
 deps = ["DataFrames", "Distributed", "DocStringExtensions", "GLM", "KernelDensity", "NetCDF", "Pkg", "ProgressMeter", "PyCall", "PyPlot", "SharedArrays", "Statistics", "Test"]

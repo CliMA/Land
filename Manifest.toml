@@ -577,6 +577,12 @@ version = "1.0.15"
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
+[[PkgUtility]]
+deps = ["Pkg", "Test"]
+git-tree-sha1 = "f2ef118ced3906dcf521cc859fd13515c8c1f262"
+uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
+version = "0.1.1"
+
 [[PoissonRandom]]
 deps = ["Random", "Statistics", "Test"]
 git-tree-sha1 = "44d018211a56626288b5d3f8c6497d28c26dc850"
