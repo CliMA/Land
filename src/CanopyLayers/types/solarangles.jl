@@ -16,6 +16,6 @@ Base.@kwdef mutable struct SolarAngles{FT}
     tts::FT = FT(30.0)
     "Viewing Zenith Angle in `[degree]`"
     tto::FT = FT(0.0 )
-    "relative azimuth in `[degree]`"
+    "Relative azimuth in `[degree]`"
     psi::FT = FT(0.0 )
 end

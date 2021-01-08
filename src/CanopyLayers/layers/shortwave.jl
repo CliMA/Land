@@ -9,7 +9,7 @@
                 can_rad::CanopyRads{FT},
                 in_rad::IncomingRadiation{FT},
                 soil::SoilOpticals{FT},
-                rt_con::RTContainer{FT}
+                rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
 
 Simulate the short wave radiation through the canopy, given
@@ -18,7 +18,7 @@ Simulate the short wave radiation through the canopy, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `in_rad` [`IncomingRadiation`](@ref) type struct
 - `soil` [`SoilOpticals`](@ref) type struct
-- `rt_con` [`RTContainer`](@ref) type container
+- `rt_con` [`RTCache`](@ref) type cache
 """
 function short_wave!(
             can::Canopy4RT{FT},
@@ -26,13 +26,16 @@ function short_wave!(
             can_rad::CanopyRads{FT},
             in_rad::IncomingRadiation{FT},
             soil::SoilOpticals{FT},
-            rt_con::RTContainer{FT}
+            rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
-    # 1. unpack values from can and soil
-    @unpack iLAI, nLayer = can;
+    # unpack values from can and soil
+    @unpack LAI, nLayer, Ω = can;
     @unpack ks, sb, sf, sigb = can_opt;
     @unpack albedo_SW = soil;
     sw_con = rt_con.sw_con;
+
+    # 1. define some useful parameters
+    iLAI = LAI * Ω / nLayer;
 
     # 2. scattering and extinction coefficients to
     #    thin layer reflectances and transmittances

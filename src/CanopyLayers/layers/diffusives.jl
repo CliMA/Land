@@ -75,19 +75,19 @@ end
 
 """
     diffusive_S!(
-                sf_con::SFContainer{FT},
+                sf_con::SFCache{FT},
                 soil::SoilOpticals{FT},
                 rt_dim::RTDimensions
     ) where {FT<:AbstractFloat}
 
 Computes 2-stream diffusive radiation transport (used for thermal and SIF),
     given
-- `sf_con` [`SFContainer`](@ref) type container
+- `sf_con` [`SFCache`](@ref) type cache
 - `soil` [`SoilOpticals`](@ref) type struct
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function diffusive_S!(
-            sf_con::SFContainer{FT},
+            sf_con::SFCache{FT},
             soil::SoilOpticals{FT},
             rt_dim::RTDimensions
 ) where {FT<:AbstractFloat}
