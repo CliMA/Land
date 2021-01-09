@@ -15,13 +15,15 @@ const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
     big_leaf_partition(
                 lai::FT,
                 zenith::FT,
-                r_all::FT
+                r_all::FT,
+                r_dir::FT = FT(0.8)
     ) where {FT<:AbstractFloat}
 
 Partition the big-leaf canopy into sunlit and shaded layers, given
 - `lai` Leaf area index
 - `zenith` Zenith angle in degree
 - `r_all` Total radiation in `[W m⁻²]`
+- `r_dir` Direct radiation partition in `r_all`
 
 The function returns
 - `ratio` ratio of sunlit leaves out of all leaves
@@ -33,12 +35,13 @@ The function returns
 function big_leaf_partition(
             lai::FT,
             zenith::FT,
-            r_all::FT
+            r_all::FT,
+            r_dir::FT = FT(0.8)
 ) where {FT <:AbstractFloat}
-    # 1. assume 50%-50% PAR and NIR, 80%-20% beam-diffuse
+    # 1. assume 50%-50% PAR and NIR
     par_tot = r_all / 2 / FT(0.235);
-    q_ob    = par_tot * FT(0.8);
-    q_od    = par_tot * FT(0.2);
+    q_ob    = par_tot * r_dir;
+    q_od    = par_tot * (1 - r_dir);
 
     # 2. calculate the LAI
     shape = FT(1.0);
@@ -63,9 +66,9 @@ function big_leaf_partition(
     r_slm = k_be*q_ob + r_dm + q_scn/shapa;
 
     # 5. calculate lasi_sl and lai_sh
-    lai_sl = ( 1 - exp(-k_be*lai) ) / k_be
-    lai_sh = lai - lai_sl
-    ratio  = lai_sl / lai
+    lai_sl = ( 1 - exp(-k_be*lai) ) / k_be;
+    lai_sh = lai - lai_sl;
+    ratio  = lai_sl / lai;
 
     # 6. calculate the radiation based on PAR and NIR
     ep_sl = q_slm * FT(_ALPAR) * FT(0.235);

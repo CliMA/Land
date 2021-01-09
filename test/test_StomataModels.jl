@@ -146,7 +146,7 @@ println("\nTesting stomatal models...")
         hs     = LeafHydraulics{FT}();
 
         # test the solution functions
-        for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
+        for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 for result in [ envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1),
                                 envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1),
@@ -167,7 +167,7 @@ println("\nTesting stomatal models...")
         end
 
         # test the stomata solutions
-        for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
+        for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
@@ -186,9 +186,11 @@ println("\nTesting stomatal models...")
                 leaf_photo_from_envir!(mod, can, hs, envir, sm, 1);
                 @test NaN_test(can);
             end
+            leaf_photo_from_envir!(mod, can, TreeSimple{FT}(), envir, osm_3);
+            @test NaN_test(can);
         end
 
-        for (mod,can) in zip([mod_3, mod_3], [can_3, can_4])
+        for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
                 @test NaN_test(can);

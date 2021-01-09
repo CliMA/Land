@@ -68,7 +68,7 @@ function test_diurnal(
         # latent heat flux as well
         node.plant_ps[i_can].LV = latent_heat_vapor(Tlef_t[i_can]) * 1000 / 18;
         # vc dependecy as well
-        vc_temperature_effects!(node.plant_hs.leaves[i_can], Tlef_t[i_can]);
+        temperature_effects!(node.plant_hs.leaves[i_can], Tlef_t[i_can]);
     end
 
     # run dirnal cycle

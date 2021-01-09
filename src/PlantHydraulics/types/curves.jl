@@ -1,5 +1,65 @@
 ###############################################################################
 #
+# Capacitance for plants
+#
+###############################################################################
+"""
+    abstract type AbstractCapacity{FT}
+
+Hierachy of AbstractCapacity
+- [`PVCurveLinear`](@ref)
+- [`PVCurveSegmented`](@ref)
+"""
+abstract type AbstractCapacity{FT<:AbstractFloat} end
+
+
+
+
+"""
+    mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
+
+Struct that contains information for linear PV curve
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+Base.@kwdef mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
+    "Slope of the linear PV curve (relative to maximum) `[MPa⁻¹]`"
+    slope   ::FT = 0.2
+    "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
+    k_refill::FT = 0.0001
+end
+
+
+
+
+"""
+    mutable struct PVCurveSegmented{FT} <: AbstractCapacity{FT}
+
+
+"""
+Base.@kwdef mutable struct PVCurveSegmented{FT} <: AbstractCapacity{FT}
+    "n_o / maximum V `[mol m⁻³]`"
+    c_all   ::FT = 300.0
+    "Bulk modulus of elasticity `[MPa]`"
+    ϵ_bulk  ::FT = 20.0
+    "Apoplastic water content relative to maximum water volume"
+    RWC_apo ::FT = 0.2
+    "Relative water content at turgor loss point"
+    RWC_TLP ::FT = 0.8
+    "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
+    k_refill::FT = 0.0001
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
 # Vulnerability curves for xylem
 #
 ###############################################################################
@@ -10,7 +70,7 @@ Hierachy of AbstractXylemVC
 - [`WeibullSingle`](@ref)
 - [`WeibullDual`](@ref)
 """
-abstract type AbstractXylemVC{FT} end
+abstract type AbstractXylemVC{FT<:AbstractFloat} end
 
 
 
@@ -25,15 +85,15 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct WeibullDual{FT} <: AbstractXylemVC{FT}
     "B of first part `[MPa]`"
-    b1::FT = FT(1)
+    b1::FT = 1
     "C of first part"
-    c1::FT = FT(5)
+    c1::FT = 5
     "F of first part"
-    f1::FT = FT(0.5)
+    f1::FT = 0.5
     "B of second part `[MPa]`"
-    b2::FT = FT(2)
+    b2::FT = 2
     "C of second part"
-    c2::FT = FT(5)
+    c2::FT = 5
     "F of second part"
     f2::FT = 1 - f1
 end
@@ -51,9 +111,9 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct WeibullSingle{FT} <: AbstractXylemVC{FT}
     "B of first part `[MPa]`"
-    b::FT = FT(2)
+    b::FT = 2
     "C of first part"
-    c::FT = FT(5)
+    c::FT = 5
 end
 
 
@@ -75,7 +135,7 @@ Hierachy of AbstractSoilVC:
 - [`BrooksCorey`](@ref)
 - [`VanGenuchten`](@ref)
 """
-abstract type AbstractSoilVC{FT} end
+abstract type AbstractSoilVC{FT<:AbstractFloat} end
 
 
 

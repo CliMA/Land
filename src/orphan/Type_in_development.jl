@@ -1,16 +1,4 @@
-###############################################################################
-#
-# These types should go to type.jl when documentations are done
-#
-###############################################################################
-
-
-
-
-
-
-
-
+#=
 ###############################################################################
 #
 # Leaf photosynthesis-related parameter set
@@ -150,3 +138,4 @@ Base.@kwdef mutable struct MeteoParams{FT<:Number}
     "Air resistance `[Pa]`"
     ra::FT    = 1e6
 end
+=#

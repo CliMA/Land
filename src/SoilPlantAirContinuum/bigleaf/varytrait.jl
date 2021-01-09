@@ -20,13 +20,13 @@ function vary_spac!(
 ) where {FT<:AbstractFloat}
     # choose which parameter(s) to vary
     if factor_to_vary=="wb"
-        node.hs.root.vc.b *= ratio_to_vary;
-        node.hs.stem.vc.b *= ratio_to_vary;
-        node.hs.leaf.vc.b *= ratio_to_vary;
+        (node.hs.root.vc).b *= ratio_to_vary;
+        (node.hs.stem.vc).b *= ratio_to_vary;
+        (node.hs.leaf.vc).b *= ratio_to_vary;
     elseif factor_to_vary=="wc"
-        node.hs.root.vc.c *= ratio_to_vary;
-        node.hs.stem.vc.c *= ratio_to_vary;
-        node.hs.leaf.vc.c *= ratio_to_vary;
+        (node.hs.root.vc).c *= ratio_to_vary;
+        (node.hs.stem.vc).c *= ratio_to_vary;
+        (node.hs.leaf.vc).c *= ratio_to_vary;
     elseif factor_to_vary=="wk"
         node.hs.root.k_max *= ratio_to_vary;
         node.hs.stem.k_max *= ratio_to_vary;

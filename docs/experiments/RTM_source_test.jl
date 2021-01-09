@@ -106,7 +106,16 @@ sigb = canOpt.ddb*leaf.ρ_LW + canOpt.ddf*leaf.τ_LW
 τ_dd = (1 - (exp(-sigf*iLAI))*ones(nwl,nl)
 ρ_dd = (sigb*iLAI)*ones(nwl,nl)
 
-1.0-τ_dd[1,1]-ρ_dd[1,1]
+#
+#
+#
+#
+# a parsing error here
+# 1.0-τ_dd[1,1]-ρ_dd[1,1]
+#
+#
+#
+#
 S⁺ = zeros(nwl,nl).+150*iLAI*0.98
 S⁻ = zeros(nwl,nl).+150*iLAI*0.98
 #S⁺[1,80:109].=200*iLAI
@@ -125,7 +134,3 @@ plot!(1 .+Emin2',-sumLAI2, label="Downwelling Thermal fine")
 plot!(1 .+Eplu2',-sumLAI2, label="Upwelling Thermal fine")
 xlabel!("W/m2")
 ylabel!("-Cum LAI")
-
-
-
-

@@ -4,15 +4,20 @@
 #
 ###############################################################################
 """
-    create_grass_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_grass(
+                z_root::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
-Create a [`GrassLikeHS`](@ref), given
+Create a [`GrassLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_canopy` Maximal canopy height (positive value)
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_grass_like_hs(
+function create_grass(
             z_root::FT,
             z_canopy::FT,
             soil_bounds::Array{FT,1},
@@ -46,7 +51,7 @@ function create_grass_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
@@ -59,31 +64,36 @@ function create_grass_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return GrassLikeHS{FT}(_n_root,
-                           _n_canopy,
-                           _roots,
-                           _leaves,
-                           _r_index,
-                           _c_index,
-                           zeros(FT,_n_root),
-                           zeros(FT,_n_root),
-                           zeros(FT,_n_root))
+    return GrassLikeOrganism{FT}(_n_root,
+                                 _n_canopy,
+                                 _roots,
+                                 _leaves,
+                                 _r_index,
+                                 _c_index,
+                                 zeros(FT,_n_root),
+                                 zeros(FT,_n_root),
+                                 zeros(FT,_n_root))
 end
 
 
 
 
 """
-    create_palm_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_palm(z_root::FT,
+                z_trunk::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
-Create a [`PalmLikeHS`](@ref), given
+Create a [`PalmLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_trunk` Maximal trunk height (positive value)
 - `z_canopy` Maximal canopy height (positive value)
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_palm_like_hs(
+function create_palm(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,
@@ -130,7 +140,7 @@ function create_palm_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
@@ -148,32 +158,37 @@ function create_palm_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return PalmLikeHS{FT}(_n_root,
-                          _n_canopy,
-                          _roots,
-                          _trunk,
-                          _leaves,
-                          _r_index,
-                          _c_index,
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root))
+    return PalmLikeOrganism{FT}(_n_root,
+                                _n_canopy,
+                                _roots,
+                                _trunk,
+                                _leaves,
+                                _r_index,
+                                _c_index,
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root))
 end
 
 
 
 
 """
-    create_tree_like_hs(z_root::FT, z_trunk::FT, z_canopy::FT, soil_bounds::Array{FT,1}, air_bounds::Array{FT,1}) where {FT<:AbstractFloat}
+    create_tree(z_root::FT,
+                z_trunk::FT,
+                z_canopy::FT,
+                soil_bounds::Array{FT,1},
+                air_bounds::Array{FT,1}
+    ) where {FT<:AbstractFloat}
 
-Create a [`TreeLikeHS`](@ref), given
+Create a [`TreeLikeOrganism`](@ref), given
 - `z_root` Maximal root depth (negative value)
 - `z_trunk` Maximal trunk height (positive value)
 - `z_canopy` Maximal canopy height (positive value)
 - `soil_bounds` Array of soil layer boundaries starting from 0
 - `air_bounds` Array of air layer boundaries starting from 0
 """
-function create_tree_like_hs(
+function create_tree(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,
@@ -220,7 +235,7 @@ function create_tree_like_hs(
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = (soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
         _rt = RootHydraulics{FT}(
                     area=1/_n_root,
                     k_max=25/_n_root,
@@ -251,15 +266,15 @@ function create_tree_like_hs(
     _leaves = [LeafHydraulics{FT}(area=1500/_n_canopy) for i in 1:_n_canopy];
 
     # return plant
-    return TreeLikeHS{FT}(_n_root,
-                          _n_canopy,
-                          _roots,
-                          _trunk,
-                          _branch,
-                          _leaves,
-                          _r_index,
-                          _c_index,
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root),
-                          zeros(FT,_n_root))
+    return TreeLikeOrganism{FT}(_n_root,
+                                _n_canopy,
+                                _roots,
+                                _trunk,
+                                _branch,
+                                _leaves,
+                                _r_index,
+                                _c_index,
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root),
+                                zeros(FT,_n_root))
 end

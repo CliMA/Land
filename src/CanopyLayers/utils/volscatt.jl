@@ -4,24 +4,23 @@
 #
 ###############################################################################
 """
-    volscatt!(
-                container::Array{FT,1},
-                tts::FT,
-                tto::FT,
-                psi::FT,
-                ttl::FT
+    volscatt!(cache::Array{FT,1},
+              tts::FT,
+              tto::FT,
+              psi::FT,
+              ttl::FT
     ) where {FT<:AbstractFloat}
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
     multiplier (`frho`) and transmittance multiplier (`ftau`), given
-- `container` Array container for results
+- `cache` Array cache for results
 - `tts` Solar zenith angle
 - `tto` Viewing zenith angle
 - `psi` Azimuth angle
 - `ttl` Leaf inclination angle
 """
 function volscatt!(
-            container::Array{FT,1},
+            cache::Array{FT,1},
             tts::FT,
             tto::FT,
             psi::FT,
@@ -43,29 +42,29 @@ function volscatt!(
     cosbts = FT(1.0);
     cosbto = FT(1.0);
     if (abs(Ss)>1e-6)
-    	cosbts = -Cs / Ss;
+        cosbts = -Cs / Ss;
     end
     if (abs(So)>1e-6)
-    	cosbto = -Co / So;
+        cosbto = -Co / So;
     end
 
     if (abs(cosbts)<1)
-    	bts = acos(cosbts);
-    	ds  = Ss;
+        bts = acos(cosbts);
+        ds  = Ss;
     else
-    	bts = FT(pi);
-    	ds  = Cs;
+        bts = FT(pi);
+        ds  = Cs;
     end
 
-    if (abs(cosbto)<1)
-    	bto = acos(cosbto);
-    	doo = So;
-    elseif(tto<90)
-    	bto = FT(pi);
-    	doo = Co;
+    if abs(cosbto)<1
+        bto = acos(cosbto);
+        doo = So;
+    elseif tto<90
+        bto = FT(pi);
+        doo = Co;
     else
-    	bto = 0;
-    	doo = -Co;
+        bto = 0;
+        doo = -Co;
     end
 
     chi_s = 2 / FT(pi) * ( (bts - FT(pi)/2) * Cs + sin(bts) * Ss );
@@ -79,35 +78,35 @@ function volscatt!(
     #btran_=pi-abs(bts+bto-FT(pi))
 
     if psi_rad <= btran1
-    	bt1 = psi_rad;
-    	bt2 = btran1;
-    	bt3 = btran2;
+        bt1 = psi_rad;
+        bt2 = btran1;
+        bt3 = btran2;
     else
-    	bt1 = btran1;
-    	if psi_rad <= btran2
-    		bt2 = psi_rad;
-    		bt3 = btran2;
+        bt1 = btran1;
+        if psi_rad <= btran2
+            bt2 = psi_rad;
+            bt3 = btran2;
         else
-    		bt2 = btran2;
-    		bt3 = psi_rad;
+            bt2 = btran2;
+            bt3 = psi_rad;
         end
     end
 
     t1 = 2Cs * Co + Ss * So * cos_psi;
     t2 = 0;
     if bt2 > 0
-    	t2 = sin(bt2) * ( 2ds * doo + Ss * So * cos(bt1) * cos(bt3) );
+        t2 = sin(bt2) * ( 2ds * doo + Ss * So * cos(bt1) * cos(bt3) );
     end
 
     denom = 2 * FT(pi)^2;
     frho  = ((pi-bt2) * t1 + t2) / denom;
     ftau  = (-bt2     * t1 + t2) / denom;
 
-    # fill the values to container
-    container[1] = chi_s;
-    container[2] = abs(chi_o);
-    container[3] = frho;
-    container[4] = ftau;
+    # fill the values to cache
+    cache[1] = chi_s;
+    cache[2] = abs(chi_o);
+    cache[3] = frho;
+    cache[4] = ftau;
 
     return nothing
 end

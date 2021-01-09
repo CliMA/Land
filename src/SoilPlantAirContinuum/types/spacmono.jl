@@ -23,7 +23,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     z_canopy::FT = FT(10)
 
     "Plant hydraulic system"
-    plant_hs::AbstractPlantHS{FT} = create_grass_like_hs(z_root, z_canopy, soil_bounds, air_bounds)
+    plant_hs::AbstractPlantOrganism{FT} = create_grass(z_root, z_canopy, soil_bounds, air_bounds)
     "Number of canopy layers"
     n_canopy::Int = length(plant_hs.canopy_index_in_air)
     "Number of root layers"
@@ -96,5 +96,5 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Incoming radiation container"
     in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
     "RT container"
-    rt_con::RTContainer{FT} = create_rt_container(FT, rt_dim)
+    rt_con::RTCache{FT} = create_rt_cache(FT, rt_dim)
 end

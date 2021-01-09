@@ -30,16 +30,51 @@ function update_leaf_TP!(
         canopyi.ps.T  = canopyi.T;
         leaf_temperature_dependence!(photo_set, canopyi.ps, envir);
         canopyi.p_sat = canopyi.ps.p_sat;
-        hs.f_st       = relative_surface_tension(T);
-        hs.f_vis      = relative_viscosity(T);
+        temperature_effects!(hs);
         hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = leaf_e_crit(hs, canopyi.ec);
+        canopyi.ec    = critical_flow(hs, canopyi.ec);
         canopyi.T_old = canopyi.T;
         canopyi.p_old = canopyi.p_ups;
     # if only p_ups changes, update ec and p_old
     elseif p_ups != p_old
         hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = leaf_e_crit(hs, canopyi.ec);
+        canopyi.ec    = critical_flow(hs, canopyi.ec);
+        canopyi.p_old = canopyi.p_ups;
+    end
+
+    return nothing
+end
+
+
+
+
+function update_leaf_TP!(
+            photo_set::AbstractPhotoModelParaSet{FT},
+            canopyi::CanopyLayer{FT},
+            hs::TreeSimple{FT},
+            envir::AirLayer{FT}
+) where {FT<:AbstractFloat}
+    # unpack required variables
+    @unpack g_max25, g_min25, p_ups, p_old, T, T_old = canopyi;
+
+    # note that canopyi.p_ups is not used here
+    # if T changes, update TD and ec, then T_old
+    if T != T_old
+        canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
+        canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
+        canopyi.LV    = latent_heat_vapor(T) * MOLMASS_WATER(FT);
+        canopyi.ps.T  = canopyi.T;
+        leaf_temperature_dependence!(photo_set, canopyi.ps, envir);
+        canopyi.p_sat = canopyi.ps.p_sat;
+        temperature_effects!(hs);
+        tree_ec       = critical_flow(hs, canopyi.ec * canopyi.LA);
+        canopyi.ec    = tree_ec / canopyi.LA;
+        canopyi.T_old = canopyi.T;
+        canopyi.p_old = canopyi.p_ups;
+    # if only p_ups changes, update ec and p_old
+    elseif p_ups != p_old
+        tree_ec       = critical_flow(hs, canopyi.ec * canopyi.LA);
+        canopyi.ec    = tree_ec / canopyi.LA;
         canopyi.p_old = canopyi.p_ups;
     end
 

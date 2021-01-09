@@ -1,4 +1,5 @@
 # Provides a framework on how to translate between LAI coordinates and physical Z-dimensions
+#=
 
 using Distributions:Beta,cdf,pdf
 using Parameters
@@ -20,3 +21,4 @@ function convert_z_to_dLAI!(mod::BetaCanopyStructure, canopy, z)
     # h = Canopy height
     LAI * cdf.(mod.B,z/h)
 end # functi
+=#

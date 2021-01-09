@@ -4,7 +4,10 @@
 #
 ###############################################################################
 """
-    create_leaf_opticals(sWL::Array{FT,1}, file::String)
+    create_leaf_opticals(
+                sWL::Array{FT,1},
+                file::String = FILE_OPTI
+    ) where {FT<:AbstractFloat}
 
 Create an `AbstractLeafOptiPara` struct, given
 - `sWL` Standard wave length
@@ -48,7 +51,7 @@ function create_leaf_opticals(
     @inbounds for i in 1:N
         wo = findall( (_lambda.>=sWL[i]) .& (_lambda.<sWL[i+1]) );
         if length(wo)==0
-            println("Warning, some wavelengths out of bounds ", sWL[i]);
+            @warn "Warning, some wavelengths out of bounds $(string(sWL[i]))";
         end
 
         nr[i]     = mean(    _nr[wo]);

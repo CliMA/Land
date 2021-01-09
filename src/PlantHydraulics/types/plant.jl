@@ -4,20 +4,20 @@
 #
 ###############################################################################
 """
-    abstract type AbstractPlantHS{FT}
+    abstract type AbstractPlantOrganism{FT}
 
-Hierachy of AbstractPlantHS
-- [`GrassLikeHS`](@ref)
-- [`PalmLikeHS`](@ref)
-- [`TreeLikeHS`](@ref)
+Hierachy of AbstractPlantOrganism
+- [`GrassLikeOrganism`](@ref)
+- [`PalmLikeOrganism`](@ref)
+- [`TreeLikeOrganism`](@ref)
 """
-abstract type AbstractPlantHS{FT} end
+abstract type AbstractPlantOrganism{FT<:AbstractFloat} end
 
 
 
 
 """
-    mutable struct GrassLikeHS{FT<:AbstractFloat}
+    mutable struct GrassLikeOrganism{FT}
 
 A plant hydraulic system like a grass, which contains multiple root layers, and
 multiple canopy layers. No trunk or branch system applies.
@@ -25,7 +25,7 @@ multiple canopy layers. No trunk or branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct GrassLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -46,18 +46,18 @@ mutable struct GrassLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
 
 
 """
-    mutable struct PalmLikeHS{FT<:AbstractFloat}
+    mutable struct PalmLikeOrganism{FT}
 
 A plant hydraulic system like a palm, which contains multiple root layers, one
 trunk, and multiple canopy layers. No branch system applies.
@@ -65,7 +65,7 @@ trunk, and multiple canopy layers. No branch system applies.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct PalmLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -88,18 +88,18 @@ mutable struct PalmLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
 
 
 """
-    mutable struct TreeLikeHS{FT<:AbstractFloat}
+    mutable struct TreeLikeOrganism{FT}
 
 A plant hydraulic system like a tree, which contains multiple root layers, one
 trunk, and multiple branch and canopy layers.
@@ -107,7 +107,7 @@ trunk, and multiple branch and canopy layers.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int
@@ -132,25 +132,26 @@ mutable struct TreeLikeHS{FT<:AbstractFloat} <: AbstractPlantHS{FT}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    container_k::Array{FT,1}
+    cache_k::Array{FT,1}
     "Pressure for each layer at given flow"
-    container_p::Array{FT,1}
+    cache_p::Array{FT,1}
     "Flow rate"
-    container_q::Array{FT,1}
+    cache_q::Array{FT,1}
 end
 
 
 
 
 """
-    mutable struct TreeSimple{FT<:AbstractFloat}
+    mutable struct TreeSimple{FT}
 
-A plant hydraulic system with one root, one stem, and one leaf for testing purpose
+A plant hydraulic system with one root, one stem, and one leaf for testing
+    purpose
 
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct TreeSimple{FT<:AbstractFloat} <: AbstractPlantHS{FT}
+Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantOrganism{FT}
     # Arrays of roots and leaves
     "Root"
     root::RootHydraulics{FT} = RootHydraulics{FT}()

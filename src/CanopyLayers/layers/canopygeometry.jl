@@ -44,7 +44,7 @@ end
                 can::Canopy4RT{FT},
                 angles::SolarAngles{FT},
                 can_opt::CanopyOpticals{FT},
-                rt_con::RTContainer{FT}
+                rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
 
 Computes canopy optical properties (extinction coefficients for direct and
@@ -54,13 +54,13 @@ Computes canopy optical properties (extinction coefficients for direct and
 - `can` [`Canopy4RT`](@ref) type struct
 - `angles` [`SolarAngles`](@ref) type struct
 - `can_opt` [`CanopyOpticals`](@ref) type struct
-- `rt_con` [`RTContainer`](@ref) type container
+- `rt_con` [`RTCache`](@ref) type cache
 """
 function canopy_geometry!(
             can::Canopy4RT{FT},
             angles::SolarAngles{FT},
             can_opt::CanopyOpticals{FT},
-            rt_con::RTContainer{FT}
+            rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
     # 1. update clumping factor from zenith angle
     clumping_factor!(can, angles);
@@ -73,15 +73,15 @@ function canopy_geometry!(
     sin_tto = sind(tto);
     cos_tts = cosd(tts);
     sin_tts = sind(tts);
-    tan_tts	= tand(tts);
+    tan_tts = tand(tts);
     cts_cto = cos_tts * cos_tto;
-    dso		= sqrt( tan_tts^2 + tan_tto^2 - 2*tan_tts*tan_tto*cos_psi );
+    dso     = sqrt( tan_tts^2 + tan_tto^2 - 2*tan_tts*tan_tto*cos_psi );
     psi_vol = abs( psi - 360*round(psi/360) );
 
     # 3. unpack canopy parameters
     @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, Ω = can;
 
-    # 4. update the RTContainer
+    # 4. update the RTCache
     can.cos_philo .= cosd.(lazitab .- psi);
     @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = can;
 
