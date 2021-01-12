@@ -180,7 +180,8 @@ function update_PVF!(
 
         # 2.3 adjust the qs so that sum(qs) = f_sum
         q_diff = sum(cache_q) - q_sum;
-        if abs(q_diff) < max(FT(1e-6), eps(FT))
+        if (abs(q_diff) < max(FT(1e-6), eps(FT))) &&
+           (maximum(cache_p) - minimum(cache_p) < 1e-4)
             break
         end
         k_sum  = sum(cache_k);

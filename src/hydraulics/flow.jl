@@ -161,7 +161,7 @@ function roots_flow!(
     # use ps and ks to compute the Δq to adjust
     pm = mean(ps);
     for i in 1:N
-        qs[i] -= (pm - ps[i]) * ks[i]
+        qs[i] -= (pm - ps[i]) * ks[i];
     end
 
     # adjust the qs so that sum(qs) = flow
@@ -247,7 +247,8 @@ function xylem_flow(
             pressure::FT,
             ini::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    _fh    = (root.p_ups - pressure) * root.k_max / root.f_vis;
+    _fh    = (root.p_ups + root.p_osm * root.T_sap / K_25(FT) - pressure) *
+             root.k_max / root.f_vis;
     _fl    = -_fh;
     _fx    = min(_fh, ini);
     _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
