@@ -52,10 +52,10 @@ uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.8.2"
 
 [[CanopyLayers]]
-deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "LinearAlgebra", "MAT", "Parameters", "Pkg", "PkgUtility", "Polynomials", "QuadGK", "Statistics", "Test"]
-git-tree-sha1 = "a69522cfb29799ee8f519957cb6e1ac51478db36"
+deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "LazyArtifacts", "LinearAlgebra", "MAT", "Parameters", "Pkg", "PkgUtility", "Polynomials", "QuadGK", "Statistics", "Test"]
+git-tree-sha1 = "8d7bbe016227e8b14e7ac7b0a2ccf6b29a769c3a"
 uuid = "677f5362-5107-42e4-8e81-51d9c4a1f96c"
-version = "0.1.4"
+version = "0.1.5"
 
 [[CategoricalArrays]]
 deps = ["DataAPI", "Future", "JSON", "Missings", "Printf", "Statistics", "StructTypes", "Unicode"]
