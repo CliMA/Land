@@ -76,7 +76,7 @@ function root_pk(
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, sh, vc = root;
+            p_osm, p_ups, sh, T_sap, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -94,7 +94,7 @@ function root_pk(
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end
-    p_end = p_25 * f_st;
+    p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
@@ -122,7 +122,7 @@ function root_pk(
             flow::Array{FT,1}
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, sh, vc = root;
+            p_osm, p_ups, sh, T_sap, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -140,7 +140,7 @@ function root_pk(
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end
-    p_end = p_25 * f_st;
+    p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph, _fl) in zip(k_element, k_history, p_gravity,

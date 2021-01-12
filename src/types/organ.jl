@@ -132,6 +132,8 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     p_rhiz::FT = FT(0.0)
     "Soil matrix potential `[MPa]`"
     p_ups ::FT = FT(0.0)
+    "Soil osmotic potential at 298.15 K `[MPa]"
+    p_osm ::FT = FT(0.0)
 
     # pressure, k, and p_history profile
     "List of k_max per element `[mol s⁻¹ MPa⁻¹ m⁻²]`"
