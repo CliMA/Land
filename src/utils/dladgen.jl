@@ -45,7 +45,7 @@ function dladgen(
             b::FT,
             litab_bnd::Array{FT,2}
 ) where {FT<:AbstractFloat}
-    @assert a+b< 1;
+    @assert a + b <= 1;
     freq = similar(litab_bnd[:,1]);
     for i in eachindex(freq)
         freq[i] = dcum(a, b, litab_bnd[i,2]) - dcum(a, b, litab_bnd[i,1]);
