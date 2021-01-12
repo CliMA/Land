@@ -191,6 +191,12 @@ git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.1"
 
+[[LazyArtifacts]]
+deps = ["Pkg"]
+git-tree-sha1 = "4bb5499a1fc437342ea9ab7e319ede5a457c0968"
+uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+version = "1.3.0"
+
 [[LibCURL_jll]]
 deps = ["LibSSH2_jll", "Libdl", "MbedTLS_jll", "Pkg", "Zlib_jll", "nghttp2_jll"]
 git-tree-sha1 = "897d962c20031e6012bba7b3dcb7a667170dad17"
@@ -307,9 +313,9 @@ version = "0.1.1"
 
 [[PlantHydraulics]]
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "PkgUtility", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "93deb9317860fcbbdab1d8eca7c15565f6e73184"
+git-tree-sha1 = "88c1a4b8b132aa90c097e473cbc1aee6f6aafdd0"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.2"
+version = "0.2.3"
 
 [[Polynomials]]
 deps = ["Intervals", "LinearAlgebra", "OffsetArrays", "RecipesBase"]
