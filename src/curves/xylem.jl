@@ -24,7 +24,7 @@ function xylem_k_ratio(
     @unpack b,c = vc;
 
     if p_25<0
-        kr = max( FT(1e-4), exp( -1 * (-p_25 / vc.b) ^ vc.c ) / vis );
+        kr = max( FT(1e-4), exp( -1 * (-p_25 / vc.b) ^ vc.c ) ) / vis;
     else
         kr = 1 / vis;
     end
@@ -45,7 +45,7 @@ function xylem_k_ratio(
     if p_25<0
         k1 = exp( -1 * (-p_25 / b1) ^ c1 ) * f1;
         k2 = exp( -1 * (-p_25 / b2) ^ c2 ) * f2;
-        kr = max( FT(1e-4), (k1+k2) / vis );
+        kr = max( FT(1e-4), (k1+k2) ) / vis;
     else
         kr = 1 / vis;
     end
