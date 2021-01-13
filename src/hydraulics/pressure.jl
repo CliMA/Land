@@ -635,6 +635,7 @@ function pressure_profile!(
     p_mean /= length(roots);
 
     # update the profile in trunk
+    trunk.p_ups = p_mean;
     pressure_profile!(trunk, trunk.flow; update=update);
 
     # update the profile in leaf
