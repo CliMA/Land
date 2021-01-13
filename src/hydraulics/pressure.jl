@@ -362,6 +362,7 @@ function pressure_profile!(
         p_25 -= _dp / _f;
     end
     p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
+    root.p_rhiz = p_end;
 
     # compute k from temperature and history, then update pressure
     for i in eachindex(k_element)
