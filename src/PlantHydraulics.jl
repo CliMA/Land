@@ -56,24 +56,10 @@ export AbstractPlantOrganism,
        TreeLikeOrganism,
        TreeSimple
 
-# export public functions --- initialize soil type
-export create_VanGenuchten,
-       VGClay,
-       VGClayLoam,
-       VGLoamySand,
-       VGLoamySand2,
-       VGSand,
-       VGSandyClayLoam,
-       VGSandyClayLoam2,
-       VGSandyLoam,
-       VGSilt,
-       VGSiltyClay,
-       VGSiltyClayLoam,
-       VGSiltyLoam
-
 # export public functions --- initialize plant
 export create_grass,
        create_palm,
+       create_soil_VC,
        create_tree
 
 # export public functions --- curves related
