@@ -4,26 +4,72 @@
 #
 ###############################################################################
 """
-    create_VanGenuchten(
+    create_soil_VC(
+                vc::AbstractSoilVC{FT},
                 name::String,
-                α::FT,
-                n::FT,
-                Θs::FT,
-                Θr::FT) where {FT<:AbstractFloat}
+                α::Number,
+                n::Number,
+                Θs::Number,
+                Θr::Number
+    ) where {FT<:AbstractFloat}
+    create_soil_VC(
+                vc::AbstractSoilVC{FT},
+                name::String
+    ) where {FT<:AbstractFloat}
 
 Create a [`AbstractSoilVC`](@ref) type of soil VC, given
-- `name` Soil type name
+- `vc` [`AbstractSoilVC`](@ref) type identifier
+- `name` Soil type name. Supported names include
+  - "Sand"
+  - "Loamy Sand"
+  - "Sandy Loam"
+  - "Loam"
+  - "Sandy Clay Loam"
+  - "Silt Loam"
+  - "Silt"
+  - "Clay Loam"
+  - "Silty Clay Loam"
+  - "Sandy Clay"
+  - "Silty Clay"
+  - "Clay"
 - `α` Soil α
 - `n` Soil n
 - `Θs` SWC at saturation
 - `Θr` Residual SWC
 """
-function create_VanGenuchten(
+function create_soil_VC(
+            vc::BrooksCorey{FT},
             name::String,
-            α::FT,
-            n::FT,
-            Θs::FT,
-            Θr::FT
+            α::Number,
+            n::Number,
+            Θs::Number,
+            Θr::Number
+) where {FT<:AbstractFloat}
+    _vc_vG = VanGenuchten{FT}(stype = name,
+                              α     = α   ,
+                              n     = n   ,
+                              Θs    = Θs  ,
+                              Θr    = Θr  )
+    _vc_BC = BrooksCorey{FT}(stype = name        ,
+                             b     = (2n-1)/(n-1),
+                             ϕs    = 1/α         ,
+                             Θs    = Θs          ,
+                             Θr    = Θr          )
+    fit_soil_VC!(_vc_vG, _vc_BC);
+
+    return _vc_BC
+end
+
+
+
+
+function create_soil_VC(
+            vc::VanGenuchten{FT},
+            name::String,
+            α::Number,
+            n::Number,
+            Θs::Number,
+            Θr::Number
 ) where {FT<:AbstractFloat}
     return VanGenuchten{FT}(stype = name,
                             α     = α   ,
@@ -35,122 +81,40 @@ end
 
 
 
-"""
-Create VanGenuchten VC for sand soil
-"""
-VGSand(FT) = create_VanGenuchten(
-                        "Sand",
-                        FT(1479.5945),
-                        FT(2.68),
-                        FT(0.43),
-                        FT(0.045))
+function create_soil_VC(
+            vc::AbstractSoilVC{FT},
+            name::String
+) where {FT<:AbstractFloat}
+    # Parameters from Silt soil
+    paras = [ 163.2656, 1.37, 0.46, 0.034];
 
-"""
-Create VanGenuchten VC for loamy sand soil
-"""
-VGLoamySand(FT) = create_VanGenuchten(
-                        "Loamy Sand",
-                        FT(1265.3084),
-                        FT(2.28),
-                        FT(0.41),
-                        FT(0.057))
+    if name=="Sand"
+        paras = [1479.5945, 2.68, 0.43, 0.045];
+    elseif name=="Loamy Sand"
+        paras = [1265.3084, 2.28, 0.41, 0.057];
+    elseif name=="Sandy Loam"
+        paras = [ 765.3075, 1.89, 0.41, 0.065];
+    elseif name=="Loam"
+        paras = [ 367.3476, 1.56, 0.43, 0.078];
+    elseif name=="Sandy Clay Loam"
+        paras = [ 602.0419, 1.48, 0.39, 0.100];
+    elseif name=="Silt Loam"
+        paras = [ 204.0820, 1.41, 0.45, 0.067];
+    elseif name=="Silt"
+        nothing;
+    elseif name=="Clay Loam"
+        paras = [ 193.8779, 1.31, 0.41, 0.095];
+    elseif name=="Silty Clay Loam"
+        paras = [ 102.0410, 1.23, 0.43, 0.089];
+    elseif name== "Sandy Clay"
+        paras = [ 275.5107, 1.23, 0.38, 0.100];
+    elseif name=="Silty Clay"
+        paras = [  51.0205, 1.09, 0.36, 0.070];
+    elseif name=="Clay"
+        paras = [  81.6328, 1.09, 0.38, 0.068];
+    else
+        @warn "Soil type $(name) not recognized, use Silt soil instead.";
+    end
 
-"""
-Create VanGenuchten VC for Sandy Loam soil
-"""
-VGSandyLoam(FT) = create_VanGenuchten(
-                        "Sandy Loam",
-                        FT(765.3075),
-                        FT(1.89),
-                        FT(0.41),
-                        FT(0.065))
-
-"""
-Create VanGenuchten VC for Loamy Sand 2 soil
-"""
-VGLoamySand2(FT) = create_VanGenuchten(
-                        "Loamy Sand 2",
-                        FT(367.3476),
-                        FT(1.56),
-                        FT(0.43),
-                        FT(0.078))
-
-"""
-Create VanGenuchten VC for Sandy Clay Loam soil
-"""
-VGSandyClayLoam(FT) = create_VanGenuchten(
-                        "Sandy Clay Loam",
-                        FT(602.0419),
-                        FT(1.48),
-                        FT(0.39),
-                        FT(0.1))
-
-"""
-Create VanGenuchten VC for Silty Loam soil
-"""
-VGSiltyLoam(FT) = create_VanGenuchten(
-                        "Silty Loam",
-                        FT(204.082),
-                        FT(1.41),
-                        FT(0.45),
-                        FT(0.067))
-
-"""
-Create VanGenuchten VC for Silt soil
-"""
-VGSilt(FT) = create_VanGenuchten(
-                        "Silt",
-                        FT(163.2656),
-                        FT(1.37),
-                        FT(0.46),
-                        FT(0.034))
-
-"""
-Create VanGenuchten VC for Clay Loam soil
-"""
-VGClayLoam(FT) = create_VanGenuchten(
-                        "Clay Loam",
-                        FT(193.8779),
-                        FT(1.31),
-                        FT(0.41),
-                        FT(0.095))
-
-"""
-Create VanGenuchten VC for Silty Clay Loam soil
-"""
-VGSiltyClayLoam(FT) = create_VanGenuchten(
-                        "Silty Clay Loam",
-                        FT(102.041),
-                        FT(1.23),
-                        FT(0.43),
-                        FT(0.089))
-
-"""
-Create VanGenuchten VC for Sandy Clay Loam 2 soil
-"""
-VGSandyClayLoam2(FT) = create_VanGenuchten(
-                        "Sandy Clay Loam 2",
-                        FT(275.5107),
-                        FT(1.23),
-                        FT(0.38),
-                        FT(0.1))
-
-"""
-Create VanGenuchten VC for Silty Clay soil
-"""
-VGSiltyClay(FT) = create_VanGenuchten(
-                        "Silty Clay",
-                        FT(51.0205),
-                        FT(1.09),
-                        FT(0.36),
-                        FT(0.07))
-
-"""
-Create VanGenuchten VC for Clay soil
-"""
-VGClay(FT) = create_VanGenuchten(
-                        "Clay",
-                        FT(81.6328),
-                        FT(1.09),
-                        FT(0.38),
-                        FT(0.068))
+    return create_soil_VC(vc, name, paras...)
+end

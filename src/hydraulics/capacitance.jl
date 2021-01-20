@@ -40,11 +40,12 @@ Note that this function only updates the equilibrium pressure in the tissue,
 """
 function update_PVF!(hs::LeafHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack p_element, p_leaf, q_out, pv, T_sap, v_maximum, v_storage = hs;
+    @unpack f_vis, p_element, p_leaf, q_out, pv, T_sap, v_maximum,
+            v_storage = hs;
 
     # calculate the flow rate out of the capacitance
     # use buffer_rate here to avoid alloaction issues
-    f_cap = (hs.p_storage - p_leaf) * buffer_rate(pv) * v_maximum;
+    f_cap = (hs.p_storage - p_leaf) * buffer_rate(pv) / f_vis * v_maximum;
     if (f_cap > 0) && (hs.v_storage <= f_cap * Δt)
         f_cap = hs.v_storage / Δt;
     end
@@ -62,13 +63,14 @@ end
 
 function update_PVF!(hs::StemHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack N, q_element, p_element, p_storage, pv, q_out, T_sap, v_maximum,
-            v_storage = hs;
+    @unpack f_vis, N, q_element, p_element, p_storage, pv, q_out, T_sap,
+            v_maximum, v_storage = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
     for i in N:-1:1
-        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
+        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) / f_vis *
+                v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
         end
@@ -87,13 +89,14 @@ end
 
 function update_PVF!(hs::RootHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
-            T_sap, v_maximum, v_storage = hs;
+    @unpack f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element,
+            q_out, T_sap, v_maximum, v_storage = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
     for i in N:-1:1
-        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
+        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) / f_vis *
+                v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
         end
@@ -118,13 +121,14 @@ function update_PVF!(
             nss::Bool
 ) where {FT<:AbstractFloat}
     # unpack values
-    @unpack N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out,
-            v_maximum, v_storage = hs;
+    @unpack f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element,
+            q_out, v_maximum, v_storage = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
     for i in N:-1:1
-        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) * v_maximum[i];
+        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) /f_vis *
+                v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
         end
