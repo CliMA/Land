@@ -213,10 +213,13 @@ VanGenuchten
 ```
 
 Pre-defined parameter sets are avialble, and you may quick create a soil type
-    struct using
+    struct using [`create_soil_VC`](@ref). Note that soil type parameters are
+    van Genuchten type VC, and we curve fitted the curve to provide the
+    parameters for Brooks and Corey type VC.
 
 ```@docs
 create_soil_VC
+fit_soil_VC!
 ```
 
 Correlations among soil relative water content, relative hydraulic conductance,

@@ -45,11 +45,19 @@ function create_soil_VC(
             Θs::Number,
             Θr::Number
 ) where {FT<:AbstractFloat}
-    return BrooksCorey{FT}(stype = name        ,
-                           b     = (2n-1)/(n-1),
-                           ϕs    = 1/α         ,
-                           Θs    = Θs          ,
-                           Θr    = Θr          )
+    _vc_vG = VanGenuchten{FT}(stype = name,
+                              α     = α   ,
+                              n     = n   ,
+                              Θs    = Θs  ,
+                              Θr    = Θr  )
+    _vc_BC = BrooksCorey{FT}(stype = name        ,
+                             b     = (2n-1)/(n-1),
+                             ϕs    = 1/α         ,
+                             Θs    = Θs          ,
+                             Θr    = Θr          )
+    fit_soil_VC!(_vc_vG, _vc_BC);
+
+    return _vc_BC
 end
 
 

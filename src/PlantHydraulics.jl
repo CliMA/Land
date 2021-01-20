@@ -60,7 +60,8 @@ export AbstractPlantOrganism,
 export create_grass,
        create_palm,
        create_soil_VC,
-       create_tree
+       create_tree,
+       fit_soil_VC!
 
 # export public functions --- curves related
 export p_from_volume,

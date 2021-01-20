@@ -379,3 +379,54 @@ function soil_p_25_swc(
 
     return soil_p_25_erwc(sh, erwc)
 end
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Fit Soil VC
+#
+###############################################################################
+"""
+    fit_soil_VC!(
+                vc_vG::VanGenuchten{FT},
+                vc_BC::BrooksCorey{FT}
+    ) where {FT<:AbstractFloat}
+
+Update BrooksCorey setup from known VanGenuchten parameters, given
+- `vc_vG` [`VanGenuchten`](@ref) type soil VC
+- `vc_BC` [`BrooksCorey`](@ref) type soil VC
+"""
+function fit_soil_VC!(
+            vc_vG::VanGenuchten{FT},
+            vc_BC::BrooksCorey{FT}
+) where {FT<:AbstractFloat}
+    # generate data to fit
+    _Θ    = range(vc_vG.Θr+FT(1e-2); stop=vc_vG.Θs-FT(1e-2), length=30);
+    _P_vG = -1 .* soil_p_25_swc.([vc_vG], _Θ);
+    _P_BC = -1 .* soil_p_25_swc.([vc_BC], _Θ);
+
+    f(x) = (
+        vc_BC.b  = x[1];
+        vc_BC.ϕs = x[2];
+        _P_BC   .= -1 .* soil_p_25_swc.([vc_BC], _Θ);
+        _diff    = sum( (log.(_P_BC) .- log.(_P_vG)) .^ 2 );
+        return -_diff
+    );
+
+    st = SolutionToleranceND{FT}([1e-3, 1e-6], 30);
+    ms = ReduceStepMethodND{FT}(x_mins = FT[1e-3, 1e-6],
+                                x_maxs = FT[ 100, 1000],
+                                x_inis = [vc_BC.b, vc_BC.ϕs],
+                                Δ_inis = FT[0.1, 1e-3]);
+    bc = find_peak(f, ms, st);
+    vc_BC.b  = bc[1];
+    vc_BC.ϕs = bc[2];
+
+    return nothing
+end
