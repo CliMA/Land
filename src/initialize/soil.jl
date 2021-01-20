@@ -45,11 +45,11 @@ function create_soil_VC(
             Θs::Number,
             Θr::Number
 ) where {FT<:AbstractFloat}
-    return BrooksCorey{FT}(stype = name,
-                           b     = 1/n ,
-                           ϕs    = 1/α ,
-                           Θs    = Θs  ,
-                           Θr    = Θr  )
+    return BrooksCorey{FT}(stype = name        ,
+                           b     = (2n-1)/(n-1),
+                           ϕs    = 1/α         ,
+                           Θs    = Θs          ,
+                           Θr    = Θr          )
 end
 
 

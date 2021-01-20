@@ -165,7 +165,7 @@ function soil_k_ratio_rwc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (rwc * Θs - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
     return soil_k_ratio_erwc(sh, erwc)
 end
@@ -179,7 +179,7 @@ function soil_k_ratio_rwc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (rwc * Θs - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
     return soil_k_ratio_erwc(sh, erwc)
 end
@@ -200,7 +200,7 @@ function soil_k_ratio_swc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (swc - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
     return soil_k_ratio_erwc(sh, erwc)
 end
@@ -214,7 +214,7 @@ function soil_k_ratio_swc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (swc - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
     return soil_k_ratio_erwc(sh, erwc)
 end
@@ -322,7 +322,7 @@ function soil_p_25_rwc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (rwc * Θs - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
     return soil_p_25_erwc(sh, erwc)
 end
@@ -336,7 +336,7 @@ function soil_p_25_rwc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (rwc * Θs - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
     return soil_p_25_erwc(sh, erwc)
 end
@@ -361,7 +361,7 @@ function soil_p_25_swc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (swc - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
     return soil_p_25_erwc(sh, erwc)
 end
@@ -375,7 +375,7 @@ function soil_p_25_swc(
 ) where {FT<:AbstractFloat}
     @unpack Θr, Θs = sh;
 
-    erwc = (swc - Θr) / (Θs - Θr);
+    erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
     return soil_p_25_erwc(sh, erwc)
 end
