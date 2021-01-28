@@ -45,7 +45,7 @@ Make temperature correction from a given value, given
 - `val` Uncorrected value at 298.15 K
 - `T` Leaf temperature
 
-Useful for Vcmax, Vomac, Vpmax, Jmax, and Respiration.
+Useful for Vcmax, Vomax, Vpmax, Jmax, and Respiration.
 """
 function photo_TD_from_val(
             td_set::AbstractTDParameterSet{FT},
