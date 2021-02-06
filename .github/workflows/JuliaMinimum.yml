@@ -19,5 +19,7 @@ jobs:
           version: "1.3"
       - name: Force update registry
         run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+      - name: Install Dependencies
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
       - name: Test package
         run: julia --project -e 'using Pkg; Pkg.test();'
