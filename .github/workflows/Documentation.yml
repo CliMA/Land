@@ -17,9 +17,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: "1.5"
-      - name: Force update registry
-        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+          version: "1"
       - name: Install Dependencies
         run: julia --project=docs/ -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
       - name: Build and deploy
