@@ -19,12 +19,16 @@ jobs:
           version: "1.5"
       - name: Force update registry
         run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-      - name: Test package
-        run: julia --project -e 'using Pkg; Pkg.test(coverage=true);'
-      - name: Upload code coverage
-        run: julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder());'
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Install Dependencies
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        uses: julia-actions/julia-runtest@latest
+      - name: Process Coverage
+        uses: julia-actions/julia-processcoverage@v1
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info
   macos-test:
     runs-on: macos-latest
     steps:
@@ -36,8 +40,10 @@ jobs:
           version: "1.5"
       - name: Force update registry
         run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-      - name: Test package
-        run: julia --project -e 'using Pkg; Pkg.test();'
+      - name: Install Dependencies
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        uses: julia-actions/julia-runtest@latest
   windows-test:
     runs-on: windows-latest
     steps:
@@ -49,5 +55,7 @@ jobs:
           version: "1.5"
       - name: Force update registry
         run: julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
-      - name: Test package
-        run: julia --project -e 'using Pkg; Pkg.test();'
+      - name: Install Dependencies
+        run: julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        uses: julia-actions/julia-runtest@latest
