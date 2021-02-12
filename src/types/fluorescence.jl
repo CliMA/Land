@@ -27,9 +27,9 @@ $(DocStringExtensions.FIELDS)
 """
 struct FluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet{FT}
     "Fluorescence model coefficient"
-    Kn1::FT
+    Kr1::FT
     "Fluorescence model coefficient"
-    Kn2::FT
+    Kr2::FT
     "Fluorescence model coefficient"
-    Kn3::FT
+    Kr3::FT
 end
