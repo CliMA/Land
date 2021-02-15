@@ -8,8 +8,6 @@ jobs:
   CompatHelper:
     runs-on: ubuntu-latest
     steps:
-      - name: Force update registry
-        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Add CompatHelper
         run: julia -e 'using Pkg; Pkg.add("CompatHelper");'
       - name: Run CompatHelper
