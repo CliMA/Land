@@ -162,11 +162,24 @@ function update_leaf_from_gsw!(
 
     # update the photosynthetic rates
     leaf_photo_from_glc!(photo_set, canopyi.ps, envir, canopyi.g_lc[ind]);
+    #
+    #
+    #
+    #
+    # be careful that this one might have memory allocation
+    # make some changes on Photosynthesis.jl to avoid memory allocation
+    # such as leaf_fluorescence!(photo_set, canopyi.ps);
+    #
+    #
+    #
+    #
+    leaf_fluorescence!(photo_set.Flu, canopyi.ps);
     canopyi.Ac[ind] = canopyi.ps.Ac;
     canopyi.Aj[ind] = canopyi.ps.Aj;
     canopyi.Ap[ind] = canopyi.ps.Ap;
     canopyi.Ag[ind] = canopyi.ps.Ag;
     canopyi.An[ind] = canopyi.ps.An;
+    canopyi.ϕs[ind] = canopyi.ps.ϕs;
 
     # update the pressures
     canopyi.p_i[ind] = canopyi.ps.p_i;
