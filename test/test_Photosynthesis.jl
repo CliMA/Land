@@ -7,6 +7,8 @@
                           C4CLM(FT),
                           AirLayer{FT}(),
                           Leaf{FT}(),
+                          FluorescenceVanDerTol(FT),
+                          FluorescenceVanDerTolDrought(FT),
                           KoTDBernacchi(FT),
                           RespirationTDBernacchi(FT),
                           VcmaxTDBernacchi(FT),
@@ -30,6 +32,7 @@ end
 
 
 # FT and NaN test for the structs
+println();
 @testset "Photosynthesis --- functions" begin
     for FT in [Float32, Float64]
         c3_set   = C3CLM(FT);

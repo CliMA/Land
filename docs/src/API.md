@@ -326,13 +326,14 @@ leaf_photo_from_glc!
 
 ## Fluorescence
 Photosynthesis module also provide ways to compute leaf fluorescence. By
-    default, the modules uses fluorescence parameters from Flexas et al. with
-    struct [`FluorescenceFlexas`](@ref):
+    default, the modules uses fluorescence parameters from van del Tol et al.
+    (2014) with struct [`FluorescenceVanDerTol`](@ref):
 
 ```@docs
 AbstractFluoModelParaSet
 FluoParaSet
-FluorescenceFlexas
+FluorescenceVanDerTol
+FluorescenceVanDerTolDrought
 ```
 
 The function that is used to compute fluorescene is
