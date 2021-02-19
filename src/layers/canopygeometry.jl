@@ -50,7 +50,7 @@ end
 Computes canopy optical properties (extinction coefficients for direct and
     diffuse light) based on the SAIL model. Most important input parameters are
     leaf inclination and azimuth distribution functions and sun-sensor
-    geometry . Canopy clumping Ω is implemented as in Pinty et al (2015), given
+    geometry. Canopy clumping Ω is implemented as in Pinty et al (2015), given
 - `can` [`Canopy4RT`](@ref) type struct
 - `angles` [`SolarAngles`](@ref) type struct
 - `can_opt` [`CanopyOpticals`](@ref) type struct
