@@ -60,7 +60,7 @@ function canopy_fluxes!(
     # 4. Normalization factor for leaf direct PAR
     #    weighted sum has to be 1 to conserve net SW direct
     #    Direct PAR is normalized by layer Ps value
-    mul!(cf_con.absfs_lidf, can_opt.absfs', can.lidf);
+    mul!(cf_con.absfs_lidf, adjoint(can_opt.absfs), can.lidf);
     normi       = 1 / mean(cf_con.absfs_lidf);
     cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+
                   view(can_opt.Ps, 2:nLayer+1)) ./ 2;
