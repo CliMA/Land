@@ -4,7 +4,12 @@
 #
 ###############################################################################
 """
-    optimize_leaf!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::Array{FT,2}, printing::Bool) where {FT<:AbstractFloat}
+    optimize_leaf!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                weather::Array{FT,2},
+                printing::Bool
+    ) where {FT<:AbstractFloat}
 
 Optimize leaf area (LAI within 0-20) and photosynthetic capacity (within
     5-200), given

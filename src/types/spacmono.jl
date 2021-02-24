@@ -23,13 +23,15 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     z_canopy::FT = FT(10)
 
     "Plant hydraulic system"
-    plant_hs::AbstractPlantOrganism{FT} = create_grass(z_root, z_canopy, soil_bounds, air_bounds)
+    plant_hs::AbstractPlantOrganism{FT} = create_grass(z_root, z_canopy,
+                                                       soil_bounds, air_bounds)
     "Number of canopy layers"
     n_canopy::Int = length(plant_hs.canopy_index_in_air)
     "Number of root layers"
     n_root  ::Int = length(plant_hs.root_index_in_soil)
     "Plant photosynthesis systems"
-    plant_ps::Array{CanopyLayer{FT},1} = [CanopyLayer{FT}() for i in 1:n_canopy]
+    plant_ps::Array{CanopyLayer{FT},1} = [CanopyLayer{FT}() for
+                                          i in 1:n_canopy]
     "Basal area `[m²]`"
     ba::FT = sum( [plant_hs.roots[i].area for i in 1:n_root] )
     "Ground area `[m²]`"
@@ -47,7 +49,8 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Zero plane displacement `[m]`"
     wind_d ::FT = z_canopy * 2/3
     "Mean layer height `[m]`"
-    wind_zs::Array{FT,1} = [(air_bounds[i]+air_bounds[i+1])/2 for i in 1:length(air_bounds)-1]
+    wind_zs::Array{FT,1} = [(air_bounds[i]+air_bounds[i+1])/2 for
+                            i in 1:length(air_bounds)-1]
     "Wind speed per layer `[m s⁻¹]`"
     winds::Array{FT,1} = [FT(1) for i in 1:length(air_bounds)-1]
 
@@ -90,7 +93,8 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "CanopyOpticals container"
     can_opt::CanopyOpticals{FT} = create_canopy_opticals(FT, rt_dim)
     "Array of LeafBios container"
-    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for i in 1:n_canopy]
+    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for
+                                         i in 1:n_canopy]
     "SoilOpticals container"
     soil_opt::SoilOpticals{FT} = create_soil_opticals(wl_set)
     "Incoming radiation container"

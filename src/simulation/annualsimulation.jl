@@ -4,7 +4,12 @@
 #
 ###############################################################################
 """
-    annual_simulation!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::DataFrame, output::DataFrame) where {FT<:AbstractFloat}
+    annual_simulation!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                weather::DataFrame,
+                output::DataFrame
+    ) where {FT<:AbstractFloat}
 
 Run annual simulation for a growing season, given
 - `node` [`SPACSimple`] type struct
@@ -58,10 +63,12 @@ function annual_simulation!(
             optimize_flows!(node, photo_set);
             leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
             flow = node.opt_f_sl + node.opt_f_sh;
-            anet = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
+            anet = frac_sl * node.container2L.cont_sl.an +
+                   frac_sh * node.container2L.cont_sh.an;
 
             # 2.2.3 update drought history
-            pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
+            pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
+                              node.opt_f_sh, frac_sl);
 
             # 2.2.4 pass values to DataFrame
             output[i, "LAI_sl"] = (node.container2L).lai_sl
@@ -96,7 +103,7 @@ function annual_simulation!(
             leaf_rd!(photo_set.ReT, node.ps);
             anet = -node.ps.Rd;
 
-            # 2.3.3 update temperature effects and then the leaf water potential
+            # 2.3.3 update temperature effects and then leaf water potential
             flow = FT(0);
             # TODO morea reasonable functions need to be added
             # vc_temperature_effects!(node.hs.leaf, tlef);

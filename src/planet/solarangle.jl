@@ -4,8 +4,17 @@
 #
 ###############################################################################
 """
-    zenith_angle(latd::FT, decd::FT, lhad::FT) where {FT<:AbstractFloat}
-    zenith_angle(latd::FT, day::FT, hour::FT, minute::FT) where {FT<:AbstractFloat}
+    zenith_angle(
+                latd::FT,
+                decd::FT,
+                lhad::FT
+    ) where {FT<:AbstractFloat}
+    zenith_angle(
+                latd::FT,
+                day::FT,
+                hour::FT,
+                minute::FT
+    ) where {FT<:AbstractFloat}
 
 Calculate the zenith angle, given
 - `latd` Latitude in degree
