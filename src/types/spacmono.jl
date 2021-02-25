@@ -101,4 +101,15 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
     "RT container"
     rt_con::RTCache{FT} = create_rt_cache(FT, rt_dim)
+    "Container for sunlit leaf area fraction in each layer"
+    f_SL::Array{FT,1} = repeat(canopy_rt.lidf, outer=[ canopy_rt.nAzi ]) /
+                        canopy_rt.nAzi;
+
+    # local storage for canopy GPP and NPP
+    "Canopy GPP per ground area"
+    f_gpp::FT = 0
+    "Canopy GPP per ground area"
+    f_npp::FT = 0
+    "Canopy water flux per ground area"
+    f_H₂O::FT = 0
 end

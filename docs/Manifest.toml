@@ -404,7 +404,7 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 deps = ["CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "LazyArtifacts", "Parameters", "Photosynthesis", "Pkg", "PkgUtility", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
-version = "0.1.6"
+version = "0.1.7"
 
 [[SortingAlgorithms]]
 deps = ["DataStructures", "Random", "Test"]
