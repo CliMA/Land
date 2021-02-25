@@ -55,6 +55,7 @@ export annual_profit,
        create_dataframe,
        gain_risk_map,
        initialize_spac_canopy!,
+       layer_fluxes!,
        leaf_allocation!,
        leaf_gas_exchange!,
        leaf_gas_exchange_nonopt!,
@@ -87,6 +88,7 @@ include("bigleaf/partition.jl"     )
 include("bigleaf/temperature.jl"   )
 include("bigleaf/varytrait.jl"     )
 
+include("layers/layer_fluxes.jl")
 include("layers/initializert.jl")
 include("layers/test_diurnal.jl")
 include("layers/test_soil.jl"   )

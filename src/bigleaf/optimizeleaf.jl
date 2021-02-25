@@ -4,7 +4,12 @@
 #
 ###############################################################################
 """
-    optimize_leaf!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::Array{FT,2}, printing::Bool) where {FT<:AbstractFloat}
+    optimize_leaf!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                weather::Array{FT,2},
+                printing::Bool
+    ) where {FT<:AbstractFloat}
 
 Optimize leaf area (LAI within 0-20) and photosynthetic capacity (within
     5-200), given
@@ -24,9 +29,7 @@ function optimize_leaf!(
                     leaf_allocation!(tmp_node, photo_set, x[1], x[2]);
                     tmp_prof = annual_profit(tmp_node, photo_set, weather);
                     if printing
-                        println("\tLABA is ", x[1],
-                                "\tVMAX is ", x[2],
-                                "\tPROF is ", tmp_prof);
+                        @info "\tLABA=$(x[1])\tVMAX=$(x[2])\tPROF=$(tmp_prof)";
                     end;
                     return tmp_prof);
 

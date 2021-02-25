@@ -4,7 +4,11 @@
 #
 ###############################################################################
 """
-    annual_profit(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, weather::Array{FT,2}) where {FT<:AbstractFloat}
+    annual_profit(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                weather::Array{FT,2}
+    ) where {FT<:AbstractFloat}
 
 Calculate the profit in the growing season so as to optimize leaf investment,
     given
@@ -24,7 +28,7 @@ function annual_profit(
 
     # if cons > 0
     if cons > 0
-        # 1. update the environmental constants based on the node geographycal info
+        # 1. update the environmental constants based on node geographycal info
         ratio            = atmospheric_pressure_ratio(elevation);
         node.envir.p_atm = ratio * P_ATM(FT);
         node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
@@ -72,10 +76,12 @@ function annual_profit(
                 optimize_flows!(node, photo_set);
                 leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
                 flow = node.opt_f_sl + node.opt_f_sh;
-                anet = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
+                anet = frac_sl * node.container2L.cont_sl.an +
+                       frac_sh * node.container2L.cont_sh.an;
 
                 # 2.2.3 update drought history
-                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
+                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
+                                  node.opt_f_sh, frac_sl);
 
             # 2.3 if night time
             else

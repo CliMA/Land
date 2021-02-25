@@ -4,9 +4,14 @@
 #
 ###############################################################################
 """
-    vary_spac!(node::SPACSimple{FT}, weat_years::DataFrame, factor_to_vary::String, ratio_to_vary::FT) where {FT<:AbstractFloat}
+    vary_spac!(node::SPACSimple{FT},
+               weat_years::DataFrame,
+               factor_to_vary::String,
+               ratio_to_vary::FT
+    ) where {FT<:AbstractFloat}
 
-Generalized function to vary the SoilPlantAirContinuum to run sensitivity analysis, given
+Generalized function to vary the SoilPlantAirContinuum to run sensitivity
+    analysis, given
 - `node` SPACSimple type struct
 - `weat_years` Weather data
 - `factor_to_vary` Which parameter to vary
@@ -64,7 +69,7 @@ function vary_spac!(
         _multip2 = saturation_vapor_pressure.((weat_years).Tair .+ FT(273.15));
         (weat_years).D    .*= _multip2 ./ _multip1;
     else
-        println("Invalid parameter provided, nothing has been changed.")
+        @warn "Invalid parameter provided, nothing has been changed";
     end
 
     return nothing
