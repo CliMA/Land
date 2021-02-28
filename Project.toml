@@ -1,7 +1,7 @@
 name = "SoilPlantAirContinuum"
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.7"
+version = "0.1.8"
 
 [deps]
 CLIMAParameters = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"

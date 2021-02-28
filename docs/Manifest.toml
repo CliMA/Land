@@ -47,9 +47,9 @@ version = "0.1.9"
 
 [[CSV]]
 deps = ["Dates", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode"]
-git-tree-sha1 = "1f79803452adf73e2d3fc84785adb7aaca14db36"
+git-tree-sha1 = "6d4242ef4cb1539e7ede8e01a47a32365e0a34cd"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.8.3"
+version = "0.8.4"
 
 [[CanopyLayers]]
 deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "LazyArtifacts", "LinearAlgebra", "MAT", "Parameters", "Pkg", "PkgUtility", "Polynomials", "QuadGK", "Statistics", "Test"]
@@ -280,9 +280,9 @@ version = "0.7.1"
 
 [[OffsetArrays]]
 deps = ["Adapt"]
-git-tree-sha1 = "986e7c0a0ef1863be969d191957ac32cb17d0d79"
+git-tree-sha1 = "f64fbf703e7f5af5d82ea7b7385b443bb7765ce9"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.6.0"
+version = "1.6.1"
 
 [[OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -404,7 +404,7 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 deps = ["CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "LazyArtifacts", "Parameters", "Photosynthesis", "Pkg", "PkgUtility", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
-version = "0.1.7"
+version = "0.1.8"
 
 [[SortingAlgorithms]]
 deps = ["DataStructures", "Random", "Test"]

@@ -108,17 +108,26 @@ end
 #
 # Update carbon and water fluxes
 #
+# TODO: work more to make this function more customized
+#
 ###############################################################################
 """
-    layer_fluxes!(node::SPACMono{FT}) where {FT<:AbstractFloat}
+    layer_fluxes!(
+                node::SPACMono{FT};
+                updating::Bool = false
+    ) where {FT<:AbstractFloat}
 
-Run carbon, water, and energy fluxes for all canopy layers, given
+Run carbon, water, energy, and SIF fluxes for all canopy layers, given
 - `node` [`SPACMono`](@ref) type struct
+- `updating` If true, update cavitation history
 """
-function layer_fluxes!(node::SPACMono{FT}) where {FT<:AbstractFloat}
+function layer_fluxes!(
+            node::SPACMono{FT};
+            updating::Bool = false
+) where {FT<:AbstractFloat}
     # 0.1 unpack data
     @unpack angles, can_opt, can_rad, canopy_rt, envirs, f_SL, ga, in_rad,
-            leaves_rt, n_canopy, photo_set, plant_hs, plant_ps, rt_con,
+            leaves_rt, n_canopy, photo_set, plant_hs, plant_ps, rt_con, rt_dim,
             soil_opt, stomata_model, wl_set = node;
     @unpack nAzi, nIncl = canopy_rt;
     nSL = nAzi * nIncl;
@@ -160,6 +169,20 @@ function layer_fluxes!(node::SPACMono{FT}) where {FT<:AbstractFloat}
             leaf_gsw_control!(photo_set, iPS, iEN);
         end
 
+        #
+        #
+        #
+        #
+        # TODO: make fqe arrays like APAR
+        # TODO: reduce the memory allocation of fluspect!
+        #
+        #
+        #
+        #
+        # update leaf fluorescence and FQE
+        leaves_rt[iRT].fqe = (adjoint(iPS.ϕs) * iPS.LAIx) * 100;
+        fluspect!(leaves_rt[iRT], wl_set);
+
         # update the flow rates
         for iLF in 1:(nSL+1)
             f_GPP += iPS.Ag[iLF] * iPS.LAIx[iLF] * iPS.LA;
@@ -167,6 +190,28 @@ function layer_fluxes!(node::SPACMono{FT}) where {FT<:AbstractFloat}
             f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm *
                      iPS.LAIx[iLF] * iPS.LA;
         end
+    end
+
+    # do SIF simulation
+    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt,
+                wl_set, rt_con, rt_dim);
+
+    # update flow profile and pressure history along the tree
+    if updating
+        for i_can in 1:n_canopy
+            iEN = envirs[i_can];
+            iLF = plant_hs.leaves[i_can];
+            iPS = plant_ps[i_can];
+            iST = plant_hs.branch[i_can];
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
+                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iST.flow = iLF.flow * iPS.LA;
+        end
+        plant_hs.trunk.flow = sum([iST.flow for iST in plant_hs.branch]);
+        for iRT in plant_hs.roots
+            iRT.flow = plant_hs.trunk.flow / length(plant_hs.roots);
+        end
+        pressure_profile!(plant_hs, SteadyStateMode(); update=true);
     end
 
     # update the flows in SPACMono
