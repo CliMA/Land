@@ -6,18 +6,38 @@
 """
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
-                leaf::Leaf{FT}
+                leaf::Leaf{FT},
+                envir::AirLayer{FT}
     ) where {FT<:AbstractFloat}
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
+                envir::AirLayer{FT},
                 p_i::FT
+    ) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(
+                photo_set::C3ParaSet{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(
+                photo_set::C4ParaSet{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT},
+                g_lc::FT
     ) where {FT<:AbstractFloat}
 
 Compute leaf photosynthetic rates, given
 - `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
 - `leaf` [`Leaf`](@ref) type struct
 - `p_i` Given leaf internal CO₂
+- `envir` [`AirLayer`](@ref) type struct
+- `g_lc` Given leaf diffusive conductance to CO₂
 
 The C3 photosynthesis model is from Farquhar et al. (1980) "A biochemical model
     of photosynthetic CO₂ assimilation in leaves of C3 species."
@@ -27,8 +47,11 @@ The C4 photosynthesis model is adapted from Collatz et al. (1992) "Coupled
 """
 function leaf_photosynthesis!(
             photo_set::AbstractPhotoModelParaSet{FT},
-            leaf::Leaf{FT}
+            leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            mode::PCO₂Mode
 ) where {FT<:AbstractFloat}
+    leaf_temperature_dependence!(photo_set, leaf, envir);
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
@@ -45,10 +68,12 @@ end
 function leaf_photosynthesis!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            mode::PCO₂Mode,
             p_i::FT
 ) where {FT<:AbstractFloat}
     leaf.p_i = p_i;
-    leaf_photosynthesis!(photo_set, leaf);
+    leaf_photosynthesis!(photo_set, leaf, envir, mode);
 
     return nothing
 end
@@ -56,39 +81,13 @@ end
 
 
 
-
-
-
-
-###############################################################################
-#
-# Calculate photosynthesis from leaf diffusive conductance for CO₂
-#
-###############################################################################
-"""
-    leaf_photosynthesis!(
-                photo_set::AbstractPhotoModelParaSet{FT},
-                leaf::Leaf{FT},
-                envir::AirLayer{FT}
-    ) where {FT<:AbstractFloat}
-    leaf_photosynthesis!(
-                photo_set::AbstractPhotoModelParaSet{FT},
-                leaf::Leaf{FT},
-                envir::AirLayer{FT},
-                g_lc::FT
-    ) where {FT<:AbstractFloat}
-
-Update leaf photosynthetic rates from a known leaf diffusive conductance, given
-- `photo_set` [`AbstractPhotoModelParaSet`](@ref) type parameter set
-- `leaf` [`Leaf`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
-- `g_lc` Given leaf diffusive conductance to CO₂
-"""
 function leaf_photosynthesis!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT},
-            envir::AirLayer{FT}
+            envir::AirLayer{FT},
+            mode::GCO₂Mode
 ) where {FT<:AbstractFloat}
+    leaf_temperature_dependence!(photo_set, leaf, envir);
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf, envir);
     rubisco_limited_rate!(photo_set, leaf, envir);
@@ -107,8 +106,10 @@ end
 function leaf_photosynthesis!(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT},
-            envir::AirLayer{FT}
+            envir::AirLayer{FT},
+            mode::GCO₂Mode
 ) where {FT<:AbstractFloat}
+    leaf_temperature_dependence!(photo_set, leaf, envir);
     leaf_ETR!(photo_set, leaf);
     light_limited_rate!(photo_set, leaf);
     rubisco_limited_rate!(photo_set, leaf);
@@ -128,10 +129,11 @@ function leaf_photosynthesis!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
+            mode::GCO₂Mode,
             g_lc::FT
 ) where {FT<:AbstractFloat}
     leaf.g_lc = g_lc;
-    leaf_photosynthesis!(photo_set, leaf, envir);
+    leaf_photosynthesis!(photo_set, leaf, envir, mode);
 
     return nothing
 end

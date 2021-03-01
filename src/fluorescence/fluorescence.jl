@@ -21,7 +21,7 @@ function leaf_fluorescence!(
     @unpack Kr1, Kr2, Kr3 = fluo_set;
 
     # Actual effective ETR:
-    leaf.Ja  = max(0, Ag / leaf.CO₂_per_electron);
+    leaf.Ja  = max(0, Ag / leaf.e2c);
 
     # Effective photochemical yield:
     if leaf.Ja <= 0

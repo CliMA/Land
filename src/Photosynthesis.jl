@@ -21,7 +21,8 @@ RT_25(FT=Float64) = FT(gas_constant()) * T_25(FT);
 
 
 # export public types
-export AbstractFluoModelParaSet,
+export AbstractCalculationMode,
+       AbstractFluoModelParaSet,
        AbstractPhotoModelParaSet,
        AbstractTDParameterSet,
        AirLayer,
@@ -30,7 +31,9 @@ export AbstractFluoModelParaSet,
        C3ParaSet,
        C4ParaSet,
        FluoParaSet,
+       GCO₂Mode,
        Leaf,
+       PCO₂Mode,
        Q10TD
 
 # export parasets
@@ -88,6 +91,7 @@ export temperature_correction,
 include("types/environment.jl" )
 include("types/fluorescence.jl")
 include("types/leaf.jl"        )
+include("types/mode.jl"        )
 include("types/temperature.jl" )
 include("types/photomodel.jl"  )
 include("types/parasets.jl"    )

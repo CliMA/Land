@@ -296,6 +296,9 @@ For empirical and optimization stomatal models, iterations are required to get
     this case, [`leaf_photosynthesis!`](@ref) is a better option:
 
 ```@docs
+AbstractCalculationMode
+GCO₂Mode
+PCO₂Mode
 leaf_photosynthesis!
 ```
 

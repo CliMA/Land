@@ -30,8 +30,8 @@ function light_limited_rate!(
     @unpack J, p_i, Γ_star = leaf;
     @unpack Eff_1, Eff_2 = photo_set;
 
-    leaf.CO₂_per_electron = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
-    leaf.Aj               = J * leaf.CO₂_per_electron;
+    leaf.e2c = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
+    leaf.Aj  = J * leaf.e2c;
 
     return nothing
 end
@@ -43,8 +43,8 @@ function light_limited_rate!(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    leaf.CO₂_per_electron = FT(1/6);
-    leaf.Aj               = leaf.J / 6;
+    leaf.e2c = 1 / 6;
+    leaf.Aj  = leaf.J / 6;
 
     return nothing
 end

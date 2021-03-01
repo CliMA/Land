@@ -78,21 +78,21 @@ println();
         @test NaN_test(leaf_4);
 
         # fluorescence
-        leaf_photosynthesis!(c3_set, leaf_3, FT(2));
+        leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), FT(2));
         leaf_fluorescence!(fluo_set, leaf_3);
-        leaf_photosynthesis!(c3_set, leaf_3, envir);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode());
         leaf_fluorescence!(fluo_set, leaf_3);
         @test NaN_test(leaf_3);
 
         # leaf photo from glc
-        leaf_photosynthesis!(c3_set, leaf_3, envir, glc);
-        leaf_photosynthesis!(c4_set, leaf_4, envir, glc);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode(), glc);
+        leaf_photosynthesis!(c4_set, leaf_4, envir, GCO₂Mode(), glc);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
 
         # leaf photo from p_i
-        leaf_photosynthesis!(c3_set, leaf_3, p_i);
-        leaf_photosynthesis!(c4_set, leaf_4, p_i);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), p_i);
+        leaf_photosynthesis!(c4_set, leaf_4, envir, PCO₂Mode(), p_i);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
     end

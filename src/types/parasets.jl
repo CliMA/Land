@@ -237,7 +237,7 @@ function C3Bernacchi(FT)
     ReT = RespirationTDBernacchi(FT);
     VcT = VcmaxTDBernacchi(FT);
     ΓsT = ΓStarTDBernacchi(FT);
-    Flu = FluorescenceVanDerTol(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
@@ -252,7 +252,7 @@ function C3CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     ΓsT = ΓStarTDCLM(FT);
-    Flu = FluorescenceVanDerTol(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
@@ -265,7 +265,7 @@ function C4CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     VpT = VpmaxTDBoyd(FT);
-    Flu = FluorescenceVanDerTol(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     return C4ParaSet{FT}(KpT, ReT, VcT, VpT, Flu, VR)
 end
