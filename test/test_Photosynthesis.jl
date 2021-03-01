@@ -56,7 +56,7 @@ println();
         rubisco_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        rubisco_limited_rate_glc!(c3_set, leaf_3, envir);
+        rubisco_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # light limited rates
@@ -66,7 +66,7 @@ println();
         light_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        light_limited_rate_glc!(c3_set, leaf_3, envir);
+        light_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # product limited rates
@@ -74,25 +74,25 @@ println();
         product_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        product_limited_rate_glc!(c4_set, leaf_4, envir);
+        product_limited_rate!(c4_set, leaf_4, envir);
         @test NaN_test(leaf_4);
 
         # fluorescence
-        leaf_photo_from_pi!(c3_set, leaf_3, FT(2));
+        leaf_photosynthesis!(c3_set, leaf_3, FT(2));
         leaf_fluorescence!(fluo_set, leaf_3);
-        leaf_photo_from_glc!(c3_set, leaf_3, envir);
+        leaf_photosynthesis!(c3_set, leaf_3, envir);
         leaf_fluorescence!(fluo_set, leaf_3);
         @test NaN_test(leaf_3);
 
         # leaf photo from glc
-        leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
-        leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, glc);
+        leaf_photosynthesis!(c4_set, leaf_4, envir, glc);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
 
         # leaf photo from p_i
-        leaf_photo_from_pi!(c3_set, leaf_3, p_i);
-        leaf_photo_from_pi!(c4_set, leaf_4, p_i);
+        leaf_photosynthesis!(c3_set, leaf_3, p_i);
+        leaf_photosynthesis!(c4_set, leaf_4, p_i);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
     end

@@ -33,9 +33,6 @@ export AbstractFluoModelParaSet,
        Leaf,
        Q10TD
 
-
-
-
 # export parasets
 export C3Bernacchi,
        C3CLM,
@@ -64,9 +61,6 @@ export C3Bernacchi,
        ΓStarTDBernacchi,
        ΓStarTDCLM
 
-
-
-
 # export functions
 export temperature_correction,
        leaf_ETR!,
@@ -76,21 +70,17 @@ export temperature_correction,
        leaf_km!,
        leaf_ko!,
        leaf_kpep!,
-       leaf_photo_from_glc!,
-       leaf_photo_from_pi!,
+       leaf_photosynthesis!,
        leaf_rd!,
        leaf_temperature_dependence!,
        leaf_vcmax!,
        leaf_vpmax!,
        leaf_Γstar!,
        light_limited_rate!,
-       light_limited_rate_glc!,
        photo_TD_from_set,
        photo_TD_from_val,
        product_limited_rate!,
-       product_limited_rate_glc!,
-       rubisco_limited_rate!,
-       rubisco_limited_rate_glc!
+       rubisco_limited_rate!
 
 
 

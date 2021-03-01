@@ -28,14 +28,14 @@ leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
 leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
 
 println("calculate photosynthesis from known internal CO₂ partial pressure");
-leaf_photo_from_pi!(c3_set, leaf_3, p_i);
-leaf_photo_from_pi!(c4_set, leaf_4, p_i);
+leaf_photosynthesis!(c3_set, leaf_3, p_i);
+leaf_photosynthesis!(c4_set, leaf_4, p_i);
 @show leaf_3.An;
 @show leaf_4.An;
 
 println("calculate photosynthesis from known leaf conductance to CO₂");
-leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
-leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
+leaf_photosynthesis!(c3_set, leaf_3, envir, glc);
+leaf_photosynthesis!(c4_set, leaf_4, envir, glc);
 @show leaf_3.An;
 @show leaf_4.An;
 #------------------------------------------------------------------------------
@@ -54,10 +54,10 @@ _p4 = collect(FT, 0:0.1:15.01);
 _a3 = similar(_p3);
 _a4 = similar(_p4);
 for i in eachindex(_p3)
-    leaf_photo_from_pi!(c3_set, leaf_3, _p3[i]); _a3[i] = leaf_3.An;
+    leaf_photosynthesis!(c3_set, leaf_3, _p3[i]); _a3[i] = leaf_3.An;
 end
 for i in eachindex(_p4)
-    leaf_photo_from_pi!(c4_set, leaf_4, _p4[i]); _a4[i] = leaf_4.An;
+    leaf_photosynthesis!(c4_set, leaf_4, _p4[i]); _a4[i] = leaf_4.An;
 end
 
 _fig,_axes = create_canvas("A-Ci curve"; ncol=2);
