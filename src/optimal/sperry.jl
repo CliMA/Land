@@ -38,8 +38,7 @@ function envir_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        ps.g_lc = g_lc;
-        leaf_photo_from_glc!(photo_set, ps, envir);
+        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -50,8 +49,7 @@ function envir_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        ps.g_lc = g_lc;
-        leaf_photo_from_glc!(photo_set, ps, envir);
+        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);

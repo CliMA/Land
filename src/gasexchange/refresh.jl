@@ -123,7 +123,7 @@ function update_leaf_AK!(
         _g_sw = max(_g_sw, g_min);
         _g_lc = 1 / (1/g_bc[i] + FT(1.6)/_g_sw + 1/g_m[i]);
         canopyi.ps.APAR = APAR[i];
-        leaf_photo_from_glc!(photo_set, canopyi.ps, envir, _g_lc);
+        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(), _g_lc);
 
         # update the a_max for each leaf
         canopyi.a_max[i] = canopyi.ps.An;

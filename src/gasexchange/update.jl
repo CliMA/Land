@@ -55,7 +55,8 @@ function update_leaf_from_glc!(
 
     # update the photosynthetic rates
     if canopyi.g_lc[ind] != canopyi.ps.g_lc
-        leaf_photo_from_glc!(photo_set, canopyi.ps, envir, canopyi.g_lc[ind]);
+        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
+                             canopyi.g_lc[ind]);
         #
         #
         #
@@ -161,7 +162,8 @@ function update_leaf_from_gsw!(
                               1 / canopyi.g_bc[ind] );
 
     # update the photosynthetic rates
-    leaf_photo_from_glc!(photo_set, canopyi.ps, envir, canopyi.g_lc[ind]);
+    leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
+                         canopyi.g_lc[ind]);
     #
     #
     #

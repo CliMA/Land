@@ -56,8 +56,7 @@ function envir_diff!(
     g_m   = canopyi.g_m[ind];
 
     # update photosynthesis for ps
-    ps.g_lc = x;
-    leaf_photo_from_glc!(photo_set, ps, envir);
+    leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # calculate g_sw from stomatal model
     β    = β_factor(bt, hs.p_element[end], psoil, swc);
@@ -91,8 +90,7 @@ function envir_diff!(
     g_m  = canopyi.g_m[ind];
 
     # update photosynthesis for ps
-    ps.g_lc = x;
-    leaf_photo_from_glc!(photo_set, ps, envir);
+    leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # make beta correction over the photosynthesis system
     β    = β_factor(bt, hs.p_element[end], psoil, swc);

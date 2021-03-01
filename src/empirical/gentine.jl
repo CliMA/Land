@@ -79,18 +79,17 @@ function envir_diff!(
     g_m   = canopyi.g_m[ind];
 
     # update photosynthesis for ps
-    ps.g_lc = x;
-    leaf_photo_from_glc!(photo_set, ps, envir);
+    leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # calculate flow rate and β
     g_sc = 1 / max( 1/x - 1/g_m - 1/g_bc, FT(1.6e-3) );
     g_sw = g_sc * FT(1.6);
     g_lw = 1 / (1/g_sw + 1/g_bw);
     e_lf = g_lw * (p_sat - p_H₂O) / p_atm;
-    k_lf = xylem_risk(hs, e_lf);
+    β    = xylem_risk(hs, e_lf);
 
     # calculate g_sw from stomatal model
-    g_md = stomatal_conductance(sm, ps, envir, k_lf);
+    g_md = stomatal_conductance(sm, ps, envir, β);
     g_md = min(canopyi.g_max, g_md);
 
     # calculate model predicted g_lc
