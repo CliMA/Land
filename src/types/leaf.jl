@@ -14,7 +14,9 @@ $(DocStringExtensions.FIELDS)
 Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     # Temperature related
     "Temperature `[K]`"
-    T::FT = 298.15
+    T    ::FT = 298.15
+    "Old Temperature `[K]`, if not T, run leaf_temperature_dependence!"
+    T_old::FT = 0
 
     # Photosynthesis system
     "Rate constant for thermal dissipation"
@@ -100,27 +102,27 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
 
     # Fluorescence related
     "Total efficiency, incl. photorespiration `[mol CO₂ mol⁻¹ e-]`"
-    CO₂_per_electron::FT = 1 / 6
+    e2c::FT = 1 / 6
     "dark adapted yield (`Kp=0`)"
-    Fm              ::FT = 0
+    Fm ::FT = 0
     "light adapted yield (`Kp=0`)"
-    Fm′             ::FT = 0
+    Fm′::FT = 0
     "dark-adapted fluorescence yield (`Kp=max`)"
-    Fo              ::FT = 0
+    Fo ::FT = 0
     "light-adapted fluorescence yield in the dark (`Kp=max`)"
-    Fo′             ::FT = 0
+    Fo′::FT = 0
     "Actual electron transport rate `[μmol m⁻² s⁻¹]`"
-    Ja              ::FT = 0
+    Ja ::FT = 0
     "Non-Photochemical quenching "
-    NPQ             ::FT = 0
+    NPQ::FT = 0
     "Photochemical quenching"
-    qQ              ::FT = 0
+    qQ ::FT = 0
     "energy quenching"
-    qE              ::FT = 0
+    qE ::FT = 0
     "PSII yield"
-    φ               ::FT = 0
+    φ  ::FT = 0
     "Steady-state (light-adapted) yield (aka Fs)"
-    ϕs              ::FT = 0
+    ϕs ::FT = 0
 
     # Environment related
     "Absorbed photosynthetic active radiation `[μmol m⁻² s⁻¹]`"

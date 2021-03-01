@@ -21,7 +21,7 @@ function leaf_fluorescence!(
     @unpack Kr1, Kr2, Kr3 = fluo_set;
 
     # Actual effective ETR:
-    leaf.Ja  = max(0, Ag / leaf.CO₂_per_electron);
+    leaf.Ja  = max(0, Ag / leaf.e2c);
 
     # Effective photochemical yield:
     if leaf.Ja <= 0
@@ -34,8 +34,8 @@ function leaf_fluorescence!(
     # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
     x        = max(0,  1-leaf.φ/maxPSII);
 
-    # Max PSII rate constant
-    x_α      = exp(log(x)*Kr2);
+    # Max PSII rate constant, x_α = exp(log(x)*Kr2);
+    x_α      = x ^ Kr2;
     leaf.Kr  = Kr1 * (1 + Kr3)* x_α / (Kr3 + x_α);
     leaf.Kp  = max(0, leaf.φ*(Kf+Kd+leaf.Kr)/(1-leaf.φ));
 

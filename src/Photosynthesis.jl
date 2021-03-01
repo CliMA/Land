@@ -4,6 +4,7 @@ using CLIMAParameters
 using CLIMAParameters.Planet
 using DocStringExtensions
 using Parameters
+using PkgUtility
 using WaterPhysics
 
 
@@ -20,7 +21,8 @@ RT_25(FT=Float64) = FT(gas_constant()) * T_25(FT);
 
 
 # export public types
-export AbstractFluoModelParaSet,
+export AbstractCalculationMode,
+       AbstractFluoModelParaSet,
        AbstractPhotoModelParaSet,
        AbstractTDParameterSet,
        AirLayer,
@@ -29,16 +31,17 @@ export AbstractFluoModelParaSet,
        C3ParaSet,
        C4ParaSet,
        FluoParaSet,
+       GCO₂Mode,
        Leaf,
+       PCO₂Mode,
        Q10TD
-
-
-
 
 # export parasets
 export C3Bernacchi,
        C3CLM,
        C4CLM,
+       FluorescenceVanDerTol,
+       FluorescenceVanDerTolDrought,
        JmaxTDBernacchi,
        JmaxTDCLM,
        JmaxTDLeuning,
@@ -61,9 +64,6 @@ export C3Bernacchi,
        ΓStarTDBernacchi,
        ΓStarTDCLM
 
-
-
-
 # export functions
 export temperature_correction,
        leaf_ETR!,
@@ -73,30 +73,25 @@ export temperature_correction,
        leaf_km!,
        leaf_ko!,
        leaf_kpep!,
-       leaf_photo_from_glc!,
-       leaf_photo_from_pi!,
+       leaf_photosynthesis!,
        leaf_rd!,
        leaf_temperature_dependence!,
        leaf_vcmax!,
        leaf_vpmax!,
        leaf_Γstar!,
        light_limited_rate!,
-       light_limited_rate_glc!,
        photo_TD_from_set,
        photo_TD_from_val,
        product_limited_rate!,
-       product_limited_rate_glc!,
-       rubisco_limited_rate!,
-       rubisco_limited_rate_glc!
+       rubisco_limited_rate!
 
 
 
-
-include("math/math.jl")
 
 include("types/environment.jl" )
 include("types/fluorescence.jl")
 include("types/leaf.jl"        )
+include("types/mode.jl"        )
 include("types/temperature.jl" )
 include("types/photomodel.jl"  )
 include("types/parasets.jl"    )
