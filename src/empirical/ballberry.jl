@@ -4,9 +4,25 @@
 #
 ###############################################################################
 """
-    stomatal_conductance(model::EmpiricalStomatalModel{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
-    stomatal_conductance(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
-    stomatal_conductance(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT, ind::Int) where {FT<:AbstractFloat}
+    stomatal_conductance(
+                model::EmpiricalStomatalModel{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT},
+                β::FT
+    ) where {FT<:AbstractFloat}
+    stomatal_conductance(
+                model::EmpiricalStomatalModel{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                β::FT
+    ) where {FT<:AbstractFloat}
+    stomatal_conductance(
+                model::EmpiricalStomatalModel{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                β::FT,
+                ind::Int
+    ) where {FT<:AbstractFloat}
 
 Steady state gsw from empirical approach given
 - `model` [`EmpiricalStomatalModel`](@ref) type empirical model parameter set

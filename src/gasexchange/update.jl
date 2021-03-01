@@ -4,8 +4,18 @@
 #
 ###############################################################################
 """
-    update_leaf_from_glc!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, ind::Int, glc::FT) where {FT<:AbstractFloat}
-    update_leaf_from_glc!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    update_leaf_from_glc!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                ind::Int,
+                glc::FT
+    ) where {FT<:AbstractFloat}
+    update_leaf_from_glc!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Update Nth leaf photosynthesis, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
@@ -106,9 +116,24 @@ end
 
 
 """
-    update_leaf_from_gsw!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, ind::Int, gsw::FT) where {FT<:AbstractFloat}
-    update_leaf_from_gsw!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
-    update_leaf_from_gsw!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    update_leaf_from_gsw!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                ind::Int,
+                gsw::FT
+    ) where {FT<:AbstractFloat}
+    update_leaf_from_gsw!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                ind::Int
+    ) where {FT<:AbstractFloat}
+    update_leaf_from_gsw!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Update Nth leaf photosynthesis, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
@@ -197,7 +222,7 @@ function update_leaf_from_gsw!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT}
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_sw)
         canopyi.ps.APAR = canopyi.APAR[i];

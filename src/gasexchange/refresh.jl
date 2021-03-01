@@ -4,7 +4,12 @@
 #
 ###############################################################################
 """
-    update_leaf_TP!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, hs::LeafHydraulics{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    update_leaf_TP!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                hs::LeafHydraulics{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Update leaf physiological parameters if temperature or pressure changes in the
 daytime, given

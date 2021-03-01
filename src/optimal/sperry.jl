@@ -123,7 +123,8 @@ function gas_exchange!(
             _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm, ind);
+            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
+                                          ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging

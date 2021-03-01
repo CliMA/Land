@@ -24,7 +24,7 @@ Hierarchy of the `AbstractStomatalModel`:
 - [`EmpiricalStomatalModel`](@ref)
 - [`OptimizationStomatalModel`](@ref)
 """
-abstract type AbstractStomatalModel{FT} end
+abstract type AbstractStomatalModel{FT<:AbstractFloat} end
 
 
 
@@ -55,7 +55,7 @@ gs = g0 + g1 ⋅ RH ⋅ \\dfrac{A}{Cs}
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMBallBerry{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
+Base.@kwdef mutable struct ESMBallBerry{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -80,7 +80,7 @@ Note it that the Gentine model does not require for a `β` function to tune the
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMGentine{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
+Base.@kwdef mutable struct ESMGentine{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -102,7 +102,7 @@ gs = g0 + g1 ⋅ \\dfrac{A}{Cs - Γ^{*}} ⋅ \\dfrac{1}{1 + \\dfrac{VPD}{d0}}
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMLeuning{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
+Base.@kwdef mutable struct ESMLeuning{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025 )
     "slope of conductance-photosynthesis correlation `[unitless]`"
@@ -126,7 +126,7 @@ gs = g0 + 1.6 ⋅ \\left( 1 + \\dfrac{g1}{\\sqrt{VPD}} \\right) ⋅ \\dfrac{A}{C
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct ESMMedlyn{FT<:AbstractFloat} <: EmpiricalStomatalModel{FT}
+Base.@kwdef mutable struct ESMMedlyn{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
     g0::FT = FT(0.025)
     "slope of conductance-photosynthesis correlation `[Pa⁽⁵⁾]`"
@@ -217,7 +217,7 @@ where K is ∂P/∂E.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct OSMWAP{FT<:AbstractFloat} <: OptimizationStomatalModel{FT}
+Base.@kwdef mutable struct OSMWAP{FT} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
     a::FT = FT(0.5)
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻¹]`"
@@ -241,7 +241,7 @@ where P is absolute value of leaf xylem pressure.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-Base.@kwdef mutable struct OSMWAPMod{FT<:AbstractFloat} <: OptimizationStomatalModel{FT}
+Base.@kwdef mutable struct OSMWAPMod{FT} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[mol mol⁻¹ MPa⁻¹]`"
     a::FT = FT(0.1)
 end

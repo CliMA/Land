@@ -4,8 +4,17 @@
 #
 ###############################################################################
 """
-    leaf_gsw_control!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
-    leaf_gsw_control!(photo_set::AbstractPhotoModelParaSet{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}) where {FT<:AbstractFloat}
+    leaf_gsw_control!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                ind::Int
+    ) where {FT<:AbstractFloat}
+    leaf_gsw_control!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 make sure g_sw is in its physiological range limited by diffusion, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set

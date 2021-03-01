@@ -14,14 +14,16 @@
                 envir::AirLayer{FT},
                 sm::OptimizationStomatalModel{FT},
                 bt::AbstractBetaFunction{FT},
-                ind::Int) where {FT<:AbstractFloat}
+                ind::Int
+    ) where {FT<:AbstractFloat}
     solution_diff!(x::FT,
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
                 sm::AbstractStomatalModel{FT},
-                ind::Int) where {FT<:AbstractFloat}
+                ind::Int
+    ) where {FT<:AbstractFloat}
 
 Calculate the difference to be minimized for a given
 - `x` Assumed leaf diffusive conductance
@@ -138,7 +140,8 @@ end
                 swc::FT,
                 envir::AirLayer{FT},
                 sm::EmpiricalStomatalModel{FT},
-                bt::AbstractBetaFunction{FT}) where {FT<:AbstractFloat}
+                bt::AbstractBetaFunction{FT}
+    ) where {FT<:AbstractFloat}
     gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
@@ -148,20 +151,23 @@ end
                 envir::AirLayer{FT},
                 sm::EmpiricalStomatalModel{FT},
                 bt::AbstractBetaFunction{FT},
-                ind::Int) where {FT<:AbstractFloat}
+                ind::Int
+    ) where {FT<:AbstractFloat}
     gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
-                sm::AbstractStomatalModel{FT}) where {FT<:AbstractFloat}
+                sm::AbstractStomatalModel{FT}
+    ) where {FT<:AbstractFloat}
     gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
                 sm::AbstractStomatalModel{FT},
-                ind::Int) where {FT<:AbstractFloat}
+                ind::Int
+    ) where {FT<:AbstractFloat}
 
 Calculate steady state gsw and photosynthesis from empirical approach, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
@@ -223,7 +229,8 @@ function gas_exchange!(
         _gl    = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
         _st    = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
+        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc,
+                                      envir, sm, bt, ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates

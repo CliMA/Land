@@ -49,6 +49,7 @@ export AbstractBetaFunction,
 # export public functions
 export leaf_gsw_control!,
        gas_exchange!,
+       solution_diff!,
        stomatal_conductance,
        update_leaf_AK!,
        update_leaf_from_glc!,
