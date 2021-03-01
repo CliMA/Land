@@ -62,7 +62,7 @@ end
 # Description in general section
 #
 ###############################################################################
-function envir_diff!(
+function solution_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},

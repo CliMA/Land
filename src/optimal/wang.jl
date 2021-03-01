@@ -4,7 +4,7 @@
 # Description in general model section in the empirical folder
 #
 ###############################################################################
-function envir_diff!(
+function solution_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
@@ -84,7 +84,7 @@ end
 # Description in general model section in the empirical folder
 #
 ###############################################################################
-function leaf_photo_from_envir!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::TreeSimple{FT},
@@ -99,7 +99,7 @@ function leaf_photo_from_envir!(
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
         leaf_ETR!(photo_set, canopyi.ps);
-        leaf_photo_from_envir!(photo_set, canopyi, hs.leaf, envir, sm, ind);
+        gas_exchange!(photo_set, canopyi, hs.leaf, envir, sm, ind);
     end
 
     return nothing

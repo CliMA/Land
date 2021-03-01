@@ -46,13 +46,9 @@ export AbstractBetaFunction,
        OSMWAP,
        OSMWAPMod
 
-
-
-
 # export public functions
-export envir_diff!,
-       leaf_gsw_control!,
-       leaf_photo_from_envir!,
+export leaf_gsw_control!,
+       gas_exchange!,
        stomatal_conductance,
        update_leaf_AK!,
        update_leaf_from_glc!,

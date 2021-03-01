@@ -5,7 +5,7 @@
 #
 ###############################################################################
 """
-    envir_diff!(x::FT,
+    solution_diff!(x::FT,
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
@@ -15,7 +15,7 @@
                 sm::OptimizationStomatalModel{FT},
                 bt::AbstractBetaFunction{FT},
                 ind::Int) where {FT<:AbstractFloat}
-    envir_diff!(x::FT,
+    solution_diff!(x::FT,
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
@@ -38,7 +38,7 @@ Calculate the difference to be minimized for a given
 The former function works for Ball-Berry, Leuning, and Medlyn models, the
     latter works for Gentine and all the optimization based models.
 """
-function envir_diff!(
+function solution_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
@@ -72,7 +72,7 @@ end
 
 
 
-function envir_diff!(
+function solution_diff!(
             x::FT,
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
@@ -130,7 +130,7 @@ end
 #
 ###############################################################################
 """
-    leaf_photo_from_envir!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
@@ -139,7 +139,7 @@ end
                 envir::AirLayer{FT},
                 sm::EmpiricalStomatalModel{FT},
                 bt::AbstractBetaFunction{FT}) where {FT<:AbstractFloat}
-    leaf_photo_from_envir!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
@@ -149,13 +149,13 @@ end
                 sm::EmpiricalStomatalModel{FT},
                 bt::AbstractBetaFunction{FT},
                 ind::Int) where {FT<:AbstractFloat}
-    leaf_photo_from_envir!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
                 sm::AbstractStomatalModel{FT}) where {FT<:AbstractFloat}
-    leaf_photo_from_envir!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
@@ -175,7 +175,7 @@ Calculate steady state gsw and photosynthesis from empirical approach, given
 The former function works for Ball-Berry, Leuning, and Medlyn models, the
     latter works for Gentine and all the optimization based models.
 """
-function leaf_photo_from_envir!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
@@ -192,14 +192,14 @@ function leaf_photo_from_envir!(
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
         leaf_ETR!(photo_set, canopyi.ps);
-        leaf_photo_from_envir!(photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
+        gas_exchange!(photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
     end
 end
 
 
 
 
-function leaf_photo_from_envir!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
@@ -223,7 +223,7 @@ function leaf_photo_from_envir!(
         _gl    = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
         _st    = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = envir_diff!(x, photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
+        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates

@@ -148,19 +148,19 @@ println("\nTesting stomatal models...")
         # test the solution functions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                for result in [ envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1),
-                                envir_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1),
+                for result in [ solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1),
                                 ]
                     @test FT_test(result, FT);
                     @test NaN_test(result);
                 end
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
-                result = envir_diff!(FT(0.1), mod, can, hs, envir, sm, 1);
+                result = solution_diff!(FT(0.1), mod, can, hs, envir, sm, 1);
                 @test FT_test(result, FT);
                 @test NaN_test(result);
             end
@@ -169,44 +169,44 @@ println("\nTesting stomatal models...")
         # test the stomata solutions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
                 @test NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
-                leaf_photo_from_envir!(mod, can, hs, envir, sm, 1);
+                gas_exchange!(mod, can, hs, envir, sm, 1);
                 @test NaN_test(can);
             end
-            leaf_photo_from_envir!(mod, can, TreeSimple{FT}(), envir, osm_3);
+            gas_exchange!(mod, can, TreeSimple{FT}(), envir, osm_3);
             @test NaN_test(can);
         end
 
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
                 @test NaN_test(can);
-                leaf_photo_from_envir!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
                 @test NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
-                leaf_photo_from_envir!(mod, can, hs, envir, sm);
+                gas_exchange!(mod, can, hs, envir, sm);
                 @test NaN_test(can);
             end
         end
