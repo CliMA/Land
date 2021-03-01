@@ -3,7 +3,7 @@
 # Medlyn model
 #
 ###############################################################################
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMMedlyn{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
@@ -20,7 +20,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMMedlyn{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -37,7 +37,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMMedlyn{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},

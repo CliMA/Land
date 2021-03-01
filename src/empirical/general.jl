@@ -61,7 +61,7 @@ function envir_diff!(
 
     # calculate g_sw from stomatal model
     β    = β_factor(bt, hs.p_element[end], psoil, swc);
-    g_md = empirical_gsw_from_model(sm, ps, envir, β);
+    g_md = stomatal_conductance(sm, ps, envir, β);
     g_md = min(canopyi.g_max, g_md);
 
     # calculate model predicted g_lc
@@ -109,7 +109,7 @@ function envir_diff!(
     end
 
     # calculate g_sw from stomatal model
-    g_md = empirical_gsw_from_model(sm, ps, envir, FT(1));
+    g_md = stomatal_conductance(sm, ps, envir, FT(1));
     g_md = min(canopyi.g_max, g_md);
 
     # calculate model predicted g_lc

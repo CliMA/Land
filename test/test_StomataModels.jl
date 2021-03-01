@@ -102,18 +102,18 @@ println("\nTesting empirical formulations...")
         hs     = LeafHydraulics{FT}();
 
         # test the empirical model formulations
-        for result in [ empirical_gsw_from_model(esm_1, leaf_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_2, leaf_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_3, leaf_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_4, leaf_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_1, can_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_2, can_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_3, can_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_4, can_3, envir, FT(1)),
-                        empirical_gsw_from_model(esm_1, can_3, envir, FT(1), 1),
-                        empirical_gsw_from_model(esm_2, can_3, envir, FT(1), 1),
-                        empirical_gsw_from_model(esm_3, can_3, envir, FT(1), 1),
-                        empirical_gsw_from_model(esm_4, can_3, envir, FT(1), 1) ]
+        for result in [ stomatal_conductance(esm_1, leaf_3, envir, FT(1)),
+                        stomatal_conductance(esm_2, leaf_3, envir, FT(1)),
+                        stomatal_conductance(esm_3, leaf_3, envir, FT(1)),
+                        stomatal_conductance(esm_4, leaf_3, envir, FT(1)),
+                        stomatal_conductance(esm_1, can_3, envir, FT(1)),
+                        stomatal_conductance(esm_2, can_3, envir, FT(1)),
+                        stomatal_conductance(esm_3, can_3, envir, FT(1)),
+                        stomatal_conductance(esm_4, can_3, envir, FT(1)),
+                        stomatal_conductance(esm_1, can_3, envir, FT(1), 1),
+                        stomatal_conductance(esm_2, can_3, envir, FT(1), 1),
+                        stomatal_conductance(esm_3, can_3, envir, FT(1), 1),
+                        stomatal_conductance(esm_4, can_3, envir, FT(1), 1) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end

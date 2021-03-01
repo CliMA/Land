@@ -50,10 +50,10 @@ export AbstractBetaFunction,
 
 
 # export public functions
-export empirical_gsw_from_model,
-       envir_diff!,
+export envir_diff!,
        leaf_gsw_control!,
        leaf_photo_from_envir!,
+       stomatal_conductance,
        update_leaf_AK!,
        update_leaf_from_glc!,
        update_leaf_from_gsw!,

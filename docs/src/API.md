@@ -98,7 +98,7 @@ For empirical stomatal models, the stomatal conductance is computed as the
     the empirical correlation is
 
 ```@docs
-empirical_gsw_from_model
+stomatal_conductance
 ```
 
 For optimization stomatal models, the stomatal conductance is computed as the

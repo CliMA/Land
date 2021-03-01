@@ -1,7 +1,7 @@
 name = "StomataModels"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.5"
+version = "0.1.6"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
@@ -21,7 +21,7 @@ CLIMAParameters = "0.1.6"
 ConstrainedRootSolvers = "0.1"
 DocStringExtensions = "0.8"
 Parameters = "0.12"
-Photosynthesis = "0.1"
+Photosynthesis = "0.1.4"
 PkgUtility = "0.1.1"
 PlantHydraulics = "0.2.1"
 WaterPhysics = "0.1"

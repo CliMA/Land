@@ -3,7 +3,7 @@
 # Leuning model
 #
 ###############################################################################
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMLeuning{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
@@ -20,7 +20,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMLeuning{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -38,7 +38,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMLeuning{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},

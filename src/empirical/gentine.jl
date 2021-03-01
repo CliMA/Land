@@ -3,7 +3,7 @@
 # Gentine model
 #
 ###############################################################################
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMGentine{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
@@ -19,7 +19,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMGentine{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -35,7 +35,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMGentine{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -90,7 +90,7 @@ function envir_diff!(
     k_lf = xylem_risk(hs, e_lf);
 
     # calculate g_sw from stomatal model
-    g_md = empirical_gsw_from_model(sm, ps, envir, k_lf);
+    g_md = stomatal_conductance(sm, ps, envir, k_lf);
     g_md = min(canopyi.g_max, g_md);
 
     # calculate model predicted g_lc

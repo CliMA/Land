@@ -4,9 +4,9 @@
 #
 ###############################################################################
 """
-    empirical_gsw_from_model(model::EmpiricalStomatalModel{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
-    empirical_gsw_from_model(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
-    empirical_gsw_from_model(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT, ind::Int) where {FT<:AbstractFloat}
+    stomatal_conductance(model::EmpiricalStomatalModel{FT}, leaf::Leaf{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
+    stomatal_conductance(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT) where {FT<:AbstractFloat}
+    stomatal_conductance(model::EmpiricalStomatalModel{FT}, canopyi::CanopyLayer{FT}, envir::AirLayer{FT}, β::FT, ind::Int) where {FT<:AbstractFloat}
 
 Steady state gsw from empirical approach given
 - `model` [`EmpiricalStomatalModel`](@ref) type empirical model parameter set
@@ -16,7 +16,7 @@ Steady state gsw from empirical approach given
 - `β` Correction factor over the g1 part of an empirical model
 - `ind` Nth leaf in the canopy layer
 """
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMBallBerry{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
@@ -32,7 +32,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMBallBerry{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -48,7 +48,7 @@ end
 
 
 
-function empirical_gsw_from_model(
+function stomatal_conductance(
             model::ESMBallBerry{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
