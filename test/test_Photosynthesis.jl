@@ -95,10 +95,5 @@ println();
         leaf_photo_from_pi!(c4_set, leaf_4, p_i);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-
-        # text lower quadratic function
-        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(3), FT(1)));
-        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(1)));
-        @test isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(5)));
     end
 end
