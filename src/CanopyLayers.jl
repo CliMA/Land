@@ -7,6 +7,7 @@ using LinearAlgebra
 using MAT
 using Parameters
 using Pkg.Artifacts
+using PkgUtility
 using Polynomials
 using QuadGK
 using Statistics
@@ -89,7 +90,6 @@ include("utils/calctav.jl"    )
 include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
 include("utils/expint.jl"     )
-include("utils/integral.jl"   )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
 

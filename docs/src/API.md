@@ -109,8 +109,6 @@ dladgen
 e2phot
 e2phot!
 expint
-fast∫
-fast∫!
 psofunction
 volscatt!
 ```

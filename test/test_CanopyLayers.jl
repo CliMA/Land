@@ -75,10 +75,6 @@ println("\nTesting the SCOPE model...");
         CanopyLayers.dcum(FT(1.1), FT(1.1), FT(1.1));
         CanopyLayers.e2phot(rand(FT,10), rand(FT,10));
         CanopyLayers.volscatt!(rand(FT,4), FT(40), FT(90), FT(40), FT(0));
-        CanopyLayers.fast∫(rand(FT,4), rand(FT,5));
-        CanopyLayers.fast∫(rand(FT,4), rand(FT,4));
-        CanopyLayers.fast∫!(rand(FT,4), rand(FT,5));
-        CanopyLayers.fast∫!(rand(FT,4), rand(FT,4));
         @test true;
     end
 end

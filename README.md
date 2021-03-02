@@ -10,9 +10,6 @@
 [st-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[bm-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Benchmarks/badge.svg?branch=main
-[bm-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"Benchmarks"
-
 [min-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Julia-1.3/badge.svg?branch=main
 [min-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.3"
 
@@ -27,9 +24,9 @@ Canopy layering model including big leaf model and mSCOPE model, latter of
     which is reactored from early version of CliMA Land model (now CliMA
     land model is synced with CanopyLayers).
 
-| Documentation                                   | CI Status             | Benchmarks            | Compatibility           | Code Coverage           |
-|:-----------------------------------------------:|:---------------------:|:---------------------:|:------------------------|:------------------------|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
+| Documentation                                   | CI Status             | Compatibility           | Code Coverage           |
+|:-----------------------------------------------:|:---------------------:|:------------------------|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
 
 
 
