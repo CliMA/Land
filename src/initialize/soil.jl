@@ -101,7 +101,7 @@ function create_soil_VC(
     elseif name=="Silt Loam"
         paras = [ 204.0820, 1.41, 0.45, 0.067];
     elseif name=="Silt"
-        nothing;
+        paras = [ 163.2656, 1.37, 0.46, 0.034];
     elseif name=="Clay Loam"
         paras = [ 193.8779, 1.31, 0.41, 0.095];
     elseif name=="Silty Clay Loam"

@@ -1,7 +1,7 @@
 name = "PlantHydraulics"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.5"
+version = "0.2.6"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
