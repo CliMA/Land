@@ -110,10 +110,11 @@ For optimization stomatal models, the stomatal conductance is computed as the
 
 This module uses ConstrainedRootSolver module to iterate through the two
     functions to find the solution. The aim is to find the stomatal conductance
-    when the [`solution_diff!`](@ref) function equals 0. The [`solution_diff!`](@ref)
-    returns the diference between real and model-predicted conductances for
-    empirical stomatal models, and the difference between marginal carbon gain
-    and risk for optimization stomatal models.
+    when the [`solution_diff!`](@ref) function equals 0. The
+    [`solution_diff!`](@ref) returns the diference between real and
+    model-predicted conductances for empirical stomatal models, and the
+    difference between marginal carbon gain and risk for optimization stomatal
+    models.
 
 ```@docs
 solution_diff!
@@ -121,17 +122,20 @@ solution_diff!
 
 In the [`solution_diff!`](@ref) function, leaf photosynthetic rates is modeled
     using [`gas_exchange!`](@ref), which calculates the gas exchange
-    rates from a known total leaf diffusive conductance.
+    rates from a known total leaf diffusive conductance using
+    [`GlcDrive`](@ref) mode.
 
 ```@docs
-gas_exchange!
+AbstractDrive
+GlcDrive
+GswDrive
 ```
 
 However, these functions do not force stomatal conductance to stay in its
     ranges. For example, the stomatal conductance solution is set to be zero if
     light is lower than the compensation point. In this case, the
-    [`solution_diff!`](@ref) function has to be used along with a control function
-    to guarantee realistic stomatal conductance.
+    [`solution_diff!`](@ref) function has to be used along with a control
+    function to guarantee realistic stomatal conductance.
 
 ```@docs
 gsw_control!
@@ -148,7 +152,7 @@ gas_exchange!
 To speed up the calculations, leaf physiological parameters are updated only
     if the environmental conditions changes. For example, PAR (photosyntheis
     active radiation) is constant when we iterate [`solution_diff!`](@ref), and
-    the electron transport is only updated once. Similar for the cases of
+    the electron transport is only updated once. Similar to the cases of
     leaf temperature and soil moisture. This kind of functions used in the
     present module are
 
@@ -164,11 +168,7 @@ I'd like to emphasize it here that the [`gas_exchange!`](@ref)
     temperature, and (2) prognostically modeling the non-steady state stomatal
     behaviors. As to the steady state case, leaf energy budget has to be
     considered. For the prognotic stomatal conductance, it is recommended to
-    use [`gas_exchange!`](@ref) function.
-
-```@docs
-gas_exchange!
-```
+    use [`gas_exchange!`](@ref) function at [`GswDrive`](@ref) mode.
 
 Note it here that stomtal conductance is controlled in this function, and thus
     no additional control like [`gsw_control!`](@ref) is required if
