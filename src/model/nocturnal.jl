@@ -102,8 +102,7 @@ end
                 photo_set::AbstractPhotoModelParaSet{FT},
                 clayer::CanopyLayer{FT},
                 envir::AirLayer{FT},
-                sm::OSMWang{FT}(),
-                LAI::FT
+                sm::OSMWang{FT}()
     ) where {FT<:AbstractFloat}
 
 Calculate the difference between marginal gain and risk of nighttime

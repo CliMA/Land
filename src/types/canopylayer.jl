@@ -162,4 +162,6 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     τ_esm::FT = 600
     "τ for optimal stomatal models `[μmol⁻¹]`, Δg/Δt = (∂A/∂E - ∂Θ/∂E) * τ"
     τ_osm::FT = FT(1e-6)
+    "τ for nighttime optimal stomatal models `[μmol⁻¹]`"
+    τ_noc::FT = FT(2e-6)
 end

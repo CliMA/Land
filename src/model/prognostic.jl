@@ -16,7 +16,7 @@
                 clayer::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
-                sm::OptimizationStomatalModel{FT},
+                sm::OSMWang{FT},
                 Δt::FT
     ) where {FT<:AbstractFloat}
 
@@ -26,7 +26,8 @@ Update g_sw prognostically, given
 - `sm` `EmpiricalStomatalModel` or `OSMWang` type stomatal model
 - `β` Tune factor to stomatal g1. 1 for AbstractBetaV mode
 - `Δt` Time interval for prognostic stomatal conductance
-- `photo_set` `AbstractPhotoModelParaSet` type photosynthesis model
+- `photo_set` `AbstractPhotoModelParaSet` type photosynthesis model, currently
+    supports [`OSMWang`](@ref) model only
 - `hs` Leaf hydraulic system
 """
 function prognostic_gsw!(
@@ -57,18 +58,22 @@ function prognostic_gsw!(
             clayer::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
-            sm::OptimizationStomatalModel{FT},
+            sm::OSMWang{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     # unpack values
-    @unpack An, ec, g_bc, g_bw, g_lw, g_m, g_sw, n_leaf, p_sat, ps = clayer;
-    @unpack p_atm, p_H₂O = envir;
+    @unpack APAR, g_sw, n_leaf = clayer;
 
     # update g_sw
     for iLF in 1:n_leaf
-        diff = solution_diff!(g_sw[iLF], photo_set, clayer, hs, envir, sm,
-                              GswDrive(), iLF);
-        g_sw[iLF] += diff * clayer.τ_osm * Δt;
+        if APAR[iLF] > 1
+            diff = solution_diff!(g_sw[iLF], photo_set, clayer, hs, envir, sm,
+                                  GswDrive(), iLF);
+            g_sw[iLF] += diff * clayer.τ_osm * Δt;
+        else
+            diff = nocturnal_diff!(g_sw[iLF], photo_set, clayer, envir, sm);
+            g_sw[iLF] += diff * clayer.τ_noc * Δt;
+        end
     end
 
     return nothing
