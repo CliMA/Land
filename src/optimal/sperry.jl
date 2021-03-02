@@ -66,7 +66,7 @@ function solution_diff!(
         @show x;
         @show ∂A∂E;
         @show ∂Θ∂E;
-        println("");
+        println();
         #sleep(0.1);
         # =#
 
@@ -132,7 +132,7 @@ function gas_exchange!(
             @show _g_max;
             @show leaf.p_ups;
             @show _solut;
-            println("");
+            println();
             =#
 
             # update leaf conductances and rates

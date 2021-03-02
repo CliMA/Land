@@ -1,5 +1,5 @@
 # test the structures
-println("\nTesting FT and NaN for the structures...")
+@info "Testing FT and NaN for the structures...";
 @testset "StomtaModels --- structures" begin
     for FT in [Float32, Float64]
         can_3 = CanopyLayer{FT}(n_leaf=2);
@@ -24,7 +24,8 @@ end
 
 
 # test the structures
-println("\nTesting gas exchange functions...")
+println();
+@info "Testing gas exchange functions...";
 @testset "StomtaModels --- gas exchange functions" begin
     for FT in [Float32, Float64]
         envir  = AirLayer{FT}();
@@ -79,7 +80,8 @@ end
 
 
 # test the structures
-println("\nTesting empirical formulations...")
+println();
+@info "Testing empirical formulations...";
 @testset "StomtaModels --- empirical formulations" begin
     for FT in [Float32, Float64]
         envir  = AirLayer{FT}();
@@ -123,7 +125,8 @@ end
 
 
 # test the structures
-println("\nTesting stomatal models...")
+println();
+@info "Testing stomatal models...";
 @testset "StomtaModels --- stomatal models" begin
     for FT in [Float32, Float64]
         envir  = AirLayer{FT}();
@@ -169,11 +172,15 @@ println("\nTesting stomatal models...")
         # test the stomata solutions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}(), 1);
+                @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}(), 1);
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
@@ -192,11 +199,15 @@ println("\nTesting stomatal models...")
 
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}());
+                @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}());
                 @test NaN_test(can);
                 gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
                 @test NaN_test(can);

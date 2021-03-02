@@ -61,7 +61,7 @@ function solution_diff!(
     leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # calculate g_sw from stomatal model
-    β    = β_factor(bt, hs.p_element[end], psoil, swc);
+    β    = β_factor(hs, bt, hs.p_element[end], psoil, swc);
     g_md = stomatal_conductance(sm, ps, envir, β);
     g_md = min(canopyi.g_max, g_md);
 
@@ -95,7 +95,7 @@ function solution_diff!(
     leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # make beta correction over the photosynthesis system
-    β    = β_factor(bt, hs.p_element[end], psoil, swc);
+    β    = β_factor(hs, bt, hs.p_element[end], psoil, swc);
     _rat = ps.Vcmax25WW * β / ps.Vcmax25;
     if _rat != 1
         ps.Jmax25  *= _rat;

@@ -4,7 +4,8 @@
 #
 ###############################################################################
 """
-    β_factor(bt::AbstractBetaFunction{FT},
+    β_factor(hs::LeafHydraulics{FT},
+             bt::AbstractBetaFunction{FT},
              p_leaf::FT,
              p_soil::FT,
              swc::FT
@@ -17,6 +18,22 @@ Calculate the β correction factor, given
 - `swc` Soil water content
 """
 function β_factor(
+            hs::LeafHydraulics{FT},
+            bt::Union{BetaGLinearKleaf{FT}, BetaVLinearKleaf{FT}},
+            p_leaf::FT,
+            p_soil::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
+    @unpack f_st, f_vis, vc = hs;
+
+    return xylem_k_ratio(vc, p_leaf/f_st, f_vis)
+end
+
+
+
+
+function β_factor(
+            hs::LeafHydraulics{FT},
             bt::Union{BetaGLinearPleaf{FT}, BetaVLinearPleaf{FT}},
             p_leaf::FT,
             p_soil::FT,
@@ -37,6 +54,7 @@ end
 
 
 function β_factor(
+            hs::LeafHydraulics{FT},
             bt::Union{BetaGLinearPsoil{FT}, BetaVLinearPsoil{FT}},
             p_leaf::FT,
             p_soil::FT,
@@ -57,6 +75,7 @@ end
 
 
 function β_factor(
+            hs::LeafHydraulics{FT},
             bt::Union{BetaGLinearSWC{FT}, BetaVLinearSWC{FT}},
             p_leaf::FT,
             p_soil::FT,
