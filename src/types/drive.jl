@@ -27,7 +27,7 @@ struct GlcDrive <: AbstractDrive end
 
 
 """
-    struct GlcDrive
+    struct GswDrive
 
 Gas exchange update is driven by changes in stomtal conductance to H₂O
 """

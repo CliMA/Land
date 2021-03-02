@@ -43,6 +43,13 @@
     gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
+                hs::TreeSimple{FT},
+                envir::AirLayer{FT},
+                sm::OSMWang{FT}
+    ) where {FT<:AbstractFloat}
+    gas_exchange!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GlcDrive,
                 ind::Int,
@@ -86,7 +93,7 @@
 Calculate steady state gas exchange rates, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi` [`CanopyLayer`](@ref) type struct
-- `hs` Leaf hydraulic system
+- `hs` Leaf hydraulic system or TreeSimple hydraulic organism
 - `envir` [`AirLayer`] type struct
 - `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
 - `bt` [`AbstractBetaFunction`](@ref) type struct
@@ -161,7 +168,7 @@ function gas_exchange!(
         _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
         _st    = SolutionTolerance{FT}(1e-4, 50);
         @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc,
-                                      envir, sm, bt, ind);
+                                      envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
@@ -234,13 +241,13 @@ function gas_exchange!(
                 canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
-            _gh    = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
-            _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
-            _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
-            _st    = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
-            _solut = find_zero(f, _sm, _st);
+            _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
+            _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
+            _sm = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
+            _st = SolutionTolerance{FT}(1e-4, 50);
+            @inline fd(x) = solution_diff!(x, photo_set, canopyi, hs, envir,
+                                           sm, GlcDrive(), ind);
+            _sl = find_zero(fd, _sm, _st);
 
             #= used for debugging
             @show _g_sw;
@@ -251,12 +258,20 @@ function gas_exchange!(
             =#
 
             # update leaf conductances and rates
-            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
+            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _sl);
         end
 
-    # if there is no light
+    # if there is no light, use nighttime mode
     else
-        canopyi.g_sw[ind] = FT(0);
+        @unpack ec, g_max, g_min, p_sat = canopyi;
+        @unpack p_atm, p_H₂O = envir;
+        _sm = NewtonBisectionMethod{FT}(g_min, g_max, (g_min+g_max)/2);
+        _st = SolutionTolerance{FT}(1e-4, 50);
+        @inline fn(x) = nocturnal_diff!(x, photo_set, canopyi, envir, sm);
+        _sl = find_zero(fn, _sm, _st);
+
+        # update leaf conductances and rates
+        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind, _sl);
     end
 
     # make sure g_sw in its range
@@ -305,7 +320,7 @@ function gas_exchange!(
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
+                                          GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -371,7 +386,7 @@ function gas_exchange!(
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
+                                          GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -588,8 +603,8 @@ end
 function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
-            drive::GswDrive,
-            envir::AirLayer{FT}
+            envir::AirLayer{FT},
+            drive::GswDrive
 ) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_sw)

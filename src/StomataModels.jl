@@ -14,10 +14,15 @@ using WaterPhysics
 
 # Define constants
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH       = EarthParameterSet()
-K_0(FT)           = FT( T_freeze(EARTH) );
-K_25(FT)          = K_0(FT) + 25;
-MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
+const EARTH        = EarthParameterSet();
+CP_DRYAIR(FT)      = FT( cp_d(EARTH) );
+K_0(FT)            = FT( T_freeze(EARTH) );
+K_STEFAN(FT)       = FT( Stefan() );
+MOLMASS_DRYAIR(FT) = FT( molmass_dryair(EARTH) );
+MOLMASS_WATER(FT)  = FT( molmass_water(EARTH) );
+
+K_25(FT)           = K_0(FT) + 25;
+CP_DRYAIR_MOL(FT)  = CP_DRYAIR(FT) * MOLMASS_DRYAIR(FT);
 
 
 
@@ -54,6 +59,7 @@ export AbstractBetaFunction,
 # export public functions
 export gsw_control!,
        gas_exchange!,
+       prognostic_gsw!,
        solution_diff!,
        stomatal_conductance,
        update_leaf_AK!,
@@ -71,6 +77,8 @@ include("model/beta.jl"       )
 include("model/control.jl"    )
 include("model/empirical.jl"  )
 include("model/gasexchange.jl")
+include("model/nocturnal.jl"  )
+include("model/prognostic.jl" )
 include("model/refresh.jl"    )
 include("model/solution.jl"   )
 

@@ -37,9 +37,9 @@ version = "0.8.3"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "21fb992ef1b28ff8f315354d3808ebf4a8fa6e45"
+git-tree-sha1 = "3ebb967819b284dc1e3c0422229b58a40a255649"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.26.2"
+version = "0.26.3"
 
 [[IOCapture]]
 deps = ["Logging"]
@@ -150,7 +150,7 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PkgUtility", "PlantHydraulics", "Test", "WaterPhysics"]
 path = ".."
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
-version = "0.1.6"
+version = "0.1.7"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
