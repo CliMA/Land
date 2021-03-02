@@ -222,6 +222,10 @@ println();
             end
         end
 
+        # test the nighttime stomatal conductance solution for Wang model
+        can_3.APAR[1] = 0;
+        gas_exchange!(mod_3, can_3, hs, envir, osm_3);
+
         # test the prognostic g_sw functions
         prognostic_gsw!(can_3, envir, esm_1, FT(1), FT(120));
         prognostic_gsw!(mod_3, can_3, hs, envir, osm_3, FT(120));

@@ -173,3 +173,13 @@ I'd like to emphasize it here that the [`gas_exchange!`](@ref)
 Note it here that stomtal conductance is controlled in this function, and thus
     no additional control like [`gsw_control!`](@ref) is required if
     [`gas_exchange!`](@ref) is used.
+
+Other functions
+
+```@docs
+dRdE
+dTdE
+dΘdE
+nocturnal_diff!
+prognostic_gsw!
+```

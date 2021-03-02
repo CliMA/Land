@@ -14,11 +14,19 @@ $(DocStringExtensions.FIELDS)
 Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     # CanopyLayer photosynthesis system
     "leaf photosynthesis system"
-    ps ::Leaf{FT} = Leaf{FT}()
+    ps  ::Leaf{FT} = Leaf{FT}()
+    "Memory leaf photosynthesis system"
+    ps_m::Leaf{FT} = Leaf{FT}()
     "Total leaf area `[m²]`"
-    LA ::FT = FT(150)
+    LA    ::FT = 150
+    "Leaf area index in the layer"
+    LAI   ::FT = 3
     "Total leaf area index in the layer"
-    LAI::FT = FT(3)
+    tLAI  ::FT = 3
+    "Memory APAR `[μmol m⁻² s⁻¹]`"
+    APAR_m::FT = 500
+    "Memory environment"
+    envir_m::AirLayer{FT} = AirLayer{FT}()
 
     # Number of leaves per canopy layer
     n_leaf::Int = 325
@@ -146,6 +154,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     p_ups ::FT = FT(0)
     "Base xylem pressre memory `[MPa]`"
     p_old ::FT = FT(1)
+    "Fitness factor for nighttime stomtal conductance"
+    ff    ::FT = FT(0.15)
 
     # time constant related to prognostic stomatal conductance
     "τ for empirical stomatal models `[-]`, Δg/Δt = (g_ss - gsw) / τ"
