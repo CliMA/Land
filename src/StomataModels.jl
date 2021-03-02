@@ -26,6 +26,7 @@ MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 export AbstractBetaFunction,
        AbstractBetaG,
        AbstractBetaV,
+       AbstractDrive,
        AbstractStomatalModel,
        BetaGLinearKleaf,
        BetaGLinearPleaf,
@@ -41,6 +42,8 @@ export AbstractBetaFunction,
        ESMGentine,
        ESMLeuning,
        ESMMedlyn,
+       GlcDrive,
+       GswDrive,
        OptimizationStomatalModel,
        OSMEller,
        OSMSperry,
@@ -54,8 +57,6 @@ export leaf_gsw_control!,
        solution_diff!,
        stomatal_conductance,
        update_leaf_AK!,
-       update_leaf_from_glc!,
-       update_leaf_from_gsw!,
        update_leaf_TP!
 
 
@@ -63,6 +64,7 @@ export leaf_gsw_control!,
 
 include("types/beta.jl"         )
 include("types/canopylayer.jl"  )
+include("types/drive.jl"        )
 include("types/stomatalmodel.jl")
 
 include("empirical/beta.jl"     )

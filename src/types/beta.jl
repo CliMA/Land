@@ -8,10 +8,12 @@
 
 Hierachy of AbstractBetaFunction:
 - [`AbstractBetaG`](@ref)
+  - [`BetaGLinearKleaf`](@ref)
   - [`BetaGLinearPleaf`](@ref)
   - [`BetaGLinearPsoil`](@ref)
   - [`BetaGLinearSWC`](@ref)
 - [`AbstractBetaV`](@ref)
+  - [`BetaVLinearKleaf`](@ref)
   - [`BetaVLinearPleaf`](@ref)
   - [`BetaVLinearPsoil`](@ref)
   - [`BetaVLinearSWC`](@ref)

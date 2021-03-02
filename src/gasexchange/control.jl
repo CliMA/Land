@@ -22,7 +22,7 @@ make sure g_sw is in its physiological range limited by diffusion, given
 - `envir` [`AirLayer`] type struct
 - `ind` Nth leaf
 
-Note that this function is meant to use jointly with update_leaf_from_glc! when
+Note that this function is meant to use jointly with gas_exchange! when
     computing optimal stomtal conductance.
 """
 function leaf_gsw_control!(
@@ -33,9 +33,11 @@ function leaf_gsw_control!(
 ) where {FT<:AbstractFloat}
     # if g_sw is low than g_min
     if canopyi.g_sw[ind] < canopyi.g_min
-        update_leaf_from_gsw!(photo_set, canopyi, envir, ind, canopyi.g_min);
+        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind,
+                      canopyi.g_min);
     elseif canopyi.g_sw[ind] > canopyi.g_max
-        update_leaf_from_gsw!(photo_set, canopyi, envir, ind, canopyi.g_max);
+        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind,
+                      canopyi.g_max);
     end
 
     return nothing

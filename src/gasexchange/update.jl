@@ -4,23 +4,33 @@
 #
 ###############################################################################
 """
-    update_leaf_from_glc!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
+                drive::GlcDrive,
                 ind::Int,
                 glc::FT
     ) where {FT<:AbstractFloat}
-    update_leaf_from_glc!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
-                envir::AirLayer{FT}
+                envir::AirLayer{FT},
+                drive::GlcDrive,
+                ind::Int
+    ) where {FT<:AbstractFloat}
+    gas_exchange!(
+                photo_set::AbstractPhotoModelParaSet{FT},
+                canopyi::CanopyLayer{FT},
+                envir::AirLayer{FT},
+                drive::GlcDrive
     ) where {FT<:AbstractFloat}
 
 Update Nth leaf photosynthesis, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi` [`CanopyLayer`](@ref) type struct
 - `envir` [`AirLayer`] type struct
+- `drive` [`GlcDrive`](@ref) or [`GswDrive`](@ref) drive mode
 - `ind` Nth leaf
 - `glc` Given leaf diffusive conductance
 
@@ -30,18 +40,19 @@ Note that this function does not make the gsw control, so it is not guaranteed
     optimal stomatl conductance models only, because optimal conductance can be
     outside the physiological stomatal conductance range. Thus, using this
     function for other purposes need to be cautious. In this case, it is
-    recommended to use `update_leaf_from_gsw!`.
+    recommended to use `gas_exchange!`.
 """
-function update_leaf_from_glc!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
+            drive::GlcDrive,
             ind::Int,
             glc::FT
 ) where {FT<:AbstractFloat}
     # update the conductances
     canopyi.g_lc[ind] = glc;
-    update_leaf_from_glc!(photo_set, canopyi, envir, ind);
+    gas_exchange!(photo_set, canopyi, envir, drive, ind);
 
     return nothing
 end
@@ -49,10 +60,11 @@ end
 
 
 
-function update_leaf_from_glc!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
+            drive::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # update the conductances
@@ -97,16 +109,17 @@ end
 
 
 
-function update_leaf_from_glc!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
-            envir::AirLayer{FT}
+            envir::AirLayer{FT},
+            drive::GlcDrive
 ) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_lc)
         canopyi.ps.APAR = canopyi.APAR[i];
         leaf_ETR!(photo_set, canopyi.ps);
-        update_leaf_from_glc!(photo_set, canopyi, envir, i, canopyi.g_lc[i]);
+        gas_exchange!(photo_set, canopyi, envir, drive, i, canopyi.g_lc[i]);
     end
 
     return nothing
@@ -116,23 +129,26 @@ end
 
 
 """
-    update_leaf_from_gsw!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
+                drive::GswDrive,
                 ind::Int,
                 gsw::FT
     ) where {FT<:AbstractFloat}
-    update_leaf_from_gsw!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
+                drive::GswDrive,
                 ind::Int
     ) where {FT<:AbstractFloat}
-    update_leaf_from_gsw!(
+    gas_exchange!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
-                envir::AirLayer{FT}
+                envir::AirLayer{FT},
+                drive::GswDrive
     ) where {FT<:AbstractFloat}
 
 Update Nth leaf photosynthesis, given
@@ -145,16 +161,17 @@ Update Nth leaf photosynthesis, given
 Note that this function makes the gsw control so that gsw is within the
     physiological range.
 """
-function update_leaf_from_gsw!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
+            drive::GswDrive,
             ind::Int,
             gsw::FT
 ) where {FT<:AbstractFloat}
     # update the conductances
     canopyi.g_sw[ind] = gsw;
-    update_leaf_from_gsw!(photo_set, canopyi, envir, ind);
+    gas_exchange!(photo_set, canopyi, envir, drive, ind);
 
     return nothing
 end
@@ -162,10 +179,11 @@ end
 
 
 
-function update_leaf_from_gsw!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
+            drive::GswDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     @unpack g_max, g_min = canopyi;
@@ -218,16 +236,17 @@ end
 
 
 
-function update_leaf_from_gsw!(
+function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
+            drive::GswDrive,
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_sw)
         canopyi.ps.APAR = canopyi.APAR[i];
         leaf_ETR!(photo_set, canopyi.ps);
-        update_leaf_from_gsw!(photo_set, canopyi, envir, i);
+        gas_exchange!(photo_set, canopyi, envir, drive, i);
     end
 
     return nothing

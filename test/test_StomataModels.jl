@@ -58,13 +58,13 @@ println();
         @test NaN_test(can_3);
         @test NaN_test(can_4);
 
-        update_leaf_from_glc!(mod_3, can_3, envir, 1, FT(0.1));
-        update_leaf_from_glc!(mod_4, can_4, envir, 1, FT(0.1));
+        gas_exchange!(mod_3, can_3, envir, GlcDrive(), 1, FT(0.1));
+        gas_exchange!(mod_4, can_4, envir, GlcDrive(), 1, FT(0.1));
         @test NaN_test(can_3);
         @test NaN_test(can_4);
 
-        update_leaf_from_gsw!(mod_3, can_3, envir, 1, FT(0.05));
-        update_leaf_from_gsw!(mod_4, can_4, envir, 1, FT(0.05));
+        gas_exchange!(mod_3, can_3, envir, GswDrive(), 1, FT(0.05));
+        gas_exchange!(mod_4, can_4, envir, GswDrive(), 1, FT(0.05));
         @test NaN_test(can_3);
         @test NaN_test(can_4);
 

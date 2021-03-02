@@ -101,23 +101,23 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Fluorescence related, different for each leaf
     "Total efficiency, incl. photorespiration `[mol CO₂ mol⁻¹ e-]`"
-    CO₂_per_electron::Array{FT,1} = zeros(FT, n_leaf) .+ FT(1/6)
+    e2c::Array{FT,1} = zeros(FT, n_leaf) .+ FT(1/6)
     "light adapted yield (`Kp=0`)"
-    Fm′             ::Array{FT,1} = zeros(FT, n_leaf)
+    Fm′::Array{FT,1} = zeros(FT, n_leaf)
     "light-adapted fluorescence yield in the dark (`Kp=max`)"
-    Fo′             ::Array{FT,1} = zeros(FT, n_leaf)
+    Fo′::Array{FT,1} = zeros(FT, n_leaf)
     "Actual electron transport rate `[μmol m⁻² s⁻¹]`"
-    Ja              ::Array{FT,1} = zeros(FT, n_leaf)
+    Ja ::Array{FT,1} = zeros(FT, n_leaf)
     "Non-Photochemical quenching "
-    NPQ             ::Array{FT,1} = zeros(FT, n_leaf)
+    NPQ::Array{FT,1} = zeros(FT, n_leaf)
     "Photochemical quenching"
-    qQ              ::Array{FT,1} = zeros(FT, n_leaf)
+    qQ ::Array{FT,1} = zeros(FT, n_leaf)
     "energy quenching"
-    qE              ::Array{FT,1} = zeros(FT, n_leaf)
+    qE ::Array{FT,1} = zeros(FT, n_leaf)
     "PSII yield"
-    φ               ::Array{FT,1} = zeros(FT, n_leaf)
+    φ  ::Array{FT,1} = zeros(FT, n_leaf)
     "Steady-state (light-adapted) yield (aka Fs)"
-    ϕs              ::Array{FT,1} = zeros(FT, n_leaf)
+    ϕs ::Array{FT,1} = zeros(FT, n_leaf)
 
     # Fluorescence related, same for all leaves
     "dark adapted yield (`Kp=0`)"

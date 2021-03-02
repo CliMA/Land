@@ -78,7 +78,7 @@ function gas_exchange!(
             =#
 
             # update leaf conductances and rates
-            update_leaf_from_glc!(photo_set, canopyi, envir, ind, _solut);
+            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
         end
 
     # if there is no light

@@ -40,6 +40,7 @@ Some beta functions make correction over the `g1` parameter as in the empitical
 
 ```@docs
 AbstractBetaG
+BetaGLinearKleaf
 BetaGLinearPleaf
 BetaGLinearPsoil
 BetaGLinearSWC
@@ -50,6 +51,7 @@ Some beta functions make correction over the photosynthetic capacity as in the
 
 ```@docs
 AbstractBetaV
+BetaVLinearKleaf
 BetaVLinearPleaf
 BetaVLinearPsoil
 BetaVLinearSWC
@@ -118,11 +120,11 @@ solution_diff!
 ```
 
 In the [`solution_diff!`](@ref) function, leaf photosynthetic rates is modeled
-    using [`update_leaf_from_glc!`](@ref), which calculates the gas exchange
+    using [`gas_exchange!`](@ref), which calculates the gas exchange
     rates from a known total leaf diffusive conductance.
 
 ```@docs
-update_leaf_from_glc!
+gas_exchange!
 ```
 
 However, these functions do not force stomatal conductance to stay in its
@@ -162,12 +164,12 @@ I'd like to emphasize it here that the [`gas_exchange!`](@ref)
     temperature, and (2) prognostically modeling the non-steady state stomatal
     behaviors. As to the steady state case, leaf energy budget has to be
     considered. For the prognotic stomatal conductance, it is recommended to
-    use [`update_leaf_from_gsw!`](@ref) function.
+    use [`gas_exchange!`](@ref) function.
 
 ```@docs
-update_leaf_from_gsw!
+gas_exchange!
 ```
 
 Note it here that stomtal conductance is controlled in this function, and thus
     no additional control like [`leaf_gsw_control!`](@ref) is required if
-    [`update_leaf_from_gsw!`](@ref) is used.
+    [`gas_exchange!`](@ref) is used.

@@ -234,7 +234,7 @@ function gas_exchange!(
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
-        update_leaf_from_glc!(photo_set, canopyi, envir, ind, _solut);
+        gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
     else
         canopyi.g_sw[ind] = FT(0);
     end
