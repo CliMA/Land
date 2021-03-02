@@ -26,10 +26,13 @@ MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 export AbstractBetaFunction,
        AbstractBetaG,
        AbstractBetaV,
+       AbstractDrive,
        AbstractStomatalModel,
+       BetaGLinearKleaf,
        BetaGLinearPleaf,
        BetaGLinearPsoil,
        BetaGLinearSWC,
+       BetaVLinearKleaf,
        BetaVLinearPleaf,
        BetaVLinearPsoil,
        BetaVLinearSWC,
@@ -39,6 +42,8 @@ export AbstractBetaFunction,
        ESMGentine,
        ESMLeuning,
        ESMMedlyn,
+       GlcDrive,
+       GswDrive,
        OptimizationStomatalModel,
        OSMEller,
        OSMSperry,
@@ -46,17 +51,12 @@ export AbstractBetaFunction,
        OSMWAP,
        OSMWAPMod
 
-
-
-
 # export public functions
-export empirical_gsw_from_model,
-       envir_diff!,
-       leaf_gsw_control!,
-       leaf_photo_from_envir!,
+export gsw_control!,
+       gas_exchange!,
+       solution_diff!,
+       stomatal_conductance,
        update_leaf_AK!,
-       update_leaf_from_glc!,
-       update_leaf_from_gsw!,
        update_leaf_TP!
 
 
@@ -64,25 +64,15 @@ export empirical_gsw_from_model,
 
 include("types/beta.jl"         )
 include("types/canopylayer.jl"  )
+include("types/drive.jl"        )
 include("types/stomatalmodel.jl")
 
-include("empirical/beta.jl"     )
-include("empirical/general.jl"  )
-include("empirical/ballberry.jl")
-include("empirical/gentine.jl"  )
-include("empirical/leuning.jl"  )
-include("empirical/medlyn.jl"   )
-
-include("optimal/general.jl")
-include("optimal/eller.jl"  )
-include("optimal/sperry.jl" )
-include("optimal/wang.jl"   )
-include("optimal/wap.jl"    )
-include("optimal/wapmod.jl" )
-
-include("gasexchange/control.jl")
-include("gasexchange/refresh.jl")
-include("gasexchange/update.jl" )
+include("model/beta.jl"       )
+include("model/control.jl"    )
+include("model/empirical.jl"  )
+include("model/gasexchange.jl")
+include("model/refresh.jl"    )
+include("model/solution.jl"   )
 
 
 
