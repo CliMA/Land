@@ -4,13 +4,13 @@
 #
 ###############################################################################
 """
-    leaf_gsw_control!(
+    gsw_control!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 ind::Int
     ) where {FT<:AbstractFloat}
-    leaf_gsw_control!(
+    gsw_control!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT}
@@ -25,7 +25,7 @@ make sure g_sw is in its physiological range limited by diffusion, given
 Note that this function is meant to use jointly with gas_exchange! when
     computing optimal stomtal conductance.
 """
-function leaf_gsw_control!(
+function gsw_control!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
@@ -46,7 +46,7 @@ end
 
 
 
-function leaf_gsw_control!(
+function gsw_control!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT}
@@ -55,7 +55,7 @@ function leaf_gsw_control!(
     for i in eachindex(canopyi.g_sw)
         canopyi.ps.APAR = canopyi.APAR[i];
         leaf_ETR!(photo_set, canopyi.ps);
-        leaf_gsw_control!(photo_set, canopyi, envir, i);
+        gsw_control!(photo_set, canopyi, envir, i);
     end
 
     return nothing

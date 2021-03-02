@@ -134,7 +134,7 @@ However, these functions do not force stomatal conductance to stay in its
     to guarantee realistic stomatal conductance.
 
 ```@docs
-leaf_gsw_control!
+gsw_control!
 ```
 
 To facilitate the use of the StomataModels module, an abstractized function is
@@ -171,5 +171,5 @@ gas_exchange!
 ```
 
 Note it here that stomtal conductance is controlled in this function, and thus
-    no additional control like [`leaf_gsw_control!`](@ref) is required if
+    no additional control like [`gsw_control!`](@ref) is required if
     [`gas_exchange!`](@ref) is used.

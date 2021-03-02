@@ -70,8 +70,8 @@ println();
 
         can_3.g_sw[2] = 0;
         can_4.g_sw[2] = 0;
-        leaf_gsw_control!(mod_3, can_3, envir, 2);
-        leaf_gsw_control!(mod_4, can_4, envir, 2);
+        gsw_control!(mod_3, can_3, envir, 2);
+        gsw_control!(mod_4, can_4, envir, 2);
         @test NaN_test(can_3);
         @test NaN_test(can_4);
     end

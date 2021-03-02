@@ -103,7 +103,8 @@ end
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
-            envir::AirLayer{FT}) where {FT<:AbstractFloat}
+            envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
 Update leaf maximal A and K for Sperry model, given
 - `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
