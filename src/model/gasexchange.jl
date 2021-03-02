@@ -161,7 +161,7 @@ function gas_exchange!(
         _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
         _st    = SolutionTolerance{FT}(1e-4, 50);
         @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc,
-                                      envir, sm, bt, ind);
+                                      envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
@@ -239,7 +239,7 @@ function gas_exchange!(
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
+                                          GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -305,7 +305,7 @@ function gas_exchange!(
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
+                                          GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -371,7 +371,7 @@ function gas_exchange!(
             _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
             _st    = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          ind);
+                                          GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -588,8 +588,8 @@ end
 function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
-            drive::GswDrive,
-            envir::AirLayer{FT}
+            envir::AirLayer{FT},
+            drive::GswDrive
 ) where {FT<:AbstractFloat}
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_sw)

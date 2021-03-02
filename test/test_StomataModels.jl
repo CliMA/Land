@@ -151,19 +151,19 @@ println();
         # test the solution functions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                for result in [ solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1),
+                for result in [ solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), GlcDrive(), 1),
                                 ]
                     @test FT_test(result, FT);
                     @test NaN_test(result);
                 end
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
-                result = solution_diff!(FT(0.1), mod, can, hs, envir, sm, 1);
+                result = solution_diff!(FT(0.1), mod, can, hs, envir, sm, GlcDrive(), 1);
                 @test FT_test(result, FT);
                 @test NaN_test(result);
             end
@@ -221,5 +221,10 @@ println();
                 @test NaN_test(can);
             end
         end
+
+        # test the prognostic g_sw functions
+        prognostic_gsw!(can_3, envir, esm_1, FT(1), FT(120));
+        prognostic_gsw!(mod_3, can_3, hs, envir, osm_3, FT(120));
+        @test true;
     end
 end

@@ -14,6 +14,7 @@
                 envir::AirLayer{FT},
                 sm::OptimizationStomatalModel{FT},
                 bt::AbstractBetaFunction{FT},
+                mode::GlcDrive,
                 ind::Int
     ) where {FT<:AbstractFloat}
     solution_diff!(x::FT,
@@ -22,11 +23,13 @@
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
                 sm::AbstractStomatalModel{FT},
+                mode::AbstractDrive,
                 ind::Int
     ) where {FT<:AbstractFloat}
 
 Calculate the difference to be minimized for a given
-- `x` Assumed leaf diffusive conductance
+- `x` Assumed leaf diffusive conductance or stomatal conductance, depending on
+    `mode`
 - `photo_set`[`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi`[`CanopyLayer`](@ref) type struct
 - `hs` Leaf hydraulic system
@@ -35,10 +38,11 @@ Calculate the difference to be minimized for a given
 - `envir`[`AirLayer`] type struct
 - `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
 - `bt` [`AbstractBetaFunction`](@ref) type struct
+- `mode` [`GlcDrive`](@ref) or [`GswDrive`](@ref) mode
 - `ind` Nth leaf in the canopy layer
 
-The former function works for Ball-Berry, Leuning, and Medlyn models, the
-    latter works for Gentine and all the optimization based models.
+The former function works for all empirical stomatal models, and the latter
+    works for all optimization based models.
 """
 function solution_diff!(
             x::FT,
@@ -50,6 +54,7 @@ function solution_diff!(
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel{FT},
             bt::AbstractBetaG{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -84,6 +89,7 @@ function solution_diff!(
             envir::AirLayer{FT},
             sm::EmpiricalStomatalModel{FT},
             bt::AbstractBetaV{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -128,8 +134,9 @@ function solution_diff!(
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMEller,
+            mode::GlcDrive,
             ind::Int
-            ) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat}
     # unpack variables
     @unpack g_max, g_min, p_sat, ps = canopyi;
     @unpack p_atm, p_H₂O = envir;
@@ -200,6 +207,7 @@ function solution_diff!(
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMSperry{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -273,6 +281,7 @@ function solution_diff!(
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWang{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -343,6 +352,7 @@ function solution_diff!(
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWAP{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -415,6 +425,7 @@ function solution_diff!(
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWAPMod{FT},
+            mode::GlcDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
@@ -475,4 +486,30 @@ function solution_diff!(
 
         return diff
     end
+end
+
+
+
+
+function solution_diff!(
+            x::FT,
+            photo_set::AbstractPhotoModelParaSet{FT},
+            canopyi::CanopyLayer{FT},
+            hs::LeafHydraulics{FT},
+            envir::AirLayer{FT},
+            sm::OptimizationStomatalModel{FT},
+            mode::GswDrive,
+            ind::Int
+) where {FT<:AbstractFloat}
+    # gsw has already been guaranteed to be in the range
+    # unpack variables
+    @unpack ec, g_max, g_min, p_sat, ps = canopyi;
+    @unpack p_atm, p_H₂O = envir;
+    g_bc = canopyi.g_bc[ind];
+    g_bw = canopyi.g_bw[ind];
+    g_m  = canopyi.g_m[ind];
+    g_lc = 1 / (1/g_bc + FT(1.6)/x + 1/g_m);
+
+    return solution_diff!(g_lc, photo_set, canopyi, hs, envir, sm, GlcDrive(),
+                          ind)
 end

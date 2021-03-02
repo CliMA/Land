@@ -54,6 +54,7 @@ export AbstractBetaFunction,
 # export public functions
 export gsw_control!,
        gas_exchange!,
+       prognostic_gsw!,
        solution_diff!,
        stomatal_conductance,
        update_leaf_AK!,
@@ -71,6 +72,7 @@ include("model/beta.jl"       )
 include("model/control.jl"    )
 include("model/empirical.jl"  )
 include("model/gasexchange.jl")
+include("model/prognostic.jl" )
 include("model/refresh.jl"    )
 include("model/solution.jl"   )
 

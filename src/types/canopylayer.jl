@@ -146,4 +146,10 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     p_ups ::FT = FT(0)
     "Base xylem pressre memory `[MPa]`"
     p_old ::FT = FT(1)
+
+    # time constant related to prognostic stomatal conductance
+    "τ for empirical stomatal models `[-]`, Δg/Δt = (g_ss - gsw) / τ"
+    τ_esm::FT = 600
+    "τ for optimal stomatal models `[μmol⁻¹]`, Δg/Δt = (∂A/∂E - ∂Θ/∂E) * τ"
+    τ_osm::FT = FT(1e-6)
 end
