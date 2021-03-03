@@ -73,7 +73,7 @@ function leaf_gas_exchange_nonopt!(
         if flow == 0
             g_lw = FT(0);
             g_lc = FT(1e-6);
-            leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+            leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(), g_lc);
             container.an = node.ps.An;
 
         # if flow > 0 and reasonable
@@ -87,7 +87,8 @@ function leaf_gas_exchange_nonopt!(
             g_lc  = max(FT(1e-6), 1 / (1/g_bc + 1/g_sc));
             g_lim = 1 / (1/g_bw + 1/g_max);
             if g_lw < g_lim * t_cor
-                leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+                leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(),
+                                     g_lc);
                 container.an = node.ps.An;
             else
                 container.an = FT(-Inf);
@@ -228,7 +229,7 @@ function leaf_gas_exchange!(
     # 4. calculate photosynthesis
     g_lw = flow / la / d_leaf * p_atm;
     g_lc = max(FT(1e-6), g_lw / FT(1.6));
-    leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+    leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(), g_lc);
     container.ag = node.ps.Ag;
     container.an = node.ps.An;
     container.c  = node.ps.p_i;

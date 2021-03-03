@@ -1,111 +1,5 @@
 ###############################################################################
 #
-# Update g_sw using different stomatal models
-# This part should be move to StomataModels in its next release
-#
-###############################################################################
-"""
-    update_gsw!(clayer::CanopyLayer{FT},
-                sm::EmpiricalStomatalModel{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
-                envir::AirLayer{FT},
-                Δt::FT
-    ) where {FT<:AbstractFloat}
-    update_gsw!(clayer::CanopyLayer{FT},
-                sm::OSMWang{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
-                envir::AirLayer{FT},
-                Δt::FT
-    ) where {FT<:AbstractFloat}
-
-Update g_sw prognostically, given
-- `clayer` A canoy layer --- `CanopyLayer` type struct
-- `sm` `EmpiricalStomatalModel` or `OSMWang` type stomatal model
-- `photo_set` AbstractPhotoModelParaSet type photosynthesis model
-- `envir` `AirLayer` type environmental conditions
-- `Δt` Time interval for prognostic stomatal conductance
-"""
-function update_gsw!(
-            clayer::CanopyLayer{FT},
-            sm::EmpiricalStomatalModel{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
-            envir::AirLayer{FT},
-            Δt::FT
-) where {FT<:AbstractFloat}
-    # unpack values
-    @unpack g_sw, n_leaf, ps = clayer;
-
-    # calculate steady state values
-    #
-    #
-    #
-    #
-    # use a container here in CanopyLayer in the release version
-    #
-    #
-    #
-    #
-    gsw_ss = max.(sm.g0, empirical_gsw_from_model(sm, clayer, envir, FT(1)));
-    # assume τ = 10 minutes
-    for iLF in 1:n_leaf
-        g_sw[iLF] += (gsw_ss[iLF] - g_sw[iLF]) / 600 * Δt;
-    end
-
-    return nothing
-end
-
-
-
-
-function update_gsw!(
-            clayer::CanopyLayer{FT},
-            sm::OSMWang{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
-            envir::AirLayer{FT},
-            Δt::FT
-) where {FT<:AbstractFloat}
-    # unpack values
-    @unpack An, ec, g_bc, g_bw, g_lw, g_m, g_sw, n_leaf, p_sat, ps = clayer;
-    @unpack p_atm, p_H₂O = envir;
-
-    # update g_sw
-    for iLF in 1:n_leaf
-        _gsw = g_sw[iLF] .+ FT(0.001);
-        _glw = 1 / ( 1/_gsw + 1/g_bw[iLF] );
-        _gsc = _gsw / FT(1.6);
-        _glc = 1 / ( 1/_gsc +  1/g_m[iLF] +  1/g_bc[iLF] );
-        leaf_photo_from_glc!(photo_set, ps, envir, _glc);
-        ∂A   = ps.An - An[iLF];
-        e0   = g_lw[iLF] * (p_sat - p_H₂O) / p_atm;
-        e1   = _glw * (p_sat - p_H₂O) / p_atm;
-        ∂E   = e1 - e0;
-        ∂A∂E = ∂A / ∂E;
-        ∂Θ∂E = FT(max(0.1, An[iLF]) / max(ec - e0, 1e-7));
-        #
-        #
-        #
-        #
-        # remember to add a τ parameter in CanopyLayer
-        # assume τ is 1e-6 here
-        #
-        #
-        #
-        #
-        g_sw[iLF] += (∂A∂E - ∂Θ∂E) * FT(1e-6) * Δt;
-    end
-
-    return nothing
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Update carbon and water fluxes
 #
 # TODO: work more to make this function more customized
@@ -161,27 +55,42 @@ function layer_fluxes!(
         iPS.APAR[end] = can_rad.absPAR_shadeCab[iRT] * FT(1e6);
         iPS.LAIx[end] = 1 - f_view;
 
-        # iterate for 15 times to find steady state solution
-        for iter in 1:15
+        # iterate for N times until sum(iPS.Ag) does not change any more
+        sum_ag_last = sum(iPS.Ag);
+        count       = 0;
+        while true
             # calculate the photosynthetic rates
-            update_leaf_from_gsw!(photo_set, iPS, iEN);
-            update_gsw!(iPS, stomata_model, photo_set, iEN, FT(120));
-            leaf_gsw_control!(photo_set, iPS, iEN);
+            count += 1;
+            gas_exchange!(photo_set, iPS, iEN, GswDrive());
+            if typeof(stomata_model) <: EmpiricalStomatalModel
+                #
+                #
+                #
+                #
+                # also need to determine which β function is used
+                #     to tune g1
+                #     to tune Vcmax
+                #
+                #
+                #
+                #
+                prognostic_gsw!(iPS, iEN, stomata_model, FT(1), FT(120));
+            else
+                prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model,
+                                FT(120));
+            end
+            gsw_control!(photo_set, iPS, iEN);
+            sum_ag_curr = sum(iPS.Ag);
+            if (abs(sum_ag_curr - sum_ag_last) < 0.01) || count > 1000
+                break
+            else
+                sum_ag_last = sum_ag_curr;
+            end
         end
 
-        #
-        #
-        #
-        #
-        # TODO: make fqe arrays like APAR
-        # TODO: reduce the memory allocation of fluspect!
-        #
-        #
-        #
-        #
-        # update leaf fluorescence and FQE
-        leaves_rt[iRT].fqe = (adjoint(iPS.ϕs) * iPS.LAIx) * 100;
-        fluspect!(leaves_rt[iRT], wl_set);
+        # update the fluorescence quantum yield from leaf level calculation
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.ϕs,1:nSL), nIncl, nAzi);
+        can_rad.ϕ_shade[iRT] = iPS.ϕs[end];
 
         # update the flow rates
         for iLF in 1:(nSL+1)
