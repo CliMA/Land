@@ -150,11 +150,11 @@ function test_diurnal(
             #e_i_can = sum( node.plant_ps[i_can].g_lw .* (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) ./ node.envirs[i_can].p_atm .* node.plant_ps[i_can].LAIx ) * node.plant_ps[i_can].LA;
 
             # calculate the photosynthetic rates
-            update_leaf_from_gsw!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
-            leaf_gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+            gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+            gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
 
             # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
-            gsw_ss = empirical_gsw_from_model(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));
+            gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));
 
             # assume τ = 10 minutes
             for i_leaf in 1:(n_sl+1)
