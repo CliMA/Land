@@ -39,9 +39,6 @@ export Canopy4RT,
        SolarAngles,
        WaveLengths
 
-
-
-
 # export public functions
 export big_leaf_partition,
        canopy_fluxes!,
@@ -63,9 +60,6 @@ export big_leaf_partition,
        short_wave!,
        SIF_fluxes!,
        thermal_fluxes!
-
-
-
 
 # Vegetation indices
 export BLUE,

@@ -97,7 +97,7 @@ function diffusive_S!(
     @unpack albedo_SW_SIF = soil;
     @unpack nLayer, nLevel = rt_dim;
 
-    # Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann
+    # Get dimensions (1st is wavelength, 2nd is layers), for Stefan Boltzmann
     # just one effective wavelength
     dnorm .= 1 .- view(ρ_dd, :, 1);
 

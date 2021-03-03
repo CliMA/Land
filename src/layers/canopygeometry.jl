@@ -18,10 +18,10 @@ function clumping_factor!(
             angles::SolarAngles{FT}
 ) where {FT<:AbstractFloat}
     @unpack clump_a, clump_b = can;
-    @unpack tts = angles;
+    @unpack sza = angles;
 
     if clump_b > 0
-        can.Ω = clump_a + clump_b * (1 - cosd(tts));
+        can.Ω = clump_a + clump_b * (1 - cosd(sza));
     end
 
     return nothing
@@ -66,23 +66,23 @@ function canopy_geometry!(
     clumping_factor!(can, angles);
 
     # 2. update solor angle dependent variables
-    @unpack tts, tto, psi = angles;
-    cos_tto = cosd(tto);
-    tan_tto = tand(tto);
-    cos_psi = cosd(psi);
-    sin_tto = sind(tto);
-    cos_tts = cosd(tts);
-    sin_tts = sind(tts);
-    tan_tts = tand(tts);
-    cts_cto = cos_tts * cos_tto;
-    dso     = sqrt( tan_tts^2 + tan_tto^2 - 2*tan_tts*tan_tto*cos_psi );
-    psi_vol = abs( psi - 360*round(psi/360) );
+    @unpack sza, vza, raa = angles;
+    cos_vza = cosd(vza);
+    tan_vza = tand(vza);
+    cos_raa = cosd(raa);
+    sin_vza = sind(vza);
+    cos_sza = cosd(sza);
+    sin_sza = sind(sza);
+    tan_sza = tand(sza);
+    cts_cto = cos_sza * cos_vza;
+    dso     = sqrt( tan_sza^2 + tan_vza^2 - 2*tan_sza*tan_vza*cos_raa );
+    psi_vol = abs( raa - 360*round(raa/360) );
 
     # 3. unpack canopy parameters
     @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, Ω = can;
 
     # 4. update the RTCache
-    can.cos_philo .= cosd.(lazitab .- psi);
+    can.cos_philo .= cosd.(lazitab .- raa);
     @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = can;
 
     # 5. calculate geometric factors associated with extinction and scattering
@@ -97,12 +97,12 @@ function canopy_geometry!(
         _ctl = cos_ttli[i];
 
         # interception parameters and ref/trans multipliers
-        volscatt!(can.vol_scatt, tts, tto, psi_vol, _lit);
+        volscatt!(can.vol_scatt, sza, vza, psi_vol, _lit);
         chi_s, chi_o, frho, ftau = can.vol_scatt;
 
         # Extinction coefficients
-        ksli = abs(chi_s / cos_tts);
-        koli = abs(chi_o / cos_tto);
+        ksli = abs(chi_s / cos_sza);
+        koli = abs(chi_o / cos_vza);
 
         # Area scattering coefficient fractions
         if ftau < 0
@@ -132,10 +132,10 @@ function canopy_geometry!(
 
     # 7. eq 19 in vdT 2009 page 305 modified by Joris
     cg_con = rt_con.cg_con;
-    cg_con._Cs .= cos_ttli .* cos_tts; # [nli]
-    cg_con._Ss .= sin_ttli .* sin_tts; # [nli]
-    cg_con._Co .= cos_ttli .* cos_tto; # [nli]
-    cg_con._So .= sin_ttli .* sin_tto; # [nli]
+    cg_con._Cs .= cos_ttli .* cos_sza; # [nli]
+    cg_con._Ss .= sin_ttli .* sin_sza; # [nli]
+    cg_con._Co .= cos_ttli .* cos_vza; # [nli]
+    cg_con._So .= sin_ttli .* sin_vza; # [nli]
     @unpack _Co, _Cs, _So, _Ss, _1s = cg_con;
     # cg_con._cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
     # cg_con._cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
@@ -150,8 +150,8 @@ function canopy_geometry!(
     # 8. update fs and fo
     # This is basically equivalent to Kb in Bonan, eq. 14.21
     # TOD reduce allocations
-    can_opt.fs      .= _cds ./ cos_tts;
-    can_opt.fo      .= _cdo ./ cos_tto;
+    can_opt.fs      .= _cds ./ cos_sza;
+    can_opt.fo      .= _cdo ./ cos_vza;
     can_opt.absfs   .= abs.( can_opt.fs );
     can_opt.absfo   .= abs.( can_opt.fo );
     can_opt.cosΘ_l  .= cos_ttli .* _1s;
