@@ -24,7 +24,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-BenchmarkTools = "0.5"
+BenchmarkTools = "0.5, 0.6"
 CLIMAParameters = "0.1"
 CSV = "0.8"
 ConstrainedRootSolvers = "0.1"
