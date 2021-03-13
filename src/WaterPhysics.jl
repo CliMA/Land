@@ -1,7 +1,8 @@
 module WaterPhysics
 
 using CLIMAParameters
-using CLIMAParameters.Planet
+using CLIMAParameters.Planet: LH_v0, R_v, T_freeze, T_triple, cp_l, cp_v,
+            molmass_water, press_triple, ρ_cloud_liq
 
 
 
@@ -75,7 +76,7 @@ Hierarchy of AbstractTraceGas
 - [`TraceGasCO₂`](@ref)
 - [`TraceGasH₂O`](@ref)
 """
-abstract type AbstractTraceGas <:AbstractTraceMolecule end
+abstract type AbstractTraceGas <: AbstractTraceMolecule end
 
 
 
@@ -86,7 +87,7 @@ abstract type AbstractTraceGas <:AbstractTraceMolecule end
 Hierarchy of AbstractTraceLiquid
 - [`TraceLiquidH₂O`](@ref)
 """
-abstract type AbstractTraceLiquid <:AbstractTraceMolecule end
+abstract type AbstractTraceLiquid <: AbstractTraceMolecule end
 
 
 
@@ -94,7 +95,7 @@ abstract type AbstractTraceLiquid <:AbstractTraceMolecule end
 """
     struct TraceGasAir
 """
-struct TraceGasAir <:AbstractTraceGas end
+struct TraceGasAir <: AbstractTraceGas end
 
 
 
@@ -102,7 +103,7 @@ struct TraceGasAir <:AbstractTraceGas end
 """
     struct TraceGasCO₂
 """
-struct TraceGasCO₂ <:AbstractTraceGas end
+struct TraceGasCO₂ <: AbstractTraceGas end
 
 
 
@@ -110,7 +111,7 @@ struct TraceGasCO₂ <:AbstractTraceGas end
 """
     struct TraceGasH₂O
 """
-struct TraceGasH₂O <:AbstractTraceGas end
+struct TraceGasH₂O <: AbstractTraceGas end
 
 
 
@@ -118,7 +119,7 @@ struct TraceGasH₂O <:AbstractTraceGas end
 """
     struct TraceLiquidH₂O
 """
-struct TraceLiquidH₂O <:AbstractTraceLiquid end
+struct TraceLiquidH₂O <: AbstractTraceLiquid end
 
 
 
