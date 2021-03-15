@@ -29,23 +29,13 @@ MOLVOL_H₂O(FT)   = MOLMASS_H₂O(FT) / ρ_H₂O(FT);
 
 
 # export public types
-export TraceGasAir,
-       TraceGasCO₂,
-       TraceGasH₂O,
-       TraceLiquidH₂O
+export TraceGasAir, TraceGasCO₂, TraceGasH₂O, TraceLiquidH₂O
 
 # export public functions
-export capillary_pressure,
-       diffusive_coefficient,
-       latent_heat_vapor,
-       pressure_correction,
-       relative_diffusive_coefficient,
-       relative_surface_tension,
-       relative_viscosity,
-       saturation_vapor_pressure,
-       saturation_vapor_pressure_slope,
-       surface_tension,
-       viscosity
+export capillary_pressure, diffusive_coefficient, latent_heat_vapor,
+       pressure_correction, relative_diffusive_coefficient,
+       relative_surface_tension, relative_viscosity, saturation_vapor_pressure,
+       saturation_vapor_pressure_slope, surface_tension, viscosity
 
 
 
@@ -116,8 +106,10 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef struct TraceGasCO₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
-    "Diffusive coefficient in air"
-    d_air::FT = 1.6e-5
+    "Diffusive coefficient in air in `[m² s⁻¹]`"
+    d_air  ::FT = 2.82e-5 / 1.6
+    "Diffusive coefficient in liquid water in `[m² s⁻¹]`"
+    d_water::FT = 1.92e-9
 end
 
 
@@ -129,7 +121,30 @@ Identity label for gas phase H₂O.
 $(TYPEDEF)
 
 """
-struct TraceGasH₂O{FT<:AbstractFloat} <: AbstractTraceGas{FT} end
+Base.@kwdef struct TraceGasH₂O{FT<:AbstractFloat} <: AbstractTraceGas{FT}
+    "Diffusive coefficient in air in `[m² s⁻¹]`"
+    d_air::FT = 2.82e-5
+end
+
+
+
+
+"""
+Identity label for gas phase O₂.
+
+$(TYPEDEF)
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+Base.@kwdef struct TraceGasO₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
+    "Diffusive coefficient in air in `[m² s⁻¹]`"
+    d_air  ::FT = 1.76e-5
+    "Diffusive coefficient in liquid water in `[m² s⁻¹]`"
+    d_water::FT = 2.10e-9
+end
 
 
 
