@@ -45,6 +45,8 @@ P_{c} = \dfrac{\gamma \cdot \text{cos}(\alpha)}{r}
 
 ```@docs
 capillary_pressure
+capillary_pressure(r::FT, T::FT, med::TraceLiquidH₂O = TraceLiquidH₂O()) where {FT<:AbstractFloat}
+capillary_pressure(r::FT, T::FT, α::FT, med::TraceLiquidH₂O = TraceLiquidH₂O()) where {FT<:AbstractFloat}
 ```
 
 

@@ -16,7 +16,7 @@ pages = Pair{Any,Any}[
 
 
 # add example pages
-gen_example = true;
+gen_example = false;
 gen_dir     = joinpath(@__DIR__, "src/generated");
 rm(gen_dir, force=true, recursive=true);
 mkpath(gen_dir);

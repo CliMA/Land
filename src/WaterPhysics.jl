@@ -3,6 +3,7 @@ module WaterPhysics
 using CLIMAParameters
 using CLIMAParameters.Planet: LH_v0, R_v, T_freeze, T_triple, cp_l, cp_v,
             molmass_water, press_triple, ρ_cloud_liq
+using DocStringExtensions: FUNCTIONNAME, METHODLIST, TYPEDEF, TYPEDSIGNATURES
 
 
 
@@ -57,9 +58,10 @@ export capillary_pressure,
 #
 ###############################################################################
 """
-    abstract type AbstractTraceMolecule
 
-Hierarchy of AbstractTraceMolecule
+$(TYPEDEF)
+
+Identity label for trace gas or liquid. Hierarchy of `AbstractTraceMolecule`:
 - [`AbstractTraceGas`](@ref)
 - [`AbstractTraceLiquid`](@ref)
 """
@@ -69,9 +71,10 @@ abstract type AbstractTraceMolecule end
 
 
 """
-    abstract type AbstractTraceGas
 
-Hierarchy of AbstractTraceGas
+$(TYPEDEF)
+
+Identity label for trace gas. Hierarchy of `AbstractTraceGas`:
 - [`TraceGasAir`](@ref)
 - [`TraceGasCO₂`](@ref)
 - [`TraceGasH₂O`](@ref)
@@ -82,9 +85,10 @@ abstract type AbstractTraceGas <: AbstractTraceMolecule end
 
 
 """
-    abstract type AbstractTraceLiquid
 
-Hierarchy of AbstractTraceLiquid
+$(TYPEDEF)
+
+Identity label for trace liquid. Hierarchy of `AbstractTraceLiquid`:
 - [`TraceLiquidH₂O`](@ref)
 """
 abstract type AbstractTraceLiquid <: AbstractTraceMolecule end
@@ -93,7 +97,10 @@ abstract type AbstractTraceLiquid <: AbstractTraceMolecule end
 
 
 """
-    struct TraceGasAir
+
+$(TYPEDEF)
+
+Identity label for air.
 """
 struct TraceGasAir <: AbstractTraceGas end
 
@@ -101,7 +108,10 @@ struct TraceGasAir <: AbstractTraceGas end
 
 
 """
-    struct TraceGasCO₂
+
+$(TYPEDEF)
+
+Identity label for gas phase CO₂.
 """
 struct TraceGasCO₂ <: AbstractTraceGas end
 
@@ -109,7 +119,10 @@ struct TraceGasCO₂ <: AbstractTraceGas end
 
 
 """
-    struct TraceGasH₂O
+
+$(TYPEDEF)
+
+Identity label for gas phase H₂O.
 """
 struct TraceGasH₂O <: AbstractTraceGas end
 
@@ -117,7 +130,10 @@ struct TraceGasH₂O <: AbstractTraceGas end
 
 
 """
-    struct TraceLiquidH₂O
+
+$(TYPEDEF)
+
+Identity label for liquid phase H₂O.
 """
 struct TraceLiquidH₂O <: AbstractTraceLiquid end
 
@@ -134,43 +150,58 @@ struct TraceLiquidH₂O <: AbstractTraceLiquid end
 #
 ###############################################################################
 """
-    capillary_pressure(
-                r::FT,
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
-    capillary_pressure(
-                r::FT,
-                T::FT,
-                α::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
+Capillary pressure of trace liquid.
 
-Compute the capillary pressure in `[Pa]`, given
+$(METHODLIST)
+
+"""
+function capillary_pressure end
+
+
+
+
+"""
+
+$(TYPEDSIGNATURES)
+
+Capillary pressure of trace liquid in `[Pa]`, given
+- `r` Curvature radius in `[m]`
+- `T` Trace liquid temperature in `[K]`
+- `med` Medium. Optional. Default is liquid water
+
+"""
+capillary_pressure(
+            r::FT,
+            T::FT,
+            med::TraceLiquidH₂O = TraceLiquidH₂O()
+) where {FT<:AbstractFloat} =
+(
+     return 2 * surface_tension(T, med) / r
+)
+
+
+
+
+"""
+
+$(TYPEDSIGNATURES)
+
+Capillary pressure of trace liquid in `[Pa]`, given
 - `r` Curvature radius in `[m]`
 - `T` Trace liquid temperature in `[K]`
 - `α` Contact angle in `[°]`
 - `med` Medium. Optional. Default is liquid water
+
 """
-function capillary_pressure(
-            r::FT,
-            T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
-) where {FT<:AbstractFloat}
-     return 2 * surface_tension(T, med) / r
-end
-
-
-
-
-function capillary_pressure(
+capillary_pressure(
             r::FT,
             T::FT,
             α::FT,
             med::TraceLiquidH₂O = TraceLiquidH₂O()
-) where {FT<:AbstractFloat}
+) where {FT<:AbstractFloat} =
+(
      return cosd(α) * capillary_pressure(r, T, med)
-end
+)
 
 
 
@@ -186,15 +217,11 @@ end
 ###############################################################################
 const D_CO2_IN_AIR = 1.6e-5;
 """
-    diffusive_coefficient(
-                T::FT,
-                mol::TraceGasCO₂,
-                med::TraceGasAir
-    ) where {FT<:AbstractFloat}
 
-Return the diffusive coefficient of trace molecule in medium (unit: m² s⁻¹),
-    given
-- `T` Trace molecule temperature in `[K]`
+$(TYPEDSIGNATURES)
+
+Diffusive coefficient of trace molecule in medium (unit: m² s⁻¹), given
+- `T` Trace medium temperature in `[K]`
 - `mol` Trace molecule
 - `med` Diffusion medium
 """
@@ -212,13 +239,10 @@ end
 
 
 """
-    relative_diffusive_coefficient(
-                T::FT,
-                mol::TraceGasH₂O,
-                med::TraceGasAir
-    ) where {FT<:AbstractFloat}
 
-Returns the relative diffusive coefficient of trace gas in medium, given
+$(TYPEDSIGNATURES)
+
+Relative diffusive coefficient of trace gas in medium, given
 - `T` Water vapor temperature in `[K]`
 - `mol` Trace molecule. Optional, default is water vapor
 - `med` Medium. Optional, default is air
@@ -245,12 +269,10 @@ end
 #
 ###############################################################################
 """
-    latent_heat_vapor(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-The specific latent heat of vaporization `[J kg⁻¹]`, given
+$(TYPEDSIGNATURES)
+
+Latent heat of vaporization `[J kg⁻¹]`, given
 - `T` Medium temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
 """
@@ -279,17 +301,14 @@ end
 #
 ###############################################################################
 """
-    pressure_correction(
-                T::FT,
-                Ψ::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-Make Kelvin correction to saturation vapor pressure, given
+$(TYPEDSIGNATURES)
+
+Kelvin correction factor for saturation vapor pressure, given
 - `T` Liquid water temperature in `[K]`
 - `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
     interface
-    - `med` Medium. Optional. Default is liquid water
+- `med` Medium. Optional. Default is liquid water
 
 The Kelvin equation is
 ```math
@@ -309,20 +328,11 @@ end
 
 
 """
-    saturation_vapor_pressure(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
-    saturation_vapor_pressure(
-                T::FT,
-                Ψ::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-Return the saturation vapor pressure, given
+$(TYPEDSIGNATURES)
+
+Saturation vapor pressure, given
 - `T` Liquid water temperature in `[K]`
-- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
-    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 - `med` Medium. Optional. Default is liquid water
 """
 function saturation_vapor_pressure(
@@ -346,6 +356,16 @@ end
 
 
 
+"""
+
+$(TYPEDSIGNATURES)
+
+Saturation vapor pressure, given
+- `T` Liquid water temperature in `[K]`
+- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
+    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
+- `med` Medium. Optional. Default is liquid water
+"""
 function saturation_vapor_pressure(
             T::FT,
             Ψ::FT,
@@ -358,20 +378,11 @@ end
 
 
 """
-    saturation_vapor_pressure_slope(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
-    saturation_vapor_pressure_slope(
-                T::FT,
-                Ψ::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-Return the 1st order derivative of saturation vapor pressure, given
+$(TYPEDSIGNATURES)
+
+First order derivative of saturation vapor pressure, given
 - `T` Liquid water temperature in `[K]`
-- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
-    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 - `med` Medium. Optional. Default is liquid water
 
 Compute the the 1st order derivative of saturation vapor pressure over a plane
@@ -400,6 +411,16 @@ end
 
 
 
+"""
+
+$(TYPEDSIGNATURES)
+
+First order derivative of saturation vapor pressure, given
+- `T` Liquid water temperature in `[K]`
+- `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
+    interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
+- `med` Medium. Optional. Default is liquid water
+"""
 function saturation_vapor_pressure_slope(
             T::FT,
             Ψ::FT,
@@ -428,12 +449,10 @@ const ST_corr   = 0.625
 const ST_ref    = 0.07197220523
 
 """
-    surface_tension(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-Surface tension `[N m⁻¹]` of water against air, given
+$(TYPEDSIGNATURES)
+
+Surface tension `[N m⁻¹]` of trace liquid, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
 
@@ -462,25 +481,12 @@ end
 
 
 """
-    relative_surface_tension(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
 
-Relative surface tension of water against air relative to 298.15 K, given
+$(TYPEDSIGNATURES)
+
+Relative surface tension of trace liquid relative to 298.15 K, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
-
-The equation used is
-```math
-γ = 0.2358 ⋅
-    \\left( 1 - \\dfrac{T}{T_c} \\right)^{1.256} ⋅
-    \\left[ 1 - 0.625 ⋅ \\left( 1 - \\dfrac{T}{T_c} \\right) \\right]
-```
-See http://www.iapws.org/relguide/Surf-H2O.html
-
-A reference temperature at 298.15 K is used because the hydraulic conductances
-and vulnerability curves of plants are described at 298.15 K.
 """
 function relative_surface_tension(
             T::FT,
@@ -509,9 +515,8 @@ const VIS_C =  0.04527      # K⁻¹  | Used for viscosity
 const VIS_D = -3.376e-5     # K⁻²  | Used for viscosity
 
 """
-    viscosity(T::FT,
-              med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
+
+$(TYPEDSIGNATURES)
 
 Viscosity of water in `[Pa s]`, given
 - `T` Liquid water temperature in `[K]`
@@ -546,10 +551,8 @@ end
 
 
 """
-    relative_viscosity(
-                T::FT,
-                med::TraceLiquidH₂O
-    ) where {FT<:AbstractFloat}
+
+$(TYPEDSIGNATURES)
 
 Viscosity relative to 25 degree C (298.15 K), given
 - `T` Liquid water temperature in `[K]`
