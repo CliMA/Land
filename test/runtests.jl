@@ -12,8 +12,8 @@ using WaterPhysics
         rand_α = rand(FT) * 50;
         rand_Ψ = rand(FT) - 3;
 
-        gas_air = TraceGasAir();
-        gas_CO₂ = TraceGasCO₂();
+        gas_air = TraceGasAir{FT}();
+        gas_CO₂ = TraceGasCO₂{FT}();
 
         # capillary_pressure
         for result in [ capillary_pressure(rand_r, rand_T),

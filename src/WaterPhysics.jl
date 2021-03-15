@@ -3,7 +3,8 @@ module WaterPhysics
 using CLIMAParameters
 using CLIMAParameters.Planet: LH_v0, R_v, T_freeze, T_triple, cp_l, cp_v,
             molmass_water, press_triple, ρ_cloud_liq
-using DocStringExtensions: METHODLIST, TYPEDEF
+using DocStringExtensions: METHODLIST, TYPEDEF, TYPEDFIELDS
+using Parameters: @unpack
 
 
 
@@ -28,10 +29,7 @@ MOLVOL_H₂O(FT)   = MOLMASS_H₂O(FT) / ρ_H₂O(FT);
 
 
 # export public types
-export AbstractTraceGas,
-       AbstractTraceLiquid,
-       AbstractTraceMolecule,
-       TraceGasAir,
+export TraceGasAir,
        TraceGasCO₂,
        TraceGasH₂O,
        TraceLiquidH₂O
@@ -54,18 +52,18 @@ export capillary_pressure,
 
 ###############################################################################
 #
-# Abstracted trace gas
+# Trace gas or liquid
 #
 ###############################################################################
 """
-Identity label for trace gas or liquid. Hierarchy of `AbstractTraceMolecule`:
+Identity label for trace gas or liquid. Hierarchy of `AbstractTrace`:
 - [`AbstractTraceGas`](@ref)
 - [`AbstractTraceLiquid`](@ref)
 
 $(TYPEDEF)
 
 """
-abstract type AbstractTraceMolecule end
+abstract type AbstractTrace{FT<:AbstractFloat} end
 
 
 
@@ -79,7 +77,7 @@ Identity label for trace gas. Hierarchy of `AbstractTraceGas`:
 $(TYPEDEF)
 
 """
-abstract type AbstractTraceGas <: AbstractTraceMolecule end
+abstract type AbstractTraceGas{FT<:AbstractFloat} <: AbstractTrace{FT} end
 
 
 
@@ -91,7 +89,7 @@ Identity label for trace liquid. Hierarchy of `AbstractTraceLiquid`:
 $(TYPEDEF)
 
 """
-abstract type AbstractTraceLiquid <: AbstractTraceMolecule end
+abstract type AbstractTraceLiquid{FT<:AbstractFloat} <: AbstractTrace{FT} end
 
 
 
@@ -102,7 +100,7 @@ Identity label for air.
 $(TYPEDEF)
 
 """
-struct TraceGasAir <: AbstractTraceGas end
+struct TraceGasAir{FT<:AbstractFloat} <: AbstractTraceGas{FT} end
 
 
 
@@ -112,8 +110,15 @@ Identity label for gas phase CO₂.
 
 $(TYPEDEF)
 
+# Fields
+
+$(TYPEDFIELDS)
+
 """
-struct TraceGasCO₂ <: AbstractTraceGas end
+Base.@kwdef struct TraceGasCO₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
+    "Diffusive coefficient in air"
+    d_air::FT = 1.6e-5
+end
 
 
 
@@ -124,7 +129,7 @@ Identity label for gas phase H₂O.
 $(TYPEDEF)
 
 """
-struct TraceGasH₂O <: AbstractTraceGas end
+struct TraceGasH₂O{FT<:AbstractFloat} <: AbstractTraceGas{FT} end
 
 
 
@@ -134,8 +139,36 @@ Identity label for liquid phase H₂O.
 
 $(TYPEDEF)
 
+# Fields
+
+$(TYPEDFIELDS)
+
 """
-struct TraceLiquidH₂O <: AbstractTraceLiquid end
+Base.@kwdef struct TraceLiquidH₂O{FT<:AbstractFloat} <: AbstractTraceLiquid{FT}
+    # Surface tension related
+    # γ = γ_k * (1-T/γ_T_c)^γ_exp * [1 - γ_cor*(1-T/γ_T_c)]
+    "Surface tension coefficient correction"
+    γ_cor::FT = 0.625
+    "Surface tension coefficient exponent"
+    γ_exp::FT = 1.256
+    "Surface tension coefficient k in `[N m⁻¹]`"
+    γ_k  ::FT = 0.2358
+    "Surface tension at 298.15 K in `[N m⁻¹]`"
+    γ_ref::FT = 0.07197220523
+    "Surface tension coefficient T_crit in `[K]`"
+    γ_T_c::FT = 647.096
+
+    # Viscosity related
+    # υ = A ⋅ exp( A/T + C⋅T + D⋅T^2 )
+    "Viscosity coefficient A in `[Pa s]`"
+    υ_A::FT = 1.856e-14
+    "Viscosity coefficient B in `[K]`"
+    υ_B::FT = 4209.0
+    "Viscosity coefficient C in `[K⁻¹]`"
+    υ_C::FT = 0.04527
+    "Viscosity coefficient D in `[K⁻²]`"
+    υ_D::FT = -3.376e-5
+end
 
 
 
@@ -164,7 +197,7 @@ function capillary_pressure end
     capillary_pressure(
                 r::FT,
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Capillary pressure of trace liquid in `[Pa]`, given
@@ -175,7 +208,7 @@ Capillary pressure of trace liquid in `[Pa]`, given
 capillary_pressure(
             r::FT,
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
      return 2 * surface_tension(T, med) / r
@@ -189,7 +222,7 @@ capillary_pressure(
                 r::FT,
                 T::FT,
                 α::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Capillary pressure of trace liquid in `[Pa]`, given
@@ -202,7 +235,7 @@ capillary_pressure(
             r::FT,
             T::FT,
             α::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
      return cosd(α) * capillary_pressure(r, T, med)
@@ -217,10 +250,9 @@ capillary_pressure(
 
 ###############################################################################
 #
-# Diffusive coefficient vs T
+# Diffusive coefficient
 #
 ###############################################################################
-const D_CO2_IN_AIR = 1.6e-5;
 """
 Diffusive coefficient of trace molecule in medium
 
@@ -235,24 +267,22 @@ function diffusive_coefficient end
 """
     diffusive_coefficient(
                 T::FT,
-                mol::TraceGasCO₂,
-                med::TraceGasAir
+                mol::TraceGasCO₂{FT},
+                med::TraceGasAir{FT}
     ) where {FT<:AbstractFloat}
 
-Diffusive coefficient of trace molecule in medium (unit: m² s⁻¹), given
+Diffusive coefficient of trace molecule in `[m² s⁻¹]`, given
 - `T` Trace medium temperature in `[K]`
 - `mol` Trace molecule
 - `med` Diffusion medium
 """
 diffusive_coefficient(
             T::FT,
-            mol::TraceGasCO₂,
-            med::TraceGasAir
+            mol::TraceGasCO₂{FT},
+            med::TraceGasAir{FT}
 ) where {FT<:AbstractFloat} =
 (
-    D_0::FT = D_CO2_IN_AIR;
-
-    return D_0 * relative_diffusive_coefficient(T, mol, med)
+    return mol.d_air * relative_diffusive_coefficient(T, mol, med)
 )
 
 
@@ -272,8 +302,8 @@ function relative_diffusive_coefficient end
 """
     relative_diffusive_coefficient(
                 T::FT,
-                mol::AbstractTraceGas = TraceGasH₂O(),
-                med::AbstractTraceGas = TraceGasAir()
+                mol::AbstractTraceGas{FT} = TraceGasH₂O{FT}(),
+                med::AbstractTraceGas{FT} = TraceGasAir{FT}()
     ) where {FT<:AbstractFloat}
 
 Relative diffusive coefficient of trace gas in medium, given
@@ -283,8 +313,8 @@ Relative diffusive coefficient of trace gas in medium, given
 """
 relative_diffusive_coefficient(
             T::FT,
-            mol::AbstractTraceGas = TraceGasH₂O(),
-            med::AbstractTraceGas = TraceGasAir()
+            mol::AbstractTraceGas{FT} = TraceGasH₂O{FT}(),
+            med::AbstractTraceGas{FT} = TraceGasAir{FT}()
 ) where {FT<:AbstractFloat} =
 (
     return (T / K_25(FT)) ^ FT(1.8)
@@ -299,7 +329,7 @@ relative_diffusive_coefficient(
 
 ###############################################################################
 #
-# Latent heat
+# Latent heat of evaporation
 # Adapted from the ClimateMachine/Common/ThermoDynamics/relations.jl
 #
 ###############################################################################
@@ -317,7 +347,7 @@ function latent_heat_vapor end
 """
     latent_heat_vapor(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Latent heat of vaporization in `[J kg⁻¹]`, given
@@ -326,7 +356,7 @@ Latent heat of vaporization in `[J kg⁻¹]`, given
 """
 latent_heat_vapor(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     _LH_v0::FT = LH_V0(FT);
@@ -364,7 +394,7 @@ function pressure_correction end
     pressure_correction(
                 T::FT,
                 Ψ::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Kelvin correction factor for saturation vapor pressure, given
@@ -382,7 +412,7 @@ The Kelvin equation is
 pressure_correction(
             T::FT,
             Ψ::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     return exp((Ψ * MOLVOL_H₂O(FT)) / (GAS_R(FT) * T))
@@ -405,7 +435,7 @@ function saturation_vapor_pressure end
 """
     saturation_vapor_pressure(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Saturation vapor pressure in `[Pa]`, given
@@ -414,7 +444,7 @@ Saturation vapor pressure in `[Pa]`, given
 """
 saturation_vapor_pressure(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     _LH_v0       ::FT = LH_V0(FT);
@@ -438,10 +468,10 @@ saturation_vapor_pressure(
     saturation_vapor_pressure(
                 T::FT,
                 Ψ::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
-Saturation vapor pressure, given
+Saturation vapor pressure in `[Pa]`, given
 - `T` Liquid water temperature in `[K]`
 - `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
     interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
@@ -450,7 +480,7 @@ Saturation vapor pressure, given
 saturation_vapor_pressure(
             T::FT,
             Ψ::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     return saturation_vapor_pressure(T, med) * pressure_correction(T, Ψ, med)
@@ -460,7 +490,7 @@ saturation_vapor_pressure(
 
 
 """
-First order derivative of saturation vapor pressure
+First order derivative of saturation vapor pressure.
 
 $(METHODLIST)
 
@@ -473,10 +503,10 @@ function saturation_vapor_pressure_slope end
 """
     saturation_vapor_pressure_slope(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
-First order derivative of saturation vapor pressure, given
+First order derivative of saturation vapor pressure in `[Pa K⁻¹]`, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
 
@@ -491,7 +521,7 @@ The re-arranged Clausius-Clapeyron relation
 """
 saturation_vapor_pressure_slope(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     _LH_v0::FT = LH_V0(FT);
@@ -511,10 +541,10 @@ saturation_vapor_pressure_slope(
     saturation_vapor_pressure_slope(
                 T::FT,
                 Ψ::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
-First order derivative of saturation vapor pressure, given
+First order derivative of saturation vapor pressure in `[Pa K⁻¹]`, given
 - `T` Liquid water temperature in `[K]`
 - `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
     interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
@@ -523,7 +553,7 @@ First order derivative of saturation vapor pressure, given
 saturation_vapor_pressure_slope(
             T::FT,
             Ψ::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
     return saturation_vapor_pressure_slope(T, med) *
@@ -539,17 +569,11 @@ saturation_vapor_pressure_slope(
 
 ###############################################################################
 #
-# Surface tension functions
+# Surface tension
 #
 ###############################################################################
-const ST_k      = 0.2358
-const ST_T_crit = 647.096
-const ST_exp    = 1.256
-const ST_corr   = 0.625
-const ST_ref    = 0.07197220523
-
 """
-Surface tension
+Surface tension.
 
 $(METHODLIST)
 
@@ -562,10 +586,10 @@ function surface_tension end
 """
     surface_tension(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
-Surface tension `[N m⁻¹]` of trace liquid, given
+Surface tension of trace liquid in `[N m⁻¹]`, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
 
@@ -579,16 +603,13 @@ See http://www.iapws.org/relguide/Surf-H2O.html
 """
 surface_tension(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    _ST_corr    ::FT = ST_corr;
-    _ST_exp     ::FT = ST_exp;
-    _ST_k       ::FT = ST_k;
-    _ST_T_crit  ::FT = ST_T_crit;
-    _ST_T_r_diff::FT = 1 - T / _ST_T_crit;
+    @unpack γ_cor, γ_exp, γ_k, γ_T_c = med;
+    _γ_T_r_diff = 1 - T / γ_T_c;
 
-    return _ST_k * _ST_T_r_diff^_ST_exp * (1 - _ST_corr*_ST_T_r_diff)
+    return γ_k * _γ_T_r_diff^γ_exp * (1 - γ_cor*_γ_T_r_diff)
 )
 
 
@@ -608,7 +629,7 @@ function relative_surface_tension end
 """
     relative_surface_tension(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Relative surface tension of trace liquid relative to 298.15 K, given
@@ -617,12 +638,10 @@ Relative surface tension of trace liquid relative to 298.15 K, given
 """
 relative_surface_tension(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    _ST_ref::FT = ST_ref;
-
-    return surface_tension(T, med) / _ST_ref
+    return surface_tension(T, med) / med.γ_ref
 )
 
 
@@ -634,14 +653,9 @@ relative_surface_tension(
 
 ###############################################################################
 #
-# Viscosity functions
+# Viscosity
 #
 ###############################################################################
-const VIS_A =  1.856e-14    # Pa s | Used for viscosity
-const VIS_B =  4209.0       # K    | Used for viscosity
-const VIS_C =  0.04527      # K⁻¹  | Used for viscosity
-const VIS_D = -3.376e-5     # K⁻²  | Used for viscosity
-
 """
 Viscosity.
 
@@ -655,7 +669,7 @@ function viscosity end
 
 """
     viscosity(T::FT,
-              med::TraceLiquidH₂O = TraceLiquidH₂O()
+              med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Viscosity in `[Pa s]`, given
@@ -676,15 +690,12 @@ D = -3.376E-5 # K⁻²
 ```
 """
 viscosity(T::FT,
-          med::TraceLiquidH₂O = TraceLiquidH₂O()
+          med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    _A::FT = VIS_A;
-    _B::FT = VIS_B;
-    _C::FT = VIS_C;
-    _D::FT = VIS_D;
+    @unpack υ_A, υ_B, υ_C, υ_D = med;
 
-    return _A * exp( _B/T + _C*T + _D*T^2 )
+    return υ_A * exp( υ_B/T + υ_C*T + υ_D*T^2 )
 )
 
 
@@ -704,7 +715,7 @@ function relative_viscosity end
 """
     relative_viscosity(
                 T::FT,
-                med::TraceLiquidH₂O = TraceLiquidH₂O()
+                med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
     ) where {FT<:AbstractFloat}
 
 Viscosity relative to 298.15 K, given
@@ -725,15 +736,13 @@ D = -3.376E-5 # K⁻²
 """
 relative_viscosity(
             T::FT,
-            med::TraceLiquidH₂O = TraceLiquidH₂O()
+            med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    _B::FT = VIS_B;
-    _C::FT = VIS_C;
-    _D::FT = VIS_D;
-    _K::FT = K_25(FT);
+    @unpack υ_B, υ_C, υ_D = med;
+    _K = K_25(FT);
 
-    return exp( _B * ( 1/T - 1/_K) + _C * (T - _K) + _D * (T^2 - _K^2) )
+    return exp( υ_B * ( 1/T - 1/_K) + υ_C * (T - _K) + υ_D * (T^2 - _K^2) )
 )
 
 

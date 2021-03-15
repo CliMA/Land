@@ -12,8 +12,8 @@ rand_T = rand(FT) + 298;
 rand_α = rand(FT) * 50;
 rand_Ψ = rand(FT) - 3;
 
-gas_air = TraceGasAir();
-gas_CO₂ = TraceGasCO₂();
+gas_air = TraceGasAir{FT}();
+gas_CO₂ = TraceGasCO₂{FT}();
 #------------------------------------------------------------------------------
 
 
