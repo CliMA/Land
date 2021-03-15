@@ -25,10 +25,11 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1"
-      - name: Use Conda Python
+      - name: Install Dependencies for Linux
         if: runner.os == 'Linux'
-        run: julia --project -e 'ENV["PYTHON"]="";'
-      - name: Install Dependencies
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Install Dependencies for Windows and Mac-OS
+        if: runner.os != 'Linux'
         run: julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
