@@ -210,10 +210,10 @@ deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "R
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PkgUtility]]
-deps = ["Dates", "NCDatasets", "Pkg", "Statistics", "Test"]
-git-tree-sha1 = "aeb76faf14c567ba8e64a16abacb2878c0cd7c17"
+deps = ["Dates", "DocStringExtensions", "NCDatasets", "Pkg", "Statistics", "Test"]
+git-tree-sha1 = "1ca1a54400cb277182d0472749d54d74dc7a8f73"
 uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
-version = "0.1.4"
+version = "0.1.5"
 
 [[Printf]]
 deps = ["Unicode"]

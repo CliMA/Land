@@ -14,6 +14,8 @@ using WaterPhysics
 
         gas_air = TraceGasAir{FT}();
         gas_CO₂ = TraceGasCO₂{FT}();
+        gas_O₂  = TraceGasO₂{FT}();
+        liq_H₂O = TraceLiquidH₂O{FT}();
 
         # capillary_pressure
         for result in [ capillary_pressure(rand_r, rand_T),
@@ -24,7 +26,9 @@ using WaterPhysics
 
         # diffusive_coefficient
         for result in [ diffusive_coefficient(rand_T, gas_CO₂, gas_air),
-                        relative_diffusive_coefficient(rand_T) ]
+                        diffusive_coefficient(rand_T, gas_CO₂, liq_H₂O),
+                        relative_diffusive_coefficient(rand_T),
+                        relative_diffusive_coefficient(rand_T, gas_CO₂, liq_H₂O) ]
             @test FT_test(result, FT);
             @test NaN_test(result);
         end
