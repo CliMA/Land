@@ -107,6 +107,14 @@ Identity trace label for air.
 
 $(TYPEDEF)
 
+---
+Examples
+```julia
+# load package before using the public functions
+using WaterPhysics
+# gas-phase air trace
+trace = TraceGasAir{Float64}();
+```
 """
 struct TraceGasAir{FT<:AbstractFloat} <: AbstractTraceGas{FT} end
 
@@ -122,6 +130,12 @@ $(TYPEDEF)
 
 $(TYPEDFIELDS)
 
+---
+Examples
+```julia
+# gas-phase CO₂ trace
+trace = TraceGasCO₂{Float64}();
+```
 """
 Base.@kwdef struct TraceGasCO₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
     # related to diffusive coefficient in air
@@ -145,6 +159,16 @@ Identity trace label for gas phase H₂O.
 
 $(TYPEDEF)
 
+# Fields
+
+$(TYPEDFIELDS)
+
+---
+Examples
+```julia
+# gas-phase H₂O trace
+trace = TraceGasH₂O{Float64}();
+```
 """
 Base.@kwdef struct TraceGasH₂O{FT<:AbstractFloat} <: AbstractTraceGas{FT}
     # related to diffusive coefficient in air
@@ -164,6 +188,12 @@ $(TYPEDEF)
 
 $(TYPEDFIELDS)
 
+---
+Examples
+```julia
+# gas-phase N₂ trace
+trace = TraceGasN₂{Float64}();
+```
 """
 Base.@kwdef struct TraceGasN₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
     # related to diffusive coefficient in liquid water
@@ -187,6 +217,12 @@ $(TYPEDEF)
 
 $(TYPEDFIELDS)
 
+---
+Examples
+```julia
+# gas-phase O₂ trace
+trace = TraceGasO₂{Float64}();
+```
 """
 Base.@kwdef struct TraceGasO₂{FT<:AbstractFloat} <: AbstractTraceGas{FT}
     # related to diffusive coefficient in air
@@ -210,6 +246,12 @@ $(TYPEDEF)
 
 $(TYPEDFIELDS)
 
+---
+Examples
+```julia
+# liquid water trace
+trace = TraceLiquidH₂O{Float64}();
+```
 """
 Base.@kwdef struct TraceLiquidH₂O{FT<:AbstractFloat} <: AbstractTraceLiquid{FT}
     # Surface tension related
@@ -280,6 +322,14 @@ Capillary pressure of trace liquid in `[Pa]`, given
 - `r` Curvature radius in `[m]`
 - `T` Trace liquid temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# capillary pressure of liquid water
+p_1 = capillary_pressure(3e-6, 298.15);
+p_2 = capillary_pressure(3e-6, 298.15, TraceLiquidH₂O{Float64}());
+```
 """
 capillary_pressure(
             r::FT,
@@ -308,6 +358,14 @@ Capillary pressure of trace liquid in `[Pa]`, given
 - `T` Trace liquid temperature in `[K]`
 - `α` Contact angle in `[°]`
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# capillary pressure of liquid water with contact angle
+p_1 = capillary_pressure(3e-6, 298.15, 30.0);
+p_2 = capillary_pressure(3e-6, 298.15, 30.0, TraceLiquidH₂O{Float64}());
+```
 """
 capillary_pressure(
             r::FT,
@@ -366,6 +424,16 @@ Diffusive coefficient of trace molecule in `[m² s⁻¹]`, given
 - `T` Trace medium temperature in `[K]`
 - `mol` Trace molecule
 - `med` Diffusion medium (air)
+
+---
+Examples
+```julia
+# diffusive coefficient of gas-phase CO₂, H₂O, and O₂ in air
+air   = TraceGasAir{Float64}();
+d_CO₂ = diffusive_coefficient(298.15, TraceGasCO₂{Float64}(), air);
+d_H₂O = diffusive_coefficient(298.15, TraceGasH₂O{Float64}(), air);
+d_O₂  = diffusive_coefficient(298.15, TraceGasO₂{Float64}(), air);
+```
 """
 diffusive_coefficient(
             T::FT,
@@ -396,6 +464,15 @@ Diffusive coefficient of trace molecule in `[m² s⁻¹]`, given
 - `T` Trace medium temperature in `[K]`
 - `mol` Trace molecule
 - `med` Diffusion medium (liquid water)
+
+---
+Examples
+```julia
+# diffusive coefficient of CO₂ and N₂ in liquid water
+water = TraceLiquidH₂O{Float64}();
+d_CO₂ = diffusive_coefficient(298.15, TraceGasCO₂{FT}(), water);
+d_N₂  = diffusive_coefficient(298.15, TraceGasN₂{FT}(), water);
+```
 """
 diffusive_coefficient(
             T::FT,
@@ -442,6 +519,16 @@ Relative diffusive coefficient of trace gas in medium, given
 - `T` Water vapor temperature in `[K]`
 - `mol` Trace molecule. Optional, default is water vapor
 - `med` Medium. Optional, default is air
+
+---
+Examples
+```julia
+# relative diffusive coefficient of gas in air
+rat_1 = relative_diffusive_coefficient(298.15);
+rat_2 = relative_diffusive_coefficient(298.15, TraceGasH₂O{Float64}());
+rat_3 = relative_diffusive_coefficient(298.15, TraceGasH₂O{Float64}(),
+                                       TraceGasAir{Float64});
+```
 """
 relative_diffusive_coefficient(
             T::FT,
@@ -469,6 +556,15 @@ Relative diffusive coefficient of trace gas in medium, given
 - `T` Water vapor temperature in `[K]`
 - `mol` Trace molecule. Optional, default is water vapor
 - `med` Medium. Optional, default is air
+
+---
+Examples
+```julia
+# relative diffusive coefficient of CO₂ and N₂ in liquid water
+water = TraceLiquidH₂O{Float64}();
+rat_1 = relative_diffusive_coefficient(298.15, TraceGasCO₂{Float64}(), water);
+rat_2 = relative_diffusive_coefficient(298.15, TraceGasN₂{Float64}(), water);
+```
 """
 relative_diffusive_coefficient(
             T::FT,
@@ -516,6 +612,14 @@ function latent_heat_vapor end
 Latent heat of vaporization in `[J kg⁻¹]`, given
 - `T` Medium temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# latent heat of vapor of liquid water
+λ_1 = latent_heat_vapor(298.15);
+λ_2 = latent_heat_vapor(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 latent_heat_vapor(
             T::FT,
@@ -574,6 +678,14 @@ The Kelvin equation is
 \\log \\left( \\dfrac{P_{sat}}{P_{sat}^{*}} \\right) =
 \\dfrac{Ψ ⋅ V_{m}}{R ⋅ T}
 ```
+
+---
+Examples
+```julia
+# correction to saturation vapor pressure of liquid water with non-flat surface
+cor_1 = pressure_correction(298.15, -1e6);
+cor_2 = pressure_correction(298.15, -1e6, TraceLiquidH₂O{Float64}());
+```
 """
 pressure_correction(
             T::FT,
@@ -609,6 +721,14 @@ function saturation_vapor_pressure end
 Saturation vapor pressure in `[Pa]`, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# saturation vapor pressure of liquid water with flat surface
+p_1 = saturation_vapor_pressure(298.15);
+p_2 = saturation_vapor_pressure(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 saturation_vapor_pressure(
             T::FT,
@@ -644,6 +764,14 @@ Saturation vapor pressure in `[Pa]`, given
 - `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
     interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# saturation vapor pressure of liquid water with non-flat surface
+p_1 = saturation_vapor_pressure(298.15, -1e6);
+p_2 = saturation_vapor_pressure(298.15, -1e6, TraceLiquidH₂O{Float64}());
+```
 """
 saturation_vapor_pressure(
             T::FT,
@@ -686,6 +814,14 @@ The re-arranged Clausius-Clapeyron relation
 \\frac{∂P_{sat}^{*}}{∂T} = P_{sat} ⋅ \\dfrac{ LH_0 + Δc_p ⋅ (T - T_{triple})}
                                         { R_v ⋅ T^2 }
 ```
+
+---
+Examples
+```julia
+# slope of saturation vapor pressure of liquid water with flat surface
+s_1 = saturation_vapor_pressure_slope(298.15);
+s_2 = saturation_vapor_pressure_slope(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 saturation_vapor_pressure_slope(
             T::FT,
@@ -717,6 +853,14 @@ First order derivative of saturation vapor pressure in `[Pa K⁻¹]`, given
 - `Ψ` Liquid water pressure in `[Pa]`, positive/negative for convex/concave
     interface; if `Ψ` is given, [`pressure_correction`](@ref) is made
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# slope of saturation vapor pressure of liquid water with non-flat surface
+s_1 = saturation_vapor_pressure_slope(298.15, -1e6);
+s_2 = saturation_vapor_pressure_slope(298.15, -1e6, TraceLiquidH₂O{Float64}());
+```
 """
 saturation_vapor_pressure_slope(
             T::FT,
@@ -778,6 +922,14 @@ The equation used is
     \\left[ 1 - 0.625 ⋅ \\left( 1 - \\dfrac{T}{T_c} \\right) \\right]
 ```
 See http://www.iapws.org/relguide/Surf-H2O.html
+
+---
+Examples
+```julia
+# surface tension of liquid water
+γ_1 = surface_tension(298.15);
+γ_2 = surface_tension(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 surface_tension(
             T::FT,
@@ -813,6 +965,14 @@ function relative_surface_tension end
 Relative surface tension of trace liquid relative to 298.15 K, given
 - `T` Liquid water temperature in `[K]`
 - `med` Medium. Optional. Default is liquid water
+
+---
+Examples
+```julia
+# relative surface tension of liquid water
+γ_1 = relative_surface_tension(298.15);
+γ_2 = relative_surface_tension(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 relative_surface_tension(
             T::FT,
@@ -875,6 +1035,14 @@ B = 4209      # K
 C = 0.04527   # K⁻¹
 D = -3.376E-5 # K⁻²
 ```
+
+---
+Examples
+```julia
+# viscosity of liquid water
+γ_1 = viscosity(298.15);
+γ_2 = viscosity(298.15, TraceLiquidH₂O{Float64}());
+```
 """
 viscosity(T::FT,
           med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
@@ -919,6 +1087,14 @@ through 273-643 K
 B = 4209      # K
 C = 0.04527   # K⁻¹
 D = -3.376E-5 # K⁻²
+```
+
+---
+Examples
+```julia
+# relative viscosity of liquid water
+γ_1 = relative_viscosity(298.15);
+γ_2 = relative_viscosity(298.15, TraceLiquidH₂O{Float64}());
 ```
 """
 relative_viscosity(
