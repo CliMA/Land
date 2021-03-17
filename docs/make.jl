@@ -54,6 +54,7 @@ format = Documenter.HTML(
     prettyurls = get(ENV, "CI", nothing) == "true",
     mathengine = mathengine,
     collapselevel = 1,
+    assets = ["assets/favicon.ico"]
 )
 
 
