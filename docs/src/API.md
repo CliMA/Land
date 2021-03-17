@@ -15,6 +15,7 @@ AbstractTraceLiquid
 TraceGasAir
 TraceGasCO₂
 TraceGasH₂O
+TraceGasN₂
 TraceGasO₂
 TraceLiquidH₂O
 ```
