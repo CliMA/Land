@@ -59,7 +59,7 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     # variables used for canopy_geometry!
     "Cosine of lazitab"
     cos_ttlo ::Array{FT,1} = cosd.(lazitab)
-    "Cosine of lazitab - psi (relative azimuth angle), update with time"
+    "Cosine of lazitab - raa (relative azimuth angle), update with time"
     cos_philo::Array{FT,1} = cosd.(lazitab .- 0)
     "Cosine of litab"
     cos_ttli ::Array{FT,1} = cosd.(litab)

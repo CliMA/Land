@@ -5,39 +5,39 @@
 ###############################################################################
 """
     volscatt!(cache::Array{FT,1},
-              tts::FT,
-              tto::FT,
-              psi::FT,
+              sza::FT,
+              vza::FT,
+              raa::FT,
               ttl::FT
     ) where {FT<:AbstractFloat}
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
     multiplier (`frho`) and transmittance multiplier (`ftau`), given
 - `cache` Array cache for results
-- `tts` Solar zenith angle
-- `tto` Viewing zenith angle
-- `psi` Azimuth angle
+- `sza` Solar zenith angle
+- `vza` Viewing zenith angle
+- `raa` Relative azimuth angle
 - `ttl` Leaf inclination angle
 """
 function volscatt!(
             cache::Array{FT,1},
-            tts::FT,
-            tto::FT,
-            psi::FT,
+            sza::FT,
+            vza::FT,
+            raa::FT,
             ttl::FT
 ) where {FT<:AbstractFloat}
-    psi_rad = deg2rad(psi);
-    cos_psi = cosd(psi);
+    psi_rad = deg2rad(raa);
+    cos_raa = cosd(raa);
     cos_ttl = cosd(ttl);
     sin_ttl = sind(ttl);
-    cos_tts = cosd(tts);
-    sin_tts = sind(tts);
-    cos_tto = cosd(tto);
-    sin_tto = sind(tto);
-    Cs      = cos_ttl*cos_tts;
-    Ss      = sin_ttl*sin_tts;
-    Co      = cos_ttl*cos_tto;
-    So      = sin_ttl*sin_tto;
+    cos_sza = cosd(sza);
+    sin_sza = sind(sza);
+    cos_vza = cosd(vza);
+    sin_vza = sind(vza);
+    Cs      = cos_ttl*cos_sza;
+    Ss      = sin_ttl*sin_sza;
+    Co      = cos_ttl*cos_vza;
+    So      = sin_ttl*sin_vza;
 
     cosbts = FT(1.0);
     cosbto = FT(1.0);
@@ -59,7 +59,7 @@ function volscatt!(
     if abs(cosbto)<1
         bto = acos(cosbto);
         doo = So;
-    elseif tto<90
+    elseif vza<90
         bto = FT(pi);
         doo = Co;
     else
@@ -92,7 +92,7 @@ function volscatt!(
         end
     end
 
-    t1 = 2Cs * Co + Ss * So * cos_psi;
+    t1 = 2Cs * Co + Ss * So * cos_raa;
     t2 = 0;
     if bt2 > 0
         t2 = sin(bt2) * ( 2ds * doo + Ss * So * cos(bt1) * cos(bt3) );

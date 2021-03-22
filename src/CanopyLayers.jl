@@ -7,6 +7,7 @@ using LinearAlgebra
 using MAT
 using Parameters
 using Pkg.Artifacts
+using PkgUtility
 using Polynomials
 using QuadGK
 using Statistics
@@ -19,7 +20,9 @@ AVOGADRO(FT)    = FT( avogad() );
 H_PLANCK(FT)    = FT( h_Planck() );
 K_STEFAN(FT)    = FT( Stefan() );
 LIGHT_SPEED(FT) = FT( light_speed() );
-const FILE_OPTI = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
+const OPTI_2021 = artifact"land_model_spectrum" *
+                  "/Optipar2021_ProspectPRO_CX.mat";
+const OPTI_2017 = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
 const FILE_SUN  = artifact"land_model_spectrum" * "/sun.mat";
 
 
@@ -37,9 +40,6 @@ export Canopy4RT,
        SoilOpticals,
        SolarAngles,
        WaveLengths
-
-
-
 
 # export public functions
 export big_leaf_partition,
@@ -62,9 +62,6 @@ export big_leaf_partition,
        short_wave!,
        SIF_fluxes!,
        thermal_fluxes!
-
-
-
 
 # Vegetation indices
 export BLUE,
@@ -89,7 +86,6 @@ include("utils/calctav.jl"    )
 include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
 include("utils/expint.jl"     )
-include("utils/integral.jl"   )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
 
