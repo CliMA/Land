@@ -45,7 +45,7 @@ function canopy_fluxes!(
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
-    iLAI = LAI * Ω / nLayer;
+    tLAI = LAI / nLayer;
     fac  = FT(1e-3);
 
     # 3. Compute some fluxes, can be done separately if needed
@@ -63,7 +63,7 @@ function canopy_fluxes!(
     mul!(cf_con.absfs_lidf, adjoint(can_opt.absfs), can.lidf);
     normi       = 1 / mean(cf_con.absfs_lidf);
     cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+
-                  view(can_opt.Ps, 2:nLayer+1)) ./ 2;
+                   view(can_opt.Ps, 2:nLayer+1)) ./ 2;
     @unpack lPs = cf_con;
 
     @inbounds for j in 1:nLayer
@@ -75,11 +75,11 @@ function canopy_fluxes!(
         # for diffuse PAR
         cf_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
-        cf_con.PAR_diff .*= fac / iLAI;
+        cf_con.PAR_diff .*= fac / tLAI;
         # for direct PAR
         cf_con.E_iPAR .= view(can_rad.netSW_sunlit, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
-        cf_con.PAR_dir .*= fac / iLAI;
+        cf_con.PAR_dir .*= fac / tLAI;
         cf_con.PAR_dir .+= cf_con.PAR_diff;
         # for leaf absorbed
         cf_con.PAR_diffCab .= cf_con.kChlrel .* cf_con.PAR_diff;
@@ -111,10 +111,10 @@ function canopy_fluxes!(
                                   can_rad.incomingPAR_direct;
     @inbounds for i in 1:nLayer
         cf_con.E_all .= view(can_rad.netSW_shade, :, i);
-        can_rad.intNetSW_shade[i]  = numerical∫(cf_con.E_all, dWL) * fac / iLAI;
+        can_rad.intNetSW_shade[i]  = numerical∫(cf_con.E_all, dWL) * fac / tLAI;
         cf_con.E_all .= view(can_rad.netSW_sunlit, :, i);
         can_rad.intNetSW_sunlit[i] = numerical∫(cf_con.E_all, dWL) *
-                                     fac / iLAI / lPs[i] +
+                                     fac / tLAI / lPs[i] +
                                      can_rad.intNetSW_shade[i];
     end
 
