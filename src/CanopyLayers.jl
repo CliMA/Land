@@ -20,7 +20,9 @@ AVOGADRO(FT)    = FT( avogad() );
 H_PLANCK(FT)    = FT( h_Planck() );
 K_STEFAN(FT)    = FT( Stefan() );
 LIGHT_SPEED(FT) = FT( light_speed() );
-const FILE_OPTI = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
+const OPTI_2021 = artifact"land_model_spectrum" *
+                  "/Optipar2021_ProspectPRO_CX.mat";
+const OPTI_2017 = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
 const FILE_SUN  = artifact"land_model_spectrum" * "/sun.mat";
 
 

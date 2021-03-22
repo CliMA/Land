@@ -6,7 +6,7 @@
 """
     create_leaf_opticals(
                 sWL::Array{FT,1},
-                file::String = FILE_OPTI
+                file::String = OPTI_2021
     ) where {FT<:AbstractFloat}
 
 Create an `AbstractLeafOptiPara` struct, given
@@ -15,7 +15,7 @@ Create an `AbstractLeafOptiPara` struct, given
 """
 function create_leaf_opticals(
             sWL::Array{FT,1},
-            opfn::String = FILE_OPTI
+            opfn::String = OPTI_2021
 ) where {FT<:AbstractFloat}
     N = length(sWL) - 1;
 
