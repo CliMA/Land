@@ -1,4 +1,5 @@
 Manifest.toml
+!docs/Manifest.toml
 
 data/*
 docs/build/*

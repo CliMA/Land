@@ -66,8 +66,8 @@ export annual_profit,
        optimize_hs!,
        optimize_leaf!,
        ppm_to_Pa,
-       test_soil_from_psoil,
-       test_soil_from_swc,
+       test_soil_from_psoil!,
+       test_soil_from_swc!,
        vary_spac!,
        zenith_angle
 
