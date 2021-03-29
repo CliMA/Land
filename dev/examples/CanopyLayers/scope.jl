@@ -1,7 +1,7 @@
 # # SCOPE Model
 
 ## load packages
-using CanopyLayers
+using Land.CanopyLayers
 using PlotPlants
 FT = Float32;
 #------------------------------------------------------------------------------
