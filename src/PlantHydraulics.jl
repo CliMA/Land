@@ -5,7 +5,7 @@ using CLIMAParameters.Planet: T_freeze, grav, ρ_cloud_liq
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
             ResidualTolerance, SolutionTolerance, SolutionToleranceND,
             find_peak, find_zero
-using DocStringExtensions: TYPEDEF, TYPEDFIELDS, TYPEDSIGNATURES
+using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using Parameters
 using Statistics
 using WaterPhysics

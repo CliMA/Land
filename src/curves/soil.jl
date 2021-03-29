@@ -393,9 +393,7 @@ end
 #
 ###############################################################################
 """
-    $(TYPEDSIGNATURES)
-
-fit_soil_VC!(
+    fit_soil_VC!(
                 vc_vG::VanGenuchten{FT},
                 vc_BC::BrooksCorey{FT}
     ) where {FT<:AbstractFloat}
