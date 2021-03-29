@@ -4,9 +4,26 @@
 #
 ###############################################################################
 """
-    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT, par::FT, rad::FT, la::FT, container::SPACContainer1L{FT}) where {FT<:AbstractFloat}
-    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT) where {FT<:AbstractFloat}
-    leaf_gas_exchange_nonopt!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, f_sl::FT, f_sh::FT) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                flow::FT,
+                par::FT,
+                rad::FT,
+                la::FT,
+                container::SPACContainer1L{FT}
+    ) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                flow::FT
+    ) where {FT<:AbstractFloat}
+    leaf_gas_exchange_nonopt!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                f_sl::FT,
+                f_sh::FT
+    ) where {FT<:AbstractFloat}
 
 Simulate leaf level gas exchange and fill it into the `container` for 1-layer
     or 2-layer canopy, given
@@ -56,7 +73,7 @@ function leaf_gas_exchange_nonopt!(
         if flow == 0
             g_lw = FT(0);
             g_lc = FT(1e-6);
-            leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+            leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(), g_lc);
             container.an = node.ps.An;
 
         # if flow > 0 and reasonable
@@ -70,7 +87,8 @@ function leaf_gas_exchange_nonopt!(
             g_lc  = max(FT(1e-6), 1 / (1/g_bc + 1/g_sc));
             g_lim = 1 / (1/g_bw + 1/g_max);
             if g_lw < g_lim * t_cor
-                leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+                leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(),
+                                     g_lc);
                 container.an = node.ps.An;
             else
                 container.an = FT(-Inf);
@@ -94,12 +112,14 @@ function leaf_gas_exchange_nonopt!(
             flow::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
+    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh,
+            rad_sl = node.container2L;
 
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange_nonopt!(node, photo_set, flow, par_mean, rad_mean, node.laba, node.container1L);
+    leaf_gas_exchange_nonopt!(node, photo_set, flow, par_mean, rad_mean,
+                              node.laba, node.container1L);
 
     node.containerOP = (node.ec - flow) * (node.container1L).an;
 
@@ -116,13 +136,17 @@ function leaf_gas_exchange_nonopt!(
             f_sh::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
+    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh,
+            rad_sl = node.container2L;
 
     # calculate gas exchangr for sunlit and shaded layers
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, par_sl, rad_sl, la_sl, (node.container2L).cont_sl);
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sh, par_sh, rad_sh, la_sh, (node.container2L).cont_sh);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, par_sl, rad_sl, la_sl,
+                              node.container2L.cont_sl);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sh, par_sh, rad_sh, la_sh,
+                              node.container2L.cont_sh);
 
-    a_sum = frac_sl * (node.container2L).cont_sl.an + frac_sh * (node.container2L).cont_sh.an;
+    a_sum = frac_sl * node.container2L.cont_sl.an +
+            frac_sh * node.container2L.cont_sh.an;
     e_sum = f_sl + f_sh;
     node.containerOP = (node.ec - e_sum) * a_sum;
 
@@ -142,9 +166,26 @@ end
 #
 ###############################################################################
 """
-    leaf_gas_exchange!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT, par::FT, rad::FT, la::FT, container::SPACContainer1L{FT}) where {FT<:AbstractFloat}
-    leaf_gas_exchange!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, flow::FT) where {FT<:AbstractFloat}
-    leaf_gas_exchange!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, f_sl::FT, f_sh::FT) where {FT<:AbstractFloat}
+    leaf_gas_exchange!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                flow::FT,
+                par::FT,
+                rad::FT,
+                la::FT,
+                container::SPACContainer1L{FT}
+    ) where {FT<:AbstractFloat}
+    leaf_gas_exchange!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                flow::FT
+    ) where {FT<:AbstractFloat}
+    leaf_gas_exchange!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                f_sl::FT,
+                f_sh::FT
+    ) where {FT<:AbstractFloat}
 
 Simulate leaf level gas exchange and fill it into the `container` for 1-layer
     or 2-layer canopy, given
@@ -188,7 +229,7 @@ function leaf_gas_exchange!(
     # 4. calculate photosynthesis
     g_lw = flow / la / d_leaf * p_atm;
     g_lc = max(FT(1e-6), g_lw / FT(1.6));
-    leaf_photo_from_glc!(photo_set, node.ps, envir, g_lc);
+    leaf_photosynthesis!(photo_set, node.ps, envir, GCO₂Mode(), g_lc);
     container.ag = node.ps.Ag;
     container.an = node.ps.An;
     container.c  = node.ps.p_i;
@@ -215,7 +256,8 @@ function leaf_gas_exchange!(
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, laba, node.container1L);
+    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, laba,
+                       node.container1L);
 
     return nothing
 end
@@ -230,11 +272,14 @@ function leaf_gas_exchange!(
             f_sh::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
+    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh,
+            rad_sl = node.container2L;
 
     # calculate gas exchangr for sunlit and shaded layers
-    leaf_gas_exchange!(node, photo_set, f_sl, par_sl, rad_sl, la_sl, (node.container2L).cont_sl);
-    leaf_gas_exchange!(node, photo_set, f_sh, par_sh, rad_sh, la_sh, (node.container2L).cont_sh);
+    leaf_gas_exchange!(node, photo_set, f_sl, par_sl, rad_sl, la_sl,
+                       node.container2L.cont_sl);
+    leaf_gas_exchange!(node, photo_set, f_sh, par_sh, rad_sh, la_sh,
+                       node.container2L.cont_sh);
 
     return nothing
 end

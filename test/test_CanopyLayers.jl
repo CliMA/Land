@@ -1,5 +1,5 @@
 # Test big leaf canopy model
-println("\nTesting the big leaf model...");
+@info "Testing the big leaf model...";
 @testset "CanopyLayers --- big leaf model" begin
     for FT in [Float32, Float64]
         for result in [ big_leaf_partition(FT(3.0), FT(30.0), FT(1000.0)),
@@ -15,7 +15,8 @@ end
 
 
 # FT and NaN tests
-println("\nTesting the SCOPE model...");
+println();
+@info "Testing the SCOPE model...";
 @testset "CanopyLayers --- SCOPE model" begin
     for FT in [Float32, Float64]
         collections = initialize_rt_module(FT; nLayer=20, LAI=3);
@@ -26,12 +27,12 @@ println("\nTesting the SCOPE model...");
         end
 
         # add more tests
-        angles.tts = 30;
-        angles.psi = 0;
+        angles.sza = 30;
+        angles.raa = 0;
         can.LAI    = 3;
         VZA        = collect(FT, -89.5:0.5:89.5);
         for VZA_ in VZA
-            angles.tto = VZA_;
+            angles.vza = VZA_;
             canopy_geometry!(can, angles, can_opt, rt_con);
             canopy_matrices!(leaves, can_opt);
             short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
@@ -39,13 +40,13 @@ println("\nTesting the SCOPE model...");
         end
         @test true;
 
-        angles.tts = 48;
-        angles.psi = 0;
+        angles.sza = 48;
+        angles.raa = 0;
         can.LAI    = FT(3.22);
-        for psi in 0:5:360
-            angles.psi = psi;
+        for raa in 0:5:360
+            angles.raa = raa;
             for VZA in 0:5:85
-                angles.tto = VZA;
+                angles.vza = VZA;
                 canopy_geometry!(can, angles, can_opt, rt_con);
                 canopy_matrices!(leaves, can_opt);
                 short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
@@ -55,7 +56,7 @@ println("\nTesting the SCOPE model...");
         @test true;
 
         # test warnings
-        println("Expect warnings here!");
+        @info "Expect warnings here!";
         warn_wls   = create_wave_length(FT, collect(FT,2100:100:2600));
         warn_inrad = create_incoming_radiation(warn_wls);
         @test true;
@@ -75,10 +76,6 @@ println("\nTesting the SCOPE model...");
         CanopyLayers.dcum(FT(1.1), FT(1.1), FT(1.1));
         CanopyLayers.e2phot(rand(FT,10), rand(FT,10));
         CanopyLayers.volscatt!(rand(FT,4), FT(40), FT(90), FT(40), FT(0));
-        CanopyLayers.fast∫(rand(FT,4), rand(FT,5));
-        CanopyLayers.fast∫(rand(FT,4), rand(FT,4));
-        CanopyLayers.fast∫!(rand(FT,4), rand(FT,5));
-        CanopyLayers.fast∫!(rand(FT,4), rand(FT,4));
         @test true;
     end
 end
@@ -87,7 +84,8 @@ end
 
 
 # indices test
-println("\nTesting the Indicies...");
+println();
+@info "Testing the Indicies...";
 @testset "CanopyLayers --- Indicies" begin
     for FT in [Float32, Float64]
         collections = initialize_rt_module(FT; nLayer=20, LAI=3);
@@ -104,7 +102,7 @@ println("\nTesting the Indicies...");
         @test FT_test(_indices, FT);
 
         # out bounds warnings
-        println("Expect warnings here!");
+        @info "Expect warnings here!";
         REF_WL(can_rad, wls, FT(3000));
         SIF_WL(can_rad, wls, FT(3000));
         @test true

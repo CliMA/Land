@@ -28,34 +28,34 @@ Base.@kwdef mutable struct CanopyRads{FT}
 
     # Scalars
     "Integrated TOC outgoing flux `[W m⁻²]`"
-    intEout            ::FT = FT(0.0)
+    intEout            ::FT = 0
     "Incident spectrally integrated total PAR `[mol m⁻² s⁻¹]`"
-    incomingPAR        ::FT = FT(0.0)
+    incomingPAR        ::FT = 0
     "Incident spectrally integrated direct PAR `[mol m⁻² s⁻¹]`"
-    incomingPAR_direct ::FT = FT(0.0)
+    incomingPAR_direct ::FT = 0
     "Incident spectrally integrated diffuse PAR `[mol m⁻² s⁻¹]`"
-    incomingPAR_diffuse::FT = FT(0.0)
+    incomingPAR_diffuse::FT = 0
     "Net radiation of shaded soil `[W m⁻²]`"
-    RnSoil_diffuse     ::FT = FT(0.0)
+    RnSoil_diffuse     ::FT = 0
     "Net Short-wave radiation of sunlit soil `[W m⁻²]`"
-    RnSoil_direct      ::FT = FT(0.0)
+    RnSoil_direct      ::FT = 0
     "Net Short-wave radiation of soil (shaded + sunlit) `[W m⁻²]`"
-    RnSoil             ::FT = FT(0.0)
+    RnSoil             ::FT = 0
     "Net long-wave radiation of soil (shaded + sunlit) `[W m⁻²]`"
-    RnSoilLW           ::FT = FT(0.0)
+    RnSoilLW           ::FT = 0
 
     # Dim of nLayer
     "Net PAR of shaded leaves `[mol m⁻² s⁻¹]`"
     absPAR_shade   ::Array{FT,1} = zeros(FT, nLayer)
     "Net PAR by Cab+Car of shaded leaves `[moles m⁻² s⁻¹]`"
     absPAR_shadeCab::Array{FT,1} = zeros(FT, nLayer)
-    "Spectrally integrated net absorbed direct radiation in each layer `[W m⁻²)]`"
+    "Spectrally integrated net absorbed direct radiation in each layer per leaf area `[W m⁻²]`"
     intNetSW_sunlit::Array{FT,1} = zeros(FT, nLayer)
-    "Spectrally integrated net absorbed diffuse radiation in each layer `[W m⁻²)]`"
+    "Spectrally integrated net absorbed diffuse radiation in each layer per leaf area `[W m⁻²]`"
     intNetSW_shade ::Array{FT,1} = zeros(FT, nLayer)
-    "Spectrally integrated net absorbed direct radiation in each layer `[W m⁻²)]`"
+    "Spectrally integrated net absorbed direct radiation in each layer per leaf area `[W m⁻²]`"
     intNetLW_sunlit::Array{FT,1} = zeros(FT, nLayer)
-    "Spectrally integrated net absorbed diffuse radiation in each layer `[W m⁻²)]`"
+    "Spectrally integrated net absorbed diffuse radiation in each layer per leaf area `[W m⁻²]`"
     intNetLW_shade ::Array{FT,1} = zeros(FT, nLayer)
     "Leaf temperature (sunlit) `[K]`"
     T_sun          ::Array{FT,1} = zeros(FT, nLayer) .+ FT(298.15)
@@ -135,15 +135,15 @@ Base.@kwdef mutable struct CanopyRads{FT}
     # Fluorescence Output:
     "Hemispheric total outgoing SIF flux `[mW m⁻² nm⁻¹]`)"
     SIF_hemi         ::Array{FT,1} = zeros(FT, nWLF)
-    "Observer-direction outgoing SIF radiance  (mW m⁻² nm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance (mW m⁻² nm⁻¹ sr⁻¹))"
     SIF_obs          ::Array{FT,1} = zeros(FT, nWLF)
-    "Observer-direction outgoing SIF radiance, sunlit leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, sunlit leaves (mW m⁻² nm⁻¹ sr⁻¹)"
     SIF_obs_sunlit   ::Array{FT,1} = zeros(FT, nWLF)
-    "Observer-direction outgoing SIF radiance, shaded leaves  (mW m⁻² nm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, shaded leaves (mW m⁻² nm⁻¹ sr⁻¹)"
     SIF_obs_shaded   ::Array{FT,1} = zeros(FT, nWLF)
-    "Observer-direction outgoing SIF radiance, scattered   (mW m⁻² nm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, scattered (mW m⁻² nm⁻¹ sr⁻¹)"
     SIF_obs_scattered::Array{FT,1} = zeros(FT, nWLF)
-    "Observer-direction outgoing SIF radiance, soil-reflected  (mW m⁻² nm⁻¹ sr⁻¹))"
+    "Observer-direction outgoing SIF radiance, soil-reflected (mW m⁻² nm⁻¹ sr⁻¹)"
     SIF_obs_soil     ::Array{FT,1} = zeros(FT, nWLF)
     "Total SIF sum of layer sources  `[mW m⁻² nm⁻¹]`)"
     SIF_sum          ::Array{FT,1} = zeros(FT, nWLF)

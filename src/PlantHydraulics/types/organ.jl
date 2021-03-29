@@ -27,7 +27,7 @@ abstract type AbstractHydraulicOrgan{FT<:AbstractFloat} end
 A struct that contains leaf hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
@@ -99,7 +99,7 @@ end
 A struct that contains root hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
@@ -132,6 +132,8 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     p_rhiz::FT = FT(0.0)
     "Soil matrix potential `[MPa]`"
     p_ups ::FT = FT(0.0)
+    "Soil osmotic potential at 298.15 K `[MPa]"
+    p_osm ::FT = FT(0.0)
 
     # pressure, k, and p_history profile
     "List of k_max per element `[mol s⁻¹ MPa⁻¹ m⁻²]`"
@@ -185,7 +187,7 @@ end
 A struct that contains stem hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices

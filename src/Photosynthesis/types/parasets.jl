@@ -204,12 +204,17 @@ VtoRDefault(FT) = FT(0.015);
 ###############################################################################
 #
 # Fluorescence model parameter set
-# Data source: Flexas et al. (2002)
-# Energy dissipation in C3 plants under drought
+# Data source: van der Tol et al. (2014)
+# Models of fluorescence and photosynthesis for interpreting measurements of
+#     solar-induced chlorophyll fluorescence
 #
 ###############################################################################
-""" [`FluoParaSet`](@ref) type parameter set using Flexas's data """
-FluorescenceFlexas(FT) =
+""" [`FluoParaSet`](@ref) type parameter set using all data """
+FluorescenceVanDerTol(FT) =
+        FluoParaSet{FT}(2.48, 2.83, 0.114);
+
+""" [`FluoParaSet`](@ref) type parameter set using Flexas's data (drought) """
+FluorescenceVanDerTolDrought(FT) =
         FluoParaSet{FT}(5.01, 1.93, 10.0);
 
 
@@ -232,7 +237,7 @@ function C3Bernacchi(FT)
     ReT = RespirationTDBernacchi(FT);
     VcT = VcmaxTDBernacchi(FT);
     ΓsT = ΓStarTDBernacchi(FT);
-    Flu = FluorescenceFlexas(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
@@ -247,7 +252,7 @@ function C3CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     ΓsT = ΓStarTDCLM(FT);
-    Flu = FluorescenceFlexas(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
@@ -260,7 +265,7 @@ function C4CLM(FT)
     ReT = RespirationTDCLM(FT);
     VcT = VcmaxTDCLM(FT);
     VpT = VpmaxTDBoyd(FT);
-    Flu = FluorescenceFlexas(FT);
+    Flu = FluorescenceVanDerTolDrought(FT);
     VR  = VtoRDefault(FT);
     return C4ParaSet{FT}(KpT, ReT, VcT, VpT, Flu, VR)
 end

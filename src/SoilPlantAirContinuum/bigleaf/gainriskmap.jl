@@ -4,7 +4,10 @@
 #
 ###############################################################################
 """
-    gain_risk_map(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}) where {FT<:AbstractFloat}
+    gain_risk_map(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT}
+    ) where {FT<:AbstractFloat}
 
 Return the matrix of optimizers at different sunlit and shaded layer flow
     rates, given

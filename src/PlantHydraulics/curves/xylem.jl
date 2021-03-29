@@ -24,7 +24,7 @@ function xylem_k_ratio(
     @unpack b,c = vc;
 
     if p_25<0
-        kr = max( FT(1e-4), exp( -1 * (-p_25 / vc.b) ^ vc.c ) / vis );
+        kr = max( FT(1e-4), exp( -1 * (-p_25 / vc.b) ^ vc.c ) ) / vis;
     else
         kr = 1 / vis;
     end
@@ -45,7 +45,7 @@ function xylem_k_ratio(
     if p_25<0
         k1 = exp( -1 * (-p_25 / b1) ^ c1 ) * f1;
         k2 = exp( -1 * (-p_25 / b2) ^ c2 ) * f2;
-        kr = max( FT(1e-4), (k1+k2) / vis );
+        kr = max( FT(1e-4), (k1+k2) ) / vis;
     else
         kr = 1 / vis;
     end
@@ -94,4 +94,47 @@ function xylem_p_crit(
     p2 = -b2 * log( FT(1000) ) ^ (1 / c2) * f_st
 
     return min(p1, p2)
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Fit xylem vulnerability curve
+#
+###############################################################################
+
+function fit_xylem_VC(xs::Array{FT,1}, ys::Array{FT,1}; label="TPLC") where {FT<:AbstractFloat}
+    _ps = xs;
+    _ks = ys;
+
+    # if x is tension and y is plc
+    if label=="TPLC"
+        _ps = -xs;
+        _ks = (100 .- ys) ./ 100;
+    end
+
+    @inline f(x) = (
+        @show x;
+        _vc = WeibullSingle{FT}(b=x[1], c=x[2]);
+        _kp = xylem_k_ratio.([_vc], _ps);
+        return -sum((_kp .- _ks) .^ 2);
+    );
+
+
+    _st = SolutionToleranceND{FT}([1e-3, 1e-3], 30);
+    _ms = ReduceStepMethodND{FT}(x_mins = FT[1e-3, 1e-3],
+                                 x_maxs = FT[ 100, 100],
+                                 x_inis = [1, 1],
+                                 Δ_inis = FT[1, 1]);
+    _bc = find_peak(f, _ms, _st);
+
+    @show _bc;
+
+    return _bc
 end

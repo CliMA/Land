@@ -7,6 +7,8 @@
                           C4CLM(FT),
                           AirLayer{FT}(),
                           Leaf{FT}(),
+                          FluorescenceVanDerTol(FT),
+                          FluorescenceVanDerTolDrought(FT),
                           KoTDBernacchi(FT),
                           RespirationTDBernacchi(FT),
                           VcmaxTDBernacchi(FT),
@@ -30,6 +32,7 @@ end
 
 
 # FT and NaN test for the structs
+println();
 @testset "Photosynthesis --- functions" begin
     for FT in [Float32, Float64]
         c3_set   = C3CLM(FT);
@@ -53,7 +56,7 @@ end
         rubisco_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        rubisco_limited_rate_glc!(c3_set, leaf_3, envir);
+        rubisco_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # light limited rates
@@ -63,7 +66,7 @@ end
         light_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        light_limited_rate_glc!(c3_set, leaf_3, envir);
+        light_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # product limited rates
@@ -71,31 +74,26 @@ end
         product_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        product_limited_rate_glc!(c4_set, leaf_4, envir);
+        product_limited_rate!(c4_set, leaf_4, envir);
         @test NaN_test(leaf_4);
 
         # fluorescence
-        leaf_photo_from_pi!(c3_set, leaf_3, FT(2));
+        leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), FT(2));
         leaf_fluorescence!(fluo_set, leaf_3);
-        leaf_photo_from_glc!(c3_set, leaf_3, envir);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode());
         leaf_fluorescence!(fluo_set, leaf_3);
         @test NaN_test(leaf_3);
 
         # leaf photo from glc
-        leaf_photo_from_glc!(c3_set, leaf_3, envir, glc);
-        leaf_photo_from_glc!(c4_set, leaf_4, envir, glc);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode(), glc);
+        leaf_photosynthesis!(c4_set, leaf_4, envir, GCO₂Mode(), glc);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
 
         # leaf photo from p_i
-        leaf_photo_from_pi!(c3_set, leaf_3, p_i);
-        leaf_photo_from_pi!(c4_set, leaf_4, p_i);
+        leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), p_i);
+        leaf_photosynthesis!(c4_set, leaf_4, envir, PCO₂Mode(), p_i);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-
-        # text lower quadratic function
-        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(3), FT(1)));
-        @test !isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(1)));
-        @test isnan(Photosynthesis.lower_quadratic(FT(1), FT(2), FT(5)));
     end
 end

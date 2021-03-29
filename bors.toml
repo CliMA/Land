@@ -1,9 +1,10 @@
 status = [
-  "clean-notebooks",
-  "docs-build",
-  "linux-test",
-  "macos-test",
-  "windows-test"
+    "clean-notebooks",
+    "docs-build",
+    "macos-latest",
+    "ubuntu-latest",
+    "windows-latest",
+    "version-test"
 ]
 delete_merged_branches = true
 timeout_sec = 86400

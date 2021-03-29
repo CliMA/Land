@@ -15,22 +15,22 @@ println("\nTesting the structures...")
         _sh2  = VanGenuchten{FT}();
 
         # Test the struct
-        for data_set in [ leaf, root, stem, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2,
-                          VGClay(FT),
-                          VGClayLoam(FT),
-                          VGLoamySand(FT),
-                          VGLoamySand2(FT),
-                          VGSand(FT),
-                          VGSandyClayLoam(FT),
-                          VGSandyClayLoam2(FT),
-                          VGSandyLoam(FT),
-                          VGSilt(FT),
-                          VGSiltyClay(FT),
-                          VGSiltyClayLoam(FT),
-                          VGSiltyLoam(FT) ]
+        for data_set in [ leaf, root, stem, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2]
             @test FT_test(data_set, FT)
             @test NaN_test(data_set)
         end
+
+        # Test Soil types
+        _nams = ["Sand", "Loamy Sand", "Sandy Loam", "Loam", "Sandy Clay Loam",
+                 "Silt Loam", "Silt", "Clay Loam", "Silty Clay Loam",
+                 "Sandy Clay", "Silty Clay", "Clay"];
+        for _name in _nams
+            create_soil_VC(_sh1, _name);
+            create_soil_VC(_sh2, _name);
+        end
+        println("Expecting a warning here");
+        create_soil_VC(_sh1, "Other");
+        @test true;
     end
 end
 

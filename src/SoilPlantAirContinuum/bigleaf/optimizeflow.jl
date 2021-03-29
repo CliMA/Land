@@ -5,7 +5,10 @@
 #
 ###############################################################################
 """
-    optimize_flows!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}) where {FT<:AbstractFloat}
+    optimize_flows!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT}
+    ) where {FT<:AbstractFloat}
 
 Optimize the flow rates in sunlit and shaded layers, given
 - `node` [`SPACSimple`] type struct

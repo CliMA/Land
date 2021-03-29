@@ -24,8 +24,8 @@ The entire model will be written in [Julia](https://docs.julialang.org/en/v1/) (
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://CliMA.github.io/Land/dev/
 
-[st-img]: https://github.com/CliMA/Land/workflows/UnitTest/badge.svg?branch=main
-[st-url]: https://github.com/CliMA/Land/actions?query=branch%3A"main"++workflow%3A"UnitTest"
+[st-img]: https://github.com/CliMA/Land/workflows/JuliaStable/badge.svg?branch=main
+[st-url]: https://github.com/CliMA/Land/actions?query=workflow%3AJuliaStable
 
 [codecov-img]: https://codecov.io/gh/CliMA/Land/branch/main/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/CliMA/Land

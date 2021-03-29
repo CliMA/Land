@@ -1,7 +1,12 @@
+###############################################################################
+#
+# Create DataFrame to save simulation output
+#
+###############################################################################
 """
     function create_dataframe(FT, weather::DataFrame)
 
-Create a data frame to storesimulation output, given
+Create a data frame to store simulation output, given
 - `FT` Floating number type
 - `weather` Weather profile in a growing season
 """

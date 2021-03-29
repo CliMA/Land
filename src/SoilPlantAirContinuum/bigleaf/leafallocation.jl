@@ -4,9 +4,21 @@
 #
 ###############################################################################
 """
-    leaf_allocation!(node::SPACSimple{FT}, laba::FT) where {FT<:AbstractFloat}
-    leaf_allocation!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, vmax::FT) where {FT<:AbstractFloat}
-    leaf_allocation!(node::SPACSimple{FT}, photo_set::AbstractPhotoModelParaSet{FT}, laba::FT, vmax::FT) where {FT<:AbstractFloat}
+    leaf_allocation!(
+                node::SPACSimple{FT},
+                laba::FT
+    ) where {FT<:AbstractFloat}
+    leaf_allocation!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                vmax::FT
+    ) where {FT<:AbstractFloat}
+    leaf_allocation!(
+                node::SPACSimple{FT},
+                photo_set::AbstractPhotoModelParaSet{FT},
+                laba::FT,
+                vmax::FT
+    ) where {FT<:AbstractFloat}
 
 Update leaf area and maximal carboxylation rate, given
 - `node` [`SPACSimple`] type struct

@@ -1,15 +1,14 @@
-name: CleanNotebooks
+name: Julia-1.5
 on:
   push:
     branches:
       - main
       - staging
       - trying
-    tags: '*'
   pull_request:
 
 jobs:
-  clean-notebooks:
+  version-test:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Actions
@@ -17,8 +16,8 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: "1"
+          version: "1.5"
       - name: Install Dependencies
-        run: julia --project -e 'using Pkg; Pkg.instantiate();'
-      - name: Test Clean Notebooks
-        run: julia --project test/clean_notebooks.jl
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        uses: julia-actions/julia-runtest@latest

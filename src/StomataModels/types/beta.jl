@@ -8,10 +8,12 @@
 
 Hierachy of AbstractBetaFunction:
 - [`AbstractBetaG`](@ref)
+  - [`BetaGLinearKleaf`](@ref)
   - [`BetaGLinearPleaf`](@ref)
   - [`BetaGLinearPsoil`](@ref)
   - [`BetaGLinearSWC`](@ref)
 - [`AbstractBetaV`](@ref)
+  - [`BetaVLinearKleaf`](@ref)
   - [`BetaVLinearPleaf`](@ref)
   - [`BetaVLinearPsoil`](@ref)
   - [`BetaVLinearSWC`](@ref)
@@ -34,11 +36,25 @@ abstract type AbstractBetaFunction{FT} end
     abstract type AbstractBetaG{FT}
 
 Hierachy of AbstractBetaG:
+- [`BetaGLinearKleaf`](@ref)
 - [`BetaGLinearPleaf`](@ref)
 - [`BetaGLinearPsoil`](@ref)
 - [`BetaGLinearSWC`](@ref)
 """
 abstract type AbstractBetaG{FT} <: AbstractBetaFunction{FT} end
+
+
+
+
+"""
+    struct BetaGLinearKleaf{FT}
+
+Linear β function for g1 based on leaf hydraulic conductance.
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+struct BetaGLinearKleaf{FT} <: AbstractBetaG{FT} end
 
 
 
@@ -110,11 +126,25 @@ end
     abstract type AbstractBetaV{FT}
 
 Hierachy of AbstractBetaV:
+- [`BetaVLinearKleaf`](@ref)
 - [`BetaVLinearPleaf`](@ref)
 - [`BetaVLinearPsoil`](@ref)
 - [`BetaVLinearSWC`](@ref)
 """
 abstract type AbstractBetaV{FT} <: AbstractBetaFunction{FT} end
+
+
+
+
+"""
+    struct BetaVLinearKleaf{FT}
+
+Linear β function for g1 based on leaf hydraulic conductance.
+
+# Fields
+$(DocStringExtensions.FIELDS)
+"""
+struct BetaVLinearKleaf{FT} <: AbstractBetaV{FT} end
 
 
 

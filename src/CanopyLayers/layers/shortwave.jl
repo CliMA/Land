@@ -40,6 +40,7 @@ function short_wave!(
     # 2. scattering and extinction coefficients to
     #    thin layer reflectances and transmittances
     # Eq. 17 in mSCOPE paper (changed here to compute real transmission)
+    # this is the original equation: τ_ss = 1 - ks * iLAI;
     τ_ss = exp(-ks * iLAI);
     sw_con.τ_dd .= 1 .- can_opt.a .* iLAI;
     sw_con.τ_sd .= sf   .* iLAI;
