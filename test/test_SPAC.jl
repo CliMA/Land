@@ -1,5 +1,5 @@
 # test the structs
-println("\nTesting the FT and NaN of the structs...")
+@info "Testing the FT and NaN of the structs...";
 @testset "FT and NaN --- Types" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -17,7 +17,8 @@ end
 
 
 # test and benchmark the big_leaf_partition!
-println("\nTesting the big_leaf_partition!...")
+println();
+@info "Testing the big_leaf_partition!...";
 @testset "SoilPlantAirContinuum --- big_leaf_partition!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -34,7 +35,8 @@ end
 
 
 # test the gain_risk_map
-println("\nTesting the gain_risk_map Function...")
+println();
+@info "Testing the gain_risk_map Function...";
 @testset "SoilPlantAirContinuum --- gain_risk_map" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -53,7 +55,8 @@ end
 
 
 # test and benchmark the leaf_gas_exchange_nonopt!
-println("\nTesting the leaf_gas_exchange_nonopt! Functions...")
+println();
+@info "Testing the leaf_gas_exchange_nonopt! Functions...";
 @testset "SoilPlantAirContinuum --- leaf_gas_exchange_nonopt!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -78,7 +81,8 @@ end
 
 
 # test and benchmark the leaf_gas_exchange!
-println("\nTesting the leaf_gas_exchange! Functions...")
+println();
+@info "Testing the leaf_gas_exchange! Functions...";
 @testset "SoilPlantAirContinuum --- leaf_gas_exchange!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -103,7 +107,8 @@ end
 
 
 # test and benchmark the leaf_temperature*
-println("\nTesting the leaf_temperature* Functions...")
+println();
+@info "Testing the leaf_temperature* Functions...";
 @testset "SoilPlantAirContinuum --- leaf_temperature*" begin
     for FT in [Float32, Float64]
         node = SPACSimple{FT}();
@@ -123,7 +128,8 @@ end
 
 
 # test and benchmark the optimize_flows!
-println("\nTesting the optimize_flows! Functions...")
+println();
+@info "Testing the optimize_flows! Functions...";
 @testset "SoilPlantAirContinuum --- optimize_flows!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
@@ -142,7 +148,8 @@ end
 
 
 # test and benchmark the atmosheric* functions
-println("\nTesting the atmosheric* Functions...")
+println();
+@info "Testing the atmosheric* Functions...";
 @testset "SoilPlantAirContinuum --- atmosheric*" begin
     for FT in [Float32, Float64]
         h = FT(1000);
@@ -160,7 +167,8 @@ end
 
 
 # test and benchmark the zenith_angle
-println("\nTesting the zenith_angle Functions...")
+println();
+@info "Testing the zenith_angle Functions...";
 @testset "SoilPlantAirContinuum --- zenith_angle" begin
     for FT in [Float32, Float64]
         latd = FT(10);
@@ -183,7 +191,8 @@ end
 
 
 # test and benchmark the annual_profit
-println("\nTesting the annual_profit Functions...")
+println();
+@info "Testing the annual_profit Functions...";
 @testset "SoilPlantAirContinuum --- annual_profit" begin
     arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
     weat = DataFrame(CSV.File(arti));
@@ -202,7 +211,8 @@ end
 
 
 # test and benchmark the annual_simulation!
-println("\nTesting annual_simulation! Functions...")
+println();
+@info "Testing annual_simulation! Functions...";
 @testset "SoilPlantAirContinuum --- annual_simulation!" begin
     arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
     weat = DataFrame(CSV.File(arti));
@@ -221,7 +231,8 @@ end
 
 
 # test and benchmark the leaf_allocation!
-println("\nTesting the leaf_allocation! Functions...")
+println();
+@info "Testing the leaf_allocation! Functions...";
 @testset "SoilPlantAirContinuum --- leaf_allocation!" begin
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
@@ -245,7 +256,8 @@ end
 
 
 # test and benchmark the optimize_leaf
-println("\nTesting the optimize_leaf! Functions...")
+println();
+@info "Testing the optimize_leaf! Functions...";
 @testset "SoilPlantAirContinuum --- optimize_leaf!" begin
     arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
     weat = DataFrame(CSV.File(arti));
@@ -264,7 +276,8 @@ end
 
 
 # test the function to vary SPACSimple
-println("\nTesting the vary_spac! Functions...")
+println();
+@info "Testing the vary_spac! Functions...";
 @testset "SoilPlantAirContinuum --- vary_spac!" begin
     arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
     weat = DataFrame(CSV.File(arti));
@@ -278,5 +291,20 @@ println("\nTesting the vary_spac! Functions...")
             vary_spac!(node, weat, _fac, FT(1.5));
             @test true;
         end
+    end
+end
+
+
+
+
+# test the function for mSCOPE version radiation
+println();
+@info "Testing the mSCOPE verion setup...";
+@testset "SoilPlantAirContinuum --- vary_spac!" begin
+    for FT in [Float32, Float64]
+        node = SPACMono{FT}();
+        initialize_spac_canopy!(node);
+        layer_fluxes!(node);
+        @test NaN_test(node);
     end
 end
