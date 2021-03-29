@@ -14,10 +14,15 @@ using WaterPhysics
 
 # Define constants
 struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH       = EarthParameterSet()
-K_0(FT)           = FT( T_freeze(EARTH) );
-K_25(FT)          = K_0(FT) + 25;
-MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
+const EARTH        = EarthParameterSet();
+CP_DRYAIR(FT)      = FT( cp_d(EARTH) );
+K_0(FT)            = FT( T_freeze(EARTH) );
+K_STEFAN(FT)       = FT( Stefan() );
+MOLMASS_DRYAIR(FT) = FT( molmass_dryair(EARTH) );
+MOLMASS_WATER(FT)  = FT( molmass_water(EARTH) );
+
+K_25(FT)           = K_0(FT) + 25;
+CP_DRYAIR_MOL(FT)  = CP_DRYAIR(FT) * MOLMASS_DRYAIR(FT);
 
 
 
@@ -26,10 +31,13 @@ MOLMASS_WATER(FT) = FT( molmass_water(EARTH) );
 export AbstractBetaFunction,
        AbstractBetaG,
        AbstractBetaV,
+       AbstractDrive,
        AbstractStomatalModel,
+       BetaGLinearKleaf,
        BetaGLinearPleaf,
        BetaGLinearPsoil,
        BetaGLinearSWC,
+       BetaVLinearKleaf,
        BetaVLinearPleaf,
        BetaVLinearPsoil,
        BetaVLinearSWC,
@@ -39,6 +47,8 @@ export AbstractBetaFunction,
        ESMGentine,
        ESMLeuning,
        ESMMedlyn,
+       GlcDrive,
+       GswDrive,
        OptimizationStomatalModel,
        OSMEller,
        OSMSperry,
@@ -46,17 +56,13 @@ export AbstractBetaFunction,
        OSMWAP,
        OSMWAPMod
 
-
-
-
 # export public functions
-export empirical_gsw_from_model,
-       envir_diff!,
-       leaf_gsw_control!,
-       leaf_photo_from_envir!,
+export gsw_control!,
+       gas_exchange!,
+       prognostic_gsw!,
+       solution_diff!,
+       stomatal_conductance,
        update_leaf_AK!,
-       update_leaf_from_glc!,
-       update_leaf_from_gsw!,
        update_leaf_TP!
 
 
@@ -64,25 +70,17 @@ export empirical_gsw_from_model,
 
 include("types/beta.jl"         )
 include("types/canopylayer.jl"  )
+include("types/drive.jl"        )
 include("types/stomatalmodel.jl")
 
-include("empirical/beta.jl"     )
-include("empirical/general.jl"  )
-include("empirical/ballberry.jl")
-include("empirical/gentine.jl"  )
-include("empirical/leuning.jl"  )
-include("empirical/medlyn.jl"   )
-
-include("optimal/general.jl")
-include("optimal/eller.jl"  )
-include("optimal/sperry.jl" )
-include("optimal/wang.jl"   )
-include("optimal/wap.jl"    )
-include("optimal/wapmod.jl" )
-
-include("gasexchange/control.jl")
-include("gasexchange/refresh.jl")
-include("gasexchange/update.jl" )
+include("model/beta.jl"       )
+include("model/control.jl"    )
+include("model/empirical.jl"  )
+include("model/gasexchange.jl")
+include("model/nocturnal.jl"  )
+include("model/prognostic.jl" )
+include("model/refresh.jl"    )
+include("model/solution.jl"   )
 
 
 
