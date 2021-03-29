@@ -288,14 +288,17 @@ function leaf_temperature_dependence!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    leaf.p_sat = saturation_vapor_pressure(leaf.T);
-    leaf_rd!(photo_set.ReT, leaf);
-    leaf_vcmax!(photo_set.VcT, leaf);
-    leaf_jmax!(photo_set.JT , leaf);
-    leaf_kc!(photo_set.KcT, leaf);
-    leaf_ko!(photo_set.KoT, leaf);
-    leaf_km!(photo_set, leaf, envir);
-    leaf_Γstar!(photo_set.ΓsT, leaf);
+    if leaf.T_old != leaf.T
+        leaf.T_old = leaf.T;
+        leaf.p_sat = saturation_vapor_pressure(leaf.T);
+        leaf_rd!(photo_set.ReT, leaf);
+        leaf_vcmax!(photo_set.VcT, leaf);
+        leaf_jmax!(photo_set.JT , leaf);
+        leaf_kc!(photo_set.KcT, leaf);
+        leaf_ko!(photo_set.KoT, leaf);
+        leaf_km!(photo_set, leaf, envir);
+        leaf_Γstar!(photo_set.ΓsT, leaf);
+    end
 
     return nothing
 end
@@ -308,11 +311,14 @@ function leaf_temperature_dependence!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    leaf.p_sat = saturation_vapor_pressure(leaf.T);
-    leaf_rd!(photo_set.ReT, leaf);
-    leaf_vcmax!(photo_set.VcT, leaf);
-    leaf_vpmax!(photo_set.VpT, leaf);
-    leaf_kpep!(photo_set.KpT, leaf);
+    if leaf.T_old != leaf.T
+        leaf.T_old = leaf.T
+        leaf.p_sat = saturation_vapor_pressure(leaf.T);
+        leaf_rd!(photo_set.ReT, leaf);
+        leaf_vcmax!(photo_set.VcT, leaf);
+        leaf_vpmax!(photo_set.VpT, leaf);
+        leaf_kpep!(photo_set.KpT, leaf);
+    end
 
     return nothing
 end

@@ -5,13 +5,23 @@
 ###############################################################################
 """
     light_limited_rate!(
-                photo_set::AbstractPhotoModelParaSet{FT},
+                photo_set::C3ParaSet{FT},
                 leaf::Leaf{FT}
     ) where {FT<:AbstractFloat}
+    light_limited_rate!(
+                photo_set::C4ParaSet{FT},
+                leaf::Leaf{FT}
+    ) where {FT<:AbstractFloat}
+    light_limited_rate!(
+                photo_set::C3ParaSet{FT},
+                leaf::Leaf{FT},
+                envir::AirLayer{FT}
+    ) where {FT<:AbstractFloat}
 
-Calculate the Light limited photosynthetic rate, given
+Calculate the light limited photosynthetic rate, given
 - `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
 - `leaf` [`Leaf`](@ref) type struct
+- `envir` [`AirLayer`](@ref) type struct
 """
 function light_limited_rate!(
             photo_set::C3ParaSet{FT},
@@ -20,8 +30,8 @@ function light_limited_rate!(
     @unpack J, p_i, Γ_star = leaf;
     @unpack Eff_1, Eff_2 = photo_set;
 
-    leaf.CO₂_per_electron = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
-    leaf.Aj               = J * leaf.CO₂_per_electron;
+    leaf.e2c = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
+    leaf.Aj  = J * leaf.e2c;
 
     return nothing
 end
@@ -33,8 +43,8 @@ function light_limited_rate!(
             photo_set::C4ParaSet{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    leaf.CO₂_per_electron = FT(1/6);
-    leaf.Aj               = leaf.J / 6;
+    leaf.e2c = 1 / 6;
+    leaf.Aj  = leaf.J / 6;
 
     return nothing
 end
@@ -42,19 +52,7 @@ end
 
 
 
-"""
-    light_limited_rate_glc!(
-                photo_set::C3ParaSet{FT},
-                leaf::Leaf{FT},
-                envir::AirLayer{FT}
-    ) where {FT<:AbstractFloat}
-
-Calculate the Light limited photosynthetic rate from glc, given
-- `photo_set` [`C3ParaSet`](@ref) type struct
-- `leaf` [`Leaf`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
-"""
-function light_limited_rate_glc!(
+function light_limited_rate!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT}
