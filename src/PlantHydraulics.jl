@@ -1,9 +1,11 @@
 module PlantHydraulics
 
 using CLIMAParameters
-using CLIMAParameters.Planet
-using ConstrainedRootSolvers
-using DocStringExtensions
+using CLIMAParameters.Planet: T_freeze, grav, ρ_cloud_liq
+using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
+            ResidualTolerance, SolutionTolerance, SolutionToleranceND,
+            find_peak, find_zero
+using DocStringExtensions: TYPEDEF, TYPEDFIELDS, TYPEDSIGNATURES
 using Parameters
 using Statistics
 using WaterPhysics
@@ -88,7 +90,8 @@ export pressure_profile!,
        xylem_flow,
        update_PVF!,
        temperature_effects!,
-       end_pressure
+       end_pressure,
+       fit_xylem_VC
 
 
 
