@@ -2,6 +2,7 @@
 # They need to be tested and abstractized
 
 # remember that the psoils are corrected by surface tension, psoil = p_25 * f_st
+#=
 function test_soil_from_psoil(
             node::SPACMono{FT},
             psoils::Array{FT,1},
@@ -117,6 +118,54 @@ function test_soil_from_swc(
                 node.plant_hs.container_p,
                 node.plant_hs.container_q,
                 e_sum);
+
+    return nothing
+end
+=#
+
+
+
+
+function test_soil_from_psoil!(
+            node::SPACMono{FT},
+            psoils::Array{FT,1},
+            e_sum::FT
+) where {FT<:AbstractFloat}
+    # update the soil water contents and potential in each layer
+    for i_root in 1:node.n_root
+        node.swc[i_root] = max(node.mswc[i_root],
+                               soil_swc(node.plant_hs.roots[i_root].sh,
+                                        psoils[i_root])
+                              );
+        node.plant_hs.roots[i_root].p_ups = psoils[i_root];
+    end
+
+    # update root flow rates
+    roots_flow!(node.plant_hs, e_sum);
+
+    return nothing
+end
+
+
+
+
+function test_soil_from_swc!(
+            node::SPACMono{FT},
+            swcs::Array{FT,1},
+            e_sum::FT
+) where {FT<:AbstractFloat}
+    # update the soil water contents and potential in each layer
+    for i_root in 1:node.n_root
+        node.swc[i_root] = max(node.mswc[i_root], swcs[i_root]);
+        node.p_soil[i_root] = soil_p_25_swc(node.plant_hs.roots[i_root].sh,
+                                            node.swc[i_root]) *
+                              node.plant_hs.roots[i_root].f_st;
+        # pass the pressure to root_hs
+        node.plant_hs.roots[i_root].p_ups = node.p_soil[i_root];
+    end
+
+    # update root flow rates
+    roots_flow!(node.plant_hs, e_sum);
 
     return nothing
 end
