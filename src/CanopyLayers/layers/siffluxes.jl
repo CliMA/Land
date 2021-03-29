@@ -97,19 +97,19 @@ function SIF_fluxes!(
         # Here comes the tedious part:
         # TODO move them to a seprate function
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* cosΘ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         sunCos = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* cosΘ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         shadeCos = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* cos2Θ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         sunCos2 = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* cos2Θ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         shadeCos2 = mean(sf_con.ϕ_cosΘ_lidf);
 
         mul!(sf_con.ϕ_cosΘ_lidf, view(ϕ_sun, :, :, i)', lidf);
@@ -117,22 +117,22 @@ function SIF_fluxes!(
         shadeLidf = mean(lidf) * ϕ_shade[i];
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfsfo;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_absfsfo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fsfo;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fsfo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+
                        _mean_fsfo    .* sf_con.M⁻_sun;
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfs;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_absfs = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fs .* cosΘ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fs = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.sfEs .= _mean_absfs .* sf_con.M⁺_sun .-
@@ -141,11 +141,11 @@ function SIF_fluxes!(
                        _mean_fs    .* sf_con.M⁻_sun;
 
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* absfo;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_absfo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= ϕ_shade[i] .* fo .* cosΘ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.vfEplu_shade .= _mean_absfo .* sf_con.M⁺⁺ .-
@@ -154,11 +154,11 @@ function SIF_fluxes!(
                                _mean_fo    .* sf_con.M⁻⁻;
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfo;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_absfo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* fo .* cosΘ_l;
-        mul!(sf_con.ϕ_cosΘ_lidf, (sf_con.ϕ_cosΘ)', lidf);
+        mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fo = mean(sf_con.ϕ_cosΘ_lidf);
 
         sf_con.vfEplu_sun .= _mean_absfo .* sf_con.M⁺⁺ .- _mean_fo .* sf_con.M⁻⁺;

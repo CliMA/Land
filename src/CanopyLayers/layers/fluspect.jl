@@ -6,7 +6,8 @@
 ###############################################################################
 """
     fluspect!(leaf::LeafBios{FT},
-              wls::WaveLengths{FT}
+              wls::WaveLengths{FT};
+              APAR_car::Bool = true
     ) where {FT<:AbstractFloat}
 
 Computes leaf optical properties (reflectance and transittance) based on
@@ -15,10 +16,12 @@ Computes leaf optical properties (reflectance and transittance) based on
     for fluorescence.
 - `leaf` [`LeafBios`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
+- `APAR_car` If true, include Car absorption in APAR for photosynthesis
 """
 function fluspect!(
             leaf::LeafBios{FT},
-            wls::WaveLengths{FT}
+            wls::WaveLengths{FT};
+            APAR_car::Bool = true
 ) where {FT<:AbstractFloat}
     # ***********************************************************************
     # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
@@ -41,8 +44,13 @@ function fluspect!(
     Kcaro = (1 -Cx)* KcaV + Cx * KcaZ;
 
     Kall    = (Cab*Kab.+Car*Kcar.+Ant*Kant.+Cs*KBrown.+Cw*Kw.+Cm*Km)/N
+
     # Relative absorption by Chlorophyll and Carotenoids only (drives SIF and GPP eventually)
-    leaf.kChlrel      = (Cab*Kab+Car*Kcar)./(Kall*N.+eps(FT));
+    if APAR_car
+        leaf.kChlrel = (Cab*Kab+Car*Kcar)./(Kall*N.+eps(FT));
+    else
+        leaf.kChlrel = (Cab*Kab)./(Kall*N.+eps(FT));
+    end
     leaf.kChlrel_old  = (Cab*Kab)./(Kall*N.+eps(FT));
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
@@ -187,7 +195,7 @@ function fluspect!(
         A11  = xf*Ih + Iv*xe';
         A12 = (xf*xe').*(rf*Ih .+ Iv*re');
         A21  = 1 .+(xf*xe').*(1 .+rf*re');
-        A22 = (xf.*rf)*Ih+Iv*(xe.*re)';
+        A22 = (xf.*rf)*Ih+Iv*adjoint(xe.*re);
         #println(typeof(opti.phi), typeof(kChl), typeof(Mf))
         Mfn   = Mf  .* A11 .+ Mb  .* A12;
         Mbn   = Mb  .* A21 .+ Mf  .* A22;
@@ -203,9 +211,9 @@ function fluspect!(
 
     Rb = rho .+ tau.^2 .*r21./(1 .-rho.*r21);
 
-    Xe = Iv * (talf[iWLE]./(1 .-r21[iWLE].*Rb[iWLE]))';
+    Xe = Iv * adjoint(talf[iWLE]./(1 .-r21[iWLE].*Rb[iWLE]));
     Xf = t21[iWLF]./(1 .-r21[iWLF].*Rb[iWLF]) * Ih;
-    Ye = Iv * (tau[iWLE].*r21[iWLE]./(1 .-rho[iWLE].*r21[iWLE]))';
+    Ye = Iv * adjoint(tau[iWLE].*r21[iWLE]./(1 .-rho[iWLE].*r21[iWLE]));
     Yf = tau[iWLF].*r21[iWLF]./(1 .-rho[iWLF].*r21[iWLF]) * Ih;
 
     A = Xe .* (1 .+ Ye.*Yf) .* Xf;

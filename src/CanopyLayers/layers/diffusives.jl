@@ -64,7 +64,7 @@ function diffusive_S(
     E⁺[:,end] = Rdd[:,end].*E⁻[:,end]+U[:,end];
     # compute net diffuse radiation per layer:
     @inbounds for j=1:nl
-        net_diffuse[:,j]= (E⁻[:,j] +  E⁺[:,j+1]).*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
+        net_diffuse[:,j]= (E⁻[:,j] + E⁺[:,j+1]).*(1 .-(τ_dd[:,j]+ρ_dd[:,j]))
     end
 
     return E⁻,E⁺,net_diffuse
@@ -97,7 +97,7 @@ function diffusive_S!(
     @unpack albedo_SW_SIF = soil;
     @unpack nLayer, nLevel = rt_dim;
 
-    # Get dimensions (1st is wavelength, 2nd is layers), for Stefab Boltzmann
+    # Get dimensions (1st is wavelength, 2nd is layers), for Stefan Boltzmann
     # just one effective wavelength
     dnorm .= 1 .- view(ρ_dd, :, 1);
 

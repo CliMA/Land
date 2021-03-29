@@ -56,13 +56,13 @@ $(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct CGCache{FT}
     # 1D arrays
-    "cos_ttli .* cos(tto) dim: nIncl"
+    "cos_ttli .* cos(vza) dim: nIncl"
     _Co ::Array{FT,1}
-    "cos_ttli .* cos(tts) dim: nIncl"
+    "cos_ttli .* cos(sza) dim: nIncl"
     _Cs ::Array{FT,1}
-    "sin_ttli .* sin(tto) dim: nIncl"
+    "sin_ttli .* sin(vza) dim: nIncl"
     _So ::Array{FT,1}
-    "sin_ttli .* sin(tts) dim: nIncl"
+    "sin_ttli .* sin(sza) dim: nIncl"
     _Ss ::Array{FT,1}
 
     # 2D arrays
