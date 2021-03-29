@@ -241,19 +241,9 @@ rubisco_limited_rate!
 ```
 
 If total leaf diffusive conductance to CO₂ is known, $A_\text{c}$ can be
-    computed analytically by solving the quadratic function using
-
-```@docs
-lower_quadratic
-```
-
-The function to analytically compute $A_\text{c}$ is
-
-```@docs
-rubisco_limited_rate_glc!
-```
-
-Note it here that [`rubisco_limited_rate_glc!`](@ref) only applies to C3
+    computed analytically by solving the quadratic function. The calculation is
+    done by adding an `envir` to the function parameter list. Note it here that
+    analytical solution using leaf diffusive conductance only applies to C3
     photosynthesis as the RubisCO-limited rate for C4 plants is
     $V_\text{cmax}$.
 
@@ -268,15 +258,10 @@ light_limited_rate!
 ```
 
 If total leaf diffusive conductance to CO₂ is known, $A_\text{j}$ can be
-    computed analytically using
-
-```@docs
-light_limited_rate_glc!
-```
-
-Note it here that [`light_limited_rate_glc!`](@ref) only applies to C3
-    photosynthesis as the RubisCO-limited rate for C4 plants is the electron
-    transport rate.
+    computed analytically using the same function by adding an `envir` to the
+    parameter list. Note that this analytical solution using leaf diffusive
+    conductance to CO2 only applies to C3 photosynthesis as the RubisCO-limited
+    rate for C4 plants is the electron transport rate.
 
 Be aware that leaf electron transport rate needs to be calculated before the
     light-limited rate:
@@ -296,14 +281,9 @@ product_limited_rate!
 ```
 
 If total leaf diffusive conductance to CO₂ is known, $A_\text{p}$ can be
-    computed analytically using
-
-```@docs
-product_limited_rate_glc!
-```
-
-Note it here that [`product_limited_rate_glc!`](@ref) only applies to C4
-    photosynthesis as the RubisCO-limited rate for C4 plants is
+    computed analytically by adding an `envir` to the parameter list. Note it
+    here that the calculation using leaf diffusive conductance to CO2 only
+    applies to C4 photosynthesis as the RubisCO-limited rate for C4 plants is
     $V_\text{cmax}$/2.
 
 
@@ -313,12 +293,13 @@ Note it here that [`product_limited_rate_glc!`](@ref) only applies to C4
 For empirical and optimization stomatal models, iterations are required to get
     the final solution as in StomataModels module. In this case, more
     conveniently computing photosynthetic rates for each leaf is preferable. In
-    this case, [`leaf_photo_from_pi!`](@ref) and [`leaf_photo_from_glc!`](@ref)
-    are better options:
+    this case, [`leaf_photosynthesis!`](@ref) is a better option:
 
 ```@docs
-leaf_photo_from_pi!
-leaf_photo_from_glc!
+AbstractCalculationMode
+GCO₂Mode
+PCO₂Mode
+leaf_photosynthesis!
 ```
 
 
@@ -326,13 +307,14 @@ leaf_photo_from_glc!
 
 ## Fluorescence
 Photosynthesis module also provide ways to compute leaf fluorescence. By
-    default, the modules uses fluorescence parameters from Flexas et al. with
-    struct [`FluorescenceFlexas`](@ref):
+    default, the modules uses fluorescence parameters from van del Tol et al.
+    (2014) with struct [`FluorescenceVanDerTol`](@ref):
 
 ```@docs
 AbstractFluoModelParaSet
 FluoParaSet
-FluorescenceFlexas
+FluorescenceVanDerTol
+FluorescenceVanDerTolDrought
 ```
 
 The function that is used to compute fluorescene is
