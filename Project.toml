@@ -4,7 +4,6 @@ authors = ["Yujie Wang <jesiner@gmail.com>"]
 version = "0.1.8"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CLIMAParameters = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
@@ -16,7 +15,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-BenchmarkTools = "0.5"
 CLIMAParameters = "0.1.6"
 ConstrainedRootSolvers = "0.1"
 DocStringExtensions = "0.8"
