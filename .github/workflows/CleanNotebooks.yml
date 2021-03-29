@@ -17,8 +17,8 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: "1.5"
+          version: "1"
       - name: Install Dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate();'
+        run: julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Test Clean Notebooks
         run: julia --project test/clean_notebooks.jl
