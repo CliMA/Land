@@ -86,8 +86,17 @@ end
 #
 ###############################################################################
 """
-    leaf_temperature(node::SPACSimple{FT}, rad::FT, e_rad::FT, epla::FT) where {FT<:AbstractFloat}
-    leaf_temperature(node::SPACSimple{FT}, rad::FT, flow::FT) where {FT<:AbstractFloat}
+    leaf_temperature(
+                node::SPACSimple{FT},
+                rad::FT,
+                e_rad::FT,
+                epla::FT
+    ) where {FT<:AbstractFloat}
+    leaf_temperature(
+                node::SPACSimple{FT},
+                rad::FT,
+                flow::FT
+    ) where {FT<:AbstractFloat}
 
 Return leaf temperature, given
 - `node` [`SPACSimple`](@ref) type struct
@@ -134,7 +143,11 @@ end
 
 
 """
-    leaf_temperature_sunlit(node::SPACSimple{FT}, rad::FT, f_sl::FT) where {FT<:AbstractFloat}
+    leaf_temperature_sunlit(
+                node::SPACSimple{FT},
+                rad::FT,
+                f_sl::FT
+    ) where {FT<:AbstractFloat}
 
 Return leaf temperature, given
 - `node` [`SPACSimple`](@ref) type struct
@@ -157,7 +170,11 @@ end
 
 
 """
-    leaf_temperature_shaded(node::SPACSimple{FT}, rad::FT, f_sh::FT) where {FT<:AbstractFloat}
+    leaf_temperature_shaded(
+                node::SPACSimple{FT},
+                rad::FT,
+                f_sh::FT
+    ) where {FT<:AbstractFloat}
 
 Return leaf temperature, given
 - `node` [`SPACSimple`](@ref) type struct

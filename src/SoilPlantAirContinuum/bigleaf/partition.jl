@@ -4,7 +4,11 @@
 #
 ###############################################################################
 """
-    big_leaf_partition!(node::SPACSimple{FT}, zenith::FT, r_all::FT) where {FT <:AbstractFloat}
+    big_leaf_partition!(
+                node::SPACSimple{FT},
+                zenith::FT,
+                r_all::FT
+    ) where {FT <:AbstractFloat}
 
 Partition the big-leaf canopy into sunlit and shaded layers, given
 - `partition` Container for partition
