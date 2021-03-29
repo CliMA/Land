@@ -1,9 +1,11 @@
 module PlantHydraulics
 
 using CLIMAParameters
-using CLIMAParameters.Planet
-using ConstrainedRootSolvers
-using DocStringExtensions
+using CLIMAParameters.Planet: T_freeze, grav, ρ_cloud_liq
+using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
+            ResidualTolerance, SolutionTolerance, SolutionToleranceND,
+            find_peak, find_zero
+using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using Parameters
 using Statistics
 using WaterPhysics
@@ -56,25 +58,12 @@ export AbstractPlantOrganism,
        TreeLikeOrganism,
        TreeSimple
 
-# export public functions --- initialize soil type
-export create_VanGenuchten,
-       VGClay,
-       VGClayLoam,
-       VGLoamySand,
-       VGLoamySand2,
-       VGSand,
-       VGSandyClayLoam,
-       VGSandyClayLoam2,
-       VGSandyLoam,
-       VGSilt,
-       VGSiltyClay,
-       VGSiltyClayLoam,
-       VGSiltyLoam
-
 # export public functions --- initialize plant
 export create_grass,
        create_palm,
-       create_tree
+       create_soil_VC,
+       create_tree,
+       fit_soil_VC!
 
 # export public functions --- curves related
 export p_from_volume,
@@ -101,7 +90,8 @@ export pressure_profile!,
        xylem_flow,
        update_PVF!,
        temperature_effects!,
-       end_pressure
+       end_pressure,
+       fit_xylem_VC
 
 
 

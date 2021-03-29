@@ -55,7 +55,7 @@ function end_pressure(
         if p_25 < _ph
             k = xylem_k_ratio(vc, p_25, f_vis) * _k;
         else
-            k = _kh * _k;
+            k = _kh * _k / f_vis;
         end
         p_end -= flow / k;
     end
@@ -71,7 +71,7 @@ function end_pressure(
             flow::FT
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, sh, vc = root;
+            p_osm, p_ups, sh, T_sap, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -86,7 +86,7 @@ function end_pressure(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st;
+    p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
@@ -94,7 +94,7 @@ function end_pressure(
         if p_25 < _ph
             k = xylem_k_ratio(vc, p_25, f_vis) * _k;
         else
-            k = _kh * _k;
+            k = _kh * _k / f_vis;
         end
         p_end -= flow / k + _pg;
     end
@@ -120,7 +120,7 @@ function end_pressure(
         if p_25 < _ph
             k = xylem_k_ratio(vc, p_25, f_vis) * _k;
         else
-            k = _kh * _k;
+            k = _kh * _k / f_vis;
         end
         p_end -= flow / k + _pg;
     end
@@ -262,13 +262,14 @@ function pressure_profile!(
             _kr = xylem_k_ratio(vc, p_25, f_vis);
             if update
                 leaf.p_history[i] = p_25;
-                leaf.k_history[i] = _kr;
+                leaf.k_history[i] = _kr * f_vis;
             end
             k = _kr * k_element[i];
+        else
+            k = k_history[i] / f_vis * k_element[i];
         end
 
         # then use historical minimal k
-        k = k_history[i] * k_element[i];
         p_end -= flow / k;
 
         leaf.p_element[i] = p_end;
@@ -293,7 +294,7 @@ function pressure_profile!(
     root.flow = flow;
 
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, sh, vc = root;
+            p_osm, p_ups, sh, T_sap, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -308,7 +309,8 @@ function pressure_profile!(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st;
+    p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
+    root.p_rhiz = p_end;
 
     # compute k from temperature and history, then update pressure
     for i in eachindex(k_element)
@@ -318,13 +320,14 @@ function pressure_profile!(
             _kr = xylem_k_ratio(vc, p_25, f_vis);
             if update
                 root.p_history[i] = p_25;
-                root.k_history[i] = _kr;
+                root.k_history[i] = _kr * f_vis;
             end
             k = _kr * k_element[i];
+        else
+            k = k_history[i] / f_vis * k_element[i];
         end
 
         # then use historical minimal k
-        k = k_history[i] * k_element[i];
         p_end -= flow / k + p_gravity[i];
 
         root.p_element[i] = p_end;
@@ -346,7 +349,7 @@ function pressure_profile!(
             update::Bool = true
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_ups, sh, vc = root;
+            p_osm, p_ups, sh, T_sap, vc = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -361,7 +364,8 @@ function pressure_profile!(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st;
+    p_end = p_25 * f_st + p_osm * T_sap / K_25(FT);
+    root.p_rhiz = p_end;
 
     # compute k from temperature and history, then update pressure
     for i in eachindex(k_element)
@@ -371,13 +375,14 @@ function pressure_profile!(
             _kr = xylem_k_ratio(vc, p_25, f_vis);
             if update
                 root.p_history[i] = p_25;
-                root.k_history[i] = _kr;
+                root.k_history[i] = _kr * f_vis;
             end
             k = _kr * k_element[i];
+        else
+            k = k_history[i] / f_vis * k_element[i];
         end
 
         # then use historical minimal k
-        k = k_history[i] * k_element[i];
         p_end -= flow[i] / k + p_gravity[i];
 
         root.p_element[i] = p_end;
@@ -413,13 +418,14 @@ function pressure_profile!(
             _kr = xylem_k_ratio(vc, p_25, f_vis);
             if update
                 stem.p_history[i] = p_25;
-                stem.k_history[i] = _kr;
+                stem.k_history[i] = _kr * f_vis;
             end
             k = _kr * k_element[i];
+        else
+            k = k_history[i] / f_vis * k_element[i];
         end
 
         # then use historical minimal k
-        k = k_history[i] * k_element[i];
         p_end -= flow / k + p_gravity[i];
 
         stem.p_element[i] = p_end;
@@ -452,13 +458,14 @@ function pressure_profile!(
             _kr = xylem_k_ratio(vc, p_25, f_vis);
             if update
                 stem.p_history[i] = p_25;
-                stem.k_history[i] = _kr;
+                stem.k_history[i] = _kr * f_vis;
             end
             k = _kr * k_element[i];
+        else
+            k = k_history[i] / f_vis * k_element[i];
         end
 
         # then use historical minimal k
-        k = k_history[i] * k_element[i];
         p_end -= flow[i] / k + p_gravity[i];
 
         stem.p_element[i] = p_end;
@@ -629,6 +636,7 @@ function pressure_profile!(
     p_mean /= length(roots);
 
     # update the profile in trunk
+    trunk.p_ups = p_mean;
     pressure_profile!(trunk, trunk.flow; update=update);
 
     # update the profile in leaf
