@@ -2,7 +2,6 @@ module CanopyLayers
 
 using CLIMAParameters
 using DocStringExtensions
-using LazyArtifacts
 using LinearAlgebra
 using MAT
 using Parameters
