@@ -15,7 +15,9 @@ jobs:
         with:
           version: "1"
       - name: Install Dependencies
-        run: julia --project=docs/ -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.add("CompatHelper");'
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Install CompatHelper
+        run: julia -e 'using Pkg; Pkg.instantiate();'
       - name: Run CompatHelper
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
