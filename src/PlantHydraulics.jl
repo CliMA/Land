@@ -1,24 +1,13 @@
 module PlantHydraulics
 
-using CLIMAParameters
-using CLIMAParameters.Planet
-using ConstrainedRootSolvers
-using DocStringExtensions
-using Parameters
-using Statistics
-using WaterPhysics
-
-
-
-
-# define global constants
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH = EarthParameterSet()
-GRAVITY(FT) = FT( grav(EARTH) );
-K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
-R_GAS(FT)   = FT( gas_constant() );
-ρ_H₂O(FT)   = FT( ρ_cloud_liq(EARTH) );
-ρg_MPa(FT)  = ρ_H₂O(FT) * GRAVITY(FT) * FT(1e-6);
+using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
+            ResidualTolerance, SolutionTolerance, SolutionToleranceND,
+            find_peak, find_zero
+using DocStringExtensions: TYPEDEF, TYPEDFIELDS
+using PkgUtility: GAS_R, T_25, ρg_MPa
+using Statistics: mean
+using UnPack: @unpack
+using WaterPhysics: relative_surface_tension, relative_viscosity
 
 
 
@@ -88,7 +77,8 @@ export pressure_profile!,
        xylem_flow,
        update_PVF!,
        temperature_effects!,
-       end_pressure
+       end_pressure,
+       fit_xylem_VC
 
 
 

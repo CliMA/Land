@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    abstract type AbstractCapacity{FT}
+    $(TYPEDEF)
 
 Hierachy of AbstractCapacity
 - [`PVCurveLinear`](@ref)
@@ -16,14 +16,14 @@ abstract type AbstractCapacity{FT<:AbstractFloat} end
 
 
 """
-    mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
+    $(TYPEDEF)
 
 Struct that contains information for linear PV curve
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct PVCurveLinear{FT} <: AbstractCapacity{FT}
+Base.@kwdef mutable struct PVCurveLinear{FT<:AbstractFloat} <: AbstractCapacity{FT}
     "Slope of the linear PV curve (relative to maximum) `[MPa⁻¹]`"
     slope   ::FT = 0.2
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
@@ -34,7 +34,7 @@ end
 
 
 """
-    mutable struct PVCurveSegmented{FT} <: AbstractCapacity{FT}
+    $(TYPEDEF)
 
 
 """
@@ -64,7 +64,7 @@ end
 #
 ###############################################################################
 """
-    abstract type AbstractXylemVC{FT}
+    $(TYPEDEF)
 
 Hierachy of AbstractXylemVC
 - [`WeibullSingle`](@ref)
@@ -76,12 +76,12 @@ abstract type AbstractXylemVC{FT<:AbstractFloat} end
 
 
 """
-    mutable struct WeibullDual{FT}
+    $(TYPEDEF)
 
 Struct that contains dual Weibull function parameters.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WeibullDual{FT} <: AbstractXylemVC{FT}
     "B of first part `[MPa]`"
@@ -102,12 +102,12 @@ end
 
 
 """
-    mutable struct WeibullSingle{FT}
+    $(TYPEDEF)
 
 Struct that contains single Weibull function parameters.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WeibullSingle{FT} <: AbstractXylemVC{FT}
     "B of first part `[MPa]`"
@@ -146,7 +146,7 @@ abstract type AbstractSoilVC{FT<:AbstractFloat} end
 Brooks Corey soil parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BrooksCorey{FT} <: AbstractSoilVC{FT}
     "Soil type"
@@ -170,7 +170,7 @@ end
 Van Gunechten soil parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct VanGenuchten{FT} <: AbstractSoilVC{FT}
     "Soil type"

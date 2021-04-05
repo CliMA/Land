@@ -27,7 +27,7 @@ abstract type AbstractHydraulicOrgan{FT<:AbstractFloat} end
 A struct that contains leaf hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
@@ -71,9 +71,9 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = K_25(FT)
+    T_old::FT = T_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = K_25(FT)
+    T_sap::FT = T_25(FT)
 
     # capacitance
     "Pressure volume curve for storage"
@@ -99,7 +99,7 @@ end
 A struct that contains root hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
@@ -153,9 +153,9 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = K_25(FT)
+    T_old::FT = T_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = K_25(FT)
+    T_sap::FT = T_25(FT)
 
     # capacitance
     "Pressure volume curve for storage"
@@ -187,7 +187,7 @@ end
 A struct that contains stem hydraulics information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
@@ -231,9 +231,9 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = K_25(FT)
+    T_old::FT = T_25(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = K_25(FT)
+    T_sap::FT = T_25(FT)
 
     # capacitance
     "Pressure volume curve for storage"

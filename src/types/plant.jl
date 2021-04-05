@@ -23,7 +23,7 @@ A plant hydraulic system like a grass, which contains multiple root layers, and
 multiple canopy layers. No trunk or branch system applies.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 mutable struct GrassLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
@@ -63,7 +63,7 @@ A plant hydraulic system like a palm, which contains multiple root layers, one
 trunk, and multiple canopy layers. No branch system applies.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 mutable struct PalmLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
@@ -105,7 +105,7 @@ A plant hydraulic system like a tree, which contains multiple root layers, one
 trunk, and multiple branch and canopy layers.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
@@ -149,7 +149,7 @@ A plant hydraulic system with one root, one stem, and one leaf for testing
     purpose
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantOrganism{FT}
     # Arrays of roots and leaves
