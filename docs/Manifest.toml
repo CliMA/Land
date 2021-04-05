@@ -59,9 +59,9 @@ version = "0.1.7"
 
 [[CategoricalArrays]]
 deps = ["DataAPI", "Future", "JSON", "Missings", "Printf", "Statistics", "StructTypes", "Unicode"]
-git-tree-sha1 = "dbfddfafb75fae5356e00529ce67454125935945"
+git-tree-sha1 = "f713d583d10fc036252fd826feebc6c173c522a8"
 uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
-version = "0.9.3"
+version = "0.9.5"
 
 [[CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -71,15 +71,15 @@ version = "0.7.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "919c7f3151e79ff196add81d7f4e45d91bbf420b"
+git-tree-sha1 = "4fecfd5485d3c5de4003e19f00c6898cccd40667"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.25.0"
+version = "3.26.0"
 
 [[ConstrainedRootSolvers]]
-deps = ["BenchmarkTools", "DocStringExtensions", "Parameters", "Test"]
-git-tree-sha1 = "19150a7dd77e2e90358c75c33df4e907664b9f82"
+deps = ["DocStringExtensions", "PkgUtility", "Test", "UnPack"]
+git-tree-sha1 = "27df94a95a1877dff09b90386173a69a503b12d0"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
-version = "0.1.0"
+version = "0.1.2"
 
 [[Crayons]]
 git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
@@ -93,9 +93,9 @@ version = "1.6.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "6b6dcb8c1a32c2151c5110e0e11fecff1c50dfca"
+git-tree-sha1 = "d50972453ef464ddcebdf489d11885468b7b83a3"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.22.6"
+version = "0.22.7"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -330,22 +330,22 @@ deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markd
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PkgUtility]]
-deps = ["Dates", "DocStringExtensions", "NCDatasets", "Pkg", "Statistics", "Test"]
-git-tree-sha1 = "1ca1a54400cb277182d0472749d54d74dc7a8f73"
+deps = ["CLIMAParameters", "CSV", "DataFrames", "Dates", "DocStringExtensions", "LazyArtifacts", "NCDatasets", "Pkg", "Statistics", "Test"]
+git-tree-sha1 = "91e42f1e45d7e382db87f76c443a6bb7538f0cb6"
 uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
-version = "0.1.5"
+version = "0.1.9"
 
 [[PlantHydraulics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "PkgUtility", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "7ff1c52eccad7784c3dac130e059ab479a0778d2"
+deps = ["ConstrainedRootSolvers", "DocStringExtensions", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
+git-tree-sha1 = "a803255f2c389706630d5f0a756c27409bd6e08c"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.5"
+version = "0.2.6"
 
 [[Polynomials]]
 deps = ["Intervals", "LinearAlgebra", "RecipesBase"]
-git-tree-sha1 = "c6b8b87670b9e765db3001ffe640e0583a5ec317"
+git-tree-sha1 = "b49a0a4a8adec9dbc2198dccc95aea66fd9d8ceb"
 uuid = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-version = "2.0.3"
+version = "2.0.5"
 
 [[PooledArrays]]
 deps = ["DataAPI", "Future"]
@@ -413,7 +413,7 @@ uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [[SoilPlantAirContinuum]]
-deps = ["CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "LazyArtifacts", "Parameters", "Photosynthesis", "Pkg", "PkgUtility", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
+deps = ["CLIMAParameters", "CSV", "CanopyLayers", "ConstrainedRootSolvers", "DataFrames", "DocStringExtensions", "LazyArtifacts", "Parameters", "Photosynthesis", "PkgUtility", "PlantHydraulics", "Statistics", "StomataModels", "Test", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 version = "0.1.10"
@@ -440,9 +440,9 @@ version = "0.1.7"
 
 [[StructTypes]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "89b390141d2fb2ef3ac2dc32e336f7a5c4810751"
+git-tree-sha1 = "5eaf731e88587bb72a6c1262c0a014cd1859a08d"
 uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
-version = "1.5.0"
+version = "1.5.2"
 
 [[TOML]]
 deps = ["Dates"]
@@ -450,9 +450,9 @@ uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [[TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
-git-tree-sha1 = "b1ad568ba658d8cbb3b892ed5380a6f3e781a81e"
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
 uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
-version = "1.0.0"
+version = "1.0.1"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
@@ -493,10 +493,10 @@ version = "1.0.2"
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WaterPhysics]]
-deps = ["CLIMAParameters", "DocStringExtensions", "Parameters", "PkgUtility", "Test"]
-git-tree-sha1 = "1ac6825ac03b43bcd90b4b50d6b82ec72c09fa26"
+deps = ["DocStringExtensions", "PkgUtility", "Test", "UnPack"]
+git-tree-sha1 = "54cda0d2b76e76342430ebdb9442cc12a53e11be"
 uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
-version = "0.1.2"
+version = "0.1.3"
 
 [[XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
