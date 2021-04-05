@@ -1,30 +1,9 @@
 module WaterPhysics
 
-using CLIMAParameters
-using CLIMAParameters.Planet: LH_v0, R_v, T_freeze, T_triple, cp_l, cp_v,
-            molmass_water, press_triple, ρ_cloud_liq
 using DocStringExtensions: METHODLIST, TYPEDEF, TYPEDFIELDS
-using Parameters: @unpack
-
-
-
-
-# Define a local struct inherited from AbstractEarthParameterSet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH      = EarthParameterSet();
-CP_L(FT)         = FT( cp_l(EARTH) );
-CP_V(FT)         = FT( cp_v(EARTH) );
-GAS_R(FT)        = FT( gas_constant() );
-K_25(FT)         = FT( T_freeze(EARTH) + 25 );
-K_BOLTZMANN(FT)  = FT( k_Boltzmann() );
-LH_V0(FT)        = FT( LH_v0(EARTH) );
-MOLMASS_H₂O(FT)  = FT( molmass_water(EARTH) );
-PRESS_TRIPLE(FT) = FT( press_triple(EARTH) );
-R_V(FT)          = FT( R_v(EARTH) );
-T_TRIPLE(FT)     = FT( T_triple(EARTH) );
-ρ_H₂O(FT)        = FT( ρ_cloud_liq(EARTH) );
-
-MOLVOL_H₂O(FT)   = MOLMASS_H₂O(FT) / ρ_H₂O(FT);
+using PkgUtility: CP_L, CP_V, GAS_R, K_BOLTZMANN, LH_V0, PRESS_TRIPLE, R_V,
+            T_25, T_TRIPLE, V_H₂O
+using UnPack: @unpack
 
 
 
@@ -249,7 +228,7 @@ $(TYPEDFIELDS)
 ---
 Examples
 ```julia
-# liquid water trace
+# liquid-phase water trace
 trace = TraceLiquidH₂O{Float64}();
 ```
 """
@@ -536,7 +515,7 @@ relative_diffusive_coefficient(
             med::AbstractTraceGas{FT} = TraceGasAir{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    return (T / K_25(FT)) ^ FT(1.8)
+    return (T / T_25(FT)) ^ FT(1.8)
 )
 
 
@@ -693,7 +672,7 @@ pressure_correction(
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
 (
-    return exp((Ψ * MOLVOL_H₂O(FT)) / (GAS_R(FT) * T))
+    return exp((Ψ * V_H₂O(FT)) / (GAS_R(FT) * T))
 )
 
 
@@ -1103,7 +1082,7 @@ relative_viscosity(
 ) where {FT<:AbstractFloat} =
 (
     @unpack υ_B, υ_C, υ_D = med;
-    _K = K_25(FT);
+    _K = T_25(FT);
 
     return exp( υ_B * ( 1/T - 1/_K) + υ_C * (T - _K) + υ_D * (T^2 - _K^2) )
 )
