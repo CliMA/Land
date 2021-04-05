@@ -1,9 +1,8 @@
 using CSV
 using DataFrames
-using LazyArtifacts
 using SoilPlantAirContinuum
 using Photosynthesis
-using Pkg.Artifacts
+using LazyArtifacts
 using PkgUtility
 using Test
 

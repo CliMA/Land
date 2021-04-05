@@ -2,14 +2,9 @@
 @info "Testing the FT and NaN of the structs...";
 @testset "FT and NaN --- Types" begin
     for FT in [Float32, Float64]
-        node   = SPACSimple{FT}();
-        cont1L = SPACContainer1L{FT}();
-        cont2L = SPACContainer2L{FT}();
-
-        for data in [node, cont1L, cont2L]
-            @test FT_test(data, FT);
-            @test NaN_test(data);
-        end
+        node = SPACSimple{FT}();
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -306,5 +301,14 @@ println();
         initialize_spac_canopy!(node);
         layer_fluxes!(node);
         @test NaN_test(node);
+
+        update_Cab!(node, FT(30));
+        update_Kmax!(node, FT(1));
+        update_LAI!(node, FT(3));
+        update_VJR!(node, FT(0.5));
+        update_VJRWW!(node, FT(50));
+        update_Weibull!(node, FT(3));
+        update_Weibull!(node, FT(3), FT(0.9));
+        @test true;
     end
 end

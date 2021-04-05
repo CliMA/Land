@@ -31,6 +31,8 @@ P_ATM(FT)         = FT( MSLP(EARTH) );
 RK_25(FT)         = GAS_R(FT) * K_25(FT);
 YEAR_D(FT)        = FT( 365.2422222 );
 ρ_H₂O(FT)         = FT( ρ_cloud_liq(EARTH) );
+
+# TODO add unit conversion in PkgUtility
 KG_2_MOL(FT)      = 1 / MOLMASS_WATER(FT);
 KG_H_2_MOL_S(FT)  = KG_2_MOL(FT) / 3600;
 
@@ -38,38 +40,18 @@ KG_H_2_MOL_S(FT)  = KG_2_MOL(FT) / 3600;
 
 
 # export public types
-export SPACContainer1L,
-       SPACContainer2L,
-       SPACMono,
-       SPACSimple
-
-
-
+export SPACMono, SPACSimple
 
 # export public functions
-export annual_profit,
-       annual_simulation!,
-       atmospheric_pressure,
-       atmospheric_pressure_ratio,
-       big_leaf_partition!,
-       create_dataframe,
-       gain_risk_map,
-       initialize_spac_canopy!,
-       layer_fluxes!,
-       leaf_allocation!,
-       leaf_gas_exchange!,
-       leaf_gas_exchange_nonopt!,
-       leaf_temperature,
-       leaf_temperature_shaded,
-       leaf_temperature_sunlit,
-       optimize_flows!,
-       optimize_hs!,
-       optimize_leaf!,
-       ppm_to_Pa,
-       test_soil_from_psoil,
-       test_soil_from_swc,
-       vary_spac!,
-       zenith_angle
+export annual_profit, annual_simulation!, atmospheric_pressure,
+            atmospheric_pressure_ratio, big_leaf_partition!, create_dataframe,
+            gain_risk_map, initialize_spac_canopy!, layer_fluxes!,
+            leaf_allocation!, leaf_gas_exchange!, leaf_gas_exchange_nonopt!,
+            leaf_temperature, leaf_temperature_shaded, leaf_temperature_sunlit,
+            optimize_flows!, optimize_hs!, optimize_leaf!, ppm_to_Pa,
+            test_soil_from_psoil!, test_soil_from_swc!, update_Cab!,
+            update_Kmax!, update_LAI!, update_VJR!, update_VJRWW!,
+            update_Weibull!, vary_spac!, zenith_angle
 
 
 
