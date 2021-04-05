@@ -1,26 +1,13 @@
 module PlantHydraulics
 
-using CLIMAParameters
-using CLIMAParameters.Planet: T_freeze, grav, ρ_cloud_liq
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
             ResidualTolerance, SolutionTolerance, SolutionToleranceND,
             find_peak, find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
-using Parameters
-using Statistics
-using WaterPhysics
-
-
-
-
-# define global constants
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH = EarthParameterSet()
-GRAVITY(FT) = FT( grav(EARTH) );
-K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
-R_GAS(FT)   = FT( gas_constant() );
-ρ_H₂O(FT)   = FT( ρ_cloud_liq(EARTH) );
-ρg_MPa(FT)  = ρ_H₂O(FT) * GRAVITY(FT) * FT(1e-6);
+using PkgUtility: GAS_R, T_25, ρg_MPa
+using Statistics: mean
+using UnPack: @unpack
+using WaterPhysics: relative_surface_tension, relative_viscosity
 
 
 
