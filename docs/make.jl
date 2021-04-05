@@ -37,7 +37,7 @@ if gen_example
 end
 
 @info "Pages to generate:"
-pretty_display(pages);
+pretty_display!(pages);
 
 
 
