@@ -1,7 +1,7 @@
 name = "Photosynthesis"
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
