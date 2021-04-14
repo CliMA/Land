@@ -23,7 +23,7 @@ abstract type AbstractFluoModelParaSet{FT} end
 A `AbstractFluoModelParaSet` type paramter set.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct FluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet{FT}
     "Fluorescence model coefficient"

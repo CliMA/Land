@@ -25,7 +25,7 @@ abstract type AbstractPhotoModelParaSet{FT} end
 Parameter sets for C3 photosynthesis.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Jmax temperature dependency"
@@ -59,7 +59,7 @@ end
 Parameter sets for C3 photosynthesis.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Kpep temperature dependency"

@@ -10,7 +10,7 @@ Struct to store environmental conditions in each air layer corresponds to one
     canopy layer.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
     "Air temperature `[K]`"
