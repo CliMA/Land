@@ -52,7 +52,7 @@ abstract type AbstractBetaG{FT} <: AbstractBetaFunction{FT} end
 Linear β function for g1 based on leaf hydraulic conductance.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct BetaGLinearKleaf{FT} <: AbstractBetaG{FT} end
 
@@ -65,7 +65,7 @@ struct BetaGLinearKleaf{FT} <: AbstractBetaG{FT} end
 Linear β function for g1 based on soil water potential.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaGLinearPleaf{FT} <: AbstractBetaG{FT}
     "Upper bound of Pleaf `[MPa]`"
@@ -83,7 +83,7 @@ end
 Linear β function for g1 based on soil water potential.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaGLinearPsoil{FT} <: AbstractBetaG{FT}
     "Upper bound of Psoil `[MPa]`"
@@ -101,7 +101,7 @@ end
 Linear β function for g1 based on soil water content.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaGLinearSWC{FT} <: AbstractBetaG{FT}
     "Upper bound of SWC"
@@ -142,7 +142,7 @@ abstract type AbstractBetaV{FT} <: AbstractBetaFunction{FT} end
 Linear β function for g1 based on leaf hydraulic conductance.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct BetaVLinearKleaf{FT} <: AbstractBetaV{FT} end
 
@@ -155,7 +155,7 @@ struct BetaVLinearKleaf{FT} <: AbstractBetaV{FT} end
 Linear β function for g1 based on soil water potential.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaVLinearPleaf{FT} <: AbstractBetaG{FT}
     "Upper bound of Pleaf `[MPa]`"
@@ -173,7 +173,7 @@ end
 Linear β function for Vcmax based on soil water potential.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaVLinearPsoil{FT} <: AbstractBetaV{FT}
     "Upper bound of Psoil `[MPa]`"
@@ -191,7 +191,7 @@ end
 Linear β function for Vcmax based on soil water content.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct BetaVLinearSWC{FT} <: AbstractBetaV{FT}
     "Upper bound of SWC"
