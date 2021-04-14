@@ -9,7 +9,7 @@
 A struct for canopy radiation information
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct CanopyRads{FT}
     # local storage of dimension information

@@ -1,24 +1,20 @@
 module CanopyLayers
 
-using CLIMAParameters
-using DocStringExtensions
-using LinearAlgebra
-using MAT
-using Parameters
-using Pkg.Artifacts
-using PkgUtility
-using Polynomials
-using QuadGK
-using Statistics
+using LazyArtifacts
+
+using DocStringExtensions: TYPEDFIELDS
+using LinearAlgebra: mul!
+using MAT: matread
+using PkgUtility: AVOGADRO, H_PLANCK, K_STEFAN, LIGHT_SPEED, numerical∫
+using Polynomials: Polynomial
+using QuadGK: quadgk
+using Statistics: mean
+using UnPack: @unpack
 
 
 
 
 # define the constants
-AVOGADRO(FT)    = FT( avogad() );
-H_PLANCK(FT)    = FT( h_Planck() );
-K_STEFAN(FT)    = FT( Stefan() );
-LIGHT_SPEED(FT) = FT( light_speed() );
 const OPTI_2021 = artifact"land_model_spectrum" *
                   "/Optipar2021_ProspectPRO_CX.mat";
 const OPTI_2017 = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
@@ -28,55 +24,21 @@ const FILE_SUN  = artifact"land_model_spectrum" * "/sun.mat";
 
 
 # export public types
-export Canopy4RT,
-       CanopyOpticals,
-       CanopyRads,
-       IncomingRadiation,
-       LeafBios,
-       LeafOpticals,
-       RTCache,
-       RTDimensions,
-       SoilOpticals,
-       SolarAngles,
+export Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation, LeafBios,
+       LeafOpticals, RTCache, RTDimensions, SoilOpticals, SolarAngles,
        WaveLengths
 
 # export public functions
-export big_leaf_partition,
-       canopy_fluxes!,
-       canopy_geometry!,
-       canopy_matrices!,
-       create_canopy_opticals,
-       create_canopy_rads,
-       create_canopy_rt,
-       create_incoming_radiation,
-       create_leaf_bios,
-       create_leaf_opticals,
-       create_rt_cache,
-       create_rt_dims,
-       create_soil_opticals,
-       create_wave_length,
-       diffusive_S,
-       fluspect!,
-       initialize_rt_module,
-       short_wave!,
-       SIF_fluxes!,
-       thermal_fluxes!
+export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!,
+       create_canopy_opticals, create_canopy_rads, create_canopy_rt,
+       create_incoming_radiation, create_leaf_bios, create_leaf_opticals,
+       create_rt_cache, create_rt_dims, create_soil_opticals,
+       create_wave_length, diffusive_S, fluspect!, initialize_rt_module,
+       short_wave!, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
-export BLUE,
-       EVI,
-       EVI2,
-       LSWI,
-       NDVI,
-       NIR,
-       NIRv,
-       RED,
-       REF_WL,
-       SIF_740,
-       SIF_757,
-       SIF_771,
-       SIF_WL,
-       SWIR
+export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, RED, REF_WL, SIF_740, SIF_757,
+       SIF_771, SIF_WL, SWIR
 
 
 

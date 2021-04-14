@@ -1,12 +1,13 @@
 using CanopyLayers
 using Documenter
 using Literate
+using PkgUtility
 
 
 
 
 # define default docs pages
-pages = Any[
+pages = Pair{Any,Any}[
     "Home" => "index.md",
     "API"  => "API.md"
 ]
@@ -22,7 +23,7 @@ mkpath(gen_dir);
 
 if gen_example
     # array of example pages
-    ex_pages = Any[];
+    ex_pages = Pair{Any,Any}[];
     for _ex in ["bigleaf", "fluspect", "scope"]
         filename    = joinpath(@__DIR__, "src/examples/$(_ex).jl");
         script      = Literate.script(filename, gen_dir);
@@ -35,7 +36,8 @@ if gen_example
     push!(pages, "Examples" => ex_pages);
 end
 
-@show pages;
+@info tinfo("Pages to generate:");
+pretty_display!(pages);
 
 
 
