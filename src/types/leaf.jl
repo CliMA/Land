@@ -9,7 +9,7 @@
 Struct to store leaf information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     # Temperature related

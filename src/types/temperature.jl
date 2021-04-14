@@ -28,7 +28,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Uncorrected value at 298.15 K"
@@ -54,7 +54,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Ratio between ΔHa and R*K_25"
@@ -79,7 +79,7 @@ VAL = VAL_{REF} \\left( \\dfrac{T_1 - T_{REF}}}{10} \\right)^{Q_{10}}
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct Q10TD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Uncorrected value at reference temperature"

@@ -7,28 +7,33 @@
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}
+                envir::AirLayer{FT},
+                mode::PCO₂Mode
     ) where {FT<:AbstractFloat}
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
                 envir::AirLayer{FT},
+                mode::PCO₂Mode,
                 p_i::FT
     ) where {FT<:AbstractFloat}
     leaf_photosynthesis!(
                 photo_set::C3ParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}
+                envir::AirLayer{FT},
+                mode::GCO₂Mode
     ) where {FT<:AbstractFloat}
     leaf_photosynthesis!(
                 photo_set::C4ParaSet{FT},
                 leaf::Leaf{FT},
-                envir::AirLayer{FT}
+                envir::AirLayer{FT},
+                mode::GCO₂Mode
     ) where {FT<:AbstractFloat}
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
                 leaf::Leaf{FT},
                 envir::AirLayer{FT},
+                mode::GCO₂Mode,
                 g_lc::FT
     ) where {FT<:AbstractFloat}
 
