@@ -9,7 +9,7 @@
 Struct for leaf optical properties
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafOpticals{FT}
     # TODO Add explanations to each field

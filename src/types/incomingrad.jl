@@ -9,7 +9,7 @@
 Incoming radiation information
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct IncomingRadiation{FT}
     # these should match the WL in wls

@@ -9,7 +9,7 @@
 Struct for pre-set wave length parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WaveLengths{FT}
     # Wave length (WL) boundaries

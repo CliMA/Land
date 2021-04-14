@@ -9,7 +9,7 @@
 A canopy struct for the radiation transfer module
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     # local storage of dimension information

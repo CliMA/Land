@@ -9,7 +9,7 @@
 A struct of leaf biological parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafBios{FT}
     # local storage of dimension information

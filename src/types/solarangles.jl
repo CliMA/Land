@@ -9,7 +9,7 @@
 Struct for observation and solar angles
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SolarAngles{FT}
     "Hill zenith angle `[°]`, hill slope angle"

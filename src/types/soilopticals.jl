@@ -9,7 +9,7 @@
 A struct of soil optical parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SoilOpticals{FT}
     # these arrays should match the WL in wls
