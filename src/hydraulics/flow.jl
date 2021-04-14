@@ -60,11 +60,11 @@ function critical_flow(
             ini::FT = FT(0.5)
 ) where {FT<:AbstractFloat}
     # calculate maximal flow
-    _fh     = (hs.p_ups - hs.p_crt) * hs.k_sla / hs.f_vis;
-    _fl     = FT(0);
-    _fx     = min((_fh+_fl)/2, ini);
-    _ms     = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt     = SolutionTolerance{FT}(1e-5, 50);
+    _fh = (hs.p_ups - hs.p_crt) * hs.k_sla / hs.f_vis;
+    _fl = FT(0);
+    _fx = min((_fh+_fl)/2, ini);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
+    _rt = SolutionTolerance{FT}(1e-5, 50);
     @inline f(x) = end_pressure(hs, x) - hs.p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
@@ -91,7 +91,7 @@ function critical_flow(
     _fh = -1 * (tree.leaf).p_crt * _kt;
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
-    _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
     _rt = SolutionTolerance{FT}(1e-3, 50);
     @inline f(x) = end_pressure(tree, x) - (tree.leaf).p_crt;
     _solut  = find_zero(f, _ms, _rt);
@@ -247,12 +247,12 @@ function xylem_flow(
             pressure::FT,
             ini::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    _fh    = (root.p_ups + root.p_osm * root.T_sap / T_25(FT) - pressure) *
-             root.k_max / root.f_vis;
-    _fl    = -_fh;
-    _fx    = min(_fh, ini);
-    _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _st    = SolutionTolerance{FT}(1e-4, 50);
+    _fh = (root.p_ups + root.p_osm * root.T_sap / T_25(FT) - pressure) *
+          root.k_max / root.f_vis;
+    _fl = -_fh;
+    _fx = min(_fh, ini);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
+    _st = SolutionTolerance{FT}(1e-4, 50);
     @inline f(x) = end_pressure(root, x) - pressure;
     _solut = find_zero(f, _ms, _st);
 

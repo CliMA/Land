@@ -8,9 +8,9 @@ version = "1.0.1"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "ffcfa2d345aaee0ef3d8346a073d5dd03c983ebe"
+git-tree-sha1 = "f1b523983a58802c4695851926203b36e28f09db"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-version = "3.2.0"
+version = "3.3.0"
 
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -88,9 +88,9 @@ version = "0.12.7"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "4fecfd5485d3c5de4003e19f00c6898cccd40667"
+git-tree-sha1 = "ac4132ad78082518ec2037ae5770b6e796f7f956"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.26.0"
+version = "3.27.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -110,9 +110,9 @@ version = "0.2.0"
 
 [[ConstrainedRootSolvers]]
 deps = ["DocStringExtensions", "PkgUtility", "Test", "UnPack"]
-git-tree-sha1 = "27df94a95a1877dff09b90386173a69a503b12d0"
+git-tree-sha1 = "c3ad8205ea5575aa1bfa52088c53c84d2e121060"
 uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
-version = "0.1.2"
+version = "0.1.3"
 
 [[Crayons]]
 git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
@@ -246,9 +246,9 @@ version = "0.1.1"
 
 [[ImageCore]]
 deps = ["AbstractFFTs", "Colors", "FixedPointNumbers", "Graphics", "MappedArrays", "MosaicViews", "OffsetArrays", "PaddedViews", "Reexport"]
-git-tree-sha1 = "da98af44e78a2a9dd131ac12cf19b574f551dace"
+git-tree-sha1 = "db645f20b59f060d8cfae696bc9538d13fd86416"
 uuid = "a09fc81d-aa75-5fe9-8630-4744c3626534"
-version = "0.8.21"
+version = "0.8.22"
 
 [[ImageIO]]
 deps = ["FileIO", "Netpbm", "PNGFiles", "TiffImages", "UUIDs"]
@@ -383,10 +383,9 @@ uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.6"
 
 [[MappedArrays]]
-deps = ["FixedPointNumbers"]
-git-tree-sha1 = "b92bd220c95a8bbe89af28f11201fd080e0e3fe7"
+git-tree-sha1 = "18d3584eebc861e311a552cbb67723af8edff5de"
 uuid = "dbb5928d-eab1-5f90-85c2-b9b0edb7c900"
-version = "0.3.0"
+version = "0.4.0"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -406,10 +405,10 @@ version = "0.4.5"
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[MosaicViews]]
-deps = ["MappedArrays", "OffsetArrays", "PaddedViews"]
-git-tree-sha1 = "614e8d77264d20c1db83661daadfab38e8e4b77e"
+deps = ["MappedArrays", "OffsetArrays", "PaddedViews", "StackViews"]
+git-tree-sha1 = "b34e3bc3ca7c94914418637cb10cc4d1d80d877d"
 uuid = "e94cdb99-869f-56ef-bcf0-1ae2bcbe0389"
-version = "0.2.4"
+version = "0.3.3"
 
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
@@ -498,10 +497,10 @@ deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markd
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PkgUtility]]
-deps = ["CLIMAParameters", "CSV", "DataFrames", "Dates", "DocStringExtensions", "LazyArtifacts", "NCDatasets", "Pkg", "Statistics", "Test"]
-git-tree-sha1 = "91e42f1e45d7e382db87f76c443a6bb7538f0cb6"
+deps = ["CLIMAParameters", "CSV", "DataFrames", "Dates", "DocStringExtensions", "LazyArtifacts", "NCDatasets", "Pkg", "Statistics", "StatsBase", "Test"]
+git-tree-sha1 = "47faa3a3cd08fbfef79ee5de430d03c357795a21"
 uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
-version = "0.1.9"
+version = "0.1.10"
 
 [[PkgVersion]]
 deps = ["Pkg"]
@@ -513,7 +512,7 @@ version = "0.1.1"
 deps = ["ConstrainedRootSolvers", "DocStringExtensions", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.6"
+version = "0.2.7"
 
 [[PlotPlants]]
 deps = ["DataFrames", "Distributed", "DocStringExtensions", "FileIO", "GLM", "ImageIO", "ImageMagick", "KernelDensity", "NetCDF", "Pkg", "PkgUtility", "ProgressMeter", "PyCall", "PyPlot", "Random", "SharedArrays", "Statistics", "Test"]
@@ -545,9 +544,9 @@ version = "1.5.0"
 
 [[PyCall]]
 deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
-git-tree-sha1 = "dd1a970b543bd02efce2984582e996af28cab27f"
+git-tree-sha1 = "169bb8ea6b1b143c5cf57df6d34d022a7b60c6db"
 uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
-version = "1.92.2"
+version = "1.92.3"
 
 [[PyPlot]]
 deps = ["Colors", "LaTeXStrings", "PyCall", "Sockets", "Test", "VersionParsing"]
@@ -637,6 +636,12 @@ git-tree-sha1 = "5919936c0e92cff40e57d0ddf0ceb667d42e5902"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "1.3.0"
 
+[[StackViews]]
+deps = ["OffsetArrays"]
+git-tree-sha1 = "46e589465204cd0c08b4bd97385e4fa79a0c770c"
+uuid = "cae243ae-269e-4f55-b966-ac2d0dc13c15"
+version = "0.1.1"
+
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
 git-tree-sha1 = "2f01a51c23eed210ff4a1be102c4cc8236b66e5b"
@@ -649,9 +654,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics"]
-git-tree-sha1 = "a83fa3021ac4c5a918582ec4721bc0cf70b495a9"
+git-tree-sha1 = "4bc58880426274277a066de306ef19ecc22a6863"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.4"
+version = "0.33.5"
 
 [[StatsFuns]]
 deps = ["Rmath", "SpecialFunctions"]
@@ -667,9 +672,9 @@ version = "0.6.21"
 
 [[StructTypes]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "5eaf731e88587bb72a6c1262c0a014cd1859a08d"
+git-tree-sha1 = "63fbaf8345b590161cd0c35b927f88d3f7b2cf75"
 uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
-version = "1.5.2"
+version = "1.6.0"
 
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
@@ -687,9 +692,9 @@ version = "1.0.1"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
-git-tree-sha1 = "a9ff3dfec713c6677af435d6a6d65f9744feef67"
+git-tree-sha1 = "c9d2d262e9a327be1f35844df25fe4561d258dc9"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.4.1"
+version = "1.4.2"
 
 [[Tar]]
 deps = ["ArgTools", "SHA"]
