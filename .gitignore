@@ -1,1 +1,4 @@
+Manifest.toml
+!docs/Manifest.toml
+
 docs/build/*
