@@ -189,8 +189,8 @@ end
 println();
 @info "Testing the annual_profit Functions...";
 @testset "SoilPlantAirContinuum --- annual_profit" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -209,8 +209,8 @@ end
 println();
 @info "Testing annual_simulation! Functions...";
 @testset "SoilPlantAirContinuum --- annual_simulation!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
         photo = C3CLM(FT);
@@ -254,8 +254,8 @@ end
 println();
 @info "Testing the optimize_leaf! Functions...";
 @testset "SoilPlantAirContinuum --- optimize_leaf!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -274,8 +274,8 @@ end
 println();
 @info "Testing the vary_spac! Functions...";
 @testset "SoilPlantAirContinuum --- vary_spac!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     facs = ["kl", "kw", "wb", "wc", "wk",
             "cc", "cv", "gm",
             "ga", "sd",

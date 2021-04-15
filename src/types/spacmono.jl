@@ -9,7 +9,7 @@
 Struct that mono species SoilPlantAirContinuum system.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Soil layers bounds `[m]`"
@@ -87,7 +87,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Wave length container"
     wl_set::WaveLengths{FT} = create_wave_length(FT)
     "RT dimensions"
-    rt_dim::CanopyLayers.RTDimensions = create_rt_dims(canopy_rt, wl_set);
+    rt_dim::RTDimensions = create_rt_dims(canopy_rt, wl_set);
     "CanopyRads container"
     can_rad::CanopyRads{FT} = create_canopy_rads(FT, rt_dim)
     "CanopyOpticals container"
