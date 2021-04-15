@@ -44,7 +44,7 @@ function annual_simulation!(
         wind ::FT = (weather).Wind[i]
         rain ::FT = (weather).Rain[i]
 
-        node.envir.t_air = _tair + K_0(FT);
+        node.envir.t_air = _tair + T_0(FT);
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
         node.envir.p_a   = p_co2;
         node.envir.vpd   = _dair * 1000;

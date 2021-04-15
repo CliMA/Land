@@ -13,9 +13,12 @@ function initialize_spac_canopy!(
             node::SPACMono{FT}
 ) where {FT<:AbstractFloat}
     # 0.1 create variables required
-    @unpack angles, can_opt, can_rad, canopy_rt, envirs, in_rad, leaves_rt,
-            n_canopy, plant_hs, plant_ps, photo_set, rt_con, soil_opt,
-            wl_set = node;
+    @unpack angles, envirs, in_rad, leaves_rt, n_canopy, plant_ps, photo_set,
+            rt_con, soil_opt, wl_set = node;
+    canopy_rt = node.canopy_rt;
+    can_opt = node.can_opt;
+    can_rad = node.can_rad;
+    plant_hs = node.plant_hs;
     fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[canopy_rt.nAzi]) /
                                length(canopy_rt.lazitab);
     n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
@@ -55,8 +58,8 @@ function initialize_spac_canopy!(
 
         update_leaf_TP!(photo_set, iPS, plant_hs.leaves[i_can], envirs[i_can]);
 
-        envirs[i_can].t_air = K_25(FT);
-        envirs[i_can].p_sat = saturation_vapor_pressure(K_25(FT));
+        envirs[i_can].t_air = T_25(FT);
+        envirs[i_can].p_sat = saturation_vapor_pressure(T_25(FT));
         envirs[i_can].p_H₂O = envirs[i_can].p_sat / 2;
     end
 
@@ -94,8 +97,9 @@ function update_LAI!(node::SPACMono{FT}, lai::FT) where {FT<:AbstractFloat}
 
     # 3. Update the LA and LAI for stomatal and photosynthesis models
     for _iPS in node.plant_ps
-        _iPS.LA  = node.la / node.n_canopy;
-        _iPS.LAI = lai / node.n_canopy;
+        _iPS.LA   = node.la / node.n_canopy;
+        _iPS.LAI  = lai / node.n_canopy;
+        _iPS.tLAI = lai;
     end
 
     # 4. Update the LA for hydraulic model

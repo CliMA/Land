@@ -20,11 +20,13 @@ function layer_fluxes!(
             updating::Bool = false
 ) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, can_opt, can_rad, canopy_rt, envirs, f_SL, ga, in_rad,
-            leaves_rt, n_canopy, photo_set, plant_hs, plant_ps, rt_con, rt_dim,
-            soil_opt, stomata_model, wl_set = node;
-    @unpack nAzi, nIncl = canopy_rt;
-    nSL = nAzi * nIncl;
+    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set,
+            plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    canopy_rt = node.canopy_rt;
+    can_rad = node.can_rad;
+    can_opt = node.can_opt;
+    plant_hs = node.plant_hs;
+    nSL = canopy_rt.nAzi * canopy_rt.nIncl;
 
     canopy_geometry!(canopy_rt, angles, can_opt, rt_con);
     canopy_matrices!(leaves_rt, can_opt);
@@ -89,7 +91,8 @@ function layer_fluxes!(
         end
 
         # update the fluorescence quantum yield from leaf level calculation
-        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.ϕs,1:nSL), nIncl, nAzi);
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.ϕs,1:nSL), canopy_rt.nIncl,
+                                          canopy_rt.nAzi);
         can_rad.ϕ_shade[iRT] = iPS.ϕs[end];
 
         # update the flow rates

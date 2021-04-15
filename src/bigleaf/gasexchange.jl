@@ -77,7 +77,7 @@ function leaf_gas_exchange_nonopt!(
             container.an = node.ps.An;
 
         # if flow > 0 and reasonable
-        elseif (d_leaf > 0) && (t_leaf > K_0(FT))
+        elseif (d_leaf > 0) && (t_leaf > T_0(FT))
             t_cor = relative_diffusive_coefficient( (t_leaf+t_air)/2 );
             g_lw  = flow / la / d_leaf * p_atm;
             g_bw  = boundary_layer_conductance(wind, width);
