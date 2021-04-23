@@ -64,13 +64,12 @@ function critical_flow(
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
-    _rt = SolutionTolerance{FT}(1e-5, 50);
+    _rt = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(hs, x) - hs.p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
     if isnan(_solut)
-        @warn "E_crit is NaN, please check the settings...";
-        @show hs.p_ups;
+        @warn twarn("E_crit is NaN, please check the settings...") hs.p_ups;
     end
 
     return _solut
@@ -92,7 +91,7 @@ function critical_flow(
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
     _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
-    _rt = SolutionTolerance{FT}(1e-3, 50);
+    _rt = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(tree, x) - (tree.leaf).p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
@@ -252,7 +251,7 @@ function xylem_flow(
     _fl = -_fh;
     _fx = min(_fh, ini);
     _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
-    _st = SolutionTolerance{FT}(1e-4, 50);
+    _st = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(root, x) - pressure;
     _solut = find_zero(f, _ms, _st);
 

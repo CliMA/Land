@@ -1,7 +1,7 @@
 name = "PlantHydraulics"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.7"
+version = "0.2.8"
 
 [deps]
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
