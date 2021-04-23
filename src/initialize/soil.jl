@@ -46,15 +46,15 @@ function create_soil_VC(
             Θr::Number
 ) where {FT<:AbstractFloat}
     _vc_vG = VanGenuchten{FT}(stype = name,
-                              α     = α   ,
-                              n     = n   ,
-                              Θs    = Θs  ,
-                              Θr    = Θr  )
-    _vc_BC = BrooksCorey{FT}(stype = name        ,
-                             b     = (2n-1)/(n-1),
-                             ϕs    = 1/α         ,
-                             Θs    = Θs          ,
-                             Θr    = Θr          )
+                                  α = α,
+                                  n = n,
+                                 Θs = Θs,
+                                 Θr = Θr)
+    _vc_BC = BrooksCorey{FT}(stype = name,
+                                 b = (2n-1)/(n-1),
+                                ϕs = 1/α,
+                                Θs = Θs,
+                                Θr = Θr)
     fit_soil_VC!(_vc_vG, _vc_BC);
 
     return _vc_BC
@@ -72,10 +72,10 @@ function create_soil_VC(
             Θr::Number
 ) where {FT<:AbstractFloat}
     return VanGenuchten{FT}(stype = name,
-                            α     = α   ,
-                            n     = n   ,
-                            Θs    = Θs  ,
-                            Θr    = Θr  )
+                                α = α,
+                                n = n,
+                               Θs = Θs,
+                               Θr = Θr)
 end
 
 
@@ -113,7 +113,7 @@ function create_soil_VC(
     elseif name=="Clay"
         paras = [  81.6328, 1.09, 0.38, 0.068];
     else
-        @warn "Soil type $(name) not recognized, use Silt soil instead.";
+        @warn twarn("Soil type $(name) not recognized, use Silt instead.");
     end
 
     return create_soil_VC(vc, name, paras...)

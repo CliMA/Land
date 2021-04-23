@@ -540,7 +540,8 @@ function pressure_profile!(
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack leaves, roots = tree;
+    leaves = tree.leaves;
+    roots  = tree.roots;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -567,7 +568,8 @@ function pressure_profile!(
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack leaves, roots = tree;
+    leaves = tree.leaves;
+    roots  = tree.roots;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -594,7 +596,9 @@ function pressure_profile!(
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack leaves, roots, trunk = tree;
+    leaves = tree.leaves;
+    roots  = tree.roots;
+    trunk  = tree.trunk;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -625,7 +629,9 @@ function pressure_profile!(
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack leaves, roots, trunk = tree;
+    leaves = tree.leaves;
+    roots  = tree.roots;
+    trunk  = tree.trunk;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -656,7 +662,9 @@ function pressure_profile!(
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack branch, leaves, roots, trunk = tree;
+    @unpack branch, leaves = tree;
+    roots = tree.roots;
+    trunk = tree.trunk;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -691,7 +699,9 @@ function pressure_profile!(
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack branch, leaves, roots, trunk = tree;
+    @unpack branch, leaves = tree;
+    roots = tree.roots;
+    trunk = tree.trunk;
 
     # update the profile in roots
     p_mean::FT = 0;
