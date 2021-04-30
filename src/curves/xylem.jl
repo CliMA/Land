@@ -17,6 +17,22 @@ Returns the relative hydraulic conductance, given
 - `vis` Relative viscosity. If missing, vis = 1.
 """
 function xylem_k_ratio(
+            vc::LogisticSingle{FT},
+            p_25::FT,
+            vis::FT = FT(1)
+) where {FT<:AbstractFloat}
+    if p_25>=0
+        return 1 / vis
+    end
+
+    @unpack a,b = vc;
+    return max( FT(1e-4), (1 - 1/(1 + a * exp(b * p_25))) * (a+1)/a ) / vis
+end
+
+
+
+
+function xylem_k_ratio(
             vc::WeibullSingle{FT},
             p_25::FT,
             vis::FT = FT(1)
@@ -24,7 +40,7 @@ function xylem_k_ratio(
     @unpack b,c = vc;
 
     if p_25<0
-        kr = max( FT(1e-4), exp( -1 * (-p_25 / vc.b) ^ vc.c ) ) / vis;
+        kr = max( FT(1e-4), exp( -1 * (-p_25 / b) ^ c ) ) / vis;
     else
         kr = 1 / vis;
     end
