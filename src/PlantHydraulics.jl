@@ -4,6 +4,7 @@ using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
       ResidualTolerance, SolutionTolerance, SolutionToleranceND, find_peak,
       find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
+using HypergeometricFunctions: _₂F₁
 using PkgUtility: GAS_R, T_25, twarn, ρg_MPa
 using SpecialFunctions: gamma
 using Statistics: mean
@@ -17,7 +18,7 @@ using WaterPhysics: relative_surface_tension, relative_viscosity
 export BrooksCorey, VanGenuchten
 
 # export public types --- xylem vulnerability
-export LogisticSingle, WeibullDual, WeibullSingle
+export LogisticSingle, PowerSingle, WeibullDual, WeibullSingle
 
 # export public types --- pressure volume curve
 export PVCurveLinear, PVCurveSegmented
