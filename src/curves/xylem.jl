@@ -33,6 +33,22 @@ end
 
 
 function xylem_k_ratio(
+            vc::PowerSingle{FT},
+            p_25::FT,
+            vis::FT = FT(1)
+) where {FT<:AbstractFloat}
+    if p_25>=0
+        return 1 / vis
+    end
+
+    @unpack a,b = vc;
+    return max( FT(1e-4), 1 / (1 + a*(-p_25)^b) ) / vis
+end
+
+
+
+
+function xylem_k_ratio(
             vc::WeibullSingle{FT},
             p_25::FT,
             vis::FT = FT(1)
