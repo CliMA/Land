@@ -42,8 +42,8 @@ export vc_integral, p_from_volume, soil_erwc, soil_k_ratio_erwc,
        xylem_p_crit
 
 # export public functions
-export pressure_profile!, inititialize_legacy!, critical_flow, xylem_risk,
-       plant_conductances!, roots_flow!, xylem_flow, update_PVF!,
+export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow,
+       xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!,
        temperature_effects!, end_pressure, fit_xylem_VC
 
 
