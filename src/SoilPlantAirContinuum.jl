@@ -17,8 +17,9 @@ using PkgUtility: GAS_R, GRAVITY, K_STEFAN, K_VON_KARMAN, M_H₂O, P_ATM, RT_25,
       T_0, T_25, YEAR_D, ρ_H₂O
 using PlantHydraulics: AbstractPlantOrganism, GrassLikeOrganism,
       PalmLikeOrganism, SteadyStateMode, TreeLikeOrganism, TreeSimple,
-      create_grass, critical_flow, end_pressure, pressure_profile!,
-      roots_flow!, soil_p_25_swc, soil_swc, temperature_effects!
+      create_grass, critical_flow, end_pressure, flow_profile!,
+      pressure_profile!, roots_flow!, soil_p_25_swc, soil_swc,
+      temperature_effects!
 using StomataModels: AbstractStomatalModel, CanopyLayer, ESMBallBerry,
       EmpiricalStomatalModel, GswDrive, gas_exchange!, gsw_control!,
       prognostic_gsw!, stomatal_conductance, update_leaf_TP!

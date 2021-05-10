@@ -81,7 +81,28 @@ function layer_fluxes!(
                 prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model,
                                 FT(120));
             end
+
+            # update flow and pressure profile (except for history)
+            # TODO move this part to PlantHydraulics.jl
             gsw_control!(photo_set, iPS, iEN);
+            for i_can in 1:n_canopy
+                iEN = envirs[i_can];
+                iLF = plant_hs.leaves[i_can];
+                iPS = plant_ps[i_can];
+                iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
+                           (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            end
+            flow_profile!(plant_hs);
+            pressure_profile!(plant_hs, SteadyStateMode(); update=false);
+
+            # TODO make sure this is done in future SPAC module
+            # update canopy layer p_ups, which will be passed to each leaf
+            for _i_can in 1:n_canopy
+                _iHS = plant_hs.leaves[_i_can];
+                _iPS = plant_ps[_i_can];
+                _iPS.p_ups = _iHS.p_ups;
+            end;
+
             sum_ag_curr = sum(iPS.Ag);
             if (abs(sum_ag_curr - sum_ag_last) < 0.01) || count > 1000
                 break
@@ -105,8 +126,8 @@ function layer_fluxes!(
     end
 
     # do SIF simulation
-    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt,
-                wl_set, rt_con, rt_dim);
+    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set,
+                rt_con, rt_dim);
 
     # update flow profile and pressure history along the tree
     if updating
@@ -114,15 +135,10 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iST = plant_hs.branch[i_can];
             iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
                        (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
-            iST.flow = iLF.flow * iPS.LA;
         end
-        plant_hs.trunk.flow = sum([iST.flow for iST in plant_hs.branch]);
-        for iRT in plant_hs.roots
-            iRT.flow = plant_hs.trunk.flow / length(plant_hs.roots);
-        end
+        flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
     end
 
