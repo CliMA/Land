@@ -105,7 +105,7 @@ function annual_simulation!(
 
             # 2.3.3 update temperature effects and then leaf water potential
             flow = FT(0);
-            # TODO morea reasonable functions need to be added
+            # TODO more reasonable functions need to be added
             # vc_temperature_effects!(node.hs.leaf, tlef);
             plef = end_pressure(node.hs, flow);
 
