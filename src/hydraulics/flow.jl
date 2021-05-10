@@ -257,3 +257,67 @@ function xylem_flow(
 
     return _solut
 end
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Update the flow profile from leaf flow rates
+#
+###############################################################################
+function flow_profile!(hs::GrassLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        _flow += hs.leaves[_i].flow * hs.leaves[_i].area;
+    end
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+
+    return nothing
+end
+
+
+
+
+function flow_profile!(hs::PalmLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        _flow += hs.leaves[_i].flow * hs.leaves[_i].area;
+    end
+
+    # trunk flow rate
+    hs.trunk.flow = _flow;
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+
+    return nothing
+end
+
+
+
+
+function flow_profile!(hs::TreeLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        hs.branch[_i].flow = hs.leaves[_i].flow * hs.leaves[_i].area;
+        _flow += hs.branch[_i].flow
+    end
+
+    # trunk flow rate
+    hs.trunk.flow = _flow;
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+
+    return nothing
+end
