@@ -37,8 +37,8 @@ export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!,
        short_wave!, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
-export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, RED, REF_WL, SIF_740, SIF_757,
-       SIF_771, SIF_WL, SWIR
+export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_740,
+       SIF_757, SIF_771, SIF_WL, SWIR
 
 
 
