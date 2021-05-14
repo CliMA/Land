@@ -95,6 +95,7 @@ println();
                     LSWI(can_rad, wls),
                     NDVI(can_rad, wls),
                     NIRv(can_rad, wls),
+                    NIRvES(can_rad, wls),
                     SIF_740(can_rad, wls),
                     SIF_757(can_rad, wls),
                     SIF_771(can_rad, wls)];

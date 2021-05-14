@@ -157,6 +157,28 @@ end
 
 
 """
+    NIRvES(can_rad::CanopyRads{FT},
+           wls::WaveLengths{FT}
+    ) where {FT<:AbstractFloat}
+
+Return the NIRv from the energy spectrum, given
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
+"""
+function NIRvES(
+            can_rad::CanopyRads{FT},
+            wls::WaveLengths{FT}
+) where {FT<:AbstractFloat}
+    _NIR = SPECTRUM_WL(can_rad.Lo, wls, FT(858.5));
+    _RED = SPECTRUM_WL(can_rad.Lo, wls, FT(645));
+
+    return (_NIR - _RED) / (_NIR + _RED) * _NIR
+end
+
+
+
+
+"""
     RED(can_rad::CanopyRads{FT},
         wls::WaveLengths{FT}
     ) where {FT<:AbstractFloat}
@@ -211,6 +233,47 @@ function REF_WL(
     else
         return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * alb_obs[ind] +
                (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * alb_obs[ind+1]
+    end
+end
+
+
+
+
+"""
+    SPECTRUM_WL(wls::WaveLengths{FT},
+           can_rad::CanopyRads{FT}
+           wls::WaveLengths{FT},
+           twl::FT
+    ) where {FT<:AbstractFloat}
+
+Return the Reflectance, given
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
+- `twl` Target wave length in nm
+"""
+function SPECTRUM_WL(
+            spectrum::Vector{FT},
+            wls::WaveLengths{FT},
+            twl::FT
+) where {FT<:AbstractFloat}
+    @unpack WL,nWL = wls;
+
+    # find the index where twl nm is
+    ind = 0;
+    for i in 1:(nWL-1)
+        if WL[i] <= twl <= WL[i+1]
+            ind = i;
+            break;
+        end
+    end
+
+    # warning if ind == 0
+    if ind==0
+        @warn "target wave length out of bounds, please check the set up!";
+        return FT(NaN)
+    else
+        return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * spectrum[ind] +
+               (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * spectrum[ind+1]
     end
 end
 
