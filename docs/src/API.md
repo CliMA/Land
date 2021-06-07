@@ -47,7 +47,6 @@ create_incoming_radiation
 create_leaf_bios
 create_leaf_opticals
 create_rt_dims
-create_soil_opticals
 create_wave_length
 initialize_rt_module
 ```

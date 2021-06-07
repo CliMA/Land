@@ -40,7 +40,7 @@ function canopy_fluxes!(
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
     @unpack LAI, nLayer, Ω = can;
-    @unpack albedo_SW, emsvty_SW = soil;
+    @unpack ρ_SW, ε_SW = soil;
     @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
     cf_con = rt_con.cf_con;
 
@@ -51,9 +51,9 @@ function canopy_fluxes!(
     # 3. Compute some fluxes, can be done separately if needed
     #    this is absolute fluxes now, for the entire soil
     last_ind_cr            = lastindex(can_rad.E_down,2);
-    cf_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* emsvty_SW;
+    cf_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* ε_SW;
     can_rad.RnSoil_diffuse = fac * numerical∫(cf_con.abs_wave, dWL);
-    cf_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* emsvty_SW;
+    cf_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* ε_SW;
     can_rad.RnSoil_direct  = fac * numerical∫(cf_con.abs_wave, dWL);
     can_rad.RnSoil         = can_rad.RnSoil_direct + can_rad.RnSoil_diffuse;
 
