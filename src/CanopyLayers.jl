@@ -4,8 +4,8 @@ using LazyArtifacts
 
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND,
       find_peak
-using DocStringExtensions: TYPEDFIELDS
-using LinearAlgebra: mul!
+using DocStringExtensions: TYPEDFIELDS, TYPEDEF
+using LinearAlgebra: mul!, pinv
 using MAT: matread
 using PkgUtility: AVOGADRO, H_PLANCK, K_STEFAN, LIGHT_SPEED, T_25, numerical∫,
       read_csv
@@ -18,9 +18,10 @@ using UnPack: @unpack
 
 
 # define the constants
-const FILE_SUN  = artifact"land_model_spectrum" * "/sun.mat";
-const OPTI_2017 = artifact"land_model_spectrum" * "/Optipar2017_ProspectD.mat";
-const OPTI_2021 = artifact"land_model_spectrum" *
+const FILE_SUN  = artifact"land_model_spectrum_V1" * "/sun.mat";
+const OPTI_2017 = artifact"land_model_spectrum_V1" *
+                  "/Optipar2017_ProspectD.mat";
+const OPTI_2021 = artifact"land_model_spectrum_V1" *
                   "/Optipar2021_ProspectPRO_CX.mat";
 const SOIL_BNDS = [0.36 0.61 0.25 0.50; 0.34 0.57 0.23 0.46;
                    0.32 0.53 0.21 0.42; 0.31 0.51 0.20 0.40;
@@ -32,7 +33,7 @@ const SOIL_BNDS = [0.36 0.61 0.25 0.50; 0.34 0.57 0.23 0.46;
                    0.18 0.29 0.09 0.18; 0.16 0.27 0.08 0.16;
                    0.14 0.25 0.07 0.14; 0.12 0.23 0.06 0.12;
                    0.10 0.21 0.05 0.10; 0.08 0.16 0.04 0.08];
-const SOIL_GSV  = "/home/wyujie/RAID/Data/SoilAlbedo/GSV.csv";
+const SOIL_GSV  = artifact"land_model_spectrum_V1" * "/GSV.csv";
 
 
 
