@@ -14,7 +14,7 @@ using DocStringExtensions: TYPEDFIELDS
 using Photosynthesis: AbstractPhotoModelParaSet, AirLayer, C3CLM, GCO₂Mode,
       Leaf, leaf_photosynthesis!, leaf_rd!, leaf_temperature_dependence!
 using PkgUtility: GAS_R, GRAVITY, K_STEFAN, K_VON_KARMAN, M_H₂O, P_ATM, RT_25,
-      T_0, T_25, YEAR_D, ρ_H₂O
+      T_0, T_25, YEAR_D, tinfo, ρ_H₂O
 using PlantHydraulics: AbstractPlantOrganism, GrassLikeOrganism,
       PalmLikeOrganism, SteadyStateMode, TreeLikeOrganism, TreeSimple,
       create_grass, critical_flow, end_pressure, flow_profile!,
