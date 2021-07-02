@@ -1,7 +1,7 @@
 name = "StomataModels"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.9"
+version = "0.1.10"
 
 [deps]
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
@@ -16,7 +16,7 @@ WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 [compat]
 ConstrainedRootSolvers = "0.1"
 DocStringExtensions = "0.8"
-Photosynthesis = "0.1.5"
+Photosynthesis = "0.2.0"
 PkgUtility = "0.1.10"
 PlantHydraulics = "0.2.7"
 UnPack = "1.0"
