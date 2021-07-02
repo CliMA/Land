@@ -104,7 +104,10 @@ function layer_fluxes!(
             end;
 
             sum_ag_curr = sum(iPS.Ag);
-            if (abs(sum_ag_curr - sum_ag_last) < 0.01) || count > 1000
+            if (abs(sum_ag_curr - sum_ag_last) < 1e-4)
+                break
+            elseif count > 100000
+                @info tinfo("layer_fluxes!: iterations exceed 100000 times");
                 break
             else
                 sum_ag_last = sum_ag_curr;
@@ -112,9 +115,9 @@ function layer_fluxes!(
         end
 
         # update the fluorescence quantum yield from leaf level calculation
-        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.ϕs,1:nSL), canopy_rt.nIncl,
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl,
                                           canopy_rt.nAzi);
-        can_rad.ϕ_shade[iRT] = iPS.ϕs[end];
+        can_rad.ϕ_shade[iRT] = iPS.φs[end];
 
         # update the flow rates
         for iLF in 1:(nSL+1)
