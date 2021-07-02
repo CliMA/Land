@@ -1,7 +1,7 @@
 name = "CanopyLayers"
 uuid = "677f5362-5107-42e4-8e81-51d9c4a1f96c"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.0"
+version = "0.1.10"
 
 [deps]
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
