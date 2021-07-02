@@ -494,7 +494,7 @@ function gas_exchange!(
     canopyi.Ap[ind] = canopyi.ps.Ap;
     canopyi.Ag[ind] = canopyi.ps.Ag;
     canopyi.An[ind] = canopyi.ps.An;
-    canopyi.ϕs[ind] = canopyi.ps.ϕs;
+    canopyi.φs[ind] = canopyi.ps.φs;
 
     # update the pressures
     canopyi.p_i[ind] = canopyi.ps.p_i;
@@ -588,7 +588,7 @@ function gas_exchange!(
     canopyi.Ap[ind] = canopyi.ps.Ap;
     canopyi.Ag[ind] = canopyi.ps.Ag;
     canopyi.An[ind] = canopyi.ps.An;
-    canopyi.ϕs[ind] = canopyi.ps.ϕs;
+    canopyi.φs[ind] = canopyi.ps.φs;
 
     # update the pressures
     canopyi.p_i[ind] = canopyi.ps.p_i;

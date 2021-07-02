@@ -125,7 +125,7 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     "PSII yield"
     φ  ::Array{FT,1} = zeros(FT, n_leaf)
     "Steady-state (light-adapted) yield (aka Fs)"
-    ϕs ::Array{FT,1} = zeros(FT, n_leaf)
+    φs ::Array{FT,1} = zeros(FT, n_leaf)
 
     # Fluorescence related, same for all leaves
     "dark adapted yield (`Kp=0`)"
