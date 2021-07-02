@@ -43,7 +43,7 @@ function SIF_fluxes!(
     @unpack a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps,
             Pso, sigb, vb, vf = can_opt;
     @unpack E_down, E_up, ϕ_shade, ϕ_sun = can_rad;
-    @unpack albedo_SW_SIF = soil;
+    @unpack ρ_SW_SIF = soil;
     @unpack dWL, dWL_iWLE, iWLE, iWLF, nWLF = wls;
     sf_con = rt_con.sf_con;
 
@@ -236,7 +236,7 @@ function SIF_fluxes!(
                                  view(vf, iWLF, :) .* view(sf_con.F⁺, :, 1:nLayer);
     mul!(can_rad.SIF_obs_scattered, sf_con.tmp_2d_nWlF_nLayer, Qo);
     can_rad.SIF_obs_scattered .= can_rad.SIF_obs_scattered .* _iLAI_pi;
-    can_rad.SIF_obs_soil .= ( albedo_SW_SIF .* view(sf_con.F⁻, :, nLayer+1) ) .* Po[end] ./ FT(pi);
+    can_rad.SIF_obs_soil .= ( ρ_SW_SIF .* view(sf_con.F⁻, :, nLayer+1) ) .* Po[end] ./ FT(pi);
 
     can_rad.SIF_hemi .= view(sf_con.F⁺, :, 1);
     can_rad.SIF_obs  .= can_rad.SIF_obs_sunlit    .+

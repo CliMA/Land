@@ -40,7 +40,7 @@ function thermal_fluxes!(
     @unpack Ps, Po, Pso,ddf,ddb = can_opt
     @unpack T_sun, T_shade = can_rad
     @unpack LAI, nLayer, lidf, Ω = can
-    @unpack albedo_LW, soil_skinT = soil
+    @unpack ρ_LW, T = soil
     @unpack nWL = wls
 
     # 1. define some useful parameters
@@ -133,9 +133,9 @@ function thermal_fluxes!(
     end
     S⁺[:] = tLAI * (fSun.*S_sun+(1 .-fSun).*S_shade)
     S⁻[:] = S⁺[:]
-    soilEmission = K_STEFAN(FT) * (1 .- albedo_LW) * soil_skinT^4
+    soilEmission = K_STEFAN(FT) * (1 .- ρ_LW) * T^4
     # Run RT:
-    F⁻,F⁺,net_diffuse = diffusive_S(τ_dd, ρ_dd, S⁻, S⁺,incLW, soilEmission, albedo_LW)
+    F⁻,F⁺,net_diffuse = diffusive_S(τ_dd, ρ_dd, S⁻, S⁺,incLW, soilEmission, ρ_LW)
     for j = 1:nLayer
         can_rad.intNetLW_sunlit[j] = net_diffuse[j] - 2*S_sun[j];
         can_rad.intNetLW_shade[j]  = net_diffuse[j] - 2*S_shade[j];

@@ -17,6 +17,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     minwlPAR::FT = FT(400.0)
     "Maximal WL for PAR `[nm]`"
     maxwlPAR::FT = FT(700.0)
+    "Maximal WL for NIR `[nm]`"
+    maxwlNIR::FT = FT(2500.0)
     "Minimal WL for SIF excitation `[nm]`"
     minwle  ::FT = FT(400.0)
     "Maximal WL for SIF excitation `[nm]`"
@@ -45,6 +47,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     iWLF::Array{Int,1} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
     "index of wlPAR in WL"
     iPAR::Array{Int,1} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
+    "index of wlNIR in WL"
+    iNIR::Array{Int,1} = findall( (WL .>= maxwlPAR) .& (WL .<= maxwlNIR) )
 
     "excitation wave length `[nm]`"
     WLE     ::Array{FT,1} = WL[iWLE]
