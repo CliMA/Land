@@ -222,12 +222,16 @@ function fit_soil_mat!(
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
+    # solve for weights using pinv
+    soil.ρ_SW_raw .= ref_NIR;
+    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.SW_vec_4 .= pinv(soil.SW_mat_raw_4) * soil.ρ_SW_raw;
+
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_4, x);
         _diff = ( mean(soil.ρ_SW_raw[iPAR]) - ref_PAR ) ^ 2+
                 mean( abs.(soil.ρ_SW_raw[iNIR] .- ref_NIR) ) ^ 2;
-        @show x, _diff;
         return -_diff
     );
 
@@ -277,6 +281,11 @@ function fit_soil_mat!(
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
+
+    # solve for weights using pinv
+    soil.ρ_SW_raw .= ref_NIR;
+    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.SW_vec_4 .= pinv(soil.SW_mat_raw_4) * soil.ρ_SW_raw;
 
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
@@ -376,6 +385,11 @@ function fit_soil_mat!(
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
+
+    # solve for weights using pinv
+    soil.ρ_SW_raw .= ref_NIR;
+    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.SW_vec_2 .= pinv(soil.SW_mat_raw_2) * soil.ρ_SW_raw;
 
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
