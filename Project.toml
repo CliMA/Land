@@ -1,7 +1,7 @@
 name = "SoilPlantAirContinuum"
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.13"
+version = "0.1.14"
 
 [deps]
 CanopyLayers = "677f5362-5107-42e4-8e81-51d9c4a1f96c"

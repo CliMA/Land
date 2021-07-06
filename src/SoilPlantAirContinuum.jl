@@ -5,8 +5,8 @@ using CanopyLayers: Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation,
       WaveLengths, big_leaf_partition, canopy_fluxes!, canopy_geometry!,
       canopy_matrices!, create_canopy_opticals, create_canopy_rads,
       create_canopy_rt, create_incoming_radiation, create_leaf_bios,
-      create_soil_opticals, create_rt_cache, create_rt_dims,
-      create_wave_length, fluspect!, short_wave!, thermal_fluxes!
+      create_rt_cache, create_rt_dims, create_wave_length, fluspect!,
+      short_wave!, thermal_fluxes!
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND,
       find_peak
 using DataFrames: DataFrame

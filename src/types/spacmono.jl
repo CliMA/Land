@@ -96,7 +96,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for
                                          i in 1:n_canopy]
     "SoilOpticals container"
-    soil_opt::SoilOpticals{FT} = create_soil_opticals(wl_set)
+    soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set)
     "Incoming radiation container"
     in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
     "RT container"
