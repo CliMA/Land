@@ -72,15 +72,17 @@ function canopy_fluxes!(
         else
             cf_con.kChlrel .= view(leaves[1].kChlrel, iPAR);
         end
+
         # for diffuse PAR
         cf_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
         cf_con.PAR_diff .*= fac / tLAI;
+
         # for direct PAR
         cf_con.E_iPAR .= view(can_rad.netSW_sunlit, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
         cf_con.PAR_dir .*= fac / tLAI;
-        cf_con.PAR_dir .+= cf_con.PAR_diff;
+
         # for leaf absorbed
         cf_con.PAR_diffCab .= cf_con.kChlrel .* cf_con.PAR_diff;
         cf_con.PAR_dirCab  .= cf_con.kChlrel .* cf_con.PAR_dir;
@@ -95,7 +97,8 @@ function canopy_fluxes!(
         _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
         _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
         can_rad.absPAR_shadeCab[j] = _difCab;
-        can_rad.absPAR_sunCab[:,:,j] .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j]  .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j] .+= _difCab;
     end
 
     # 5. Total PAR
