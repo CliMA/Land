@@ -4,8 +4,7 @@
 #
 ###############################################################################
 """
-    leaf_fluxes!(
-                leaf::LeafBios{FT},
+    leaf_fluxes(leaf::LeafBios{FT},
                 in_rad::IncomingRadiation{FT},
                 wls::WaveLengths{FT},
                 rt_con::RTCache{FT}
@@ -20,7 +19,7 @@ Return leaf PAR and APAR, given
 Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
     angle correction needs to be made before passing it to this function.
 """
-function leaf_fluxes!(
+function leaf_fluxes(
             leaf::LeafBios{FT},
             in_rad::IncomingRadiation{FT},
             wls::WaveLengths{FT},
@@ -49,5 +48,6 @@ function leaf_fluxes!(
     _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
     _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR);
 
-    return _dir + _dif, _dirCab + _difCab
+    # return PAR and APAR in μmol m⁻² s⁻¹
+    return 1000 * (_dir + _dif), 1000 * (_dirCab + _difCab)
 end

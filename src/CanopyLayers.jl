@@ -48,7 +48,7 @@ export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!,
        create_canopy_opticals, create_canopy_rads, create_canopy_rt,
        create_incoming_radiation, create_leaf_bios, create_leaf_opticals,
        create_rt_cache, create_rt_dims, create_wave_length, diffusive_S,
-       fluspect!, initialize_rt_module, short_wave!, SIF_fluxes!,
+       fluspect!, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!,
        thermal_fluxes!
 
 # Vegetation indices
