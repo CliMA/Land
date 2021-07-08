@@ -27,6 +27,7 @@ Computes 2-stream diffusive radiation transport for SIF radiation (calls
 - `wls` [`WaveLengths`](@ref) type struct
 - `rt_con` [`RTCache`](@ref) type cache
 - `rt_dim` [`RTDimensions`](@ref) type struct
+
 """
 function SIF_fluxes!(
             leaves::Array{LeafBios{FT},1},
@@ -248,6 +249,57 @@ function SIF_fluxes!(
         can_rad.SIF_sum[j] = sum( view(sf_con.S⁻, j, :) ) +
                              sum( view(sf_con.S⁺, j, :) );
     end
+
+    return nothing
+end
+
+
+
+
+"""
+    SIF_fluxes!(leaf::LeafBios{FT},
+                in_rad::IncomingRadiation{FT},
+                wls::WaveLengths{FT},
+                rt_con::RTCache{FT},
+                fqe::FT = FT(0.01)
+    ) where {FT<:AbstractFloat}
+
+Leaf level SIF, given
+- `leaf` [`LeafBio`](@ref) type struct
+- `in_rad` [`IncomingRadiation`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
+- `rt_con` [`RTCache`](@ref) type cache
+- `fqe` Fluorescence quantum yield (default at 1%)
+
+Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
+    angle correction needs to be made before passing it to this function. The
+    up- and down-ward SIF are stored in `sf_con` as `M⁻_sun` and `M⁺_sun`.
+"""
+function SIF_fluxes!(
+            leaf::LeafBios{FT},
+            in_rad::IncomingRadiation{FT},
+            wls::WaveLengths{FT},
+            rt_con::RTCache{FT},
+            fqe::FT = FT(0.01)
+) where {FT<:AbstractFloat}
+    # unpack the values
+    @unpack Mb, Mf = leaf;
+    @unpack dWL_iWLE, iWLE = wls;
+    sf_con = rt_con.sf_con;
+    sf_con.tmp_dwl_iWlE .= (view(in_rad.E_direct , iWLE, 1) .+
+                            view(in_rad.E_diffuse, iWLE, 1)) .* dWL_iWLE;
+
+    # calculate the SIF spectra for direct light
+    # sf_con.M⁺ .= (Mb .+ Mf) ./ 2;
+    # sf_con.M⁻ .= (Mb .- Mf) ./ 2;
+    # mul!(sf_con.M⁺_sun, sf_con.M⁺, sf_con.tmp_dwl_iWlE);
+    # mul!(sf_con.M⁻_sun, sf_con.M⁻, sf_con.tmp_dwl_iWlE);
+    mul!(sf_con.M⁺_sun, Mb, sf_con.tmp_dwl_iWlE);
+    mul!(sf_con.M⁻_sun, Mf, sf_con.tmp_dwl_iWlE);
+
+    # divide by pi to account for scattering
+    sf_con.M⁻_sun .*= fqe / pi;
+    sf_con.M⁺_sun .*= fqe / pi;
 
     return nothing
 end

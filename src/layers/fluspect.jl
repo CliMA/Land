@@ -117,6 +117,7 @@ function fluspect!(
     denom   = 1 .-Rsub.*r
     leaf.τ_SW    = Ta.*Tsub./denom
     leaf.ρ_SW    = Ra.+Ta.*Rsub.*t./denom
+    leaf.α_SW    = 1 .- leaf.τ_SW .- leaf.ρ_SW;
     τ_SW    = leaf.τ_SW
     ρ_SW    = leaf.ρ_SW
     #RT     = [refl tran]
