@@ -5,6 +5,7 @@
 ###############################################################################
 """
     β_factor(hs::LeafHydraulics{FT},
+             svc::AbstractSoilVC{FT},
              bt::AbstractBetaFunction{FT},
              p_leaf::FT,
              p_soil::FT,
@@ -12,6 +13,8 @@
     ) where {FT<:AbstractFloat}
 
 Calculate the β correction factor, given
+- `hs` `LeafHydraulics` structure
+- `svc` Soil vulnerability curve
 - `bt` [`AbstractBetaFunction`](@ref) type struct
 - `p_leaf` Leaf water potential `[MPa]`
 - `p_soil` Soil water potential `[MPa]`
@@ -19,6 +22,7 @@ Calculate the β correction factor, given
 """
 function β_factor(
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             bt::Union{BetaGLinearKleaf{FT}, BetaVLinearKleaf{FT}},
             p_leaf::FT,
             p_soil::FT,
@@ -34,6 +38,21 @@ end
 
 function β_factor(
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
+            bt::Union{BetaGLinearKsoil{FT}, BetaVLinearKsoil{FT}},
+            p_leaf::FT,
+            p_soil::FT,
+            swc::FT
+) where {FT<:AbstractFloat}
+    return soil_k_ratio_p25(svc, p_soil)
+end
+
+
+
+
+function β_factor(
+            hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             bt::Union{BetaGLinearPleaf{FT}, BetaVLinearPleaf{FT}},
             p_leaf::FT,
             p_soil::FT,
@@ -55,6 +74,7 @@ end
 
 function β_factor(
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             bt::Union{BetaGLinearPsoil{FT}, BetaVLinearPsoil{FT}},
             p_leaf::FT,
             p_soil::FT,
@@ -76,6 +96,7 @@ end
 
 function β_factor(
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             bt::Union{BetaGLinearSWC{FT}, BetaVLinearSWC{FT}},
             p_leaf::FT,
             p_soil::FT,

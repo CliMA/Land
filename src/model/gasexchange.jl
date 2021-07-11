@@ -123,6 +123,7 @@ function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             psoil::FT,
             swc::FT,
             envir::AirLayer{FT},
@@ -136,7 +137,8 @@ function gas_exchange!(
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
         leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
+        gas_exchange!(photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt,
+                      ind);
     end
 end
 
@@ -147,6 +149,7 @@ function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             psoil::FT,
             swc::FT,
             envir::AirLayer{FT},
@@ -167,8 +170,8 @@ function gas_exchange!(
         _gl = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
         _st = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc,
-                                      envir, sm, bt, GlcDrive(), ind);
+        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, svc, psoil,
+                                      swc, envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates

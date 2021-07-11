@@ -1,7 +1,7 @@
 name = "StomataModels"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.10"
+version = "0.1.11"
 
 [deps]
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
