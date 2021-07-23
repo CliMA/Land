@@ -101,8 +101,26 @@ function soil_albedos(color::Int, swc::FT) where {FT<:AbstractFloat}
 
     # calculate albedos for PAR and NIR
     _delta   = max(0, FT(0.11) - FT(0.4) * swc);
-    _alb_par = max(SOIL_BNDS[color,1], SOIL_BNDS[color,3] + _delta);
-    _alb_nir = max(SOIL_BNDS[color,2], SOIL_BNDS[color,4] + _delta);
+    _alb_par::FT = max(SOIL_BNDS[color,1], SOIL_BNDS[color,3] + _delta);
+    _alb_nir::FT = max(SOIL_BNDS[color,2], SOIL_BNDS[color,4] + _delta);
+
+    return _alb_par,_alb_nir
+end
+
+
+
+
+function soil_albedos(
+            color::Int,
+            rswc::FT,
+            rel::Bool
+) where {FT<:AbstractFloat}
+    # soil class must be from 1 to 20
+    @assert 1 <= color <=20;
+
+    # calculate albedos for PAR and NIR
+    _alb_par::FT = SOIL_BNDS[color,1] * (1 - rswc) + rswc * SOIL_BNDS[color,3];
+    _alb_nir::FT = SOIL_BNDS[color,2] * (1 - rswc) + rswc * SOIL_BNDS[color,4];
 
     return _alb_par,_alb_nir
 end
@@ -115,7 +133,8 @@ end
                 soil::SoilOpticals{FT},
                 wls::WaveLengths{FT},
                 swc::FT,
-                method::AbstractAlbedoFitting
+                method::AbstractAlbedoFitting;
+                clm::Bool = false
     ) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
@@ -123,17 +142,23 @@ Fit soil albedo bands parameters, given
 - `wls` [`Wavelengths`](@ref) type structure
 - `swc` Soil volumetric water content
 - `method` [`AbstractAlbedoFitting`](@ref) type fitting method
+- `clm` If true, use CLM method, else use new method
 """
 function fit_soil_mat!(
             soil::SoilOpticals{FT},
             wls::WaveLengths{FT},
             swc::FT,
-            method::AbstractAlbedoFitting
+            method::AbstractAlbedoFitting;
+            clm::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack iPAR, iWLF = wls;
+    @unpack iWLF = wls;
 
     # fit the curve only if the values mismatch
-    _ref_par,_ref_nir = soil_albedos(soil.color, swc);
+    if clm
+        _ref_par,_ref_nir = soil_albedos(soil.color, swc);
+    else
+        _ref_par,_ref_nir = soil_albedos(soil.color, swc, true);
+    end;
     if soil.ρ_PAR !== _ref_par || soil.ρ_NIR !== _ref_nir
         fit_soil_mat!(soil, wls, _ref_par, _ref_nir, method);
     end
@@ -171,16 +196,13 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::FourBandsFittingCurve
 ) where {FT<:AbstractFloat}
-    @unpack iPAR, iWLF = wls;
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
-
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights using pinv
-    soil.ρ_SW_raw .= ref_NIR;
-    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.ρ_SW_raw[32:end] .= ref_NIR;
+    soil.ρ_SW_raw[1:31] .= ref_PAR;
     soil.SW_vec_4 .= pinv(soil.SW_mat_raw_4) * soil.ρ_SW_raw;
 
     # update vectors in soil
@@ -215,23 +237,20 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::FourBandsFittingHybrid
 ) where {FT<:AbstractFloat}
-    @unpack iNIR, iPAR, iWLF = wls;
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
-
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights using pinv
-    soil.ρ_SW_raw .= ref_NIR;
-    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.ρ_SW_raw[32:end] .= ref_NIR;
+    soil.ρ_SW_raw[1:31] .= ref_PAR;
     soil.SW_vec_4 .= pinv(soil.SW_mat_raw_4) * soil.ρ_SW_raw;
 
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_4, x);
-        _diff = ( mean(soil.ρ_SW_raw[iPAR]) - ref_PAR ) ^ 2+
-                mean( abs.(soil.ρ_SW_raw[iNIR] .- ref_NIR) ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
+                mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
         return -_diff
     );
 
@@ -275,23 +294,20 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::FourBandsFittingPoint
 ) where {FT<:AbstractFloat}
-    @unpack iNIR, iPAR, iWLF = wls;
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
-
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights using pinv
-    soil.ρ_SW_raw .= ref_NIR;
-    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.ρ_SW_raw[32:end] .= ref_NIR;
+    soil.ρ_SW_raw[1:31] .= ref_PAR;
     soil.SW_vec_4 .= pinv(soil.SW_mat_raw_4) * soil.ρ_SW_raw;
 
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_4, x);
-        _diff = ( mean(soil.ρ_SW_raw[iPAR]) - ref_PAR ) ^ 2 +
-                ( mean(soil.ρ_SW_raw[iNIR]) - ref_NIR ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
+                ( mean(soil.ρ_SW_raw[32:end]) - ref_NIR ) ^ 2;
         return -_diff
     );
 
@@ -335,16 +351,13 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::TwoBandsFittingCurve
 ) where {FT<:AbstractFloat}
-    @unpack iPAR, iWLF = wls;
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
-
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights using pinv
-    soil.ρ_SW_raw .= ref_NIR;
-    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.ρ_SW_raw[32:end] .= ref_NIR;
+    soil.ρ_SW_raw[1:31] .= ref_PAR;
     soil.SW_vec_2 .= pinv(soil.SW_mat_raw_2) * soil.ρ_SW_raw;
 
     # update vectors in soil
@@ -379,23 +392,20 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::TwoBandsFittingHybrid
 ) where {FT<:AbstractFloat}
-    @unpack iNIR, iPAR, iWLF = wls;
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
-
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights using pinv
-    soil.ρ_SW_raw .= ref_NIR;
-    soil.ρ_SW_raw[iPAR] .= ref_PAR;
+    soil.ρ_SW_raw[32:end] .= ref_NIR;
+    soil.ρ_SW_raw[1:31] .= ref_PAR;
     soil.SW_vec_2 .= pinv(soil.SW_mat_raw_2) * soil.ρ_SW_raw;
 
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_2, x);
-        _diff = ( mean(soil.ρ_SW_raw[iPAR]) - ref_PAR ) ^ 2 +
-                mean( abs.(soil.ρ_SW_raw[iNIR] .- ref_NIR) ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
+                mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
         return -_diff
     );
 
@@ -439,7 +449,6 @@ function fit_soil_mat!(
             ref_NIR::FT,
             method::TwoBandsFittingPoint
 ) where {FT<:AbstractFloat}
-    @unpack iWLF = wls;
     @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
 
     # update soil PAR and NIR albedo
