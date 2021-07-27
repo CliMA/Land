@@ -300,6 +300,7 @@ println();
         node = SPACMono{FT}();
         initialize_spac_canopy!(node);
         layer_fluxes!(node);
+        layer_fluxes!(node, FT(30));
         @test NaN_test(node);
 
         update_Cab!(node, FT(30));
