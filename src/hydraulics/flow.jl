@@ -279,6 +279,9 @@ function flow_profile!(hs::GrassLikeOrganism{FT}) where {FT<:AbstractFloat}
 
     # update root flow among root layers
     roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
 
     return nothing
 end
@@ -298,6 +301,9 @@ function flow_profile!(hs::PalmLikeOrganism{FT}) where {FT<:AbstractFloat}
 
     # update root flow among root layers
     roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
 
     return nothing
 end
@@ -318,6 +324,9 @@ function flow_profile!(hs::TreeLikeOrganism{FT}) where {FT<:AbstractFloat}
 
     # update root flow among root layers
     roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
 
     return nothing
 end
