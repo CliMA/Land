@@ -22,6 +22,13 @@
 
 
 
+## Note
+
+`Photosynthesis.jl` will be deprecated and archived, and thus version number will be stopped at v0.2.1. Literally, only bug fixes should be committed in the future, and new developments will be moved `Emerald.jl`. However, users may continue to use the package. As `Photosynthesis.jl` is a module of CliMA Land, please cite CliMA Land when you use `Photosynthesis.jl`.
+
+
+
+
 ## About
 
 Photosynthesis models for C3 and C4 photosynthesis.
