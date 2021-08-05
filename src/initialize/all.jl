@@ -55,6 +55,5 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     # # Compute Long Wave (Last term is LW incoming in W m^-2)
     thermal_fluxes!(leaves, can_opt, can_rad, can, soil, [FT(400.0)], wls);
 
-    return angles, can, can_opt, can_rad, in_rad, leaves,
-           rt_con, rt_dim, soil, wls
+    return angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls
 end
