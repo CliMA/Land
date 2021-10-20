@@ -19,7 +19,7 @@
                           Photosynthesis.VcmaxTDLeuning(FT),
                           Photosynthesis.JmaxTDBernacchi(FT),
                           Photosynthesis.VtoRCollatz(FT),
-                          C3Bernacchi(FT),
+                          Photosynthesis.C3Bernacchi(FT),
                           Photosynthesis.Q10TDAngiosperm(FT),
                           Photosynthesis.Q10TDGymnosperm(FT) ]
             @test FT_test(data_set, FT);
