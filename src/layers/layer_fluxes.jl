@@ -143,9 +143,6 @@ function layer_fluxes!(
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
-        for _i_root in eachindex(plant_hs.roots)
-            plant_hs.roots[_i_root].flow = plant_hs.cache_q[_i_root];
-        end;
     end
 
     # update the flows in SPACMono
@@ -283,9 +280,6 @@ function layer_fluxes!(
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
-        for _i_root in eachindex(plant_hs.roots)
-            plant_hs.roots[_i_root].flow = plant_hs.cache_q[_i_root];
-        end;
     end
 
     # update the flows in SPACMono
