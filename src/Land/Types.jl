@@ -21,7 +21,7 @@ Base.@kwdef mutable struct VerticalLayers{FT}
 
     # Temperature
     "Temperature at each layer"
-    T::Array{FT,1} = ones(FT,n_layer) .* WaterPhysics.K_25(FT)
+    T::Array{FT,1} = ones(FT,n_layer) .* T_25(FT)
 
     # CO₂ partial pressure
     "Diffusion coefficient array"

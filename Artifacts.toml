@@ -11,13 +11,13 @@ lazy = true
     sha256 = "5073edf5b7a3713f65ba0a2ee6801323570250ce6e46faa7cd45bb84fda487c5"
     url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/2020_leaf_invest/2020_leaf_invest_weather.tar.gz"
 
-[land_model_spectrum]
-git-tree-sha1 = "ad248def1185cce69f626613dd1f70333a8290a6"
+[land_model_spectrum_V1]
+git-tree-sha1 = "ea4a9eb822a62542d0cedd7a0921d620dde47af7"
 lazy = true
 
-    [[land_model_spectrum.download]]
-    sha256 = "cd260824a471900a88004818bb9ea0b77e6255213ef2a6648668659268ed494d"
-    url = "ftp://fluo.gps.caltech.edu/XYZT_CLIMA_LUT/LandModel/land_model_spectrum.tar.gz"
-    [[land_model_spectrum.download]]
-    sha256 = "cd260824a471900a88004818bb9ea0b77e6255213ef2a6648668659268ed494d"
-    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/CliMA_LUT/land_model_spectrum.tar.gz"
+    [[land_model_spectrum_V1.download]]
+    sha256 = "ee0ee97c013317d5535868db08a0929e4f5dbaef2d2003ed61485003e5302386"
+    url = "ftp://fluo.gps.caltech.edu/XYZT_CLIMA_LUT/LandModel/land_model_spectrum_V1.tar.gz"
+    [[land_model_spectrum_V1.download]]
+    sha256 = "ee0ee97c013317d5535868db08a0929e4f5dbaef2d2003ed61485003e5302386"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V1.tar.gz"

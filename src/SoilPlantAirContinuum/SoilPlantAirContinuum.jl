@@ -1,6 +1,6 @@
 module SoilPlantAirContinuum
 
-using CanopyLayers: Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation,
+using ..CanopyLayers: Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation,
       LeafBios, RTCache, RTDimensions, SIF_fluxes!, SoilOpticals, SolarAngles,
       WaveLengths, big_leaf_partition, canopy_fluxes!, canopy_geometry!,
       canopy_matrices!, create_canopy_opticals, create_canopy_rads,
@@ -11,16 +11,16 @@ using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND,
       find_peak
 using DataFrames: DataFrame
 using DocStringExtensions: TYPEDFIELDS
-using Photosynthesis: AbstractPhotoModelParaSet, AirLayer, C3CLM, GCO₂Mode,
+using ..Photosynthesis: AbstractPhotoModelParaSet, AirLayer, C3CLM, GCO₂Mode,
       Leaf, leaf_photosynthesis!, leaf_rd!, leaf_temperature_dependence!
 using PkgUtility: GAS_R, GRAVITY, K_STEFAN, K_VON_KARMAN, M_H₂O, P_ATM, RT_25,
       T_0, T_25, YEAR_D, tinfo, ρ_H₂O
-using PlantHydraulics: AbstractPlantOrganism, GrassLikeOrganism,
+using ..PlantHydraulics: AbstractPlantOrganism, GrassLikeOrganism,
       PalmLikeOrganism, SteadyStateMode, TreeLikeOrganism, TreeSimple,
       create_grass, critical_flow, end_pressure, flow_profile!,
       pressure_profile!, roots_flow!, soil_p_25_swc, soil_swc,
       temperature_effects!
-using StomataModels: AbstractStomatalModel, CanopyLayer, ESMBallBerry,
+using ..StomataModels: AbstractStomatalModel, CanopyLayer, ESMBallBerry,
       EmpiricalStomatalModel, GswDrive, gas_exchange!, gsw_control!,
       prognostic_gsw!, stomatal_conductance, update_leaf_TP!
 using UnPack: @unpack

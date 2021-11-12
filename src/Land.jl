@@ -4,7 +4,8 @@ using DiffEqOperators
 using DocStringExtensions
 using OrdinaryDiffEq
 using Parameters
-using WaterPhysics
+using PkgUtility: T_25
+using WaterPhysics: TraceGasAir, TraceGasCO₂, diffusive_coefficient
 
 # export public types
 export VerticalLayers
