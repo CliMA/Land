@@ -9,7 +9,7 @@
 Struct that contains 1-layer gas exchange information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SPACContainer1L{FT<:AbstractFloat}
     "Mean gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -37,7 +37,7 @@ end
 Struct that contains 2-layer gas exchange information.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SPACContainer2L{FT<:AbstractFloat}
     # gas exchange information
