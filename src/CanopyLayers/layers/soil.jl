@@ -139,7 +139,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `swc` Soil volumetric water content
 - `method` [`AbstractAlbedoFitting`](@ref) type fitting method
 - `clm` If true, use CLM method, else use new method
@@ -184,7 +184,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingCurve`](@ref) type fitting method
@@ -225,7 +225,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingHybrid`](@ref) type fitting method
@@ -282,7 +282,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingPoint`](@ref) type fitting method
@@ -339,7 +339,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingCurve`](@ref) type fitting method
@@ -380,7 +380,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingHybrid`](@ref) type fitting method
@@ -437,7 +437,7 @@ end
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
-- `wls` [`Wavelengths`](@ref) type structure
+- `wls` [`WaveLengths`](@ref) type structure
 - `ref_PAR` Target albedo for PAR
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingPoint`](@ref) type fitting method

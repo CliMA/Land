@@ -41,6 +41,7 @@ Some beta functions make correction over the `g1` parameter as in the empitical
 ```@docs
 AbstractBetaG
 BetaGLinearKleaf
+BetaGLinearKsoil
 BetaGLinearPleaf
 BetaGLinearPsoil
 BetaGLinearSWC

@@ -247,7 +247,7 @@ end
     ) where {FT<:AbstractFloat}
 
 Leaf level SIF, given
-- `leaf` [`LeafBio`](@ref) type struct
+- `leaf` [`LeafBios`](@ref) type struct
 - `in_rad` [`IncomingRadiation`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `rt_con` [`RTCache`](@ref) type cache

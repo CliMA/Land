@@ -24,9 +24,9 @@ mutable struct SoilOpticals{FT}
     ρ_PAR::FT
 
     # hyperspectral shortwave albedo
-    "Shortwave albedo that matches `WL` from [`Wavelengths`](@ref)"
+    "Shortwave albedo that matches `WL` from [`WaveLengths`](@ref)"
     ρ_SW::Vector{FT}
-    "Shortwave albedo that matches `WLF` from [`Wavelengths`](@ref)"
+    "Shortwave albedo that matches `WLF` from [`WaveLengths`](@ref)"
     ρ_SW_SIF::Vector{FT}
     "Shortwave absorption that equals `1 - ρ_SW`"
     ε_SW::Vector{FT}
@@ -36,9 +36,9 @@ mutable struct SoilOpticals{FT}
     SW_mat_raw_4::Matrix{FT}
     "Shortwave albedo matrix from 2 bands, wavelengths are 400:10:2500 nm"
     SW_mat_raw_2::Matrix{FT}
-    "Shortwave albedo matrix from 4 bands with `WL` from [`Wavelengths`](@ref)"
+    "Shortwave albedo matrix from 4 bands with `WL` from [`WaveLengths`](@ref)"
     SW_mat_4::Matrix{FT}
-    "Shortwave albedo matrix from 2 bands with `WL` from [`Wavelengths`](@ref)"
+    "Shortwave albedo matrix from 2 bands with `WL` from [`WaveLengths`](@ref)"
     SW_mat_2::Matrix{FT}
     "Shortwave albedo weight from 4 bands"
     SW_vec_4::Vector{FT}

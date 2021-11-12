@@ -40,8 +40,6 @@ To initialize a hydraulics system, one needs to provide the floating type, for
     example:
 
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 hs_leaf = LeafHydraulics{FT}();
 hs_root = RootHydraulics{FT}();
@@ -110,8 +108,6 @@ What these functions do are to determine how many root layers and branch/canopy
 To initialize a whole-plant hydraulic system, checkout the example below:
 
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 grass = create_grass(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 palm  =  create_palm(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
@@ -157,6 +153,8 @@ The VC formulations are abstractized as
 AbstractXylemVC
 WeibullDual
 WeibullSingle
+LogisticSingle
+PowerSingle
 ```
 
 The function to call is
@@ -185,8 +183,6 @@ xylem_p_crit
 Examples:
 
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 vc_1 = WeibullSingle{FT}();
 vc_2 = WeibullDual{FT}();
@@ -278,8 +274,6 @@ inititialize_legacy!
 
 Examples:
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 leaf = LeafHydraulics{FT}();
 p = end_pressure(leaf, FT(0.01));
@@ -351,8 +345,6 @@ However, the steps above are only 1 iteration, and can only be used for the
 Example:
 
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 palm = create_palm(FT(-2.1), FT(0.5), FT(8), FT[0,-1,-2,-3], collect(FT,0:1:20));
 roots_flow!(palm.roots, palm.cache_k, palm.cache_p, palm.cache_q, FT(1));
@@ -391,8 +383,6 @@ Note that function [`xylem_risk`](@ref) can work on its own without having
 Examples
 
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 leaf = LeafHydraulics{FT}();
 risk = xylem_risk(leaf, FT(0.01));
@@ -410,8 +400,6 @@ Function [`critical_flow`](@ref) calculates critical leaf transpiration rate,
 
 Examples
 ```julia
-using Land.PlantHydraulics
-
 FT = Float32;
 leaf = LeafHydraulics{FT}();
 risk = critical_flow(leaf);
