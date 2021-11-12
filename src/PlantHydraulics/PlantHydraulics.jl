@@ -1,97 +1,50 @@
 module PlantHydraulics
 
-using CLIMAParameters
-using CLIMAParameters.Planet: T_freeze, grav, ρ_cloud_liq
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
-            ResidualTolerance, SolutionTolerance, SolutionToleranceND,
-            find_peak, find_zero
+      ResidualTolerance, SolutionTolerance, SolutionToleranceND, find_peak,
+      find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
-using Parameters
-using Statistics
-using WaterPhysics
-
-
-
-
-# define global constants
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH = EarthParameterSet()
-GRAVITY(FT) = FT( grav(EARTH) );
-K_25(FT)    = FT( T_freeze(EARTH) ) + 25;
-R_GAS(FT)   = FT( gas_constant() );
-ρ_H₂O(FT)   = FT( ρ_cloud_liq(EARTH) );
-ρg_MPa(FT)  = ρ_H₂O(FT) * GRAVITY(FT) * FT(1e-6);
+using HypergeometricFunctions: _₂F₁
+using PkgUtility: GAS_R, T_25, twarn, ρg_MPa
+using SpecialFunctions: gamma
+using Statistics: mean
+using UnPack: @unpack
+using WaterPhysics: relative_surface_tension, relative_viscosity
 
 
 
 
 # export public types --- soil vulnerability
-export AbstractSoilVC,
-       BrooksCorey,
-       VanGenuchten
+export BrooksCorey, VanGenuchten
 
 # export public types --- xylem vulnerability
-export AbstractXylemVC,
-       WeibullDual,
-       WeibullSingle
+export LogisticSingle, PowerSingle, WeibullDual, WeibullSingle
 
 # export public types --- pressure volume curve
-export AbstractCapacity,
-       PVCurveLinear,
-       PVCurveSegmented
+export PVCurveLinear, PVCurveSegmented
 
 # export public types --- flow mode
-export AbstractFlowMode,
-       NonSteadyStateMode,
-       SteadyStateMode
+export NonSteadyStateMode, SteadyStateMode
 
 # export public types --- hydraulic tissue
-export AbstractHydraulicOrgan,
-       LeafHydraulics,
-       RootHydraulics,
-       StemHydraulics
+export LeafHydraulics, RootHydraulics, StemHydraulics
 
 # export public types --- hydraulic system
-export AbstractPlantOrganism,
-       GrassLikeOrganism,
-       PalmLikeOrganism,
-       TreeLikeOrganism,
-       TreeSimple
+export GrassLikeOrganism, PalmLikeOrganism, TreeLikeOrganism, TreeSimple
 
 # export public functions --- initialize plant
-export create_grass,
-       create_palm,
-       create_soil_VC,
-       create_tree,
-       fit_soil_VC!
+export create_grass, create_palm, create_soil_VC, create_tree, fit_soil_VC!
 
 # export public functions --- curves related
-export p_from_volume,
-       soil_erwc,
-       soil_k_ratio_erwc,
-       soil_k_ratio_p25,
-       soil_k_ratio_rwc,
-       soil_k_ratio_swc,
-       soil_p_25_erwc,
-       soil_p_25_rwc,
-       soil_p_25_swc,
-       soil_rwc,
-       soil_swc,
-       xylem_k_ratio,
+export vc_integral, p_from_volume, soil_erwc, soil_k_ratio_erwc,
+       soil_k_ratio_p25, soil_k_ratio_rwc, soil_k_ratio_swc, soil_p_25_erwc,
+       soil_p_25_rwc, soil_p_25_swc, soil_rwc, soil_swc, xylem_k_ratio,
        xylem_p_crit
 
 # export public functions
-export pressure_profile!,
-       inititialize_legacy!,
-       critical_flow,
-       xylem_risk,
-       plant_conductances!,
-       roots_flow!,
-       xylem_flow,
-       update_PVF!,
-       temperature_effects!,
-       end_pressure,
-       fit_xylem_VC
+export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow,
+       xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!,
+       temperature_effects!, end_pressure, fit_xylem_VC
 
 
 
@@ -106,6 +59,7 @@ include("initialize/soil.jl"  )
 include("initialize/plant.jl" )
 
 include("curves/capacity.jl")
+include("curves/integral.jl")
 include("curves/soil.jl"    )
 include("curves/xylem.jl"   )
 

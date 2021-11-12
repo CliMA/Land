@@ -166,6 +166,7 @@ println("\nTesting the legacy functions...")
         @test NaN_test(treet);
 
         for _plant in [grass, palm, tree]
+            flow_profile!(_plant);
             pressure_profile!(_plant, SteadyStateMode(); update=true);
             @test FT_test(_plant, FT);
             @test NaN_test(_plant);

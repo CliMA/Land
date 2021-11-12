@@ -32,10 +32,10 @@ function p_from_volume(
     @unpack c_all, RWC_apo, RWC_TLP, ϵ_bulk = pv;
 
     if rvol > RWC_TLP
-        return -c_all * R_GAS(FT) * T / (rvol - RWC_apo) * FT(1e-6) +
+        return -c_all * GAS_R(FT) * T / (rvol - RWC_apo) * FT(1e-6) +
                 ϵ_bulk * (rvol - RWC_TLP)
     elseif rvol > RWC_apo
-        return -c_all * R_GAS(FT) * T / (rvol - RWC_apo) * FT(1e-6)
+        return -c_all * GAS_R(FT) * T / (rvol - RWC_apo) * FT(1e-6)
     else
         return FT(-100)
     end
