@@ -28,7 +28,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 
 The equation used for [`Q10TD`](@ref) is
 ```math
-corr = \\left( \\dfrac{T_1 - T_{REF}}}{10} \\right)^{Q_{10}}
+corr = \\left( \\dfrac{T_1 - T_\\text{REF}}{10} \\right)^{Q_{10}}
 ```
 """
 function temperature_correction(

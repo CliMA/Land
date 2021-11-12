@@ -51,6 +51,28 @@ The C4 photosynthesis model is adapted from Collatz et al. (1992) "Coupled
     photosynthesis-stomatal conductance model for leaves of C4 plants."
 """
 function leaf_photosynthesis!(
+            photo_set::C3Cytochrome{FT},
+            leaf::Leaf{FT},
+            envir::AirLayer{FT},
+            mode::PCO₂Mode
+) where {FT<:AbstractFloat}
+    leaf_temperature_dependence!(photo_set, leaf, envir);
+    leaf_ETR!(photo_set, leaf);
+    light_limited_rate!(photo_set, leaf);
+    rubisco_limited_rate!(photo_set, leaf);
+    product_limited_rate!(photo_set, leaf);
+    leaf.Ag = min(leaf.Ac, leaf.Aj, leaf.Ap);
+    leaf.An = leaf.Ag - leaf.Rd;
+    leaf.J_P680_a = min(leaf.J_P680_c, leaf.J_P680_j, leaf.J_P680_p);
+    leaf.J_P700_a = min(leaf.J_P700_c, leaf.J_P700_j, leaf.J_P700_p);
+
+    return nothing
+end
+
+
+
+
+function leaf_photosynthesis!(
             photo_set::AbstractPhotoModelParaSet{FT},
             leaf::Leaf{FT},
             envir::AirLayer{FT},
