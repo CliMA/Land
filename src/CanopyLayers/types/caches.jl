@@ -9,7 +9,7 @@
 Cache to speed [`canopy_fluxes!`](@ref) by pre-allocating arrays
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct CFCache{FT}
     "absorbed energy from wave lengths"
@@ -52,7 +52,7 @@ end
 Cache to speed [`canopy_geometry!`](@ref) by pre-allocating arrays
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct CGCache{FT}
     # 1D arrays
@@ -94,7 +94,7 @@ end
 Cache to speed [`SIF_fluxes!`](@ref) by pre-allocating arrays
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SFCache{FT}
     # 1D array
@@ -173,7 +173,7 @@ end
 Cache to speed [`short_wave!`](@ref) by pre-allocating arrays
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SWCache{FT}
     # 1D arrays
@@ -217,7 +217,7 @@ end
 Collection of caches to speed up RT module
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct RTCache{FT}
     "[`CFCache`](@ref) type cache"

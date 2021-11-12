@@ -31,7 +31,7 @@ function short_wave!(
     # unpack values from can and soil
     @unpack LAI, nLayer, Ω = can;
     @unpack ks, sb, sf, sigb = can_opt;
-    @unpack albedo_SW = soil;
+    @unpack ρ_SW = soil;
     sw_con = rt_con.sw_con;
 
     # 1. define some useful parameters
@@ -53,8 +53,8 @@ function short_wave!(
     Xss = τ_ss;
 
     # 3.2 Soil reflectance boundary condition (same for diffuse and direct)
-    can_opt.R_sd[:,end] .= albedo_SW;
-    can_opt.R_dd[:,end] .= albedo_SW;
+    can_opt.R_sd[:,end] .= ρ_SW;
+    can_opt.R_dd[:,end] .= ρ_SW;
 
     # 3.3 reflectance for each layer from bottom to top
     @inbounds for j in nLayer:-1:1

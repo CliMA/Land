@@ -94,14 +94,14 @@ function diffusive_S!(
     # 1. unpack values from sf_con
     @unpack dnorm,  F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd,
             τ_dd = sf_con;
-    @unpack albedo_SW_SIF = soil;
+    @unpack ρ_SW_SIF = soil;
     @unpack nLayer, nLevel = rt_dim;
 
     # Get dimensions (1st is wavelength, 2nd is layers), for Stefan Boltzmann
     # just one effective wavelength
     dnorm .= 1 .- view(ρ_dd, :, 1);
 
-    Rdd[:,end] .= albedo_SW_SIF;
+    Rdd[:,end] .= ρ_SW_SIF;
 
     # Source at TOC (0 for SIF, downwelling LW from atmosphere for thermal)
     F⁻[:,1]  .= zeroB;

@@ -9,7 +9,7 @@
 Struct that stores matrix dimension information
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct RTDimensions
     "Number of azimuth angles"

@@ -35,7 +35,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     can_rad = create_canopy_rads(FT, rt_dim);
     can_opt = create_canopy_opticals(FT, rt_dim);
     in_rad  = create_incoming_radiation(wls);
-    soil    = create_soil_opticals(wls);
+    soil    = SoilOpticals{FT}(wls);
     angles  = SolarAngles{FT}();
     rt_con  = create_rt_cache(FT, rt_dim);
 
@@ -55,6 +55,5 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     # # Compute Long Wave (Last term is LW incoming in W m^-2)
     thermal_fluxes!(leaves, can_opt, can_rad, can, soil, [FT(400.0)], wls);
 
-    return angles, can, can_opt, can_rad, in_rad, leaves,
-           rt_con, rt_dim, soil, wls
+    return angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls
 end
