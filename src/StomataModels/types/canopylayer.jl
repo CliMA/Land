@@ -9,7 +9,7 @@
 Struct to store leaf information (multi-dimensional).
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     # CanopyLayer photosynthesis system
@@ -41,9 +41,9 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Tempearture related, same for all leaves
     "Latent Heat of evaporation `[J mol⁻¹]`"
-    LV   ::FT = latent_heat_vapor(K_25(FT)) * MOLMASS_WATER(FT)
+    LV   ::FT = latent_heat_vapor(T_25(FT)) * M_H₂O(FT)
     "Temperature `[K]`"
-    T    ::FT = K_25(FT)
+    T    ::FT = T_25(FT)
     "Old temperature `[K]`"
     T_old::FT = FT(0)
     "Leaf width `[m]`"
@@ -125,7 +125,7 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     "PSII yield"
     φ  ::Array{FT,1} = zeros(FT, n_leaf)
     "Steady-state (light-adapted) yield (aka Fs)"
-    ϕs ::Array{FT,1} = zeros(FT, n_leaf)
+    φs ::Array{FT,1} = zeros(FT, n_leaf)
 
     # Fluorescence related, same for all leaves
     "dark adapted yield (`Kp=0`)"

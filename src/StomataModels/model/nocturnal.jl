@@ -23,8 +23,10 @@ function dRdE(
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     @unpack ps, T = clayer;
+    @unpack Rd = ps;
 
-    return dTdE(clayer, envir) * ps.Rd * photo_set.ΓsT.ΔHa_to_R / T^2
+    return dTdE(clayer, envir) * Rd * photo_set.ReT.ΔHa_to_RT25 * T_25(FT) /
+           T^2
 end
 
 
@@ -47,10 +49,10 @@ function dTdE(
     @unpack T, tLAI, width = clayer;
     @unpack wind = envir;
 
-    lambda = latent_heat_vapor(T) * MOLMASS_WATER(FT);
+    lambda = latent_heat_vapor(T) * M_H₂O(FT);
     gbe    = FT(0.189 * sqrt(wind/(0.72*width)));
     emis   = FT(0.97);
-    denom  = 2 * CP_DRYAIR_MOL(FT) * gbe +
+    denom  = 2 * CP_D_MOL(FT) * gbe +
              4 / tLAI * K_STEFAN(FT) * emis * T^3;
     ∂T∂E   = lambda / denom;
 
@@ -80,6 +82,7 @@ function dΘdE(
             g_sw::FT
 ) where {FT<:AbstractFloat}
     @unpack APAR_m, ec, envir_m, ff, ps_m = clayer;
+    @unpack p_atm, p_H₂O = envir_m
     ps_m.APAR = APAR_m;
 
     # calculate g_lc and a_net using memory clayer and envir
@@ -87,7 +90,7 @@ function dΘdE(
     g_lc = 1 / (1/g_sc + 1/ps_m.g_bc);
     g_bw = ps_m.g_bc * FT(1.35);
     g_lw = 1 / (1/g_sw + 1/g_bw);
-    flow = g_lw * max(1, ps_m.p_sat - envir_m.p_H₂O) / envir_m.p_atm;
+    flow = g_lw * max(1, ps_m.p_sat - p_H₂O) / p_atm;
     leaf_photosynthesis!(photo_set, ps_m, envir_m, GCO₂Mode(), g_lc);
 
     return ps_m.An / (ec - flow) * ff

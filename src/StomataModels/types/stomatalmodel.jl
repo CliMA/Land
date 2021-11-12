@@ -53,7 +53,7 @@ gs = g0 + g1 ⋅ RH ⋅ \\dfrac{A}{Cs}
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMBallBerry{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
@@ -78,7 +78,7 @@ Note it that the Gentine model does not require for a `β` function to tune the
     post-drought stomatal response unless `k_leaf` can be recovered.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMGentine{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
@@ -100,7 +100,7 @@ gs = g0 + g1 ⋅ \\dfrac{A}{Cs - Γ^{*}} ⋅ \\dfrac{1}{1 + \\dfrac{VPD}{d0}}
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMLeuning{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
@@ -124,7 +124,7 @@ gs = g0 + 1.6 ⋅ \\left( 1 + \\dfrac{g1}{\\sqrt{VPD}} \\right) ⋅ \\dfrac{A}{C
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMMedlyn{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
@@ -162,7 +162,7 @@ The equation used for Eller model is
 where K is ``\\dfrac{∂E}{∂P}``.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct OSMEller{FT} <: OptimizationStomatalModel{FT} end
 
@@ -180,7 +180,7 @@ The equation used for Sperry model is
 where K is ``\\dfrac{∂E}{∂P}``.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct OSMSperry{FT} <: OptimizationStomatalModel{FT} end
 
@@ -197,7 +197,7 @@ The equation used for Wang model is
 ```
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 struct OSMWang{FT} <: OptimizationStomatalModel{FT} end
 
@@ -215,7 +215,7 @@ The equation used for Wolf-Anderegg-Pacala model is
 where K is ∂P/∂E.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct OSMWAP{FT} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
@@ -239,7 +239,7 @@ The equation used for modified Wolf-Anderegg-Pacala model is
 where P is absolute value of leaf xylem pressure.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct OSMWAPMod{FT} <: OptimizationStomatalModel{FT}
     "Quadratic equation parameter `[mol mol⁻¹ MPa⁻¹]`"
