@@ -5,7 +5,7 @@
 ###############################################################################
 """
     light_limited_rate!(
-                photo_set::C3ParaSet{FT},
+                photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
                 leaf::Leaf{FT}
     ) where {FT<:AbstractFloat}
     light_limited_rate!(
@@ -24,7 +24,7 @@ Calculate the light limited photosynthetic rate, given
 - `envir` [`AirLayer`](@ref) type struct
 """
 function light_limited_rate!(
-            photo_set::C3ParaSet{FT},
+            photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     @unpack J, p_i, Γ_star = leaf;
@@ -73,7 +73,8 @@ function light_limited_rate!(
     _qc = _a*_p - _b - Rd*(_c*_p + _d);
     _an = lower_quadratic(_qa, _qb, _qc);
 
-    leaf.Aj = _an + Rd;
+    leaf.Aj  = _an + Rd;
+    leaf.e2c = leaf.Aj / leaf.J;
 
     return nothing
 end

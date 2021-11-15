@@ -9,7 +9,7 @@
 A struct for canopy optical properties
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct CanopyOpticals{FT}
     # local storage of dimension information

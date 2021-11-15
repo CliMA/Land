@@ -123,6 +123,7 @@ function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             psoil::FT,
             swc::FT,
             envir::AirLayer{FT},
@@ -136,7 +137,8 @@ function gas_exchange!(
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
         leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs, psoil, swc, envir, sm, bt, ind);
+        gas_exchange!(photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt,
+                      ind);
     end
 end
 
@@ -147,6 +149,7 @@ function gas_exchange!(
             photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
+            svc::AbstractSoilVC{FT},
             psoil::FT,
             swc::FT,
             envir::AirLayer{FT},
@@ -163,12 +166,12 @@ function gas_exchange!(
         _g_m  = canopyi.g_m[ind];
 
         # solve for optimal g_lc, A and g_sw updated here
-        _gh    = 1 / (1/_g_bc + FT(1.6)/g_max + 1/_g_m);
-        _gl    = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
-        _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
-        _st    = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, psoil, swc,
-                                      envir, sm, bt, GlcDrive(), ind);
+        _gh = 1 / (1/_g_bc + FT(1.6)/g_max + 1/_g_m);
+        _gl = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
+        _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
+        _st = SolutionTolerance{FT}(1e-4, 50);
+        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, svc, psoil,
+                                      swc, envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
@@ -243,7 +246,7 @@ function gas_exchange!(
             # solve for optimal g_lc, A and g_sw updated here
             _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
-            _sm = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
+            _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
             @inline fd(x) = solution_diff!(x, photo_set, canopyi, hs, envir,
                                            sm, GlcDrive(), ind);
@@ -265,7 +268,7 @@ function gas_exchange!(
     else
         @unpack ec, g_max, g_min, p_sat = canopyi;
         @unpack p_atm, p_H₂O = envir;
-        _sm = NewtonBisectionMethod{FT}(g_min, g_max, (g_min+g_max)/2);
+        _sm = NewtonBisectionMethod{FT}(x_min=g_min, x_max=g_max);
         _st = SolutionTolerance{FT}(1e-4, 50);
         @inline fn(x) = nocturnal_diff!(x, photo_set, canopyi, envir, sm);
         _sl = find_zero(fn, _sm, _st);
@@ -315,10 +318,10 @@ function gas_exchange!(
                 canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
-            _gh    = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
-            _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
-            _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
-            _st    = SolutionTolerance{FT}(1e-4, 50);
+            _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
+            _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
+            _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
+            _st = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
                                           GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
@@ -381,10 +384,10 @@ function gas_exchange!(
                 canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
-            _gh    = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
-            _gl    = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
-            _sm    = NewtonBisectionMethod{FT}(_gl, _gh, (_gl+_gh)/2);
-            _st    = SolutionTolerance{FT}(1e-4, 50);
+            _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
+            _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
+            _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
+            _st = SolutionTolerance{FT}(1e-4, 50);
             @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
                                           GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
@@ -494,7 +497,7 @@ function gas_exchange!(
     canopyi.Ap[ind] = canopyi.ps.Ap;
     canopyi.Ag[ind] = canopyi.ps.Ag;
     canopyi.An[ind] = canopyi.ps.An;
-    canopyi.ϕs[ind] = canopyi.ps.ϕs;
+    canopyi.φs[ind] = canopyi.ps.φs;
 
     # update the pressures
     canopyi.p_i[ind] = canopyi.ps.p_i;
@@ -588,7 +591,7 @@ function gas_exchange!(
     canopyi.Ap[ind] = canopyi.ps.Ap;
     canopyi.Ag[ind] = canopyi.ps.Ag;
     canopyi.An[ind] = canopyi.ps.An;
-    canopyi.ϕs[ind] = canopyi.ps.ϕs;
+    canopyi.φs[ind] = canopyi.ps.φs;
 
     # update the pressures
     canopyi.p_i[ind] = canopyi.ps.p_i;

@@ -40,7 +40,7 @@ function canopy_fluxes!(
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
     @unpack LAI, nLayer, Ω = can;
-    @unpack albedo_SW, emsvty_SW = soil;
+    @unpack ρ_SW, ε_SW = soil;
     @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
     cf_con = rt_con.cf_con;
 
@@ -51,9 +51,9 @@ function canopy_fluxes!(
     # 3. Compute some fluxes, can be done separately if needed
     #    this is absolute fluxes now, for the entire soil
     last_ind_cr            = lastindex(can_rad.E_down,2);
-    cf_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* emsvty_SW;
+    cf_con.abs_wave       .= view(can_rad.E_down, :, last_ind_cr) .* ε_SW;
     can_rad.RnSoil_diffuse = fac * numerical∫(cf_con.abs_wave, dWL);
-    cf_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* emsvty_SW;
+    cf_con.abs_wave       .= view(can_opt.Es_, :, last_ind_cr) .* ε_SW;
     can_rad.RnSoil_direct  = fac * numerical∫(cf_con.abs_wave, dWL);
     can_rad.RnSoil         = can_rad.RnSoil_direct + can_rad.RnSoil_diffuse;
 
@@ -72,15 +72,17 @@ function canopy_fluxes!(
         else
             cf_con.kChlrel .= view(leaves[1].kChlrel, iPAR);
         end
+
         # for diffuse PAR
         cf_con.E_iPAR .= view(can_rad.netSW_shade, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
         cf_con.PAR_diff .*= fac / tLAI;
+
         # for direct PAR
         cf_con.E_iPAR .= view(can_rad.netSW_sunlit, iPAR, j);
         e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
         cf_con.PAR_dir .*= fac / tLAI;
-        cf_con.PAR_dir .+= cf_con.PAR_diff;
+
         # for leaf absorbed
         cf_con.PAR_diffCab .= cf_con.kChlrel .* cf_con.PAR_diff;
         cf_con.PAR_dirCab  .= cf_con.kChlrel .* cf_con.PAR_dir;
@@ -95,7 +97,8 @@ function canopy_fluxes!(
         _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
         _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
         can_rad.absPAR_shadeCab[j] = _difCab;
-        can_rad.absPAR_sunCab[:,:,j] .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j]  .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j] .+= _difCab;
     end
 
     # 5. Total PAR

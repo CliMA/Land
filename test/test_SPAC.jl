@@ -2,14 +2,9 @@
 @info "Testing the FT and NaN of the structs...";
 @testset "FT and NaN --- Types" begin
     for FT in [Float32, Float64]
-        node   = SPACSimple{FT}();
-        cont1L = SPACContainer1L{FT}();
-        cont2L = SPACContainer2L{FT}();
-
-        for data in [node, cont1L, cont2L]
-            @test FT_test(data, FT);
-            @test NaN_test(data);
-        end
+        node = SPACSimple{FT}();
+        @test FT_test(node, FT);
+        @test NaN_test(node);
     end
 end
 
@@ -194,8 +189,8 @@ end
 println();
 @info "Testing the annual_profit Functions...";
 @testset "SoilPlantAirContinuum --- annual_profit" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -214,8 +209,8 @@ end
 println();
 @info "Testing annual_simulation! Functions...";
 @testset "SoilPlantAirContinuum --- annual_simulation!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
         photo = C3CLM(FT);
@@ -259,8 +254,8 @@ end
 println();
 @info "Testing the optimize_leaf! Functions...";
 @testset "SoilPlantAirContinuum --- optimize_leaf!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
         photo   = C3CLM(FT);
@@ -279,8 +274,8 @@ end
 println();
 @info "Testing the vary_spac! Functions...";
 @testset "SoilPlantAirContinuum --- vary_spac!" begin
-    arti = artifact"2020_leaf_invest_weather" *  "/gs_sample.csv";
-    weat = DataFrame(CSV.File(arti));
+    arti = artifact"2020_leaf_invest_weather" * "/gs_sample.csv";
+    weat = read_csv(arti);
     facs = ["kl", "kw", "wb", "wc", "wk",
             "cc", "cv", "gm",
             "ga", "sd",
@@ -305,6 +300,16 @@ println();
         node = SPACMono{FT}();
         initialize_spac_canopy!(node);
         layer_fluxes!(node);
+        layer_fluxes!(node, FT(30));
         @test NaN_test(node);
+
+        update_Cab!(node, FT(30));
+        update_Kmax!(node, FT(1));
+        update_LAI!(node, FT(3));
+        update_VJR!(node, FT(0.5));
+        update_VJRWW!(node, FT(50));
+        update_Weibull!(node, FT(3));
+        update_Weibull!(node, FT(3), FT(0.9));
+        @test true;
     end
 end

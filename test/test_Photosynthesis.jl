@@ -1,27 +1,27 @@
 # FT and NaN test for the structs
 @testset "Photosynthesis --- structures" begin
     for FT in [Float32, Float64]
-        for data_set in [ KcTDBernacchi(FT),
-                          VpmaxTDBoyd(FT),
+        for data_set in [ Photosynthesis.KcTDBernacchi(FT),
+                          Photosynthesis.VpmaxTDBoyd(FT),
                           C3CLM(FT),
                           C4CLM(FT),
                           AirLayer{FT}(),
                           Leaf{FT}(),
-                          FluorescenceVanDerTol(FT),
-                          FluorescenceVanDerTolDrought(FT),
-                          KoTDBernacchi(FT),
-                          RespirationTDBernacchi(FT),
-                          VcmaxTDBernacchi(FT),
-                          VomaxTDBernacchi(FT),
-                          ΓStarTDBernacchi(FT),
-                          KpepTDBoyd(FT),
-                          JmaxTDLeuning(FT),
-                          VcmaxTDLeuning(FT),
-                          JmaxTDBernacchi(FT),
-                          VtoRCollatz(FT),
+                          Photosynthesis.FluorescenceVanDerTol(FT),
+                          Photosynthesis.FluorescenceVanDerTolDrought(FT),
+                          Photosynthesis.KoTDBernacchi(FT),
+                          Photosynthesis.RespirationTDBernacchi(FT),
+                          Photosynthesis.VcmaxTDBernacchi(FT),
+                          Photosynthesis.VomaxTDBernacchi(FT),
+                          Photosynthesis.ΓStarTDBernacchi(FT),
+                          Photosynthesis.KpepTDBoyd(FT),
+                          Photosynthesis.JmaxTDLeuning(FT),
+                          Photosynthesis.VcmaxTDLeuning(FT),
+                          Photosynthesis.JmaxTDBernacchi(FT),
+                          Photosynthesis.VtoRCollatz(FT),
                           C3Bernacchi(FT),
-                          Q10TDAngiosperm(FT),
-                          Q10TDGymnosperm(FT) ]
+                          Photosynthesis.Q10TDAngiosperm(FT),
+                          Photosynthesis.Q10TDGymnosperm(FT) ]
             @test FT_test(data_set, FT);
             @test NaN_test(data_set);
         end
@@ -39,7 +39,7 @@ println();
         c4_set   = C4CLM(FT);
         leaf_3   = Leaf{FT}();
         leaf_4   = Leaf{FT}();
-        td_q10   = Q10TD{FT}(1, 273.15, 1.7);
+        td_q10   = Photosynthesis.Q10TD{FT}(1, 273.15, 1.7);
         envir    = AirLayer{FT}();
         fluo_set = c3_set.Flu;
         T        = rand(FT) + 298;
@@ -47,34 +47,34 @@ println();
         p_i      = rand(FT) + 20;
 
         # temperature corrections
-        photo_TD_from_set(td_q10, T);
+        Photosynthesis.photo_TD_from_set(td_q10, T);
         leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
         leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
 
         # rubisco limited rates
-        rubisco_limited_rate!(c3_set, leaf_3);
-        rubisco_limited_rate!(c4_set, leaf_4);
+        Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3);
+        Photosynthesis.rubisco_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        rubisco_limited_rate!(c3_set, leaf_3, envir);
+        Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # light limited rates
-        leaf_ETR!(c3_set, leaf_3);
-        leaf_ETR!(c4_set, leaf_4);
-        light_limited_rate!(c3_set, leaf_3);
-        light_limited_rate!(c4_set, leaf_4);
+        Photosynthesis.leaf_ETR!(c3_set, leaf_3);
+        Photosynthesis.leaf_ETR!(c4_set, leaf_4);
+        Photosynthesis.light_limited_rate!(c3_set, leaf_3);
+        Photosynthesis.light_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        light_limited_rate!(c3_set, leaf_3, envir);
+        Photosynthesis.light_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # product limited rates
-        product_limited_rate!(c3_set, leaf_3);
-        product_limited_rate!(c4_set, leaf_4);
+        Photosynthesis.product_limited_rate!(c3_set, leaf_3);
+        Photosynthesis.product_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        product_limited_rate!(c4_set, leaf_4, envir);
+        Photosynthesis.product_limited_rate!(c4_set, leaf_4, envir);
         @test NaN_test(leaf_4);
 
         # fluorescence

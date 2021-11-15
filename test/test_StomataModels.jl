@@ -147,16 +147,17 @@ println();
         osm_4  = OSMWAP{FT}();
         osm_5  = OSMWAPMod{FT}();
         hs     = LeafHydraulics{FT}();
+        svc    = VanGenuchten{FT}();
 
         # test the solution functions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                for result in [ solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), GlcDrive(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), GlcDrive(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), GlcDrive(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), GlcDrive(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), GlcDrive(), 1),
-                                solution_diff!(FT(0.1), mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), GlcDrive(), 1),
+                for result in [ solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), GlcDrive(), 1),
+                                solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), GlcDrive(), 1),
                                 ]
                     @test FT_test(result, FT);
                     @test NaN_test(result);
@@ -172,21 +173,25 @@ println();
         # test the stomata solutions
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKsoil{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKsoil{FT}(), 1);
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
                 @test NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
@@ -199,21 +204,25 @@ println();
 
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKsoil{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKsoil{FT}());
                 @test NaN_test(can);
-                gas_exchange!(mod, can, hs, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
+                @test NaN_test(can);
+                gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
                 @test NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]

@@ -1,69 +1,33 @@
 module StomataModels
 
-using CLIMAParameters
-using CLIMAParameters.Planet
-using ConstrainedRootSolvers
-using DocStringExtensions
-using Parameters
-using ..Photosynthesis
-using ..PlantHydraulics
-using WaterPhysics
-
-
-
-
-# Define constants
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const EARTH        = EarthParameterSet();
-CP_DRYAIR(FT)      = FT( cp_d(EARTH) );
-K_0(FT)            = FT( T_freeze(EARTH) );
-K_STEFAN(FT)       = FT( Stefan() );
-MOLMASS_DRYAIR(FT) = FT( molmass_dryair(EARTH) );
-MOLMASS_WATER(FT)  = FT( molmass_water(EARTH) );
-
-K_25(FT)           = K_0(FT) + 25;
-CP_DRYAIR_MOL(FT)  = CP_DRYAIR(FT) * MOLMASS_DRYAIR(FT);
+using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance,
+      find_zero
+using DocStringExtensions: TYPEDFIELDS
+using ..Photosynthesis: AbstractPhotoModelParaSet, AirLayer, GCO₂Mode, Leaf,
+      leaf_ETR!, leaf_fluorescence!, leaf_photosynthesis!,
+      leaf_temperature_dependence!
+using PkgUtility: CP_D_MOL, K_STEFAN, M_H₂O, T_25
+using ..PlantHydraulics: AbstractSoilVC, LeafHydraulics, TreeSimple,
+      critical_flow, end_pressure, soil_k_ratio_p25, temperature_effects!,
+      xylem_k_ratio, xylem_risk
+using UnPack: @unpack
+using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient,
+      saturation_vapor_pressure
 
 
 
 
 # export public types and structs
-export AbstractBetaFunction,
-       AbstractBetaG,
-       AbstractBetaV,
-       AbstractDrive,
-       AbstractStomatalModel,
-       BetaGLinearKleaf,
-       BetaGLinearPleaf,
-       BetaGLinearPsoil,
-       BetaGLinearSWC,
-       BetaVLinearKleaf,
-       BetaVLinearPleaf,
-       BetaVLinearPsoil,
-       BetaVLinearSWC,
-       CanopyLayer,
-       EmpiricalStomatalModel,
-       ESMBallBerry,
-       ESMGentine,
-       ESMLeuning,
-       ESMMedlyn,
-       GlcDrive,
-       GswDrive,
-       OptimizationStomatalModel,
-       OSMEller,
-       OSMSperry,
-       OSMWang,
-       OSMWAP,
+export BetaGLinearKleaf, BetaGLinearKsoil, BetaGLinearPleaf, BetaGLinearPsoil,
+       BetaGLinearSWC, BetaVLinearKleaf, BetaVLinearKsoil, BetaVLinearPleaf,
+       BetaVLinearPsoil, BetaVLinearSWC, CanopyLayer, EmpiricalStomatalModel,
+       ESMBallBerry, ESMGentine, ESMLeuning, ESMMedlyn, GlcDrive, GswDrive,
+       OptimizationStomatalModel, OSMEller, OSMSperry, OSMWang, OSMWAP,
        OSMWAPMod
 
 # export public functions
-export gsw_control!,
-       gas_exchange!,
-       prognostic_gsw!,
-       solution_diff!,
-       stomatal_conductance,
-       update_leaf_AK!,
-       update_leaf_TP!
+export gsw_control!, gas_exchange!, prognostic_gsw!, solution_diff!,
+       stomatal_conductance, update_leaf_AK!, update_leaf_TP!
 
 
 

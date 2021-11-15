@@ -60,17 +60,16 @@ function critical_flow(
             ini::FT = FT(0.5)
 ) where {FT<:AbstractFloat}
     # calculate maximal flow
-    _fh     = (hs.p_ups - hs.p_crt) * hs.k_sla / hs.f_vis;
-    _fl     = FT(0);
-    _fx     = min((_fh+_fl)/2, ini);
-    _ms     = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt     = SolutionTolerance{FT}(1e-5, 50);
+    _fh = (hs.p_ups - hs.p_crt) * hs.k_sla / hs.f_vis;
+    _fl = FT(0);
+    _fx = min((_fh+_fl)/2, ini);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
+    _rt = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(hs, x) - hs.p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
     if isnan(_solut)
-        @warn "E_crit is NaN, please check the settings...";
-        @show hs.p_ups;
+        @warn twarn("E_crit is NaN, please check the settings...") hs.p_ups;
     end
 
     return _solut
@@ -91,8 +90,8 @@ function critical_flow(
     _fh = -1 * (tree.leaf).p_crt * _kt;
     _fl = FT(0);
     _fx = min((_fh+_fl)/2, ini);
-    _ms = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _rt = SolutionTolerance{FT}(1e-3, 50);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
+    _rt = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(tree, x) - (tree.leaf).p_crt;
     _solut  = find_zero(f, _ms, _rt);
 
@@ -247,14 +246,87 @@ function xylem_flow(
             pressure::FT,
             ini::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    _fh    = (root.p_ups + root.p_osm * root.T_sap / K_25(FT) - pressure) *
-             root.k_max / root.f_vis;
-    _fl    = -_fh;
-    _fx    = min(_fh, ini);
-    _ms    = NewtonBisectionMethod{FT}(_fl, _fh, _fx);
-    _st    = SolutionTolerance{FT}(1e-4, 50);
+    _fh = (root.p_ups + root.p_osm * root.T_sap / T_25(FT) - pressure) *
+          root.k_max / root.f_vis;
+    _fl = -_fh;
+    _fx = min(_fh, ini);
+    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
+    _st = SolutionTolerance{FT}(eps(FT)*100, 50);
     @inline f(x) = end_pressure(root, x) - pressure;
     _solut = find_zero(f, _ms, _st);
 
     return _solut
+end
+
+
+
+
+
+
+
+
+###############################################################################
+#
+# Update the flow profile from leaf flow rates
+#
+###############################################################################
+function flow_profile!(hs::GrassLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        _flow += hs.leaves[_i].flow * hs.leaves[_i].area;
+    end
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
+
+    return nothing
+end
+
+
+
+
+function flow_profile!(hs::PalmLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        _flow += hs.leaves[_i].flow * hs.leaves[_i].area;
+    end
+
+    # trunk flow rate
+    hs.trunk.flow = _flow;
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
+
+    return nothing
+end
+
+
+
+
+function flow_profile!(hs::TreeLikeOrganism{FT}) where {FT<:AbstractFloat}
+    # leaf rate is per leaf area so stem flow should that times leaf area
+    _flow::FT = 0;
+    for _i in eachindex(hs.leaves)
+        hs.branch[_i].flow = hs.leaves[_i].flow * hs.leaves[_i].area;
+        _flow += hs.branch[_i].flow
+    end
+
+    # trunk flow rate
+    hs.trunk.flow = _flow;
+
+    # update root flow among root layers
+    roots_flow!(hs, _flow);
+    for _i in eachindex(hs.roots)
+        hs.roots[_i].flow = hs.cache_q[_i];
+    end
+
+    return nothing
 end

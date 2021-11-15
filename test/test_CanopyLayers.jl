@@ -95,6 +95,7 @@ println();
                     LSWI(can_rad, wls),
                     NDVI(can_rad, wls),
                     NIRv(can_rad, wls),
+                    NIRvES(can_rad, wls),
                     SIF_740(can_rad, wls),
                     SIF_757(can_rad, wls),
                     SIF_771(can_rad, wls)];
@@ -106,5 +107,30 @@ println();
         REF_WL(can_rad, wls, FT(3000));
         SIF_WL(can_rad, wls, FT(3000));
         @test true
+    end
+end
+
+
+
+
+# indices test
+println();
+@info "Testing soil albedo...";
+@testset "CanopyLayers --- Soil albedo" begin
+    for FT in [Float32, Float64]
+        collections = initialize_rt_module(FT; nLayer=20, LAI=3);
+        angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls = collections;
+        _2p = CanopyLayers.TwoBandsFittingPoint();
+        _2c = CanopyLayers.TwoBandsFittingCurve();
+        _2h = CanopyLayers.TwoBandsFittingHybrid();
+        _4p = CanopyLayers.FourBandsFittingPoint();
+        _4c = CanopyLayers.FourBandsFittingCurve();
+        _4h = CanopyLayers.FourBandsFittingHybrid();
+        for _method in [_2p, _2c, _2h, _4p, _4c, _4h]
+            CanopyLayers.fit_soil_mat!(soil, wls, FT(0.5), _method; clm=false);
+            @test true;
+            CanopyLayers.fit_soil_mat!(soil, wls, FT(0.5), _method; clm=true);
+            @test true;
+        end;
     end
 end

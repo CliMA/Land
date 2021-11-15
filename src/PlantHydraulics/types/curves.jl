@@ -67,10 +67,48 @@ end
     $(TYPEDEF)
 
 Hierachy of AbstractXylemVC
+- [`LogisticSingle`](@ref)
+- [`PowerSingle`](@ref)
 - [`WeibullSingle`](@ref)
 - [`WeibullDual`](@ref)
 """
 abstract type AbstractXylemVC{FT<:AbstractFloat} end
+
+
+
+
+"""
+    $(TYPEDEF)
+
+Struct that contains single modified logistc function parameters.
+
+# Fields
+$(TYPEDFIELDS)
+"""
+Base.@kwdef mutable struct LogisticSingle{FT} <: AbstractXylemVC{FT}
+    "Multiplier to exp"
+    a::FT = 2
+    "Multiplier to P `[MPa⁻¹]`"
+    b::FT = 2
+end
+
+
+
+
+"""
+    $(TYPEDEF)
+
+Struct that contains single power function parameters.
+
+# Fields
+$(TYPEDFIELDS)
+"""
+Base.@kwdef mutable struct PowerSingle{FT} <: AbstractXylemVC{FT}
+    "Multiplier to power function, `[MPa⁻ᵇ]`"
+    a::FT = 2
+    "Power to pressure"
+    b::FT = 2
+end
 
 
 

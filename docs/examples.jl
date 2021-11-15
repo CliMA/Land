@@ -10,7 +10,7 @@ include("pages_helper.jl")
 
 
 # Allow flag to skip generated examples
-generate_examples = true
+generate_examples = false
 if generate_examples
     examples_dir = joinpath(@__DIR__, "src/examples");
     examples     = [

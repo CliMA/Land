@@ -9,7 +9,7 @@
 A struct of leaf biological parameters
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafBios{FT}
     # local storage of dimension information
@@ -47,6 +47,8 @@ Base.@kwdef mutable struct LeafBios{FT}
     ρ_SW       ::Array{FT,1} = zeros(FT, nWL)
     "Shortwave leaf transmission"
     τ_SW       ::Array{FT,1} = zeros(FT, nWL)
+    "Shortwave absorption"
+    α_SW       ::Vector{FT}  = zeros(FT, nWL)
     "Relative absorbtion by Chlorophyll+Car"
     kChlrel    ::Array{FT,1} = zeros(FT, nWL)
     "Relative absorbtion by Chlorophyll"

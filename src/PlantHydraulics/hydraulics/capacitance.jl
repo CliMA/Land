@@ -211,7 +211,8 @@ function update_PVF!(
             tree::GrassLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack cache_k, cache_p, cache_q, leaves, roots = tree;
+    @unpack cache_k, cache_p, cache_q, roots = tree;
+    leaves = tree.leaves;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf PVF for each layer
@@ -237,7 +238,9 @@ function update_PVF!(
             tree::PalmLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack cache_k, cache_p, cache_q, leaves, roots, trunk = tree;
+    @unpack cache_k, cache_p, cache_q, roots = tree;
+    leaves = tree.leaves;
+    trunk = tree.trunk;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf PVF for each layer
@@ -267,8 +270,8 @@ function update_PVF!(
             tree::TreeLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack branch, cache_k, cache_p, cache_q, leaves, roots,
-            trunk = tree;
+    @unpack branch, cache_k, cache_p, cache_q, leaves, roots = tree;
+    trunk = tree.trunk;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf and stem PVF for each layer

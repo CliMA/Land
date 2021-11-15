@@ -44,7 +44,7 @@ function annual_simulation!(
         wind ::FT = (weather).Wind[i]
         rain ::FT = (weather).Rain[i]
 
-        node.envir.t_air = _tair + K_0(FT);
+        node.envir.t_air = _tair + T_0(FT);
         node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
         node.envir.p_a   = p_co2;
         node.envir.vpd   = _dair * 1000;
@@ -105,7 +105,7 @@ function annual_simulation!(
 
             # 2.3.3 update temperature effects and then leaf water potential
             flow = FT(0);
-            # TODO morea reasonable functions need to be added
+            # TODO more reasonable functions need to be added
             # vc_temperature_effects!(node.hs.leaf, tlef);
             plef = end_pressure(node.hs, flow);
 

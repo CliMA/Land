@@ -10,7 +10,7 @@ Struct that simplest mono species SoilPlantAirContinuum system, with 1 root,
     stem, and leaf.
 
 # Fields
-$(DocStringExtensions.FIELDS)
+$(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     # Hydraulic system
