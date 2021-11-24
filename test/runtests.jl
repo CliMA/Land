@@ -1,21 +1,39 @@
 using ClimaCache
 using Test
 
+
 @testset "Structure --- Radiation" begin
-    println("             Testing WaveLengthSet constructors...");
+    println("Testing WaveLengthSet constructors...");
     for FT in [Float32, Float64]
         wls = WaveLengthSet{FT}();
-        wls = WaveLengthSet{FT}(collect(FT,400:5:2500));
-        wls = WaveLengthSet{FT}(collect(FT,400:5:2500); opti=ClimaCache.OPTI_2017);
+        wls = WaveLengthSet{FT}(collect(400:5:2500));
+        wls = WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
         @test true;
     end;
 
-    println("             Testing HyperspectralRadiation constructors...");
+    println("Testing HyperspectralRadiation constructors...");
     for FT in [Float32, Float64]
         rad = HyperspectralRadiation{FT}();
-        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)));
-        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)), "");
-        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)), ClimaCache.FILE_SUN);
+        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
+        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)), "");
+        rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2500)), ClimaCache.FILE_SUN);
         @test true;
     end;
-end
+end;
+
+
+@testset "Structure --- Soil" begin
+    println("Testing BrooksCorey constructors...");
+    for FT in [Float32, Float64]
+        bc = BrooksCorey{FT}("Soil type", 1, 1, 0.5, 0.2);
+        @test true;
+    end;
+
+    println("Testing VanGenuchten constructors...");
+    for FT in [Float32, Float64]
+        vg = VanGenuchten{FT}("");
+        vg = VanGenuchten{FT}("Loam");
+        vg = VanGenuchten{FT}("Test", 100, 2, 0.5, 0.1);
+        @test true;
+    end;
+end;

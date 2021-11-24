@@ -67,7 +67,7 @@ end
 
 
 """
-    WaveLengthSet{FT}(swl::Vector{FT}=FT.(WAVELENGTHS); opti::String=OPTI_2021) where {FT<:AbstractFloat}
+    WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat}
 
 Constructor for [`WaveLengthSet`](@ref), given
 - `swl` Standard wave length boundaries `[nm]`, default is `ClimaCache.WAVELENGTHS`
@@ -77,11 +77,11 @@ Constructor for [`WaveLengthSet`](@ref), given
 # Examples
 ```julia
 wls = WaveLengthSet{FT}();
-wls = WaveLengthSet{FT}(collect(FT,400:5:2500));
-wls = WaveLengthSet{FT}(collect(FT,400:5:2500); opti=ClimaCache.OPTI_2017);
+wls = WaveLengthSet{FT}(collect(400:5:2500));
+wls = WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
 ```
 """
-WaveLengthSet{FT}(swl::Vector{FT}=FT.(WAVELENGTHS); opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
+WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
     _dwl    = diff(swl);
     _λ      = zeros(FT, length(swl)-1);
     _opti   = matread(opti)["optipar"];
@@ -95,6 +95,6 @@ WaveLengthSet{FT}(swl::Vector{FT}=FT.(WAVELENGTHS); opti::String=OPTI_2021) wher
     _iλ_sif  = findall( 640 .<= _λ .<= 850  );
     _iλ_sife = findall( 400 .<= _λ .<= 750  );
 
-    return WaveLengthSet(_iλ_nir, _iλ_par, _iλ_sif, _iλ_sife, length(_λ), length(_iλ_par), length(_iλ_sif), length(_iλ_sife), FT[700,2500], FT[400,700], FT[640,850], FT[400,750], swl, _dwl,
-                         _dwl[_iλ_par], _dwl[_iλ_sife], _λ, _λ[_iλ_par], _λ[_iλ_sif], _λ[_iλ_sife])
+    return WaveLengthSet{FT}(_iλ_nir, _iλ_par, _iλ_sif, _iλ_sife, length(_λ), length(_iλ_par), length(_iλ_sif), length(_iλ_sife), FT[700,2500], FT[400,700], FT[640,850], FT[400,750], swl, _dwl,
+                             _dwl[_iλ_par], _dwl[_iλ_sife], _λ, _λ[_iλ_par], _λ[_iλ_sif], _λ[_iλ_sife])
 )

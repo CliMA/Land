@@ -13,14 +13,6 @@ Structure that stores hyperspectral radiation information
 
 # Fields
 $(TYPEDFIELDS)
-
----
-# Examples
-```julia
-rad = HyperspectralRadiation{Float64}();
-rad = HyperspectralRadiation{Float64}(WaveLengthSet{Float64}());
-rad = HyperspectralRadiation{Float64}(WaveLengthSet{Float64}(), "");
-```
 """
 mutable struct HyperspectralRadiation{FT<:AbstractFloat}
     # prognostic variables that change with time
@@ -32,7 +24,7 @@ end
 
 
 """
-    HyperspectralRadiation{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(), wlfn::String = FILE_SUN)
+    HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), wlfn::String = FILE_SUN)
 
 Constructor for [`HyperspectralRadiation`](@ref), given
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
@@ -42,12 +34,12 @@ Constructor for [`HyperspectralRadiation`](@ref), given
 # Examples
 ```julia
 rad = HyperspectralRadiation{FT}();
-rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)));
-rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)), "");
-rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(FT,400:50:2400)), ClimaCache.FILE_SUN);
+rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
+rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)), "");
+rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)), ClimaCache.FILE_SUN);
 ```
 """
-HyperspectralRadiation{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(), wlfn::String = FILE_SUN) where {FT<:AbstractFloat} = (
+HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), wlfn::String = FILE_SUN) where {FT<:AbstractFloat} = (
     @unpack SΛ, NΛ = wls;
 
     # create arrays

@@ -10,6 +10,7 @@ using UnPack: @unpack
 
 # export public types and structures
 export HyperspectralRadiation, WaveLengthSet
+export BrooksCorey, VanGenuchten
 
 
 #######################################################################################################################################################################################################
@@ -32,6 +33,9 @@ include("radiation/hyperspectral_radiation.jl")
 
 # include the plant types and structures
 include("plant/leaf.jl")
+
+# include the soil types and structures
+include("soil/vulnerability_curve.jl")
 
 
 end # module
