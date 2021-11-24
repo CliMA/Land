@@ -24,22 +24,22 @@ end
 
 
 """
-    HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), wlfn::String = FILE_SUN)
+    HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), file::String = FILE_SUN)
 
 Constructor for [`HyperspectralRadiation`](@ref), given
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
-- `wlfn` File path to solar radiation setting, default is `ClimaCache.FILE_SUN`
+- `file` File path to solar radiation setting, default is `ClimaCache.FILE_SUN`
 
 ---
 # Examples
 ```julia
 rad = HyperspectralRadiation{FT}();
 rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
-rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)), "");
-rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)), ClimaCache.FILE_SUN);
+rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)); file = "");
+rad = HyperspectralRadiation{FT}(WaveLengthSet{FT}(collect(400:50:2400)); file = ClimaCache.FILE_SUN);
 ```
 """
-HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), wlfn::String = FILE_SUN) where {FT<:AbstractFloat} = (
+HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat} = (
     @unpack SΛ, NΛ = wls;
 
     # create arrays
@@ -47,15 +47,15 @@ HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), wlfn::Strin
     _e_diffuse = zeros(FT, NΛ);
 
     # Read data from SCOPE MAT file if file is given, if not use 0
-    if isfile(wlfn)
-        _suni    = matread(wlfn)["sun"];
+    if isfile(file)
+        _suni    = matread(file)["sun"];
         _wl      = _suni["wl"      ];
         __e_dir  = _suni["Edirect" ];
         __e_diff = _suni["Ediffuse"];
 
         # fill in the arrays
         for _i in 1:NΛ
-            _wi = findall( (_wl.>=SΛ[_i]) .& (_wl.<SΛ[_i+1]) );
+            _wi = findall( SΛ[_i] .<= _wl .< SΛ[_i+1] );
             if length(_wi)==0 @warn "Some wavelengths out of bounds $(string(SΛ[_i]))" end;
             _e_direct[_i]  = mean( __e_dir[_wi]);
             _e_diffuse[_i] = mean(__e_diff[_wi]);

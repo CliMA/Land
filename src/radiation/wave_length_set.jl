@@ -81,7 +81,7 @@ WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:Ab
     _opti   = matread(opti)["optipar"];
     _λ_opti = _opti["wl"];
     @inbounds for _i in 1:length(swl)-1
-        _wo    = findall( (swl[_i] .<= _λ_opti .< swl[_i+1]) .& .!isnan.(_λ_opti) );
+        _wo    = findall( swl[_i] .<= _λ_opti .< swl[_i+1] );
         _λ[_i] = mean(_λ_opti[_wo]);
     end;
     _iλ_nir  = findall( 700 .<= _λ .<= 2500 );
