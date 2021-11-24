@@ -1,19 +1,5 @@
 #######################################################################################################################################################################################################
 #
-# Changes to these constants
-# General
-#     2020-May-30: put the 2017 mat file in an artifact
-#     2020-Aug-30: add the updated 2021 mat file along with that of 2017 into a new artifact
-#
-#######################################################################################################################################################################################################
-const FILE_SUN  = artifact"land_model_spectrum_V1" * "/sun.mat";
-const OPTI_2017 = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
-const OPTI_2021 = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
-const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
-
-
-#######################################################################################################################################################################################################
-#
 # Changes to this structure
 # General
 #     2021-Aug-10: refactor the structure with renamed fields
@@ -101,7 +87,7 @@ WaveLengthSet{FT}(swl::Vector{FT}=FT.(WAVELENGTHS); opti::String=OPTI_2021) wher
     _opti   = matread(opti)["optipar"];
     _λ_opti = _opti["wl"];
     @inbounds for _i in 1:length(swl)-1
-        _wo    = findall( swl[_i] .<= _λ_opti .< swl[_i+1] ) .& .!isnan.(_λ_opti);
+        _wo    = findall( (swl[_i] .<= _λ_opti .< swl[_i+1]) .& .!isnan.(_λ_opti) );
         _λ[_i] = mean(_λ_opti[_wo]);
     end;
     _iλ_nir  = findall( 700 .<= _λ .<= 2500 );
