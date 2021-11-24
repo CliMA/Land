@@ -57,12 +57,6 @@ mutable struct WaveLengthSet{FT<:AbstractFloat}
     Λ_SIF::Vector{FT}
     "Wavelength bins for SIF excitation `[nm]`"
     Λ_SIFE::Vector{FT}
-
-    # prognostic variables that change with time
-
-    # dignostic variables that change with time
-
-    # caches to speed up calculations
 end
 
 
