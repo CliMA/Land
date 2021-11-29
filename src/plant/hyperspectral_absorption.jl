@@ -58,8 +58,8 @@ Constructor for [`HyperspectralAbsorption`](@ref), given
 # Examples
 ```julia
 ha = HyperspectralAbsorption{FT}();
-ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:5:2500)));
-ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:5:2500)); opti=ClimaCache.OPTI_2017);
+ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
+ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)); opti=ClimaCache.OPTI_2017);
 ```
 """
 HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
