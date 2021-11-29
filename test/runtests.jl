@@ -56,4 +56,11 @@ end;
         lbio = LeafBiophysics{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
         @test true;
     end;
+
+    println("Testing C₃VJPSystem constructors...");
+    for FT in [Float32, Float64]
+        c3 = C₃VJPSystem{Float64}();
+        c3 = C₃VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
+        @test true;
+    end;
 end;
