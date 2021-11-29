@@ -1,0 +1,7 @@
+status = [
+    "docs-build",
+    "macos-latest",
+    "ubuntu-latest",
+    "windows-latest"
+]
+timeout_sec = 7200
