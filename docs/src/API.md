@@ -88,12 +88,15 @@ LSWI
 NDVI
 NIR
 NIRv
+NIRvES
 RED
 REF_WL
+SIF_683
 SIF_740
 SIF_757
 SIF_771
 SIF_WL
+SPECTRUM_WL
 SWIR
 ```
 
@@ -107,7 +110,6 @@ dcum
 dladgen
 e2phot
 e2phot!
-expint
 psofunction
 volscatt!
 ```
