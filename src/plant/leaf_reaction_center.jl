@@ -33,6 +33,8 @@ mutable struct PhotosynthesisReactionCenter{FT<:AbstractFloat}
     k_npq_sus::FT
     "Rate constant for photochemistry (all reaction centers open)"
     k_p::FT
+    "Photochemical yield"
+    ϕ_p::FT
 end
 
 
@@ -41,4 +43,4 @@ end
 
 Constructor of `PhotosynthesisReactionCenter`
 """
-PhotosynthesisReactionCenter{FT}() where {FT<:AbstractFloat} = PhotosynthesisReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4);
+PhotosynthesisReactionCenter{FT}() where {FT<:AbstractFloat} = PhotosynthesisReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0);
