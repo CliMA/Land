@@ -119,8 +119,8 @@ function photosystem_temperature_dependence! end
 """
     photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
-Update the temperature dependencies of C3 photosynthesis system, given
-- `ps` `C3VJPModel` structure for C3 photosynthesis system
+Update the temperature dependencies of C3 photosynthesis model, given
+- `ps` `C3VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `t` Target temperature in `K`
 
@@ -148,8 +148,8 @@ photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT
 """
     photosystem_temperature_dependence!(ps::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
-Update the temperature dependencies of C3 photosynthesis system, given
-- `ps` `C4VJPModel` structure for C3 photosynthesis system
+Update the temperature dependencies of C3 photosynthesis model, given
+- `ps` `C4VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `t` Target temperature in `K`
 
