@@ -59,10 +59,10 @@ end;
         @test true;
     end;
 
-    println("Testing C₃VJPSystem constructors...");
+    println("Testing C3VJPSystem constructors...");
     for FT in [Float32, Float64]
-        c3 = C₃VJPSystem{Float64}();
-        c3 = C₃VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
+        c3 = C3VJPSystem{Float64}();
+        c3 = C3VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
         @test true;
     end;
 end;

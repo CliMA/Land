@@ -2,7 +2,7 @@
 $(TYPEDEF)
 
 Hierachy of AbstractSoilVC:
-- [`C₃VJPSystem`](@ref)
+- [`C3VJPSystem`](@ref)
 """
 abstract type AbstractPhotosynthesisSystem{FT<:AbstractFloat} end
 
@@ -11,10 +11,28 @@ abstract type AbstractPhotosynthesisSystem{FT<:AbstractFloat} end
 #
 # Changes to this struct
 # General
-#     2021-Nov-11: add C₃VJPSystem structure for classic C₃ photosynthesis system
+#     2021-Nov-11: add C3VJPSystem structure for classic C₃ photosynthesis system
 #
 #######################################################################################################################################################################################################
-mutable struct C₃VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT}
+mutable struct C3VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT}
+    # parameters that do not change with time
+    "Jmax temperature dependency"
+    TD_JMAX::AbstractTemperatureDependency{FT}
+    "Kc temperature dependency"
+    TD_KC::AbstractTemperatureDependency{FT}
+    "Ko temperature dependency"
+    TD_KO::AbstractTemperatureDependency{FT}
+    "Respiration temperature dependency"
+    TD_R::AbstractTemperatureDependency{FT}
+    "Vcmax temperature dependency"
+    TD_VCMAX::AbstractTemperatureDependency{FT}
+    "Γ* temperature dependency"
+    TD_Γ::AbstractTemperatureDependency{FT}
+    "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_1::FT
+    "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_2::FT
+
     # prognostic variables that change with time
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     j_max25::FT
@@ -56,9 +74,9 @@ end
 
 
 """
-    C₃VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+    C3VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
 
-Constructor for [`C₃VJPSystem`](@ref), given
+Constructor for [`C3VJPSystem`](@ref), given
 - `v_max25` Maximal carboxylation rate at 298.15 K
 - `j_max25` Maximal electron transport rate at 298.15 K
 - `r_d25` Respiration rate at 298.15 K
@@ -66,10 +84,11 @@ Constructor for [`C₃VJPSystem`](@ref), given
 ---
 # Examples
 ```julia
-c3 = C₃VJPSystem{Float64}();
-c3 = C₃VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
+c3 = C3VJPSystem{Float64}();
+c3 = C3VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
 ```
 """
-C₃VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C₃VJPSystem{FT}(j_max25, r_d25, v_max25, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_max25, 0)
+C3VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+    return C3VJPSystem{FT}(JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT),ΓStarTDCLM(FT), 4, 8,
+                           j_max25, r_d25, v_max25, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_max25, 0)
 );
