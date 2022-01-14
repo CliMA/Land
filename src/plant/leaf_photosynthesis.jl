@@ -99,5 +99,85 @@ c3 = C3VJPSystem{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
 """
 C3VJPSystem{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
     return C3VJPSystem{FT}(JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT),ΓStarTDCLM(FT), 4, 8,
-                           j_max25, r_d25, v_cmax25, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
+                           j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2021-Jan-14: add C4VJPSystem structure for classic C₄ photosynthesis system
+#
+#######################################################################################################################################################################################################
+"""
+$(TYPEDEF)
+
+Structure that stores C4 photosynthesis system information
+
+# Fields
+$(TYPEDFIELDS)
+"""
+mutable struct C4VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT}
+    # parameters that do not change with time
+    "Kpep temperature dependency"
+    TD_KPEP::AbstractTemperatureDependency{FT}
+    "Respiration temperature dependency"
+    TD_R::AbstractTemperatureDependency{FT}
+    "Vcmax temperature dependency"
+    TD_VCMAX::AbstractTemperatureDependency{FT}
+    "Vpmax temperature dependency"
+    TD_VPMAX::AbstractTemperatureDependency{FT}
+
+    # prognostic variables that change with time
+    "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    r_d25::FT
+    "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_cmax25::FT
+    "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_pmax25::FT
+
+    # dignostic variables that change with time
+    "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_c::FT
+    "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_gross::FT
+    "Light limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_j::FT
+    "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_net::FT
+    "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_p::FT
+    "Electron transport `[μmol m⁻² s⁻¹]`"
+    j::FT
+    "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
+    j_pot::FT
+    "PEP coefficient Kpep `[Pa]`"
+    k_pep::FT
+    "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
+    r_d::FT
+    "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
+    v_cmax::FT
+    "Maximal PEP carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
+    v_pmax::FT
+end
+
+
+"""
+C4VJPSystem{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+
+Constructor for [`C4VJPSystem`](@ref), given
+- `v_cmax25` Maximal carboxylation rate at 298.15 K
+- `v_pmax25` Maximal PEP carboxylation rate at 298.15 K
+- `r_d25` Respiration rate at 298.15 K
+
+---
+# Examples
+```julia
+c4 = C4VJPSystem{Float64}();
+c4 = C4VJPSystem{Float64}(v_cmax25 = 30, v_pmax = 40, r_d25 = 1);
+```
+"""
+C4VJPSystem{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+    return C4VJPSystem{FT}(KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT), r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
 );
