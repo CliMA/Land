@@ -14,7 +14,6 @@ println();
         p_i      = rand(FT) + 20;
 
         # temperature corrections
-        PhotosynthesisOld.photo_TD_from_set(td_q10, T);
         leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
         leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
 

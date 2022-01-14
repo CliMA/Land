@@ -7,8 +7,6 @@ using PkgUtility: GAS_R, RT_25, T_25, lower_quadratic
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
 
-using ..Photosynthesis: temperature_correction
-
 
 # export public types
 export AirLayer, C3ParaSet, C4ParaSet, GCO₂Mode, Leaf, PCO₂Mode

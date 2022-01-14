@@ -1,6 +1,6 @@
 module Photosynthesis
 
-using ClimaCache: Arrhenius, ArrheniusPeak, Q10
+using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPSystem, Q10
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R
 using UnPack: @unpack
