@@ -34,7 +34,9 @@ end;
     for FT in [Float32, Float64]
         @info "Expecting Warning here!";
         vg = VanGenuchten{FT}("");
-        vg = VanGenuchten{FT}("Loam");
+        for stype in ["Sand", "Loamy Sand", "Sandy Loam", "Loam", "Sandy Clay Loam", "Silt Loam", "Silt", "Clay Loam", "Silty Clay Loam", "Sandy Clay", "Silty Clay", "Clay"]
+            vg = VanGenuchten{FT}(stype);
+        end;
         vg = VanGenuchten{FT}("Test", 100, 2, 0.5, 0.1);
         @test true;
     end;

@@ -22,16 +22,6 @@ using Statistics: mean
 using UnPack: @unpack
 
 
-# export public types and structures from plant
-export C₃VJPSystem, HyperspectralAbsorption, LeafBiophysics
-
-# export public types and structures from radiation
-export HyperspectralRadiation, WaveLengthSet
-
-# export public types and structures from soil
-export BrooksCorey, VanGenuchten
-
-
 #######################################################################################################################################################################################################
 #
 # Changes to these constants
@@ -55,6 +45,7 @@ include("plant/hyperspectral_absorption.jl")
 include("plant/leaf_biophysics.jl")
 include("plant/leaf_photosynthesis.jl")
 include("plant/leaf.jl")
+include("plant/temperature_dependency.jl")
 
 # include the soil types and structures
 include("soil/vulnerability_curve.jl")
