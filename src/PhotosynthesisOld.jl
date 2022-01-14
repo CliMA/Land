@@ -6,7 +6,7 @@ using PkgUtility: GAS_R, RT_25, T_25, lower_quadratic
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
 
-
+using ..Photosynthesis: temperature_correction
 
 
 # export public types
@@ -21,19 +21,18 @@ export leaf_fluorescence!, leaf_photosynthesis!, leaf_temperature_dependence!
 
 
 
-include("types.jl")
-include("parasets.jl")
+include("old/types.jl")
+include("old/parasets.jl")
 
-include("temperature/correction.jl")
-include("temperature/dependency.jl")
+include("old/temperature/dependency.jl")
 
-include("photosynthesis/etr.jl"           )
-include("photosynthesis/lightlimited.jl"  )
-include("photosynthesis/productlimited.jl")
-include("photosynthesis/rubiscolimited.jl")
-include("photosynthesis/model.jl"         )
+include("old/photosynthesis/etr.jl"           )
+include("old/photosynthesis/lightlimited.jl"  )
+include("old/photosynthesis/productlimited.jl")
+include("old/photosynthesis/rubiscolimited.jl")
+include("old/photosynthesis/model.jl"         )
 
-include("fluorescence/fluorescence.jl")
+include("old/fluorescence/fluorescence.jl")
 
 
 
