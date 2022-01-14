@@ -3,6 +3,7 @@
 # Calculate the light-limited photosynthetic rates
 #
 ###############################################################################
+#=
 """
     light_limited_rate!(
                 photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
@@ -35,3 +36,4 @@ function light_limited_rate!(
 
     return nothing
 end
+=#

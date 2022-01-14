@@ -139,7 +139,7 @@ photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT
     ps.k_c    = temperature_corrected_value(ps.TD_KC, t);
     ps.k_o    = temperature_corrected_value(ps.TD_KO, t);
     ps.γ_star = temperature_corrected_value(ps.TD_Γ, t);
-    ps.k_m    = ps.k_c * (1 + air.P_O2 / ps.k_o);
+    ps.k_m    = ps.k_c * (1 + air.P_O₂ / ps.k_o);
 
     return nothing
 );

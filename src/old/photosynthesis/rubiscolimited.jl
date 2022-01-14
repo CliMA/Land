@@ -3,6 +3,7 @@
 # Calculate the rubisco-limited photosynthetic rates
 #
 ###############################################################################
+#=
 """
     rubisco_limited_rate!(
                 photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
@@ -36,3 +37,4 @@ function rubisco_limited_rate!(
 
     return nothing
 end
+=#

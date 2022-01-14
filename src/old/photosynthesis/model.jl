@@ -3,6 +3,7 @@
 # Calculate photosynthesis from CO₂ partial pressure
 #
 ###############################################################################
+#=
 """
     leaf_photosynthesis!(
                 photo_set::AbstractPhotoModelParaSet{FT},
@@ -68,99 +69,4 @@ function leaf_photosynthesis!(
 
     return nothing
 end
-
-
-
-
-function leaf_photosynthesis!(
-            photo_set::AbstractPhotoModelParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            mode::PCO₂Mode
-) where {FT<:AbstractFloat}
-    leaf_temperature_dependence!(photo_set, leaf, envir);
-    leaf_ETR!(photo_set, leaf);
-    light_limited_rate!(photo_set, leaf);
-    rubisco_limited_rate!(photo_set, leaf);
-    product_limited_rate!(photo_set, leaf);
-    leaf.Ag = min(leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An = leaf.Ag - leaf.Rd;
-
-    return nothing
-end
-
-
-
-
-function leaf_photosynthesis!(
-            photo_set::AbstractPhotoModelParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            mode::PCO₂Mode,
-            p_i::FT
-) where {FT<:AbstractFloat}
-    leaf.p_i = p_i;
-    leaf_photosynthesis!(photo_set, leaf, envir, mode);
-
-    return nothing
-end
-
-
-
-
-function leaf_photosynthesis!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            mode::GCO₂Mode
-) where {FT<:AbstractFloat}
-    leaf_temperature_dependence!(photo_set, leaf, envir);
-    leaf_ETR!(photo_set, leaf);
-    light_limited_rate!(photo_set, leaf, envir);
-    rubisco_limited_rate!(photo_set, leaf, envir);
-    product_limited_rate!(photo_set, leaf);
-    leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An  = leaf.Ag - leaf.Rd;
-    leaf.p_i = envir.p_a - leaf.An / leaf.g_lc * envir.p_atm * FT(1e-6);
-    leaf.p_s = envir.p_a - leaf.An / leaf.g_bc * envir.p_atm * FT(1e-6);
-
-    return nothing
-end
-
-
-
-
-function leaf_photosynthesis!(
-            photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            mode::GCO₂Mode
-) where {FT<:AbstractFloat}
-    leaf_temperature_dependence!(photo_set, leaf, envir);
-    leaf_ETR!(photo_set, leaf);
-    light_limited_rate!(photo_set, leaf);
-    rubisco_limited_rate!(photo_set, leaf);
-    product_limited_rate!(photo_set, leaf, envir);
-    leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An  = leaf.Ag - leaf.Rd;
-    leaf.p_i = envir.p_a - leaf.An / leaf.g_lc * envir.p_atm * FT(1e-6);
-    leaf.p_s = envir.p_a - leaf.An / leaf.g_bc * envir.p_atm * FT(1e-6);
-
-    return nothing
-end
-
-
-
-
-function leaf_photosynthesis!(
-            photo_set::AbstractPhotoModelParaSet{FT},
-            leaf::Leaf{FT},
-            envir::AirLayer{FT},
-            mode::GCO₂Mode,
-            g_lc::FT
-) where {FT<:AbstractFloat}
-    leaf.g_lc = g_lc;
-    leaf_photosynthesis!(photo_set, leaf, envir, mode);
-
-    return nothing
-end
+=#

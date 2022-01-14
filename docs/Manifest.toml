@@ -89,8 +89,8 @@ uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.2"
 
 [[deps.ClimaCache]]
-deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack"]
-git-tree-sha1 = "206849c308d30daeb96bfcd9eee39d9f4369979b"
+deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
+git-tree-sha1 = "65d2429ef182f71f8e6ad949c4f3a74bd097097d"
 repo-rev = "wyujie"
 repo-url = "https://github.com/Yujie-W/ClimaCache.jl"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
@@ -576,7 +576,7 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.1.2"
 
 [[deps.Photosynthesis]]
-deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "Test", "UnPack", "WaterPhysics"]
+deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "Test", "UnPack"]
 path = ".."
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 version = "0.3.0"

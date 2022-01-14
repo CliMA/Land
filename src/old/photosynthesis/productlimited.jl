@@ -3,6 +3,7 @@
 # Calculate the product-limited photosynthetic rates
 #
 ###############################################################################
+#=
 """
     product_limited_rate!(
                 photo_set::C3ParaSet{FT},
@@ -36,3 +37,4 @@ function product_limited_rate!(
 
     return nothing
 end
+=#

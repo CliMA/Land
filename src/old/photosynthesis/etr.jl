@@ -3,6 +3,7 @@
 # Calculate the electron transport rate
 #
 ###############################################################################
+#=
 """
     leaf_ETR!(photo_set::AbstractPhotoModelParaSet{FT},
               leaf::Leaf{FT}
@@ -31,3 +32,4 @@ function leaf_ETR!(
 
     return nothing
 end
+=#
