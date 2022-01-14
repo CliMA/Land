@@ -8,23 +8,23 @@
     photo_TD_from_set(td_set::Q10TD{FT}, T::FT) where {FT<:AbstractFloat}
 
 Make temperature correction from parameter set, given
-- `td_set` [`ArrheniusTD`](@ref) type parameter set, which has a `VAL_25` field
+- `td_set` [`ArrheniusTD`](@ref) type parameter set, which has a `VAL_REF` field
 - `T` Leaf temperature
 
 Useful for Kc, Ko, Kpep, and ``Γ^{*}``.
 """
 function photo_TD_from_set(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    return td_set.VAL_25 * temperature_correction(td_set, T)
+    return td_set.VAL_REF * temperature_correction(td_set, T)
 end
 
 
 
 
 function photo_TD_from_set(
-            td_set::Q10TD{FT},
+            td_set::Q10{FT},
             T::FT
 ) where {FT<:AbstractFloat}
     return td_set.VAL_REF * temperature_correction(td_set, T)
@@ -48,7 +48,7 @@ Make temperature correction from a given value, given
 Useful for Vcmax, Vomax, Vpmax, Jmax, and Respiration.
 """
 function photo_TD_from_val(
-            td_set::AbstractTDParameterSet{FT},
+            td_set::AbstractTemperatureDependency{FT},
             val::FT,
             T::FT
 ) where {FT<:AbstractFloat}
@@ -77,7 +77,7 @@ Update maximal electron transport rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_jmax!(
-            td_set::AbstractTDParameterSet{FT},
+            td_set::AbstractTemperatureDependency{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Jmax = photo_TD_from_val(td_set, leaf.Jmax25, leaf.T);
@@ -96,7 +96,7 @@ Update Kc at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_kc!(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Kc = photo_TD_from_set(td_set, leaf.T);
@@ -139,7 +139,7 @@ Update Ko at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_ko!(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Ko = photo_TD_from_set(td_set, leaf.T);
@@ -160,7 +160,7 @@ Update Kpep at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_kpep!(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Kpep = photo_TD_from_set(td_set, leaf.T);
@@ -181,7 +181,7 @@ Update leaf dark respiration rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_rd!(
-            td_set::AbstractTDParameterSet{FT},
+            td_set::AbstractTemperatureDependency{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Rd = photo_TD_from_val(td_set, leaf.Rd25, leaf.T);
@@ -202,7 +202,7 @@ Update leaf maximal carboxylation rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_vcmax!(
-            td_set::AbstractTDParameterSet{FT},
+            td_set::AbstractTemperatureDependency{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Vcmax = photo_TD_from_val(td_set, leaf.Vcmax25, leaf.T);
@@ -223,7 +223,7 @@ Update leaf maximal PEP carboxylation rate at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_vpmax!(
-            td_set::AbstractTDParameterSet{FT},
+            td_set::AbstractTemperatureDependency{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Vpmax = photo_TD_from_val(td_set, leaf.Vpmax25, leaf.T);
@@ -244,7 +244,7 @@ Update ``Γ^{*}`` at leaf temperature, given
 - `leaf` [`Leaf`](@ref) type struct
 """
 function leaf_Γstar!(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     leaf.Γ_star = photo_TD_from_set(td_set, leaf.T);

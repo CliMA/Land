@@ -7,34 +7,22 @@
 #
 ###############################################################################
 """ [`ArrheniusTD`](@ref) type Kc TD from Bernacchi's data """
-KcTDBernacchi(FT) =
-    ArrheniusTD{FT}(41.0264925, 79430.0 / GAS_R(), 79430.0 / RT_25(FT));
+KcTDBernacchi(FT) = Arrhenius{FT}(T_25(), 41.0264925, 79430.0);
 
 """ [`ArrheniusTD`](@ref) type Ko TD from Bernacchi's data """
-KoTDBernacchi(FT) =
-    ArrheniusTD{FT}(  28208.88, 36380.0 / GAS_R(), 36380.0 / RT_25(FT));
+KoTDBernacchi(FT) = Arrhenius{FT}(T_25(), 28208.88, 36380.0);
 
 """ [`ArrheniusTD`](@ref) type Respiration TD from Bernacchi's data """
-RespirationTDBernacchi(FT) =
-    ArrheniusTD{FT}(       Inf, 46390.0 / GAS_R(), 46390.0 / RT_25(FT));
+RespirationTDBernacchi(FT) = Arrhenius{FT}(T_25(), 1, 46390.0);
 
 """ [`ArrheniusTD`](@ref) type Vcmax TD from Bernacchi's data """
-VcmaxTDBernacchi(FT) =
-    ArrheniusTD{FT}(       Inf, 65330.0 / GAS_R(), 65330.0 / RT_25(FT));
+VcmaxTDBernacchi(FT) = Arrhenius{FT}(T_25(), 1, 65330.0);
 
 """ [`ArrheniusTD`](@ref) type Vomax TD from Bernacchi's data """
-VomaxTDBernacchi(FT) =
-    ArrheniusTD{FT}(       Inf, 60110.0 / GAS_R(), 60110.0 / RT_25(FT));
+VomaxTDBernacchi(FT) = Arrhenius{FT}(T_25(), 1, 60110.0);
 
 """ [`ArrheniusTD`](@ref) type ``Γ^{*}`` TD from Bernacchi's data """
-ΓStarTDBernacchi(FT) =
-    ArrheniusTD{FT}(4.33164375, 37830.0 / GAS_R(), 37830.0 / RT_25(FT));
-
-
-
-
-
-
+ΓStarTDBernacchi(FT) = Arrhenius{FT}(T_25(), 4.33164375, 37830.0);
 
 
 ###############################################################################
@@ -46,23 +34,10 @@ VomaxTDBernacchi(FT) =
 #
 ###############################################################################
 """ [`ArrheniusTD`](@ref) type Kpep TD from Boyd's data """
-KpepTDBoyd(FT) =
-    ArrheniusTD{FT}(16.0, 36300.0 / GAS_R(), 36300.0 / RT_25(FT));
+KpepTDBoyd(FT) = Arrhenius{FT}(T_25(), 16.0, 36300.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Vpmax TD from Boyd's data """
-function VpmaxTDBoyd(FT)
-    ΔHa_to_RT25::FT = 94800.0 / RT_25(FT);
-    ΔHd_to_R::FT = 73300.0 / GAS_R();
-    ΔSv_to_R::FT = 250.0   / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
-
-
-
-
-
-
+VpmaxTDBoyd(FT) = ArrheniusPeak{FT}(T_25(), 1, 94800.0, 73300.0, 250.0);
 
 
 ###############################################################################
@@ -73,28 +48,10 @@ end
 #
 ###############################################################################
 """ [`ArrheniusPeakTD`](@ref) type Jmax TD from Leuning's data """
-function JmaxTDLeuning(FT)
-    ΔHa_to_RT25::FT = 50300.0  / RT_25(FT);
-    ΔHd_to_R::FT = 152044.0 / GAS_R();
-    ΔSv_to_R::FT = 495.0    / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
+JmaxTDLeuning(FT) =  ArrheniusPeak{FT}(T_25(), 1, 50300.0, 152044.0, 495.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Vcmax TD from Leuning's data """
-function VcmaxTDLeuning(FT)
-    ΔHa_to_RT25::FT = 73637.0  / RT_25(FT);
-    ΔHd_to_R::FT = 149252.0 / GAS_R();
-    ΔSv_to_R::FT = 486.0    / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
-
-
-
-
-
-
+VcmaxTDLeuning(FT) = ArrheniusPeak{FT}(T_25(), 1, 73637.0, 149252.0, 486.0);
 
 
 ###############################################################################
@@ -106,16 +63,10 @@ end
 #
 ###############################################################################
 """ [`Q10TD`](@ref) type Respiration TD for angiosperms per biomass """
-Q10TDAngiosperm(FT) = Q10TD{FT}(0.014/8760, 298.15, 1.4)
+Q10TDAngiosperm(FT) = Q10{FT}(T_25(), 0.014/8760, 1.4)
 
 """ [`Q10TD`](@ref) type Respiration TD for symnosperms per biomass """
-Q10TDGymnosperm(FT) = Q10TD{FT}(0.0425/8760, 298.15, 1.7)
-
-
-
-
-
-
+Q10TDGymnosperm(FT) = Q10{FT}(T_25(), 0.0425/8760, 1.7)
 
 
 ###############################################################################
@@ -125,62 +76,28 @@ Q10TDGymnosperm(FT) = Q10TD{FT}(0.0425/8760, 298.15, 1.7)
 #
 ###############################################################################
 """ [`ArrheniusTD`](@ref) type Kc TD """
-KcTDCLM(FT) =
-    ArrheniusTD{FT}(  40.49, 79430.0 / GAS_R(), 79430.0 / RT_25(FT));
+KcTDCLM(FT) = Arrhenius{FT}(T_25(), 40.49, 79430.0);
 
 """ [`ArrheniusTD`](@ref) type Ko TD """
-KoTDCLM(FT) =
-    ArrheniusTD{FT}(27840.0, 36380.0 / GAS_R(), 36380.0 / RT_25(FT));
+KoTDCLM(FT) = Arrhenius{FT}(T_25(), 27840.0, 36380.0);
 
 """ [`ArrheniusTD`](@ref) type Kpep TD """
-KpepTDCLM(FT) =
-    ArrheniusTD{FT}(    8.0, 36000.0 / GAS_R(), 36000.0 / RT_25(FT));
+KpepTDCLM(FT) = Arrhenius{FT}(T_25(), 8.0, 36000.0);
 
 """ [`ArrheniusTD`](@ref) type Γ* TD """
-ΓStarTDCLM(FT) =
-    ArrheniusTD{FT}(  4.275, 37830.0 / GAS_R(), 37830.0 / RT_25(FT));
+ΓStarTDCLM(FT) = Arrhenius{FT}(T_25(), 4.275, 37830.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Jmax TD """
-function JmaxTDBernacchi(FT)
-    ΔHa_to_RT25::FT = 57500.0  / RT_25(FT);
-    ΔHd_to_R::FT = 439000.0 / GAS_R();
-    ΔSv_to_R::FT = 1400.0   / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
+JmaxTDBernacchi(FT) = ArrheniusPeak{FT}(T_25(), 1, 57500.0, 439000.0, 1400.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Jmax TD """
-function JmaxTDCLM(FT)
-    ΔHa_to_RT25::FT = 43540.0  / RT_25(FT);
-    ΔHd_to_R::FT = 150000.0 / GAS_R();
-    ΔSv_to_R::FT = 490.0    / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
+JmaxTDCLM(FT) = ArrheniusPeak{FT}(T_25(), 1, 43540.0, 150000.0, 490.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Respiration TD """
-function RespirationTDCLM(FT)
-    ΔHa_to_RT25::FT = 46390.0  / RT_25(FT);
-    ΔHd_to_R::FT = 150650.0 / GAS_R();
-    ΔSv_to_R::FT = 490.0    / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
+RespirationTDCLM(FT) = ArrheniusPeak{FT}(T_25(), 1, 46390.0, 150650.0, 490.0);
 
 """ [`ArrheniusPeakTD`](@ref) type Vcmax TD """
-function VcmaxTDCLM(FT)
-    ΔHa_to_RT25::FT = 65330.0  / RT_25(FT);
-    ΔHd_to_R::FT = 150000.0 / GAS_R();
-    ΔSv_to_R::FT = 490.0    / GAS_R();
-    C::FT = 1 + exp( ΔSv_to_R - ΔHd_to_R/T_25(FT) );
-    return ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C)
-end
-
-
-
-
-
-
+VcmaxTDCLM(FT) = ArrheniusPeak{FT}(T_25(), 1, 65330.0, 150000.0, 490.0);
 
 
 ###############################################################################
@@ -195,12 +112,6 @@ VtoRCollatz(FT) = FT(0.010);
 VtoRDefault(FT) = FT(0.015);
 
 
-
-
-
-
-
-
 ###############################################################################
 #
 # Fluorescence model parameter set
@@ -210,18 +121,10 @@ VtoRDefault(FT) = FT(0.015);
 #
 ###############################################################################
 """ [`FluoParaSet`](@ref) type parameter set using all data """
-FluorescenceVanDerTol(FT) =
-        FluoParaSet{FT}(2.48, 2.83, 0.114);
+FluorescenceVanDerTol(FT) = FluoParaSet{FT}(2.48, 2.83, 0.114);
 
 """ [`FluoParaSet`](@ref) type parameter set using Flexas's data (drought) """
-FluorescenceVanDerTolDrought(FT) =
-        FluoParaSet{FT}(5.01, 1.93, 10.0);
-
-
-
-
-
-
+FluorescenceVanDerTolDrought(FT) = FluoParaSet{FT}(5.01, 1.93, 10.0);
 
 
 ###############################################################################

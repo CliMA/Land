@@ -171,7 +171,7 @@ temperature_correction
 ```
 
 Second, depending on which physiological parameter to correct, some corrections
-    use the `VAL_25` field in the [`ArrheniusTD`](@ref), like $K_\text{c}$,
+    use the `VAL_REF` field in the [`ArrheniusTD`](@ref), like $K_\text{c}$,
     $K_\text{o}$, and $K_\text{pep}$:
 
 ```@docs

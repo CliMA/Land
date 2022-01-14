@@ -369,131 +369,6 @@ end
 
 
 
-
-###############################################################################
-#
-# Temperature dependency parameter set
-#
-###############################################################################
-"""
-    abstract type AbstractTDParameterSet{FT}
-
-Hierarchy of the `AbstractTDParameterSet`:
-- [`ArrheniusTD`](@ref)
-- [`ArrheniusPeakTD`](@ref)
-- [`Q10TD`](@ref)
-"""
-abstract type AbstractTDParameterSet{FT} end
-
-
-
-
-"""
-    struct ArrheniusTD{FT}
-
-An [`AbstractTDParameterSet`](@ref) type struct using
-```math
-corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
-```
-
-# Fields
-$(TYPEDFIELDS)
-
----
-# Examples
-```julia
-td = ArrheniusTD{FT}(41.0264925, 79430.0 / GAS_R(), 79430.0 / RT_25(FT));
-```
-"""
-struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
-    "Uncorrected value at 298.15 K"
-    VAL_25::FT
-    # TODO use @kwdef and change the Examples
-    #"ΔHa"
-    #ΔHa::FT
-    "Ratio between ΔHa and R `[K]`"
-    ΔHa_to_R::FT
-    "Ratio between ΔHa and R*K_25"
-    ΔHa_to_RT25::FT
-end
-
-
-
-
-"""
-    struct ArrheniusPeakTD{FT}
-
-An [`AbstractTDParameterSet`](@ref) type struct using
-```math
-corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
-       \\cdot
-       \\dfrac{ 1 + \\exp \\left( \\dfrac{S_v T_0 - H_d}{R T_0} \\right) }
-              { 1 + \\exp \\left( \\dfrac{S_v T_1 - H_d}{R T_1} \\right) }
-```
-
-# Fields
-$(TYPEDFIELDS)
-
----
-# Examples
-```julia
-td = ArrheniusPeakTD{FT}(ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R, C);
-```
-"""
-struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
-    # TODO use @kwdef and change the Examples
-    #"ΔHa"
-    #ΔHa::FT
-    #"ΔHd"
-    #ΔHd::FT
-    #"ΔSv"
-    #ΔSv::FT
-    "Ratio between ΔHa and R*K_25"
-    ΔHa_to_RT25::FT
-    "Ratio between ΔHd and R"
-    ΔHd_to_R::FT
-    "Ratio between ΔSv and R"
-    ΔSv_to_R::FT
-    "Correction factor C = 1 + exp( Sv/R + Hd/(RT0) )"
-    C::FT
-end
-
-
-
-
-"""
-    struct Q10TD{FT}
-
-An [`AbstractTDParameterSet`](@ref) type struct using
-```math
-VAL = VAL_{REF} \\left( \\dfrac{T_1 - T_{REF}}}{10} \\right)^{Q_{10}}
-```
-
-# Fields
-$(TYPEDFIELDS)
-
----
-# Examples
-```julia
-td = Q10TD{FT}(0.014/8760, 298.15, 1.4);
-```
-"""
-struct Q10TD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
-    "Uncorrected value at reference temperature"
-    VAL_REF::FT
-    "Reference temperature `[K]`"
-    T_REF::FT
-    "Power of Q10 correction"
-    Q_10::FT
-end
-
-
-
-
-
-
-
-
 ###############################################################################
 #
 # Photosynthesis model parameter set -- temperature dependencies and etc
@@ -540,17 +415,17 @@ $(TYPEDFIELDS)
 """
 mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Jmax temperature dependency"
-    JT::AbstractTDParameterSet{FT}
+    JT::AbstractTemperatureDependency{FT}
     "Kc temperature dependency"
-    KcT::AbstractTDParameterSet{FT}
+    KcT::AbstractTemperatureDependency{FT}
     "Ko temperature dependency"
-    KoT::AbstractTDParameterSet{FT}
+    KoT::AbstractTemperatureDependency{FT}
     "Respiration temperature dependency"
-    ReT::AbstractTDParameterSet{FT}
+    ReT::AbstractTemperatureDependency{FT}
     "Vcmax temperature dependency"
-    VcT::AbstractTDParameterSet{FT}
+    VcT::AbstractTemperatureDependency{FT}
     "Γ_star temperature dependency"
-    ΓsT::AbstractTDParameterSet{FT}
+    ΓsT::AbstractTemperatureDependency{FT}
     "Fluorescence model"
     Flu::AbstractFluoModelParaSet{FT}
     "Vcmax25 and respiration correlation"
@@ -574,13 +449,13 @@ $(TYPEDFIELDS)
 """
 mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Kpep temperature dependency"
-    KpT::AbstractTDParameterSet{FT}
+    KpT::AbstractTemperatureDependency{FT}
     "Respiration temperature dependency"
-    ReT::AbstractTDParameterSet{FT}
+    ReT::AbstractTemperatureDependency{FT}
     "Vcmax temperature dependency"
-    VcT::AbstractTDParameterSet{FT}
+    VcT::AbstractTemperatureDependency{FT}
     "Vpmax temperature dependency"
-    VpT::AbstractTDParameterSet{FT}
+    VpT::AbstractTemperatureDependency{FT}
     "Fluorescence model"
     Flu::AbstractFluoModelParaSet{FT}
     "Vcmax25 and respiration correlation"

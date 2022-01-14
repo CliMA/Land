@@ -1,5 +1,6 @@
 module PhotosynthesisOld
 
+using ClimaCache: AbstractTemperatureDependency, Arrhenius, ArrheniusPeak, Q10
 using DocStringExtensions: TYPEDFIELDS
 using PkgUtility: GAS_R, RT_25, T_25, lower_quadratic
 using UnPack: @unpack

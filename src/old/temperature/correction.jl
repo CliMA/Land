@@ -32,34 +32,38 @@ corr = \\left( \\dfrac{T_1 - T_\\text{REF}}{10} \\right)^{Q_{10}}
 ```
 """
 function temperature_correction(
-            td_set::ArrheniusTD{FT},
+            td_set::Arrhenius{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    return exp( td_set.ΔHa_to_RT25 - td_set.ΔHa_to_R/T )
+    @unpack ΔHA, T_REF = td_set;
+
+    return exp( ΔHA / GAS_R(FT) * (1 / T_REF - 1 / T) )
 end
 
 
 
 
 function temperature_correction(
-            td_set::ArrheniusPeakTD{FT},
+            td_set::ArrheniusPeak{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    @unpack C, ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R = td_set;
+    @unpack ΔHA, ΔHD, ΔSV, T_REF = td_set;
 
     # _f_a: activation correction, C/_f_b: de-activation correction
-    _f_a::FT = exp( ΔHa_to_RT25 * (1 - T_25(FT)/T) );
-    _f_b::FT = 1 + exp(ΔSv_to_R - ΔHd_to_R/T);
+    _f_a::FT = exp( ΔHA / GAS_R(FT) * (1 / T_REF - 1 / T) );
+    _f_b::FT = (1 + exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * T_REF))) / (1 + exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * T)));
 
-    return C /_f_b * _f_a
+    return _f_a * _f_b
 end
 
 
 
 
 function temperature_correction(
-            td_set::Q10TD{FT},
+            td_set::Q10{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    return (td_set.Q_10) ^ ( (T - td_set.T_REF) / 10 )
+    @unpack Q_10, T_REF = td_set;
+
+    return Q_10 ^ ( (T - T_REF) / 10 )
 end

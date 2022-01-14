@@ -1,27 +1,27 @@
 # FT and NaN test for the structs
 @testset "Photosynthesis --- structures" begin
     for FT in [Float32, Float64]
-        for data_set in [ Photosynthesis.KcTDBernacchi(FT),
-                          Photosynthesis.VpmaxTDBoyd(FT),
+        for data_set in [ PhotosynthesisOld.KcTDBernacchi(FT),
+                          PhotosynthesisOld.VpmaxTDBoyd(FT),
                           C3CLM(FT),
                           C4CLM(FT),
                           AirLayer{FT}(),
                           Leaf{FT}(),
-                          Photosynthesis.FluorescenceVanDerTol(FT),
-                          Photosynthesis.FluorescenceVanDerTolDrought(FT),
-                          Photosynthesis.KoTDBernacchi(FT),
-                          Photosynthesis.RespirationTDBernacchi(FT),
-                          Photosynthesis.VcmaxTDBernacchi(FT),
-                          Photosynthesis.VomaxTDBernacchi(FT),
-                          Photosynthesis.ΓStarTDBernacchi(FT),
-                          Photosynthesis.KpepTDBoyd(FT),
-                          Photosynthesis.JmaxTDLeuning(FT),
-                          Photosynthesis.VcmaxTDLeuning(FT),
-                          Photosynthesis.JmaxTDBernacchi(FT),
-                          Photosynthesis.VtoRCollatz(FT),
-                          Photosynthesis.C3Bernacchi(FT),
-                          Photosynthesis.Q10TDAngiosperm(FT),
-                          Photosynthesis.Q10TDGymnosperm(FT) ]
+                          PhotosynthesisOld.FluorescenceVanDerTol(FT),
+                          PhotosynthesisOld.FluorescenceVanDerTolDrought(FT),
+                          PhotosynthesisOld.KoTDBernacchi(FT),
+                          PhotosynthesisOld.RespirationTDBernacchi(FT),
+                          PhotosynthesisOld.VcmaxTDBernacchi(FT),
+                          PhotosynthesisOld.VomaxTDBernacchi(FT),
+                          PhotosynthesisOld.ΓStarTDBernacchi(FT),
+                          PhotosynthesisOld.KpepTDBoyd(FT),
+                          PhotosynthesisOld.JmaxTDLeuning(FT),
+                          PhotosynthesisOld.VcmaxTDLeuning(FT),
+                          PhotosynthesisOld.JmaxTDBernacchi(FT),
+                          PhotosynthesisOld.VtoRCollatz(FT),
+                          PhotosynthesisOld.C3Bernacchi(FT),
+                          PhotosynthesisOld.Q10TDAngiosperm(FT),
+                          PhotosynthesisOld.Q10TDGymnosperm(FT) ]
             @test FT_test(data_set, FT);
             @test NaN_test(data_set);
         end
@@ -39,7 +39,7 @@ println();
         c4_set   = C4CLM(FT);
         leaf_3   = Leaf{FT}();
         leaf_4   = Leaf{FT}();
-        td_q10   = Photosynthesis.Q10TD{FT}(1, 273.15, 1.7);
+        td_q10   = ClimaCache.Q10{FT}(1, 273.15, 1.7);
         envir    = AirLayer{FT}();
         fluo_set = c3_set.Flu;
         T        = rand(FT) + 298;
@@ -47,34 +47,34 @@ println();
         p_i      = rand(FT) + 20;
 
         # temperature corrections
-        Photosynthesis.photo_TD_from_set(td_q10, T);
+        PhotosynthesisOld.photo_TD_from_set(td_q10, T);
         leaf_temperature_dependence!(c3_set, leaf_3, envir, T);
         leaf_temperature_dependence!(c4_set, leaf_4, envir, T);
 
         # rubisco limited rates
-        Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3);
-        Photosynthesis.rubisco_limited_rate!(c4_set, leaf_4);
+        PhotosynthesisOld.rubisco_limited_rate!(c3_set, leaf_3);
+        PhotosynthesisOld.rubisco_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3, envir);
+        PhotosynthesisOld.rubisco_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # light limited rates
-        Photosynthesis.leaf_ETR!(c3_set, leaf_3);
-        Photosynthesis.leaf_ETR!(c4_set, leaf_4);
-        Photosynthesis.light_limited_rate!(c3_set, leaf_3);
-        Photosynthesis.light_limited_rate!(c4_set, leaf_4);
+        PhotosynthesisOld.leaf_ETR!(c3_set, leaf_3);
+        PhotosynthesisOld.leaf_ETR!(c4_set, leaf_4);
+        PhotosynthesisOld.light_limited_rate!(c3_set, leaf_3);
+        PhotosynthesisOld.light_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        Photosynthesis.light_limited_rate!(c3_set, leaf_3, envir);
+        PhotosynthesisOld.light_limited_rate!(c3_set, leaf_3, envir);
         @test NaN_test(leaf_3);
 
         # product limited rates
-        Photosynthesis.product_limited_rate!(c3_set, leaf_3);
-        Photosynthesis.product_limited_rate!(c4_set, leaf_4);
+        PhotosynthesisOld.product_limited_rate!(c3_set, leaf_3);
+        PhotosynthesisOld.product_limited_rate!(c4_set, leaf_4);
         @test NaN_test(leaf_3);
         @test NaN_test(leaf_4);
-        Photosynthesis.product_limited_rate!(c4_set, leaf_4, envir);
+        PhotosynthesisOld.product_limited_rate!(c4_set, leaf_4, envir);
         @test NaN_test(leaf_4);
 
         # fluorescence
