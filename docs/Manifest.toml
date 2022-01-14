@@ -89,8 +89,8 @@ uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.2"
 
 [[deps.ClimaCache]]
-deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "Statistics", "Test", "UnPack"]
-git-tree-sha1 = "9c475290314195cb78c6a2c06880a3081bdf530d"
+deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack"]
+git-tree-sha1 = "9087892c918d9dee844b534afbc0f775026bbbe0"
 repo-rev = "wyujie"
 repo-url = "https://github.com/Yujie-W/ClimaCache.jl"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
@@ -691,9 +691,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
-git-tree-sha1 = "244586bc07462d22aed0113af9c731f2a518c93e"
+git-tree-sha1 = "15dfe6b103c2a993be24404124b8791a09460983"
 uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.3.10"
+version = "1.3.11"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"

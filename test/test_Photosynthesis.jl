@@ -1,37 +1,4 @@
 # FT and NaN test for the structs
-@testset "Photosynthesis --- structures" begin
-    for FT in [Float32, Float64]
-        for data_set in [ PhotosynthesisOld.KcTDBernacchi(FT),
-                          PhotosynthesisOld.VpmaxTDBoyd(FT),
-                          C3CLM(FT),
-                          C4CLM(FT),
-                          AirLayer{FT}(),
-                          Leaf{FT}(),
-                          PhotosynthesisOld.FluorescenceVanDerTol(FT),
-                          PhotosynthesisOld.FluorescenceVanDerTolDrought(FT),
-                          PhotosynthesisOld.KoTDBernacchi(FT),
-                          PhotosynthesisOld.RespirationTDBernacchi(FT),
-                          PhotosynthesisOld.VcmaxTDBernacchi(FT),
-                          PhotosynthesisOld.VomaxTDBernacchi(FT),
-                          PhotosynthesisOld.ΓStarTDBernacchi(FT),
-                          PhotosynthesisOld.KpepTDBoyd(FT),
-                          PhotosynthesisOld.JmaxTDLeuning(FT),
-                          PhotosynthesisOld.VcmaxTDLeuning(FT),
-                          PhotosynthesisOld.JmaxTDBernacchi(FT),
-                          PhotosynthesisOld.VtoRCollatz(FT),
-                          PhotosynthesisOld.C3Bernacchi(FT),
-                          PhotosynthesisOld.Q10TDAngiosperm(FT),
-                          PhotosynthesisOld.Q10TDGymnosperm(FT) ]
-            @test FT_test(data_set, FT);
-            @test NaN_test(data_set);
-        end
-    end
-end
-
-
-
-
-# FT and NaN test for the structs
 println();
 @testset "Photosynthesis --- functions" begin
     for FT in [Float32, Float64]
