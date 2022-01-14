@@ -20,28 +20,13 @@ envir = AirLayer{Float32}();
 ```
 """
 Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
-    "Air temperature `[K]`"
-    t_air::FT = T_25()
-
     # pressures
     "Atmospheric CO₂ partial pressure `[Pa]`"
     p_a::FT = 41
     "Atmospheric pressure `[Pa]`"
     p_atm::FT = 101325
-    "Atmospheric vapor pressure `[Pa]`"
-    p_H₂O::FT = 1500
     "Atmospheric O₂ partial pressure `[Pa]`"
     p_O₂::FT = p_atm * 0.209
-    "Saturation vapor pressure `[Pa]`"
-    p_sat::FT = saturation_vapor_pressure(t_air)
-    "Relative humidity"
-    RH::FT = p_H₂O / p_sat
-    "Vapor pressure deficit `[Pa]`"
-    vpd::FT = p_sat - p_H₂O
-
-    # wind speed
-    "Wind speed `[m s⁻¹]`"
-    wind::FT = FT(2)
 end
 
 
@@ -428,8 +413,6 @@ mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     ΓsT::AbstractTemperatureDependency{FT}
     "Fluorescence model"
     Flu::AbstractFluoModelParaSet{FT}
-    "Vcmax25 and respiration correlation"
-    VR::FT
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     Eff_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -458,6 +441,4 @@ mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     VpT::AbstractTemperatureDependency{FT}
     "Fluorescence model"
     Flu::AbstractFluoModelParaSet{FT}
-    "Vcmax25 and respiration correlation"
-    VR::FT
 end

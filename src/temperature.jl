@@ -143,3 +143,29 @@ photosystem_temperature_dependence!(ps::C3VJPSystem{FT}, air::AirLayer{FT}, t::F
 
     return nothing
 );
+
+
+"""
+    photosystem_temperature_dependence!(ps::C4VJPSystem{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
+
+Update the temperature dependencies of C3 photosynthesis system, given
+- `ps` `C4VJPSystem` structure for C3 photosynthesis system
+- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
+- `t` Target temperature in `K`
+
+---
+# Examples
+```julia
+ps = C4VJPSystem{Float64}();
+air = AirLayer{Float64}();
+photosystem_temperature_dependence!(ps, air, 300.0);
+```
+"""
+photosystem_temperature_dependence!(ps::C4VJPSystem{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    ps.r_d    = ps.r_d25    * temperature_correction(ps.TD_R, t);
+    ps.v_cmax = ps.v_cmax25 * temperature_correction(ps.TD_VCMAX, t);
+    ps.v_pmax = ps.v_pmax25 * temperature_correction(ps.TD_VPMAX, t);
+    ps.k_pep  = temperature_corrected_value(ps.TD_KPEP, t);
+
+    return nothing
+);
