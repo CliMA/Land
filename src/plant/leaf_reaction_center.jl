@@ -33,8 +33,26 @@ mutable struct PhotosynthesisReactionCenter{FT<:AbstractFloat}
     k_npq_sus::FT
     "Rate constant for photochemistry (all reaction centers open)"
     k_p::FT
+    "Non-Photochemical quenching "
+    npq::FT
+    "Fluorescence yield"
+    ϕ_s::FT
     "Photochemical yield"
     ϕ_p::FT
+
+    # dignostic variables that change with time
+    "Dark adapted yield (`Kp=0`)"
+    f_m::FT
+    "Light adapted yield (`Kp=0`)"
+    f_m′::FT
+    "Dark-adapted fluorescence yield (`Kp=max`)"
+    f_o::FT
+    "Light-adapted fluorescence yield in the dark (`Kp=max`)"
+    f_o′::FT
+    "Energy quenching"
+    q_e::FT
+    "Photochemical quenching"
+    q_p::FT
 end
 
 
@@ -43,4 +61,4 @@ end
 
 Constructor of `PhotosynthesisReactionCenter`
 """
-PhotosynthesisReactionCenter{FT}() where {FT<:AbstractFloat} = PhotosynthesisReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0);
+PhotosynthesisReactionCenter{FT}() where {FT<:AbstractFloat} = PhotosynthesisReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0);
