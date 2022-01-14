@@ -29,6 +29,7 @@ $(TYPEDFIELDS)
 
 """
 mutable struct Arrhenius{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
+    # parameters that do not change with time
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"
@@ -61,6 +62,7 @@ $(TYPEDFIELDS)
 
 """
 mutable struct ArrheniusPeak{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
+    # parameters that do not change with time
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"
@@ -94,6 +96,7 @@ $(TYPEDFIELDS)
 
 """
 mutable struct Q10{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
+    # parameters that do not change with time
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"

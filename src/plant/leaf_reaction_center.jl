@@ -28,9 +28,9 @@ mutable struct PhotosynthesisReactionCenter{FT<:AbstractFloat}
 
     # prognostic variables that change with time
     "Reversible NPQ rate constant (initially zero)"
-    k_npq_r::FT
+    k_npq_rev::FT
     "Sustained NPQ rate constant (for seasonal changes, default is zero)"
-    k_npq_s::FT
+    k_npq_sus::FT
     "Rate constant for photochemistry (all reaction centers open)"
     k_p::FT
 end

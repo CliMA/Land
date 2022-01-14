@@ -18,11 +18,11 @@ mutable struct AirLayer{FT<:AbstractFloat}
     "Atmospheric pressure `[Pa]`"
     P_AIR::FT
     "O₂ partial pressure `[Pa]`"
-    P_O2::FT
+    P_O₂::FT
 
     # prognostic variables that change with time
     "CO₂ partial pressure `[Pa]`"
-    p_co2::FT
+    p_CO₂::FT
 end
 
 
