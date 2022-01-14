@@ -16,9 +16,13 @@ $(TYPEDFIELDS)
 mutable struct AirLayer{FT<:AbstractFloat}
     # parameters that do not change with time
     "Atmospheric pressure `[Pa]`"
-    P_A::FT
+    P_AIR::FT
     "O₂ partial pressure `[Pa]`"
     P_O2::FT
+
+    # prognostic variables that change with time
+    "CO₂ partial pressure `[Pa]`"
+    p_co2::FT
 end
 
 

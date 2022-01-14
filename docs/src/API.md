@@ -10,9 +10,9 @@ HyperspectralAbsorption
 HyperspectralAbsorption{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
 LeafBiophysics
 LeafBiophysics{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
-AbstractPhotosynthesisSystem
-C3VJPSystem
-C3VJPSystem{FT}() where {FT<:AbstractFloat}
+AbstractPhotosynthesisModel
+C3VJPModel
+C3VJPModel{FT}() where {FT<:AbstractFloat}
 ```
 
 

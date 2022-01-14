@@ -46,9 +46,10 @@ include("radiation/hyperspectral_radiation.jl")
 
 # include the plant types and structures
 include("plant/hyperspectral_absorption.jl")
-include("plant/leaf_biophysics.jl")
 include("plant/temperature_dependency.jl")
+include("plant/leaf_biophysics.jl")
 include("plant/leaf_photosynthesis.jl")
+include("plant/leaf_reaction_center.jl")
 include("plant/leaf.jl")
 
 # include the soil types and structures
