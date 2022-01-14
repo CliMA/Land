@@ -12,8 +12,17 @@ abstract type AbstractPhotosynthesisSystem{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2021-Nov-11: add C3VJPSystem structure for classic C₃ photosynthesis system
+#     2022-Jan-14: add temperature dependency into the structure
 #
 #######################################################################################################################################################################################################
+"""
+$(TYPEDEF)
+
+Structure that stores C3 photosynthesis system information
+
+# Fields
+$(TYPEDFIELDS)
+"""
 mutable struct C3VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT}
     # parameters that do not change with time
     "Jmax temperature dependency"
@@ -39,7 +48,7 @@ mutable struct C3VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     r_d25::FT
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_max25::FT
+    v_cmax25::FT
 
     # dignostic variables that change with time
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -67,17 +76,17 @@ mutable struct C3VJPSystem{FT<:AbstractFloat} <: AbstractPhotosynthesisSystem{FT
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     r_d::FT
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
-    v_max::FT
+    v_cmax::FT
     "CO₂ compensation point with the absence of Rd `[Pa]`"
     γ_star::FT
 end
 
 
 """
-    C3VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+    C3VJPSystem{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
 
 Constructor for [`C3VJPSystem`](@ref), given
-- `v_max25` Maximal carboxylation rate at 298.15 K
+- `v_cmax25` Maximal carboxylation rate at 298.15 K
 - `j_max25` Maximal electron transport rate at 298.15 K
 - `r_d25` Respiration rate at 298.15 K
 
@@ -85,10 +94,10 @@ Constructor for [`C3VJPSystem`](@ref), given
 # Examples
 ```julia
 c3 = C3VJPSystem{Float64}();
-c3 = C3VJPSystem{Float64}(v_max25 = 30, j_max25 = 50, r_d25 = 1);
+c3 = C3VJPSystem{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
 ```
 """
-C3VJPSystem{FT}(; v_max25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+C3VJPSystem{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
     return C3VJPSystem{FT}(JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT),ΓStarTDCLM(FT), 4, 8,
-                           j_max25, r_d25, v_max25, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_max25, 0)
+                           j_max25, r_d25, v_cmax25, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
 );

@@ -93,7 +93,7 @@ Y_1 = Y_0 \\cdot Q_{10} ^ \\dfrac{T_1 - T_0}{10}
 $(TYPEDFIELDS)
 
 """
-struct Q10{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
+mutable struct Q10{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"

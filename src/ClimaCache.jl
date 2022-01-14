@@ -18,7 +18,7 @@ using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using MAT: matread
-using PkgUtility: T_25
+using PkgUtility: P_ATM, T_25
 using Statistics: mean
 using UnPack: @unpack
 
@@ -36,6 +36,9 @@ const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.m
 const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
 const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
 
+
+# include the air types and structures
+include("air/air_layer.jl")
 
 # include the radiation types and structures
 include("radiation/wave_length_set.jl")
