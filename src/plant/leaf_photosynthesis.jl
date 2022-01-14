@@ -3,6 +3,7 @@ $(TYPEDEF)
 
 Hierachy of AbstractSoilVC:
 - [`C3VJPModel`](@ref)
+- [`C4VJPModel`](@ref)
 """
 abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 
@@ -61,6 +62,8 @@ mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     a_net::FT
     "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_p::FT
+    "Electron to CO₂ coefficient"
+    e_to_c::FT
     "Electron transport `[μmol m⁻² s⁻¹]`"
     j::FT
     "Maximal electron transport rate at leaf temperature `[μmol m⁻² s⁻¹]`"
@@ -99,7 +102,7 @@ c3 = C3VJPModel{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
 """
 C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
     return C3VJPModel{FT}(JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT),ΓStarTDCLM(FT), 4, 8,
-                           j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
+                           j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
 );
 
 
@@ -150,6 +153,8 @@ mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     a_net::FT
     "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_p::FT
+    "Electron to CO₂ coefficient"
+    e_to_c::FT
     "Electron transport `[μmol m⁻² s⁻¹]`"
     j::FT
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
@@ -181,5 +186,31 @@ c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax = 40, r_d25 = 1);
 ```
 """
 C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C4VJPModel{FT}(KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT), r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
+    return C4VJPModel{FT}(KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT), r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
 );
+
+
+"""
+$(TYPEDEF)
+
+Hierachy of AbstractSoilVC:
+- [`GCO₂Mode`](@ref)
+- [`PCO₂Mode`](@ref)
+"""
+abstract type AbstractPhotosynthesisMode end
+
+
+"""
+$(TYPEDEF)
+
+An empty structure to signal the function to calculate photosynthetic rates based on leaf diffusive conductance to CO₂.
+"""
+struct GCO₂Mode <: AbstractPhotosynthesisMode end
+
+
+"""
+$(TYPEDEF)
+
+An empty structure to signal the function to calculate photosynthetic rates based on CO₂ partial pressure.
+"""
+struct PCO₂Mode <: AbstractPhotosynthesisMode end
