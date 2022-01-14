@@ -1,12 +1,13 @@
 module Photosynthesis
 
-using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPSystem, C4VJPSystem, Q10
+using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C4VJPModel, PhotosynthesisReactionCenter, Q10
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R
 using UnPack: @unpack
 
 
 # include the functions
+include("etr.jl")
 include("temperature.jl")
 
 

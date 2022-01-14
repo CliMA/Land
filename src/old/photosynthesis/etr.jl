@@ -31,38 +31,3 @@ function leaf_ETR!(
 
     return nothing
 end
-
-
-
-
-function leaf_ETR!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack APAR, maxPSII, Jmax, PSII_frac = leaf;
-
-    _Jp = PSII_frac * maxPSII * APAR;
-    _J  = min(_Jp, Jmax);
-
-    leaf.J_pot = _Jp;
-    leaf.J     = _J;
-
-    return nothing
-end
-
-
-
-
-function leaf_ETR!(
-            photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack APAR, maxPSII, PSII_frac = leaf
-
-    _Jp = PSII_frac * maxPSII * APAR;
-
-    leaf.J_pot = _Jp;
-    leaf.J     = _Jp;
-
-    return nothing
-end
