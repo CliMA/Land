@@ -1,5 +1,10 @@
-abstract type AbstractColimit end
 
-struct MinimumColimit <:AbstractColimit end
+abstract type AbstractColimit{FT<:AbstractFloat} end
 
-struct QuadraticColimit <: AbstractColimit end
+
+struct MinimumColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end
+
+
+mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimit{FT}
+    CURVATURE::FT
+end

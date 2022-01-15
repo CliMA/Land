@@ -26,6 +26,12 @@ $(TYPEDFIELDS)
 """
 mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
+    "Colimitation method"
+    COLIMIT::AbstractColimit{FT}
+    "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_1::FT
+    "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_2::FT
     "Jmax temperature dependency"
     TD_JMAX::AbstractTemperatureDependency{FT}
     "Kc temperature dependency"
@@ -38,10 +44,6 @@ mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     TD_VCMAX::AbstractTemperatureDependency{FT}
     "Γ* temperature dependency"
     TD_Γ::AbstractTemperatureDependency{FT}
-    "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
-    EFF_1::FT
-    "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
-    EFF_2::FT
 
     # prognostic variables that change with time
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
@@ -101,8 +103,8 @@ c3 = C3VJPModel{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
 ```
 """
 C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C3VJPModel{FT}(JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT),ΓStarTDCLM(FT), 4, 8,
-                           j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
+    return C3VJPModel{FT}(MinimumColimit{FT}(), 4, 8, JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), ΓStarTDCLM(FT),
+                          j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
 );
 
 
@@ -125,6 +127,8 @@ $(TYPEDFIELDS)
 """
 mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
+    "Colimitation method"
+    COLIMIT::AbstractColimit{FT}
     "Kpep temperature dependency"
     TD_KPEP::AbstractTemperatureDependency{FT}
     "Respiration temperature dependency"
@@ -186,7 +190,8 @@ c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax = 40, r_d25 = 1);
 ```
 """
 C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C4VJPModel{FT}(KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT), r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
+    return C4VJPModel{FT}(MinimumColimit{FT}(), KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT),
+                          r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
 );
 
 
