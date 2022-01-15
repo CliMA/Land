@@ -36,7 +36,7 @@ mutable struct PhotosynthesisReactionCenter{FT<:AbstractFloat}
     "Non-Photochemical quenching "
     npq::FT
     "Fluorescence yield"
-    ϕ_s::FT
+    ϕ_f::FT
     "Photochemical yield"
     ϕ_p::FT
 

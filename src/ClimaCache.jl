@@ -38,6 +38,9 @@ const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO
 const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
 
 
+# include the utility types and structures
+include("util/colimit.jl")
+
 # include the air types and structures
 include("air/air_layer.jl")
 
