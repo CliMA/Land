@@ -1,46 +1,9 @@
 ###############################################################################
 #
-# Environmental conditions cache
-#
-###############################################################################
-"""
-    mutable struct AirLayer{FT}
-
-Struct to store environmental conditions in each air layer corresponds to one
-    canopy layer.
-
-# Fields
-$(TYPEDFIELDS)
-
----
-# Examples
-```julia
-# create a layer of air surrouding the leaf
-envir = AirLayer{Float32}();
-```
-"""
-Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
-    # pressures
-    "Atmospheric CO₂ partial pressure `[Pa]`"
-    p_a::FT = 41
-    "Atmospheric pressure `[Pa]`"
-    p_atm::FT = 101325
-    "Atmospheric O₂ partial pressure `[Pa]`"
-    p_O₂::FT = p_atm * 0.209
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Leaf parameters container
 #
 ###############################################################################
+#=
 """
     mutable struct Leaf{FT}
 
@@ -86,8 +49,6 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     p_i::FT = 10
     "Leaf surface CO₂ partial pressure `[Pa]`"
     p_s::FT = 40
-    "Saturation H₂O vapor pressure `[Pa]`"
-    p_sat::FT = saturation_vapor_pressure(T)
     "Leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_bc::FT = 3 / 1.35
     "Leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -227,107 +188,4 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "Absorbed photosynthetic active radiation `[μmol m⁻² s⁻¹]`"
     APAR::FT = 100
 end
-
-
-
-
-
-
-
-
-###############################################################################
-#
-# Leaf fluorescence-related parameter set
-#
-###############################################################################
-"""
-    abstract type AbstractFluoModelParaSet{FT}
-
-Hierarchy of the `AbstractFluoModelParaSet`:
-- [`FluoParaSet`](@ref)
-"""
-abstract type AbstractFluoModelParaSet{FT} end
-
-
-
-
-"""
-    mutable struct CytoFluoParaSet{FT}
-
-A `AbstractFluoModelParaSet` type paramter set using Johnson-Berry
-    photosynthesis model.
-
----
-Examples
-```julia
-# define Cytochrome model mode (no input)
-fluo = CytoFluoParaSet();
-```
-"""
-struct CytoFluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet{FT} end
-
-
-
-
-"""
-    mutable struct FluoParaSet{FT}
-
-A `AbstractFluoModelParaSet` type paramter set.
-
-# Fields
-$(TYPEDFIELDS)
-
----
-Examples
-```julia
-# define classic model mode (3 inputs)
-fluo = FluoParaSet(5.01, 1.93, 10.0);
-```
-"""
-struct FluoParaSet{FT<:AbstractFloat} <: AbstractFluoModelParaSet{FT}
-    "Fluorescence model coefficient"
-    Kr1::FT
-    "Fluorescence model coefficient"
-    Kr2::FT
-    "Fluorescence model coefficient"
-    Kr3::FT
-end
-
-
-
-
-
-
-
-###############################################################################
-#
-# Photosynthesis model parameter set -- temperature dependencies and etc
-#
-###############################################################################
-"""
-    abstract type AbstractPhotoModelParaSet{FT}
-
-Hierarchy of the `AbstractPhotoModelParaSet`:
-- [`C3Cytochrome`](@ref)
-- [`C3ParaSet`](@ref)
-- [`C4ParaSet`](@ref)
-"""
-abstract type AbstractPhotoModelParaSet{FT} end
-
-
-
-
-"""
-    mutable struct C3Cytochrome{FT}
-
-Parameter sets for C3 photosynthesis with Cytochrome activity.
-
-# Fields
-$(TYPEDFIELDS)
-"""
-mutable struct C3Cytochrome{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
-    "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
-    Eff_1::FT
-    "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
-    Eff_2::FT
-end
+=#

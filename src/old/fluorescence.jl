@@ -3,6 +3,7 @@
 # Update the fluorescence in the leaf
 #
 ###############################################################################
+#=
 """
     leaf_fluorescence!(
                 fluo_set::CytoFluoParaSet{FT},
@@ -24,8 +25,7 @@ function leaf_fluorescence!(
     @unpack APAR, C_b₆f, J_P680_a, J_P700_a, J_P700_j, K_D1, K_F1, K_N1, K_P1,
             K_P2, K_U2, k_q, φ_P1_max, α_1, α_2, ϵ_1, ϵ_2 = leaf;
 
-    # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/
-    #                      scripts/model_fun.m
+    # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/scripts/model_fun.m
     # TODO PAR or APAR?
     # primary fluorescence parameters
     _b₆f_a  = J_P700_j / k_q;
@@ -88,53 +88,4 @@ function leaf_fluorescence!(
 
     return nothing
 end
-
-
-
-
-function leaf_fluorescence!(
-            fluo_set::FluoParaSet{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack Ag, Kd, Kf, Kp_max, maxPSII = leaf;
-    @unpack Kr1, Kr2, Kr3 = fluo_set;
-
-    # Actual effective ETR:
-    leaf.Ja  = max(0, Ag / leaf.e2c);
-
-    # Effective photochemical yield:
-    if leaf.Ja <= 0
-        _φ   = maxPSII;
-    else
-        _φ   = maxPSII*leaf.Ja/leaf.J_pot;
-    end
-
-    leaf.φ   = min(1/maxPSII, _φ);
-    # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
-    x        = max(0,  1-leaf.φ/maxPSII);
-
-    # Max PSII rate constant, x_α = exp(log(x)*Kr2);
-    x_α      = x ^ Kr2;
-    leaf.Kr  = Kr1 * (1 + Kr3)* x_α / (Kr3 + x_α);
-    leaf.Kp  = max(0, leaf.φ*(Kf+Kd+leaf.Kr)/(1-leaf.φ));
-
-    leaf.Fo  = Kf / (Kf+Kp_max+Kd                );
-    leaf.Fo′ = Kf / (Kf+Kp_max+Kd+leaf.Kr+leaf.Ks);
-    leaf.Fm  = Kf / (Kf       +Kd                );
-    leaf.Fm′ = Kf / (Kf       +Kd+leaf.Kr+leaf.Ks);
-    leaf.φs  = leaf.Fm′ * (1 - leaf.φ);
-
-    #
-    #
-    # TODO should these change with Ks?
-    #
-    #
-    # leaf.eta  = leaf.ϕs/leaf.Fo
-    # don't need this anymore
-    # better to use ϕs directly for SIF as Fo is not always fqe=0.01
-    leaf.qQ  = 1 - (leaf.φs-leaf.Fo′) / (leaf.Fm-leaf.Fo′);
-    leaf.qE  = 1 - (leaf.Fm-leaf.Fo′) / (leaf.Fm′-leaf.Fo);
-    leaf.NPQ = leaf.Kr / (Kf + Kd);
-
-    return nothing
-end
+=#

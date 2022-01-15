@@ -269,6 +269,9 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     leaf.PSM.a_gross = min(leaf.PSM.a_c, leaf.PSM.a_j, leaf.PSM.a_p);
     leaf.PSM.a_net   = leaf.PSM.a_gross - leaf.PSM.r_d;
 
+    # update the fluorescence related parameters
+    leaf_fluorescence!(leaf);
+
     return nothing
 );
 
@@ -300,6 +303,9 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
 
     leaf.p_CO₂_i = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂   * air.P_AIR * FT(1e-6);
     leaf.p_CO₂_s = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
+
+    # update the fluorescence related parameters
+    leaf_fluorescence!(leaf);
 
     return nothing
 );
