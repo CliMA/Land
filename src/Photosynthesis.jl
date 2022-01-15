@@ -7,7 +7,7 @@ using UnPack: @unpack
 
 
 # export function from this module
-export leaf_fluorescence!, leaf_photosynthesis!
+export leaf_photosynthesis!
 
 # export types from ClimaCache
 export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
@@ -16,9 +16,11 @@ export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
 # include the functions
 include("etr.jl")
 include("fluorescence.jl")
+include("light_limited.jl")
 include("photosynthesis.jl")
+include("product_limited.jl")
+include("rubisco_limited.jl")
 include("temperature.jl")
 
-include("old/PhotosynthesisOld.jl")
 
 end # module
