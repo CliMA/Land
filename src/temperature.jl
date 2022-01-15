@@ -129,21 +129,21 @@ function photosystem_temperature_dependence! end
 #
 #######################################################################################################################################################################################################
 """
-    photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
+    photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
 Update the temperature dependencies of C3 photosynthesis model, given
-- `ps` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `t` Target temperature in `K`
 """
-photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    ps.r_d    = ps.r_d25    * temperature_correction(ps.TD_R, t);
-    ps.v_cmax = ps.v_cmax25 * temperature_correction(ps.TD_VCMAX, t);
-    ps.j_max  = ps.j_max25  * temperature_correction(ps.TD_JMAX, t);
-    ps.k_c    = temperature_corrected_value(ps.TD_KC, t);
-    ps.k_o    = temperature_corrected_value(ps.TD_KO, t);
-    ps.γ_star = temperature_corrected_value(ps.TD_Γ, t);
-    ps.k_m    = ps.k_c * (1 + air.P_O₂ / ps.k_o);
+photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm.j_max  = psm.j_max25  * temperature_correction(psm.TD_JMAX, t);
+    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
+    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
+    psm.γ_star = temperature_corrected_value(psm.TD_Γ, t);
+    psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
 
     return nothing
 );
@@ -158,18 +158,18 @@ photosystem_temperature_dependence!(ps::C3VJPModel{FT}, air::AirLayer{FT}, t::FT
 #
 #######################################################################################################################################################################################################
 """
-    photosystem_temperature_dependence!(ps::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
+    photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
 Update the temperature dependencies of C3 photosynthesis model, given
-- `ps` `C4VJPModel` structure for C3 photosynthesis model
+- `psm` `C4VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `t` Target temperature in `K`
 """
-photosystem_temperature_dependence!(ps::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    ps.r_d    = ps.r_d25    * temperature_correction(ps.TD_R, t);
-    ps.v_cmax = ps.v_cmax25 * temperature_correction(ps.TD_VCMAX, t);
-    ps.v_pmax = ps.v_pmax25 * temperature_correction(ps.TD_VPMAX, t);
-    ps.k_pep  = temperature_corrected_value(ps.TD_KPEP, t);
+photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm.v_pmax = psm.v_pmax25 * temperature_correction(psm.TD_VPMAX, t);
+    psm.k_pep  = temperature_corrected_value(psm.TD_KPEP, t);
 
     return nothing
 );

@@ -1,4 +1,2 @@
-using ClimaCache
-using Photosynthesis.PhotosynthesisOld
-using PkgUtility
+using Photosynthesis
 using Test

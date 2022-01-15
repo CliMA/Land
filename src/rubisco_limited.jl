@@ -22,14 +22,14 @@ function rubisco_limited_rate! end
 #
 #######################################################################################################################################################################################################
 """
-    rubisco_limited_rate!(ps::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+    rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate, given
-- `ps` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3VJPModel` structure for C3 photosynthesis model
 - `p_i` Internal CO₂ partial pressure in `Pa`
 """
-rubisco_limited_rate!(ps::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
-    ps.a_c = ps.v_cmax * (p_i - ps.γ_star) / (p_i + ps.k_m);
+rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
+    psm.a_c = psm.v_cmax * (p_i - psm.γ_star) / (p_i + psm.k_m);
 
     return nothing
 );
@@ -43,14 +43,14 @@ rubisco_limited_rate!(ps::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
 #
 #######################################################################################################################################################################################################
 """
-    rubisco_limited_rate!(ps::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+    rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate, given
-- `ps` `C4VJPModel` structure for C3 photosynthesis model
+- `psm` `C4VJPModel` structure for C3 photosynthesis model
 - `p_i` Internal CO₂ partial pressure in `Pa`, not used in this method
 """
-rubisco_limited_rate!(ps::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
-    ps.a_c = ps.v_cmax;
+rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
+    psm.a_c = psm.v_cmax;
 
     return nothing
 );
@@ -64,27 +64,27 @@ rubisco_limited_rate!(ps::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
 #
 #######################################################################################################################################################################################################
 """
-    rubisco_limited_rate!(ps::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+    rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate in conductance mode, given
-- `ps` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`
 """
-rubisco_limited_rate!(ps::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
-    _a = ps.v_max;
-    _b = ps.v_max * ps.γ_star;
-    _d = ps.k_m;
+rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
+    _a = psm.v_max;
+    _b = psm.v_max * psm.γ_star;
+    _d = psm.k_m;
     _f = air.P_AIR / g_lc * FT(1e-6);
     _p = air.p_CO₂;
-    _r = ps.r_d;
+    _r = psm.r_d;
 
     _qa = _f;
     _qb = _f*_r - _p - _d - _a*_f;
     _qc = _a*_p - _b - _r*(_p + _d);
     _an = lower_quadratic(_qa, _qb, _qc);
 
-    ps.a_c = _an + _r;
+    psm.a_c = _an + _r;
 
     return nothing
 );
@@ -98,15 +98,15 @@ rubisco_limited_rate!(ps::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT
 #
 #######################################################################################################################################################################################################
 """
-    rubisco_limited_rate!(ps::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+    rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate in conductance mode, given
-- `ps` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure, not used in the method
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, not used in this methid
 """
-rubisco_limited_rate!(ps::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
-    ps.a_c = ps.v_cmax;
+rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
+    psm.a_c = psm.v_cmax;
 
     return nothing
 );

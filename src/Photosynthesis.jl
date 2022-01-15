@@ -1,6 +1,6 @@
 module Photosynthesis
 
-using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C4VJPModel, GCO₂Mode, Leaf, PCO₂Mode, PhotosynthesisReactionCenter, Q10, VanDerTolFluorescenceModel
+using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C4VJPModel, GCO₂Mode, Leaf, MinimumColimit, PCO₂Mode, PhotosynthesisReactionCenter, Q10, QuadraticColimit, VanDerTolFluorescenceModel
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, lower_quadratic
 using UnPack: @unpack
@@ -14,6 +14,7 @@ export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
 
 
 # include the functions
+include("colimit.jl")
 include("etr.jl")
 include("fluorescence.jl")
 include("light_limited.jl")

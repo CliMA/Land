@@ -90,7 +90,7 @@ version = "0.1.2"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "888f836f7b47a4ff0de28e8256a65186d91b9090"
+git-tree-sha1 = "1363d722998d8d338368619c2c31a4b76269988d"
 repo-rev = "wyujie"
 repo-url = "https://github.com/Yujie-W/ClimaCache.jl"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"

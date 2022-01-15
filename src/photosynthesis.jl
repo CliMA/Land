@@ -21,6 +21,7 @@ function leaf_photosynthesis! end
 #     2022-Jan-14: set a default p_i from leaf to combine two methods
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
+#     2022-Jan-14: use colimit function to compute a_gross and a_net
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -55,10 +56,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     rubisco_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     light_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     product_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
-
-    # TODO: add a function leaf_ag! to use colimit functions
-    leaf.PSM.a_gross = min(leaf.PSM.a_c, leaf.PSM.a_j, leaf.PSM.a_p);
-    leaf.PSM.a_net   = leaf.PSM.a_gross - leaf.PSM.r_d;
+    colimit_photosynthesis!(leaf.PSM, leaf.COLIMIT);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(leaf);
@@ -74,6 +72,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Jan-14: set a default g_lc from leaf to combine two methods
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
+#     2022-Jan-14: use colimit function to compute a_gross and a_net
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -108,11 +107,9 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     rubisco_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     light_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     product_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
+    colimit_photosynthesis!(leaf.PSM, leaf.COLIMIT);
 
-    # TODO: add a function leaf_ag! to use colimit functions
-    leaf.PSM.a_gross = min(leaf.PSM.a_c, leaf.PSM.a_j, leaf.PSM.a_p);
-    leaf.PSM.a_net   = leaf.PSM.a_gross - leaf.PSM.r_d;
-
+    # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
     leaf.p_CO₂_i = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂   * air.P_AIR * FT(1e-6);
     leaf.p_CO₂_s = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
