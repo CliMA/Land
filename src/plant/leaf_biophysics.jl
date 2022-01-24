@@ -28,13 +28,13 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
     NDUB::Int
 
     # prognostic variables that change with time
-    "Anthocynanin content `[ug cm⁻²]`"
+    "Anthocynanin content `[μg cm⁻²]`"
     ant::FT
     "Senescent material (brown pigments) fraction `[-]`"
     brown::FT
-    "Chlorophyll a and b content `[ug cm⁻²]`"
+    "Chlorophyll a and b content `[μg cm⁻²]`"
     cab::FT
-    "Carotenoid content `[ug cm⁻²]`"
+    "Carotenoid content `[μg cm⁻²]`"
     car::FT
     "Carbon-based constituents in lma `[g cm⁻²]`"
     cbc::FT

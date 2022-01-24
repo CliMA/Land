@@ -36,3 +36,23 @@ end
 #######################################################################################################################################################################################################
 FluorescenceVDT(FT) = VanDerTolFluorescenceModel{FT}(2.48, 2.83, 0.114)
 FluorescenceVDTDrought(FT) = VanDerTolFluorescenceModel{FT}(5.01, 1.93, 10)
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the structure
+# General
+#     2022-Jan-24: add an empty structure for Cytochrome based fluorescence model
+# Sources
+#     Johnson and Berry (2021) The role of Cytochrome b₆f in the control of steady-state photosynthesis: a conceptual and quantitative model
+#
+#######################################################################################################################################################################################################
+"""
+$(TYPEDEF)
+
+Structure that stores Johnson and Berry (2021) fluorescence model parameters.
+
+# Fields
+$(TYPEDFIELDS)
+"""
+struct CytochromeFluorescenceModel{FT<:AbstractFloat} <: AbstractFluorescenceModel{FT} end

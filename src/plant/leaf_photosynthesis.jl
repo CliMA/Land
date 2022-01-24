@@ -112,6 +112,69 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 #
 # Changes to this struct
 # General
+#     2021-Jan-18: add C3CytochromeModel structure for C₃ photosynthesis system
+# To do
+#     TODO: add TD in Photosynthesis.jl
+#
+#######################################################################################################################################################################################################
+"""
+$(TYPEDEF)
+
+Structure that stores C3 Cytochrome photosynthesis system information
+
+# Fields
+$(TYPEDFIELDS)
+"""
+mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
+    # parameters that do not change with time
+    "Colimitation method"
+    COLIMIT::AbstractColimit{FT}
+    "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_1::FT
+    "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
+    EFF_2::FT
+
+    # prognostic variables that change with time
+    "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"
+    b₆f::FT
+    "Maximal turnover rate of Cytochrome b₆f `[e⁻ s⁻¹]`"
+    k_q::FT
+
+    # dignostic variables that change with time
+    "PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p680_a::FT
+    "Rubisco limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p680_c::FT
+    "Light limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p680_j::FT
+    "Product limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p680_p::FT
+    "PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p700_a::FT
+    "Rubisco limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p700_c::FT
+    "Light limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p700_j::FT
+    "Product limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_p700_p::FT
+    "Maximal Cytochrome b₆f activity `[μmol e⁻ m⁻² s⁻¹]`"
+    v_qmax::FT
+    "ratio between J_P700 and J_P680"
+    η::FT
+    "CO₂ compensation point with the absence of Rd `[Pa]`"
+    γ_star::FT
+end
+
+
+C3CytochromeModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+    return C3CytochromeModel{FT}(MinimumColimit{FT}(), 4, 8, 350 / 300, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
 #     2021-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl

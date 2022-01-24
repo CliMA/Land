@@ -7,6 +7,7 @@
 #     TODO: add leaf physiological parameters as a field well
 #     TODO: add leaf hydraulics as a field as well
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
+#     TODO: add auto reference in fields
 #
 #######################################################################################################################################################################################################
 """
@@ -24,7 +25,7 @@ mutable struct Leaf{FT<:AbstractFloat}
     "Leaf fluorescence model"
     FLM::AbstractFluorescenceModel{FT}
     "Photosynthesis reaction center"
-    PRC::PhotosynthesisReactionCenter{FT}
+    PRC::AbstractReactionCenter{FT}
     "Photosynthesis model"
     PSM::AbstractPhotosynthesisModel{FT}
 
@@ -53,11 +54,9 @@ end
 
 
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C4"];
+    @assert psm in ["C3", "C3Cytochrome", "C4"];
 
     _bio = LeafBiophysics{FT}(wls);
-    _flm = FluorescenceVDT(FT);
-    _prc = PhotosynthesisReactionCenter{FT}();
     _t   = T_25();
     _p   = saturation_vapor_pressure(_t);
 
@@ -66,10 +65,14 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:A
     _p_i  = 20.0;
 
     if psm == "C3"
-        return Leaf{FT}(_bio, _flm, _prc, C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+    end;
+
+    if psm == "C3Cytochrome"
+        return Leaf{FT}(_bio, CytochromeFluorescenceModel{FT}(), CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
     end;
 
     if psm == "C4"
-        return Leaf{FT}(_bio, _flm, _prc, C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
     end;
 );
