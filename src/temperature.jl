@@ -41,6 +41,7 @@ temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: add FT control to r_ref
 #
 #######################################################################################################################################################################################################
 """
@@ -51,7 +52,7 @@ Return the correction ratio for a temperature dependent variable, given
 - `t` Target temperature in `K`
 - `t_ref` Reference temperature in `K`, default is `td.T_REF` (298.15 K)
 """
-temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref = td.T_REF) where {FT<:AbstractFloat} = (
+temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = (
     @unpack ΔHA, ΔHD, ΔSV = td;
 
     # _f_a: activation correction, _f_b: de-activation correction
@@ -69,10 +70,11 @@ temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref = td.T_REF) where {FT
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
+    temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the correction ratio for a temperature dependent variable, given
 - `td` `Q10` type temperature dependency struture

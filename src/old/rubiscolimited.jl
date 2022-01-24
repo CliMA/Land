@@ -1,29 +1,4 @@
-###############################################################################
-#
-# Calculate the rubisco-limited photosynthetic rates
-#
-###############################################################################
 #=
-"""
-    rubisco_limited_rate!(
-                photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
-                leaf::Leaf{FT}
-    ) where {FT<:AbstractFloat}
-    rubisco_limited_rate!(
-                photo_set::C4ParaSet{FT},
-                leaf::Leaf{FT}
-    ) where {FT<:AbstractFloat}
-    rubisco_limited_rate!(
-                photo_set::C3ParaSet{FT},
-                leaf::Leaf{FT},
-                envir::AirLayer{FT}
-    ) where {FT<:AbstractFloat}
-
-Calculate the RubisCO limited photosynthetic rate, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
-- `leaf` [`Leaf`](@ref) type struct
-- `envir` [`AirLayer`](@ref) type struct
-"""
 function rubisco_limited_rate!(
             photo_set::C3Cytochrome{FT},
             leaf::Leaf{FT}

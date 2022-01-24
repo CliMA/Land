@@ -39,6 +39,34 @@ product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 #
 # Changes to this function
 # General
+#     2022-Jan-18: add support to C3CytochromeModel
+#     2022-Jan-18: add input variable p_i to make the code more modular
+# Bug fix
+#     2022-Jan-18: j_psi_p = j_psii_p * η (was j_psii_c * η)
+#
+#######################################################################################################################################################################################################
+"""
+    light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+
+Update the product limited photosynthetic rate, given
+- `psm` `C3CytochromeModel` structure for C3 photosynthesis model
+- `p_i` Internal CO₂ partial pressure in `Pa`, not used in this method
+"""
+product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
+    @unpack EFF_1, EFF_2 = psm;
+
+    psm.a_p      = psm.v_cmax / 2;
+    psm.j_psii_p = psm.a_c * (EFF_1*p_i + EFF_2*psm.γ_star) / (p_i - psm.γ_star);
+    psm.j_psi_p  = psm.j_psii_p* psm.η;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Jan-14: add input variable p_i to make the code more modular
 #
 #######################################################################################################################################################################################################

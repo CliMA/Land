@@ -20,17 +20,18 @@ function photosystem_coefficients! end
 # General
 #     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add function that operates PSM, PRC, and FLM directly so as to be more modular (reduce memory allocations)
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::PhotosynthesisReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}) where {FT<:AbstractFloat}
+    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}) where {FT<:AbstractFloat}
 
 Update the rate constants and coefficients in reaction center, given
 - `psm` `C3VJPModel` or `C4VJPModel` type photosynthesis model
-- `rc` Photosynthesis reaction center for rate constants and coefficients
+- `rc` `VJPReactionCenter` type photosynthesis system reaction center
 - `vdt` van der Tol et al. (2013) fluorescence model
 """
-photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::PhotosynthesisReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}) where {FT<:AbstractFloat} = (
+photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}) where {FT<:AbstractFloat} = (
     @unpack K_0, K_A, K_B = vdt;
     @unpack K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
 

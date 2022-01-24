@@ -95,13 +95,14 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {F
 # Changes to this function
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+    rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate in conductance mode, given
-- `psm` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C4VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure, not used in the method
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, not used in this methid
 """

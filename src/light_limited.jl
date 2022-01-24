@@ -20,16 +20,18 @@ function light_limited_rate! end
 # General
 #     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add p_i to input list to make the code more modular
+#     2022-Jan-24: add C3CytochromeModel support in a Union
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+    light_limited_rate!(psm::Union{C3VJPModel{FT}, C3CytochromeModel{FT}}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate, given
-- `psm` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3VJPModel` or `C3CytochromeModel` structure for C3 photosynthesis model
 - `p_i` Internal CO₂ partial pressure in `Pa`
 """
-light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
+light_limited_rate!(psm::Union{C3VJPModel{FT}, C3CytochromeModel{FT}}, p_i::FT) where {FT<:AbstractFloat} = (
     @unpack EFF_1, EFF_2 = psm;
 
     psm.e_to_c = (p_i - psm.γ_star) / (EFF_1 * p_i + EFF_2 * psm.γ_star);
@@ -55,7 +57,7 @@ Update the electron transport limited photosynthetic rate, given
 """
 light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
     psm.e_to_c = 1 / 6;
-    psm.a_j = psm.j * psm.e_to_c;
+    psm.a_j    = psm.j * psm.e_to_c;
 
     return nothing
 );
@@ -66,6 +68,7 @@ light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
 # Changes to this function
 # General
 #     2022-Jan-14: add g_lc to input list to make the code more modular
+#     2022-Jan-24: fix a bug in field name e_to_c in psm
 #
 #######################################################################################################################################################################################################
 """
@@ -90,8 +93,8 @@ light_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<
     _qc = _a*_p - _b - _r*(_c*_p + _d);
     _an = lower_quadratic(_qa, _qb, _qc);
 
-    psm.a_j = _an + _r;
-    psm.e2c = psm.a_j / psm.j;
+    psm.a_j    = _an + _r;
+    psm.e_to_c = psm.a_j / psm.j;
 
     return nothing
 );
@@ -114,7 +117,7 @@ Update the electron transport limited photosynthetic rate in conductance mode, g
 """
 light_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
     psm.e_to_c = 1 / 6;
-    psm.a_j = psm.j * psm.e_to_c;
+    psm.a_j    = psm.j * psm.e_to_c;
 
     return nothing
 );

@@ -22,6 +22,7 @@ function leaf_photosynthesis! end
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
+#     2022-Jan-18: add p_i to electron transport function input variables
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -52,7 +53,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(leaf.PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar);
+    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar, p_i);
     rubisco_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     light_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     product_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
@@ -75,6 +76,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
+#     TODO: this method does not work with C3CytochromeModel because the need of interations for c_i
 #
 #######################################################################################################################################################################################################
 """

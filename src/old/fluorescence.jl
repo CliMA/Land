@@ -1,23 +1,4 @@
-###############################################################################
-#
-# Update the fluorescence in the leaf
-#
-###############################################################################
 #=
-"""
-    leaf_fluorescence!(
-                fluo_set::CytoFluoParaSet{FT},
-                leaf::Leaf{FT}
-    ) where {FT<:AbstractFloat}
-    leaf_fluorescence!(
-                fluo_set::FluoParaSet{FT},
-                leaf::Leaf{FT}
-    ) where {FT<:AbstractFloat}
-
-Compute fluorescence yield, Kr, Ks, and Kp for leaf, given
-- `fluo_set` [`FluoParaSet`](@ref) type parameter set
-- `leaf` [`Leaf`](@ref) struct
-"""
 function leaf_fluorescence!(
             fluo_set::CytoFluoParaSet{FT},
             leaf::Leaf{FT}
