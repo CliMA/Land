@@ -23,6 +23,9 @@ function leaf_photosynthesis! end
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 #     2022-Jan-18: add p_i to electron transport function input variables
+#     2022-Jan-24: fix documentation
+# Bug fixes:
+#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -39,8 +42,8 @@ Updates leaf photosynthetic rates, given
 ---
 # Examples
 ```julia
-leaf = Leaf{Float64}();
-air = AirLayer{FT}();
+leaf = Leaf{Float64}("C3");
+air = AirLayer{Float64}();
 mode = PCO₂Mode();
 leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 30.0);
@@ -57,7 +60,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     rubisco_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     light_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     product_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
-    colimit_photosynthesis!(leaf.PSM, leaf.COLIMIT);
+    colimit_photosynthesis!(leaf.PSM);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(leaf);
@@ -74,6 +77,9 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
+#     2022-Jan-24: fix documentation
+# Bug fixes:
+#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #     TODO: this method does not work with C3CytochromeModel because the need of interations for c_i
@@ -85,14 +91,14 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 Updates leaf photosynthetic rates, given
 - `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+- `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
 
 ---
 # Examples
 ```julia
-leaf = Leaf{Float64}();
-air = AirLayer{FT}();
+leaf = Leaf{Float64}("C3");
+air = AirLayer{Float64}();
 mode = GCO₂Mode();
 leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 0.1);
@@ -109,7 +115,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     rubisco_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     light_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     product_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
-    colimit_photosynthesis!(leaf.PSM, leaf.COLIMIT);
+    colimit_photosynthesis!(leaf.PSM);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
     leaf.p_CO₂_i = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂   * air.P_AIR * FT(1e-6);
