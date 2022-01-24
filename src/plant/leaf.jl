@@ -2,7 +2,9 @@
 #
 # Changes to this structure
 # General
-#     2021-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
+#     2022-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
+# Bug fixes:
+#     2022-Jan-24: add FT control to p_CO₂_i
 # To do
 #     TODO: add leaf physiological parameters as a field well
 #     TODO: add leaf hydraulics as a field as well
@@ -43,7 +45,7 @@ mutable struct Leaf{FT<:AbstractFloat}
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂_b::FT
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_CO₂_i
+    p_CO₂_i::FT
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
 

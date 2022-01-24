@@ -112,7 +112,7 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 #
 # Changes to this struct
 # General
-#     2021-Jan-18: add C3CytochromeModel structure for C₃ photosynthesis system
+#     2022-Jan-18: add C3CytochromeModel structure for C₃ photosynthesis system
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -175,7 +175,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Num
 #
 # Changes to this struct
 # General
-#     2021-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
+#     2022-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl
 #

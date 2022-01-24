@@ -14,7 +14,7 @@ abstract type AbstractReactionCenter{FT<:AbstractFloat} end
 #
 # Changes to this struct
 # General
-#     2021-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
+#     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -80,7 +80,7 @@ VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, 0
 #
 # Changes to this struct
 # General
-#     2021-Jan-18: add the struct of Cytochrome reaction center
+#     2022-Jan-18: add the struct of Cytochrome reaction center
 #
 #######################################################################################################################################################################################################
 """
