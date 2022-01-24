@@ -2,7 +2,9 @@
 #
 # Changes to this struct
 # General
-#     2021-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
+#     2022-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
+#     2022-Jan-14: rename P_A to P_AIR, P_O2 to P_O₂
+#     2022-Jan-14: add p_CO₂ to the structure
 #
 #######################################################################################################################################################################################################
 """
@@ -26,6 +28,14 @@ mutable struct AirLayer{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
+#     2022-Jan-24: add p_CO₂ to the constructors#
+#
+#######################################################################################################################################################################################################
 """
     AirLayer{FT}() where {FT<:AbstractFloat}
 
@@ -37,4 +47,4 @@ Constructor for AirLayer
 air = AirLayer{Float64}();
 ```
 """
-AirLayer{FT}() where {FT<:AbstractFloat} = AirLayer{FT}(P_ATM(FT), P_ATM(FT) * 0.209);
+AirLayer{FT}() where {FT<:AbstractFloat} = AirLayer{FT}(P_ATM(FT), P_ATM(FT) * 0.209, 40);
