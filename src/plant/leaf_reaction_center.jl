@@ -112,3 +112,11 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
 
     # dignostic variables that change with time
 end
+
+
+"""
+    CytochromeReactionCenter{FT}() where {FT<:AbstractFloat}
+
+Constructor of `CytochromeReactionCenter`
+"""
+CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = CytochromeReactionCenter{FT}(0.41/(0.41+0.44), 5.5e8, 5e7, 1.45e10, 1, 0.75, 1.45e10 / (1.45e10+5.5e8+5e7));
