@@ -3,6 +3,8 @@
 # Changes to this structure
 # General
 #     2022-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
+#     2022-Jan-24: add p_CO₂_s to the structure
+#     2022-Jan-24: fix documentation
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -13,12 +15,15 @@
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure to save leaf parameters
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
@@ -57,6 +62,36 @@ mutable struct Leaf{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jan-14: add C3 and C4 constructors
+#     2022-Jan-24: add C3Cytochrome constructor
+#     2022-Jan-24: add p_CO₂_s to the constructor
+#     2022-Jan-24: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+
+Constructor for `Leaf`, given
+- `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
+- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+
+---
+# Examples
+```julia
+leaf_c3 = Leaf{Float64}("C3");
+leaf_c4 = Leaf{Float64}("C4");
+leaf_cy = Leaf{Float64}("C3Cytochrome");
+wls = WaveLengthSet{FT}(collect(400:10:2500));
+leaf_c3 = Leaf{Float64}("C3", wls);
+leaf_c4 = Leaf{Float64}("C4", wls);
+leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
+```
+"""
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"];
 
