@@ -1,35 +1,12 @@
 # ClimaCache
+
 ```@meta
 CurrentModule = ClimaCache
 ```
 
 
-## Plant
+## Air
 ```@docs
-HyperspectralAbsorption
-HyperspectralAbsorption{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
-LeafBiophysics
-LeafBiophysics{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
-AbstractPhotosynthesisModel
-C3VJPModel
-C3VJPModel{FT}() where {FT<:AbstractFloat}
-```
-
-
-## Radiation
-```@docs
-HyperspectralRadiation
-HyperspectralRadiation{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
-WaveLengthSet
-WaveLengthSet{FT}(swl::Vector) where {FT<:AbstractFloat}
-```
-
-
-## Soil
-```@docs
-AbstractSoilVC
-BrooksCorey
-VanGenuchten
-VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
-VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
+AirLayer{FT<:AbstractFloat}
+AirLayer{FT}() where {FT<:AbstractFloat}
 ```

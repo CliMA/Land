@@ -2,6 +2,17 @@ using ClimaCache
 using Test
 
 
+@testset verbose = true "ClimaCache Test" begin
+    @testset "Air" begin
+        for FT in [Float32, Float64]
+            air = AirLayer{FT}();
+            @test true;
+        end;
+    end;
+end;
+
+
+#=
 @testset "Structure --- Radiation" begin
     println("Testing WaveLengthSet constructors...");
     for FT in [Float32, Float64]
@@ -66,3 +77,4 @@ end;
         @test true;
     end;
 end;
+=#

@@ -24,6 +24,10 @@ using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
 
 
+# export public types and constructors
+export AirLayer
+
+
 #######################################################################################################################################################################################################
 #
 # Changes to these constants
