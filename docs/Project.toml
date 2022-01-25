@@ -1,7 +1,6 @@
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 Photosynthesis = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 PkgUtility = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 PlotPlants = "62700b34-1872-4917-b6af-4f42ae699f38"

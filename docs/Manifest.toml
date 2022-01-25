@@ -90,7 +90,7 @@ version = "0.1.2"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "0dc4eb67f714bbc9f6eae28f782e472f5ef01deb"
+git-tree-sha1 = "6048117f4e16e37e2b0dd20488439bb7679762eb"
 repo-rev = "wyujie"
 repo-url = "https://github.com/Yujie-W/ClimaCache.jl"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
@@ -429,12 +429,6 @@ version = "4.3.0+0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-
-[[deps.Literate]]
-deps = ["Base64", "IOCapture", "JSON", "REPL"]
-git-tree-sha1 = "231916f1f577c5688ae5a5b94d3d135f69cfd1cd"
-uuid = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
-version = "2.10.0"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
@@ -779,9 +773,9 @@ version = "0.33.14"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "bedb3e17cc1d94ce0e6e66d3afa47157978ba404"
+git-tree-sha1 = "f35e1879a71cca95f4826a14cdbf0b9e253ed918"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "0.9.14"
+version = "0.9.15"
 
 [[deps.StatsModels]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "Printf", "REPL", "ShiftedArrays", "SparseArrays", "StatsBase", "StatsFuns", "Tables"]

@@ -21,9 +21,11 @@ function temperature_correction end
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the correction ratio for a temperature dependent variable, given
@@ -42,9 +44,11 @@ temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
 #     2022-Jan-24: add FT control to r_ref
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the correction ratio for a temperature dependent variable, given
@@ -74,6 +78,7 @@ temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where
 #
 #######################################################################################################################################################################################################
 """
+
     temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the correction ratio for a temperature dependent variable, given
@@ -91,9 +96,11 @@ temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:Abst
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     temperature_corrected_value(td::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the temperature corrected value, given
@@ -128,9 +135,11 @@ function photosystem_temperature_dependence! end
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
 Update the temperature dependencies of C3 photosynthesis model, given
@@ -157,9 +166,11 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
 
 Update the temperature dependencies of C3 photosynthesis model, given

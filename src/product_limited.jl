@@ -19,10 +19,12 @@ function product_limited_rate! end
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+
+    product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the product limited photosynthetic rate, given
 - `psm` `C3VJPModel` structure for C3 photosynthesis model
@@ -41,12 +43,14 @@ product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # General
 #     2022-Jan-18: add support to C3CytochromeModel
 #     2022-Jan-18: add input variable p_i to make the code more modular
+#     2022-Jan-24: fix documentation
 # Bug fix
 #     2022-Jan-18: j_psi_p = j_psii_p * η (was j_psii_c * η)
 #
 #######################################################################################################################################################################################################
 """
-    light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+
+    product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the product limited photosynthetic rate, given
 - `psm` `C3CytochromeModel` structure for C3 photosynthesis model
@@ -68,10 +72,12 @@ product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFl
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-    light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+
+    product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the product limited photosynthetic rate, given
 - `psm` `C4VJPModel` structure for C3 photosynthesis model
@@ -89,9 +95,11 @@ product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # Changes to this function
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     product_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
@@ -111,9 +119,11 @@ product_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {F
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable g_lc to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     product_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given

@@ -19,9 +19,11 @@ function colimit_photosynthesis! end
 # Changes to this function
 # General
 #     2022-Jan-24: use colimit from psm to abstractize the MinimumColimit and QuadraticColimit methods
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat}
 
 Use the minimal photosynthetic rates of rubisco-, light-, and product-limited photosynthetic rates, given
@@ -39,9 +41,11 @@ colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:A
 # Changes to this function
 # General
 #     2022-Jan-14: add colimt function back
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, colim::MinimumColimit{FT}) where {FT<:AbstractFloat}
 
 Use the minimal photosynthetic rates of rubisco-, light-, and product-limited photosynthetic rates, given
@@ -62,9 +66,11 @@ colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, colim::Minim
 # General
 #     2022-Jan-14: add colimt function back
 #     2022-Jan-14: unpack CONSTANT from the input variables only
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat}
 
 Use the minimal photosynthetic rates of rubisco-, light-, and product-limited photosynthetic rates, given

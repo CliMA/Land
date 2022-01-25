@@ -18,12 +18,35 @@ function photosystem_coefficients! end
 #
 # Changes to this function
 # General
+#     2022-Jan-14: add function that for simple function call directly on Leaf
+#     2022-Jan-24: fix documentation
+#
+#######################################################################################################################################################################################################
+"""
+
+    photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+
+Update the rate constants and coefficients in reaction center, given
+- `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
+"""
+photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM);
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add function that operates PSM, PRC, and FLM directly so as to be more modular (reduce memory allocations)
 #     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}) where {FT<:AbstractFloat}
 
 Update the rate constants and coefficients in reaction center, given
@@ -55,26 +78,6 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
     rc.q_e = 1 - (rc.f_m - rc.f_o′) / (rc.f_m′ - rc.f_o);
     rc.q_p = 1 - (rc.ϕ_f - rc.f_o′) / (rc.f_m - rc.f_o′);
     rc.npq = rc.k_npq_rev / (K_F + K_D);
-
-    return nothing
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this function
-# General
-#     2022-Jan-14: add function that for simple function call directly on Leaf
-#
-#######################################################################################################################################################################################################
-"""
-    photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
-
-Update the rate constants and coefficients in reaction center, given
-- `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
-"""
-photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM);
 
     return nothing
 );

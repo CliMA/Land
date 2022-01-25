@@ -2,12 +2,19 @@
 
 Photosynthesis models for C3 and C4 photosynthesis.
 
-## Usage
+## Install
 ```julia
-using Photosynthesis
+using Pkg;
+Pkg.add("Photosynthesis");
+```
 
-mod_3 = C3CLM(Float32);
-leaf  = Leaf{Float32}();
-envir = AirLayer{Float32}();
-leaf_photosynthesis!(mod_3, leaf, envir, GCO₂Mode());
+
+## Examples
+```julia
+leaf   = Leaf{Float32}("C3");
+air    = AirLayer{Float32}();
+p_mode = PCO₂Mode();
+g_mode = PCO₂Mode();
+leaf_photosynthesis!(leaf, air, p_mode);
+leaf_photosynthesis!(leaf, air, g_mode);
 ```

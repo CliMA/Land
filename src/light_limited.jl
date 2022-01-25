@@ -25,6 +25,7 @@ function light_limited_rate! end
 #
 #######################################################################################################################################################################################################
 """
+
     light_limited_rate!(psm::Union{C3VJPModel{FT}, C3CytochromeModel{FT}}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate, given
@@ -46,9 +47,11 @@ light_limited_rate!(psm::Union{C3VJPModel{FT}, C3CytochromeModel{FT}}, p_i::FT) 
 # Changes to this function
 # General
 #     2022-Jan-14: add p_i to input list to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate, given
@@ -69,9 +72,11 @@ light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
 # General
 #     2022-Jan-14: add g_lc to input list to make the code more modular
 #     2022-Jan-24: fix a bug in field name e_to_c in psm
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     light_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
@@ -105,9 +110,11 @@ light_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<
 # Changes to this function
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     light_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
