@@ -25,7 +25,7 @@ using WaterPhysics: saturation_vapor_pressure
 
 
 # export public types and constructors
-export AirLayer, CytochromeFluorescenceModel, Leaf, LeafBiophysics, VanDerTolFluorescenceModel, WaveLengthSet
+export AirLayer, CytochromeFluorescenceModel, CytochromeReactionCenter, Leaf, LeafBiophysics, VJPReactionCenter, VanDerTolFluorescenceModel, WaveLengthSet
 
 
 #######################################################################################################################################################################################################

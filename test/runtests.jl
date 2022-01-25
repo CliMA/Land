@@ -44,6 +44,14 @@ using Test
                 @test FT_test(vdt, FT);
                 @test NaN_test(vdt);
             end;
+
+            # Reaction center
+            rc1 = VJPReactionCenter{FT}();
+            rc2 = CytochromeReactionCenter{FT}();
+            for rc in [rc1, rc2]
+                @test FT_test(rc, FT);
+                @test NaN_test(rc);
+            end;
         end;
     end;
 

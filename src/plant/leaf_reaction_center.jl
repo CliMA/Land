@@ -1,4 +1,13 @@
+#######################################################################################################################################################################################################
+#
+# Changes to this type
+# General
+#     2022-Jan-24: abstractize the reaction center
+#     2022-Jan-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure that stores reaction center information
@@ -15,15 +24,19 @@ abstract type AbstractReactionCenter{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
+#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure that stores reaction center information
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReactionCenter{FT}
     # parameters that do not change with time
@@ -68,10 +81,25 @@ mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReactionCenter{FT}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
+#     2022-Jan-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
+
     VJPReactionCenter{FT}() where {FT<:AbstractFloat}
 
 Constructor of `VJPReactionCenter`
+
+---
+# Examples
+```julia
+rc = VJPReactionCenter{Float64}();
+```
 """
 VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -81,15 +109,19 @@ VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, 0
 # Changes to this struct
 # General
 #     2022-Jan-18: add the struct of Cytochrome reaction center
+#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure that stores reaction center information
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCenter{FT}
     # parameters that do not change with time
@@ -114,9 +146,23 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jan-24: add constructor for CytochromeReactionCenter
+#     2022-Jan-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
     CytochromeReactionCenter{FT}() where {FT<:AbstractFloat}
 
 Constructor of `CytochromeReactionCenter`
+
+---
+# Examples
+```julia
+rc = CytochromeReactionCenter{Float64}();
+```
 """
 CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = CytochromeReactionCenter{FT}(0.41/(0.41+0.44), 5.5e8, 5e7, 1.45e10, 1, 0.75, 1.45e10 / (1.45e10+5.5e8+5e7));

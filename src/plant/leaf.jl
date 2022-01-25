@@ -31,7 +31,7 @@ mutable struct Leaf{FT<:AbstractFloat}
     BIO::LeafBiophysics{FT}
     "[`AbstractFluorescenceModel`](@ref) type leaf fluorescence model"
     FLM::AbstractFluorescenceModel{FT}
-    "Photosynthesis reaction center"
+    "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
     PRC::AbstractReactionCenter{FT}
     "Photosynthesis model"
     PSM::AbstractPhotosynthesisModel{FT}

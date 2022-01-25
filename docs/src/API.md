@@ -22,6 +22,11 @@ AbstractFluorescenceModel
 VanDerTolFluorescenceModel
 VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
 CytochromeFluorescenceModel
+AbstractReactionCenter
+VJPReactionCenter
+VJPReactionCenter{FT}() where {FT<:AbstractFloat}
+CytochromeReactionCenter
+CytochromeReactionCenter{FT}() where {FT<:AbstractFloat}
 ```
 
 
