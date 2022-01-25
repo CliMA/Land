@@ -46,6 +46,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     g_CO₂_b::FT
     "Leaf internal CO₂ partial pressure `[Pa]`"
     p_CO₂_i::FT
+    "Leaf surface CO₂ partial pressure `[Pa]`"
+    p_CO₂_s::FT
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
 
@@ -65,16 +67,17 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:A
     _g_lc = 0.01;
     _g_bc = 3.0;
     _p_i  = 20.0;
+    _p_s  = 40.0;
 
     if psm == "C3"
-        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 
     if psm == "C3Cytochrome"
-        return Leaf{FT}(_bio, CytochromeFluorescenceModel{FT}(), CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+        return Leaf{FT}(_bio, CytochromeFluorescenceModel{FT}(), CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 
     if psm == "C4"
-        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p, 0)
+        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 );
