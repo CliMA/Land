@@ -16,6 +16,8 @@ AirLayer{FT}() where {FT<:AbstractFloat}
 ```@docs
 Leaf
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+LeafBiophysics
+LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 ```
 
 

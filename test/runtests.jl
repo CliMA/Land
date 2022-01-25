@@ -14,6 +14,7 @@ using Test
 
     @testset "Plant" begin
         for FT in [Float32, Float64]
+            # Leaf
             leaf_c3 = Leaf{FT}("C3");
             leaf_c4 = Leaf{FT}("C4");
             leaf_cy = Leaf{FT}("C3Cytochrome");
@@ -25,6 +26,14 @@ using Test
                 @test FT_test(leaf, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
+            end;
+
+            # LeafBiophysics
+            lbio1 = LeafBiophysics{FT}();
+            lbio2 = LeafBiophysics{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
+            for lbio in [lbio1, lbio2]
+                @test FT_test(lbio, FT);
+                @test NaN_test(lbio);
             end;
         end;
     end;

@@ -25,7 +25,7 @@ using WaterPhysics: saturation_vapor_pressure
 
 
 # export public types and constructors
-export AirLayer, Leaf, WaveLengthSet
+export AirLayer, Leaf, LeafBiophysics, WaveLengthSet
 
 
 #######################################################################################################################################################################################################

@@ -27,7 +27,7 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
-    "Leaf biophysical parameters"
+    "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::LeafBiophysics{FT}
     "Leaf fluorescence model"
     FLM::AbstractFluorescenceModel{FT}
