@@ -29,7 +29,7 @@ mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
     "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::LeafBiophysics{FT}
-    "Leaf fluorescence model"
+    "[`AbstractFluorescenceModel`](@ref) type leaf fluorescence model"
     FLM::AbstractFluorescenceModel{FT}
     "Photosynthesis reaction center"
     PRC::AbstractReactionCenter{FT}
@@ -105,7 +105,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:A
     _p_s  = 40.0;
 
     if psm == "C3"
-        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        return Leaf{FT}(_bio, VanDerTolFluorescenceModel{FT}(), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 
     if psm == "C3Cytochrome"
@@ -113,6 +113,6 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:A
     end;
 
     if psm == "C4"
-        return Leaf{FT}(_bio, FluorescenceVDT(FT), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        return Leaf{FT}(_bio, VanDerTolFluorescenceModel{FT}(), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 );

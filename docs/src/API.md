@@ -18,6 +18,10 @@ Leaf
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 LeafBiophysics
 LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+AbstractFluorescenceModel
+VanDerTolFluorescenceModel
+VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
+CytochromeFluorescenceModel
 ```
 
 
