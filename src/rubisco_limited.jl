@@ -19,9 +19,11 @@ function rubisco_limited_rate! end
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate, given
@@ -40,9 +42,11 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
     rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate, given
@@ -61,9 +65,13 @@ rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # Changes to this function
 # General
 #     2022-Jan-14: add input variable g_lc to make the code more modular
+#     2022-Jan-24: fix documentation
+# Bug fixes
+#     2022-Jan-24: use v_cmax rather than v_max
 #
 #######################################################################################################################################################################################################
 """
+
     rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate in conductance mode, given
@@ -72,8 +80,8 @@ Update the RubisCO limited photosynthetic rate in conductance mode, given
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`
 """
 rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
-    _a = psm.v_max;
-    _b = psm.v_max * psm.γ_star;
+    _a = psm.v_cmax;
+    _b = psm.v_cmax * psm.γ_star;
     _d = psm.k_m;
     _f = air.P_AIR / g_lc * FT(1e-6);
     _p = air.p_CO₂;
@@ -99,6 +107,7 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {F
 #
 #######################################################################################################################################################################################################
 """
+
     rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the RubisCO limited photosynthetic rate in conductance mode, given

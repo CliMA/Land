@@ -1,4 +1,3 @@
-using ClimaCache: AirLayer, Leaf, PCO₂Mode
 using Photosynthesis
 using Test
 
@@ -9,7 +8,7 @@ using Test
             leaf   = Leaf{FT}("C3");
             air    = AirLayer{FT}();
             p_mode = PCO₂Mode();
-            g_mode = PCO₂Mode();
+            g_mode = GCO₂Mode();
             leaf_photosynthesis!(leaf, air, p_mode);
             @test true;
             leaf_photosynthesis!(leaf, air, g_mode);
@@ -31,7 +30,7 @@ using Test
             leaf   = Leaf{FT}("C4");
             air    = AirLayer{FT}();
             p_mode = PCO₂Mode();
-            g_mode = PCO₂Mode();
+            g_mode = GCO₂Mode();
             leaf_photosynthesis!(leaf, air, p_mode);
             @test true;
             leaf_photosynthesis!(leaf, air, g_mode);
