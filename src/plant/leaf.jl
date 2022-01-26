@@ -33,7 +33,7 @@ mutable struct Leaf{FT<:AbstractFloat}
     FLM::AbstractFluorescenceModel{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
     PRC::AbstractReactionCenter{FT}
-    "Photosynthesis model"
+    "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::AbstractPhotosynthesisModel{FT}
 
     # prognostic variables that change with time

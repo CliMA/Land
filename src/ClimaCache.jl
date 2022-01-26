@@ -25,7 +25,8 @@ using WaterPhysics: saturation_vapor_pressure
 
 
 # export public types and constructors
-export AirLayer, CytochromeFluorescenceModel, CytochromeReactionCenter, Leaf, LeafBiophysics, VJPReactionCenter, VanDerTolFluorescenceModel, WaveLengthSet
+export AirLayer, Arrhenius, ArrheniusPeak, C3CytochromeModel, C3VJPModel, C4VJPModel, CytochromeFluorescenceModel, CytochromeReactionCenter, GCO₂Mode, Leaf, LeafBiophysics, MinimumColimit, PCO₂Mode,
+       Q10, QuadraticColimit, VJPReactionCenter, VanDerTolFluorescenceModel, WaveLengthSet
 
 
 #######################################################################################################################################################################################################
@@ -50,10 +51,10 @@ include("air/air_layer.jl")
 
 # include the radiation types and structures
 include("radiation/wave_length_set.jl")
+include("radiation/feature_absorption.jl")
 include("radiation/hyperspectral_radiation.jl")
 
 # include the plant types and structures
-include("plant/hyperspectral_absorption.jl")
 include("plant/temperature_dependency.jl")
 include("plant/leaf_biophysics.jl")
 include("plant/leaf_fluorescence.jl")

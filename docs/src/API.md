@@ -27,6 +27,23 @@ VJPReactionCenter
 VJPReactionCenter{FT}() where {FT<:AbstractFloat}
 CytochromeReactionCenter
 CytochromeReactionCenter{FT}() where {FT<:AbstractFloat}
+AbstractPhotosynthesisModel
+C3CytochromeModel
+C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+C3VJPModel
+C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+C4VJPModel
+C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+AbstractPhotosynthesisMode
+GCO₂Mode
+PCO₂Mode
+AbstractColimit
+MinimumColimit
+QuadraticColimit
+AbstractTemperatureDependency
+Arrhenius
+ArrheniusPeak
+Q10
 ```
 
 

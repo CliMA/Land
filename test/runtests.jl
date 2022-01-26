@@ -52,6 +52,42 @@ using Test
                 @test FT_test(rc, FT);
                 @test NaN_test(rc);
             end;
+
+            # Photosynthesis model
+            cy_1 = C3CytochromeModel{FT}();
+            cy_2 = C3CytochromeModel{FT}(v_cmax25 = 30, r_d25 = 1);
+            c3_1 = C3VJPModel{FT}();
+            c3_2 = C3VJPModel{FT}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
+            c4_1 = C4VJPModel{FT}();
+            c4_2 = C4VJPModel{FT}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1);
+            for st in [cy_1, cy_2, c3_1, c3_2, c4_1, c4_2]
+                for rc in [rc1, rc2]
+                    @test FT_test(st, FT);
+                    # NaN test will not pass because of the NaNs in temperature dependency structures
+                    # @test NaN_test(st);
+                end;
+            end;
+
+            # Mode and colimitations
+            mod1 = GCO₂Mode();
+            mod2 = PCO₂Mode();
+            col1 = MinimumColimit{FT}();
+            col2 = QuadraticColimit{FT}(0.98);
+            for st in [mod1, mod2, col1, col2]
+                for rc in [rc1, rc2]
+                    @test FT_test(st, FT);
+                    @test NaN_test(st);
+                end;
+            end;
+
+            # Temperature dependency
+            td_1 = Arrhenius{FT}(298.15, 41.0, 79430.0);
+            td_2 = ArrheniusPeak{FT}(298.15, 1.0, 57500.0, 439000.0, 1400.0);
+            td_3 = Q10{FT}(298.15, 0.0140/8760, 1.4);
+            for td in [td_1, td_2, td_3]
+                @test FT_test(td, FT);
+                @test NaN_test(td);
+            end;
         end;
     end;
 

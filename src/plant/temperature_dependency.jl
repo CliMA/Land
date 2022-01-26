@@ -1,9 +1,19 @@
+#######################################################################################################################################################################################################
+#
+# Changes to this type
+# General
+#     2022-Jan-13: migrate abstract temperature dependency type from Photosynthesis.jl
+#     2022-Jan-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Hierachy of AbstractTemperatureDependency:
 - [`Arrhenius`](@ref)
 - [`ArrheniusPeak`](@ref)
+- [`Q10`](@ref)
 """
 abstract type AbstractTemperatureDependency{FT<:AbstractFloat} end
 
@@ -14,9 +24,11 @@ abstract type AbstractTemperatureDependency{FT<:AbstractFloat} end
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Arrhenius
 #     2022-Jan-13: define the struct mutable, use ΔHA directly in the struct, add field T_REF
+#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 An [`Arrhenius`](@ref) type struct using
@@ -25,6 +37,7 @@ Y_1 = Y_0 \\cdot \\exp \\left( \\dfrac{H_a}{R T_0} - \\dfrac{H_a}{R T_1} \\right
 ```
 
 # Fields
+
 $(TYPEDFIELDS)
 
 """
@@ -45,9 +58,11 @@ end
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to ArrheniusPeak
 #     2022-Jan-13: define the struct mutable, use ΔHA/ΔHD/ΔSV directly in the struct, add field T_REF/VAL_REF
+#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 An [`ArrheniusPeak`](@ref) type struct using
@@ -58,6 +73,7 @@ Y_1 = Y_0 \\cdot \\exp \\left( \\dfrac{H_a}{R T_0} - \\dfrac{H_a}{R T_1} \\right
 ```
 
 # Fields
+
 $(TYPEDFIELDS)
 
 """
@@ -81,9 +97,12 @@ end
 # Changes to this structure
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Q10
+#     2022-Jan-14: make structure mutable
+#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 An [`Q10`](@ref) type struct using
@@ -92,6 +111,7 @@ Y_1 = Y_0 \\cdot Q_{10} ^ \\dfrac{T_1 - T_0}{10}
 ```
 
 # Fields
+
 $(TYPEDFIELDS)
 
 """
