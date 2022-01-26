@@ -13,10 +13,12 @@ pages = Any[
 
 # format the docs
 mathengine = MathJax(
-    Dict(:TeX => Dict(:equationNumbers => Dict(:autoNumber => "AMS"),
-                      :Macros => Dict(),
-                     ),
+    Dict(
+        :TeX => Dict(
+            :equationNumbers => Dict(:autoNumber => "AMS"),
+            :Macros => Dict()
         )
+    )
 );
 
 format = Documenter.HTML(
@@ -33,7 +35,7 @@ makedocs(
     format = format,
     clean = false,
     modules = [ClimaCache],
-    pages = pages,
+    pages = pages
 );
 
 
@@ -42,5 +44,5 @@ deploydocs(
     repo = "github.com/Yujie-W/ClimaCache.jl.git",
     target = "build",
     devbranch = "main",
-    push_preview = true,
+    push_preview = true
 );

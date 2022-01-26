@@ -10,15 +10,19 @@
 #     2021-Oct-19: sort variable to prognostic and dignostic catergories
 #     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
 #     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Struct that contains leaf biophysical traits used to run leaf reflection and transmittance.
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct LeafBiophysics{FT<:AbstractFloat}
     # parameters that do not change with time
@@ -28,13 +32,13 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
     NDUB::Int
 
     # prognostic variables that change with time
-    "Anthocynanin content `[ug cm⁻²]`"
+    "Anthocynanin content `[μg cm⁻²]`"
     ant::FT
     "Senescent material (brown pigments) fraction `[-]`"
     brown::FT
-    "Chlorophyll a and b content `[ug cm⁻²]`"
+    "Chlorophyll a and b content `[μg cm⁻²]`"
     cab::FT
-    "Carotenoid content `[ug cm⁻²]`"
+    "Carotenoid content `[μg cm⁻²]`"
     car::FT
     "Carbon-based constituents in lma `[g cm⁻²]`"
     cbc::FT
@@ -71,20 +75,29 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2021-Nov-24: migrate the constructor from CanopyLayers
+#     2022-Jan-24: fix documentation
+#
+#######################################################################################################################################################################################################
 """
-    LeafBiophysics{FT}(wls::WaveLengthSet) where {FT<:AbstractFloat}
 
-Constructor for [`LeafBiophysics`](@ref), given
+    LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+
+Constructor for `LeafBiophysics`, given
 - `wls` [`WaveLengthSet`](@ref) type structure
 
 ---
 # Examples
 ```julia
-lbio = LeafBiophysics{FT}();
-lbio = LeafBiophysics{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
+lbio = LeafBiophysics{Float64}();
+lbio = LeafBiophysics{Float64}(WaveLengthSet{Float64}(collect(400:50:2400)));
 ```
 """
-LeafBiophysics{FT}(wls::WaveLengthSet = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
+LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;
 
     return LeafBiophysics{FT}(1.4, 10, 0, 0, 40, 10, 0, 0, 0.01, 0.012, 0, zeros(FT,NΛ), zeros(FT,NΛ_SIF,NΛ_SIFE), zeros(FT,NΛ_SIF,NΛ_SIFE), zeros(FT,NΛ), zeros(FT,NΛ), zeros(FT,NΛ), 0.01,

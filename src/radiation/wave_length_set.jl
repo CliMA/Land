@@ -5,15 +5,19 @@
 #     2021-Aug-10: refactor the structure with renamed fields
 #     2021-Aug-10: add a constructor within the structure to avoid external initialization
 #     2021-Oct-19: sort variable to prognostic and dignostic catergories
+#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure that stores wave length information.
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct WaveLengthSet{FT<:AbstractFloat}
     # parameters that do not change with time
@@ -60,7 +64,16 @@ mutable struct WaveLengthSet{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2021-Nov-24: isolate the constructor from structure
+#     2022-Jan-24: fix documentation
+#
+#######################################################################################################################################################################################################
 """
+
     WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat}
 
 Constructor for [`WaveLengthSet`](@ref), given
@@ -70,9 +83,9 @@ Constructor for [`WaveLengthSet`](@ref), given
 ---
 # Examples
 ```julia
-wls = WaveLengthSet{FT}();
-wls = WaveLengthSet{FT}(collect(400:5:2500));
-wls = WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
+wls = WaveLengthSet{Float64}();
+wls = WaveLengthSet{Float64}(collect(400:5:2500));
+wls = WaveLengthSet{Float64}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
 ```
 """
 WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
@@ -91,4 +104,4 @@ WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:Ab
 
     return WaveLengthSet{FT}(_iλ_nir, _iλ_par, _iλ_sif, _iλ_sife, length(_λ), length(_iλ_par), length(_iλ_sif), length(_iλ_sife), FT[700,2500], FT[400,700], FT[640,850], FT[400,750], swl, _dwl,
                              _dwl[_iλ_par], _dwl[_iλ_sife], _λ, _λ[_iλ_par], _λ[_iλ_sif], _λ[_iλ_sife])
-)
+);
