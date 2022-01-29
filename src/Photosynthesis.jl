@@ -1,45 +1,28 @@
 module Photosynthesis
 
-using DocStringExtensions: TYPEDFIELDS
-using PkgUtility: GAS_R, RT_25, T_25, lower_quadratic
+using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter, GCO₂Mode, Leaf, MinimumColimit, PCO₂Mode, VJPReactionCenter, Q10,
+      QuadraticColimit, VanDerTolFluorescenceModel
+using DocStringExtensions: METHODLIST
+using PkgUtility: GAS_R, lower_quadratic
 using UnPack: @unpack
-using WaterPhysics: saturation_vapor_pressure
 
 
+# export function from this module
+export leaf_photosynthesis!
+
+# export types from ClimaCache
+export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
 
 
-# export public types
-export AirLayer, C3ParaSet, C4ParaSet, GCO₂Mode, Leaf, PCO₂Mode
-
-# export parasets
-export C3Bernacchi, C3CLM, C4CLM
-
-# export functions
-export leaf_fluorescence!, leaf_photosynthesis!, leaf_temperature_dependence!
-
-
-
-
-include("types/environment.jl" )
-include("types/fluorescence.jl")
-include("types/leaf.jl"        )
-include("types/mode.jl"        )
-include("types/temperature.jl" )
-include("types/photomodel.jl"  )
-include("types/parasets.jl"    )
-
-include("temperature/correction.jl")
-include("temperature/dependency.jl")
-
-include("photosynthesis/etr.jl"           )
-include("photosynthesis/lightlimited.jl"  )
-include("photosynthesis/productlimited.jl")
-include("photosynthesis/rubiscolimited.jl")
-include("photosynthesis/model.jl"         )
-
-include("fluorescence/fluorescence.jl")
-
-
+# include the functions
+include("colimit.jl"        )
+include("etr.jl"            )
+include("fluorescence.jl"   )
+include("light_limited.jl"  )
+include("model.jl"          )
+include("product_limited.jl")
+include("rubisco_limited.jl")
+include("temperature.jl"    )
 
 
 end # module
