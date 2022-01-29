@@ -15,14 +15,14 @@ export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
 
 
 # include the functions
-include("colimit.jl")
-include("etr.jl")
-include("fluorescence.jl")
-include("light_limited.jl")
-include("photosynthesis.jl")
+include("colimit.jl"        )
+include("etr.jl"            )
+include("fluorescence.jl"   )
+include("light_limited.jl"  )
+include("model.jl"          )
 include("product_limited.jl")
 include("rubisco_limited.jl")
-include("temperature.jl")
+include("temperature.jl"    )
 
 
 end # module
