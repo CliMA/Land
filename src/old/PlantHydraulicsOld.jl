@@ -11,6 +11,8 @@ using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
+using ..PlantHydraulics: relative_hydraulic_conductance
+
 
 # export public types --- soil vulnerability
 export BrooksCorey, VanGenuchten
@@ -36,8 +38,7 @@ export create_grass, create_palm, create_soil_VC, create_tree, fit_soil_VC!
 # export public functions --- curves related
 export vc_integral, p_from_volume, soil_erwc, soil_k_ratio_erwc,
        soil_k_ratio_p25, soil_k_ratio_rwc, soil_k_ratio_swc, soil_p_25_erwc,
-       soil_p_25_rwc, soil_p_25_swc, soil_rwc, soil_swc, xylem_k_ratio,
-       xylem_p_crit
+       soil_p_25_rwc, soil_p_25_swc, soil_rwc, soil_swc, xylem_p_crit
 
 # export public functions
 export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow,

@@ -53,7 +53,7 @@ function end_pressure(
     for (_k, _kh, _ph) in zip(k_element, k_history, p_history)
         p_25 = p_end / f_st;
         if p_25 < _ph
-            k = xylem_k_ratio(vc, p_25, f_vis) * _k;
+            k = relative_hydraulic_conductance(vc, p_25) / f_vis * _k;
         else
             k = _kh * _k / f_vis;
         end
@@ -92,7 +92,7 @@ function end_pressure(
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
         p_25 = p_end / f_st;
         if p_25 < _ph
-            k = xylem_k_ratio(vc, p_25, f_vis) * _k;
+            k = relative_hydraulic_conductance(vc, p_25) / f_vis * _k;
         else
             k = _kh * _k / f_vis;
         end
@@ -118,7 +118,7 @@ function end_pressure(
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
         p_25 = p_end / f_st;
         if p_25 < _ph
-            k = xylem_k_ratio(vc, p_25, f_vis) * _k;
+            k = relative_hydraulic_conductance(vc, p_25) / f_vis * _k;
         else
             k = _kh * _k / f_vis;
         end
@@ -259,7 +259,7 @@ function pressure_profile!(
         # update history first
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
-            _kr = xylem_k_ratio(vc, p_25, f_vis);
+            _kr = relative_hydraulic_conductance(vc, p_25) / f_vis;
             if update
                 leaf.p_history[i] = p_25;
                 leaf.k_history[i] = _kr * f_vis;
@@ -317,7 +317,7 @@ function pressure_profile!(
         # update history first
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
-            _kr = xylem_k_ratio(vc, p_25, f_vis);
+            _kr = relative_hydraulic_conductance(vc, p_25) / f_vis;
             if update
                 root.p_history[i] = p_25;
                 root.k_history[i] = _kr * f_vis;
@@ -372,7 +372,7 @@ function pressure_profile!(
         # update history first
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
-            _kr = xylem_k_ratio(vc, p_25, f_vis);
+            _kr = relative_hydraulic_conductance(vc, p_25) / f_vis;
             if update
                 root.p_history[i] = p_25;
                 root.k_history[i] = _kr * f_vis;
@@ -415,7 +415,7 @@ function pressure_profile!(
         # update history first
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
-            _kr = xylem_k_ratio(vc, p_25, f_vis);
+            _kr = relative_hydraulic_conductance(vc, p_25) / f_vis;
             if update
                 stem.p_history[i] = p_25;
                 stem.k_history[i] = _kr * f_vis;
@@ -455,7 +455,7 @@ function pressure_profile!(
         # update history first
         p_25 = p_end / f_st;
         if p_25 < p_history[i]
-            _kr = xylem_k_ratio(vc, p_25, f_vis);
+            _kr = relative_hydraulic_conductance(vc, p_25) / f_vis;
             if update
                 stem.p_history[i] = p_25;
                 stem.k_history[i] = _kr * f_vis;

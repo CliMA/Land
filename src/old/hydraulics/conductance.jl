@@ -100,7 +100,7 @@ function root_pk(
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
         p_25 = p_end / f_st;
         if p_25 < _ph
-            k = xylem_k_ratio(vc, p_25, f_vis) * _k;
+            k = relative_hydraulic_conductance(vc, p_25) / f_vis * _k;
         else
             k = _kh * _k;
         end
@@ -147,7 +147,7 @@ function root_pk(
                                         p_history, flow)
         p_25 = p_end / f_st;
         if p_25 < _ph
-            k = xylem_k_ratio(vc, p_25, f_vis) * _k;
+            k = relative_hydraulic_conductance(vc, p_25) / f_vis * _k;
         else
             k = _kh * _k;
         end
@@ -186,7 +186,7 @@ function xylem_risk(
     @unpack f_st, f_vis, vc = hs;
 
     p_25 = end_pressure(hs, flow) / hs.f_st;
-    T_25 = xylem_k_ratio(vc, p_25, f_vis);
+    T_25 = relative_hydraulic_conductance(vc, p_25) / f_vis;
 
     return T_25
 end

@@ -1,35 +1,5 @@
 ###############################################################################
 #
-# Xylem K ratio functions
-#
-###############################################################################
-function xylem_k_ratio(
-            vc::WeibullDual{FT},
-            p_25::FT,
-            vis::FT = FT(1)
-) where {FT<:AbstractFloat}
-    @unpack b1,c1,f1,b2,c2,f2 = vc;
-
-    if p_25<0
-        k1 = exp( -1 * (-p_25 / b1) ^ c1 ) * f1;
-        k2 = exp( -1 * (-p_25 / b2) ^ c2 ) * f2;
-        kr = max( FT(1e-4), (k1+k2) ) / vis;
-    else
-        kr = 1 / vis;
-    end
-
-    return kr
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Xylem P_crit functions
 #
 ###############################################################################
@@ -84,14 +54,14 @@ function fit_xylem_VC(xs::Array{FT,1}, ys::Array{FT,1}; label="TPLC") where {FT<
     @inline f(x) = (
         @show x;
         _vc = WeibullSingle{FT}(b=x[1], c=x[2]);
-        _kp = xylem_k_ratio.([_vc], _ps);
+        _kp = relative_hydraulic_conductance.([_vc], _ps);
         return -sum((_kp .- _ks) .^ 2);
     );
 
     @inline g(x) = (
         @show x;
         _vc = WeibullSingle{FT}(b=x[1], c=x[2]);
-        _kp = x[3] * xylem_k_ratio.([_vc], _ps);
+        _kp = x[3] * relative_hydraulic_conductance.([_vc], _ps);
         return -sum((_kp .- _ks) .^ 2);
     );
 
