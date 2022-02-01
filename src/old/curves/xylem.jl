@@ -3,29 +3,6 @@
 # Xylem K ratio functions
 #
 ###############################################################################
-
-
-
-
-function xylem_k_ratio(
-            vc::WeibullSingle{FT},
-            p_25::FT,
-            vis::FT = FT(1)
-) where {FT<:AbstractFloat}
-    @unpack b,c = vc;
-
-    if p_25<0
-        kr = max( FT(1e-4), exp( -1 * (-p_25 / b) ^ c ) ) / vis;
-    else
-        kr = 1 / vis;
-    end
-
-    return kr
-end
-
-
-
-
 function xylem_k_ratio(
             vc::WeibullDual{FT},
             p_25::FT,
