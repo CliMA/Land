@@ -1,10 +1,8 @@
 # PlantHydraulics.jl
 Plant hydraulics package using numerical methods.
 
-## Usage
+## Installation
 ```julia
-using PlantHydraulics
-
-leaf   = LeafHydraulics{Float32}();
-critical_flow = critical_flow(leaf);
+using Pkg;
+Pkg.add("PlantHydraulics");
 ```
