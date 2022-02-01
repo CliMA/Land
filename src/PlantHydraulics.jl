@@ -1,15 +1,15 @@
 module PlantHydraulics
 
-using ClimaCache: LogisticVC, PowerVC, WeibullVC
+using ClimaCache: ComplexVC, LogisticVC, PowerVC, WeibullVC
 using DocStringExtensions: METHODLIST
 using UnPack: @unpack
 
 
 # export public types from ClimaCache
-export LogisticVC, PowerVC, WeibullVC
+export ComplexVC, LogisticVC, PowerVC, WeibullVC
 
 # export public functions
-export xylem_k_ratio
+export relative_hydraulic_conductance
 
 
 # include functions

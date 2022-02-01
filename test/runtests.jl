@@ -6,21 +6,15 @@ using Test
     @testset "Vulnerability" begin
         for FT in [Float32, Float64]
             vc = LogisticVC{FT}(2, 2);
-            k1 = xylem_k_ratio(vc, FT(-2.0));
-            @test true;
-            k2 = xylem_k_ratio(vc, FT(-2.0), FT(0.95));
+            kr = relative_hydraulic_conductance(vc, FT(-2.0));
             @test true;
 
             vc = PowerVC{FT}(2, 2);
-            k1 = xylem_k_ratio(vc, FT(-2.0));
-            @test true;
-            k2 = xylem_k_ratio(vc, FT(-2.0), FT(0.95));
+            kr = relative_hydraulic_conductance(vc, FT(-2.0));
             @test true;
 
             vc = WeibullVC{FT}(2, 2);
-            k1 = xylem_k_ratio(vc, FT(-2.0));
-            @test true;
-            k2 = xylem_k_ratio(vc, FT(-2.0), FT(0.95));
+            kr = relative_hydraulic_conductance(vc, FT(-2.0));
             @test true;
         end;
     end;
