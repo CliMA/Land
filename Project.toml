@@ -1,9 +1,10 @@
 name = "PlantHydraulics"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.12"
+version = "0.3.0"
 
 [deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 HypergeometricFunctions = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
