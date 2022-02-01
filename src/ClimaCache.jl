@@ -60,6 +60,7 @@ include("plant/leaf_biophysics.jl")
 include("plant/leaf_fluorescence.jl")
 include("plant/leaf_photosynthesis.jl")
 include("plant/leaf_reaction_center.jl")
+include("plant/vulnerability.jl")
 include("plant/leaf.jl")
 
 # include the soil types and structures
