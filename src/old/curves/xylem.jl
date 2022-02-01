@@ -3,47 +3,6 @@
 # Xylem K ratio functions
 #
 ###############################################################################
-"""
-    xylem_k_ratio(
-                vc::AbstractXylemVC{FT},
-                p_25::FT,
-                vis::FT
-    ) where {FT<:AbstractFloat}
-
-Returns the relative hydraulic conductance, given
-- `vc` Xylem vulnerability curve
-- `p` Xylem pressure at 298.15 K in `[MPa]`
-- `p_25` Equivalent xylem pressure at 298.15 K in `[MPa]`
-- `vis` Relative viscosity. If missing, vis = 1.
-"""
-function xylem_k_ratio(
-            vc::LogisticSingle{FT},
-            p_25::FT,
-            vis::FT = FT(1)
-) where {FT<:AbstractFloat}
-    if p_25>=0
-        return 1 / vis
-    end
-
-    @unpack a,b = vc;
-    return max( FT(1e-4), (1 - 1/(1 + a * exp(b * p_25))) * (a+1)/a ) / vis
-end
-
-
-
-
-function xylem_k_ratio(
-            vc::PowerSingle{FT},
-            p_25::FT,
-            vis::FT = FT(1)
-) where {FT<:AbstractFloat}
-    if p_25>=0
-        return 1 / vis
-    end
-
-    @unpack a,b = vc;
-    return max( FT(1e-4), 1 / (1 + a*(-p_25)^b) ) / vis
-end
 
 
 

@@ -10,6 +10,12 @@ using Test
             @test true;
             k2 = xylem_k_ratio(vc, FT(-2.0), FT(0.95));
             @test true;
+
+            vc = PowerVC{FT}(2, 2);
+            k1 = xylem_k_ratio(vc, FT(-2.0));
+            @test true;
+            k2 = xylem_k_ratio(vc, FT(-2.0), FT(0.95));
+            @test true;
         end;
     end;
 end;
