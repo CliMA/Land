@@ -20,4 +20,17 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "PAR & APAR" begin
+        for FT in [Float32, Float64]
+            wls = WaveLengthSet{FT}();
+            bio = LeafBiophysics{FT}(wls);
+            rad = HyperspectralRadiation{FT}();
+
+            par,apar = leaf_PAR(bio, wls, rad);
+            @test true;
+            par,apar = leaf_PAR(bio, wls, rad; APAR_car=false);
+            @test true;
+        end;
+    end;
 end;

@@ -13,9 +13,15 @@ leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_ni
 ```
 
 
+## Leaf PAR and APAR
+```@docs
+leaf_PAR
+```
+
+
 ## Utility functions
 ```@docs
-average_transmittance(α::FT, nr::FT) where {FT<:AbstractFloat}
+average_transmittance
 photon
 photon(λ::FT, E::FT) where {FT<:AbstractFloat}
 energy
