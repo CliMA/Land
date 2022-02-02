@@ -5,6 +5,7 @@
 #     2021-Oct-22: add function to compute leaf level PAR and APAR
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
+#     2022-Feb-02: unpack CONSTANTS only
 #
 #######################################################################################################################################################################################################
 """
@@ -28,18 +29,16 @@ par,apar = leaf_PAR(bio, wls, rad; APAR_car=false);
 ```
 """
 function leaf_PAR(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
-    @unpack α_cab, α_cabcar, α_SW = bio;
-    @unpack e_direct, e_diffuse = rad;
     @unpack IΛ_PAR, ΔΛ_PAR, Λ_PAR = wls;
 
     # APAR absorption feature
-    _α = (APAR_car ? view(α_cabcar, IΛ_PAR) : view(α_cab, IΛ_PAR));
+    _α = (APAR_car ? view(bio.α_cabcar, IΛ_PAR) : view(bio.α_cab, IΛ_PAR));
 
     # PAR energy from direct  and diffuse light
-    _e_par_dir  = view(e_direct , IΛ_PAR) .* view(α_SW, IΛ_PAR);
-    _e_par_diff = view(e_diffuse, IΛ_PAR) .* view(α_SW, IΛ_PAR);
-    _par_dir  = photon.(Λ_PAR, _e_par_dir );
-    _par_diff = photon.(Λ_PAR, _e_par_diff);
+    _e_par_dir  = view(rad.e_direct , IΛ_PAR) .* view(bio.α_SW, IΛ_PAR);
+    _e_par_diff = view(rad.e_diffuse, IΛ_PAR) .* view(bio.α_SW, IΛ_PAR);
+    _par_dir    = photon.(Λ_PAR, _e_par_dir);
+    _par_diff   = photon.(Λ_PAR, _e_par_diff);
 
     # absorbed PAR energy from direct and diffuse light
     _apar_dir  = _α .* _par_dir;

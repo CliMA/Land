@@ -231,6 +231,7 @@ leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_ni
     bio.ρ_SW[IΛ_NIR] .= ρ_nir;
     bio.τ_SW[IΛ_PAR] .= τ_par;
     bio.τ_SW[IΛ_NIR] .= τ_nir;
+
     bio.α_SW = 1 .- bio.τ_SW .- bio.ρ_SW;
 
     return nothing

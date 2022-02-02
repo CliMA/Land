@@ -8,6 +8,7 @@
 #     2021-Oct-22: refactor the function to leaf_SIF to return the SIFs directly
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
+#     2022-Feb-02: unpack CONSTANTS only
 #
 #######################################################################################################################################################################################################
 """
@@ -32,17 +33,15 @@ sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01; ϕ_photon=false);
 ```
 """
 function leaf_SIF(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}, ϕ::FT = FT(0.01); ϕ_photon::Bool = true) where {FT<:AbstractFloat}
-    @unpack mat_b, mat_f = bio;
-    @unpack e_direct, e_diffuse = rad;
     @unpack IΛ_SIFE, ΔΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
 
     # calculate the excitation energy and photons
-    _e_excitation = (view(e_direct , IΛ_SIFE) .+ view(e_diffuse, IΛ_SIFE)) .* ΔΛ_SIFE;
+    _e_excitation = (view(rad.e_direct , IΛ_SIFE) .+ view(rad.e_diffuse, IΛ_SIFE)) .* ΔΛ_SIFE;
 
     # convert energy to energy using the matrices
     if !ϕ_photon
-        _sif_b = mat_b * _e_excitation * ϕ / FT(pi);
-        _sif_f = mat_f * _e_excitation * ϕ / FT(pi);
+        _sif_b = bio.mat_b * _e_excitation * ϕ / FT(pi);
+        _sif_f = bio.mat_f * _e_excitation * ϕ / FT(pi);
 
         return _sif_b, _sif_f
     end;
@@ -51,8 +50,8 @@ function leaf_SIF(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::Hyperspe
     _phot_excitation = photon.(Λ_SIFE, _e_excitation);
 
     # convert photon to photon using the matrices
-    _phot_b = mat_b * _phot_excitation * ϕ / FT(pi);
-    _phot_f = mat_f * _phot_excitation * ϕ / FT(pi);
+    _phot_b = bio.mat_b * _phot_excitation * ϕ / FT(pi);
+    _phot_f = bio.mat_f * _phot_excitation * ϕ / FT(pi);
 
     # convert photon to back to energy
     _sif_b = energy.(Λ_SIF, _phot_b);
