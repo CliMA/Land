@@ -1,0 +1,11 @@
+name = "LeafOptics"
+uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
+authors = ["Yujie Wang <jesiner@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
+
+[compat]
+ClimaCache = "0.1.0"
+julia = "1.6"
