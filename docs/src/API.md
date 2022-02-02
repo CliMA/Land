@@ -19,6 +19,12 @@ leaf_PAR
 ```
 
 
+## Leaf SIF
+```@docs
+leaf_SIF
+```
+
+
 ## Utility functions
 ```@docs
 average_transmittance

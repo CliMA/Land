@@ -33,4 +33,17 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "SIF" begin
+        for FT in [Float32, Float64]
+            wls = WaveLengthSet{FT}();
+            bio = LeafBiophysics{FT}(wls);
+            rad = HyperspectralRadiation{FT}();
+
+            sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01));
+            @test true;
+            sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01); ϕ_photon=false);
+            @test true;
+        end;
+    end;
 end;
