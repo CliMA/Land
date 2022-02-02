@@ -40,7 +40,7 @@ function leaf_spectra! end
 
 Update leaf reflectance and transmittance spectra, and fluorescence spectrum matrices, given
 - `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
-- `wls` [`WaveLengthSet`](@ref) type struct that contain wave length bins
+- `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `lha` `ClimaCache.HyperspectralAbsorption` type struct that contains absorption characteristic curves
 - `APAR_car` If true, carotenoid absorption is accounted for in APAR, default is `true`
 - `α` Optimum angle of incidence (default is 40° as in PROSPECT-D, SCOPE uses 59°)
@@ -210,8 +210,8 @@ leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::Hyperspectra
     leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat}
 
 Update leaf reflectance and transmittance (e.g., prescribe broadband PAR and NIR values), given
-- `bio` [`LeafBiophysics`](@ref) type struct that contains leaf biophysical parameters
-- `wls` [`WaveLengthSet`](@ref) type struct that contain wave length bins
+- `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
+- `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `ρ_par` Reflectance at PAR region
 - `ρ_nir` Reflectance at NIR region
 - `τ_par` Transmittance at PAR region

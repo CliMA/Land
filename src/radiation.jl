@@ -13,9 +13,9 @@
     leaf_PAR(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
 
 Return leaf level PAR and APAR, given
-- `bio` [`LeafBiophysics`](@ref) type struct that contains leaf biophysical parameters
-- `wls` [`WaveLengthSet`](@ref) type struct that contains wave length bins
-- `rad` [`HyperspectralRadiation`](@ref) type struct that contains incoming radiation information
+- `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
+- `wls` `ClimaCache.WaveLengthSet` type struct that contains wave length bins
+- `rad` `ClimaCache.HyperspectralRadiation` type struct that contains incoming radiation information
 - `APAR_car` If true (default), account carotenoid absorption as APAR; otherwise, APAR is only by chlorophyll
 
 ---
