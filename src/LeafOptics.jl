@@ -8,6 +8,7 @@ using UnPack: @unpack
 
 
 # export public types from ClimaCache
+export HyperspectralAbsorption, LeafBiophysics, WaveLengthSet
 
 # export public functions
 export leaf_PAR, leaf_SIF, leaf_spectra!
