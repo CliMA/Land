@@ -2,7 +2,7 @@ module WaterPhysics
 
 using DocStringExtensions: METHODLIST, TYPEDEF, TYPEDFIELDS
 using PkgUtility: CP_L, CP_V, GAS_R, K_BOLTZMANN, LH_V0, PRESS_TRIPLE, R_V,
-            T_25, T_TRIPLE, V_H₂O
+      T_25, T_TRIPLE, V_H₂O
 using UnPack: @unpack
 
 
@@ -315,9 +315,7 @@ capillary_pressure(
             T::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-     return 2 * surface_tension(T, med) / r
-)
+    2 * surface_tension(T, med) / r
 
 
 
@@ -352,9 +350,7 @@ capillary_pressure(
             α::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-     return cosd(α) * capillary_pressure(r, T, med)
-)
+    cosd(α) * capillary_pressure(r, T, med)
 
 
 
@@ -419,9 +415,7 @@ diffusive_coefficient(
             mol::Union{TraceGasCO₂{FT}, TraceGasH₂O{FT}, TraceGasO₂{FT}},
             med::TraceGasAir{FT}
 ) where {FT<:AbstractFloat} =
-(
-    return mol.d_air * relative_diffusive_coefficient(T, mol, med)
-)
+    mol.d_air * relative_diffusive_coefficient(T, mol, med)
 
 
 
@@ -514,9 +508,7 @@ relative_diffusive_coefficient(
             mol::AbstractTraceGas{FT} = TraceGasH₂O{FT}(),
             med::AbstractTraceGas{FT} = TraceGasAir{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    return (T / T_25(FT)) ^ FT(1.8)
-)
+    (T / T_25(FT)) ^ FT(1.8)
 
 
 
@@ -550,11 +542,7 @@ relative_diffusive_coefficient(
             mol::Union{TraceGasCO₂{FT}, TraceGasN₂{FT}},
             med::TraceLiquidH₂O{FT}
 ) where {FT<:AbstractFloat} =
-(
-    @unpack d_water = mol;
-
-    return diffusive_coefficient(T, mol, med) / d_water
-)
+    diffusive_coefficient(T, mol, med) / mol.d_water
 
 
 
@@ -604,13 +592,7 @@ latent_heat_vapor(
             T::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    _LH_v0::FT = LH_V0(FT);
-    _T_0  ::FT = T_TRIPLE(FT);
-    _Δcp_v::FT = CP_V(FT) - CP_L(FT);
-
-    return _LH_v0 + _Δcp_v * (T - _T_0)
-)
+    LH_V0(FT) + (CP_V(FT) - CP_L(FT)) * (T - T_TRIPLE(FT))
 
 
 
@@ -671,9 +653,7 @@ pressure_correction(
             Ψ::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    return exp((Ψ * V_H₂O(FT)) / (GAS_R(FT) * T))
-)
+    exp((Ψ * V_H₂O(FT)) / (GAS_R(FT) * T))
 
 
 
@@ -757,9 +737,7 @@ saturation_vapor_pressure(
             Ψ::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    return saturation_vapor_pressure(T, med) * pressure_correction(T, Ψ, med)
-)
+    saturation_vapor_pressure(T, med) * pressure_correction(T, Ψ, med)
 
 
 
@@ -846,10 +824,7 @@ saturation_vapor_pressure_slope(
             Ψ::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    return saturation_vapor_pressure_slope(T, med) *
-           pressure_correction(T, Ψ, med)
-)
+    saturation_vapor_pressure_slope(T, med) * pressure_correction(T, Ψ, med)
 
 
 
@@ -957,9 +932,7 @@ relative_surface_tension(
             T::FT,
             med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    return surface_tension(T, med) / med.γ_ref
-)
+    surface_tension(T, med) / med.γ_ref
 
 
 
@@ -1026,11 +999,7 @@ Examples
 viscosity(T::FT,
           med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()
 ) where {FT<:AbstractFloat} =
-(
-    @unpack υ_A, υ_B, υ_C, υ_D = med;
-
-    return υ_A * exp( υ_B/T + υ_C*T + υ_D*T^2 )
-)
+    med.υ_A * exp( med.υ_B/T + med.υ_C*T + med.υ_D*T^2 )
 
 
 
@@ -1086,6 +1055,7 @@ relative_viscosity(
 
     return exp( υ_B * ( 1/T - 1/_K) + υ_C * (T - _K) + υ_D * (T^2 - _K^2) )
 )
+
 
 
 
