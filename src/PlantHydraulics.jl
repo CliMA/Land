@@ -1,6 +1,6 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, LogisticVC, PowerVC, WeibullVC
+using ClimaCache: AbstractVulnreabilityCurve, ComplexVC, LogisticVC, PowerVC, WeibullVC
 using DocStringExtensions: METHODLIST
 using UnPack: @unpack
 
@@ -9,11 +9,12 @@ using UnPack: @unpack
 export ComplexVC, LogisticVC, PowerVC, WeibullVC
 
 # export public functions
-export relative_hydraulic_conductance
+export critical_pressure, relative_hydraulic_conductance
 
 
 # include functions
-include("vulnerability.jl")
+include("critical_pressure.jl")
+include("vulnerability.jl"    )
 
 # include old module
 include("old/PlantHydraulicsOld.jl")
