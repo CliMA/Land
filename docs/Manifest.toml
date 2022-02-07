@@ -23,12 +23,6 @@ git-tree-sha1 = "5d55b9486590fdda5905c275bb21ce1f0754020f"
 uuid = "e1450e63-4bb3-523b-b2a4-4ffa8c0fd77d"
 version = "1.0.0"
 
-[[deps.CFTime]]
-deps = ["Dates", "Printf"]
-git-tree-sha1 = "bca6cb6ee746e6485ca4535f6cc29cf3579a0f20"
-uuid = "179af706-886a-5703-950a-314cd64e0468"
-version = "0.1.1"
-
 [[deps.CLIMAParameters]]
 deps = ["Test"]
 git-tree-sha1 = "95bfba52e0e514336d506a6eb3488eb7d2145ad6"
@@ -55,9 +49,9 @@ version = "0.1.2"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "0c41a5aaa7034ec520b0b16aead35d2393bfa2f0"
+git-tree-sha1 = "53c599f14dadea38a8bdb93614921c6ff169970c"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "0.1.0"
+version = "0.1.1"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -154,9 +148,9 @@ version = "0.16.2"
 
 [[deps.HDF5_jll]]
 deps = ["Artifacts", "JLLWrappers", "LibCURL_jll", "Libdl", "OpenSSL_jll", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "fd83fa0bde42e01952757f01149dd968c06c4dba"
+git-tree-sha1 = "bab67c0d1c4662d2c4be8c6007751b0b6111de5c"
 uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
-version = "1.12.0+1"
+version = "1.12.1+0"
 
 [[deps.IOCapture]]
 deps = ["Logging", "Random"]
@@ -269,24 +263,6 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 
-[[deps.NCDatasets]]
-deps = ["CFTime", "DataStructures", "Dates", "NetCDF_jll", "Printf"]
-git-tree-sha1 = "17e39eb5bbe564f48bdbefbd103bd3f49fcfcb9b"
-uuid = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
-version = "0.11.9"
-
-[[deps.NetCDF_jll]]
-deps = ["Artifacts", "HDF5_jll", "JLLWrappers", "LibCURL_jll", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Pkg", "Zlib_jll", "nghttp2_jll"]
-git-tree-sha1 = "0cf4d1bf2ef45156aed85c9ac5f8c7e697d9288c"
-uuid = "7243133f-43d8-5620-bbf4-c2c921802cf3"
-version = "400.702.400+0"
-
-[[deps.NetcdfIO]]
-deps = ["DataFrames", "DocStringExtensions", "NCDatasets", "Test"]
-git-tree-sha1 = "24d46a3001701f303756f9d31cdcd66f25ee3332"
-uuid = "6a36f34d-89cf-423a-87c4-84549e82f670"
-version = "0.1.2"
-
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
@@ -322,10 +298,10 @@ deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markd
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[deps.PkgUtility]]
-deps = ["CLIMAParameters", "CSV", "DataFrames", "Dates", "DocStringExtensions", "LazyArtifacts", "NetcdfIO", "Pkg", "Statistics", "StatsBase", "Test"]
-git-tree-sha1 = "b6cfa5cbe4806d230e698237a1da5b34e316de3f"
+deps = ["CLIMAParameters", "CSV", "DataFrames", "Dates", "DocStringExtensions", "LazyArtifacts", "Pkg", "Statistics", "StatsBase", "Test"]
+git-tree-sha1 = "3cbe2b4556b1746ad2db9d8f4d3eb218039efe78"
 uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
-version = "0.1.14"
+version = "0.2.0"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]

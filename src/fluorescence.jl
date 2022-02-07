@@ -3,6 +3,7 @@
 # Changes to this function
 # General
 #     2022-Jan-14: rename the function to photosystem_coefficients!
+#     2022-Feb-07: remove the wrapper function method
 #
 #######################################################################################################################################################################################################
 """
@@ -12,29 +13,6 @@ $(METHODLIST)
 
 """
 function photosystem_coefficients! end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this function
-# General
-#     2022-Jan-14: add function that for simple function call directly on Leaf
-#     2022-Jan-24: fix documentation
-#     2022-Feb-07: use apar in fluorescence model
-#
-#######################################################################################################################################################################################################
-"""
-
-    photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
-
-Update the rate constants and coefficients in reaction center, given
-- `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
-"""
-photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM, leaf.apar);
-
-    return nothing
-);
 
 
 #######################################################################################################################################################################################################
