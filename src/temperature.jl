@@ -164,6 +164,29 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
 #
 # Changes to this function
 # General
+#     2022-Feb-07: add method for C3CytochromeModel photosynthesis model
+# To do
+# TODO: add temperature dependencies for the components once the model is done
+#
+#######################################################################################################################################################################################################
+"""
+
+    photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat}
+
+Update the temperature dependencies of C3 photosynthesis model, given
+- `psm` `C3CytochromeModel` structure for C3 photosynthesis model
+- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
+- `t` Target temperature in `K`
+"""
+photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
 #     2022-Jan-24: fix documentation
