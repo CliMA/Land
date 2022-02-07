@@ -16,7 +16,7 @@ function rubisco_limited_rate! end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
 #     2022-Jan-24: fix documentation
@@ -39,7 +39,32 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
+# General
+#     2022-Feb-07: add method for C3CytochromeModel (as well as j_p680 and j_p700)
+#     2022-Feb-07: use e_to_c calculated in function photosystem_electron_transport!
+#
+#######################################################################################################################################################################################################
+"""
+
+    rubisco_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+
+Update the RubisCO limited photosynthetic rate, given
+- `psm` `C3CytochromeModel` structure for C3 photosynthesis model
+- `p_i` Internal CO₂ partial pressure in `Pa`
+"""
+rubisco_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
+    psm.a_c      = psm.v_cmax * (p_i - psm.γ_star) / (p_i + psm.k_m);
+    psm.j_p680_c = psm.a_c / psm.e_to_c;
+    psm.j_p700_c = psm.j_p680_c * psm.η;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
 #     2022-Jan-24: fix documentation
@@ -62,7 +87,7 @@ rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-14: add input variable g_lc to make the code more modular
 #     2022-Jan-24: fix documentation
@@ -100,7 +125,7 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {F
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
 #     2022-Jan-24: fix documentation

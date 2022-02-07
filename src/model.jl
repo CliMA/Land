@@ -76,7 +76,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     colimit_photosynthesis!(leaf.PSM);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM, leaf.apar);
 
     return nothing
 );
@@ -138,7 +138,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     leaf.p_CO₂_s = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM, leaf.apar);
 
     return nothing
 );
