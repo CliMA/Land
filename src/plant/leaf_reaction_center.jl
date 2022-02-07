@@ -110,6 +110,7 @@ VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, 0
 # General
 #     2022-Jan-18: add the struct of Cytochrome reaction center
 #     2022-Jan-25: fix documentation
+#     2022-Feb-07: add more fields to work with Photosynthesis v0.3.1
 #
 #######################################################################################################################################################################################################
 """
@@ -133,6 +134,10 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     K_F::FT
     "Rate constant of photochemistry for PS I `[s⁻¹]`"
     K_PSI::FT
+    "Rate constant of photochemistry for PS II `[s⁻¹]`"
+    K_PSII::FT
+    "Rate constant of excitation sharing for PS II `[s⁻¹]`"
+    K_U::FT
     "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
     Η_C::FT
     "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
@@ -141,6 +146,10 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     Φ_PSI_MAX::FT
 
     # prognostic variables that change with time
+    "Fluorescence yield"
+    ϕ_f::FT
+    "Photochemical yield"
+    ϕ_p::FT
 
     # dignostic variables that change with time
 end
@@ -152,6 +161,7 @@ end
 # General
 #     2022-Jan-24: add constructor for CytochromeReactionCenter
 #     2022-Jan-25: fix documentation
+#     2022-Feb-07: make the constructor more readable
 #
 #######################################################################################################################################################################################################
 """
@@ -165,4 +175,17 @@ Constructor of `CytochromeReactionCenter`
 rc = CytochromeReactionCenter{Float64}();
 ```
 """
-CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = CytochromeReactionCenter{FT}(0.41/(0.41+0.44), 5.5e8, 5e7, 1.45e10, 1, 0.75, 1.45e10 / (1.45e10+5.5e8+5e7));
+CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = (
+    return CytochromeReactionCenter{FT}(
+                0.41/(0.41+0.44),               # F_PSI
+                5.5e8,                          # K_D
+                5e7,                            # K_F
+                1.45e10,                        # K_PSI
+                4.5e9,                          # K_PSII
+                0,                              # K_U
+                1,                              # Η_C
+                0.75,                           # Η_L
+                1.45e10 / (1.45e10+5.5e8+5e7),  # Φ_PSI_MAX
+                0,                              # ϕ_f
+                0)                              # ϕ_p
+);

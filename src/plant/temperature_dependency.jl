@@ -20,7 +20,7 @@ abstract type AbstractTemperatureDependency{FT<:AbstractFloat} end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Arrhenius
 #     2022-Jan-13: define the struct mutable, use ΔHA directly in the struct, add field T_REF
@@ -54,7 +54,7 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to ArrheniusPeak
 #     2022-Jan-13: define the struct mutable, use ΔHA/ΔHD/ΔSV directly in the struct, add field T_REF/VAL_REF
@@ -94,7 +94,7 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Q10
 #     2022-Jan-14: make structure mutable

@@ -3,7 +3,7 @@
 
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2021-Oct-22: refactor the structure with renamed fields
 #     2021-Oct-22: add a constructor to define the structure from wavelength sets and prescribed wave shape

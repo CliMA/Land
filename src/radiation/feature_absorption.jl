@@ -3,7 +3,7 @@
 
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2021-Aug-04: refactor the structure with constants, variables, and temporary cache
 #     2021-Aug-04: add concentrations and characteristic curves altogether

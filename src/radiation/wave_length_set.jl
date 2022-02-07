@@ -1,6 +1,6 @@
 #######################################################################################################################################################################################################
 #
-# Changes to this structure
+# Changes to this struct
 # General
 #     2021-Aug-10: refactor the structure with renamed fields
 #     2021-Aug-10: add a constructor within the structure to avoid external initialization
