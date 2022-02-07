@@ -82,6 +82,8 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     a_net::FT
     "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_p::FT
+    "Electron to CO₂ coefficient"
+    e_to_c::FT
     "PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
     j_p680_a::FT
     "Rubisco limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
@@ -159,6 +161,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:
                 0,                      # a_j
                 -r_d25,                 # a_net
                 0,                      # a_p
+                0,                      # e_to_c
                 0,                      # j_p680_a
                 0,                      # j_p680_c
                 0,                      # j_p680_j
