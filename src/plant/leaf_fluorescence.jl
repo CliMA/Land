@@ -19,7 +19,7 @@ abstract type AbstractFluorescenceModel{FT<:AbstractFloat} end
 
 #######################################################################################################################################################################################################
 #
-# Changes to the type
+# Changes to the struct
 # General
 #     2022-Jan-14: add van der Tol model struct
 #     2022-Jan-24: fix documentation
@@ -50,7 +50,7 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to the constructors
+# Changes to the constructor
 # General
 #     2022-Jan-14: migrate from Photosynthesis.jl
 # Sources
@@ -82,7 +82,7 @@ VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat} 
 
 #######################################################################################################################################################################################################
 #
-# Changes to the structure
+# Changes to the struct
 # General
 #     2022-Jan-24: add an empty structure for Cytochrome based fluorescence model
 #     2022-Jan-24: fix documentation
