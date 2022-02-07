@@ -26,6 +26,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 # General
 #     2022-Jan-18: add C3CytochromeModel structure for C₃ photosynthesis system
 #     2022-Jan-25: fix documentation
+#     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -49,14 +50,38 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_2::FT
+    "[`AbstractTemperatureDependency`](@ref) type Kc temperature dependency"
+    TD_KC::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Ko temperature dependency"
+    TD_KO::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type respiration temperature dependency"
+    TD_R::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
+    TD_VCMAX::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Γ* temperature dependency"
+    TD_Γ::AbstractTemperatureDependency{FT}
 
     # prognostic variables that change with time
     "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"
     b₆f::FT
     "Maximal turnover rate of Cytochrome b₆f `[e⁻ s⁻¹]`"
     k_q::FT
+    "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    r_d25::FT
+    "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_cmax25::FT
 
     # dignostic variables that change with time
+    "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_c::FT
+    "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_gross::FT
+    "Light limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_j::FT
+    "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_net::FT
+    "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_p::FT
     "PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
     j_p680_a::FT
     "Rubisco limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
@@ -73,6 +98,16 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     j_p700_j::FT
     "Product limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
     j_p700_p::FT
+    "RubisCO coefficient Kc `[Pa]`"
+    k_c::FT
+    "Michaelis-Menten's coefficient `[Pa]`"
+    k_m::FT
+    "RubisCO coefficient Ko `[Pa]`"
+    k_o::FT
+    "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
+    r_d::FT
+    "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
+    v_cmax::FT
     "Maximal Cytochrome b₆f activity `[μmol e⁻ m⁻² s⁻¹]`"
     v_qmax::FT
     "ratio between J_P700 and J_P680"
@@ -106,7 +141,40 @@ cy = C3CytochromeModel{Float64}(v_cmax25 = 30, r_d25 = 1);
 ```
 """
 C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C3CytochromeModel{FT}(MinimumColimit{FT}(), 4, 8, 350 / 300, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    return C3CytochromeModel{FT}(
+                MinimumColimit{FT}(),   # COLIMIT
+                4,                      # EFF_1
+                8,                      # EFF_2
+                KcTDCLM(FT),            # TD_KC
+                KoTDCLM(FT),            # TD_KO
+                RespirationTDCLM(FT),   # TD_R
+                VcmaxTDCLM(FT),         # TD_VCMAX
+                ΓStarTDCLM(FT),         # TD_Γ
+                350 / 300,              # b₆f
+                300,                    # k_q
+                r_d25,                  # r_d25
+                v_cmax25,               # v_cmax25,
+                0,                      # a_c
+                0,                      # a_gross
+                0,                      # a_j
+                -r_d25,                 # a_net
+                0,                      # a_p
+                0,                      # j_p680_a
+                0,                      # j_p680_c
+                0,                      # j_p680_j
+                0,                      # j_p680_p
+                0,                      # j_p700_a
+                0,                      # j_p700_c
+                0,                      # j_p700_j
+                0,                      # j_p700_p
+                0,                      # k_c
+                0,                      # k_m
+                0,                      # k_o
+                r_d25,                  # r_d
+                v_cmax25,               # v_cmax
+                0,                      # v_qmax
+                0,                      # η
+                0)                      # γ_star
 );
 
 
