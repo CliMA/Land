@@ -7,11 +7,11 @@ using PkgUtility: GAS_R, lower_quadratic
 using UnPack: @unpack
 
 
-# export function from this module
-export leaf_photosynthesis!
-
 # export types from ClimaCache
 export AirLayer, GCO₂Mode, Leaf, PCO₂Mode
+
+# export function from this module
+export leaf_photosynthesis!
 
 
 # include the functions
