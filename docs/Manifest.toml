@@ -51,7 +51,7 @@ version = "0.1.2"
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "0.1.1"
+version = "0.1.2"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]

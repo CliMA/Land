@@ -27,6 +27,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Jan-18: add C3CytochromeModel structure for C₃ photosynthesis system
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
+#     2022-Feb-07: remove j_p680 and j_p700 series variables
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -84,22 +85,8 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     a_p::FT
     "Electron to CO₂ coefficient"
     e_to_c::FT
-    "PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p680_a::FT
-    "Rubisco limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p680_c::FT
-    "Light limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p680_j::FT
-    "Product limited PS II electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p680_p::FT
-    "PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p700_a::FT
-    "Rubisco limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p700_c::FT
-    "Light limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p700_j::FT
-    "Product limited PS I electron transport rate `[μmol e⁻ m⁻² s⁻¹]`"
-    j_p700_p::FT
+    "Potential Electron Transport Rate `[μmol e⁻ m⁻² s⁻¹]`"
+    j_pot::FT
     "RubisCO coefficient Kc `[Pa]`"
     k_c::FT
     "Michaelis-Menten's coefficient `[Pa]`"
@@ -125,6 +112,7 @@ end
 # General
 #     2021-Nov-18: add constructor
 #     2022-Jan-25: add documentation
+#     2022-Feb-07: add more fields into the constructors
 #
 #######################################################################################################################################################################################################
 """
@@ -162,14 +150,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:
                 -r_d25,                 # a_net
                 0,                      # a_p
                 0,                      # e_to_c
-                0,                      # j_p680_a
-                0,                      # j_p680_c
-                0,                      # j_p680_j
-                0,                      # j_p680_p
-                0,                      # j_p700_a
-                0,                      # j_p700_c
-                0,                      # j_p700_j
-                0,                      # j_p700_p
+                0,                      # j_pot
                 0,                      # k_c
                 0,                      # k_m
                 0,                      # k_o

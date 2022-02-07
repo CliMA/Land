@@ -5,6 +5,7 @@
 #     2022-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
 #     2022-Jan-24: add p_CO₂_s to the structure
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: moved FLM to PRC
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -29,8 +30,6 @@ mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
     "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::LeafBiophysics{FT}
-    "[`AbstractFluorescenceModel`](@ref) type leaf fluorescence model"
-    FLM::AbstractFluorescenceModel{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
     PRC::AbstractReactionCenter{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
@@ -70,6 +69,7 @@ end
 #     2022-Jan-24: add C3Cytochrome constructor
 #     2022-Jan-24: add p_CO₂_s to the constructor
 #     2022-Jan-24: add documentation
+#     2022-Feb-07: remove fluorescence model from Leaf struct
 #
 #######################################################################################################################################################################################################
 """
@@ -105,14 +105,14 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:A
     _p_s  = 40.0;
 
     if psm == "C3"
-        return Leaf{FT}(_bio, VanDerTolFluorescenceModel{FT}(), VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        return Leaf{FT}(_bio, VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 
     if psm == "C3Cytochrome"
-        return Leaf{FT}(_bio, CytochromeFluorescenceModel{FT}(), CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        return Leaf{FT}(_bio, CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 
     if psm == "C4"
-        return Leaf{FT}(_bio, VanDerTolFluorescenceModel{FT}(), VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        return Leaf{FT}(_bio, VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
     end;
 );

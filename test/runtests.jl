@@ -39,8 +39,7 @@ using Test
             # Fluorescence model
             vdt1 = ClimaCache.VanDerTolFluorescenceModel{FT}();
             vdt2 = ClimaCache.VanDerTolFluorescenceModel{FT}(true);
-            cyto = ClimaCache.CytochromeFluorescenceModel{FT}();
-            for vdt in [vdt1, vdt2, cyto]
+            for vdt in [vdt1, vdt2]
                 @test FT_test(vdt, FT);
                 @test NaN_test(vdt);
             end;
