@@ -44,6 +44,7 @@ product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 #     2022-Jan-18: add support to C3CytochromeModel
 #     2022-Jan-18: add input variable p_i to make the code more modular
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: use correct field names in C3CytochromeModel
 # Bug fix
 #     2022-Jan-18: j_psi_p = j_psii_p * η (was j_psii_c * η)
 #
@@ -60,8 +61,8 @@ product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFl
     @unpack EFF_1, EFF_2 = psm;
 
     psm.a_p      = psm.v_cmax / 2;
-    psm.j_psii_p = psm.a_c * (EFF_1*p_i + EFF_2*psm.γ_star) / (p_i - psm.γ_star);
-    psm.j_psi_p  = psm.j_psii_p* psm.η;
+    psm.j_p680_p = psm.a_c * (EFF_1*p_i + EFF_2*psm.γ_star) / (p_i - psm.γ_star);
+    psm.j_p700_p = psm.j_p680_p * psm.η;
 
     return nothing
 );

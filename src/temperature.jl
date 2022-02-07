@@ -16,7 +16,7 @@ function temperature_correction end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
@@ -38,7 +38,7 @@ temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
@@ -69,7 +69,7 @@ temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
@@ -131,7 +131,7 @@ function photosystem_temperature_dependence! end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
@@ -162,11 +162,11 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Feb-07: add method for C3CytochromeModel photosynthesis model
 # To do
-# TODO: add temperature dependencies for the components once the model is done
+#     TODO: add temperature dependencies for the v_qmax or b₆f or k_q
 #
 #######################################################################################################################################################################################################
 """
@@ -179,13 +179,20 @@ Update the temperature dependencies of C3 photosynthesis model, given
 - `t` Target temperature in `K`
 """
 photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
+    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
+    psm.γ_star = temperature_corrected_value(psm.TD_Γ, t);
+    psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
+
     return nothing
 );
 
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public

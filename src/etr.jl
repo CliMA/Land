@@ -53,6 +53,7 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 #     2022-Jan-18: unpack CONSTANT from the input variables only
 #     2022-Jan-18: use apar rather than par as in Johnson and Berry's paper
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: use correct field names in C3CytochromeModel
 #
 #######################################################################################################################################################################################################
 """
@@ -69,11 +70,11 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSI, Η_C, Η_L, Φ_PSI_MAX = rc;
 
-    psm.j_psi_j  = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
+    psm.j_p700_j = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
     psm.η        = 1 - Η_L / Η_C + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / Η_C;
-    psm.j_psii_j = psm.j_psi_j / psm.η;
-    psm.j_pot    = psm.j_psii_j;
-    psm.j        = psm.j_psii_j;
+    psm.j_p680_j = psm.j_p700_j / psm.η;
+    psm.j_pot    = psm.j_p680_j;
+    psm.j        = psm.j_p680_j;
 
     return nothing
 );
