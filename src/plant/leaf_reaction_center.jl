@@ -1,9 +1,75 @@
 #######################################################################################################################################################################################################
 #
+# Changes to the struct
+# General
+#     2022-Jan-14: add van der Tol model struct
+#     2022-Jan-24: fix documentation
+#     2022-Feb-07: remove the hierachy from abstract fluorescence model
+#     2022-Feb-07: move struct definition as a field of VJPReactionCenter
+# Sources
+#     van der Tol et al. (2014) Models of fluorescence and photosynthesis for interpreting measurements of solar-induced chlorophyll fluorescence
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure that stores van der Tol et al. (2014) fluorescence model parameters.
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+struct VanDerTolFluorescenceModel{FT<:AbstractFloat}
+    "Fitting parameter K_0"
+    K_0::FT
+    "Fitting parameter α"
+    K_A::FT
+    "Fitting parameter β"
+    K_B::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the constructor
+# General
+#     2022-Jan-14: migrate from Photosynthesis.jl
+# Sources
+#     van der Tol et al. (2013) Models of fluorescence and photosynthesis for interpreting measurements of solar-induced chlorophyll fluorescence
+#
+#######################################################################################################################################################################################################
+"""
+
+    VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
+
+Constructor for `VanDerTolFluorescenceModel` fluorescence model, given
+- `drought` If true, use parameters trained from drought stressed plant. Default is `false`.
+
+---
+# Examples
+```julia
+vdt = VanDerTolFluorescenceModel{Float64}();
+vdt = VanDerTolFluorescenceModel{Float64}(true);
+```
+"""
+VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat} = (
+    if drought
+        return VanDerTolFluorescenceModel{FT}(5.01, 1.93, 10)
+    else
+        return VanDerTolFluorescenceModel{FT}(2.48, 2.83, 0.114)
+    end
+);
+
+
+#######################################################################################################################################################################################################
+#
 # Changes to this type
 # General
 #     2022-Jan-24: abstractize the reaction center
 #     2022-Jan-25: fix documentation
+#     2022-Feb-07: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -12,7 +78,7 @@ $(TYPEDEF)
 
 Structure that stores reaction center information
 
-Hierachy of the `AbstractFluorescenceModel`
+Hierachy of the `AbstractReactionCenter`
 - [`VJPReactionCenter`](@ref)
 - [`CytochromeReactionCenter`](@ref)
 """
@@ -25,6 +91,7 @@ abstract type AbstractReactionCenter{FT<:AbstractFloat} end
 # General
 #     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
 #     2022-Jan-25: fix documentation
+#     2022-Feb-07: add fluorescence model as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -42,6 +109,8 @@ mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReactionCenter{FT}
     # parameters that do not change with time
     "Fraction of absorbed light used by PSII ETR"
     F_PSII::FT
+    "Fluorescence model"
+    FLM::VanDerTolFluorescenceModel{FT}
     "Rate constant for thermal dissipation"
     K_D::FT
     "Rate constant for fluorescence"
@@ -101,7 +170,7 @@ Constructor of `VJPReactionCenter`
 rc = VJPReactionCenter{Float64}();
 ```
 """
-VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+VJPReactionCenter{FT}() where {FT<:AbstractFloat} = VJPReactionCenter{FT}(0.5, VanDerTolFluorescenceModel{FT}(), 0.85, 0.05, 4, 4/(0.85+0.05+4), 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 
 #######################################################################################################################################################################################################
