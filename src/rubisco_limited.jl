@@ -42,6 +42,7 @@ rubisco_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # Changes to this method
 # General
 #     2022-Feb-07: add method for C3CytochromeModel (as well as j_p680 and j_p700)
+#     2022-Feb-07: use e_to_c calculated in function photosystem_electron_transport!
 #
 #######################################################################################################################################################################################################
 """
@@ -53,10 +54,8 @@ Update the RubisCO limited photosynthetic rate, given
 - `p_i` Internal CO₂ partial pressure in `Pa`
 """
 rubisco_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
-    @unpack EFF_1, EFF_2 = psm;
-
     psm.a_c      = psm.v_cmax * (p_i - psm.γ_star) / (p_i + psm.k_m);
-    psm.j_p680_c = psm.a_c * (EFF_1*p_i + EFF_2*psm.γ_star) / (p_i - psm.γ_star);
+    psm.j_p680_c = psm.a_c / psm.e_to_c;
     psm.j_p700_c = psm.j_p680_c * psm.η;
 
     return nothing

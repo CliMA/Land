@@ -20,19 +20,20 @@ function colimit_photosynthesis! end
 # General
 #     2022-Jan-24: use colimit from psm to abstractize the MinimumColimit and QuadraticColimit methods
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: add C3CytochromeModel support
 #
 #######################################################################################################################################################################################################
 """
 
-    colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat}
+    colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat}
 
 Use the minimal photosynthetic rates of rubisco-, light-, and product-limited photosynthetic rates, given
 - `psm` `C3VJPModel` or `C4VJPModel` type photosynthesis model
 """
-colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat} = (
+colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat} = (
     colimit_photosynthesis!(psm, psm.COLIMIT);
 
-    return nothing;
+    return nothing
 );
 
 
@@ -56,7 +57,7 @@ colimit_photosynthesis!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, colim::Minim
     psm.a_gross = min(psm.a_c, psm.a_j, psm.a_p);
     psm.a_net   = psm.a_gross - psm.r_d;
 
-    return nothing;
+    return nothing
 );
 
 
@@ -82,7 +83,7 @@ colimit_photosynthesis!(psm::C3CytochromeModel{FT}, colim::MinimumColimit{FT}) w
     psm.j_p680_a = min(psm.j_p680_c, psm.j_p680_j, psm.j_p680_p);
     psm.j_p700_a = psm.j_p680_a * psm.η;
 
-    return nothing;
+    return nothing
 );
 
 

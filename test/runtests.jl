@@ -21,6 +21,7 @@ using Test
             leaf   = Leaf{FT}("C3Cytochrome");
             air    = AirLayer{FT}();
             p_mode = PCO₂Mode();
+            leaf_photosynthesis!(leaf, air, p_mode);
             @test true;
         end;
     end;

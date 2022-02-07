@@ -38,7 +38,7 @@ photosystem_coefficients!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
 
 #######################################################################################################################################################################################################
 #
-# Changes to this function
+# Changes to this method
 # General
 #     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add function that operates PSM, PRC, and FLM directly so as to be more modular (reduce memory allocations)
@@ -81,3 +81,24 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
 
     return nothing
 );
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Feb-07: add support for Johnson and Berry (2021) model
+#
+#######################################################################################################################################################################################################
+"""
+
+    photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, vdt::CytochromeFluorescenceModel{FT}) where {FT<:AbstractFloat}
+
+Update the rate constants and coefficients in reaction center, given
+- `psm` `C3CytochromeModel` type photosynthesis model
+- `rc` `CytochromeReactionCenter` type photosynthesis system reaction center
+- `cfm` Johnson and Berry (2021) fluorescence model
+"""
+photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, cfm::CytochromeFluorescenceModel{FT}) where {FT<:AbstractFloat} = (
+    return nothing
+)
