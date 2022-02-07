@@ -24,11 +24,6 @@ using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
 
 
-# export public types and constructors
-export AirLayer, Arrhenius, ArrheniusPeak, C3CytochromeModel, C3VJPModel, C4VJPModel, CytochromeFluorescenceModel, CytochromeReactionCenter, GCO₂Mode, Leaf, LeafBiophysics, MinimumColimit, PCO₂Mode,
-       Q10, QuadraticColimit, VJPReactionCenter, VanDerTolFluorescenceModel, WaveLengthSet
-
-
 #######################################################################################################################################################################################################
 #
 # Changes to these constants
