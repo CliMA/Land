@@ -49,9 +49,9 @@ version = "0.1.2"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "53c599f14dadea38a8bdb93614921c6ff169970c"
+git-tree-sha1 = "539b60e7e0c58cdb0c1e4a6e949308bbcf1a694f"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "0.1.1"
+version = "0.1.2"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -291,7 +291,7 @@ version = "2.2.1"
 deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "Test", "UnPack"]
 path = ".."
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
-version = "0.3.1"
+version = "0.3.2"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
