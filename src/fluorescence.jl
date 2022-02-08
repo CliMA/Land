@@ -23,20 +23,20 @@ function photosystem_coefficients! end
 #     2022-Jan-14: add function that operates PSM, PRC, and FLM directly so as to be more modular (reduce memory allocations)
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use apar in fluorescence model (not used in this method)
+#     2022-Feb-07: remove fluorescence model from input variables (in reaction center since ClimaCache v0.1.2)
 #
 #######################################################################################################################################################################################################
 """
 
-    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}, apar::FT) where {FT<:AbstractFloat}
+    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat}
 
 Update the rate constants and coefficients in reaction center, given
 - `psm` `C3VJPModel` or `C4VJPModel` type photosynthesis model
 - `rc` `VJPReactionCenter` type photosynthesis system reaction center
-- `vdt` van der Tol et al. (2013) fluorescence model
 - `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
 """
-photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, vdt::VanDerTolFluorescenceModel{FT}, apar::FT) where {FT<:AbstractFloat} = (
-    @unpack K_0, K_A, K_B = vdt;
+photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat} = (
+    @unpack K_0, K_A, K_B = rc.FLM;
     @unpack K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
 
     # calculate photochemical yield
@@ -69,30 +69,31 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
 # Changes to this method
 # General
 #     2022-Feb-07: add support for Johnson and Berry (2021) model
+#     2022-Feb-07: remove fluorescence model from input variables
+#     2022-Feb-07: use a_gross and j_pot rather than a series of j_p680 and j_p700
 # To do
 #     TODO: add more calculations such as NPQ when the model is ready
 #
 #######################################################################################################################################################################################################
 """
 
-    photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, cfm::CytochromeFluorescenceModel{FT}, apar::FT) where {FT<:AbstractFloat}
+    photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat}
 
 Update the rate constants and coefficients in reaction center, given
 - `psm` `C3CytochromeModel` type photosynthesis model
 - `rc` `CytochromeReactionCenter` type photosynthesis system reaction center
-- `cfm` Johnson and Berry (2021) fluorescence model
 - `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
 """
-photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, cfm::CytochromeFluorescenceModel{FT}, apar::FT) where {FT<:AbstractFloat} = (
+photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat} = (
     @unpack F_PSI, K_D, K_F, K_PSII, K_U, Φ_PSI_MAX = rc;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/blob/main/scripts/model_fun.m
     # primary fluorescence parameters
     # TODO: should this one be j_p700_a?
-    _b₆f_a    = psm.j_p700_j / psm.k_q;
-    _ϕ_p700_a = psm.j_p700_a / (apar * F_PSI);
-    _q1_a     = _ϕ_p700_a  / Φ_PSI_MAX;
-    _ϕ_P2_a   = psm.j_p680_a / (apar * (1 - F_PSI));
+    _b₆f_a    = psm.j_pot * psm.η / psm.k_q;
+    _ϕ_p700_a = psm.a_gross / psm.e_to_c / (apar * F_PSI);
+    _q1_a     = _ϕ_p700_a / Φ_PSI_MAX;
+    _ϕ_P2_a   = psm.a_gross / psm.e_to_c / (apar * (1 - F_PSI));
     _q2_a     = 1 - _b₆f_a / psm.b₆f;
 
     # rearrange Eqn. 25a to solve for _kn_2_a
