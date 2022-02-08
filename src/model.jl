@@ -36,6 +36,7 @@ function leaf_photosynthesis! end
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 #     2022-Jan-18: add p_i to electron transport function input variables
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: use new method of photosystem_coefficients!
 # Bug fixes
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
@@ -76,7 +77,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     colimit_photosynthesis!(leaf.PSM);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM, leaf.apar);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.apar);
 
     return nothing
 );
@@ -91,6 +92,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 #     2022-Jan-24: fix documentation
+#     2022-Feb-07: use new method of photosystem_coefficients!
 # Bug fixes
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
@@ -138,7 +140,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     leaf.p_CO₂_s = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.FLM, leaf.apar);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.apar);
 
     return nothing
 );
