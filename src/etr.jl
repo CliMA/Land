@@ -56,6 +56,8 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 #     2022-Feb-07: use correct field names in C3CytochromeModel
 #     2022-Feb-07: remove j_pot and j definitions
 #     2022-Feb-07: add e_to_c calculation
+#     2022-Feb-07: add j_pot calculation back to work with ClimaCache v0.1.2
+#     2022-Feb-07: move e_to_c calculation back to light_limited_rate!
 #
 #######################################################################################################################################################################################################
 """
@@ -72,10 +74,9 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSI, Η_C, Η_L, Φ_PSI_MAX = rc;
 
-    psm.j_p700_j = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
-    psm.η        = 1 - Η_L / Η_C + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / Η_C;
-    psm.j_p680_j = psm.j_p700_j / psm.η;
-    psm.e_to_c   = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
+    _j_p700   = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
+    psm.η     = 1 - Η_L / Η_C + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / Η_C;
+    psm.j_pot = _j_p700 / psm.η;
 
     return nothing
 );
@@ -91,6 +92,7 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
 #     2022-Jan-18: add input variable p_i for modularity
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: add e_to_c definition
+#     2022-Feb-07: remove duplicated j (using j_pot is enough)
 #
 #######################################################################################################################################################################################################
 """
@@ -106,9 +108,7 @@ Update the electron transport rates, given
 photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT = FT(0)) where {FT<:AbstractFloat} = (
     @unpack F_PSII, Φ_PSII_MAX = rc;
 
-    psm.j_pot  = F_PSII * Φ_PSII_MAX * apar;
-    psm.j      = psm.j_pot;
-    psm.e_to_c = 1 / 6;
+    psm.j_pot = F_PSII * Φ_PSII_MAX * apar;
 
     return nothing
 );

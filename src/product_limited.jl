@@ -18,50 +18,22 @@ function product_limited_rate! end
 #
 # Changes to this function
 # General
-#     2022-Jan-14: add input variable p_i to make the code more modular
-#     2022-Jan-24: fix documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-    product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-
-Update the product limited photosynthetic rate, given
-- `psm` `C3VJPModel` structure for C3 photosynthesis model
-- `p_i` Internal CO₂ partial pressure in `Pa`, not used in this method
-"""
-product_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
-    psm.a_p = psm.v_cmax / 2;
-
-    return nothing
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this function
-# General
 #     2022-Jan-18: add support to C3CytochromeModel
 #     2022-Jan-18: add input variable p_i to make the code more modular
 #     2022-Jan-24: fix documentation
-#     2022-Feb-07: use correct field names in C3CytochromeModel
-#     2022-Feb-07: use e_to_c calculated in function photosystem_electron_transport!
-# Bug fix
-#     2022-Jan-18: j_psi_p = j_psii_p * η (was j_psii_c * η)
+#     2022-Feb-07: add C3CytochromeModel support into Union
 #
 #######################################################################################################################################################################################################
 """
 
-    product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat}
+    product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, p_i::FT) where {FT<:AbstractFloat}
 
 Update the product limited photosynthetic rate, given
-- `psm` `C3CytochromeModel` structure for C3 photosynthesis model
+- `psm` `C3CytochromeModel` or `C3VJPModel` structure for C3 photosynthesis model
 - `p_i` Internal CO₂ partial pressure in `Pa`, not used in this method
 """
-product_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat} = (
-    psm.a_p      = psm.v_cmax / 2;
-    psm.j_p680_p = psm.a_p / psm.e_to_c;
-    psm.j_p700_p = psm.j_p680_p * psm.η;
+product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, p_i::FT) where {FT<:AbstractFloat} = (
+    psm.a_p = psm.v_cmax / 2;
 
     return nothing
 );

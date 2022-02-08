@@ -165,6 +165,7 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
 # Changes to this method
 # General
 #     2022-Feb-07: add method for C3CytochromeModel photosynthesis model
+#     2022-Feb-07: add v_qmax without temperature dependency
 # To do
 #     TODO: add temperature dependencies for the v_qmax or b₆f or k_q
 #
@@ -181,6 +182,7 @@ Update the temperature dependencies of C3 photosynthesis model, given
 photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
     psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
     psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm.v_qmax = psm.b₆f * psm.k_q;
     psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
     psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
     psm.γ_star = temperature_corrected_value(psm.TD_Γ, t);
