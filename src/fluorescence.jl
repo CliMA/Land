@@ -71,6 +71,9 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
 #     2022-Feb-07: add support for Johnson and Berry (2021) model
 #     2022-Feb-07: remove fluorescence model from input variables
 #     2022-Feb-07: use a_gross and j_pot rather than a series of j_p680 and j_p700
+# Bug fix
+#     2022-Feb-10: scale fluorescence quantum yield based on F_PSI and reabsorption factor
+#     2022-Feb-10: _q1 needs to be multiply by η
 # To do
 #     TODO: add more calculations such as NPQ when the model is ready
 #
@@ -85,54 +88,39 @@ Update the rate constants and coefficients in reaction center, given
 - `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
 """
 photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat} = (
-    @unpack F_PSI, K_D, K_F, K_PSII, K_U, Φ_PSI_MAX = rc;
+    @unpack F_PSI, K_D, K_F, K_PSI, K_PSII, K_U, K_X, Φ_PSI_MAX = rc;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/blob/main/scripts/model_fun.m
-    # primary fluorescence parameters
-    # TODO: should this one be j_p700_a?
-    _b₆f_a    = psm.j_pot * psm.η / psm.k_q;
-    _ϕ_p700_a = psm.a_gross / psm.e_to_c / (apar * F_PSI);
-    _q1_a     = _ϕ_p700_a / Φ_PSI_MAX;
-    _ϕ_P2_a   = psm.a_gross / psm.e_to_c / (apar * (1 - F_PSI));
-    _q2_a     = 1 - _b₆f_a / psm.b₆f;
+    _y2 = psm.a_gross / (psm.e_to_c * apar * (1 - F_PSI));
+    _q2 = 1 - psm.j_pot * psm.η / psm.v_qmax;
+    _q1 = psm.a_gross * psm.η / (psm.e_to_c * apar * F_PSI * Φ_PSI_MAX);
 
-    # rearrange Eqn. 25a to solve for _kn_2_a
-    _kn_2_a = ( sqrt(K_PSII^2 * _ϕ_P2_a^2 -
-                     2 * K_PSII^2 * _ϕ_P2_a * _q2_a +
-                     K_PSII^2 * _q2_a^2 -
-                     4 * K_PSII * K_U * _ϕ_P2_a^2 * _q2_a +
-                     2 * K_PSII * K_U * _ϕ_P2_a^2 +
-                     2 * K_PSII * K_U * _ϕ_P2_a * _q2_a +
-                     K_U^2 * _ϕ_P2_a^2) -
-                K_PSII * _ϕ_P2_a +
-                K_U * _ϕ_P2_a +
-                K_PSII * _q2_a
-              ) / (2 * _ϕ_P2_a) - K_F - K_U - K_D;
+    # solve PSII K_N
+    _k_n     = ( sqrt(K_PSII^2 * (_y2 - _q2)^2 + K_U^2 * _y2^2 + 2 * K_PSII * K_U * _y2 * (_y2 + _q2 - 2 * _y2 * _q2)) + K_PSII * (_q2 - _y2) + K_U * _y2 ) / (2 * _y2) - K_F - K_U - K_D;
+    _k_sum_1 = K_D + K_F + K_U + _k_n;
+    _k_sum_2 = K_D + K_F + K_U + _k_n + K_PSII;
+    _k_sum_3 = K_D + K_F + K_PSI;
+    _k_sum_4 = K_D + K_F + K_X;
 
-    # Photosystem II (Eqns. 23a-23e and 25a-25d)
-    _k_sum_1 = _kn_2_a + K_D + K_F + K_U;
-    _k_sum_2 = _kn_2_a + K_D + K_F + K_U + K_PSII;
-    _ϕ_P2_a  = _q2_a * K_PSII  / _k_sum_2;
-    _ϕ_N2_a  = _q2_a * _kn_2_a / _k_sum_2 + (1 - _q2_a) * _kn_2_a / _k_sum_1;
-    _ϕ_D2_a  = _q2_a * K_D     / _k_sum_2 + (1 - _q2_a) * K_D     / _k_sum_1;
-    _ϕ_F2_a  = _q2_a * K_F     / _k_sum_2 + (1 - _q2_a) * K_F     / _k_sum_1;
-    _ϕ_U2_a  = _q2_a * K_U     / _k_sum_2 + (1 - _q2_a) * K_U     / _k_sum_1;
-    _ϕ_P2_a /= 1 - _ϕ_U2_a;
-    _ϕ_N2_a /= 1 - _ϕ_U2_a;
-    _ϕ_D2_a /= 1 - _ϕ_U2_a;
-    _ϕ_F2_a /= 1 - _ϕ_U2_a;
+    # compute PSII and PSI yeilds
+    _ϕ_U2_a = _q2 * K_U    / _k_sum_2 + (1 - _q2) * K_U  / _k_sum_1;
+    _ϕ_P2_a = _q2 * K_PSII / _k_sum_2 / (1 - _ϕ_U2_a);
+    _ϕ_F2_a = (_q2 * K_F   / _k_sum_2 + (1 - _q2) * K_F  / _k_sum_1) / (1 - _ϕ_U2_a);
+    _ϕ_F1_a = K_F / _k_sum_3 * _q1 + K_F / _k_sum_4 * (1 - _q1);
 
-    rc.ϕ_f = _ϕ_F2_a;
-    rc.ϕ_p = _ϕ_P2_a;
+    # save the fluorescence and photosynthesis yields in reaction center
+    rc.ϕ_f = _ϕ_F1_a * rc.ϵ_1 * F_PSI + _ϕ_F2_a * rc.ϵ_2 * (1 - F_PSI);
+    rc.ϕ_p = _ϕ_P2_a * (1 - F_PSI);
+
+    return nothing
 
     #=
-    # For Photosystem I (Eqns. 19a-19d)
-    _k_sum_3 = K_P1 + K_D + K_F;
-    _k_sum_4 = K_N1 + K_D + K_F;
-    _ϕ_p700_a  = _q1_a * K_P1 / _k_sum_3;
-    _ϕ_N1_a  = (1 - _q1_a) * K_N1 / _k_sum_4;
-    _ϕ_D1_a  = _q1_a * K_D / _k_sum_3 + (1 - _q1_a) * K_D / _k_sum_4;
-    _ϕ_F1_a  = _q1_a * K_F / _k_sum_3 + (1 - _q1_a) * K_F / _k_sum_4;
+    # some unused or unsaved variables
+    #_ϕ_N2_a = (_q2 * _k_n  / _k_sum_2 + (1 - _q2) * _k_n / _k_sum_1) / (1 - _ϕ_U2_a);
+    #_ϕ_D2_a = (_q2 * K_D   / _k_sum_2 + (1 - _q2) * K_D  / _k_sum_1) / (1 - _ϕ_U2_a);
+    #_ϕ_P1_a = K_PSI / _k_sum_3 * _q1;
+    #_ϕ_N1_a = K_X   / _k_sum_4 * (1 - _q1);
+    #_ϕ_D1_a = K_D   / _k_sum_3 * _q1 + K_D / _k_sum_4 * (1 - _q1);
 
     # PAM measured fluorescence levels (Eqns. 38-42)
     #   N.B., hardcoding of a2(1) for dark-adapted value
@@ -140,8 +128,8 @@ photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCent
     _tmp_2 = α_2 * K_F * ϵ_2;
     _Fm_a  = _tmp_1 / _k_sum_4 + _tmp_2 / (K_D + K_F);
     _Fo_a  = _tmp_1 / _k_sum_3 + _tmp_2 / (K_D + K_F + K_PSII);
-    _Fmp_a = _tmp_1 / _k_sum_4 + _tmp_2 / (K_D + K_F + _kn_2_a);
-    _Fop_a = _tmp_1 / _k_sum_3 + _tmp_2 / (K_D + K_F + K_PSII + _kn_2_a);
+    _Fmp_a = _tmp_1 / _k_sum_4 + _tmp_2 / (K_D + K_F + _k_n);
+    _Fop_a = _tmp_1 / _k_sum_3 + _tmp_2 / (K_D + K_F + K_PSII + _k_n);
     _Fs_a  = α_1 * _ϕ_F1_a * ϵ_1 + α_2 * _ϕ_F2_a * ϵ_2;
 
     # PAM indices used in plotter_forward_fun.m
@@ -149,6 +137,4 @@ photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCent
     _PAM2_a = _Fs_a * (1 / _Fmp_a - 1/_Fm_a); # ϕ_N
     _PAM3_a = _Fs_a / _Fm_a; # ϕ_D + ϕ_F
     =#
-
-    return nothing
 );
