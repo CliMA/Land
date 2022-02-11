@@ -28,6 +28,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
 #     2022-Feb-07: remove j_p680 and j_p700 series variables
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -45,8 +46,10 @@ $(TYPEDFIELDS)
 """
 mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
-    "[`AbstractColimit`](@ref) type colimitation method"
-    COLIMIT::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
+    COLIMIT_AC::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
+    COLIMIT_IP::AbstractColimit{FT}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -113,6 +116,7 @@ end
 #     2021-Nov-18: add constructor
 #     2022-Jan-25: add documentation
 #     2022-Feb-07: add more fields into the constructors
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -132,7 +136,8 @@ cy = C3CytochromeModel{Float64}(v_cmax25 = 30, r_d25 = 1);
 """
 C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
     return C3CytochromeModel{FT}(
-                MinimumColimit{FT}(),   # COLIMIT
+                MinimumColimit{FT}(),   # COLIMIT_AC
+                MinimumColimit{FT}(),   # COLIMIT_IP
                 4,                      # EFF_1
                 8,                      # EFF_2
                 KcTDCLM(FT),            # TD_KC
@@ -171,6 +176,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:
 #     2022-Jan-14: rename to photosynthesis model
 #     2022-Jan-14: add colimitation and e_to_c
 #     2022-Jan-25: fix documentation
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC, COLIMIT_IP, and COLIMIT_J (minor breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -186,8 +192,12 @@ $(TYPEDFIELDS)
 """
 mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
-    "[`AbstractColimit`](@ref) type colimitation method"
-    COLIMIT::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
+    COLIMIT_AC::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
+    COLIMIT_IP::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for J"
+    COLIMIT_J::AbstractColimit{FT}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -254,6 +264,7 @@ end
 #     2021-Nov-11: add constructor
 #     2022-Jan-14: update constructor to match structure
 #     2022-Jan-25: fix documentation
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC, COLIMIT_IP, and COLIMIT_J (minor breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -273,8 +284,36 @@ c3 = C3VJPModel{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
 ```
 """
 C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C3VJPModel{FT}(MinimumColimit{FT}(), 4, 8, JmaxTDCLM(FT), KcTDCLM(FT), KoTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), ΓStarTDCLM(FT),
-                          j_max25, r_d25, v_cmax25, 0, 0, 0, -r_d25, 0, 0, 0, j_max25, 0, 0, 0, 0, r_d25, v_cmax25, 0)
+    return C3VJPModel{FT}(
+                MinimumColimit{FT}(),   # COLIMIT_AC
+                MinimumColimit{FT}(),   # COLIMIT_IP
+                MinimumColimit{FT}(),   # COLIMIT_J
+                4,                      # EFF_1
+                8,                      # EFF_2
+                JmaxTDCLM(FT),          # TD_JMAX
+                KcTDCLM(FT),            # TD_KC
+                KoTDCLM(FT),            # TD_KO
+                RespirationTDCLM(FT),   # TD_R
+                VcmaxTDCLM(FT),         # TD_VCMAX
+                ΓStarTDCLM(FT),         # TD_Γ
+                j_max25,                # j_max25
+                r_d25,                  # r_d25
+                v_cmax25,               # v_cmax25
+                0,                      # a_c
+                0,                      # a_gross
+                0,                      # a_j
+                -r_d25,                 # a_net
+                0,                      # a_p
+                0,                      # e_to_c
+                0,                      # j
+                j_max25,                # j_max
+                0,                      # j_pot
+                0,                      # k_c
+                0,                      # k_m
+                0,                      # k_o
+                r_d25,                  # r_d
+                v_cmax25,               # v_cmax
+                0)                      # γ_star
 );
 
 
@@ -284,8 +323,10 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 # General
 #     2022-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
 #     2022-Jan-25: fix documentation
+#     2022-Feb-11: remove j from the struct
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
 # To do
-#     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl
+#     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl (not necessary)
 #
 #######################################################################################################################################################################################################
 """
@@ -301,8 +342,10 @@ $(TYPEDFIELDS)
 """
 mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
-    "[`AbstractColimit`](@ref) type colimitation method"
-    COLIMIT::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
+    COLIMIT_AC::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
+    COLIMIT_IP::AbstractColimit{FT}
     "[`AbstractTemperatureDependency`](@ref) type Kpep temperature dependency"
     TD_KPEP::AbstractTemperatureDependency{FT}
     "[`AbstractTemperatureDependency`](@ref) type  respiration temperature dependency"
@@ -333,8 +376,6 @@ mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     a_p::FT
     "Electron to CO₂ coefficient"
     e_to_c::FT
-    "Electron transport `[μmol m⁻² s⁻¹]`"
-    j::FT
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
     j_pot::FT
     "PEP coefficient Kpep `[Pa]`"
@@ -354,6 +395,9 @@ end
 # General
 #     2021-Nov-18: add constructor
 #     2022-Jan-25: fix documentation
+#     2022-Feb-11: remove j from the struct
+#     2022-Feb-11: default e_to_c set to 1/6
+#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -373,8 +417,27 @@ c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1);
 ```
 """
 C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
-    return C4VJPModel{FT}(MinimumColimit{FT}(), KpepTDCLM(FT), RespirationTDCLM(FT), VcmaxTDCLM(FT), VpmaxTDBoyd(FT),
-                          r_d25, v_cmax25, v_pmax25, 0, 0, 0, -r_d25, 0, 0, 0, 0, 0, r_d25, v_cmax25, v_pmax25)
+    return C4VJPModel{FT}(
+                MinimumColimit{FT}(),   # COLIMIT_AC
+                MinimumColimit{FT}(),   # COLIMIT_IP
+                KpepTDCLM(FT),          # TD_KPEP
+                RespirationTDCLM(FT),   # TD_R
+                VcmaxTDCLM(FT),         # TD_VCMAX
+                VpmaxTDBoyd(FT),        # TD_VPMAX
+                r_d25,                  # r_d25
+                v_cmax25,               # v_cmax25
+                v_pmax25,               # v_pmax25
+                0,                      # a_c
+                0,                      # a_gross
+                0,                      # a_j
+                -r_d25,                 # a_net
+                0,                      # a_p
+                1/6,                    # e_to_c
+                0,                      # j_pot
+                0,                      # k_pep
+                r_d25,                  # r_d
+                v_cmax25,               # v_cmax
+                v_pmax25)               # v_pmax
 );
 
 
