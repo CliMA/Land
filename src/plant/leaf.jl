@@ -9,10 +9,8 @@
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
-#     TODO: add leaf physiological parameters as a field well
 #     TODO: add leaf hydraulics as a field as well
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
-#     TODO: add auto reference in fields
 #
 #######################################################################################################################################################################################################
 """
@@ -70,11 +68,13 @@ end
 #     2022-Jan-24: add p_CO₂_s to the constructor
 #     2022-Jan-24: add documentation
 #     2022-Feb-07: remove fluorescence model from Leaf struct
+#     2022-Feb-11: set default APAR = 1000
+#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat}
 
 Constructor for `Leaf`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
@@ -86,33 +86,40 @@ Constructor for `Leaf`, given
 leaf_c3 = Leaf{Float64}("C3");
 leaf_c4 = Leaf{Float64}("C4");
 leaf_cy = Leaf{Float64}("C3Cytochrome");
+leaf_c3 = Leaf{Float64}("C3"; colimit = true);
+leaf_c4 = Leaf{Float64}("C4"; colimit = true);
+leaf_cy = Leaf{Float64}("C3Cytochrome"; colimit = true);
 wls = WaveLengthSet{FT}(collect(400:10:2500));
 leaf_c3 = Leaf{Float64}("C3", wls);
 leaf_c4 = Leaf{Float64}("C4", wls);
 leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C3Cytochrome", "C4"];
-
-    _bio = LeafBiophysics{FT}(wls);
-    _t   = T_25();
-    _p   = saturation_vapor_pressure(_t);
-
-    _g_lc = 0.01;
-    _g_bc = 3.0;
-    _p_i  = 20.0;
-    _p_s  = 40.0;
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat} = (
+    @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
-        return Leaf{FT}(_bio, VJPReactionCenter{FT}(), C3VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
+        _prc = VJPReactionCenter{FT}();
+        _psm = C3VJPModel{FT}(colimit = colimit);
+    elseif psm == "C3Cytochrome"
+        _prc = CytochromeReactionCenter{FT}();
+        _psm = C3CytochromeModel{FT}(colimit = colimit);
+    elseif psm == "C4"
+        _prc = VJPReactionCenter{FT}();
+        _psm = C4VJPModel{FT}(colimit = colimit);
     end;
 
-    if psm == "C3Cytochrome"
-        return Leaf{FT}(_bio, CytochromeReactionCenter{FT}(), C3CytochromeModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
-    end;
-
-    if psm == "C4"
-        return Leaf{FT}(_bio, VJPReactionCenter{FT}(), C4VJPModel{FT}(), 0, 0, _t, _g_lc, _g_bc, _p_i, _p_s, _p, 0)
-    end;
+    return Leaf{FT}(
+                LeafBiophysics{FT}(wls),            # BIO
+                _prc,                               # PRC
+                _psm,                               # PSM
+                1000,                               # apar
+                0.01,                               # g_H₂O_s
+                T_25(),                             # t
+                0.01,                               # g_CO₂
+                3.0,                                # g_CO₂_b
+                20,                                 # p_CO₂_i
+                40,                                 # p_CO₂_s
+                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
+                0)                                  # _t
 );
