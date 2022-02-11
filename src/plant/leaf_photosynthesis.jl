@@ -28,7 +28,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
 #     2022-Feb-07: remove j_p680 and j_p700 series variables
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -47,7 +47,7 @@ $(TYPEDFIELDS)
 mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_AC::AbstractColimit{FT}
+    COLIMIT_CJ::AbstractColimit{FT}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
     COLIMIT_IP::AbstractColimit{FT}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -116,28 +116,38 @@ end
 #     2021-Nov-18: add constructor
 #     2022-Jan-25: add documentation
 #     2022-Feb-07: add more fields into the constructors
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #
 #######################################################################################################################################################################################################
 """
 
-    C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+    C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat}
 
 Constructor for `C3CytochromeModel`, given
 - `v_cmax25` Maximal carboxylation rate at 298.15 K
 - `r_d25` Respiration rate at 298.15 K
+- `colimit` If true, use quadratic colimitations for a_c, a_j, and a_p
 
 ---
 # Examples
 ```julia
 cy = C3CytochromeModel{Float64}();
-cy = C3CytochromeModel{Float64}(v_cmax25 = 30, r_d25 = 1);
+cy = C3CytochromeModel{Float64}(v_cmax25 = 30, r_d25 = 1, colimit = true);
 ```
 """
-C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat} = (
+    if colimit
+        _colim_cj = QuadraticColimit{FT}(0.98);
+        _colim_ip = QuadraticColimit{FT}(0.95);
+    else
+        _colim_cj = MinimumColimit{FT}();
+        _colim_ip = MinimumColimit{FT}();
+    end;
+
     return C3CytochromeModel{FT}(
-                MinimumColimit{FT}(),   # COLIMIT_AC
-                MinimumColimit{FT}(),   # COLIMIT_IP
+                _colim_cj,              # COLIMIT_CJ
+                _colim_ip,              # COLIMIT_IP
                 4,                      # EFF_1
                 8,                      # EFF_2
                 KcTDCLM(FT),            # TD_KC
@@ -176,7 +186,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75) where {FT<:
 #     2022-Jan-14: rename to photosynthesis model
 #     2022-Jan-14: add colimitation and e_to_c
 #     2022-Jan-25: fix documentation
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC, COLIMIT_IP, and COLIMIT_J (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ, COLIMIT_IP, and COLIMIT_J (minor breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -193,7 +203,7 @@ $(TYPEDFIELDS)
 mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_AC::AbstractColimit{FT}
+    COLIMIT_CJ::AbstractColimit{FT}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
     COLIMIT_IP::AbstractColimit{FT}
     "[`AbstractColimit`](@ref) type colimitation method for J"
@@ -264,30 +274,42 @@ end
 #     2021-Nov-11: add constructor
 #     2022-Jan-14: update constructor to match structure
 #     2022-Jan-25: fix documentation
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC, COLIMIT_IP, and COLIMIT_J (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ, COLIMIT_IP, and COLIMIT_J (minor breaking)
+#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #
 #######################################################################################################################################################################################################
 """
 
-    C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+    C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat}
 
 Constructor for [`C3VJPModel`](@ref), given
 - `v_cmax25` Maximal carboxylation rate at 298.15 K
 - `j_max25` Maximal electron transport rate at 298.15 K
 - `r_d25` Respiration rate at 298.15 K
+- `colimit` If true, use quadratic colimitations for j and a_c, a_j, and a_p
 
 ---
 # Examples
 ```julia
 c3 = C3VJPModel{Float64}();
-c3 = C3VJPModel{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
+c3 = C3VJPModel{Float64}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1, colimit = true);
 ```
 """
-C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat} = (
+    if colimit
+        _colim_cj = QuadraticColimit{FT}(0.98);
+        _colim_ip = QuadraticColimit{FT}(0.95);
+        _colim_j  = QuadraticColimit{FT}(0.7);
+    else
+        _colim_cj = MinimumColimit{FT}();
+        _colim_ip = MinimumColimit{FT}();
+        _colim_j  = MinimumColimit{FT}();
+    end;
+
     return C3VJPModel{FT}(
-                MinimumColimit{FT}(),   # COLIMIT_AC
-                MinimumColimit{FT}(),   # COLIMIT_IP
-                MinimumColimit{FT}(),   # COLIMIT_J
+                _colim_cj,              # COLIMIT_CJ
+                _colim_ip,              # COLIMIT_IP
+                _colim_j,               # COLIMIT_J
                 4,                      # EFF_1
                 8,                      # EFF_2
                 JmaxTDCLM(FT),          # TD_JMAX
@@ -324,7 +346,7 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 #     2022-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: remove j from the struct
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl (not necessary)
 #
@@ -343,7 +365,7 @@ $(TYPEDFIELDS)
 mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_AC::AbstractColimit{FT}
+    COLIMIT_CJ::AbstractColimit{FT}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
     COLIMIT_IP::AbstractColimit{FT}
     "[`AbstractTemperatureDependency`](@ref) type Kpep temperature dependency"
@@ -397,29 +419,39 @@ end
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: remove j from the struct
 #     2022-Feb-11: default e_to_c set to 1/6
-#     2022-Feb-11: split COLIMIT to COLIMIT_AC and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
+#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #
 #######################################################################################################################################################################################################
 """
 
-    C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat}
+    C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat}
 
 Constructor for [`C4VJPModel`](@ref), given
 - `v_cmax25` Maximal carboxylation rate at 298.15 K
 - `v_pmax25` Maximal PEP carboxylation rate at 298.15 K
 - `r_d25` Respiration rate at 298.15 K
+- `colimit` If true, use quadratic colimitations for a_c, a_j, and a_p
 
 ---
 # Examples
 ```julia
 c4 = C4VJPModel{Float64}();
-c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1);
+c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1, colimit = true);
 ```
 """
-C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75) where {FT<:AbstractFloat} = (
+C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat} = (
+    if colimit
+        _colim_cj = QuadraticColimit{FT}(0.8);
+        _colim_ip = QuadraticColimit{FT}(0.95);
+    else
+        _colim_cj = MinimumColimit{FT}();
+        _colim_ip = MinimumColimit{FT}();
+    end;
+
     return C4VJPModel{FT}(
-                MinimumColimit{FT}(),   # COLIMIT_AC
-                MinimumColimit{FT}(),   # COLIMIT_IP
+                _colim_cj,              # COLIMIT_CJ
+                _colim_ip,              # COLIMIT_IP
                 KpepTDCLM(FT),          # TD_KPEP
                 RespirationTDCLM(FT),   # TD_R
                 VcmaxTDCLM(FT),         # TD_VCMAX

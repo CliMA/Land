@@ -54,11 +54,11 @@ using Test
 
             # Photosynthesis model
             cy_1 = ClimaCache.C3CytochromeModel{FT}();
-            cy_2 = ClimaCache.C3CytochromeModel{FT}(v_cmax25 = 30, r_d25 = 1);
+            cy_2 = ClimaCache.C3CytochromeModel{FT}(v_cmax25 = 30, r_d25 = 1, colimit = true);
             c3_1 = ClimaCache.C3VJPModel{FT}();
-            c3_2 = ClimaCache.C3VJPModel{FT}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1);
+            c3_2 = ClimaCache.C3VJPModel{FT}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1, colimit = true);
             c4_1 = ClimaCache.C4VJPModel{FT}();
-            c4_2 = ClimaCache.C4VJPModel{FT}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1);
+            c4_2 = ClimaCache.C4VJPModel{FT}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1, colimit = true);
             for st in [cy_1, cy_2, c3_1, c3_2, c4_1, c4_2]
                 for rc in [rc1, rc2]
                     @test FT_test(st, FT);
