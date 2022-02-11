@@ -18,11 +18,14 @@ using Test
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
             leaf_cy = ClimaCache.Leaf{FT}("C3Cytochrome");
+            leaf_d3 = ClimaCache.Leaf{FT}("C3", colimit = true);
+            leaf_d4 = ClimaCache.Leaf{FT}("C4", colimit = true);
+            leaf_dy = ClimaCache.Leaf{FT}("C3Cytochrome", colimit = true);
             wls     = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
-            leaf_d3 = ClimaCache.Leaf{FT}("C3", wls);
-            leaf_d4 = ClimaCache.Leaf{FT}("C4", wls);
-            leaf_dy = ClimaCache.Leaf{FT}("C3Cytochrome", wls);
-            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_d3, leaf_d4, leaf_dy]
+            leaf_e3 = ClimaCache.Leaf{FT}("C3", wls);
+            leaf_e4 = ClimaCache.Leaf{FT}("C4", wls);
+            leaf_ey = ClimaCache.Leaf{FT}("C3Cytochrome", wls);
+            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_d3, leaf_d4, leaf_dy, leaf_e3, leaf_e4, leaf_ey]
                 @test FT_test(leaf, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
