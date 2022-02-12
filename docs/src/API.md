@@ -61,8 +61,10 @@ product_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {F
 ```@docs
 colimit_photosynthesis!
 colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat}
-colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}, colim::MinimumColimit{FT}) where {FT<:AbstractFloat}
-colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat}
+colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPModel{FT}}, colim_cj::Union{MinimumColimit{FT}, QuadraticColimit{FT}},colim_ip::Union{MinimumColimit{FT}, QuadraticColimit{FT}}) where {FT<:AbstractFloat}
+colimited_rate
+colimited_rate(a_1::FT, a_2::FT, colim::MinimumColimit{FT}) where {FT<:AbstractFloat}
+colimited_rate(a_1::FT, a_2::FT, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat}
 ```
 
 

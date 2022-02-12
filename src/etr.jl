@@ -39,7 +39,7 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
     @unpack F_PSII, Φ_PSII_MAX = rc;
 
     psm.j_pot = F_PSII * Φ_PSII_MAX * apar;
-    psm.j     = min(psm.j_pot, psm.j_max);
+    psm.j     = colimited_rate(psm.j_pot, psm.j_max, psm.COLIMIT_J);
 
     return nothing
 );
