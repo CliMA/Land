@@ -24,6 +24,8 @@ function photosystem_coefficients! end
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use apar in fluorescence model (not used in this method)
 #     2022-Feb-07: remove fluorescence model from input variables (in reaction center since ClimaCache v0.1.2)
+# Bug fix
+#     2022-Feb-24: a typo from "rc.ϕ_f  = rc.f_m′ / (1 - rc.ϕ_p);" to "rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);"
 #
 #######################################################################################################################################################################################################
 """
@@ -53,7 +55,7 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
     rc.f_o′ = K_F / (K_F + K_P_MAX + K_D + rc.k_npq_rev + rc.k_npq_sus);
     rc.f_m  = K_F / (K_F + K_D);
     rc.f_m′ = K_F / (K_F + K_D + rc.k_npq_rev + rc.k_npq_sus);
-    rc.ϕ_f  = rc.f_m′ / (1 - rc.ϕ_p);
+    rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);
 
     # calculate quenching rates
     rc.q_e = 1 - (rc.f_m - rc.f_o′) / (rc.f_m′ - rc.f_o);
