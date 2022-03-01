@@ -59,6 +59,7 @@ end
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to ArrheniusPeak
 #     2022-Jan-13: define the struct mutable, use ΔHA/ΔHD/ΔSV directly in the struct, add field T_REF/VAL_REF
 #     2022-Jan-25: fix documentation
+#     2022-Mar-01: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -87,7 +88,7 @@ mutable struct ArrheniusPeak{FT<:AbstractFloat} <: AbstractTemperatureDependency
     ΔHA::FT
     "Deactivation energy"
     ΔHD::FT
-    "Entrophy factor"
+    "Entropy factor"
     ΔSV::FT
 end
 
@@ -138,6 +139,8 @@ end
 #     Boyd et al. (2001) Temperature responses of C4 photosynthesis: biochemical analysis of Rubisco, phosphoenolpyruvate carboxylase, and carbonic anhydrase in Setaria viridis
 #     Leuning (2002) Temperature dependence of two parameters in a photosynthesis model
 #     Kattge et al. (2007) Temperature acclimation in a biochemical model of photosynthesis: a reanalysis of data from 36 species
+#     Sperry et al. (2019) The impact of rising CO2 and acclimation on the response of US forests to global warming
+#     Johnson et al. (2021) The limiting factors and regulatory processes that control the environmental responses of C3, C3–C4 intermediate, and C4 photosynthesis
 #     CLM5 Documentation. Chapter 9 Page 106
 #
 #######################################################################################################################################################################################################
@@ -147,6 +150,7 @@ KoTDBernacchi(FT)          = Arrhenius{FT}(T_25(), 28208.88  , 36380.0);
 KoTDCLM(FT)                = Arrhenius{FT}(T_25(), 27840.0   , 36380.0);
 KpepTDCLM(FT)              = Arrhenius{FT}(T_25(), 8.0       , 36000.0);
 KpepTDBoyd(FT)             = Arrhenius{FT}(T_25(), 16.0      , 36300.0);
+KqTDJohnson(FT)            = Arrhenius{FT}(T_25(), NaN       , 37000.0);
 RespirationTDBernacchi(FT) = Arrhenius{FT}(T_25(), NaN       , 46390.0);
 VcmaxTDBernacchi(FT)       = Arrhenius{FT}(T_25(), NaN       , 65330.0);
 VomaxTDBernacchi(FT)       = Arrhenius{FT}(T_25(), NaN       , 60110.0);
@@ -160,6 +164,7 @@ RespirationTDCLM(FT)               = ArrheniusPeak{FT}(T_25(), NaN, 46390.0, 150
 VcmaxTDCLM(FT, t::Number = T_25()) = ArrheniusPeak{FT}(T_25(), NaN, 72000.0, 200000.0, 668.39 - 1.07 * (t - T_0()) );
 VcmaxTDLeuning(FT)                 = ArrheniusPeak{FT}(T_25(), NaN, 73637.0, 149252.0, 486.0 );
 VpmaxTDBoyd(FT)                    = ArrheniusPeak{FT}(T_25(), NaN, 94800.0, 73300.0 , 250.0 );
+ΗTDJohnson(FT)                     = ArrheniusPeak{FT}(T_25(), NaN, 0.0    , 220000.0, 710.0 );
 
 Q10TDAngiosperm(FT) = Q10{FT}(T_25(), 0.0140/8760, 1.4);
 Q10TDGymnosperm(FT) = Q10{FT}(T_25(), 0.0425/8760, 1.7);

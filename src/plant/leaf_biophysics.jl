@@ -11,13 +11,14 @@
 #     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
 #     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
 #     2022-Jan-24: fix documentation
+#     2022-Mar-01: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
 $(TYPEDEF)
 
-Struct that contains leaf biophysical traits used to run leaf reflection and transmittance.
+Struct that contains leaf biophysical traits used to run leaf reflectance and transmittance.
 
 # Fields
 
@@ -26,13 +27,13 @@ $(TYPEDFIELDS)
 """
 mutable struct LeafBiophysics{FT<:AbstractFloat}
     # parameters that do not change with time
-    "Leaf mesophyll structural parameter that describes mesophyll reflection and transmittance"
+    "Leaf mesophyll structural parameter that describes mesophyll reflectance and transmittance"
     MESOPHYLL_N::FT
     "Doubling adding layers"
     NDUB::Int
 
     # prognostic variables that change with time
-    "Anthocynanin content `[μg cm⁻²]`"
+    "Anthocyanin content `[μg cm⁻²]`"
     ant::FT
     "Senescent material (brown pigments) fraction `[-]`"
     brown::FT
@@ -43,7 +44,7 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
     "Carbon-based constituents in lma `[g cm⁻²]`"
     cbc::FT
     "Zeaxanthin fraction in Carotenoid (1=all Zeaxanthin, 0=all Violaxanthin) `[-]`"
-    f_zeax
+    f_zeax::FT
     "Equivalent water thickness `[cm]`"
     l_H₂O::FT
     "Dry matter content (dry leaf mass per unit area) `[g cm⁻²]`"

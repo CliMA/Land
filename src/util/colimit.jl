@@ -13,6 +13,7 @@ $(TYPEDEF)
 Hierachy of `AbstractColimit`
 - [`MinimumColimit`](@ref)
 - [`QuadraticColimit`](@ref)
+- [`SerialColimit`](@ref)
 """
 abstract type AbstractColimit{FT<:AbstractFloat} end
 
@@ -46,6 +47,7 @@ struct MinimumColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end
 # General
 #     2022-Jan-14: add quadratic colimitation struct
 #     2022-Jan-25: add documentation
+#     2022-Mar-01: add documentation to field
 #
 #######################################################################################################################################################################################################
 """
@@ -65,5 +67,28 @@ col = QuadraticColimit{Float64}(0.98);
 ```
 """
 mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimit{FT}
+    "Curvature factor"
     CURVATURE::FT
 end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Feb-28: add serial colimitation struct
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Empty structure to indicate serial colimitation.
+
+---
+# Examples
+```julia
+col = SerialColimit{Float64}();
+```
+"""
+struct SerialColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end

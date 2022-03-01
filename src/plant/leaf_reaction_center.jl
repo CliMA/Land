@@ -36,25 +36,28 @@ end
 # Changes to the constructor
 # General
 #     2022-Jan-14: migrate from Photosynthesis.jl
+#     2022-Feb-24: set default to true to make the response more reasonable
+# To do
+#     TODO: examine why van der Tol et al has the nonstressed parameter set that are so far away from the stressed one
 # Sources
 #     van der Tol et al. (2013) Models of fluorescence and photosynthesis for interpreting measurements of solar-induced chlorophyll fluorescence
 #
 #######################################################################################################################################################################################################
 """
 
-    VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
+    VanDerTolFluorescenceModel{FT}(drought::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `VanDerTolFluorescenceModel` fluorescence model, given
-- `drought` If true, use parameters trained from drought stressed plant. Default is `false`.
+- `drought` If true, use parameters trained from drought stressed plant. Default is `true`.
 
 ---
 # Examples
 ```julia
 vdt = VanDerTolFluorescenceModel{Float64}();
-vdt = VanDerTolFluorescenceModel{Float64}(true);
+vdt = VanDerTolFluorescenceModel{Float64}(false);
 ```
 """
-VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat} = (
+VanDerTolFluorescenceModel{FT}(drought::Bool = true) where {FT<:AbstractFloat} = (
     if drought
         return VanDerTolFluorescenceModel{FT}(5.01, 1.93, 10)
     else
@@ -92,6 +95,7 @@ abstract type AbstractReactionCenter{FT<:AbstractFloat} end
 #     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add fluorescence model as a field
+#     2022-Mar-01: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -125,7 +129,7 @@ mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReactionCenter{FT}
     k_npq_rev::FT
     "Sustained NPQ rate constant (for seasonal changes, default is zero)"
     k_npq_sus::FT
-    "Rate constant for photochemistry (all reaction centers open)"
+    "Rate constant for photochemistry"
     k_p::FT
     "Non-Photochemical quenching "
     npq::FT
@@ -201,6 +205,7 @@ VJPReactionCenter{FT}() where {FT<:AbstractFloat} = (
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add more fields to work with Photosynthesis v0.3.1
 #     2022-Feb-10: add K_X, ϵ_1, and ϵ_2 fields
+#     2022-Mar-01: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -228,7 +233,7 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     K_PSII::FT
     "Rate constant of excitation sharing for PS II `[ns⁻¹]`"
     K_U::FT
-    "Rate constant of regulated heat loss vua oxidized PS I center `[s⁻¹]`"
+    "Rate constant of regulated heat loss via oxidized PS I center `[s⁻¹]`"
     K_X::FT
     "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
     Η_C::FT
@@ -242,6 +247,10 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     ϵ_1::FT
     "Weight factor that PSII fluorescence reaches sensor (after reabsorption)"
     ϵ_2::FT
+    "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_c::FT
+    "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_l::FT
     "Fluorescence yield"
     ϕ_f::FT
     "Photochemical yield"
@@ -286,6 +295,8 @@ CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = (
                 14.5 / (14.5+0.55+0.05),    # Φ_PSI_MAX
                 0,                          # ϵ_1
                 1,                          # ϵ_2
+                1,                          # η_c
+                0.75,                       # η_l
                 0,                          # ϕ_f
                 0)                          # ϕ_p
 );
