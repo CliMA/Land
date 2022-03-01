@@ -30,8 +30,6 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Feb-07: remove j_p680 and j_p700 series variables
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Mar-01: add two more fields
-# To do
-#     TODO: add TD in Photosynthesis.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -61,12 +59,18 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     TD_KC::AbstractTemperatureDependency{FT}
     "[`AbstractTemperatureDependency`](@ref) type Ko temperature dependency"
     TD_KO::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Kq temperature dependency"
+    TD_KQ::AbstractTemperatureDependency{FT}
     "[`AbstractTemperatureDependency`](@ref) type respiration temperature dependency"
     TD_R::AbstractTemperatureDependency{FT}
     "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
     TD_VCMAX::AbstractTemperatureDependency{FT}
     "[`AbstractTemperatureDependency`](@ref) type Γ* temperature dependency"
     TD_Γ::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Η_C temperature dependency"
+    TD_ΗC::AbstractTemperatureDependency{FT}
+    "[`AbstractTemperatureDependency`](@ref) type Η_L temperature dependency"
+    TD_ΗL::AbstractTemperatureDependency{FT}
 
     # prognostic variables that change with time
     "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"
@@ -159,9 +163,12 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 8,                      # EFF_2
                 KcTDCLM(FT),            # TD_KC
                 KoTDCLM(FT),            # TD_KO
+                KqTDJohnson(FT),        # TD_KQ
                 RespirationTDCLM(FT),   # TD_R
                 VcmaxTDCLM(FT),         # TD_VCMAX
                 ΓStarTDCLM(FT),         # TD_Γ
+                ΗTDJohnson(FT),         # TD_ΗC
+                ΗTDJohnson(FT),         # TD_ΗL
                 350 / 300,              # b₆f
                 300,                    # k_q
                 r_d25,                  # r_d25

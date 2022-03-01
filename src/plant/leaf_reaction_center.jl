@@ -247,6 +247,10 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     ϵ_1::FT
     "Weight factor that PSII fluorescence reaches sensor (after reabsorption)"
     ϵ_2::FT
+    "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_c::FT
+    "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_l::FT
     "Fluorescence yield"
     ϕ_f::FT
     "Photochemical yield"
@@ -291,6 +295,8 @@ CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = (
                 14.5 / (14.5+0.55+0.05),    # Φ_PSI_MAX
                 0,                          # ϵ_1
                 1,                          # ϵ_2
+                1,                          # η_c
+                0.75,                       # η_l
                 0,                          # ϕ_f
                 0)                          # ϕ_p
 );
