@@ -38,6 +38,7 @@ PCO₂Mode
 AbstractColimit
 MinimumColimit
 QuadraticColimit
+SerialColimit
 AbstractTemperatureDependency
 Arrhenius
 ArrheniusPeak

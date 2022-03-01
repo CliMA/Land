@@ -29,6 +29,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
 #     2022-Feb-07: remove j_p680 and j_p700 series variables
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
+#     2022-Mar-01: add two more fields
 # To do
 #     TODO: add TD in Photosynthesis.jl
 #
@@ -50,6 +51,8 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     COLIMIT_CJ::AbstractColimit{FT}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
     COLIMIT_IP::AbstractColimit{FT}
+    "[`AbstractColimit`](@ref) type colimitation method for J"
+    COLIMIT_J::AbstractColimit{FT}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
@@ -90,6 +93,8 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     e_to_c::FT
     "Potential Electron Transport Rate `[μmol e⁻ m⁻² s⁻¹]`"
     j_pot::FT
+    "PSI electron transport rate after colimitation"
+    j_psi::FT
     "RubisCO coefficient Kc `[Pa]`"
     k_c::FT
     "Michaelis-Menten's coefficient `[Pa]`"
@@ -118,6 +123,7 @@ end
 #     2022-Feb-07: add more fields into the constructors
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
+#     2022-Mar-01: add two more fields
 #
 #######################################################################################################################################################################################################
 """
@@ -148,6 +154,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
     return C3CytochromeModel{FT}(
                 _colim_cj,              # COLIMIT_CJ
                 _colim_ip,              # COLIMIT_IP
+                SerialColimit{FT}(),    # COLIMIT_J
                 4,                      # EFF_1
                 8,                      # EFF_2
                 KcTDCLM(FT),            # TD_KC
@@ -166,6 +173,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 0,                      # a_p
                 0,                      # e_to_c
                 0,                      # j_pot
+                0,                      # j_psi
                 0,                      # k_c
                 0,                      # k_m
                 0,                      # k_o

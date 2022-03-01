@@ -59,6 +59,7 @@ end
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to ArrheniusPeak
 #     2022-Jan-13: define the struct mutable, use ΔHA/ΔHD/ΔSV directly in the struct, add field T_REF/VAL_REF
 #     2022-Jan-25: fix documentation
+#     2022-Mar-01: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -87,7 +88,7 @@ mutable struct ArrheniusPeak{FT<:AbstractFloat} <: AbstractTemperatureDependency
     ΔHA::FT
     "Deactivation energy"
     ΔHD::FT
-    "Entrophy factor"
+    "Entropy factor"
     ΔSV::FT
 end
 
@@ -138,6 +139,7 @@ end
 #     Boyd et al. (2001) Temperature responses of C4 photosynthesis: biochemical analysis of Rubisco, phosphoenolpyruvate carboxylase, and carbonic anhydrase in Setaria viridis
 #     Leuning (2002) Temperature dependence of two parameters in a photosynthesis model
 #     Kattge et al. (2007) Temperature acclimation in a biochemical model of photosynthesis: a reanalysis of data from 36 species
+#     Sperry et al. (2019) The impact of rising CO2 and acclimation on the response of US forests to global warming
 #     CLM5 Documentation. Chapter 9 Page 106
 #
 #######################################################################################################################################################################################################
