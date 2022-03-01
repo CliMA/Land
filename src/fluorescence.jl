@@ -26,6 +26,8 @@ function photosystem_coefficients! end
 #     2022-Feb-07: remove fluorescence model from input variables (in reaction center since ClimaCache v0.1.2)
 # Bug fix
 #     2022-Feb-24: a typo from "rc.ϕ_f  = rc.f_m′ / (1 - rc.ϕ_p);" to "rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);"
+#     2022-Feb-28: psm.e_to_c is recalculated based on analytically resolving leaf.p_CO₂_i from leaf.g_CO₂, this psm.e_to_c used to be calculated as psm.a_j / psm.j (a_j here is not p_CO₂_i based)
+#                  note here that in CliMA v0.1, this e_to_c is not updated properly, need to check SCOPE
 #
 #######################################################################################################################################################################################################
 """

@@ -30,9 +30,9 @@ temperature_corrected_value
 ## Electron transport
 ```@docs
 photosystem_electron_transport!
-photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT = FT(0)) where {FT<:AbstractFloat}
+photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT) where {FT<:AbstractFloat}
 photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT, p_i::FT) where {FT<:AbstractFloat}
-photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT = FT(0)) where {FT<:AbstractFloat}
+photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT) where {FT<:AbstractFloat}
 ```
 
 
@@ -41,18 +41,18 @@ photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 rubisco_limited_rate!
 rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT},C3VJPModel{FT}}, p_i::FT) where {FT<:AbstractFloat}
 rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-rubisco_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 light_limited_rate!
-light_limited_rate!(psm::C3VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-light_limited_rate!(psm::C3CytochromeModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-light_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-light_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
-light_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+light_limited_rate!(psm::C3VJPModel{FT}) where {FT<:AbstractFloat}
+light_limited_rate!(psm::Union{C3CytochromeModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat}
+light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
+light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
+light_limited_rate!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
 product_limited_rate!
 product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, p_i::FT) where {FT<:AbstractFloat}
 product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat}
-product_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 product_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 ```
 

@@ -68,18 +68,19 @@ product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT) where {FT<:AbstractFloat} = 
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
 #     2022-Jan-24: fix documentation
+#     2022-Feb-28: add C3CytochromeModel support
 #
 #######################################################################################################################################################################################################
 """
 
-    product_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
+    product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
-- `psm` `C3VJPModel` structure for C3 photosynthesis model
+- `psm` `C3CytochromeModel` or `C3VJPModel` structure for C3 photosynthesis model
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure, not used in this method
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, not used in this method
 """
-product_limited_rate!(psm::C3VJPModel{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
+product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
     psm.a_p = psm.v_cmax / 2;
 
     return nothing
