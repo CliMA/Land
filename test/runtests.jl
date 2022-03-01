@@ -75,7 +75,8 @@ using Test
             mod2 = ClimaCache.PCO₂Mode();
             col1 = ClimaCache.MinimumColimit{FT}();
             col2 = ClimaCache.QuadraticColimit{FT}(0.98);
-            for st in [mod1, mod2, col1, col2]
+            col3 = ClimaCache.SerialColimit{FT}();
+            for st in [mod1, mod2, col1, col2, col3]
                 for rc in [rc1, rc2]
                     @test FT_test(st, FT);
                     @test NaN_test(st);
