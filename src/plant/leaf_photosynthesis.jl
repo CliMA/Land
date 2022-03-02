@@ -29,7 +29,8 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Feb-07: add more fields to use with Photosynthesis v0.3.1
 #     2022-Feb-07: remove j_p680 and j_p700 series variables
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
-#     2022-Mar-01: add two more fields
+#     2022-Mar-01: add two more fields: TD_ΗC and TD_ΗL
+#     2022-Mar-01: move η_c and η_l from reaction center to photosynthesis model
 #
 #######################################################################################################################################################################################################
 """
@@ -113,6 +114,10 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     v_qmax::FT
     "ratio between J_P700 and J_P680"
     η::FT
+    "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_c::FT
+    "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
+    η_l::FT
     "CO₂ compensation point with the absence of Rd `[Pa]`"
     γ_star::FT
 end
@@ -127,7 +132,8 @@ end
 #     2022-Feb-07: add more fields into the constructors
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
-#     2022-Mar-01: add two more fields
+#     2022-Mar-01: add two more fields: TD_ΗC and TD_ΗL
+#     2022-Mar-01: move η_c and η_l from reaction center to photosynthesis model
 #
 #######################################################################################################################################################################################################
 """
@@ -167,8 +173,8 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 RespirationTDCLM(FT),   # TD_R
                 VcmaxTDCLM(FT),         # TD_VCMAX
                 ΓStarTDCLM(FT),         # TD_Γ
-                ΗTDJohnson(FT),         # TD_ΗC
-                ΗTDJohnson(FT),         # TD_ΗL
+                ΗCTDJohnson(FT),        # TD_ΗC
+                ΗLTDJohnson(FT),        # TD_ΗL
                 350 / 300,              # b₆f
                 300,                    # k_q
                 r_d25,                  # r_d25
@@ -188,6 +194,8 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 v_cmax25,               # v_cmax
                 0,                      # v_qmax
                 0,                      # η
+                0,                      # η_c
+                0,                      # η_l
                 0)                      # γ_star
 );
 
