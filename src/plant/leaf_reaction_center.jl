@@ -205,7 +205,8 @@ VJPReactionCenter{FT}() where {FT<:AbstractFloat} = (
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: add more fields to work with Photosynthesis v0.3.1
 #     2022-Feb-10: add K_X, ϵ_1, and ϵ_2 fields
-#     2022-Mar-01: fix documentation
+#     2022-Mar-01: add more fields: η_c and η_l
+#     2022-Mar-01: delete Η_C and Η_L, move η_c and η_l to photosynthesis model
 #
 #######################################################################################################################################################################################################
 """
@@ -235,10 +236,6 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     K_U::FT
     "Rate constant of regulated heat loss via oxidized PS I center `[s⁻¹]`"
     K_X::FT
-    "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
-    Η_C::FT
-    "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
-    Η_L::FT
     "Maximal PS I photochemical yield"
     Φ_PSI_MAX::FT
 
@@ -247,10 +244,6 @@ mutable struct CytochromeReactionCenter{FT<:AbstractFloat} <:AbstractReactionCen
     ϵ_1::FT
     "Weight factor that PSII fluorescence reaches sensor (after reabsorption)"
     ϵ_2::FT
-    "Coupling efficiency of cyclic electron flow `[mol ATP mol⁻¹ e⁻]`"
-    η_c::FT
-    "Coupling efficiency of linear electron flow `[mol ATP mol⁻¹ e⁻]`"
-    η_l::FT
     "Fluorescence yield"
     ϕ_f::FT
     "Photochemical yield"
@@ -268,6 +261,8 @@ end
 #     2022-Jan-25: fix documentation
 #     2022-Feb-07: make the constructor more readable
 #     2022-Feb-10: add K_X, ϵ_1, and ϵ_2 fields
+#     2022-Mar-01: add more fields: η_c and η_l
+#     2022-Mar-01: delete Η_C and Η_L, move η_c and η_l to photosynthesis model
 #
 #######################################################################################################################################################################################################
 """
@@ -290,13 +285,9 @@ CytochromeReactionCenter{FT}() where {FT<:AbstractFloat} = (
                 4.5,                        # K_PSII
                 0,                          # K_U
                 14.5,                       # K_X
-                1,                          # Η_C
-                0.75,                       # Η_L
                 14.5 / (14.5+0.55+0.05),    # Φ_PSI_MAX
                 0,                          # ϵ_1
                 1,                          # ϵ_2
-                1,                          # η_c
-                0.75,                       # η_l
                 0,                          # ϕ_f
                 0)                          # ϕ_p
 );
