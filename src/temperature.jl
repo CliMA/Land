@@ -136,6 +136,7 @@ function photosystem_temperature_dependence! end
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
 #     2022-Jan-24: fix documentation
+#     2022-Mar-03: rearrange the order to make it look better :)
 #
 #######################################################################################################################################################################################################
 """
@@ -148,12 +149,12 @@ Update the temperature dependencies of C3 photosynthesis model, given
 - `t` Target temperature in `K`
 """
 photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
+    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
+    psm.γ_star = temperature_corrected_value(psm.TD_Γ , t);
     psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
     psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
     psm.j_max  = psm.j_max25  * temperature_correction(psm.TD_JMAX, t);
-    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
-    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
-    psm.γ_star = temperature_corrected_value(psm.TD_Γ, t);
     psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
 
     return nothing
@@ -166,8 +167,7 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
 # General
 #     2022-Feb-07: add method for C3CytochromeModel photosynthesis model
 #     2022-Feb-07: add v_qmax without temperature dependency
-# To do
-#     TODO: add temperature dependencies for the v_qmax or b₆f or k_q
+#     2022-Mar-01: add temperature dependencies for k_q, v_qmax, η_c, and η_l
 #
 #######################################################################################################################################################################################################
 """
@@ -180,13 +180,16 @@ Update the temperature dependencies of C3 photosynthesis model, given
 - `t` Target temperature in `K`
 """
 photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
-    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
-    psm.v_qmax = psm.b₆f * psm.k_q;
     psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
     psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
-    psm.γ_star = temperature_corrected_value(psm.TD_Γ, t);
+    psm.k_q    = temperature_corrected_value(psm.TD_KQ, t);
+    psm.γ_star = temperature_corrected_value(psm.TD_Γ , t);
+    psm.η_c    = temperature_corrected_value(psm.TD_ΗC, t);
+    psm.η_l    = temperature_corrected_value(psm.TD_ΗL, t);
+    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
     psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
+    psm.v_qmax = psm.b₆f * psm.k_q;
 
     return nothing
 );
@@ -199,6 +202,7 @@ photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-14: remove examples from doc as this function is not meant to be public
 #     2022-Jan-24: fix documentation
+#     2022-Mar-03: rearrange the order to make it look better :)
 #
 #######################################################################################################################################################################################################
 """
@@ -211,10 +215,10 @@ Update the temperature dependencies of C3 photosynthesis model, given
 - `t` Target temperature in `K`
 """
 photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+    psm.k_pep  = temperature_corrected_value(psm.TD_KPEP, t);
     psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
     psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
     psm.v_pmax = psm.v_pmax25 * temperature_correction(psm.TD_VPMAX, t);
-    psm.k_pep  = temperature_corrected_value(psm.TD_KPEP, t);
 
     return nothing
 );

@@ -65,6 +65,7 @@ colimit_photosynthesis!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}, C4VJPM
 colimited_rate
 colimited_rate(a_1::FT, a_2::FT, colim::MinimumColimit{FT}) where {FT<:AbstractFloat}
 colimited_rate(a_1::FT, a_2::FT, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat}
+colimited_rate(a_1::FT, a_2::FT, colim::SerialColimit{FT}) where {FT<:AbstractFloat}
 ```
 
 
