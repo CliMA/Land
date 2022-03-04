@@ -24,6 +24,7 @@ function photosystem_coefficients! end
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use apar in fluorescence model (not used in this method)
 #     2022-Feb-07: remove fluorescence model from input variables (in reaction center since ClimaCache v0.1.2)
+#     2022-Mar-04: add support to sustained NPQ
 # Bug fix
 #     2022-Feb-24: a typo from "rc.ϕ_f  = rc.f_m′ / (1 - rc.ϕ_p);" to "rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);"
 #     2022-Feb-28: psm.e_to_c is recalculated based on analytically resolving leaf.p_CO₂_i from leaf.g_CO₂, this psm.e_to_c used to be calculated as psm.a_j / psm.j (a_j here is not p_CO₂_i based)
@@ -41,16 +42,16 @@ Update the rate constants and coefficients in reaction center, given
 """
 photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, apar::FT) where {FT<:AbstractFloat} = (
     @unpack K_0, K_A, K_B = rc.FLM;
-    @unpack K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
+    @unpack F_PSII, K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
 
     # calculate photochemical yield
-    rc.ϕ_p = psm.a_gross / psm.e_to_c / psm.j_pot * Φ_PSII_MAX;
+    rc.ϕ_p = psm.a_gross / (psm.e_to_c * F_PSII * apar);
 
     # calculate rate constants
     _x           = max(0, 1 - rc.ϕ_p / Φ_PSII_MAX);
     _xᵅ          = _x ^ K_A;
     rc.k_npq_rev = K_0 * (1 + K_B) * _xᵅ / (K_B + _xᵅ);
-    rc.k_p       = max(0, rc.ϕ_p * (K_F + K_D + rc.k_npq_rev) / (1 - rc.ϕ_p) );
+    rc.k_p       = max(0, rc.ϕ_p * (K_F + K_D + rc.k_npq_rev + rc.k_npq_sus) / (1 - rc.ϕ_p) );
 
     # calculate fluorescence quantum yield
     rc.f_o  = K_F / (K_F + K_P_MAX + K_D);
@@ -62,7 +63,7 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
     # calculate quenching rates
     rc.q_e = 1 - (rc.f_m - rc.f_o′) / (rc.f_m′ - rc.f_o);
     rc.q_p = 1 - (rc.ϕ_f - rc.f_o′) / (rc.f_m - rc.f_o′);
-    rc.npq = rc.k_npq_rev / (K_F + K_D);
+    rc.npq = (rc.k_npq_rev + rc.k_npq_sus) / (K_F + K_D);
 
     return nothing
 );
@@ -75,6 +76,8 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
 #     2022-Feb-07: add support for Johnson and Berry (2021) model
 #     2022-Feb-07: remove fluorescence model from input variables
 #     2022-Feb-07: use a_gross and j_pot rather than a series of j_p680 and j_p700
+#     2022-Mar-04: reorganize the function orders
+#     2022-Mar-04: use the weighted yield for photosynthesis
 # Bug fix
 #     2022-Feb-10: scale fluorescence quantum yield based on F_PSI and reabsorption factor
 #     2022-Feb-10: _q1 needs to be multiply by η
@@ -95,36 +98,40 @@ photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCent
     @unpack F_PSI, K_D, K_F, K_PSI, K_PSII, K_U, K_X, Φ_PSI_MAX = rc;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/blob/main/scripts/model_fun.m
-    _y2 = psm.a_gross / (psm.e_to_c * apar * (1 - F_PSI));
-    _q2 = 1 - psm.j_pot * psm.η / psm.v_qmax;
-    _q1 = psm.a_gross * psm.η / (psm.e_to_c * apar * F_PSI * Φ_PSI_MAX);
+    _ϕ_P1_a = psm.a_gross * psm.η / (psm.e_to_c * apar * F_PSI);
+    _ϕ_P2_a = psm.a_gross / (psm.e_to_c * apar * (1 - F_PSI));
+    _q1     = _ϕ_P1_a / Φ_PSI_MAX;
+    _q2     = 1 - psm.j_psi / psm.v_qmax;
 
     # solve PSII K_N
-    _k_n     = ( sqrt(K_PSII^2 * (_y2 - _q2)^2 + K_U^2 * _y2^2 + 2 * K_PSII * K_U * _y2 * (_y2 + _q2 - 2 * _y2 * _q2)) + K_PSII * (_q2 - _y2) + K_U * _y2 ) / (2 * _y2) - K_F - K_U - K_D;
+    _k_sum_na = _ϕ_P2_a;
+    _k_sum_nb = -1 * (K_U * _ϕ_P2_a + K_PSII * (_q2 - _ϕ_P2_a));
+    _k_sum_nc = -1 * (_ϕ_P2_a * (1 - _q2) * K_U * K_PSII);
+    _k_sum    = upper_quadratic(_k_sum_na, _k_sum_nb, _k_sum_nc);
+    _k_n      = _k_sum - K_F - K_U - K_D;
+
+    # compute PSII and PSI yeilds
     _k_sum_1 = K_D + K_F + K_U + _k_n;
     _k_sum_2 = K_D + K_F + K_U + _k_n + K_PSII;
     _k_sum_3 = K_D + K_F + K_PSI;
     _k_sum_4 = K_D + K_F + K_X;
+    _ϕ_U2_a  =  _q2 * K_U / _k_sum_2 + (1 - _q2) * K_U  / _k_sum_1;
+    _ϕ_F2_a  = (_q2 * K_F / _k_sum_2 + (1 - _q2) * K_F  / _k_sum_1) / (1 - _ϕ_U2_a);
+    _ϕ_F1_a  = K_F / _k_sum_3 * _q1 + K_F / _k_sum_4 * (1 - _q1);
 
-    # compute PSII and PSI yeilds
-    _ϕ_U2_a = _q2 * K_U    / _k_sum_2 + (1 - _q2) * K_U  / _k_sum_1;
-    _ϕ_P2_a = _q2 * K_PSII / _k_sum_2 / (1 - _ϕ_U2_a);
-    _ϕ_F2_a = (_q2 * K_F   / _k_sum_2 + (1 - _q2) * K_F  / _k_sum_1) / (1 - _ϕ_U2_a);
-    _ϕ_F1_a = K_F / _k_sum_3 * _q1 + K_F / _k_sum_4 * (1 - _q1);
-
-    # save the fluorescence and photosynthesis yields in reaction center
+    # save the weighted fluorescence and photosynthesis yields in reaction center
     rc.ϕ_f = _ϕ_F1_a * rc.ϵ_1 * F_PSI + _ϕ_F2_a * rc.ϵ_2 * (1 - F_PSI);
-    rc.ϕ_p = _ϕ_P2_a * (1 - F_PSI);
+    rc.ϕ_p = _ϕ_P1_a * F_PSI + _ϕ_P2_a * (1 - F_PSI);
 
     return nothing
 
     #=
     # some unused or unsaved variables
-    #_ϕ_N2_a = (_q2 * _k_n  / _k_sum_2 + (1 - _q2) * _k_n / _k_sum_1) / (1 - _ϕ_U2_a);
-    #_ϕ_D2_a = (_q2 * K_D   / _k_sum_2 + (1 - _q2) * K_D  / _k_sum_1) / (1 - _ϕ_U2_a);
-    #_ϕ_P1_a = K_PSI / _k_sum_3 * _q1;
-    #_ϕ_N1_a = K_X   / _k_sum_4 * (1 - _q1);
-    #_ϕ_D1_a = K_D   / _k_sum_3 * _q1 + K_D / _k_sum_4 * (1 - _q1);
+    _ϕ_N2_a = (_q2 * _k_n  / _k_sum_2 + (1 - _q2) * _k_n / _k_sum_1) / (1 - _ϕ_U2_a);
+    _ϕ_D2_a = (_q2 * K_D   / _k_sum_2 + (1 - _q2) * K_D  / _k_sum_1) / (1 - _ϕ_U2_a);
+    _ϕ_P1_a = K_PSI / _k_sum_3 * _q1;
+    _ϕ_N1_a = K_X   / _k_sum_4 * (1 - _q1);
+    _ϕ_D1_a = K_D   / _k_sum_3 * _q1 + K_D / _k_sum_4 * (1 - _q1);
 
     # PAM measured fluorescence levels (Eqns. 38-42)
     #   N.B., hardcoding of a2(1) for dark-adapted value
