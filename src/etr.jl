@@ -62,6 +62,8 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 #     2022-Feb-07: add j_pot calculation back to work with ClimaCache v0.1.2
 #     2022-Feb-07: move e_to_c calculation back to light_limited_rate!
 #     2022-Feb-28: move e_to_c calculation back into this function to get aligned with C3CytochromeModel at GCO₂Mode analytically
+#     2022-Mar-01: save PSI J to psm.j_psi
+#     2022-Mar-01: use η_c and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
 #
 #######################################################################################################################################################################################################
 """
@@ -76,12 +78,12 @@ Update the electron transport rates, given
 """
 photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT, p_i::FT) where {FT<:AbstractFloat} = (
     @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSI, Η_C, Η_L, Φ_PSI_MAX = rc;
+    @unpack F_PSI, Φ_PSI_MAX = rc;
 
     psm.e_to_c = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
-    _j_p700    = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
-    psm.η      = 1 - Η_L / Η_C + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / Η_C;
-    psm.j_pot  = _j_p700 / psm.η;
+    psm.j_psi  = colimited_rate(psm.v_qmax, apar * F_PSI * Φ_PSI_MAX, psm.COLIMIT_J);
+    psm.η      = 1 - psm.η_l / psm.η_c + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / psm.η_c;
+    psm.j_pot  = psm.j_psi / psm.η;
 
     return nothing
 );

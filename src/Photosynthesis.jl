@@ -1,9 +1,9 @@
 module Photosynthesis
 
 using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter, GCO₂Mode, Leaf, MinimumColimit, PCO₂Mode, VJPReactionCenter, Q10,
-      QuadraticColimit, VanDerTolFluorescenceModel
+      QuadraticColimit, SerialColimit, VanDerTolFluorescenceModel
 using DocStringExtensions: METHODLIST
-using PkgUtility: GAS_R, lower_quadratic
+using PkgUtility: GAS_R, lower_quadratic, upper_quadratic
 using UnPack: @unpack
 
 

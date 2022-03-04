@@ -129,3 +129,22 @@ Return the quadratic colimitation of two rates, given
 - `colim` `QuadraticColimit` type struct
 """
 colimited_rate(a_1::FT, a_2::FT, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat} = lower_quadratic(colim.CURVATURE, -(a_1 + a_2), a_1 * a_2);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Mar-01: add colimit method for serial colimitation
+#
+#######################################################################################################################################################################################################
+"""
+
+    colimited_rate(a_1::FT, a_2::FT, colim::SerialColimit{FT}) where {FT<:AbstractFloat}
+
+Return the serial colimitation of two rates, given
+- `a_1` Rate 1
+- `a_2` Rate 2
+- `colim` `SerialColimit` type struct
+"""
+colimited_rate(a_1::FT, a_2::FT, colim::SerialColimit{FT}) where {FT<:AbstractFloat} = a_1 * a_2 / (a_1 + a_2);

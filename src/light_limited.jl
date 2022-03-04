@@ -71,6 +71,7 @@ light_limited_rate!(psm::Union{C3CytochromeModel{FT}, C4VJPModel{FT}}) where {FT
 # Changes to this function
 # General
 #     2022-Feb-28: add C3CytochromeModel support
+#     2022-Mar-01: j_psi, η_c, and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
 #
 #######################################################################################################################################################################################################
 """
@@ -86,16 +87,15 @@ Update the electron transport limited photosynthetic rate in conductance mode, g
 """
 light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat} = (
     @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSI, Η_C, Η_L, Φ_PSI_MAX = rc;
+    @unpack F_PSI, Φ_PSI_MAX = rc;
 
-    _j_psi = psm.v_qmax * apar * F_PSI * Φ_PSI_MAX / (psm.v_qmax + apar * F_PSI * Φ_PSI_MAX);
-    _eff_a = 1 - Η_L / Η_C;
-    _eff_b = 1 / Η_C;
+    _eff_a = 1 - psm.η_l / psm.η_c;
+    _eff_b = 1 / psm.η_c;
     _eff_1 = _eff_a * EFF_1 + 3 * _eff_b;
     _eff_2 = _eff_a * EFF_2 + 7 * _eff_b;
 
-    _a = _j_psi;
-    _b = _j_psi * psm.γ_star;
+    _a = psm.j_psi;
+    _b = psm.j_psi * psm.γ_star;
     _c = _eff_1;
     _d = _eff_2 * psm.γ_star;
     _f = air.P_AIR / g_lc * FT(1e-6);
