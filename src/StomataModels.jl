@@ -1,18 +1,13 @@
 module StomataModels
 
-using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance,
-      find_zero
+using ClimaCache: AirLayer, GCO₂Mode, Leaf
+using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: TYPEDFIELDS
-using Photosynthesis: AbstractPhotoModelParaSet, AirLayer, GCO₂Mode, Leaf,
-      leaf_ETR!, leaf_fluorescence!, leaf_photosynthesis!,
-      leaf_temperature_dependence!
-using PkgUtility: CP_D_MOL, K_STEFAN, M_H₂O, T_25
-using PlantHydraulics: AbstractSoilVC, LeafHydraulics, TreeSimple,
-      critical_flow, end_pressure, soil_k_ratio_p25, temperature_effects!,
-      xylem_k_ratio, xylem_risk
+using Photosynthesis: leaf_photosynthesis!
+using PkgUtility: CP_D_MOL, GAS_R, K_STEFAN, M_H₂O, T_25
+using PlantHydraulics: AbstractSoilVC, LeafHydraulics, TreeSimple, critical_flow, end_pressure, soil_k_ratio_p25, temperature_effects!, xylem_k_ratio, xylem_risk
 using UnPack: @unpack
-using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient,
-      saturation_vapor_pressure
+using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient, saturation_vapor_pressure
 
 
 

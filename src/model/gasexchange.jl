@@ -5,7 +5,6 @@
 ###############################################################################
 """
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 psoil::FT,
@@ -15,7 +14,6 @@
                 bt::AbstractBetaFunction{FT}
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 psoil::FT,
@@ -26,14 +24,12 @@
                 ind::Int
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
                 sm::AbstractStomatalModel{FT}
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
@@ -41,14 +37,12 @@
                 ind::Int
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::TreeSimple{FT},
                 envir::AirLayer{FT},
                 sm::OSMWang{FT}
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GlcDrive,
@@ -56,20 +50,17 @@
                 glc::FT
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GlcDrive,
                 ind::Int
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GlcDrive
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GswDrive,
@@ -77,21 +68,18 @@
                 gsw::FT
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GswDrive,
                 ind::Int
     ) where {FT<:AbstractFloat}
     gas_exchange!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 envir::AirLayer{FT},
                 drive::GswDrive
     ) where {FT<:AbstractFloat}
 
 Calculate steady state gas exchange rates, given
-- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi` [`CanopyLayer`](@ref) type struct
 - `hs` Leaf hydraulic system or TreeSimple hydraulic organism
 - `envir` [`AirLayer`] type struct
@@ -120,7 +108,6 @@ Note 3: When using GswDrive mode, gas exchange rates are computed using the
     physiological range.
 """
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             svc::AbstractSoilVC{FT},
@@ -131,14 +118,12 @@ function gas_exchange!(
             bt::AbstractBetaFunction{FT}
 ) where {FT<:AbstractFloat}
     # update the temperature dependent parameters
-    update_leaf_TP!(photo_set, canopyi, hs, envir);
+    update_leaf_TP!(canopyi, hs, envir);
 
     # calculate optimal solution for each leaf
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
-        leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt,
-                      ind);
+        gas_exchange!(canopyi, hs, svc, psoil, swc, envir, sm, bt, ind);
     end
 end
 
@@ -146,7 +131,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             svc::AbstractSoilVC{FT},
@@ -170,18 +154,17 @@ function gas_exchange!(
         _gl = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
         _st = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, svc, psoil,
-                                      swc, envir, sm, bt, GlcDrive(), ind);
+        @inline f(x) = solution_diff!(x, canopyi, hs, svc, psoil, swc, envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
-        gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
+        gas_exchange!(canopyi, envir, GlcDrive(), ind, _solut);
     else
         canopyi.g_sw[ind] = FT(0);
     end
 
     # make sure g_sw in its range
-    gsw_control!(photo_set, canopyi, envir, ind);
+    gsw_control!(canopyi, envir, ind);
 
     return nothing
 end
@@ -190,21 +173,19 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OptimizationStomatalModel{FT}
 ) where {FT<:AbstractFloat}
     # update the temperature dependent parameters and maximal a and kr
-    update_leaf_TP!(photo_set, canopyi, hs, envir);
-    update_leaf_AK!(photo_set, canopyi, hs, envir);
+    update_leaf_TP!(canopyi, hs, envir);
+    update_leaf_AK!(canopyi, hs, envir);
 
     # calculate optimal solution for each leaf
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
-        leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs, envir, sm, ind);
+        gas_exchange!(canopyi, hs, envir, sm, ind);
     end
 
     return nothing
@@ -214,7 +195,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -248,8 +228,7 @@ function gas_exchange!(
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline fd(x) = solution_diff!(x, photo_set, canopyi, hs, envir,
-                                           sm, GlcDrive(), ind);
+            @inline fd(x) = solution_diff!(x, canopyi, hs, envir, sm, GlcDrive(), ind);
             _sl = find_zero(fd, _sm, _st);
 
             #= used for debugging
@@ -261,7 +240,7 @@ function gas_exchange!(
             =#
 
             # update leaf conductances and rates
-            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _sl);
+            gas_exchange!(canopyi, envir, GlcDrive(), ind, _sl);
         end
 
     # if there is no light, use nighttime mode
@@ -270,15 +249,15 @@ function gas_exchange!(
         @unpack p_atm, p_H₂O = envir;
         _sm = NewtonBisectionMethod{FT}(x_min=g_min, x_max=g_max);
         _st = SolutionTolerance{FT}(1e-4, 50);
-        @inline fn(x) = nocturnal_diff!(x, photo_set, canopyi, envir, sm);
+        @inline fn(x) = nocturnal_diff!(x, canopyi, envir, sm);
         _sl = find_zero(fn, _sm, _st);
 
         # update leaf conductances and rates
-        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind, _sl);
+        gas_exchange!(canopyi, envir, GswDrive(), ind, _sl);
     end
 
     # make sure g_sw in its range
-    gsw_control!(photo_set, canopyi, envir, ind);
+    gsw_control!(canopyi, envir, ind);
 
     return nothing
 end
@@ -287,7 +266,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -322,8 +300,7 @@ function gas_exchange!(
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          GlcDrive(), ind);
+            @inline f(x) = solution_diff!(x, canopyi, hs, envir, sm, GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -335,7 +312,7 @@ function gas_exchange!(
             =#
 
             # update leaf conductances and rates
-            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
+            gas_exchange!(canopyi, envir, GlcDrive(), ind, _solut);
         end
 
     # if there is no light
@@ -344,7 +321,7 @@ function gas_exchange!(
     end
 
     # make sure g_sw in its range
-    gsw_control!(photo_set, canopyi, envir, ind);
+    gsw_control!(canopyi, envir, ind);
 
     return nothing
 end
@@ -353,7 +330,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -388,8 +364,7 @@ function gas_exchange!(
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          GlcDrive(), ind);
+            @inline f(x) = solution_diff!(x, canopyi, hs, envir, sm, GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -401,7 +376,7 @@ function gas_exchange!(
             =#
 
             # update leaf conductances and rates
-            gas_exchange!(photo_set, canopyi, envir, GlcDrive(), ind, _solut);
+            gas_exchange!(canopyi, envir, GlcDrive(), ind, _solut);
         end
 
     # if there is no light
@@ -410,7 +385,7 @@ function gas_exchange!(
     end
 
     # make sure g_sw in its range
-    gsw_control!(photo_set, canopyi, envir, ind);
+    gsw_control!(canopyi, envir, ind);
 
     return nothing
 end
@@ -419,21 +394,19 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::TreeSimple{FT},
             envir::AirLayer{FT},
             sm::OSMWang{FT}
 ) where {FT<:AbstractFloat}
     # update the temperature dependent parameters and maximal a and kr
-    update_leaf_TP!(photo_set, canopyi, hs, envir);
-    update_leaf_AK!(photo_set, canopyi, hs.leaf, envir);
+    update_leaf_TP!(canopyi, hs, envir);
+    update_leaf_AK!(canopyi, hs.leaf, envir);
 
     # calculate optimal solution for each leaf
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
-        leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs.leaf, envir, sm, ind);
+        gas_exchange!(canopyi, hs.leaf, envir, sm, ind);
     end
 
     return nothing
@@ -443,7 +416,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GlcDrive,
@@ -452,7 +424,7 @@ function gas_exchange!(
 ) where {FT<:AbstractFloat}
     # update the conductances
     canopyi.g_lc[ind] = glc;
-    gas_exchange!(photo_set, canopyi, envir, drive, ind);
+    gas_exchange!(canopyi, envir, drive, ind);
 
     return nothing
 end
@@ -461,7 +433,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GlcDrive,
@@ -477,20 +448,7 @@ function gas_exchange!(
 
     # update the photosynthetic rates
     if canopyi.g_lc[ind] != canopyi.ps.g_lc
-        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
-                             canopyi.g_lc[ind]);
-        #
-        #
-        #
-        #
-        # be careful that this one might have memory allocation
-        # make some changes on Photosynthesis.jl to avoid memory allocation
-        # such as leaf_fluorescence!(photo_set, canopyi.ps);
-        #
-        #
-        #
-        #
-        leaf_fluorescence!(photo_set.Flu, canopyi.ps);
+        leaf_photosynthesis!(canopyi.ps, envir, GCO₂Mode(), canopyi.g_lc[ind]);
     end
     canopyi.Ac[ind] = canopyi.ps.Ac;
     canopyi.Aj[ind] = canopyi.ps.Aj;
@@ -510,7 +468,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GlcDrive
@@ -518,8 +475,7 @@ function gas_exchange!(
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_lc)
         canopyi.ps.APAR = canopyi.APAR[i];
-        leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, envir, drive, i, canopyi.g_lc[i]);
+        gas_exchange!(canopyi, envir, drive, i, canopyi.g_lc[i]);
     end
 
     return nothing
@@ -529,7 +485,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GswDrive,
@@ -538,7 +493,7 @@ function gas_exchange!(
 ) where {FT<:AbstractFloat}
     # update the conductances
     canopyi.g_sw[ind] = gsw;
-    gas_exchange!(photo_set, canopyi, envir, drive, ind);
+    gas_exchange!(canopyi, envir, drive, ind);
 
     return nothing
 end
@@ -547,7 +502,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GswDrive,
@@ -572,20 +526,7 @@ function gas_exchange!(
                               1 / canopyi.g_bc[ind] );
 
     # update the photosynthetic rates
-    leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
-                         canopyi.g_lc[ind]);
-    #
-    #
-    #
-    #
-    # be careful that this one might have memory allocation
-    # make some changes on Photosynthesis.jl to avoid memory allocation
-    # such as leaf_fluorescence!(photo_set, canopyi.ps);
-    #
-    #
-    #
-    #
-    leaf_fluorescence!(photo_set.Flu, canopyi.ps);
+    leaf_photosynthesis!(canopyi.ps, envir, GCO₂Mode(), canopyi.g_lc[ind]);
     canopyi.Ac[ind] = canopyi.ps.Ac;
     canopyi.Aj[ind] = canopyi.ps.Aj;
     canopyi.Ap[ind] = canopyi.ps.Ap;
@@ -604,7 +545,6 @@ end
 
 
 function gas_exchange!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             envir::AirLayer{FT},
             drive::GswDrive
@@ -612,8 +552,7 @@ function gas_exchange!(
     # update the conductances for each "leaf"
     for i in eachindex(canopyi.g_sw)
         canopyi.ps.APAR = canopyi.APAR[i];
-        leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, envir, drive, i);
+        gas_exchange!(canopyi, envir, drive, i);
     end
 
     return nothing

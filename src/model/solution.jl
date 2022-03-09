@@ -6,7 +6,6 @@
 ###############################################################################
 """
     solution_diff!(x::FT,
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 svc::AbstractSoilVC{FT},
@@ -19,7 +18,6 @@
                 ind::Int
     ) where {FT<:AbstractFloat}
     solution_diff!(x::FT,
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT},
@@ -31,7 +29,6 @@
 Calculate the difference to be minimized for a given
 - `x` Assumed leaf diffusive conductance or stomatal conductance, depending on
     `mode`
-- `photo_set`[`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi`[`CanopyLayer`](@ref) type struct
 - `hs` Leaf hydraulic system
 - `psoil` Soil water potential `[MPa]`
@@ -47,7 +44,6 @@ The former function works for all empirical stomatal models, and the latter
 """
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             svc::AbstractSoilVC{FT},
@@ -65,7 +61,7 @@ function solution_diff!(
     g_m   = canopyi.g_m[ind];
 
     # update photosynthesis for ps
-    leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
+    leaf_photosynthesis!(ps, envir, GCO₂Mode(), x);
 
     # calculate g_sw from stomatal model
     β    = β_factor(hs, svc, bt, hs.p_element[end], psoil, swc);
@@ -83,7 +79,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             svc::AbstractSoilVC{FT},
@@ -101,7 +96,7 @@ function solution_diff!(
     g_m  = canopyi.g_m[ind];
 
     # update photosynthesis for ps
-    leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
+    leaf_photosynthesis!(ps, envir, GCO₂Mode(), x);
 
     # make beta correction over the photosynthesis system
     β    = β_factor(hs, svc, bt, hs.p_element[end], psoil, swc);
@@ -132,7 +127,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet,
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -164,7 +158,7 @@ function solution_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -175,7 +169,7 @@ function solution_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -205,7 +199,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -238,7 +231,7 @@ function solution_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -249,7 +242,7 @@ function solution_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -279,7 +272,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -311,7 +303,7 @@ function solution_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -321,7 +313,7 @@ function solution_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -350,7 +342,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -382,7 +373,7 @@ function solution_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -393,7 +384,7 @@ function solution_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -423,7 +414,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -455,7 +445,7 @@ function solution_diff!(
     else
         # update photosynthesis from x-FT(1e-3)
         g_lc = x - FT(1e-3);
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -466,7 +456,7 @@ function solution_diff!(
 
         # update photosynthesis from x
         g_lc = x;
-        leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), g_lc);
+        leaf_photosynthesis!(ps, envir, GCO₂Mode(), g_lc);
 
         g_sc = 1 / ( 1/g_lc - 1/g_m - 1/g_bc );
         g_sw = g_sc * FT(1.6);
@@ -496,7 +486,6 @@ end
 
 function solution_diff!(
             x::FT,
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
@@ -513,6 +502,5 @@ function solution_diff!(
     g_m  = canopyi.g_m[ind];
     g_lc = 1 / (1/g_bc + FT(1.6)/x + 1/g_m);
 
-    return solution_diff!(g_lc, photo_set, canopyi, hs, envir, sm, GlcDrive(),
-                          ind)
+    return solution_diff!(g_lc, canopyi, hs, envir, sm, GlcDrive(), ind)
 end
