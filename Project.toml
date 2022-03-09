@@ -1,9 +1,10 @@
 name = "StomataModels"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.1.11"
+version = "0.2.0"
 
 [deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Photosynthesis = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
@@ -14,11 +15,12 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-ConstrainedRootSolvers = "0.1"
-DocStringExtensions = "0.8"
-Photosynthesis = "0.2.0"
-PkgUtility = "0.1.10"
-PlantHydraulics = "0.2.7"
-UnPack = "1.0"
-WaterPhysics = "0.1"
-julia = "1.3"
+ClimaCache = "0.3.1"
+ConstrainedRootSolvers = "0.1.4"
+DocStringExtensions = "0.8.6"
+Photosynthesis = "0.3.7"
+PkgUtility = "0.2.0"
+PlantHydraulics = "0.2.13"
+UnPack = "1.0.2"
+WaterPhysics = "0.1.4"
+julia = "1.6"

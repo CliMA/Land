@@ -5,7 +5,6 @@
 ###############################################################################
 """
     update_leaf_TP!(
-                photo_set::AbstractPhotoModelParaSet{FT},
                 canopyi::CanopyLayer{FT},
                 hs::LeafHydraulics{FT},
                 envir::AirLayer{FT}
@@ -13,13 +12,11 @@
 
 Update leaf physiological parameters if temperature or pressure changes in the
 daytime, given
-- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi` [`CanopyLayer`](@ref) type struct
 - `hs` Leaf hydraulic system
 - `envir` [`AirLayer`] type struct
 """
 function update_leaf_TP!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT}
@@ -32,9 +29,11 @@ function update_leaf_TP!(
         canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
         canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
         canopyi.LV    = latent_heat_vapor(T) * M_H₂O(FT);
-        canopyi.ps.T  = canopyi.T;
-        leaf_temperature_dependence!(photo_set, canopyi.ps, envir);
-        canopyi.p_sat = canopyi.ps.p_sat;
+        canopyi.ps.t  = canopyi.T;
+        photosystem_temperature_dependence!(canopyi.ps.PSM, envir, canopyi.ps.t);
+        canopyi.ps.p_H₂O_sat = saturation_vapor_pressure(canopyi.ps.t);
+        canopyi.p_sat        = canopyi.ps.p_H₂O_sat;
+        canopyi.ps._t        = canopyi.ps.t;
         temperature_effects!(hs);
         hs.p_ups      = canopyi.p_ups;
         canopyi.ec    = critical_flow(hs, canopyi.ec);
@@ -54,7 +53,6 @@ end
 
 
 function update_leaf_TP!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::TreeSimple{FT},
             envir::AirLayer{FT}
@@ -68,9 +66,11 @@ function update_leaf_TP!(
         canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
         canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
         canopyi.LV    = latent_heat_vapor(T) * M_H₂O(FT);
-        canopyi.ps.T  = canopyi.T;
-        leaf_temperature_dependence!(photo_set, canopyi.ps, envir);
-        canopyi.p_sat = canopyi.ps.p_sat;
+        canopyi.ps.t  = canopyi.T;
+        photosystem_temperature_dependence!(canopyi.ps.PSM, envir, canopyi.ps.t);
+        canopyi.ps.p_H₂O_sat = saturation_vapor_pressure(canopyi.ps.t);
+        canopyi.p_sat        = canopyi.ps.p_H₂O_sat;
+        canopyi.ps._t        = canopyi.ps.t;
         temperature_effects!(hs);
         tree_ec       = critical_flow(hs, canopyi.ec * canopyi.LA);
         canopyi.ec    = tree_ec / canopyi.LA;
@@ -100,39 +100,36 @@ end
 ###############################################################################
 """
     update_leaf_AK!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT}
     ) where {FT<:AbstractFloat}
 
 Update leaf maximal A and K for Sperry model, given
-- `photo_set` [`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi` [`CanopyLayer`](@ref) type struct
 - `envir` [`AirLayer`] type struct
 """
 function update_leaf_AK!(
-            photo_set::AbstractPhotoModelParaSet{FT},
             canopyi::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # unpack required variables
     @unpack APAR, ec, g_bc, g_bw, g_m, g_max, g_min, p_sat = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    @unpack P_AIR, p_H₂O = envir;
 
     # calculate the physiological maximal g_sw
-    _g_crit = ec / (p_sat - p_H₂O) * p_atm;
+    _g_crit = ec / (p_sat - p_H₂O) * P_AIR;
     for i in eachindex(APAR)
         _g_sw = 1 / max(1/_g_crit - 1/g_bw[i], FT(1e-3));
         _g_sw = min(_g_sw, g_max);
         _g_sw = max(_g_sw, g_min);
         _g_lc = 1 / (1/g_bc[i] + FT(1.6)/_g_sw + 1/g_m[i]);
-        canopyi.ps.APAR = APAR[i];
-        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(), _g_lc);
+        canopyi.ps.apar = APAR[i];
+        leaf_photosynthesis!(canopyi.ps, envir, GCO₂Mode(), _g_lc);
 
         # update the a_max for each leaf
-        canopyi.a_max[i] = canopyi.ps.An;
+        canopyi.a_max[i] = canopyi.ps.PSM.a_net;
     end
 
     # update the kr_max
