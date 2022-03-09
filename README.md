@@ -10,8 +10,8 @@
 [st-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[min-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Julia-1.3/badge.svg?branch=main
-[min-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.3"
+[min-img]: https://github.com/Yujie-W/CanopyLayers.jl/workflows/Julia-1.6/badge.svg?branch=main
+[min-url]: https://github.com/Yujie-W/CanopyLayers.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.6"
 
 [cov-img]: https://codecov.io/gh/Yujie-W/CanopyLayers.jl/branch/main/graph/badge.svg
 [cov-url]: https://codecov.io/gh/Yujie-W/CanopyLayers.jl
