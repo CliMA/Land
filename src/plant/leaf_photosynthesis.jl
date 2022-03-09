@@ -31,6 +31,8 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Mar-01: add two more fields: TD_ΗC and TD_ΗL
 #     2022-Mar-01: move η_c and η_l from reaction center to photosynthesis model
+#     2022-Mar-01: move k_q from prognostic to dignostic section
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -76,12 +78,12 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     # prognostic variables that change with time
     "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"
     b₆f::FT
-    "Maximal turnover rate of Cytochrome b₆f `[e⁻ s⁻¹]`"
-    k_q::FT
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     r_d25::FT
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_cmax25::FT
+    "Well watered maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_cmax25_ww::FT
 
     # dignostic variables that change with time
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -106,6 +108,8 @@ mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisMod
     k_m::FT
     "RubisCO coefficient Ko `[Pa]`"
     k_o::FT
+    "Maximal turnover rate of Cytochrome b₆f `[e⁻ s⁻¹]`"
+    k_q::FT
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     r_d::FT
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
@@ -134,6 +138,8 @@ end
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #     2022-Mar-01: add two more fields: TD_ΗC and TD_ΗL
 #     2022-Mar-01: move η_c and η_l from reaction center to photosynthesis model
+#     2022-Mar-01: move k_q from prognostic to dignostic section
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -176,9 +182,9 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 ΗCTDJohnson(FT),        # TD_ΗC
                 ΗLTDJohnson(FT),        # TD_ΗL
                 350 / 300,              # b₆f
-                300,                    # k_q
                 r_d25,                  # r_d25
                 v_cmax25,               # v_cmax25,
+                v_cmax25,               # v_cmax25_ww
                 0,                      # a_c
                 0,                      # a_gross
                 0,                      # a_j
@@ -190,6 +196,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
                 0,                      # k_c
                 0,                      # k_m
                 0,                      # k_o
+                0,                      # k_q
                 r_d25,                  # r_d
                 v_cmax25,               # v_cmax
                 0,                      # v_qmax
@@ -210,6 +217,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
 #     2022-Jan-14: add colimitation and e_to_c
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ, COLIMIT_IP, and COLIMIT_J (minor breaking)
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -255,6 +263,8 @@ mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     r_d25::FT
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_cmax25::FT
+    "Well watered maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_cmax25_ww::FT
 
     # dignostic variables that change with time
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -299,6 +309,7 @@ end
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ, COLIMIT_IP, and COLIMIT_J (minor breaking)
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -344,6 +355,7 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
                 j_max25,                # j_max25
                 r_d25,                  # r_d25
                 v_cmax25,               # v_cmax25
+                v_cmax25,               # v_cmax25_ww
                 0,                      # a_c
                 0,                      # a_gross
                 0,                      # a_j
@@ -370,6 +382,7 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: remove j from the struct
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl (not necessary)
 #
@@ -405,6 +418,8 @@ mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     r_d25::FT
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_cmax25::FT
+    "Well watered maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
+    v_cmax25_ww::FT
     "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_pmax25::FT
 
@@ -444,6 +459,7 @@ end
 #     2022-Feb-11: default e_to_c set to 1/6
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
+#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -481,6 +497,7 @@ C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0
                 VpmaxTDBoyd(FT),        # TD_VPMAX
                 r_d25,                  # r_d25
                 v_cmax25,               # v_cmax25
+                v_cmax25,               # v_cmax25_ww
                 v_pmax25,               # v_pmax25
                 0,                      # a_c
                 0,                      # a_gross
