@@ -19,10 +19,9 @@ function dRdE(
             clayer::CanopyLayer{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack ps, T = clayer;
-    @unpack Rd = ps;
+    @unpack T = clayer;
 
-    return dTdE(clayer, envir) * Rd * clayer.ps.TD_R.ΔHA / GAS_R(FT) / T^2
+    return dTdE(clayer, envir) * clayer.ps.PSM.r_d * clayer.ps.PSM.TD_R.ΔHA / GAS_R(FT) / T^2
 end
 
 
@@ -74,19 +73,19 @@ function dΘdE(
             sm::OSMWang{FT},
             g_sw::FT
 ) where {FT<:AbstractFloat}
-    @unpack APAR_m, ec, envir_m, ff, ps_m = clayer;
-    @unpack p_atm, p_H₂O = envir_m
-    ps_m.APAR = APAR_m;
+    @unpack APAR_m, ec, envir_m, ff = clayer;
+    @unpack P_AIR, p_H₂O = envir_m
+    clayer.ps_m.apar = APAR_m;
 
     # calculate g_lc and a_net using memory clayer and envir
     g_sc = g_sw / FT(1.6);
-    g_lc = 1 / (1/g_sc + 1/ps_m.g_bc);
-    g_bw = ps_m.g_bc * FT(1.35);
+    g_lc = 1 / (1/g_sc + 1/clayer.ps_m.g_CO₂_b);
+    g_bw = clayer.ps_m.g_CO₂_b * FT(1.35);
     g_lw = 1 / (1/g_sw + 1/g_bw);
-    flow = g_lw * max(1, ps_m.p_sat - p_H₂O) / p_atm;
-    leaf_photosynthesis!(ps_m, envir_m, GCO₂Mode(), g_lc);
+    flow = g_lw * max(1, clayer.ps_m.p_H₂O_sat - p_H₂O) / P_AIR;
+    leaf_photosynthesis!(clayer.ps_m, envir_m, GCO₂Mode(), g_lc);
 
-    return ps_m.An / (ec - flow) * ff
+    return clayer.ps_m.PSM.a_net / (ec - flow) * ff
 end
 
 

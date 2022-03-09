@@ -39,8 +39,7 @@ function prognostic_gsw!(
 
     # update g_sw
     for iLF in 1:n_leaf
-        gsw_ss = max(sm.g0,
-                     stomatal_conductance(sm, clayer, envir, β, iLF));
+        gsw_ss = max(sm.g0, stomatal_conductance(sm, clayer, envir, β, iLF));
         g_sw[iLF] += (gsw_ss - g_sw[iLF]) / clayer.τ_esm * Δt;
     end
 

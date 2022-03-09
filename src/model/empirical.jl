@@ -39,10 +39,9 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1    = model;
-    @unpack An, p_s   = leaf;
-    @unpack p_atm, RH = envir;
+    @unpack P_AIR, rh = envir;
 
-    return g0 + g1 * RH * p_atm * FT(1e-6) * β * An / p_s
+    return g0 + g1 * rh * P_AIR * FT(1e-6) * β * leaf.PSM.a_net / leaf.p_CO₂_s
 end
 
 
@@ -55,10 +54,9 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1    = model;
-    @unpack An, p_s   = canopyi;
-    @unpack p_atm, RH = envir;
+    @unpack P_AIR, rh = envir;
 
-    return g0 .+ g1 * RH * p_atm * FT(1e-6) * β .* An ./ p_s
+    return g0 .+ g1 * rh * P_AIR * FT(1e-6) * β .* canopyi.ps.PSM.a_net / canopyi.ps.p_CO₂_s
 end
 
 
@@ -73,9 +71,9 @@ function stomatal_conductance(
 ) where {FT<:AbstractFloat}
     @unpack g0, g1    = model;
     @unpack An, p_s   = canopyi;
-    @unpack p_atm, RH = envir;
+    @unpack P_AIR, rh = envir;
 
-    return g0 + g1 * RH * p_atm * FT(1e-6) * β * An[ind] / p_s[ind]
+    return g0 + g1 * rh * P_AIR * FT(1e-6) * β * An[ind] / p_s[ind]
 end
 
 
@@ -88,10 +86,9 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1  = model;
-    @unpack An, p_i = leaf;
-    @unpack p_atm   = envir;
+    @unpack P_AIR   = envir;
 
-    return g0 + g1 * p_atm * FT(1e-6) * β * An / p_i
+    return g0 + g1 * P_AIR * FT(1e-6) * β * leaf.PSM.a_net / leaf.p_CO₂_i
 end
 
 
@@ -104,10 +101,9 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1  = model;
-    @unpack An, p_i = canopyi;
-    @unpack p_atm   = envir;
+    @unpack P_AIR   = envir;
 
-    return g0 .+ g1 * p_atm * FT(1e-6) * β .* An ./ p_i
+    return g0 .+ g1 * P_AIR * FT(1e-6) * β .* canopyi.ps.PSM.a_net / canopyi.ps.p_CO₂_i
 end
 
 
@@ -122,9 +118,9 @@ function stomatal_conductance(
 ) where {FT<:AbstractFloat}
     @unpack g0, g1  = model;
     @unpack An, p_i = canopyi;
-    @unpack p_atm   = envir;
+    @unpack P_AIR   = envir;
 
-    return g0 + g1 * p_atm * FT(1e-6) * β * An[ind] / p_i[ind]
+    return g0 + g1 * P_AIR * FT(1e-6) * β * An[ind] / p_i[ind]
 end
 
 
@@ -136,12 +132,16 @@ function stomatal_conductance(
             envir::AirLayer{FT},
             β::FT
 ) where {FT<:AbstractFloat}
-    @unpack d0, g0, g1             = model;
-    @unpack An, p_s, p_sat, Γ_star = leaf;
-    @unpack p_atm, p_H₂O           = envir;
+    @unpack d0, g0, g1 = model;
+    @unpack P_AIR, p_H₂O = envir;
 
-    return g0 + g1 * p_atm * FT(1e-6) / (1 + (p_sat - p_H₂O)/d0) *
-                β * An / (p_s - Γ_star)
+    if typeof(leaf.PSM) <: C4VJPModel
+        _γ_s = FT(0);
+    else
+        _γ_s = leaf.PSM.γ_star;
+    end;
+
+    return g0 + g1 * P_AIR * FT(1e-6) / (1 + (leaf.p_H₂O_sat - p_H₂O)/d0) * β * leaf.PSM.a_net / (leaf.p_CO₂_s - _γ_s)
 end
 
 
@@ -154,12 +154,15 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack d0, g0, g1     = model;
-    @unpack An, p_s, p_sat = canopyi;
-    @unpack Γ_star         = canopyi.ps;
-    @unpack p_atm, p_H₂O   = envir;
+    @unpack P_AIR, p_H₂O   = envir;
 
-    return g0 .+ g1 * p_atm * FT(1e-6) / (1 + (p_sat - p_H₂O)/d0) *
-                 β .* An ./ (p_s .- Γ_star)
+    if typeof(canopyi.ps.PSM) <: C4VJPModel
+        _γ_s = FT(0);
+    else
+        _γ_s = canopyi.ps.PSM.γ_star;
+    end;
+
+    return g0 .+ g1 * P_AIR * FT(1e-6) / (1 + (canopyi.ps.p_H₂O_sat - p_H₂O)/d0) * β .* canopyi.ps.PSM.a_net ./ (canopyi.ps.p_CO₂_s .- _γ_s)
 end
 
 
@@ -174,11 +177,15 @@ function stomatal_conductance(
 ) where {FT<:AbstractFloat}
     @unpack d0, g0, g1     = model;
     @unpack An, p_s, p_sat = canopyi;
-    @unpack Γ_star         = canopyi.ps;
-    @unpack p_atm, p_H₂O   = envir;
+    @unpack P_AIR, p_H₂O   = envir;
 
-    return g0 + g1 * p_atm * FT(1e-6) / (1 + (p_sat - p_H₂O)/d0) *
-                β * An[ind] / (p_s[ind] - Γ_star)
+    if typeof(canopyi.ps.PSM) <: C4VJPModel
+        _γ_s = FT(0);
+    else
+        _γ_s = canopyi.ps.PSM.γ_star;
+    end;
+
+    return g0 + g1 * P_AIR * FT(1e-6) / (1 + (p_sat - p_H₂O)/d0) * β * An[ind] / (p_s[ind] - _γ_s)
 end
 
 
@@ -191,11 +198,10 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1            = model;
-    @unpack An, p_sat         = leaf;
-    @unpack p_a, p_atm, p_H₂O = envir;
-    vpd = max(FT(0.001), p_sat - p_H₂O);
+    @unpack p_CO₂, P_AIR, p_H₂O = envir;
+    vpd = max(FT(0.001), leaf.p_H₂O_sat - p_H₂O);
 
-    return g0 + p_atm * FT(1e-6) / p_a * (1 + g1/sqrt(vpd)) * β * An
+    return g0 + P_AIR * FT(1e-6) / p_CO₂ * (1 + g1/sqrt(vpd)) * β * leaf.PSM.a_net
 end
 
 
@@ -208,11 +214,10 @@ function stomatal_conductance(
             β::FT
 ) where {FT<:AbstractFloat}
     @unpack g0, g1            = model;
-    @unpack An, p_sat         = canopyi;
-    @unpack p_a, p_atm, p_H₂O = envir;
-    vpd = max(FT(0.001), p_sat - p_H₂O);
+    @unpack p_CO₂, P_AIR, p_H₂O = envir;
+    vpd = max(FT(0.001), canopyi.ps.p_H₂O_sat - p_H₂O);
 
-    return g0 .+ p_atm * FT(1e-6) / p_a * (1 + g1/sqrt(vpd)) * β .* An
+    return g0 .+ P_AIR * FT(1e-6) / p_CO₂ * (1 + g1/sqrt(vpd)) * β .* canopyi.ps.PSM.a_net
 end
 
 
@@ -227,8 +232,8 @@ function stomatal_conductance(
 ) where {FT<:AbstractFloat}
     @unpack g0, g1            = model;
     @unpack An, p_sat         = canopyi;
-    @unpack p_a, p_atm, p_H₂O = envir;
+    @unpack p_CO₂, P_AIR, p_H₂O = envir;
     vpd = max(FT(0.001), p_sat - p_H₂O);
 
-    return g0 + p_atm * FT(1e-6) / p_a * (1 + g1/sqrt(vpd)) * β * An[ind]
+    return g0 + P_AIR * FT(1e-6) / p_CO₂ * (1 + g1/sqrt(vpd)) * β * An[ind]
 end

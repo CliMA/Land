@@ -46,7 +46,7 @@ function gsw_control!(
 ) where {FT<:AbstractFloat}
     # if g_sw is low than g_min
     for i in eachindex(canopyi.g_sw)
-        canopyi.ps.APAR = canopyi.APAR[i];
+        canopyi.ps.apar = canopyi.APAR[i];
         gsw_control!(canopyi, envir, i);
     end
 

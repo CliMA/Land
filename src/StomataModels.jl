@@ -1,9 +1,9 @@
 module StomataModels
 
-using ClimaCache: AirLayer, GCO₂Mode, Leaf
+using ClimaCache: AirLayer, C3VJPModel, C4VJPModel, GCO₂Mode, Leaf
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: TYPEDFIELDS
-using Photosynthesis: leaf_photosynthesis!
+using Photosynthesis: leaf_photosynthesis!, photosystem_temperature_dependence!
 using PkgUtility: CP_D_MOL, GAS_R, K_STEFAN, M_H₂O, T_25
 using PlantHydraulics: AbstractSoilVC, LeafHydraulics, TreeSimple, critical_flow, end_pressure, soil_k_ratio_p25, temperature_effects!, xylem_k_ratio, xylem_risk
 using UnPack: @unpack

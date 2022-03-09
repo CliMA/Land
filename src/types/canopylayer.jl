@@ -14,9 +14,9 @@ $(TYPEDFIELDS)
 Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     # CanopyLayer photosynthesis system
     "leaf photosynthesis system"
-    ps  ::Leaf{FT} = Leaf{FT}()
+    ps  ::Leaf{FT} = Leaf{FT}("C3")
     "Memory leaf photosynthesis system"
-    ps_m::Leaf{FT} = Leaf{FT}()
+    ps_m::Leaf{FT} = Leaf{FT}("C3")
     "Total leaf area `[m²]`"
     LA    ::FT = 150
     "Leaf area index in the layer"
