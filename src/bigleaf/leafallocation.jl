@@ -10,19 +10,18 @@
     ) where {FT<:AbstractFloat}
     leaf_allocation!(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
-                vmax::FT
+                isvmax::Bool,
+                vmax::FT,
+                v2r::FT = FT(0.015)
     ) where {FT<:AbstractFloat}
     leaf_allocation!(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
                 laba::FT,
                 vmax::FT
     ) where {FT<:AbstractFloat}
 
 Update leaf area and maximal carboxylation rate, given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `laba` Given leaf area per basal area
 - `vmax` Given Vcmax25
 """
@@ -42,12 +41,14 @@ end
 
 function leaf_allocation!(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
-            vmax::FT
+            isvmax::Bool,
+            vmax::FT,
+            v2r::FT = FT(0.015)
 ) where {FT<:AbstractFloat}
-    node.ps.Vcmax25 = vmax;
-    node.ps.Jmax25  = vmax * node.vtoj;
-    node.ps.Rd25    = vmax * photo_set.VR;
+    node.ps.PSM.v_cmax25_ww = vmax;
+    node.ps.PSM.v_cmax25    = vmax;
+    node.ps.PSM.j_max25     = vmax * node.vtoj;
+    node.ps.PSM.r_d25       = vmax * v2r;
 
     return nothing
 end
@@ -57,12 +58,11 @@ end
 
 function leaf_allocation!(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
             laba::FT,
             vmax::FT
 ) where {FT<:AbstractFloat}
     leaf_allocation!(node, laba);
-    leaf_allocation!(node, photo_set, vmax);
+    leaf_allocation!(node, true, vmax);
 
     return nothing
 end

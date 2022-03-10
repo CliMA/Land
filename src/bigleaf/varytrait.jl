@@ -60,14 +60,14 @@ function vary_spac!(
         node.h_soil *= ratio_to_vary;
         node.hs.root.p_gravity .*= ratio_to_vary;
     elseif factor_to_vary=="ca"
-        (weat_years).CO2 *= ratio_to_vary;
+        weat_years[:,"CO2"] *= ratio_to_vary;
     elseif factor_to_vary=="rh"
-        (weat_years).D *= ratio_to_vary;
+        weat_years[:, "D"] *= ratio_to_vary;
     elseif factor_to_vary=="ta"
-        _multip1 = saturation_vapor_pressure.((weat_years).Tair .+ FT(273.15));
-        (weat_years).Tair .+= ratio_to_vary;
-        _multip2 = saturation_vapor_pressure.((weat_years).Tair .+ FT(273.15));
-        (weat_years).D    .*= _multip2 ./ _multip1;
+        _multip1 = saturation_vapor_pressure.((weat_years).Tair .+ T_0(FT));
+        weat_years[:, "Tair"] .+= ratio_to_vary;
+        _multip2 = saturation_vapor_pressure.((weat_years).Tair .+ T_0(FT));
+        weat_years[:, "D"] .*= _multip2 ./ _multip1;
     else
         @warn "Invalid parameter provided, nothing has been changed";
     end

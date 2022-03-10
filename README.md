@@ -14,8 +14,8 @@
 [st-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[min-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/Julia-1.3/badge.svg?branch=main
-[min-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.3"
+[min-img]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/workflows/Julia-1.6/badge.svg?branch=main
+[min-url]: https://github.com/Yujie-W/SoilPlantAirContinuum.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.6"
 
 [cov-img]: https://codecov.io/gh/Yujie-W/SoilPlantAirContinuum.jl/branch/main/graph/badge.svg
 [cov-url]: https://codecov.io/gh/Yujie-W/SoilPlantAirContinuum.jl
@@ -25,7 +25,7 @@
 
 ## About
 
-[`SoilPlantAirContinuum.jl`][pk-url] simulates the Soil-Plant-Air Continuum with optimal stomatal models. [`SoilPlantAirContinuum.jl`][pk-url] only supports Julia 1.3 and above.
+[`SoilPlantAirContinuum.jl`][pk-url] simulates the Soil-Plant-Air Continuum with optimal stomatal models. [`SoilPlantAirContinuum.jl`][pk-url] only supports Julia 1.6 and above.
 
 | Documentation                                   | CI Status             | Compatibility           | Code Coverage           |
 |:------------------------------------------------|:----------------------|:------------------------|:------------------------|

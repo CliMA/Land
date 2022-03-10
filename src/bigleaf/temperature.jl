@@ -111,14 +111,14 @@ function leaf_temperature(
             e_rad::FT,
             epla::FT
 ) where {FT<:AbstractFloat}
-    @unpack t_air,wind = node.envir;
+    @unpack wind = node.envir;
 
-    lambda = latent_heat_vapor(t_air) * M_H₂O(FT);
-    Gr     = radiative_conductance(t_air);
+    lambda = latent_heat_vapor(node.envir.t) * M_H₂O(FT);
+    Gr     = radiative_conductance(node.envir.t);
     GHa    = boundary_layer_conductance(wind, node.width);
     e_lat  = lambda * epla;
 
-    t_leaf = t_air + (rad-e_rad-e_lat) / (FT(29.3)*(Gr+GHa)) / 2;
+    t_leaf = node.envir.t + (rad-e_rad-e_lat) / (FT(29.3)*(Gr+GHa)) / 2;
 
     return t_leaf
 end
@@ -133,7 +133,7 @@ function leaf_temperature(
 ) where {FT<:AbstractFloat}
     lai = node.laba / node.gaba;
 
-    e_rad = FT(0.97) * black_body_emittance(node.envir.t_air) / max(1, lai);
+    e_rad = FT(0.97) * black_body_emittance(node.envir.t) / max(1, lai);
     epla  = flow / node.laba;
 
     return leaf_temperature(node, rad, e_rad, epla)
@@ -159,9 +159,8 @@ function leaf_temperature_sunlit(
             rad::FT,
             f_sl::FT
 ) where {FT<:AbstractFloat}
-    e_rad  = FT(0.97) * black_body_emittance(node.envir.t_air) /
-             max(1, (node.container2L).lai_sl);
-    epla   = f_sl / (node.container2L).la_sl;
+    e_rad = FT(0.97) * black_body_emittance(node.envir.t) / max(1, (node.container2L).lai_sl);
+    epla  = f_sl / (node.container2L).la_sl;
 
     return leaf_temperature(node, rad, e_rad, epla)
 end

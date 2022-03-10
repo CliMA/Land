@@ -6,32 +6,29 @@
 """
     annual_profit(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
                 weather::Array{FT,2}
     ) where {FT<:AbstractFloat}
 
 Calculate the profit in the growing season so as to optimize leaf investment,
     given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `weather` Weather profile in a growing season
 """
 function annual_profit(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
             weather::Array{FT,2}
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     #    make sure construction cost must be postive
     @unpack c_cons, c_vmax, elevation, gaba, laba, latitude, vtoj = node;
-    cons = laba * (c_cons + node.ps.Vcmax25 * c_vmax);
+    cons = laba * (c_cons + node.ps.PSM.v_cmax25 * c_vmax);
 
     # if cons > 0
     if cons > 0
         # 1. update the environmental constants based on node geographycal info
         ratio            = atmospheric_pressure_ratio(elevation);
-        node.envir.p_atm = ratio * P_ATM(FT);
-        node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
+        node.envir.P_AIR = ratio * P_ATM(FT);
+        node.envir.P_O₂  = node.envir.P_AIR * FT(0.209);
 
         # 2. calculate the growing season canopy profit
         day  ::FT = FT(0);
@@ -57,13 +54,12 @@ function annual_profit(
             wind  = weather[i,6 ]
             rain  = weather[i,5 ]
 
-            node.envir.t_air = _tair + T_0(FT);
-            node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
-            node.envir.p_a   = p_co2;
-            node.envir.vpd   = _dair * 1000;
-            node.envir.p_H₂O = node.envir.p_sat - node.envir.vpd;
-            node.envir.RH    = node.envir.p_H₂O / node.envir.p_sat;
-            node.envir.wind  = wind;
+            node.envir.t         = _tair + T_0(FT);
+            node.envir.p_H₂O_sat = saturation_vapor_pressure( node.envir.t );
+            node.envir.p_CO₂     = p_co2;
+            node.envir.p_H₂O     = node.envir.p_H₂O_sat - _dair * 1000;
+            node.envir.rh        = node.envir.p_H₂O / node.envir.p_H₂O_sat;
+            node.envir.wind      = wind;
 
             # 2.2 if day time
             zenith = zenith_angle(latitude, day, hour, FT(0));
@@ -73,22 +69,21 @@ function annual_profit(
                 @unpack frac_sh, frac_sl = node.container2L;
 
                 # 2.2.2 optimize flows in each layer
-                optimize_flows!(node, photo_set);
-                leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
+                optimize_flows!(node);
+                leaf_gas_exchange!(node, node.opt_f_sl, node.opt_f_sh);
                 flow = node.opt_f_sl + node.opt_f_sh;
-                anet = frac_sl * node.container2L.cont_sl.an +
-                       frac_sh * node.container2L.cont_sh.an;
+                anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
                 # 2.2.3 update drought history
-                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
-                                  node.opt_f_sh, frac_sl);
+                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
 
             # 2.3 if night time
             else
-                node.ps.T = max(200, leaf_temperature(node, r_all, FT(0)));
-                leaf_rd!(photo_set.ReT, node.ps);
+                node.ps.t = max(200, leaf_temperature(node, r_all, FT(0)));
+                photosystem_temperature_dependence!(node.ps.PSM, node.envir, node.ps.t);
+                node.ps.p_H₂O_sat = saturation_vapor_pressure(node.ps.t);
                 flow = FT(0);
-                anet = -node.ps.Rd;
+                anet = -node.ps.PSM.r_d;
             end
 
             # 2.4 update soil moisture by converting flow to Kg per hour

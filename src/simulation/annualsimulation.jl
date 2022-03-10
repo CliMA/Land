@@ -6,20 +6,17 @@
 """
     annual_simulation!(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
                 weather::DataFrame,
                 output::DataFrame
     ) where {FT<:AbstractFloat}
 
 Run annual simulation for a growing season, given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `weather` Weather profile in a growing season
 - `output` The predefined output result
 """
 function annual_simulation!(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
             weather::DataFrame,
             output::DataFrame
 ) where {FT<:AbstractFloat}
@@ -28,8 +25,8 @@ function annual_simulation!(
 
     # 1. update the environmental constants based on the node geographycal info
     ratio            = atmospheric_pressure_ratio(elevation);
-    node.envir.p_atm = ratio * P_ATM(FT);
-    node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
+    node.envir.P_AIR = ratio * P_ATM(FT);
+    node.envir.P_O₂  = node.envir.P_AIR * FT(0.209);
 
     # 2. calculate the growing season canopy profit
     gscp   = FT(0);
@@ -44,13 +41,12 @@ function annual_simulation!(
         wind ::FT = (weather).Wind[i]
         rain ::FT = (weather).Rain[i]
 
-        node.envir.t_air = _tair + T_0(FT);
-        node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
-        node.envir.p_a   = p_co2;
-        node.envir.vpd   = _dair * 1000;
-        node.envir.p_H₂O = node.envir.p_sat - node.envir.vpd;
-        node.envir.RH    = node.envir.p_H₂O / node.envir.p_sat;
-        node.envir.wind  = wind;
+        node.envir.t         = _tair + T_0(FT);
+        node.envir.p_H₂O_sat = saturation_vapor_pressure( node.envir.t );
+        node.envir.p_CO₂     = p_co2;
+        node.envir.p_H₂O     = node.envir.p_H₂O_sat - _dair * 1000;
+        node.envir.rh        = node.envir.p_H₂O / node.envir.p_H₂O_sat;
+        node.envir.wind      = wind;
 
         # 2.2 if day time
         zenith = zenith_angle(latitude, day, hour, FT(0));
@@ -60,15 +56,13 @@ function annual_simulation!(
             @unpack frac_sh, frac_sl = node.container2L;
 
             # 2.2.2 optimize flows in each layer
-            optimize_flows!(node, photo_set);
-            leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
+            optimize_flows!(node);
+            leaf_gas_exchange!(node, node.opt_f_sl, node.opt_f_sh);
             flow = node.opt_f_sl + node.opt_f_sh;
-            anet = frac_sl * node.container2L.cont_sl.an +
-                   frac_sh * node.container2L.cont_sh.an;
+            anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
             # 2.2.3 update drought history
-            pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
-                              node.opt_f_sh, frac_sl);
+            pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
 
             # 2.2.4 pass values to DataFrame
             output[i, "LAI_sl"] = (node.container2L).lai_sl
@@ -99,9 +93,10 @@ function annual_simulation!(
             tlef = max(200, leaf_temperature(node, r_all, FT(0)));
 
             # 2.3.2 calculate the gas exchange rates
-            node.ps.T = tlef;
-            leaf_rd!(photo_set.ReT, node.ps);
-            anet = -node.ps.Rd;
+            node.ps.t = tlef;
+            photosystem_temperature_dependence!(node.ps.PSM, node.envir, node.ps.t);
+            node.ps.p_H₂O_sat = saturation_vapor_pressure(node.ps.t);
+            anet = -node.ps.PSM.r_d;
 
             # 2.3.3 update temperature effects and then leaf water potential
             flow = FT(0);

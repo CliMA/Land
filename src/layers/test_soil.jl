@@ -29,14 +29,14 @@ function test_soil_from_psoil(
         for i_leaf in 1:(n_sl+1)
             e_i_can += node.plant_ps[i_can].g_lw[i_leaf] *
                        (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) /
-                       node.envirs[i_can].p_atm *
+                       node.envirs[i_can].P_AIR *
                        node.plant_ps[i_can].LAIx[i_leaf] *
                        node.plant_ps[i_can].LA;
         end
 
         # calculate the photosynthetic rates
-        gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
-        gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+        gas_exchange!(node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+        gsw_control!(node.plant_ps[i_can], node.envirs[i_can]);
 
         # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
         gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));
@@ -92,14 +92,14 @@ function test_soil_from_swc(
         for i_leaf in 1:(n_sl+1)
             e_i_can += node.plant_ps[i_can].g_lw[i_leaf] *
                        (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) /
-                       node.envirs[i_can].p_atm *
+                       node.envirs[i_can].P_AIR *
                        node.plant_ps[i_can].LAIx[i_leaf] *
                        node.plant_ps[i_can].LA;
         end
 
         # calculate the photosynthetic rates
-        gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
-        gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+        gas_exchange!(node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+        gsw_control!(node.plant_ps[i_can], node.envirs[i_can]);
 
         # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
         gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));
