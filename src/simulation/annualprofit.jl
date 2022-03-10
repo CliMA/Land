@@ -27,8 +27,8 @@ function annual_profit(
     if cons > 0
         # 1. update the environmental constants based on node geographycal info
         ratio            = atmospheric_pressure_ratio(elevation);
-        node.envir.p_atm = ratio * P_ATM(FT);
-        node.envir.p_O₂  = node.envir.p_atm * FT(0.209);
+        node.envir.P_AIR = ratio * P_ATM(FT);
+        node.envir.P_O₂  = node.envir.P_AIR * FT(0.209);
 
         # 2. calculate the growing season canopy profit
         day  ::FT = FT(0);
@@ -54,13 +54,12 @@ function annual_profit(
             wind  = weather[i,6 ]
             rain  = weather[i,5 ]
 
-            node.envir.t_air = _tair + T_0(FT);
-            node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
-            node.envir.p_a   = p_co2;
-            node.envir.vpd   = _dair * 1000;
-            node.envir.p_H₂O = node.envir.p_sat - node.envir.vpd;
-            node.envir.RH    = node.envir.p_H₂O / node.envir.p_sat;
-            node.envir.wind  = wind;
+            node.envir.t         = _tair + T_0(FT);
+            node.envir.p_H₂O_sat = saturation_vapor_pressure( node.envir.t );
+            node.envir.p_CO₂     = p_co2;
+            node.envir.p_H₂O     = node.envir.p_H₂O_sat - _dair * 1000;
+            node.envir.rh        = node.envir.p_H₂O / node.envir.p_H₂O_sat;
+            node.envir.wind      = wind;
 
             # 2.2 if day time
             zenith = zenith_angle(latitude, day, hour, FT(0));
@@ -82,6 +81,7 @@ function annual_profit(
             else
                 node.ps.t = max(200, leaf_temperature(node, r_all, FT(0)));
                 photosystem_temperature_dependence!(node.ps.PSM, node.envir, node.ps.t);
+                node.ps.p_H₂O_sat = saturation_vapor_pressure(node.ps.t);
                 flow = FT(0);
                 anet = -node.ps.PSM.r_d;
             end

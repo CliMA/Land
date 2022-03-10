@@ -10,7 +10,9 @@
     ) where {FT<:AbstractFloat}
     leaf_allocation!(
                 node::SPACSimple{FT},
-                vmax::FT
+                isvmax::Bool,
+                vmax::FT,
+                v2r::FT = FT(0.015)
     ) where {FT<:AbstractFloat}
     leaf_allocation!(
                 node::SPACSimple{FT},
@@ -39,8 +41,9 @@ end
 
 function leaf_allocation!(
             node::SPACSimple{FT},
+            isvmax::Bool,
             vmax::FT,
-            v2r::FT = 0.015
+            v2r::FT = FT(0.015)
 ) where {FT<:AbstractFloat}
     node.ps.PSM.v_cmax25_ww = vmax;
     node.ps.PSM.v_cmax25    = vmax;
@@ -59,7 +62,7 @@ function leaf_allocation!(
             vmax::FT
 ) where {FT<:AbstractFloat}
     leaf_allocation!(node, laba);
-    leaf_allocation!(node, vmax);
+    leaf_allocation!(node, true, vmax);
 
     return nothing
 end

@@ -87,8 +87,7 @@ function layer_fluxes!(
                 iEN = envirs[i_can];
                 iLF = plant_hs.leaves[i_can];
                 iPS = plant_ps[i_can];
-                iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                           (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+                iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR;
             end
             flow_profile!(plant_hs);
             pressure_profile!(plant_hs, SteadyStateMode(); update=false);
@@ -121,8 +120,7 @@ function layer_fluxes!(
         for iLF in 1:(nSL+1)
             f_GPP += iPS.Ag[iLF] * iPS.LAIx[iLF] * iPS.LA;
             f_NPP += iPS.An[iLF] * iPS.LAIx[iLF] * iPS.LA;
-            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm *
-                     iPS.LAIx[iLF] * iPS.LA;
+            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR * iPS.LAIx[iLF] * iPS.LA;
         end
     end
 
@@ -136,8 +134,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
@@ -234,7 +231,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=false);
@@ -255,8 +252,7 @@ function layer_fluxes!(
         for iLF in 1:(nSL+1)
             f_GPP += iPS.Ag[iLF] * iPS.LAIx[iLF] * iPS.LA;
             f_NPP += iPS.An[iLF] * iPS.LAIx[iLF] * iPS.LA;
-            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm *
-                     iPS.LAIx[iLF] * iPS.LA;
+            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR * iPS.LAIx[iLF] * iPS.LA;
         end
     end
 
@@ -269,7 +265,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.P_AIR;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);

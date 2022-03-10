@@ -4,7 +4,6 @@
     for FT in [Float32, Float64]
         node = SPACSimple{FT}();
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -22,7 +21,6 @@ println();
 
         big_leaf_partition!(node, zenith, r_all);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -35,12 +33,11 @@ println();
 @testset "SoilPlantAirContinuum --- gain_risk_map" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
-        photo  = C3CLM(FT);
         zenith = FT(30);
         r_all  = FT(1000);
 
         big_leaf_partition!(node, zenith, r_all);
-        mat = gain_risk_map(node, photo);
+        mat = gain_risk_map(node);
         @test FT_test(mat, FT);
         @test NaN_test(mat);
     end
@@ -55,7 +52,6 @@ println();
 @testset "SoilPlantAirContinuum --- leaf_gas_exchange_nonopt!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
-        photo  = C3CLM(FT);
         zenith = FT(30);
         r_all  = FT(1000);
         flow   = FT(4);
@@ -63,12 +59,10 @@ println();
         f_sh   = FT(1.5);
 
         big_leaf_partition!(node, zenith, r_all);
-        leaf_gas_exchange_nonopt!(node, photo, flow);
+        leaf_gas_exchange_nonopt!(node, flow);
         @test FT_test(node, FT);
-        @test NaN_test(node);
-        leaf_gas_exchange_nonopt!(node, photo, f_sl, f_sh);
+        leaf_gas_exchange_nonopt!(node, f_sl, f_sh);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -81,7 +75,6 @@ println();
 @testset "SoilPlantAirContinuum --- leaf_gas_exchange!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
-        photo  = C3CLM(FT);
         zenith = FT(30);
         r_all  = FT(1000);
         flow   = FT(4);
@@ -89,12 +82,10 @@ println();
         f_sh   = FT(1.5);
 
         big_leaf_partition!(node, zenith, r_all);
-        leaf_gas_exchange!(node, photo, flow);
+        leaf_gas_exchange!(node, flow);
         @test FT_test(node, FT);
-        @test NaN_test(node);
-        leaf_gas_exchange!(node, photo, f_sl, f_sh);
+        leaf_gas_exchange!(node, f_sl, f_sh);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -128,14 +119,12 @@ println();
 @testset "SoilPlantAirContinuum --- optimize_flows!" begin
     for FT in [Float32, Float64]
         node   = SPACSimple{FT}();
-        photo  = C3CLM(FT);
         zenith = FT(30);
         r_all  = FT(1000);
 
         big_leaf_partition!(node, zenith, r_all);
-        optimize_flows!(node, photo);
+        optimize_flows!(node);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -145,7 +134,7 @@ end
 # test and benchmark the atmosheric* functions
 println();
 @info "Testing the atmosheric* Functions...";
-@testset "SoilPlantAirContinuum --- atmosheric*" begin
+@testset "SoilPlantAirContinuum --- atmospheric*" begin
     for FT in [Float32, Float64]
         h = FT(1000);
 
@@ -193,10 +182,9 @@ println();
     weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
-        photo   = C3CLM(FT);
         weatmat = Matrix{FT}(weat);
 
-        gscp = annual_profit(node, photo, weatmat);
+        gscp = annual_profit(node, weatmat);
         @test FT_test(gscp, FT);
         @test NaN_test(gscp);
     end
@@ -213,12 +201,10 @@ println();
     weat = read_csv(arti);
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
-        photo = C3CLM(FT);
         df    = create_dataframe(FT, weat);
 
-        annual_simulation!(node, photo, weat, df);
+        annual_simulation!(node, weat, df);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -231,19 +217,15 @@ println();
 @testset "SoilPlantAirContinuum --- leaf_allocation!" begin
     for FT in [Float32, Float64]
         node  = SPACSimple{FT}();
-        photo = C3CLM(FT);
         laba  = FT(1000);
         vmax  = FT(80);
 
         leaf_allocation!(node, laba);
         @test FT_test(node, FT);
-        @test NaN_test(node);
-        leaf_allocation!(node, photo, vmax);
+        leaf_allocation!(node, true, vmax);
         @test FT_test(node, FT);
-        @test NaN_test(node);
-        leaf_allocation!(node, photo, laba, vmax);
+        leaf_allocation!(node, laba, vmax);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -258,12 +240,10 @@ println();
     weat = read_csv(arti);
     for FT in [Float32, Float64]
         node    = SPACSimple{FT}();
-        photo   = C3CLM(FT);
         weatmat = Matrix{FT}(weat);
 
-        optimize_leaf!(node, photo, weatmat);
+        optimize_leaf!(node, weatmat);
         @test FT_test(node, FT);
-        @test NaN_test(node);
     end
 end
 
@@ -301,7 +281,6 @@ println();
         initialize_spac_canopy!(node);
         layer_fluxes!(node);
         layer_fluxes!(node, FT(30));
-        @test NaN_test(node);
 
         update_Cab!(node, FT(30));
         update_Kmax!(node, FT(1));

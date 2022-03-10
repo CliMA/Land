@@ -29,7 +29,7 @@ function test_soil_from_psoil(
         for i_leaf in 1:(n_sl+1)
             e_i_can += node.plant_ps[i_can].g_lw[i_leaf] *
                        (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) /
-                       node.envirs[i_can].p_atm *
+                       node.envirs[i_can].P_AIR *
                        node.plant_ps[i_can].LAIx[i_leaf] *
                        node.plant_ps[i_can].LA;
         end
@@ -92,7 +92,7 @@ function test_soil_from_swc(
         for i_leaf in 1:(n_sl+1)
             e_i_can += node.plant_ps[i_can].g_lw[i_leaf] *
                        (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) /
-                       node.envirs[i_can].p_atm *
+                       node.envirs[i_can].P_AIR *
                        node.plant_ps[i_can].LAIx[i_leaf] *
                        node.plant_ps[i_can].LA;
         end

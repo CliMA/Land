@@ -49,14 +49,15 @@ function leaf_gas_exchange_nonopt!(
     else
         # 0. unpack required variables
         @unpack envir, g_max, width = node;
-        @unpack p_atm, p_H₂O, t_air, wind = envir;
+        @unpack P_AIR, p_H₂O, wind = envir;
 
         # 1. calculate leaf temperature from the flow rate
         t_leaf = max(200, leaf_temperature(node, rad, flow));
 
         # 2. update leaf photosynthetic variables and leaf-to-air VPD
         node.ps.apar = par;
-        photosystem_temperature_dependence!(node.ps, envir, t_leaf);
+        photosystem_temperature_dependence!(node.ps.PSM, envir, t_leaf);
+        node.ps.p_H₂O_sat = saturation_vapor_pressure(t_leaf);
         d_leaf = node.ps.p_H₂O_sat - p_H₂O;
 
         # 3. update f_vis and f_st in leaf and calculate water potentials
@@ -73,8 +74,8 @@ function leaf_gas_exchange_nonopt!(
 
         # if flow > 0 and reasonable
         elseif (d_leaf > 0) && (t_leaf > T_0(FT))
-            t_cor = relative_diffusive_coefficient( (t_leaf+t_air)/2 );
-            g_lw  = flow / la / d_leaf * p_atm;
+            t_cor = relative_diffusive_coefficient( (t_leaf+node.envir.t)/2 );
+            g_lw  = flow / la / d_leaf * P_AIR;
             g_bw  = boundary_layer_conductance(wind, width);
             g_bc  = g_bw / FT(1.35);
             g_sw  = 1 / (1/g_lw - 1/(g_bw*t_cor));
@@ -105,8 +106,7 @@ function leaf_gas_exchange_nonopt!(
             flow::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh,
-            rad_sl = node.container2L;
+    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl = node.container2L;
 
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
@@ -193,14 +193,15 @@ function leaf_gas_exchange!(
 ) where {FT<:AbstractFloat}
     # 0. unpack required variables
     @unpack envir = node;
-    @unpack p_atm, p_H₂O = envir;
+    @unpack P_AIR, p_H₂O = envir;
 
     # 1. calculate leaf temperature from the flow rate
     t_leaf = max(200, leaf_temperature(node, rad, flow));
 
     # 2. update leaf photosynthetic variables and leaf-to-air VPD
     node.ps.apar = par;
-    photosystem_temperature_dependence!(node.ps, envir, t_leaf);
+    photosystem_temperature_dependence!(node.ps.PSM, envir, t_leaf);
+    node.ps.p_H₂O_sat = saturation_vapor_pressure(t_leaf);
     d_leaf = node.ps.p_H₂O_sat - p_H₂O;
 
     # 3. update f_vis and f_st in leaf and calculate water potentials
@@ -210,7 +211,7 @@ function leaf_gas_exchange!(
     p_leaf = end_pressure(node.hs, flow);
 
     # 4. calculate photosynthesis
-    g_lw = flow / la / d_leaf * p_atm;
+    g_lw = flow / la / d_leaf * P_AIR;
     g_lc = max(FT(1e-6), g_lw / FT(1.6));
     leaf_photosynthesis!(node.ps, envir, GCO₂Mode(), g_lc);
     container.ag = node.ps.PSM.a_gross;
