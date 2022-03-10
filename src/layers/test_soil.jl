@@ -35,8 +35,8 @@ function test_soil_from_psoil(
         end
 
         # calculate the photosynthetic rates
-        gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
-        gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+        gas_exchange!(node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+        gsw_control!(node.plant_ps[i_can], node.envirs[i_can]);
 
         # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
         gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));
@@ -98,8 +98,8 @@ function test_soil_from_swc(
         end
 
         # calculate the photosynthetic rates
-        gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
-        gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+        gas_exchange!(node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+        gsw_control!(node.plant_ps[i_can], node.envirs[i_can]);
 
         # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
         gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));

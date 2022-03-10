@@ -6,20 +6,17 @@
 """
     annual_simulation!(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
                 weather::DataFrame,
                 output::DataFrame
     ) where {FT<:AbstractFloat}
 
 Run annual simulation for a growing season, given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `weather` Weather profile in a growing season
 - `output` The predefined output result
 """
 function annual_simulation!(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
             weather::DataFrame,
             output::DataFrame
 ) where {FT<:AbstractFloat}
@@ -60,11 +57,10 @@ function annual_simulation!(
             @unpack frac_sh, frac_sl = node.container2L;
 
             # 2.2.2 optimize flows in each layer
-            optimize_flows!(node, photo_set);
-            leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
+            optimize_flows!(node);
+            leaf_gas_exchange!(node, node.opt_f_sl, node.opt_f_sh);
             flow = node.opt_f_sl + node.opt_f_sh;
-            anet = frac_sl * node.container2L.cont_sl.an +
-                   frac_sh * node.container2L.cont_sh.an;
+            anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
             # 2.2.3 update drought history
             pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
@@ -99,9 +95,9 @@ function annual_simulation!(
             tlef = max(200, leaf_temperature(node, r_all, FT(0)));
 
             # 2.3.2 calculate the gas exchange rates
-            node.ps.T = tlef;
-            leaf_rd!(photo_set.ReT, node.ps);
-            anet = -node.ps.Rd;
+            node.ps.t = tlef;
+            photosystem_temperature_dependence!(node.ps.PSM, node.envir, node.ps.t);
+            anet = -node.ps.PSM.r_d;
 
             # 2.3.3 update temperature effects and then leaf water potential
             flow = FT(0);

@@ -63,7 +63,7 @@ function test_diurnal(
     # 0.4 initialize the canopy temperature
     for i_can in 1:n_canopy
         # Assume RH = 50%
-        leaf_temperature_dependence!(node.photo_set, node.plant_ps[i_can].ps, node.envirs[i_can], Tlef_t[1]);
+        photosystem_temperature_dependence!(node.plant_ps[i_can].ps, node.envirs[i_can], Tlef_t[1]);
         node.envirs[i_can].p_H₂O = node.envirs[i_can].p_sat / 2;
         # latent heat flux as well
         node.plant_ps[i_can].LV = latent_heat_vapor(Tlef_t[i_can]) * 1000 / 18;
@@ -117,9 +117,9 @@ function test_diurnal(
             # update leaf temperature
             # update the parameters from stomatal model
             node.plant_ps[i_can].T = Tlef_t[i_tim];
-            update_leaf_TP!(node.photo_set, node.plant_ps[i_can], node.plant_hs.leaves[i_can], node.envirs[i_can]);
+            update_leaf_TP!(node.plant_ps[i_can], node.plant_hs.leaves[i_can], node.envirs[i_can]);
             # uncomment this for Sperry, Eller, and Gentine models
-            #update_leaf_AK!(node.photo_set, node.plant_ps[i_can], node.plant_hs.leaves[i_can], node.envirs[i_can]);
+            #update_leaf_AK!(node.plant_ps[i_can], node.plant_hs.leaves[i_can], node.envirs[i_can]);
 
             #canopyi.t_list[1:end-1] .= reshape(node.can_rad.T_sun3D[:,:,rt_layer],(:,1))[:,1]
             #canopyi.t_list[end]      = node.can_rad.T_shade[rt_layer]
@@ -150,8 +150,8 @@ function test_diurnal(
             #e_i_can = sum( node.plant_ps[i_can].g_lw .* (node.plant_ps[i_can].p_sat - node.envirs[i_can].p_H₂O) ./ node.envirs[i_can].p_atm .* node.plant_ps[i_can].LAIx ) * node.plant_ps[i_can].LA;
 
             # calculate the photosynthetic rates
-            gas_exchange!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can], GswDrive());
-            gsw_control!(node.photo_set, node.plant_ps[i_can], node.envirs[i_can]);
+            gas_exchange!(node.plant_ps[i_can], node.envirs[i_can], GswDrive());
+            gsw_control!(node.plant_ps[i_can], node.envirs[i_can]);
 
             # use the ball-berry model here for now as the ∂A/∂E and ∂A/∂Θ functions are not yet ready
             gsw_ss = stomatal_conductance(node.stomata_model, node.plant_ps[i_can], node.envirs[i_can], FT(1));

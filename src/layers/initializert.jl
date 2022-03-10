@@ -13,14 +13,12 @@ function initialize_spac_canopy!(
             node::SPACMono{FT}
 ) where {FT<:AbstractFloat}
     # 0.1 create variables required
-    @unpack angles, envirs, in_rad, leaves_rt, n_canopy, plant_ps, photo_set,
-            rt_con, soil_opt, wl_set = node;
+    @unpack angles, envirs, in_rad, leaves_rt, n_canopy, plant_ps, rt_con, soil_opt, wl_set = node;
     canopy_rt = node.canopy_rt;
     can_opt = node.can_opt;
     can_rad = node.can_rad;
     plant_hs = node.plant_hs;
-    fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[canopy_rt.nAzi]) /
-                               length(canopy_rt.lazitab);
+    fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[canopy_rt.nAzi]) / length(canopy_rt.lazitab);
     n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
 
     # fluspect the canopy layers
@@ -31,14 +29,11 @@ function initialize_spac_canopy!(
     # Four Different steps to compute Short-Wave RT
     canopy_geometry!(canopy_rt, angles, can_opt, rt_con)
     canopy_matrices!(leaves_rt, can_opt);
-    short_wave!(canopy_rt, can_opt, can_rad, in_rad,
-                soil_opt, rt_con);
-    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad,
-                   soil_opt, leaves_rt, wl_set, rt_con);
+    short_wave!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, rt_con);
+    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, leaves_rt, wl_set, rt_con);
 
     # Compute Long Wave (Last term is LW incoming in W m^-2)
-    thermal_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt,
-                    soil_opt, [FT(400.0)], wl_set);
+    thermal_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, [FT(400.0)], wl_set);
 
     # update the canopy leaf area partition information
     for i_can in 1:n_canopy
@@ -49,14 +44,13 @@ function initialize_spac_canopy!(
         f_view = (can_opt.Ps[rt_layer] + can_opt.Ps[rt_layer+1]) / 2;
 
         for iLF in 1:n_sl
-            iPS.APAR[iLF] = can_rad.absPAR_sunCab[(rt_layer-1)*n_sl + iLF] *
-                            FT(1e6);
+            iPS.APAR[iLF] = can_rad.absPAR_sunCab[(rt_layer-1)*n_sl + iLF] * FT(1e6);
             iPS.LAIx[iLF] = f_view * fraction_sl[iLF];
         end
         iPS.APAR[end] = can_rad.absPAR_shadeCab[rt_layer] * FT(1e6);
         iPS.LAIx[end] = 1 - f_view;
 
-        update_leaf_TP!(photo_set, iPS, plant_hs.leaves[i_can], envirs[i_can]);
+        update_leaf_TP!(iPS, plant_hs.leaves[i_can], envirs[i_can]);
 
         envirs[i_can].t_air = T_25(FT);
         envirs[i_can].p_sat = saturation_vapor_pressure(T_25(FT));
@@ -179,19 +173,18 @@ end
 Update Vcmax25(WW), Jmax25(WW), and Rd25(WW) from a given Vcmax25
 """
 function update_VJRWW!(node::SPACMono{FT}, vcmax::FT) where {FT<:AbstractFloat}
-    # TODO change the ratio accordingly to photo_set
-    # TODO add another ratio V2J in photo_set
+    # TODO change the ratios
+    # TODO add another ratios
     # Update Vcmax25, Jmax25 (1.67 Vcmax), and Rd25 (0.015 Vcmax)
+    # TODO: abstractize this for other types
     for _iPS in node.plant_ps
-        _iPS.ps.Vcmax     = vcmax;
-        _iPS.ps.Vcmax25   = vcmax;
-        _iPS.ps.Vcmax25WW = vcmax;
-        _iPS.ps.Jmax      = vcmax * 1.67;
-        _iPS.ps.Jmax25    = vcmax * 1.67;
-        _iPS.ps.Jmax25WW  = vcmax * 1.67;
-        _iPS.ps.Rd        = vcmax * 0.015;
-        _iPS.ps.Rd25      = vcmax * 0.015;
-        _iPS.ps.Rd25WW    = vcmax * 0.015;
+        _iPS.ps.PSM.v_cmax      = vcmax;
+        _iPS.ps.PSM.v_cmax25    = vcmax;
+        _iPS.ps.PSM.v_cmax25_ww = vcmax;
+        _iPS.ps.PSM.j_max       = vcmax * 1.67;
+        _iPS.ps.PSM.j_max25     = vcmax * 1.67;
+        _iPS.ps.PSM.r_d         = vcmax * 0.015;
+        _iPS.ps.PSM.r_d25       = vcmax * 0.015;
     end
 
     return nothing
@@ -206,16 +199,17 @@ end
 Update effective Vcmax25, Jmax25, and Rd25 from a given tune factor
 """
 function update_VJR!(node::SPACMono{FT}, ratio::FT) where {FT<:AbstractFloat}
-    # TODO change the ratio accordingly to photo_set
-    # TODO add another ratio V2J in photo_set
+    # TODO change the ratios
+    # TODO add another ratios
     # Update Vcmax25, Jmax25 (1.67 Vcmax), and Rd25 (0.015 Vcmax)
     for _iPS in node.plant_ps
-        _iPS.ps.Vcmax   = _iPS.ps.Vcmax25WW * ratio;
-        _iPS.ps.Vcmax25 = _iPS.ps.Vcmax25WW * ratio;
-        _iPS.ps.Jmax    = _iPS.ps.Jmax25WW * ratio;
-        _iPS.ps.Jmax25  = _iPS.ps.Jmax25WW * ratio;
-        _iPS.ps.Rd      = _iPS.ps.Rd25WW * ratio;
-        _iPS.ps.Rd25    = _iPS.ps.Rd25WW * ratio;
+        _ratio = (_iPS.ps.PSM.v_cmax25_ww * ratio) / _iPS.ps.PSM.v_cmax25;
+        _iPS.ps.PSM.v_cmax   *= _ratio;
+        _iPS.ps.PSM.v_cmax25 *= _ratio;
+        _iPS.ps.PSM.j_max    *= _ratio;
+        _iPS.ps.PSM.j_max25  *= _ratio;
+        _iPS.ps.PSM.r_d      *= _ratio;
+        _iPS.ps.PSM.r_d25    *= _ratio;
     end
 
     return nothing

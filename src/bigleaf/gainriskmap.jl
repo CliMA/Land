@@ -5,18 +5,15 @@
 ###############################################################################
 """
     gain_risk_map(
-                node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT}
+                node::SPACSimple{FT}
     ) where {FT<:AbstractFloat}
 
 Return the matrix of optimizers at different sunlit and shaded layer flow
     rates, given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type photosynthesis parameter set
 """
 function gain_risk_map(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT}
 ) where {FT<:AbstractFloat}
     # 0. unpack required variables
     @unpack frac_sh, frac_sl = node.container2L;
@@ -33,7 +30,7 @@ function gain_risk_map(
     list_f_sh = FT[0];
 
     # 3. initialize the matrix
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, f_sh);
+    leaf_gas_exchange_nonopt!(node, f_sl, f_sh);
     mat = node.containerOP /  node.ec;
 
     # 4. expand the matrix
@@ -49,7 +46,7 @@ function gain_risk_map(
 
             # 4.1.1 iterate through the list_f_sh
             for tmp_f_sh in list_f_sh
-                leaf_gas_exchange_nonopt!(node, photo_set, f_sl, tmp_f_sh);
+                leaf_gas_exchange_nonopt!(node, f_sl, tmp_f_sh);
                 ele = node.containerOP / node.ec;
 
                 # expand the tmp_list horizontally
@@ -80,7 +77,7 @@ function gain_risk_map(
 
             # 4.3.1 iterate through the list_f_sl
             for tmp_f_sl in list_f_sl
-                leaf_gas_exchange_nonopt!(node, photo_set, tmp_f_sl, f_sh);
+                leaf_gas_exchange_nonopt!(node, tmp_f_sl, f_sh);
                 ele = node.containerOP / node.ec;
 
                 # expand the tmp_list vertically

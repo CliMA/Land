@@ -20,8 +20,7 @@ function layer_fluxes!(
             updating::Bool = false
 ) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set,
-            plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;
@@ -45,7 +44,7 @@ function layer_fluxes!(
         iRT = n_canopy + 1 - i_can;
 
         iPS.T = can_rad.T_sun[i_can];
-        update_leaf_TP!(photo_set, iPS, iHS, iEN);
+        update_leaf_TP!(iPS, iHS, iEN);
         temperature_effects!(iHS, iPS.T);
 
         # calculate the fraction of sunlit and shaded leaves
@@ -63,7 +62,7 @@ function layer_fluxes!(
         while true
             # calculate the photosynthetic rates
             count += 1;
-            gas_exchange!(photo_set, iPS, iEN, GswDrive());
+            gas_exchange!(iPS, iEN, GswDrive());
             if typeof(stomata_model) <: EmpiricalStomatalModel
                 #
                 #
@@ -78,13 +77,12 @@ function layer_fluxes!(
                 #
                 prognostic_gsw!(iPS, iEN, stomata_model, FT(1), FT(120));
             else
-                prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model,
-                                FT(120));
+                prognostic_gsw!(iPS, iHS, iEN, stomata_model, FT(120));
             end
 
             # update flow and pressure profile (except for history)
             # TODO move this part to PlantHydraulics.jl
-            gsw_control!(photo_set, iPS, iEN);
+            gsw_control!(iPS, iEN);
             for i_can in 1:n_canopy
                 iEN = envirs[i_can];
                 iLF = plant_hs.leaves[i_can];
@@ -174,8 +172,7 @@ function layer_fluxes!(
             updating::Bool = false
 ) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set,
-            plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;
@@ -199,7 +196,7 @@ function layer_fluxes!(
         iRT = n_canopy + 1 - i_can;
 
         iPS.T = can_rad.T_sun[i_can];
-        update_leaf_TP!(photo_set, iPS, iHS, iEN);
+        update_leaf_TP!(iPS, iHS, iEN);
         temperature_effects!(iHS, iPS.T);
 
         # calculate the fraction of sunlit and shaded leaves
@@ -212,7 +209,7 @@ function layer_fluxes!(
         iPS.LAIx[end] = 1 - f_view;
 
         # step forward with Δt
-        gas_exchange!(photo_set, iPS, iEN, GswDrive());
+        gas_exchange!(iPS, iEN, GswDrive());
         if typeof(stomata_model) <: EmpiricalStomatalModel
             #
             #
@@ -227,18 +224,17 @@ function layer_fluxes!(
             #
             prognostic_gsw!(iPS, iEN, stomata_model, FT(1), Δt);
         else
-            prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model, Δt);
+            prognostic_gsw!(iPS, iHS, iEN, stomata_model, Δt);
         end
 
         # update flow and pressure profile (except for history)
         # TODO move this part to PlantHydraulics.jl
-        gsw_control!(photo_set, iPS, iEN);
+        gsw_control!(iPS, iEN);
         for i_can in 1:n_canopy
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=false);
@@ -252,8 +248,7 @@ function layer_fluxes!(
         end;
 
         # update the fluorescence quantum yield from leaf level calculation
-        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl,
-                                          canopy_rt.nAzi);
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl, canopy_rt.nAzi);
         can_rad.ϕ_shade[iRT] = iPS.φs[end];
 
         # update the flow rates
@@ -266,8 +261,7 @@ function layer_fluxes!(
     end
 
     # do SIF simulation
-    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set,
-                rt_con, rt_dim);
+    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set, rt_con, rt_dim);
 
     # update flow profile and pressure history along the tree
     if updating
@@ -275,8 +269,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);

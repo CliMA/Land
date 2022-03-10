@@ -6,25 +6,22 @@
 """
     annual_profit(
                 node::SPACSimple{FT},
-                photo_set::AbstractPhotoModelParaSet{FT},
                 weather::Array{FT,2}
     ) where {FT<:AbstractFloat}
 
 Calculate the profit in the growing season so as to optimize leaf investment,
     given
 - `node` [`SPACSimple`] type struct
-- `photo_set` [`AbstractPhotoModelParaSet`] type struct
 - `weather` Weather profile in a growing season
 """
 function annual_profit(
             node::SPACSimple{FT},
-            photo_set::AbstractPhotoModelParaSet{FT},
             weather::Array{FT,2}
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     #    make sure construction cost must be postive
     @unpack c_cons, c_vmax, elevation, gaba, laba, latitude, vtoj = node;
-    cons = laba * (c_cons + node.ps.Vcmax25 * c_vmax);
+    cons = laba * (c_cons + node.ps.PSM.v_cmax25 * c_vmax);
 
     # if cons > 0
     if cons > 0
@@ -73,22 +70,20 @@ function annual_profit(
                 @unpack frac_sh, frac_sl = node.container2L;
 
                 # 2.2.2 optimize flows in each layer
-                optimize_flows!(node, photo_set);
-                leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
+                optimize_flows!(node);
+                leaf_gas_exchange!(node, node.opt_f_sl, node.opt_f_sh);
                 flow = node.opt_f_sl + node.opt_f_sh;
-                anet = frac_sl * node.container2L.cont_sl.an +
-                       frac_sh * node.container2L.cont_sh.an;
+                anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
                 # 2.2.3 update drought history
-                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
-                                  node.opt_f_sh, frac_sl);
+                pressure_profile!(node.hs, node.p_soil, node.opt_f_sl, node.opt_f_sh, frac_sl);
 
             # 2.3 if night time
             else
-                node.ps.T = max(200, leaf_temperature(node, r_all, FT(0)));
-                leaf_rd!(photo_set.ReT, node.ps);
+                node.ps.t = max(200, leaf_temperature(node, r_all, FT(0)));
+                photosystem_temperature_dependence!(node.ps.PSM, node.envir, node.ps.t);
                 flow = FT(0);
-                anet = -node.ps.Rd;
+                anet = -node.ps.PSM.r_d;
             end
 
             # 2.4 update soil moisture by converting flow to Kg per hour

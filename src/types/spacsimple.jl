@@ -21,7 +21,7 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
 
     # Photosynthesis parameters
     "Photosynthesis system"
-    ps::Leaf{FT} = Leaf{FT}()
+    ps::Leaf{FT} = Leaf{FT}("C3")
     "Ratio between Vcmax25 and Jmax25"
     vtoj::FT = FT(1.67)
 
