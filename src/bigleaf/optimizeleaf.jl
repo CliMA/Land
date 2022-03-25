@@ -7,7 +7,8 @@
     optimize_leaf!(
                 node::SPACSimple{FT},
                 weather::Array{FT,2},
-                printing::Bool
+                printing::Bool,
+                Δt::FT = FT(1)
     ) where {FT<:AbstractFloat}
 
 Optimize leaf area (LAI within 0-20) and photosynthetic capacity (within
@@ -15,17 +16,19 @@ Optimize leaf area (LAI within 0-20) and photosynthetic capacity (within
 - `node` [`SPACSimple`] type struct
 - `weather` Weather profile in a growing season
 - `printing` Optional. If true, printing progress
+- `Δt` Time period in `[h]`
 """
 function optimize_leaf!(
             node::SPACSimple{FT},
             weather::Array{FT,2},
-            printing::Bool = false
+            printing::Bool = false,
+            Δt::FT = FT(1)
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize
     @inline f(x) = (
         tmp_node = deepcopy(node);
         leaf_allocation!(tmp_node, x[1], x[2]);
-        tmp_prof = annual_profit(tmp_node, weather);
+        tmp_prof = annual_profit(tmp_node, weather, Δt);
         if printing
             @info "\tLABA=$(x[1])\tVMAX=$(x[2])\tPROF=$(tmp_prof)";
         end;

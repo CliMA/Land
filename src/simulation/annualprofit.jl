@@ -6,17 +6,20 @@
 """
     annual_profit(
                 node::SPACSimple{FT},
-                weather::Array{FT,2}
+                weather::Array{FT,2},
+                Δt::FT = FT(1)
     ) where {FT<:AbstractFloat}
 
 Calculate the profit in the growing season so as to optimize leaf investment,
     given
 - `node` [`SPACSimple`] type struct
 - `weather` Weather profile in a growing season
+- `Δt` Time period in `[h]`
 """
 function annual_profit(
             node::SPACSimple{FT},
-            weather::Array{FT,2}
+            weather::Array{FT,2},
+            Δt::FT = FT(1)
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     #    make sure construction cost must be postive
@@ -96,7 +99,7 @@ function annual_profit(
         end
 
         # 3. scale gscp to mol per year
-        gscp *= laba * FT(1e-6) * 3600;
+        gscp *= laba * FT(1e-6) * 3600 * Δt;
 
         # 4. substract the construction costs
         gscp -= cons;

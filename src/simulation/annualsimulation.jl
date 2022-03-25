@@ -7,18 +7,21 @@
     annual_simulation!(
                 node::SPACSimple{FT},
                 weather::DataFrame,
-                output::DataFrame
+                output::DataFrame,
+                Δt::FT = FT(1)
     ) where {FT<:AbstractFloat}
 
 Run annual simulation for a growing season, given
 - `node` [`SPACSimple`] type struct
 - `weather` Weather profile in a growing season
 - `output` The predefined output result
+- `Δt` Time period in `[h]`
 """
 function annual_simulation!(
             node::SPACSimple{FT},
             weather::DataFrame,
-            output::DataFrame
+            output::DataFrame,
+            Δt::FT = FT(1)
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     @unpack elevation, gaba, laba, latitude, vtoj = node;
@@ -143,7 +146,7 @@ function annual_simulation!(
         # 2.4 update soil moisture by converting flow to Kg per hour
         flow /= KG_H_2_MOL_S(FT);
         rain *= gaba * ρ_H₂O(FT) / 1000;
-        soil_moisture!(node, flow-rain);
+        soil_moisture!(node, flow-rain, Δt);
     end
 
     return nothing
