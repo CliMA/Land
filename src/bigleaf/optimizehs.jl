@@ -6,16 +6,19 @@
 """
     optimize_hs!(
                 node::SPACSimple{FT},
-                weather::Array{FT,2}
+                weather::Array{FT,2},
+                Δt::FT = FT(1)
     ) where {FT<:AbstractFloat}
 
 Optimize hydraulic conductance and leaf investment, given
 - `node` [`SPACSimple`] type struct
 - `weather` Weather profile in a growing season
+- `Δt` Time period in `[h]`
 """
 function optimize_hs!(
             node::SPACSimple{FT},
-            weather::Array{FT,2}
+            weather::Array{FT,2},
+            Δt::FT = FT(1)
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize
     @inline f(x) = (
@@ -27,7 +30,7 @@ function optimize_hs!(
         (tmp_node).hs.stem.k_element .= (tmp_node).hs.stem.k_max * (tmp_node).hs.stem.N;
         (tmp_node).hs.leaf.k_element .= (tmp_node).hs.leaf.k_sla * (tmp_node).hs.leaf.N;
         leaf_allocation!(tmp_node, x[2], x[3]);
-        tmp_prof = annual_profit(tmp_node, weather);
+        tmp_prof = annual_profit(tmp_node, weather, Δt);
         return tmp_prof
     );
 
