@@ -15,7 +15,7 @@ using StomataModels: AbstractStomatalModel, CanopyLayer, ESMBallBerry, Empirical
 using UnPack: @unpack
 using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient, saturation_vapor_pressure
 
-
+using ..SoilPlantAirContinuum: update_environment!
 
 
 # define constants
