@@ -1,0 +1,16 @@
+name = "SoilHydraulics"
+uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
+authors = ["Yujie Wang <jesiner@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
+ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
+DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
+
+[compat]
+ClimaCache = "0.3.1"
+ConstrainedRootSolvers = "0.1.4"
+DocStringExtensions = "0.8.6"
+UnPack = "1.0.2"
