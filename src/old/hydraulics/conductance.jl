@@ -87,10 +87,7 @@ function root_pk(
     _dr = 1 / k_rhiz * f_vis / 10;
     _dp = flow * _dr;
     for i in 1:10
-        # No idea why soil_k_ratio_p25 results in unnecessary allocations
-        # _f   = soil_k_ratio_p25(sh, p_25);
-        _rwc   = soil_rwc(sh, p_25);
-        _f     = soil_k_ratio_rwc(sh, _rwc);
+        _f     = relative_hydraulic_conductance(sh, true, p_25);
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end
@@ -133,10 +130,7 @@ function root_pk(
     _dr = 1 / k_rhiz * f_vis / 10;
     _dp = q_in * _dr;
     for i in 1:10
-        # No idea why soil_k_ratio_p25 results in unnecessary allocations
-        # _f   = soil_k_ratio_p25(sh, p_25);
-        _rwc   = soil_rwc(sh, p_25);
-        _f     = soil_k_ratio_rwc(sh, _rwc);
+        _f     = relative_hydraulic_conductance(sh, true, p_25);
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end

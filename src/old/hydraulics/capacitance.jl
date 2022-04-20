@@ -219,7 +219,7 @@ function update_PVF!(
     f_sum::FT = 0;
     for leaf in leaves
         update_PVF!(leaf, Δt);
-        f_sum += leaf.q_in * leaf.area;
+        f_sum += (leaf).q_in * (leaf).area;
     end
 
     # 2. update flow rate for roots, partition total flow rates into roots
@@ -247,7 +247,7 @@ function update_PVF!(
     f_sum::FT = 0;
     for leaf in leaves
         update_PVF!(leaf, Δt);
-        f_sum += leaf.q_in * leaf.area;
+        f_sum += (leaf).q_in * (leaf).area;
     end
 
     # 2. update PVF for trunk
@@ -280,9 +280,9 @@ function update_PVF!(
         leaf = leaves[i];
         stem = branch[i];
         update_PVF!(leaf, Δt);
-        stem.q_out = leaf.q_in * leaf.area;
+        stem.q_out = (leaf).q_in * (leaf).area;
         update_PVF!(stem, Δt);
-        f_sum += stem.q_in;
+        f_sum += (stem).q_in;
     end
 
     # 2. update PVF for trunk

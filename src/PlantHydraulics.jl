@@ -4,6 +4,8 @@ using ClimaCache: AbstractVulnreabilityCurve, ComplexVC, LogisticVC, PowerVC, We
 using DocStringExtensions: METHODLIST
 using UnPack: @unpack
 
+import SoilHydraulics: relative_hydraulic_conductance
+
 
 # export public types from ClimaCache
 export ComplexVC, LogisticVC, PowerVC, WeibullVC
