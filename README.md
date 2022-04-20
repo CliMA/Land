@@ -13,9 +13,6 @@
 [st-img]: https://github.com/Yujie-W/SoilHydraulics.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/SoilHydraulics.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[bm-img]: https://github.com/Yujie-W/SoilHydraulics.jl/workflows/Benchmarks/badge.svg?branch=main
-[bm-url]: https://github.com/Yujie-W/SoilHydraulics.jl/actions?query=branch%3A"main"++workflow%3A"Benchmarks"
-
 [min-img]: https://github.com/Yujie-W/SoilHydraulics.jl/workflows/Julia-1.6/badge.svg?branch=main
 [min-url]: https://github.com/Yujie-W/SoilHydraulics.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.6"
 
@@ -26,9 +23,9 @@
 ## About
 Soil hydraulics module for Soil-Plant-Air Continuum modeling
 
-| Documentation                                   | CI Status             | Benchmarks            | Compatibility           | Code Coverage           |
-|:------------------------------------------------|:----------------------|:----------------------|:------------------------|:------------------------|
-| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][bm-img]][bm-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
+| Documentation                                   | CI Status             | Compatibility           | Code Coverage           |
+|:------------------------------------------------|:----------------------|:------------------------|:------------------------|
+| [![][dev-img]][dev-url] [![][rel-img]][rel-url] | [![][st-img]][st-url] | [![][min-img]][min-url] | [![][cov-img]][cov-url] |
 
 
 ## Installation
