@@ -1,5 +1,5 @@
 function vc_integral(
-            vc::LogisticSingle{FT},
+            vc::LogisticVC{FT},
             p_dos::FT,
             p_ups::FT
 ) where {FT<:AbstractFloat}
@@ -17,7 +17,7 @@ end
 
 
 function vc_integral(
-            vc::LogisticSingle{FT},
+            vc::LogisticVC{FT},
             p_dos::FT,
             p_ups::FT,
             h::FT,
@@ -41,7 +41,7 @@ end
 
 
 function vc_integral(
-            vc::PowerSingle{FT},
+            vc::PowerVC{FT},
             p_dos::FT,
             p_ups::FT
 ) where {FT<:AbstractFloat}
@@ -59,7 +59,7 @@ end
 
 
 function vc_integral(
-            vc::PowerSingle{FT},
+            vc::PowerVC{FT},
             p_dos::FT,
             p_ups::FT,
             h::FT,
@@ -82,7 +82,7 @@ end
 
 
 function vc_integral(
-            vc::WeibullSingle{FT},
+            vc::WeibullVC{FT},
             p_dos::FT,
             p_ups::FT
 ) where {FT<:AbstractFloat}

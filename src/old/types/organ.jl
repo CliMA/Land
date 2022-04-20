@@ -41,7 +41,7 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Maximal leaf hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_sla::FT = FT(0.04)
     "Vulnerability curve"
-    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullVC{FT}(2,5)
     "Critical xylem pressure `[MPa]`"
     p_crt::FT = -vc.b * log(FT(1000)) ^ (1/vc.c)
 
@@ -113,7 +113,7 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Maximal xylem hydraulic conductivity `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_s  ::FT = FT(250)
     "Vulnerability curve"
-    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullVC{FT}(2,5)
     "Root z difference `[m]`"
     Δh   ::FT = FT(1.0)
 
@@ -121,7 +121,7 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
     k_rhiz   ::FT     = FT(5e14)
     "Soil hydraulics"
-    sh::AbstractSoilVC{FT} = BrooksCorey{FT}()
+    sh::AbstractSoilVC{FT} = VanGenuchten{FT}("Silt")
 
     # flows and pressures (need to be updated with time)
     "Flow rate in the xylem `[mol s⁻¹]`"
@@ -201,7 +201,7 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Maximal xylem hydraulic conductivity `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     k_s  ::FT = FT(250)
     "Vulnerability curve"
-    vc::AbstractXylemVC{FT} = WeibullSingle{FT}()
+    vc::AbstractXylemVC{FT} = WeibullVC{FT}(2,5)
     "Stem height difference `[m]`"
     Δh   ::FT = FT(5.0)
 

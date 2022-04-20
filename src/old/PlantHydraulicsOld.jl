@@ -1,9 +1,7 @@
 module PlantHydraulicsOld
 
-using ClimaCache: AbstractSoilVC, BrooksCorey, VanGenuchten
-using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
-      ResidualTolerance, SolutionTolerance, SolutionToleranceND, find_peak,
-      find_zero
+using ClimaCache: AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LogisticVC, PowerVC, VanGenuchten, WeibullVC
+using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND, SolutionTolerance, SolutionToleranceND, find_peak, find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using HypergeometricFunctions: _₂F₁
 using PkgUtility: GAS_R, T_25, twarn, ρg_MPa
@@ -13,11 +11,8 @@ using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
-using ..PlantHydraulics: relative_hydraulic_conductance
+using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance
 
-
-# export public types --- xylem vulnerability
-export LogisticSingle, PowerSingle, WeibullDual, WeibullSingle
 
 # export public types --- pressure volume curve
 export PVCurveLinear, PVCurveSegmented
@@ -35,12 +30,10 @@ export GrassLikeOrganism, PalmLikeOrganism, TreeLikeOrganism, TreeSimple
 export create_grass, create_palm, create_tree
 
 # export public functions --- curves related
-export vc_integral, p_from_volume, xylem_p_crit
+export vc_integral, p_from_volume
 
 # export public functions
-export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow,
-       xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!,
-       temperature_effects!, end_pressure, fit_xylem_VC
+export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!, temperature_effects!, end_pressure
 
 
 include("types/curves.jl")
@@ -53,7 +46,6 @@ include("initialize/plant.jl" )
 
 include("curves/capacity.jl")
 include("curves/integral.jl")
-include("curves/soil.jl"    )
 include("curves/xylem.jl"   )
 
 include("hydraulics/conductance.jl")

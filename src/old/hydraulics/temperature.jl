@@ -27,7 +27,7 @@ function temperature_effects!(hs::LeafHydraulics)
     if hs.T_sap != hs.T_old
         hs.f_st  = relative_surface_tension(hs.T_sap);
         hs.f_vis = relative_viscosity(hs.T_sap);
-        hs.p_crt = xylem_p_crit(hs.vc);
+        hs.p_crt = critical_pressure(hs.vc);
         hs.T_old = hs.T_sap;
     end
 

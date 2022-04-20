@@ -1,6 +1,6 @@
 module PlantHydraulics
 
-using ClimaCache: AbstractVulnreabilityCurve, ComplexVC, LogisticVC, PowerVC, WeibullVC
+using ClimaCache: ComplexVC, LogisticVC, PowerVC, WeibullVC
 using DocStringExtensions: METHODLIST
 using UnPack: @unpack
 
