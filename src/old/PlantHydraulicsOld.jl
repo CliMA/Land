@@ -30,7 +30,7 @@ export GrassLikeOrganism, PalmLikeOrganism, TreeLikeOrganism, TreeSimple
 export create_grass, create_palm, create_tree
 
 # export public functions --- curves related
-export vc_integral, p_from_volume
+export p_from_volume
 
 # export public functions
 export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!, temperature_effects!, end_pressure
@@ -45,8 +45,6 @@ include("initialize/legacy.jl")
 include("initialize/plant.jl" )
 
 include("curves/capacity.jl")
-include("curves/integral.jl")
-include("curves/xylem.jl"   )
 
 include("hydraulics/conductance.jl")
 include("hydraulics/flow.jl"       )

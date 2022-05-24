@@ -1,3 +1,4 @@
+#=
 function vc_integral(
             vc::LogisticVC{FT},
             p_dos::FT,
@@ -97,3 +98,4 @@ function vc_integral(
 
     return b/c * (_Γ_ups - _Γ_dos)
 end
+=#
