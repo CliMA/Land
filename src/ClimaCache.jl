@@ -54,11 +54,12 @@ include("plant/temperature_dependency.jl")
 include("plant/leaf_biophysics.jl"       )
 include("plant/leaf_photosynthesis.jl"   )
 include("plant/leaf_reaction_center.jl"  )
+include("plant/pressure_volume.jl"       )
 include("plant/vulnerability.jl"         )
 include("plant/leaf.jl"                  )
 
 # include the soil types and structures
-include("soil/vulnerability_curve.jl")
+include("soil/vulnerability.jl")
 
 
 end # module
