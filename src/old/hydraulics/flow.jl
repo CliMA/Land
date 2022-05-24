@@ -12,7 +12,7 @@ Return the buffer rate, given
 Note that only symplastic water can be used as capacitance
 """
 function buffer_rate(
-            pv::PVCurveLinear{FT}
+            pv::LinearPVCurve{FT}
 ) where {FT<:AbstractFloat}
     return pv.k_refill
 end
@@ -21,7 +21,7 @@ end
 
 
 function buffer_rate(
-            pv::PVCurveSegmented{FT}
+            pv::SegmentedPVCurve{FT}
 ) where {FT<:AbstractFloat}
     return pv.k_refill * (1 - pv.RWC_apo)
 end

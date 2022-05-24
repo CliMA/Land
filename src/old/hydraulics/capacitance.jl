@@ -53,7 +53,7 @@ function update_PVF!(hs::LeafHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # update flow into the tissue, storage and the tissue pressure (p_storage)
     hs.q_in       = q_out - f_cap;
     hs.v_storage -= f_cap * Δt;
-    hs.p_storage  = p_from_volume(pv, hs.v_storage/v_maximum, T_sap);
+    hs.p_storage  = xylem_pressure(pv, hs.v_storage/v_maximum, T_sap);
 
     return nothing
 end
@@ -75,7 +75,7 @@ function update_PVF!(hs::StemHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
             f_cap = v_storage[i] / Δt;
         end
         v_storage[i] -= f_cap * Δt;
-        p_storage[i]  = p_from_volume(pv, v_storage[i]/v_maximum[i], T_sap);
+        p_storage[i]  = xylem_pressure(pv, v_storage[i]/v_maximum[i], T_sap);
         q_element[i]  = q_out - f_sum;
         f_sum        += f_cap;
     end
@@ -103,7 +103,7 @@ function update_PVF!(hs::RootHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
         q_buffer[i]   = f_cap;
         q_diff[i]     = f_sum;
         v_storage[i] -= f_cap * Δt;
-        p_storage[i]  = p_from_volume(pv, v_storage[i]/v_maximum[i], T_sap);
+        p_storage[i]  = xylem_pressure(pv, v_storage[i]/v_maximum[i], T_sap);
         q_element[i]  = q_out - f_sum;
         f_sum        += f_cap;
     end

@@ -1,6 +1,6 @@
 module PlantHydraulicsOld
 
-using ClimaCache: AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LogisticVC, PowerVC, VanGenuchten, WeibullVC
+using ClimaCache: AbstractPVCurve, AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LinearPVCurve, LogisticVC, PowerVC, SegmentedPVCurve, VanGenuchten, WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND, SolutionTolerance, SolutionToleranceND, find_peak, find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using HypergeometricFunctions: _₂F₁
@@ -11,11 +11,7 @@ using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
-using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance
-
-
-# export public types --- pressure volume curve
-export PVCurveLinear, PVCurveSegmented
+using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance, xylem_pressure
 
 # export public types --- flow mode
 export NonSteadyStateMode, SteadyStateMode
@@ -29,22 +25,16 @@ export GrassLikeOrganism, PalmLikeOrganism, TreeLikeOrganism, TreeSimple
 # export public functions --- initialize plant
 export create_grass, create_palm, create_tree
 
-# export public functions --- curves related
-export p_from_volume
-
 # export public functions
 export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!, temperature_effects!, end_pressure
 
 
-include("types/curves.jl")
-include("types/flow.jl"  )
-include("types/organ.jl" )
-include("types/plant.jl" )
+include("types/flow.jl" )
+include("types/organ.jl")
+include("types/plant.jl")
 
 include("initialize/legacy.jl")
 include("initialize/plant.jl" )
-
-include("curves/capacity.jl")
 
 include("hydraulics/conductance.jl")
 include("hydraulics/flow.jl"       )
