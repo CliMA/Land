@@ -10,6 +10,8 @@
 $(TYPEDEF)
 
 Hierachy of AbstractPVCurve:
+- [`LinearPVCurve`](@ref)
+- [`SegmentedPVCurve`](@ref)
 """
 abstract type AbstractPVCurve{FT<:AbstractFloat} end
 
