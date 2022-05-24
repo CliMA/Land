@@ -11,7 +11,7 @@ $(TYPEDEF)
 
 Hierachy of AbstractSteadyStateMode:
 """
-abstract type AbstractSteadyStateMode{FT<:AbstractFloat} end
+abstract type AbstractSteadyStateMode end
 
 
 #######################################################################################################################################################################################################
