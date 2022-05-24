@@ -1,6 +1,7 @@
 module PlantHydraulicsOld
 
-using ClimaCache: AbstractPVCurve, AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LinearPVCurve, LogisticVC, PowerVC, SegmentedPVCurve, VanGenuchten, WeibullVC
+using ClimaCache: AbstractPVCurve, AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LinearPVCurve, LogisticVC, NonSteadyStateMode, PowerVC, SegmentedPVCurve, SteadyStateMode, VanGenuchten,
+      WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND, SolutionTolerance, SolutionToleranceND, find_peak, find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using HypergeometricFunctions: _₂F₁
@@ -12,9 +13,6 @@ using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
 using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance, xylem_pressure
-
-# export public types --- flow mode
-export NonSteadyStateMode, SteadyStateMode
 
 # export public types --- hydraulic tissue
 export LeafHydraulics, RootHydraulics, StemHydraulics
@@ -29,7 +27,6 @@ export create_grass, create_palm, create_tree
 export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!, temperature_effects!, end_pressure
 
 
-include("types/flow.jl" )
 include("types/organ.jl")
 include("types/plant.jl")
 
