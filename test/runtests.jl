@@ -43,4 +43,14 @@ using Test
             end;
         end;
     end;
+
+    @testset "Xylem End Pressure" begin
+        for FT in [Float32, Float64]
+            spac = MonoElementSPAC{FT}("C3");
+            p = xylem_end_pressure(spac, FT(2.0));
+            @test true;
+            p1,p2 = xylem_end_pressure(spac, FT(1.0), FT(0.5), FT(0.5));
+            @test true;
+        end;
+    end;
 end;
