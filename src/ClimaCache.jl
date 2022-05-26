@@ -63,5 +63,7 @@ include("plant/vulnerability.jl"         )
 include("plant/hydraulics.jl"            )
 include("plant/leaf.jl"                  )
 
+# include the spac types and structures
+include("spac/spac.jl")
 
 end # module
