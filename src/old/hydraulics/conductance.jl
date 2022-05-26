@@ -9,7 +9,7 @@
 Update plant total hydraulic information in each element and whole plant, given
 - `tree` [`TreeSimple`](@ref) type struct
 """
-function plant_conductances!(tree::TreeSimple{FT}) where {FT<:AbstractFloat}
+function plant_conductances!(tree::MonoElementSAPC{FT}) where {FT<:AbstractFloat}
     # Calculate the resistances
     r_m_root = 1 / (tree.root).k_max;
     r_m_stem = 1 / (tree.stem).k_max;

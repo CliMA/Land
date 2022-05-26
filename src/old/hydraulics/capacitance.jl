@@ -208,7 +208,7 @@ end
 
 
 function update_PVF!(
-            tree::GrassLikeOrganism{FT},
+            tree::MonoGrassSAPC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, roots = tree;
@@ -235,7 +235,7 @@ end
 
 
 function update_PVF!(
-            tree::PalmLikeOrganism{FT},
+            tree::MonoPalmSAPC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, roots = tree;
@@ -251,11 +251,11 @@ function update_PVF!(
     end
 
     # 2. update PVF for trunk
-    trunk.q_out = f_sum;
+    (trunk).q_out = f_sum;
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, cache_k, cache_p, cache_q, trunk.q_in, Δt);
+    update_PVF!(roots, cache_k, cache_p, cache_q, (trunk).q_in, Δt);
 
     # 4. update pressure profiles
     pressure_profile!(tree, NonSteadyStateMode(); update=false);
@@ -267,7 +267,7 @@ end
 
 
 function update_PVF!(
-            tree::TreeLikeOrganism{FT},
+            tree::MonoTreeSAPC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack branch, cache_k, cache_p, cache_q, leaves, roots = tree;
@@ -286,11 +286,11 @@ function update_PVF!(
     end
 
     # 2. update PVF for trunk
-    trunk.q_out = f_sum;
+    (trunk).q_out = f_sum;
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, cache_k, cache_p, cache_q, trunk.q_in, Δt);
+    update_PVF!(roots, cache_k, cache_p, cache_q, (trunk).q_in, Δt);
 
     # 4. update pressure profiles
     pressure_profile!(tree, NonSteadyStateMode(); update=false);

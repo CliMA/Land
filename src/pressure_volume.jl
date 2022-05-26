@@ -17,7 +17,7 @@ function xylem_pressure end
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-May-24: add method for LinearPVCurve
 #
@@ -36,7 +36,7 @@ xylem_pressure(pv::LinearPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFloat}
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-May-24: add method for SegmentedPVCurve
 #

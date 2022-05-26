@@ -129,7 +129,7 @@ end
 
 
 function end_pressure(
-            tree::TreeSimple{FT},
+            tree::MonoElementSAPC{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     # calculate the p_dos for roots
@@ -150,7 +150,7 @@ end
 
 
 function end_pressure(
-            tree::TreeSimple{FT},
+            tree::MonoElementSAPC{FT},
             f_sl::FT,
             f_sh::FT,
             r_sl::FT
@@ -472,7 +472,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeSimple{FT},
+            tree::MonoElementSAPC{FT},
             p_soil::FT,
             flow::FT;
             update::Bool = true
@@ -496,7 +496,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeSimple{FT},
+            tree::MonoElementSAPC{FT},
             p_soil::FT,
             f_sl::FT,
             f_sh::FT,
@@ -527,7 +527,7 @@ end
 
 
 function pressure_profile!(
-            tree::GrassLikeOrganism{FT},
+            tree::MonoGrassSAPC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -555,7 +555,7 @@ end
 
 
 function pressure_profile!(
-            tree::GrassLikeOrganism{FT},
+            tree::MonoGrassSAPC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -583,7 +583,7 @@ end
 
 
 function pressure_profile!(
-            tree::PalmLikeOrganism{FT},
+            tree::MonoPalmSAPC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -616,7 +616,7 @@ end
 
 
 function pressure_profile!(
-            tree::PalmLikeOrganism{FT},
+            tree::MonoPalmSAPC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -649,7 +649,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeLikeOrganism{FT},
+            tree::MonoTreeSAPC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -686,7 +686,7 @@ end
 
 
 function pressure_profile!(
-            tree::TreeLikeOrganism{FT},
+            tree::MonoTreeSAPC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
