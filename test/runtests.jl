@@ -25,7 +25,8 @@ using Test
             # Plant hydraulic system
             lhs = ClimaCache.LeafHydraulics{FT}();
             rhs = ClimaCache.RootHydraulics{FT}();
-            for hs in [lhs, rhs]
+            shs = ClimaCache.StemHydraulics{FT}();
+            for hs in [lhs, rhs, shs]
                 @test FT_test(hs, FT);
                 @test NaN_test(hs);
             end;

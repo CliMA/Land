@@ -156,8 +156,10 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     K_MAX::FT
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
     K_RHIZ::FT
-    "Maximal xylem hydraulic conductivity (per root depth) `[mol s⁻¹ MPa⁻¹ m⁻²]`"
+    "Maximal xylem hydraulic conductivity `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     K_X::FT
+    "Length `[m]`"
+    L::FT
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
@@ -184,12 +186,139 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     p_storage::Vector{FT}
     "Soil matrix potential `[MPa]`"
     p_ups::FT
-    "List of xylem water flow `[mol m⁻²]`"
+    "Vector of xylem water flow `[mol m⁻²]`"
     q_element::Vector{FT}
-    "List of buffer water flow `[mol m⁻²]`"
-    q_buffer::Vector{FT}
-    "List of diiferntial water flow `[mol m⁻²]`"
-    q_diff::Vector{FT}
+    "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_in::FT
+    "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
+    q_out::FT
+    "Storage per element `[mol]`"
+    v_storage::Vector{FT}
+
+    # dignostic variables that change with time
+    "Vector of leaf kr history per element"
+    k_history::Vector{FT}
+    "Vector of xylem water pressure `[MPa]`"
+    p_element::Vector{FT}
+    "Vector of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
+    p_history::Vector{FT}
+
+    # caches to speed up calculations
+    "Vector of buffer water flow `[mol m⁻²]`"
+    _q_buffer::Vector{FT}
+    "Vector of diiferntial water flow `[mol m⁻²]`"
+    _q_diff::Vector{FT}
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-May-25: add root hydraulics constructor
+#
+#######################################################################################################################################################################################################
+"""
+
+    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat}
+
+Constructor for root hydraulic system, given
+- `N` Number of xylem slices in the system, default is 5
+- `area` Root crosssection area
+- `k_x` Maximum root xylem hydraulic conductivity per crosssection area per root length
+- `Δh` Root depth
+- `Δl` Root length
+
+---
+# Examples
+```julia
+rhs = RootHydraulics{Float64}();
+rhs = RootHydraulics{Float64}(N = 5);
+rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2);
+```
+"""
+RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat} = (
+    return RootHydraulics{FT}(
+        area,                               # AREA
+        k_x * area / Δl,                    # K_MAX
+        5e14,                               # K_RHIZ
+        k_x,                                # K_X
+        Δl,                                 # L
+        N,                                  # N
+        LinearPVCurve{FT}(),                # PV
+        VanGenuchten{FT}("Silt"),           # SH
+        area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
+        WeibullVC{FT}(2,5),                 # VC
+        Δh,                                 # ΔH
+        0,                                  # flow
+        0,                                  # p_dos
+        0,                                  # p_osm
+        0,                                  # p_rhiz
+        zeros(FT,N),                        # p_storage
+        0,                                  # p_ups
+        zeros(FT,N),                        # q_element
+        0,                                  # q_in
+        0,                                  # q_out
+        zeros(FT,N),                        # v_storage
+        ones(FT,N),                         # k_history
+        zeros(FT,N),                        # p_element
+        zeros(FT,N),                        # p_history
+        zeros(FT,N),                        # _q_buffer
+        zeros(FT,N)                         # _q_diff
+    )
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this type
+# General
+#     2022-May-25: add stem hydraulic system
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct that contains stem hydraulic system
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
+    # parameters that do not change with time
+    "Root cross-section area `[m²]`"
+    AREA::FT
+    "Maximal hydraulic conductance `[mol s⁻¹ MPa⁻¹]`"
+    K_MAX::FT
+    "Maximal xylem hydraulic conductivity (per root depth) `[mol s⁻¹ MPa⁻¹ m⁻²]`"
+    K_X::FT
+    "Length `[m]`"
+    L::FT
+    "Number of xylem slices"
+    N::Int
+    "Pressure volume curve for storage"
+    PV::AbstractPVCurve{FT}
+    "Maximal storage per element `[mol]`"
+    V_MAXIMUM::Vector{FT}
+    "Vulnerability curve"
+    VC::AbstractXylemVC{FT}
+    "Root z difference `[m]`"
+    ΔH::FT
+
+    # prognostic variables that change with time
+    "Flow rate in the xylem `[mol s⁻¹]`"
+    flow::FT
+    "Xylem water pressure at the downstream end of xylem `[MPa]`"
+    p_dos::FT
+    "Pressure of storage per element"
+    p_storage::Vector{FT}
+    "Soil matrix potential `[MPa]`"
+    p_ups::FT
+    "Vector of xylem water flow `[mol m⁻²]`"
+    q_element::Vector{FT}
     "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
     q_in::FT
     "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
@@ -211,48 +340,44 @@ end
 #
 # Changes to this constructor
 # General
-#     2022-May-25: add root hydraulics constructor
+#     2022-May-25: add stem hydraulics constructor
 #
 #######################################################################################################################################################################################################
 """
 
-    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1) where {FT<:AbstractFloat}
+    StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat}
 
-Constructor for root hydraulic system, given
+Constructor for stem hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
 - `area` Root crosssection area
-- `k_x` Maximum root xylem hydraulic conductivity per crosssection area per root depth
-- `Δh` Root depth
+- `k_x` Maximum stem xylem hydraulic conductivity per crosssection area per stem length
+- `Δh` Stem height
+- `Δl` Stem length
 
 ---
 # Examples
 ```julia
-rhs = RootHydraulics{Float64}();
-rhs = RootHydraulics{Float64}(N = 5);
-rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2);
+rhs = StemHydraulics{Float64}();
+rhs = StemHydraulics{Float64}(N = 5);
+rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2);
 ```
 """
-RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1) where {FT<:AbstractFloat} = (
-    return RootHydraulics{FT}(
+StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat} = (
+    return StemHydraulics{FT}(
         area,                               # AREA
-        k_x * area / Δh,                    # K_MAX
-        5e14,                               # K_RHIZ
+        k_x * area / Δl,                    # K_MAX
         k_x,                                # K_X
+        Δl,                                 # L
         N,                                  # N
         LinearPVCurve{FT}(),                # PV
-        VanGenuchten{FT}("Silt"),           # SH
         area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
         WeibullVC{FT}(2,5),                 # VC
         Δh,                                 # ΔH
         0,                                  # flow
         0,                                  # p_dos
-        0,                                  # p_osm
-        0,                                  # p_rhiz
         zeros(FT,N),                        # p_storage
         0,                                  # p_ups
         zeros(FT,N),                        # q_element
-        zeros(FT,N),                        # q_buffer
-        zeros(FT,N),                        # q_diff
         0,                                  # q_in
         0,                                  # q_out
         zeros(FT,N),                        # v_storage
