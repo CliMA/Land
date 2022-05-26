@@ -70,11 +70,12 @@ end
 # General
 #     2021-Nov-24: isolate the constructor from structure
 #     2022-Jan-24: fix documentation
+#     2022-May-25: fine tune function
 #
 #######################################################################################################################################################################################################
 """
 
-    WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat}
+    WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat}
 
 Constructor for [`WaveLengthSet`](@ref), given
 - `swl` Standard wave length boundaries `[nm]`, default is `ClimaCache.WAVELENGTHS`
@@ -88,7 +89,7 @@ wls = WaveLengthSet{Float64}(collect(400:5:2500));
 wls = WaveLengthSet{Float64}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
 ```
 """
-WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
+WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat} = (
     _dwl    = diff(swl);
     _λ      = zeros(FT, length(swl)-1);
     _opti   = matread(opti)["optipar"];
@@ -102,6 +103,26 @@ WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:Ab
     _iλ_sif  = findall( 640 .<= _λ .<= 850  );
     _iλ_sife = findall( 400 .<= _λ .<= 750  );
 
-    return WaveLengthSet{FT}(_iλ_nir, _iλ_par, _iλ_sif, _iλ_sife, length(_λ), length(_iλ_par), length(_iλ_sif), length(_iλ_sife), FT[700,2500], FT[400,700], FT[640,850], FT[400,750], swl, _dwl,
-                             _dwl[_iλ_par], _dwl[_iλ_sife], _λ, _λ[_iλ_par], _λ[_iλ_sif], _λ[_iλ_sife])
+    return WaveLengthSet{FT}(
+                _iλ_nir,            # IΛ_NIR
+                _iλ_par,            # IΛ_PAR
+                _iλ_sif,            # IΛ_SIF
+                _iλ_sife,           # IΛ_SIFE
+                length(_λ),         # NΛ
+                length(_iλ_par),    # NΛ_PAR
+                length(_iλ_sif),    # NΛ_SIF
+                length(_iλ_sife),   # NΛ_SIFE
+                FT[700,2500],       # WL_NIR
+                FT[400,700],        # WL_PAR
+                FT[640,850],        # WL_SIF
+                FT[400,750],        # WL_SIFE
+                swl,                # SΛ
+                _dwl,               # ΔΛ
+                _dwl[_iλ_par],      # ΔΛ_PAR
+                _dwl[_iλ_sife],     # ΔΛ_SIFE
+                _λ,                 # Λ
+                _λ[_iλ_par],        # Λ_PAR
+                _λ[_iλ_sif],        # Λ_SIF
+                _λ[_iλ_sife]        # Λ_SIFE
+    )
 );

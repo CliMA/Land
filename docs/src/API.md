@@ -13,6 +13,28 @@ AirLayer{FT}() where {FT<:AbstractFloat}
 
 
 ## Plant
+
+### Hydraulics
+```@docs
+AbstractPVCurve
+LinearPVCurve
+LinearPVCurve{FT}() where {FT<:AbstractFloat}
+SegmentedPVCurve
+SegmentedPVCurve{FT}() where {FT<:AbstractFloat}
+AbstractHydraulicSystem
+AbstractXylemVC
+LogisticVC
+PowerVC
+WeibullVC
+ComplexVC
+AbstractSteadyStateMode
+SteadyStateMode
+NonSteadyStateMode
+LeafHydraulics
+LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20) where {FT<:AbstractFloat}
+```
+
+### Leaf Level
 ```@docs
 Leaf
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat}
@@ -49,5 +71,18 @@ Q10
 ## Radiation
 ```@docs
 WaveLengthSet
-WaveLengthSet{FT}(swl::Vector=WAVELENGTHS; opti::String=OPTI_2021) where {FT<:AbstractFloat}
+WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat}
+HyperspectralRadiation
+HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat}
+HyperspectralAbsorption
+HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat}
+```
+
+## Soil
+```@docs
+AbstractSoilVC
+BrooksCorey
+VanGenuchten
+VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
+VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 ```

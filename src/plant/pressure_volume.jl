@@ -69,6 +69,7 @@ LinearPVCurve{FT}() where {FT<:AbstractFloat} = LinearPVCurve{FT}(0.0001, 0.2);
 # Changes to this struct
 # General
 #     2022-May-24: add segmented PV curve
+#     2022-May-25: fix floating number type control
 #
 #######################################################################################################################################################################################################
 """
@@ -84,15 +85,15 @@ $(TYPEDFIELDS)
 """
 mutable struct SegmentedPVCurve{FT} <: AbstractPVCurve{FT}
     "n_o / maximum V `[mol m⁻³]`"
-    C_ALL
+    C_ALL::FT
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
-    K_REFILL
+    K_REFILL::FT
     "Apoplastic water content relative to maximum water volume"
-    RWC_APO
+    RWC_APO::FT
     "Relative water content at turgor loss point"
-    RWC_TLP
+    RWC_TLP::FT
     "Bulk modulus of elasticity `[MPa]`"
-    Ε_BULK
+    Ε_BULK::FT
 end
 
 

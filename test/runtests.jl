@@ -14,6 +14,21 @@ using Test
 
     @testset "Plant" begin
         for FT in [Float32, Float64]
+            # Pressure volume curve
+            pvc1 = ClimaCache.LinearPVCurve{FT}();
+            pvc2 = ClimaCache.SegmentedPVCurve{FT}();
+            for pvc in [pvc1, pvc2]
+                @test FT_test(pvc, FT);
+                @test NaN_test(pvc);
+            end;
+
+            # Plant hydraulic system
+            lhs = ClimaCache.LeafHydraulics{FT}();
+            for hs in [lhs]
+                @test FT_test(hs, FT);
+                @test NaN_test(hs);
+            end;
+
             # Leaf
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
@@ -90,6 +105,14 @@ using Test
             for td in [td_1, td_2, td_3]
                 @test FT_test(td, FT);
                 @test NaN_test(td);
+            end;
+
+            # Steady State
+            ssm1 = ClimaCache.SteadyStateMode();
+            ssm2 = ClimaCache.NonSteadyStateMode();
+            for ssm in [ssm1, ssm2]
+                @test FT_test(ssm, FT);
+                @test NaN_test(ssm);
             end;
         end;
     end;
