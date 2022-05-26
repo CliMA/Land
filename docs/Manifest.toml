@@ -128,9 +128,9 @@ version = "0.8.6"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "122d031e8dcb2d3e767ed434bc4d1ae1788b5a7f"
+git-tree-sha1 = "3eb46f2549b52a79206469cdc03ae2518ded8d31"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.17"
+version = "0.27.18"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]

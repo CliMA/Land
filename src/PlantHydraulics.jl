@@ -1,6 +1,6 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, LinearPVCurve, LogisticVC, PowerVC, SegmentedPVCurve, WeibullVC
+using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, PowerVC, SegmentedPVCurve, WeibullVC
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R
 using UnPack: @unpack
@@ -17,6 +17,7 @@ export critical_pressure, relative_hydraulic_conductance
 
 # include functions
 include("critical_pressure.jl")
+include("legacy.jl"           )
 include("pressure_volume.jl"  )
 include("vulnerability.jl"    )
 
