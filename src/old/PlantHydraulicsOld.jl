@@ -19,12 +19,9 @@ using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance, xyle
 export flow_profile!, pressure_profile!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!, end_pressure
 
 
-include("initialize/plant.jl" )
-
 include("hydraulics/conductance.jl")
 include("hydraulics/flow.jl"       )
 include("hydraulics/pressure.jl"   )
-
 include("hydraulics/capacitance.jl")
 
 

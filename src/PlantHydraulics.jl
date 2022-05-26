@@ -10,10 +10,10 @@ import SoilHydraulics: relative_hydraulic_conductance
 
 
 # export public types from ClimaCache
-export ComplexVC, LogisticVC, PowerVC, WeibullVC
+export ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics, WeibullVC
 
 # export public functions
-export critical_pressure, relative_hydraulic_conductance
+export clear_legacy!, critical_pressure, relative_hydraulic_conductance, xylem_pressure
 
 
 # include functions

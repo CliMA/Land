@@ -21,6 +21,8 @@ function critical_pressure end
 # General
 #     2022-Feb-02: add method for ComplexVC
 #     2022-Feb-02: add a reference kr for more customized calculations
+# Bug fixes:
+#     2022-May-25: iterate through VCS than than its indices
 #
 #######################################################################################################################################################################################################
 """
@@ -35,7 +37,7 @@ critical_pressure(vc::ComplexVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloa
     @unpack VCS = vc;
 
     _p_crit::FT = 0;
-    for _vc in eachindex(VCS)
+    for _vc in VCS
         _p_crit = min(_p_crit, critical_pressure(_vc, kr));
     end;
 
