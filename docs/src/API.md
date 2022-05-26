@@ -28,7 +28,7 @@ xylem_pressure(pv::SegmentedPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFlo
 ```@docs
 clear_legacy!
 clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat}
-clear_legacy!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
 clear_legacy!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat}
 clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
 clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat}

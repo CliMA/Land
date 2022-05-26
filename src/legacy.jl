@@ -45,12 +45,12 @@ clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{F
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
 
 Clear the legacy for hydraulic system, given
-- `leaf` `Leaf` type structure
+- `organ` `Leaf`, `Root`, or `Stem` type structure
 """
-clear_legacy!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = clear_legacy!(leaf.HS);
+clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
 
 
 #######################################################################################################################################################################################################
