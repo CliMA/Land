@@ -79,7 +79,7 @@ end
 
 
 function critical_flow(
-            tree::MonoElementSAPC{FT},
+            tree::MonoElementSPAC{FT},
             ini::FT = FT(0.5)
 ) where {FT<:AbstractFloat}
     # calculate maximal flow for whole tree, remember to times leaf area
@@ -204,9 +204,9 @@ end
 
 
 function roots_flow!(
-            plant::Union{MonoGrassSAPC{FT},
-                         MonoPalmSAPC{FT},
-                         MonoTreeSAPC{FT}},
+            plant::Union{MonoGrassSPAC{FT},
+                         MonoPalmSPAC{FT},
+                         MonoTreeSPAC{FT}},
             flow::FT
 ) where {FT<:AbstractFloat}
     roots_flow!(plant.roots,
@@ -270,7 +270,7 @@ end
 # Update the flow profile from leaf flow rates
 #
 ###############################################################################
-function flow_profile!(hs::MonoGrassSAPC{FT}) where {FT<:AbstractFloat}
+function flow_profile!(hs::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
     # leaf rate is per leaf area so stem flow should that times leaf area
     _flow::FT = 0;
     for _i in eachindex(hs.leaves)
@@ -289,7 +289,7 @@ end
 
 
 
-function flow_profile!(hs::MonoPalmSAPC{FT}) where {FT<:AbstractFloat}
+function flow_profile!(hs::MonoPalmSPAC{FT}) where {FT<:AbstractFloat}
     # leaf rate is per leaf area so stem flow should that times leaf area
     _flow::FT = 0;
     for _i in eachindex(hs.leaves)
@@ -311,7 +311,7 @@ end
 
 
 
-function flow_profile!(hs::MonoTreeSAPC{FT}) where {FT<:AbstractFloat}
+function flow_profile!(hs::MonoTreeSPAC{FT}) where {FT<:AbstractFloat}
     # leaf rate is per leaf area so stem flow should that times leaf area
     _flow::FT = 0;
     for _i in eachindex(hs.leaves)

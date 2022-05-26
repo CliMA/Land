@@ -129,7 +129,7 @@ end
 
 
 function end_pressure(
-            tree::MonoElementSAPC{FT},
+            tree::MonoElementSPAC{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     # calculate the p_dos for roots
@@ -150,7 +150,7 @@ end
 
 
 function end_pressure(
-            tree::MonoElementSAPC{FT},
+            tree::MonoElementSPAC{FT},
             f_sl::FT,
             f_sh::FT,
             r_sl::FT
@@ -472,7 +472,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoElementSAPC{FT},
+            tree::MonoElementSPAC{FT},
             p_soil::FT,
             flow::FT;
             update::Bool = true
@@ -496,7 +496,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoElementSAPC{FT},
+            tree::MonoElementSPAC{FT},
             p_soil::FT,
             f_sl::FT,
             f_sh::FT,
@@ -527,7 +527,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoGrassSAPC{FT},
+            tree::MonoGrassSPAC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -555,7 +555,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoGrassSAPC{FT},
+            tree::MonoGrassSPAC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -583,7 +583,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoPalmSAPC{FT},
+            tree::MonoPalmSPAC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -616,7 +616,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoPalmSAPC{FT},
+            tree::MonoPalmSPAC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -649,7 +649,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoTreeSAPC{FT},
+            tree::MonoTreeSPAC{FT},
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
@@ -686,7 +686,7 @@ end
 
 
 function pressure_profile!(
-            tree::MonoTreeSAPC{FT},
+            tree::MonoTreeSPAC{FT},
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}

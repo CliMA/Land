@@ -208,7 +208,7 @@ end
 
 
 function update_PVF!(
-            tree::MonoGrassSAPC{FT},
+            tree::MonoGrassSPAC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, roots = tree;
@@ -235,7 +235,7 @@ end
 
 
 function update_PVF!(
-            tree::MonoPalmSAPC{FT},
+            tree::MonoPalmSPAC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack cache_k, cache_p, cache_q, roots = tree;
@@ -267,7 +267,7 @@ end
 
 
 function update_PVF!(
-            tree::MonoTreeSAPC{FT},
+            tree::MonoTreeSPAC{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
     @unpack branch, cache_k, cache_p, cache_q, leaves, roots = tree;

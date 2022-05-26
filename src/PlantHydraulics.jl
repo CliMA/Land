@@ -1,6 +1,6 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSAPC, MonoGrassSAPC, MonoPalmSAPC, MonoTreeSAPC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics,
+using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics,
       WeibullVC
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R

@@ -1,6 +1,6 @@
 module PlantHydraulicsOld
 
-using ClimaCache: AbstractPVCurve, AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSAPC, MonoGrassSAPC, MonoPalmSAPC, MonoTreeSAPC,
+using ClimaCache: AbstractPVCurve, AbstractSoilVC, AbstractXylemVC, BrooksCorey, ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC,
       NonSteadyStateMode, PowerVC, RootHydraulics, SegmentedPVCurve, SteadyStateMode, StemHydraulics, VanGenuchten, WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND, SolutionTolerance, SolutionToleranceND, find_peak, find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS

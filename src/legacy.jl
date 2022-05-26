@@ -62,12 +62,12 @@ clear_legacy!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = clear_legacy!(leaf.HS)
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoElementSAPC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoElementSAPC` type structure
+- `spac` `MonoElementSPAC` type structure
 """
-clear_legacy!(spac::MonoElementSAPC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!(spac.LEAF);
     clear_legacy!(spac.ROOT);
     clear_legacy!(spac.STEM);
@@ -85,12 +85,12 @@ clear_legacy!(spac::MonoElementSAPC{FT}) where {FT<:AbstractFloat} = (
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoGrassSAPC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoGrassSAPC` type structure
+- `spac` `MonoGrassSPAC` type structure
 """
-clear_legacy!(spac::MonoGrassSAPC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!.(spac.LEAVES);
 
@@ -107,12 +107,12 @@ clear_legacy!(spac::MonoGrassSAPC{FT}) where {FT<:AbstractFloat} = (
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoPalmSAPC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoPalmSAPC` type structure
+- `spac` `MonoPalmSPAC` type structure
 """
-clear_legacy!(spac::MonoPalmSAPC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!(spac.TRUNK);
     clear_legacy!.(spac.LEAVES);
@@ -130,12 +130,12 @@ clear_legacy!(spac::MonoPalmSAPC{FT}) where {FT<:AbstractFloat} = (
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoTreeSAPC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoTreeSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoTreeSAPC` type structure
+- `spac` `MonoTreeSPAC` type structure
 """
-clear_legacy!(spac::MonoTreeSAPC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoTreeSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!(spac.TRUNK);
     clear_legacy!.(spac.BRANCHES);
