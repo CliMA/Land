@@ -90,3 +90,12 @@ VanGenuchten
 VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
 VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 ```
+
+## SPAC
+```@docs
+AbstractSPACSystem
+MonoElementSPAC
+MonoElementSPAC{FT}() where {FT<:AbstractFloat}
+MonoGrassSPAC
+MonoGrassSPAC{FT}(; z_root::Number = -0.2, z_canopy::Number = 0.5, soil_bounds::Vector = collect(0:-0.1:-1), air_bounds::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
+```

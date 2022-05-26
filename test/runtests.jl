@@ -131,4 +131,15 @@ using Test
             end;
         end;
     end;
+
+    @testset "SPAC" begin
+        for FT in [Float32, Float64]
+            spac1 = ClimaCache.MonoGrassSPAC{FT}("C3");
+            for spac in [spac1]
+                @test FT_test(spac, FT);
+                # NaN test will not pass because of the NaNs in temperature dependency structures
+                # @test NaN_test(wls);
+            end;
+        end;
+    end;
 end;
