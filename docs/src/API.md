@@ -97,5 +97,7 @@ AbstractSPACSystem
 MonoElementSPAC
 MonoElementSPAC{FT}() where {FT<:AbstractFloat}
 MonoGrassSPAC
-MonoGrassSPAC{FT}(; z_root::Number = -0.2, z_canopy::Number = 0.5, soil_bounds::Vector = collect(0:-0.1:-1), air_bounds::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
+MonoPalmSPAC
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat}
 ```

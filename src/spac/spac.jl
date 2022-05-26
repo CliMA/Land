@@ -126,31 +126,31 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoGrassSPAC{FT}(psm::String; z_root::Number = -0.2, z_canopy::Number = 0.5, soil_bounds::Vector = collect(0:-0.1:-1), air_bounds::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
+    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies grass system, given
-- `psm` Photosynthesis model, must be C3, C4 cor C3Cytochrome
-- `z_root` Maximal root depth (negative value)
-- `z_canopy` Maximal canopy height (positive value)
-- `soil_bounds` Array of soil layer boundaries starting from 0
-- `air_bounds` Array of air layer boundaries starting from 0
+- `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
+- `zr` Maximal root depth (negative value)
+- `zc` Maximal canopy height (positive value)
+- `z_soil` Array of soil layer boundaries starting from 0
+- `z_air` Array of air layer boundaries starting from 0
 
 ---
 # Examples
 ```julia
 spac = MonoGrassSPAC{Float64}();
-spac = MonoGrassSPAC{Float64}(z_root = -0.3, z_canopy = 1, soil_bounds = collect(0:-0.1:-1), air_bounds = collect(0:0.05:1.01));
+spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, z_soil = collect(0:-0.1:-1), z_air = collect(0:0.05:1.01));
 ```
 """
-MonoGrassSPAC{FT}(psm::String; z_root::Number = -0.2, z_canopy::Number = 0.5, soil_bounds::Vector = collect(0:-0.1:-1), air_bounds::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat} = (
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
     _n_root  = 0;
     _r_index = Int[];
-    for i in eachindex(soil_bounds)
-        _z = soil_bounds[i];
-        if _z > z_root
+    for i in eachindex(z_soil)
+        _z = z_soil[i];
+        if _z > zr
             _n_root += 1;
             push!(_r_index, i);
         else
@@ -161,12 +161,12 @@ MonoGrassSPAC{FT}(psm::String; z_root::Number = -0.2, z_canopy::Number = 0.5, so
     # determine how many layers of canopy
     _n_canopy = 0;
     _c_index  = Int[];
-    for i in eachindex(air_bounds)
-        _z = air_bounds[i]
-        if _z < z_canopy
+    for i in eachindex(z_air)
+        _z = z_air[i]
+        if _z < zc
             _n_canopy += 1;
             push!(_c_index, i);
-        elseif _z >= z_canopy
+        elseif _z >= zc
             break
         end;
     end;
@@ -174,7 +174,7 @@ MonoGrassSPAC{FT}(psm::String; z_root::Number = -0.2, z_canopy::Number = 0.5, so
     # create evenly distributed root system for now
     _roots = RootHydraulics{FT}[];
     for i in _r_index
-        _Δh = abs(soil_bounds[i+1] + soil_bounds[i]) / 2;
+        _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
         _rt = RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh);
         push!(_roots, _rt);
     end;
@@ -243,6 +243,105 @@ mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
     "Flow rate per root layer"
     _qs::Array{FT,1}
 end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-May-25: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat}
+
+Construct a SPAC system for monospecies palm system, given
+- `psm` Photosynthesis model, must be C3 or C3Cytochrome
+- `zr` Maximal root depth (negative value)
+- `zc` Maximal canopy height (positive value)
+- `z_soil` Array of soil layer boundaries starting from 0
+- `z_air` Array of air layer boundaries starting from 0
+
+---
+# Examples
+```julia
+spac = MonoPalmSPAC{Float64}();
+spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, z_soil = collect(0:-0.1:-2), z_air = collect(0:0.2:13));
+```
+"""
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat} = (
+    @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
+
+    # determine how many layers of roots
+    _n_root  = 0;
+    _r_index = Int[];
+    for i in eachindex(z_soil)
+        _z = z_soil[i];
+        if _z > zr
+            _n_root += 1;
+            push!(_r_index, i);
+        else
+            break
+        end;
+    end;
+
+    # determine how many layers of canopy
+    _n_canopy = 0;
+    _c_index  = Int[];
+    for i in 1:(length(z_air)-1)
+        _z0 = z_air[i];
+        _z1 = z_air[i+1];
+        if _z0 <= zt < zc <= _z1
+            _n_canopy += 1;
+            push!(_c_index, i);
+            break
+        elseif _z0 < zt < _z1 < zc
+            _n_canopy += 1;
+            push!(_c_index, i);
+        elseif zt <= _z0 < _z1 < zc
+            _n_canopy += 1;
+            push!(_c_index, i);
+        elseif zt <= _z0 <= zc < _z1
+            _n_canopy += 1;
+            push!(_c_index, i-1);
+            break
+        elseif zc <= _z0 < _z1
+            break
+        end;
+    end;
+
+    # create evenly distributed root system for now
+    _roots = RootHydraulics{FT}[];
+    for i in _r_index
+        _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
+        _rt = RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh);
+        push!(_roots, _rt);
+    end;
+
+    # create Trunk
+    _trunk = StemHydraulics{FT}(Δh=zt, Δl=zt);
+
+    # create leaves
+    _leaves = [Leaf{FT}(psm) for i in 1:_n_canopy];
+    for _leaf in _leaves
+        _leaf.HS.AREA = 1500 / _n_canopy;
+    end;
+
+    # return plant
+    return MonoPalmSPAC{FT}(
+                _leaves,            # LEAVES
+                _c_index,           # LEVES_INDEX
+                _n_canopy,          # N_CANOPY
+                _n_root,            # N_ROOT
+                _roots,             # ROOTS
+                _r_index,           # ROOTS_INDEX
+                _trunk,             # TRUNK
+                zeros(FT,_n_root),  # _ks
+                zeros(FT,_n_root),  # _ps
+                zeros(FT,_n_root),  # _qs
+    )
+);
 
 
 #######################################################################################################################################################################################################
