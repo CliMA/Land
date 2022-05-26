@@ -62,6 +62,8 @@ include("plant/steady_state.jl"          )
 include("plant/vulnerability.jl"         )
 include("plant/hydraulics.jl"            )
 include("plant/leaf.jl"                  )
+include("plant/root.jl"                  )
+include("plant/stem.jl"                  )
 
 # include the spac types and structures
 include("spac/spac.jl")

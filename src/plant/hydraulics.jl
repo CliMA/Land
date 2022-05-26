@@ -135,6 +135,7 @@ LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::N
 # Changes to this type
 # General
 #     2022-May-25: add root hydraulic system
+#     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #
 #######################################################################################################################################################################################################
 """
@@ -163,7 +164,7 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
-    PV::AbstractPVCurve{FT}
+    PVC::AbstractPVCurve{FT}
     "Soil hydraulics"
     SH::AbstractSoilVC{FT}
     "Maximal storage per element `[mol]`"
@@ -178,8 +179,6 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     flow::FT
     "Xylem water pressure at the downstream end of xylem `[MPa]`"
     p_dos::FT
-    "Soil osmotic potential at 298.15 K `[MPa]"
-    p_osm::FT
     "Xylem-rhizosphere interface water pressure `[MPa]`"
     p_rhiz::FT
     "Pressure of storage per element"
@@ -194,6 +193,8 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     q_out::FT
     "Storage per element `[mol]`"
     v_storage::Vector{FT}
+    "Soil osmotic potential at 298.15 K `[MPa]"
+    ψ_osm::FT
 
     # dignostic variables that change with time
     "Vector of leaf kr history per element"
@@ -245,14 +246,13 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
         k_x,                                # K_X
         Δl,                                 # L
         N,                                  # N
-        LinearPVCurve{FT}(),                # PV
+        LinearPVCurve{FT}(),                # PVC
         VanGenuchten{FT}("Silt"),           # SH
         area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
         WeibullVC{FT}(2,5),                 # VC
         Δh,                                 # ΔH
         0,                                  # flow
         0,                                  # p_dos
-        0,                                  # p_osm
         0,                                  # p_rhiz
         zeros(FT,N),                        # p_storage
         0,                                  # p_ups
@@ -260,6 +260,7 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
         0,                                  # q_in
         0,                                  # q_out
         zeros(FT,N),                        # v_storage
+        0,                                  # ψ_osm
         ones(FT,N),                         # k_history
         zeros(FT,N),                        # p_element
         zeros(FT,N),                        # p_history
@@ -274,6 +275,7 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
 # Changes to this type
 # General
 #     2022-May-25: add stem hydraulic system
+#     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #
 #######################################################################################################################################################################################################
 """
@@ -300,7 +302,7 @@ mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
-    PV::AbstractPVCurve{FT}
+    PVC::AbstractPVCurve{FT}
     "Maximal storage per element `[mol]`"
     V_MAXIMUM::Vector{FT}
     "Vulnerability curve"
@@ -369,7 +371,7 @@ StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
         k_x,                                # K_X
         Δl,                                 # L
         N,                                  # N
-        LinearPVCurve{FT}(),                # PV
+        LinearPVCurve{FT}(),                # PVC
         area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
         WeibullVC{FT}(2,5),                 # VC
         Δh,                                 # ΔH

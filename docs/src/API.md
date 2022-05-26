@@ -34,8 +34,12 @@ LeafHydraulics
 LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20) where {FT<:AbstractFloat}
 RootHydraulics
 RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1) where {FT<:AbstractFloat}
+Root
+Root{FT}() where {FT<:AbstractFloat}
 StemHydraulics
 StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat}
+Stem
+Stem{FT}() where {FT<:AbstractFloat}
 ```
 
 ### Leaf Level

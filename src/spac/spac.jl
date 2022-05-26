@@ -23,6 +23,7 @@ abstract type AbstractSPACSystem{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2022-May-25: toy SPAC system
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -38,12 +39,12 @@ $(TYPEDFIELDS)
 """
 mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
-    "Leaf hydrualic system"
+    "Leaf system"
     LEAF::Leaf{FT}
-    "Root hydraulic system"
-    ROOT::RootHydraulics{FT}
-    "Stem hydraulic system"
-    STEM::StemHydraulics{FT}
+    "Root system"
+    ROOT::Root{FT}
+    "Stem system"
+    STEM::Stem{FT}
 
     # caches to speed up calculations
     "Relative hydraulic conductance"
@@ -57,6 +58,7 @@ end
 # General
 #     2022-May-25: add constructor function
 #     2022-May-25: add psm to constructor option
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -70,10 +72,10 @@ MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     return MonoElementSPAC{FT}(
-                Leaf{FT}(psm),          # LEAF
-                RootHydraulics{FT}(),   # ROOT
-                StemHydraulics{FT}(),   # STEM
-                ones(FT,3)              # _krs
+                Leaf{FT}(psm),  # LEAF
+                Root{FT}(),     # ROOT
+                Stem{FT}(),     # STEM
+                ones(FT,4)      # _krs
     )
 );
 
@@ -83,6 +85,7 @@ MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat} = (
 # Changes to this struct
 # General
 #     2022-May-25: SPAC system for monospecies grass
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -107,7 +110,7 @@ mutable struct MonoGrassSPAC{FT} <: AbstractSPACSystem{FT}
     "Number of root layers"
     N_ROOT::Int
     "Root hydraulic system"
-    ROOTS::Vector{RootHydraulics{FT}}
+    ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
 
@@ -126,6 +129,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor function
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -176,10 +180,10 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
     end;
 
     # create evenly distributed root system for now
-    _roots = RootHydraulics{FT}[];
+    _roots = Root{FT}[];
     for i in _r_index
         _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh);
+        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
         push!(_roots, _rt);
     end;
 
@@ -209,6 +213,7 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
 # Changes to this struct
 # General
 #     2022-May-25: SPAC system for monospecies palm
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -233,11 +238,11 @@ mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
     "Number of root layers"
     N_ROOT::Int
     "Root hydraulic system"
-    ROOTS::Vector{RootHydraulics{FT}}
+    ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
     "Trunk hydraulic system"
-    TRUNK::StemHydraulics{FT}
+    TRUNK::Stem{FT}
 
     # caches to speed up calculations
     "Conductances for each root layer at given flow"
@@ -254,6 +259,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor function
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -316,15 +322,15 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     end;
 
     # create evenly distributed root system for now
-    _roots = RootHydraulics{FT}[];
+    _roots = Root{FT}[];
     for i in _r_index
         _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh);
+        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = StemHydraulics{FT}(Δh=zt, Δl=zt);
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh=zt, Δl=zt), T_25());
 
     # create leaves
     _leaves = [Leaf{FT}(psm) for i in 1:_n_canopy];
@@ -353,6 +359,7 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
 # Changes to this struct
 # General
 #     2022-May-25: SPAC system for monospecies tree
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -369,7 +376,7 @@ $(TYPEDFIELDS)
 mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Branch hydraulic system"
-    BRANCHES::Vector{StemHydraulics{FT}}
+    BRANCHES::Vector{Stem{FT}}
     "Leaf hydrualic system"
     LEAVES::Vector{Leaf{FT}}
     "Corresponding air layer per canopy layer"
@@ -379,11 +386,11 @@ mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
     "Number of root layers"
     N_ROOT::Int
     "Root hydraulic system"
-    ROOTS::Vector{RootHydraulics{FT}}
+    ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
     "Trunk hydraulic system"
-    TRUNK::StemHydraulics{FT}
+    TRUNK::Stem{FT}
 
     # caches to speed up calculations
     "Conductances for each root layer at given flow"
@@ -400,6 +407,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor function
+#     2022-May-25: use Root and Stem structures with temperatures
 #
 #######################################################################################################################################################################################################
 """
@@ -462,21 +470,21 @@ MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     end;
 
     # create evenly distributed root system for now
-    _roots = RootHydraulics{FT}[];
+    _roots = Root{FT}[];
     for i in _r_index
         _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh);
+        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = StemHydraulics{FT}(Δh=zt, Δl=zt);
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh=zt, Δl=zt), T_25());
 
     # create branches
-    _branches = StemHydraulics{FT}[];
+    _branches = Stem{FT}[];
     for i in _c_index
         _Δh = (z_air[i] + max(z_air[i+1], zt)) / 2 - zt;
-        _st = StemHydraulics{FT}(area=1/_n_canopy, Δh=_Δh);
+        _st = Stem{FT}(StemHydraulics{FT}(area=1/_n_canopy, Δh=_Δh), T_25());
         push!(_branches, _st);
     end;
 

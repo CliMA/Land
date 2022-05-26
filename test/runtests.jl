@@ -31,6 +31,14 @@ using Test
                 @test NaN_test(hs);
             end;
 
+            # Root and Stem
+            root = ClimaCache.Root{FT}();
+            stem = ClimaCache.Stem{FT}();
+            for hs in [root, stem]
+                @test FT_test(hs, FT);
+                @test NaN_test(hs);
+            end;
+
             # Leaf
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
