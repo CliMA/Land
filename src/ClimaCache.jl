@@ -57,6 +57,7 @@ include("plant/leaf_reaction_center.jl"  )
 include("plant/pressure_volume.jl"       )
 include("plant/steady_state.jl"          )
 include("plant/vulnerability.jl"         )
+include("plant/hydraulics.jl"            )
 include("plant/leaf.jl"                  )
 
 # include the soil types and structures
