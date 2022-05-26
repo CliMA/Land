@@ -95,7 +95,7 @@ VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 ```@docs
 AbstractSPACSystem
 MonoElementSPAC
-MonoElementSPAC{FT}() where {FT<:AbstractFloat}
+MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat}
 MonoGrassSPAC
 MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
 MonoPalmSPAC

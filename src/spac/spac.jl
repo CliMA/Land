@@ -56,17 +56,21 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor function
+#     2022-May-25: add psm to constructor option
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoElementSPAC{FT}() where {FT<:AbstractFloat}
+    MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat}
 
-Construct a `MonoElementSPAC` type toy SPAC system
+Construct a `MonoElementSPAC` type toy SPAC system, given
+- `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
 """
-MonoElementSPAC{FT}() where {FT<:AbstractFloat} = (
+MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat} = (
+    @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
+
     return MonoElementSPAC{FT}(
-                Leaf{FT}(),             # LEAF
+                Leaf{FT}(psm),          # LEAF
                 RootHydraulics{FT}(),   # ROOT
                 StemHydraulics{FT}(),   # STEM
                 ones(FT,3)              # _krs

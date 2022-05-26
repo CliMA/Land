@@ -134,10 +134,11 @@ using Test
 
     @testset "SPAC" begin
         for FT in [Float32, Float64]
-            spac1 = ClimaCache.MonoGrassSPAC{FT}("C3");
-            spac2 = ClimaCache.MonoPalmSPAC{FT}("C3");
-            spac3 = ClimaCache.MonoTreeSPAC{FT}("C3");
-            for spac in [spac1, spac2, spac3]
+            spac1 = ClimaCache.MonoElementSPAC{FT}("C3");
+            spac2 = ClimaCache.MonoGrassSPAC{FT}("C3");
+            spac3 = ClimaCache.MonoPalmSPAC{FT}("C3");
+            spac4 = ClimaCache.MonoTreeSPAC{FT}("C3");
+            for spac in [spac1, spac2, spac3, spac4]
                 @test FT_test(spac, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(wls);
