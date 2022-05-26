@@ -49,6 +49,9 @@ include("radiation/wave_length_set.jl"        )
 include("radiation/feature_absorption.jl"     )
 include("radiation/hyperspectral_radiation.jl")
 
+# include the soil types and structures
+include("soil/vulnerability.jl")
+
 # include the plant types and structures
 include("plant/temperature_dependency.jl")
 include("plant/leaf_biophysics.jl"       )
@@ -59,9 +62,6 @@ include("plant/steady_state.jl"          )
 include("plant/vulnerability.jl"         )
 include("plant/hydraulics.jl"            )
 include("plant/leaf.jl"                  )
-
-# include the soil types and structures
-include("soil/vulnerability.jl")
 
 
 end # module

@@ -10,7 +10,7 @@
 
 $(TYPEDEF)
 
-Hierachy of `AbstractColimit`
+Hierarchy of `AbstractColimit`
 - [`MinimumColimit`](@ref)
 - [`QuadraticColimit`](@ref)
 - [`SerialColimit`](@ref)

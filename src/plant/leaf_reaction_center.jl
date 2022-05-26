@@ -4,7 +4,7 @@
 # General
 #     2022-Jan-14: add van der Tol model struct
 #     2022-Jan-24: fix documentation
-#     2022-Feb-07: remove the hierachy from abstract fluorescence model
+#     2022-Feb-07: remove the Hierarchy from abstract fluorescence model
 #     2022-Feb-07: move struct definition as a field of VJPReactionCenter
 # Sources
 #     van der Tol et al. (2014) Models of fluorescence and photosynthesis for interpreting measurements of solar-induced chlorophyll fluorescence
@@ -81,7 +81,7 @@ $(TYPEDEF)
 
 Structure that stores reaction center information
 
-Hierachy of the `AbstractReactionCenter`
+Hierarchy of the `AbstractReactionCenter`
 - [`VJPReactionCenter`](@ref)
 - [`CytochromeReactionCenter`](@ref)
 """

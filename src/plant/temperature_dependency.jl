@@ -10,7 +10,7 @@
 
 $(TYPEDEF)
 
-Hierachy of AbstractTemperatureDependency:
+Hierarchy of AbstractTemperatureDependency:
 - [`Arrhenius`](@ref)
 - [`ArrheniusPeak`](@ref)
 - [`Q10`](@ref)

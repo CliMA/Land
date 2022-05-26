@@ -9,7 +9,7 @@
 
 $(TYPEDEF)
 
-Hierachy of AbstractSteadyStateMode:
+Hierarchy of AbstractSteadyStateMode:
 """
 abstract type AbstractSteadyStateMode end
 

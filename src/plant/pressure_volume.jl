@@ -9,7 +9,7 @@
 
 $(TYPEDEF)
 
-Hierachy of AbstractPVCurve:
+Hierarchy of AbstractPVCurve:
 - [`LinearPVCurve`](@ref)
 - [`SegmentedPVCurve`](@ref)
 """
