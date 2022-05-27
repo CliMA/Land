@@ -23,10 +23,13 @@ using Test
             end;
 
             # Plant hydraulic system
-            lhs = ClimaCache.LeafHydraulics{FT}();
-            rhs = ClimaCache.RootHydraulics{FT}();
-            shs = ClimaCache.StemHydraulics{FT}();
-            for hs in [lhs, rhs, shs]
+            lhs1 = ClimaCache.LeafHydraulics{FT}();
+            lhs2 = ClimaCache.LeafHydraulics{FT}(steadystate = false);
+            rhs1 = ClimaCache.RootHydraulics{FT}();
+            rhs2 = ClimaCache.RootHydraulics{FT}(steadystate = false);
+            shs1 = ClimaCache.StemHydraulics{FT}();
+            shs2 = ClimaCache.StemHydraulics{FT}(steadystate = false);
+            for hs in [lhs1, lhs2, rhs1, rhs2, shs1, shs2]
                 @test FT_test(hs, FT);
                 @test NaN_test(hs);
             end;

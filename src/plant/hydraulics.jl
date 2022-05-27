@@ -39,6 +39,8 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # parameters that do not change with time
     "Leaf area"
     AREA::FT
+    "Flow profile"
+    FLOW::AbstractFlowProfile{FT}
     "Maximal extra-xylary hydraulic conductance `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     K_OX::FT
     "Maximal leaf xylem hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
@@ -53,8 +55,6 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     VC::AbstractXylemVC{FT}
 
     # prognostic variables that change with time
-    "Flow rate in the xylem `[mol s⁻¹]`"
-    flow::FT
     "Leaf xylem water pressure at the downstream end of leaf xylem `[MPa]`"
     p_dos::FT
     "Leaf end water pressure at air-water interface `[MPa]`"
@@ -63,10 +63,6 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     p_storage::FT
     "Leaf xylem water pressure at the leaf base (upstream) `[MPa]`"
     p_ups::FT
-    "Flow rate into the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
-    q_in::FT
-    "Flow rate out of the tissue (used for non-steady state) `[mol m⁻² s⁻¹]`"
-    q_out::FT
     "Current capaciatance at Ψ_leaf `[mol m⁻²]`"
     v_storage::FT
 
@@ -89,7 +85,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20) where {FT<:AbstractFloat}
+    LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, steadystate::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for leaf hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -97,31 +93,32 @@ Constructor for leaf hydraulic system, given
 - `k_ox` Maximum extraxylary hydraulic conductance per leaf area
 - `k_sla` Maximum leaf xylem hydraulic conductance per leaf area
 - `v_max` Total water capacitance at Ψ = 0 per leaf area
+- `steadystate` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 lhs = LeafHydraulics{Float64}();
 lhs = LeafHydraulics{Float64}(N = 5);
-lhs = LeafHydraulics{Float64}(N = 5; area = 20, k_ox = 50, k_sla = 0.1, v_max = 20);
+lhs = LeafHydraulics{Float64}(N = 5; area = 20, k_ox = 50, k_sla = 0.1, v_max = 20, steadystate = true);
 ```
 """
-LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20) where {FT<:AbstractFloat} = (
+LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, steadystate::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+
     return LeafHydraulics{FT}(
                 area,                   # AREA
+                _flow,                  # FLOW
                 k_ox,                   # K_OX
                 k_sla,                  # K_SLA
                 N,                      # N
                 SegmentedPVCurve{FT}(), # PVC
                 v_max,                  # V_MAXIMUM
                 WeibullVC{FT}(2,5),     # VC
-                0,                      # flow
                 0,                      # p_dos
                 0,                      # p_leaf
                 0,                      # p_storage
                 0,                      # p_ups
-                0,                      # q_in
-                0,                      # q_out
                 v_max,                  # v_storage
                 ones(FT,N),             # k_history
                 zeros(FT,N),            # p_element
@@ -153,6 +150,8 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # parameters that do not change with time
     "Root cross-section area `[m²]`"
     AREA::FT
+    "Flow profile"
+    FLOW::AbstractFlowProfile{FT}
     "Maximal hydraulic conductance `[mol s⁻¹ MPa⁻¹]`"
     K_MAX::FT
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
@@ -175,8 +174,6 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     ΔH::FT
 
     # prognostic variables that change with time
-    "Flow rate in the xylem `[mol s⁻¹]`"
-    flow::FT
     "Xylem water pressure at the downstream end of xylem `[MPa]`"
     p_dos::FT
     "Xylem-rhizosphere interface water pressure `[MPa]`"
@@ -185,12 +182,6 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     p_storage::Vector{FT}
     "Soil matrix potential `[MPa]`"
     p_ups::FT
-    "Vector of xylem water flow `[mol m⁻²]`"
-    q_element::Vector{FT}
-    "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
-    q_in::FT
-    "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
-    q_out::FT
     "Storage per element `[mol]`"
     v_storage::Vector{FT}
     "Soil osmotic potential at 298.15 K `[MPa]"
@@ -203,12 +194,6 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     p_element::Vector{FT}
     "Vector of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
     p_history::Vector{FT}
-
-    # caches to speed up calculations
-    "Vector of buffer water flow `[mol m⁻²]`"
-    _q_buffer::Vector{FT}
-    "Vector of diiferntial water flow `[mol m⁻²]`"
-    _q_diff::Vector{FT}
 end
 
 
@@ -221,7 +206,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat}
+    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for root hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -229,18 +214,22 @@ Constructor for root hydraulic system, given
 - `k_x` Maximum root xylem hydraulic conductivity per crosssection area per root length
 - `Δh` Root depth
 - `Δl` Root length
+- `steadystate` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 rhs = RootHydraulics{Float64}();
 rhs = RootHydraulics{Float64}(N = 5);
-rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2);
+rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2, steadystate = true);
 ```
 """
-RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat} = (
+RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+
     return RootHydraulics{FT}(
         area,                               # AREA
+        _flow,                              # FLOW
         k_x * area / Δl,                    # K_MAX
         5e14,                               # K_RHIZ
         k_x,                                # K_X
@@ -251,21 +240,15 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
         area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
         WeibullVC{FT}(2,5),                 # VC
         Δh,                                 # ΔH
-        0,                                  # flow
         0,                                  # p_dos
         0,                                  # p_rhiz
         zeros(FT,N),                        # p_storage
         0,                                  # p_ups
-        zeros(FT,N),                        # q_element
-        0,                                  # q_in
-        0,                                  # q_out
         zeros(FT,N),                        # v_storage
         0,                                  # ψ_osm
         ones(FT,N),                         # k_history
         zeros(FT,N),                        # p_element
-        zeros(FT,N),                        # p_history
-        zeros(FT,N),                        # _q_buffer
-        zeros(FT,N)                         # _q_diff
+        zeros(FT,N)                         # p_history
     )
 );
 
@@ -293,6 +276,8 @@ mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     # parameters that do not change with time
     "Root cross-section area `[m²]`"
     AREA::FT
+    "Flow profile"
+    FLOW::AbstractFlowProfile{FT}
     "Maximal hydraulic conductance `[mol s⁻¹ MPa⁻¹]`"
     K_MAX::FT
     "Maximal xylem hydraulic conductivity (per root depth) `[mol s⁻¹ MPa⁻¹ m⁻²]`"
@@ -311,20 +296,12 @@ mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     ΔH::FT
 
     # prognostic variables that change with time
-    "Flow rate in the xylem `[mol s⁻¹]`"
-    flow::FT
     "Xylem water pressure at the downstream end of xylem `[MPa]`"
     p_dos::FT
     "Pressure of storage per element"
     p_storage::Vector{FT}
     "Soil matrix potential `[MPa]`"
     p_ups::FT
-    "Vector of xylem water flow `[mol m⁻²]`"
-    q_element::Vector{FT}
-    "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
-    q_in::FT
-    "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
-    q_out::FT
     "Storage per element `[mol]`"
     v_storage::Vector{FT}
 
@@ -347,7 +324,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat}
+    StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for stem hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -355,18 +332,22 @@ Constructor for stem hydraulic system, given
 - `k_x` Maximum stem xylem hydraulic conductivity per crosssection area per stem length
 - `Δh` Stem height
 - `Δl` Stem length
+- `steadystate` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 rhs = StemHydraulics{Float64}();
 rhs = StemHydraulics{Float64}(N = 5);
-rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2);
+rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2, steadystate = true);
 ```
 """
-StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl = 1) where {FT<:AbstractFloat} = (
+StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+
     return StemHydraulics{FT}(
         area,                               # AREA
+        _flow,                              # FLOW
         k_x * area / Δl,                    # K_MAX
         k_x,                                # K_X
         Δl,                                 # L
@@ -375,13 +356,9 @@ StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh = 1, Δl 
         area * Δh / N * 6000 * ones(FT,N),  # V_MAXIMUM
         WeibullVC{FT}(2,5),                 # VC
         Δh,                                 # ΔH
-        0,                                  # flow
         0,                                  # p_dos
         zeros(FT,N),                        # p_storage
         0,                                  # p_ups
-        zeros(FT,N),                        # q_element
-        0,                                  # q_in
-        0,                                  # q_out
         zeros(FT,N),                        # v_storage
         ones(FT,N),                         # k_history
         zeros(FT,N),                        # p_element
