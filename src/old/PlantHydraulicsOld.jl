@@ -12,7 +12,7 @@ using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
-using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance, xylem_end_pressure, xylem_pressure
+using ..PlantHydraulics: capacitance_buffer, critical_pressure, relative_hydraulic_conductance, xylem_end_pressure, xylem_pressure, xylem_pressure_profile!
 
 
 # export public functions

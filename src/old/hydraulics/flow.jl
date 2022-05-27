@@ -1,40 +1,5 @@
 ###############################################################################
 #
-# Capacitance buffer flow
-#
-###############################################################################
-"""
-    buffer_rate(pv::AbstractCapacity{FT}) where {FT<:AbstractFloat}
-
-Return the buffer rate, given
-- `pv` [`AbstractCapacity`](@ref) type struct
-
-Note that only symplastic water can be used as capacitance
-"""
-function buffer_rate(
-            pv::LinearPVCurve{FT}
-) where {FT<:AbstractFloat}
-    return pv.k_refill
-end
-
-
-
-
-function buffer_rate(
-            pv::SegmentedPVCurve{FT}
-) where {FT<:AbstractFloat}
-    return pv.k_refill * (1 - pv.RWC_apo)
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Calculate leaf-level critical_flow
 #
 ###############################################################################
@@ -111,126 +76,6 @@ end
 #
 ###############################################################################
 """
-    roots_flow!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
-                flow::FT,
-                recalculate::Bool
-    ) where {FT<:AbstractFloat}
-    roots_flow!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
-                flow::FT
-    ) where {FT<:AbstractFloat}
-    roots_flow!(plant::Union{GrassLikeOrganism{FT},
-                             PalmLikeOrganism{FT},
-                             TreeLikeOrganism{FT}},
-                flow::FT
-    ) where {FT<:AbstractFloat}
-
-Recalculate the flow rates in the root from the pressure and conductance
-    profiles in each root at non-steady state, given
-- `roots` Array of [`RootHydraulics`](@ref) structs
-- `ks` Container for conductance in each root layer
-- `ps` Container for end xylem pressure in each layer
-- `qs` Container for flow rate out of each layer
-- `flow` Total flow rate out of the roots
-- `recalculate` A paceholder indicator of recalculating root flow (useless)
-- `plant` [`AbstractPlantOrganism`](@ref) type struct
-"""
-function roots_flow!(
-            roots::Array{RootHydraulics{FT},1},
-            ks::Array{FT,1},
-            ps::Array{FT,1},
-            qs::Array{FT,1},
-            flow::FT,
-            recalculate::Bool
-) where {FT<:AbstractFloat}
-    N = length(roots);
-
-    # flush the values to ks, ps, and qs
-    for i in 1:N
-        _p,_k = root_pk(roots[i], qs[i]);
-        ps[i] = _p;
-        ks[i] = _k;
-    end
-
-    # use ps and ks to compute the Δq to adjust
-    pm = mean(ps);
-    for i in 1:N
-        qs[i] -= (pm - ps[i]) * ks[i];
-    end
-
-    # adjust the qs so that sum(qs) = flow
-    q_diff = sum(qs) - flow;
-    k_sum  = sum(ks);
-    for i in 1:N
-        qs[i] -= q_diff * ks[1] / k_sum;
-    end
-
-    return nothing
-end
-
-
-
-
-function roots_flow!(
-            roots::Array{RootHydraulics{FT},1},
-            ks::Array{FT,1},
-            ps::Array{FT,1},
-            qs::Array{FT,1},
-            flow::FT
-) where {FT<:AbstractFloat}
-    count = 0
-    while true
-        roots_flow!(roots, ks, ps, qs, flow, true);
-        count += 1;
-
-        if maximum(ps) - minimum(ps) < 1e-4
-            break
-        end
-
-        if count>20
-            break
-        end
-    end
-
-    return nothing
-end
-
-
-
-
-function roots_flow!(
-            plant::Union{MonoGrassSPAC{FT},
-                         MonoPalmSPAC{FT},
-                         MonoTreeSPAC{FT}},
-            flow::FT
-) where {FT<:AbstractFloat}
-    roots_flow!(plant.roots,
-                plant.cache_k,
-                plant.cache_p,
-                plant.cache_q,
-                flow);
-
-    return nothing
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
-# Calculate root flow rates and pressure from total flow rate
-#
-###############################################################################
-"""
     xylem_flow(root::RootHydraulics{FT},
                pressure::FT,
                ini::FT = FT(1)
@@ -270,6 +115,7 @@ end
 # Update the flow profile from leaf flow rates
 #
 ###############################################################################
+#=
 function flow_profile!(hs::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
     # leaf rate is per leaf area so stem flow should that times leaf area
     _flow::FT = 0;
@@ -330,3 +176,4 @@ function flow_profile!(hs::MonoTreeSPAC{FT}) where {FT<:AbstractFloat}
 
     return nothing
 end
+=#

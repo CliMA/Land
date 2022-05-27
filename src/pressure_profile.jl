@@ -483,7 +483,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
             _k = _k_mem / _f_vis * K_MAX * N;
         end;
 
-        _p_end -= mode.q_element[_i] / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode.f_element[_i] / _k + ρg_MPa(FT) * ΔH / N;
 
         hs.p_element[_i] = _p_end;
     end;

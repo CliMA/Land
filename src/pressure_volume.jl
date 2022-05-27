@@ -61,3 +61,15 @@ xylem_pressure(pv::SegmentedPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFlo
         return FT(-100)
     end
 );
+
+
+
+function capacitance_buffer end
+
+
+
+capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat} = pvc.K_REFILL;
+
+
+
+capacitance_buffer(pvc::SegmentedPVCurve{FT}) where {FT<:AbstractFloat} = pvc.K_REFILL * (1 - pvc.RWC_APO);

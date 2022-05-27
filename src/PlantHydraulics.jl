@@ -4,6 +4,7 @@ using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, Mo
       SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, T_25, ρg_MPa
+using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
 
