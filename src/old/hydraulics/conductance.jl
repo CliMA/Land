@@ -179,7 +179,7 @@ function xylem_risk(
 ) where {FT<:AbstractFloat}
     @unpack f_st, f_vis, vc = hs;
 
-    p_25 = end_pressure(hs, flow) / hs.f_st;
+    p_25 = xylem_end_pressure(hs, flow) / hs.f_st;
     T_25 = relative_hydraulic_conductance(vc, p_25) / f_vis;
 
     return T_25
