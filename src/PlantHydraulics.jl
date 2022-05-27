@@ -19,6 +19,7 @@ export clear_legacy!, critical_pressure, relative_hydraulic_conductance, xylem_e
 
 # include functions
 include("critical_pressure.jl")
+include("flow_profile.jl"     )
 include("legacy.jl"           )
 include("pressure_profile.jl" )
 include("pressure_volume.jl"  )

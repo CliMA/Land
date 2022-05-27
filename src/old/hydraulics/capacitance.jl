@@ -38,6 +38,7 @@ Note that this function only updates the equilibrium pressure in the tissue,
     but not the xylem flow pressure. The difference between the two pressures
     is used to drive water exchange between xylem and capacictance tissues.
 """
+#=
 function update_PVF!(hs::LeafHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
     @unpack f_vis, p_element, p_leaf, q_out, pv, T_sap, v_maximum,
@@ -297,3 +298,4 @@ function update_PVF!(
 
     return nothing
 end
+=#
