@@ -119,14 +119,6 @@ using Test
                 @test FT_test(td, FT);
                 @test NaN_test(td);
             end;
-
-            # Steady State
-            ssm1 = ClimaCache.SteadyStateMode();
-            ssm2 = ClimaCache.NonSteadyStateMode();
-            for ssm in [ssm1, ssm2]
-                @test FT_test(ssm, FT);
-                @test NaN_test(ssm);
-            end;
         end;
     end;
 
