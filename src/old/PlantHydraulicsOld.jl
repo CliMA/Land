@@ -16,12 +16,11 @@ using ..PlantHydraulics: critical_pressure, relative_hydraulic_conductance, xyle
 
 
 # export public functions
-export flow_profile!, pressure_profile!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!
+export flow_profile!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!
 
 
 include("hydraulics/conductance.jl")
 include("hydraulics/flow.jl"       )
-include("hydraulics/pressure.jl"   )
 include("hydraulics/capacitance.jl")
 
 
