@@ -63,13 +63,55 @@ xylem_pressure(pv::SegmentedPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFlo
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: migrate function to version v0.3
+#     2022-May-27: rename the function to capacitance_buffer
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+This function returns the xylem water buffer rate from pressure volume curve. The supported methods are
 
+$(METHODLIST)
+
+"""
 function capacitance_buffer end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-May-27: add method for LinearPVCurve
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat}
+
+Return the relative capacictance buffer rate, given
+- `pv` `LinearPVCurve` type pressure volume curve
+"""
 capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat} = pvc.K_REFILL;
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-May-27: add method for LinearPVCurve
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat}
+
+Return the relative capacictance buffer rate, given
+- `pv` `SegmentedPVCurve` type pressure volume curve
+"""
 capacitance_buffer(pvc::SegmentedPVCurve{FT}) where {FT<:AbstractFloat} = pvc.K_REFILL * (1 - pvc.RWC_APO);

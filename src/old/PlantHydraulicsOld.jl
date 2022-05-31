@@ -16,7 +16,7 @@ using ..PlantHydraulics: capacitance_buffer, critical_pressure, relative_hydraul
 
 
 # export public functions
-export flow_profile!, critical_flow, xylem_risk, plant_conductances!, roots_flow!, xylem_flow, update_PVF!
+export critical_flow, xylem_risk, plant_conductances!, xylem_flow
 
 
 include("hydraulics/conductance.jl")

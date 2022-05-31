@@ -388,9 +388,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
-git-tree-sha1 = "6a2f7d70512d205ca8c7ee31bfa9f142fe74310c"
+git-tree-sha1 = "db8481cf5d6278a121184809e9eb1628943c7704"
 uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.3.12"
+version = "1.3.13"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -405,8 +405,6 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 [[deps.SoilHydraulics]]
 deps = ["ClimaCache", "ConstrainedRootSolvers", "DocStringExtensions", "Test", "UnPack"]
 git-tree-sha1 = "bf2deab8d77b8e1666f6e270436562346e0643d6"
-repo-rev = "wyujie"
-repo-url = "https://github.com/Yujie-W/SoilHydraulics.jl"
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
 version = "0.1.0"
 
