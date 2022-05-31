@@ -24,6 +24,7 @@ abstract type AbstractFlowProfile{FT<:AbstractFloat} end
 #     2022-May-27: add non-steady state flow struct
 #     2022-May-31: remove unneeded variables from struct
 #     2022-May-31: add documentation
+#     2022-May-31: add f_sum field
 #
 #######################################################################################################################################################################################################
 """
@@ -46,6 +47,8 @@ mutable struct NonSteadyStateFlow{FT} <: AbstractFlowProfile{FT}
     f_in::FT
     "Flow rate out `[mol s⁻¹]` or `[mol m⁻² s⁻¹]` (for leaf)"
     f_out::FT
+    "Vector of sum buffer water flow `[mol m⁻²]`"
+    f_sum::Vector{FT}
 end
 
 
@@ -56,6 +59,7 @@ end
 #     2022-May-27: add non-steady state flow struct
 #     2022-May-31: remove unneeded variables from struct
 #     2022-May-31: add documentation
+#     2022-May-31: add f_sum field
 #
 #######################################################################################################################################################################################################
 """
@@ -77,7 +81,8 @@ NonSteadyStateFlow{FT}(N::Int, isleaf::Bool = true) where {FT<:AbstractFloat} = 
                 _zeros,     # f_buffer
                 _zeros,     # f_element
                 0,          # f_in
-                0           # f_out
+                0,          # f_out
+                _zeros      # f_sum
     )
 );
 
