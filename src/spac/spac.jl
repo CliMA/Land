@@ -86,6 +86,7 @@ MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat} = (
 # General
 #     2022-May-25: SPAC system for monospecies grass
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -115,12 +116,12 @@ mutable struct MonoGrassSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS_INDEX::Vector{Int}
 
     # caches to speed up calculations
+    "Flow rate per root layer"
+    _fs::Array{FT,1}
     "Conductances for each root layer at given flow"
     _ks::Array{FT,1}
     "Pressure for each root layer at given flow"
     _ps::Array{FT,1}
-    "Flow rate per root layer"
-    _qs::Array{FT,1}
 end
 
 
@@ -130,6 +131,7 @@ end
 # General
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -201,9 +203,9 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
                 _r_index,           # ROOTS_INDEX
+                zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
-                zeros(FT,_n_root),  # _ps
-                zeros(FT,_n_root),  # _qs
+                zeros(FT,_n_root)   # _ps
     )
 );
 
@@ -214,6 +216,7 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
 # General
 #     2022-May-25: SPAC system for monospecies palm
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -245,12 +248,12 @@ mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
     TRUNK::Stem{FT}
 
     # caches to speed up calculations
+    "Flow rate per root layer"
+    _fs::Array{FT,1}
     "Conductances for each root layer at given flow"
     _ks::Array{FT,1}
     "Pressure for each root layer at given flow"
     _ps::Array{FT,1}
-    "Flow rate per root layer"
-    _qs::Array{FT,1}
 end
 
 
@@ -260,6 +263,7 @@ end
 # General
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -347,9 +351,9 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
                 _roots,             # ROOTS
                 _r_index,           # ROOTS_INDEX
                 _trunk,             # TRUNK
+                zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
-                zeros(FT,_n_root),  # _ps
-                zeros(FT,_n_root),  # _qs
+                zeros(FT,_n_root)   # _ps
     )
 );
 
@@ -360,6 +364,7 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
 # General
 #     2022-May-25: SPAC system for monospecies tree
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -393,12 +398,12 @@ mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
     TRUNK::Stem{FT}
 
     # caches to speed up calculations
+    "Flow rate per root layer"
+    _fs::Array{FT,1}
     "Conductances for each root layer at given flow"
     _ks::Array{FT,1}
     "Pressure for each root layer at given flow"
     _ps::Array{FT,1}
-    "Flow rate per root layer"
-    _qs::Array{FT,1}
 end
 
 
@@ -408,6 +413,7 @@ end
 # General
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: rename _qs to _fs
 #
 #######################################################################################################################################################################################################
 """
@@ -504,8 +510,8 @@ MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
                 _roots,             # ROOTS
                 _r_index,           # ROOTS_INDEX
                 _trunk,             # TRUNK
+                zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
-                zeros(FT,_n_root),  # _ps
-                zeros(FT,_n_root),  # _qs
+                zeros(FT,_n_root)   # _ps
     )
 );
