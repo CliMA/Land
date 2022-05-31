@@ -13,7 +13,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 ClimaCache = "0.3.0"
-DocStringExtensions = "0.8.6"
+DocStringExtensions = "0.8.6, 0.9"
 PkgUtility = "0.2.0"
 SpecialFunctions = "2.1.0"
 UnPack = "1.0.2"
