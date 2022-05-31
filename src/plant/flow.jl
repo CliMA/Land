@@ -12,12 +12,6 @@ mutable struct NonSteadyStateFlow{FT} <: AbstractFlowProfile{FT}
     f_in::FT
     "Flow rate out `[mol s⁻¹]` or `[mol m⁻² s⁻¹]` (for leaf)"
     f_out::FT
-
-    # caches to speed up calculations
-    "Vector of buffer water flow `[mol m⁻²]`"
-    _f_buffer::Vector{FT}
-    "Vector of diiferntial water flow `[mol m⁻²]`"
-    _f_diff::Vector{FT}
 end
 
 
@@ -33,9 +27,7 @@ NonSteadyStateFlow{FT}(N::Int, isleaf::Bool = true) where {FT<:AbstractFloat} = 
                 _zeros,     # f_buffer
                 _zeros,     # f_element
                 0,          # f_in
-                0,          # f_out
-                _zeros,     # _f_buffer
-                _zeros      # _f_diff
+                0           # f_out
     )
 );
 
