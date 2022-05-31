@@ -27,6 +27,10 @@ LogisticVC
 PowerVC
 WeibullVC
 ComplexVC
+AbstractFlowProfile
+NonSteadyStateFlow
+NonSteadyStateFlow{FT}(N::Int, isleaf::Bool = true) where {FT<:AbstractFloat}
+SteadyStateFlow
 LeafHydraulics
 LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, steadystate::Bool = true) where {FT<:AbstractFloat}
 RootHydraulics

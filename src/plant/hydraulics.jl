@@ -22,6 +22,7 @@ abstract type AbstractHydraulicSystem{FT<:AbstractFloat} end
 # Changes to this type
 # General
 #     2022-May-25: add leaf hydraulic system
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
@@ -81,6 +82,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add leaf hydraulics constructor
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
@@ -133,6 +135,7 @@ LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::N
 # General
 #     2022-May-25: add root hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
@@ -202,6 +205,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add root hydraulics constructor
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
@@ -259,6 +263,7 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number =
 # General
 #     2022-May-25: add stem hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
@@ -320,6 +325,7 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add stem hydraulics constructor
+#     2022-May-27: move flow rates to a field FLOW
 #
 #######################################################################################################################################################################################################
 """
