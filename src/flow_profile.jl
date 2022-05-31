@@ -534,7 +534,7 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vecto
         for _i in eachindex(roots)
             _root = roots[_i];
             xylem_flow_profile!(roots[_i].HS.FLOW, cache_f[_i]);
-            cache_p[_i],cache_k[_i] = root_pk(_root, _root.T);
+            cache_p[_i],cache_k[_i] = root_pk(_root.HS, _root.t);
         end;
 
         # use ps and ks to compute the Δf to adjust
@@ -588,11 +588,11 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
     xylem_flow_profile!(LEAF, Δt);
 
     # 2. set up stem flow rate and profile
-    xylem_flow_profile!(STEM.FLOW, xylem_flow(LEAF) * LEAF.HS.AREA);
+    xylem_flow_profile!(STEM.HS.FLOW, xylem_flow(LEAF) * LEAF.HS.AREA);
     xylem_flow_profile!(STEM, Δt);
 
     # 3. set up root flow rate and profile
-    xylem_flow_profile!(ROOT.FLOW, xylem_flow(STEM));
+    xylem_flow_profile!(ROOT.HS.FLOW, xylem_flow(STEM));
     xylem_flow_profile!(STEM, Δt);
 
     return nothing
@@ -650,7 +650,7 @@ xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} =
     xylem_flow_profile!.(LEAVES, Δt);
 
     # 2. set up trunk flow rate and profile
-    xylem_flow_profile!(TRUNK.FLOW, xylem_flow(LEAVES));
+    xylem_flow_profile!(TRUNK.HS.FLOW, xylem_flow(LEAVES));
     xylem_flow_profile!(TRUNK, Δt);
 
     # 3. set up root flow rate and profile
@@ -660,7 +660,22 @@ xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} =
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-May-31: add method for MonoTreeSPAC
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+
+Update flow profiles for the soil-plant-air continuum (after setting up leaf flow rate), given
+- `spac` `MonoTreeSPAC` type SPAC system
+- `Δt` Time step length
+"""
 xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack BRANCHES, LEAVES, ROOTS, TRUNK = spac;
 
@@ -669,12 +684,12 @@ xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} =
 
     # 2. set up branch flow rate and profile
     for _i in eachindex(LEAVES)
-        xylem_flow_profile!(BRANCHES[_i].FLOW, xylem_flow(LEAVES[_i]) * LEAVES[_i].HS.AREA);
+        xylem_flow_profile!(BRANCHES[_i].HS.FLOW, xylem_flow(LEAVES[_i]) * LEAVES[_i].HS.AREA);
     end;
     xylem_flow_profile!.(BRANCHES, Δt);
 
     # 3. set up trunk flow rate and profile
-    xylem_flow_profile!(TRUNK.FLOW, xylem_flow(BRANCHES));
+    xylem_flow_profile!(TRUNK.HS.FLOW, xylem_flow(BRANCHES));
     xylem_flow_profile!(TRUNK, Δt);
 
     # 4. set up root flow rate and profile
