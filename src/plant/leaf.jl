@@ -6,10 +6,10 @@
 #     2022-Jan-24: add p_CO₂_s to the structure
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: moved FLM to PRC
+#     2022-May-25: add HS field
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
-#     TODO: add leaf hydraulics as a field as well
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
 #######################################################################################################################################################################################################
@@ -28,6 +28,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
     "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::LeafBiophysics{FT}
+    "[`LeafHydraulics`](@ref) type leaf hydraulic system"
+    HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
     PRC::AbstractReactionCenter{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
@@ -70,15 +72,18 @@ end
 #     2022-Feb-07: remove fluorescence model from Leaf struct
 #     2022-Feb-11: set default APAR = 1000
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
+#     2022-May-25: add leaf hydraulic system into the constructor
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat}
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `Leaf`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
@@ -95,7 +100,7 @@ leaf_c4 = Leaf{Float64}("C4", wls);
 leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat} = (
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -111,6 +116,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Boo
 
     return Leaf{FT}(
                 LeafBiophysics{FT}(wls),            # BIO
+                LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 1000,                               # apar

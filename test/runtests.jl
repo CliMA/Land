@@ -14,6 +14,37 @@ using Test
 
     @testset "Plant" begin
         for FT in [Float32, Float64]
+            # Pressure volume curve
+            pvc1 = ClimaCache.LinearPVCurve{FT}();
+            pvc2 = ClimaCache.SegmentedPVCurve{FT}();
+            for pvc in [pvc1, pvc2]
+                @test FT_test(pvc, FT);
+                @test NaN_test(pvc);
+            end;
+
+            # Plant hydraulic system
+            lhs1 = ClimaCache.LeafHydraulics{FT}();
+            lhs2 = ClimaCache.LeafHydraulics{FT}(ssm = true);
+            lhs3 = ClimaCache.LeafHydraulics{FT}(ssm = false);
+            rhs1 = ClimaCache.RootHydraulics{FT}();
+            rhs2 = ClimaCache.RootHydraulics{FT}(ssm = true);
+            rhs3 = ClimaCache.RootHydraulics{FT}(ssm = false);
+            shs1 = ClimaCache.StemHydraulics{FT}();
+            shs2 = ClimaCache.StemHydraulics{FT}(ssm = true);
+            shs3 = ClimaCache.StemHydraulics{FT}(ssm = false);
+            for hs in [lhs1, lhs2, lhs3, rhs1, rhs2, rhs3, shs1, shs2, shs3]
+                @test FT_test(hs, FT);
+                @test NaN_test(hs);
+            end;
+
+            # Root and Stem
+            root = ClimaCache.Root{FT}();
+            stem = ClimaCache.Stem{FT}();
+            for hs in [root, stem]
+                @test FT_test(hs, FT);
+                @test NaN_test(hs);
+            end;
+
             # Leaf
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
@@ -102,6 +133,24 @@ using Test
             for wls in [wls1, wls2, wls3]
                 @test FT_test(wls, FT);
                 # NaN test will not pass because of the NaNs in wls2 and wls3
+                # @test NaN_test(wls);
+            end;
+        end;
+    end;
+
+    @testset "SPAC" begin
+        for FT in [Float32, Float64]
+            spac1 = ClimaCache.MonoElementSPAC{FT}("C3");
+            spac2 = ClimaCache.MonoGrassSPAC{FT}("C3");
+            spac3 = ClimaCache.MonoPalmSPAC{FT}("C3");
+            spac4 = ClimaCache.MonoTreeSPAC{FT}("C3");
+            spac5 = ClimaCache.MonoElementSPAC{FT}("C3"; ssm = false);
+            spac6 = ClimaCache.MonoGrassSPAC{FT}("C3"; ssm = false);
+            spac7 = ClimaCache.MonoPalmSPAC{FT}("C3"; ssm = false);
+            spac8 = ClimaCache.MonoTreeSPAC{FT}("C3"; ssm = false);
+            for spac in [spac1, spac2, spac3, spac4, spac5, spac6, spac7, spac8]
+                @test FT_test(spac, FT);
+                # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(wls);
             end;
         end;

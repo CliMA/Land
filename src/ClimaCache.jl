@@ -49,16 +49,23 @@ include("radiation/wave_length_set.jl"        )
 include("radiation/feature_absorption.jl"     )
 include("radiation/hyperspectral_radiation.jl")
 
+# include the soil types and structures
+include("soil/vulnerability.jl")
+
 # include the plant types and structures
 include("plant/temperature_dependency.jl")
 include("plant/leaf_biophysics.jl"       )
 include("plant/leaf_photosynthesis.jl"   )
 include("plant/leaf_reaction_center.jl"  )
+include("plant/pressure_volume.jl"       )
+include("plant/flow.jl"                  )
 include("plant/vulnerability.jl"         )
+include("plant/hydraulics.jl"            )
 include("plant/leaf.jl"                  )
+include("plant/root.jl"                  )
+include("plant/stem.jl"                  )
 
-# include the soil types and structures
-include("soil/vulnerability_curve.jl")
-
+# include the spac types and structures
+include("spac/spac.jl")
 
 end # module

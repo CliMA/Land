@@ -1,6 +1,3 @@
-# TODO: add to documentation page and do tests
-
-
 #######################################################################################################################################################################################################
 #
 # Changes to this struct
@@ -13,15 +10,19 @@
 #     2021-Oct-19: sort variable to prognostic and dignostic catergories
 #     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
 #     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
+#     2022-May-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Struct that contains leaf biophysical traits used to run leaf reflection and transmittance.
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct HyperspectralAbsorption{FT<:AbstractFloat}
     # parameters that do not change with time
@@ -50,8 +51,17 @@ mutable struct HyperspectralAbsorption{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2021-Nov-24: add constructor
+#     2022-May-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
-    HyperspectralAbsorption{FT}(wls::WaveLengthSet; opti::String=OPTI_2021) where {FT<:AbstractFloat}
+
+    HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat}
 
 Constructor for [`HyperspectralAbsorption`](@ref), given
 - `wls` [`WaveLengthSet`](@ref) type structure
@@ -65,7 +75,7 @@ ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
 ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)); opti=ClimaCache.OPTI_2017);
 ```
 """
-HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String=OPTI_2021) where {FT<:AbstractFloat} = (
+HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat} = (
     @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;
 
     # read data from the MAT file
@@ -121,5 +131,17 @@ HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::Stri
         _Kcbc[_i]   = mean(__Kcbc[_wo]  );
     end;
 
-    return HyperspectralAbsorption{FT}(_Kant, _Kbrown, _Kcab, _KcaV, _KcaZ, _Kcbc, _Kh2o, _Klma, _Kpro, _Kps, _nr)
+    return HyperspectralAbsorption{FT}(
+                _Kant,      # K_ANT
+                _Kbrown,    # K_BROWN
+                _Kcab,      # K_CAB
+                _KcaV,      # K_CAR_V
+                _KcaZ,      # K_CAR_Z
+                _Kcbc,      # K_CBC
+                _Kh2o,      # K_H₂O
+                _Klma,      # K_LMA
+                _Kpro,      # K_PRO
+                _Kps,       # K_PS
+                _nr         # NR
+    )
 );

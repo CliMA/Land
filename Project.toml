@@ -1,7 +1,7 @@
 name = "ClimaCache"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
@@ -14,7 +14,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-DocStringExtensions = "0.8.6"
+DocStringExtensions = "0.8.6, 0.9"
 MAT = "0.10.1"
 PkgUtility = "0.1.13, 0.2"
 UnPack = "1.0.2"

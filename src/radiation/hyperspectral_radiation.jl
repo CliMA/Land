@@ -1,6 +1,3 @@
-# TODO: add to documentation page and do tests
-
-
 #######################################################################################################################################################################################################
 #
 # Changes to this struct
@@ -10,12 +7,15 @@
 #
 #######################################################################################################################################################################################################
 """
+
 $(TYPEDEF)
 
 Structure that stores hyperspectral radiation information
 
 # Fields
+
 $(TYPEDFIELDS)
+
 """
 mutable struct HyperspectralRadiation{FT<:AbstractFloat}
     # prognostic variables that change with time
@@ -26,8 +26,17 @@ mutable struct HyperspectralRadiation{FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2021-Oct-22: add constructor
+#     2022-May-25: fix documentation
+#
+#######################################################################################################################################################################################################
 """
-    HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(), file::String = FILE_SUN)
+
+    HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat}
 
 Constructor for [`HyperspectralRadiation`](@ref), given
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings

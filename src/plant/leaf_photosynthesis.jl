@@ -4,7 +4,7 @@
 # General
 #     2021-Nov-29: add abstract photosynthesis system type
 #     2022-Jan-14: rename to photosynthesis model
-#     2022-Jan-14: add hierachy description
+#     2022-Jan-14: add Hierarchy description
 #     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
@@ -12,7 +12,7 @@
 
 $(TYPEDEF)
 
-Hierachy of `AbstractPhotosynthesisModel`:
+Hierarchy of `AbstractPhotosynthesisModel`:
 - [`C3CytochromeModel`](@ref)
 - [`C3VJPModel`](@ref)
 - [`C4VJPModel`](@ref)
@@ -518,7 +518,7 @@ C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0
 # Changes to this type
 # General
 #     2022-Jan-14: add abstract mode type
-#     2022-Jan-14: add hierachy description
+#     2022-Jan-14: add Hierarchy description
 #     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
@@ -526,7 +526,7 @@ C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0
 
 $(TYPEDEF)
 
-Hierachy of AbstractSoilVC:
+Hierarchy of AbstractSoilVC:
 - [`GCO₂Mode`](@ref)
 - [`PCO₂Mode`](@ref)
 """
