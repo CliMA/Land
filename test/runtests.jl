@@ -29,6 +29,8 @@ using Test
             @test relative_hydraulic_conductance(bc, FT(0.2)) < 1;
             @test relative_hydraulic_conductance(vg, true, FT(-0.2)) < 1;
             @test relative_hydraulic_conductance(bc, true, FT(-0.2)) < 1;
+            @test relative_hydraulic_conductance(vg, true, FT(0.01)) == 1;
+            @test relative_hydraulic_conductance(bc, true, FT(0.01)) == 1;
         end;
     end;
 end;

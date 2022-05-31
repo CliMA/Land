@@ -367,7 +367,7 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 deps = ["ClimaCache", "ConstrainedRootSolvers", "DocStringExtensions", "Test", "UnPack"]
 path = ".."
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
-version = "0.1.0"
+version = "0.1.1"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
