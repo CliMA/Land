@@ -189,7 +189,7 @@ Return the xylem end water pressure in MPa, given
 xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
     @unpack LEAF, ROOT, STEM = spac;
 
-    # calculate the p_dos for roots
+    # calculate the p_dos for root and stem
     STEM.HS.p_ups = xylem_end_pressure(ROOT, flow);
     LEAF.HS.p_ups = xylem_end_pressure(STEM, flow);
 
@@ -219,7 +219,7 @@ Return the xylem end water pressure in MPa for sunlit and shaded leaves, given
 xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) where {FT<:AbstractFloat} = (
     @unpack LEAF, ROOT, STEM = spac;
 
-    # calculate the p_dos for roots
+    # calculate the p_dos for root and stem
     STEM.HS.p_ups = xylem_end_pressure(ROOT, f_sl + f_sh;);
     LEAF.HS.p_ups = xylem_end_pressure(STEM, f_sl + f_sh;);
 
@@ -606,6 +606,7 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 # Changes to the method
 # General
 #     2022-May-27: add method for Leaf, Root, and Stem (for both steady and non-steady states)
+#     2022-May-31: pass the test
 #
 #######################################################################################################################################################################################################
 """
@@ -616,7 +617,7 @@ Update xylem pressure profile (flow profile needs to be updated a priori), given
 - `organ` `Leaf`, `Root`, or `Stem` type organ
 - `update` If true, update xylem cavitation legacy
 """
-xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = xylem_pressure_profile!(organ.HS, organ.FLOW, organ.t; update = update);
+xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = xylem_pressure_profile!(organ.HS, organ.HS.FLOW, organ.t; update = update);
 
 
 #######################################################################################################################################################################################################
@@ -652,6 +653,7 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
 # Changes to the method
 # General
 #     2022-May-27: add method for MonoGrassSPAC
+#     2022-May-31: pass the test
 #
 #######################################################################################################################################################################################################
 """
@@ -669,7 +671,7 @@ xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<
     _p_mean::FT = 0;
     for _root in ROOTS
         xylem_pressure_profile!(_root; update = update);
-        _p_mean += _root.p_dos;
+        _p_mean += _root.HS.p_dos;
     end;
     _p_mean /= N_ROOT;
 
@@ -688,6 +690,7 @@ xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<
 # Changes to the method
 # General
 #     2022-May-27: add method for MonoPalmSPAC
+#     2022-May-31: pass the test
 #
 #######################################################################################################################################################################################################
 """
@@ -705,7 +708,7 @@ xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:
     _p_mean::FT = 0;
     for _root in ROOTS
         xylem_pressure_profile!(_root; update = update);
-        _p_mean += _root.p_dos;
+        _p_mean += _root.HS.p_dos;
     end;
     _p_mean /= N_ROOT;
 
@@ -728,6 +731,7 @@ xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:
 # Changes to the method
 # General
 #     2022-May-27: add method for MonoTreeSPAC
+#     2022-May-31: pass the test
 #
 #######################################################################################################################################################################################################
 """
@@ -745,7 +749,7 @@ xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:
     _p_mean::FT = 0;
     for _root in ROOTS
         xylem_pressure_profile!(_root; update = update);
-        _p_mean += _root.p_dos;
+        _p_mean += _root.HS.p_dos;
     end;
     _p_mean /= N_ROOT;
 

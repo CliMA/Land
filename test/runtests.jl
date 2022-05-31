@@ -80,4 +80,30 @@ using Test
             end;
         end;
     end;
+
+    @testset "Pressure Profile" begin
+        for FT in [Float32, Float64]
+            spac1 = MonoElementSPAC{FT}("C3");
+            spac2 = MonoGrassSPAC{FT}("C3");
+            spac3 = MonoPalmSPAC{FT}("C3");
+            spac4 = MonoTreeSPAC{FT}("C3");
+            spac5 = MonoElementSPAC{FT}("C3"; ssm = false);
+            spac6 = MonoGrassSPAC{FT}("C3"; ssm = false);
+            spac7 = MonoPalmSPAC{FT}("C3"; ssm = false);
+            spac8 = MonoTreeSPAC{FT}("C3"; ssm = false);
+            spacx = MonoTreeSPAC{FT}("C3"; ssm = false);
+            spacy = MonoTreeSPAC{FT}("C3"; ssm = false);
+            spacx.ROOTS[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacx.BRANCHES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacx.LEAVES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacy.ROOTS[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacy.BRANCHES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacy.LEAVES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            spacy.TRUNK.HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
+            for spac in [spac1, spac2, spac3, spac4, spac5, spac6, spac7, spac8, spacx, spacy]
+                xylem_pressure_profile!(spac);
+                @test true;
+            end;
+        end;
+    end;
 end;
