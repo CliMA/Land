@@ -17,7 +17,7 @@ function critical_pressure end
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-Feb-02: add method for ComplexVC
 #     2022-Feb-02: add a reference kr for more customized calculations
@@ -47,7 +47,7 @@ critical_pressure(vc::ComplexVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloa
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-Feb-02: add method for LogisticVC
 #     2022-Feb-02: add a reference kr for more customized calculations
@@ -70,7 +70,7 @@ critical_pressure(vc::LogisticVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFlo
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-Feb-02: add method for PowerVC
 #     2022-Feb-02: add a reference kr for more customized calculations
@@ -93,7 +93,7 @@ critical_pressure(vc::PowerVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat}
 
 #######################################################################################################################################################################################################
 #
-# Changes to the function
+# Changes to the method
 # General
 #     2022-Feb-02: add method for WeibullVC
 #     2022-Feb-02: add a reference kr for more customized calculations

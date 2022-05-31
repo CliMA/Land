@@ -1,6 +1,6 @@
 #######################################################################################################################################################################################################
 #
-# Changes to this constructor
+# Changes to the function
 # General
 #     2022-May-25: migrate inititialize_legacy! function to clear_legacy!
 #
