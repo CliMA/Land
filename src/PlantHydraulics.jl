@@ -15,7 +15,7 @@ import SoilHydraulics: relative_hydraulic_conductance
 export ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics, WeibullVC
 
 # export public functions
-export clear_legacy!, critical_pressure, relative_hydraulic_conductance, xylem_end_pressure, xylem_pressure
+export xylem_flow_profile!, xylem_pressure_profile!
 
 
 # include functions
@@ -25,9 +25,6 @@ include("legacy.jl"           )
 include("pressure_profile.jl" )
 include("pressure_volume.jl"  )
 include("vulnerability.jl"    )
-
-# include old module
-include("old/PlantHydraulicsOld.jl")
 
 
 end # module
