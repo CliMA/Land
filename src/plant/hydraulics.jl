@@ -83,11 +83,12 @@ end
 # General
 #     2022-May-25: add leaf hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-May-31: rename input variable name from steadystate to ssm
 #
 #######################################################################################################################################################################################################
 """
 
-    LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, steadystate::Bool = true) where {FT<:AbstractFloat}
+    LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for leaf hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -95,18 +96,18 @@ Constructor for leaf hydraulic system, given
 - `k_ox` Maximum extraxylary hydraulic conductance per leaf area
 - `k_sla` Maximum leaf xylem hydraulic conductance per leaf area
 - `v_max` Total water capacitance at Ψ = 0 per leaf area
-- `steadystate` Whether the flow rate is at steady state
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 lhs = LeafHydraulics{Float64}();
 lhs = LeafHydraulics{Float64}(N = 5);
-lhs = LeafHydraulics{Float64}(N = 5; area = 20, k_ox = 50, k_sla = 0.1, v_max = 20, steadystate = true);
+lhs = LeafHydraulics{Float64}(N = 5; area = 20, k_ox = 50, k_sla = 0.1, v_max = 20, ssm = true);
 ```
 """
-LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, steadystate::Bool = true) where {FT<:AbstractFloat} = (
-    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, ssm::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
 
     return LeafHydraulics{FT}(
                 area,                   # AREA
@@ -206,11 +207,12 @@ end
 # General
 #     2022-May-25: add root hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-May-31: rename input variable name from steadystate to ssm
 #
 #######################################################################################################################################################################################################
 """
 
-    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat}
+    RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for root hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -218,18 +220,18 @@ Constructor for root hydraulic system, given
 - `k_x` Maximum root xylem hydraulic conductivity per crosssection area per root length
 - `Δh` Root depth
 - `Δl` Root length
-- `steadystate` Whether the flow rate is at steady state
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 rhs = RootHydraulics{Float64}();
 rhs = RootHydraulics{Float64}(N = 5);
-rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2, steadystate = true);
+rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2, ssm = true);
 ```
 """
-RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat} = (
-    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
 
     return RootHydraulics{FT}(
         area,                               # AREA
@@ -326,11 +328,12 @@ end
 # General
 #     2022-May-25: add stem hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-May-31: rename input variable name from steadystate to ssm
 #
 #######################################################################################################################################################################################################
 """
 
-    StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat}
+    StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for stem hydraulic system, given
 - `N` Number of xylem slices in the system, default is 5
@@ -338,18 +341,18 @@ Constructor for stem hydraulic system, given
 - `k_x` Maximum stem xylem hydraulic conductivity per crosssection area per stem length
 - `Δh` Stem height
 - `Δl` Stem length
-- `steadystate` Whether the flow rate is at steady state
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 rhs = StemHydraulics{Float64}();
 rhs = StemHydraulics{Float64}(N = 5);
-rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2, steadystate = true);
+rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2, ssm = true);
 ```
 """
-StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, steadystate::Bool = true) where {FT<:AbstractFloat} = (
-    _flow = (steadystate ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat} = (
+    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
 
     return StemHydraulics{FT}(
         area,                               # AREA

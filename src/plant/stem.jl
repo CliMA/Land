@@ -32,12 +32,14 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    Stem{FT}() where {FT<:AbstractFloat}
+    Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 
-Construct a Stem structure
+Construct a Stem structure, given
+- `ssm` Whether the flow rate is at steady state
 """
-Stem{FT}() where {FT<:AbstractFloat} = Stem{FT}(StemHydraulics{FT}(), T_25());
+Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = Stem{FT}(StemHydraulics{FT}(ssm = ssm), T_25());

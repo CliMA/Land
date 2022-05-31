@@ -32,12 +32,14 @@ end
 # Changes to this constructor
 # General
 #     2022-May-25: add constructor
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    Root{FT}() where {FT<:AbstractFloat}
+    Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 
-Construct a Root structure
+Construct a Root structure, given
+- `ssm` Whether the flow rate is at steady state
 """
-Root{FT}() where {FT<:AbstractFloat} = Root{FT}(RootHydraulics{FT}(), T_25());
+Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = Root{FT}(RootHydraulics{FT}(ssm = ssm), T_25());

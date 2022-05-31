@@ -73,15 +73,17 @@ end
 #     2022-Feb-11: set default APAR = 1000
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #     2022-May-25: add leaf hydraulic system into the constructor
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat}
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `Leaf`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
@@ -98,7 +100,7 @@ leaf_c4 = Leaf{Float64}("C4", wls);
 leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false) where {FT<:AbstractFloat} = (
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -114,7 +116,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Boo
 
     return Leaf{FT}(
                 LeafBiophysics{FT}(wls),            # BIO
-                LeafHydraulics{FT}(),               # HS
+                LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 1000,                               # apar

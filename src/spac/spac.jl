@@ -48,7 +48,7 @@ mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
 
     # caches to speed up calculations
     "Relative hydraulic conductance"
-    _krs::Array{FT,1}
+    _krs::Vector{FT}
 end
 
 
@@ -59,23 +59,25 @@ end
 #     2022-May-25: add constructor function
 #     2022-May-25: add psm to constructor option
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat}
+    MonoElementSPAC{FT}(psm::String; ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a `MonoElementSPAC` type toy SPAC system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
+- `ssm` Whether the flow rate is at steady state
 """
-MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat} = (
+MonoElementSPAC{FT}(psm::String; ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     return MonoElementSPAC{FT}(
-                Leaf{FT}(psm),  # LEAF
-                Root{FT}(),     # ROOT
-                Stem{FT}(),     # STEM
-                ones(FT,4)      # _krs
+                Leaf{FT}(psm; ssm = ssm),   # LEAF
+                Root{FT}(ssm = ssm),        # ROOT
+                Stem{FT}(ssm = ssm),        # STEM
+                ones(FT,4)                  # _krs
     )
 );
 
@@ -117,11 +119,11 @@ mutable struct MonoGrassSPAC{FT} <: AbstractSPACSystem{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
-    _fs::Array{FT,1}
+    _fs::Vector{FT}
     "Conductances for each root layer at given flow"
-    _ks::Array{FT,1}
+    _ks::Vector{FT}
     "Pressure for each root layer at given flow"
-    _ps::Array{FT,1}
+    _ps::Vector{FT}
 end
 
 
@@ -132,34 +134,36 @@ end
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat}
+    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies grass system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
 - `zr` Maximal root depth (negative value)
 - `zc` Maximal canopy height (positive value)
-- `z_soil` Array of soil layer boundaries starting from 0
-- `z_air` Array of air layer boundaries starting from 0
+- `zss` Vector of soil layer boundaries starting from 0
+- `zas` Vector of air layer boundaries starting from 0
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 spac = MonoGrassSPAC{Float64}();
-spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, z_soil = collect(0:-0.1:-1), z_air = collect(0:0.05:1.01));
+spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, zss = collect(0:-0.1:-1), zas = collect(0:0.05:1.01));
 ```
 """
-MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vector = collect(0:-0.1:-1), z_air::Vector = collect(0:0.05:1)) where {FT<:AbstractFloat} = (
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
     _n_root  = 0;
     _r_index = Int[];
-    for i in eachindex(z_soil)
-        _z = z_soil[i];
+    for i in eachindex(zss)
+        _z = zss[i];
         if _z > zr
             _n_root += 1;
             push!(_r_index, i);
@@ -171,8 +175,8 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
     # determine how many layers of canopy
     _n_canopy = 0;
     _c_index  = Int[];
-    for i in eachindex(z_air)
-        _z = z_air[i]
+    for i in eachindex(zas)
+        _z = zas[i]
         if _z < zc
             _n_canopy += 1;
             push!(_c_index, i);
@@ -184,13 +188,13 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, z_soil::Vect
     # create evenly distributed root system for now
     _roots = Root{FT}[];
     for i in _r_index
-        _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
+        _Δh = abs(zss[i+1] + zss[i]) / 2;
+        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
     # create leaves
-    _leaves = [Leaf{FT}(psm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
@@ -249,11 +253,11 @@ mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
-    _fs::Array{FT,1}
+    _fs::Vector{FT}
     "Conductances for each root layer at given flow"
-    _ks::Array{FT,1}
+    _ks::Vector{FT}
     "Pressure for each root layer at given flow"
-    _ps::Array{FT,1}
+    _ps::Vector{FT}
 end
 
 
@@ -264,34 +268,36 @@ end
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat}
+    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies palm system, given
 - `psm` Photosynthesis model, must be C3 or C3Cytochrome
 - `zr` Maximal root depth (negative value)
 - `zc` Maximal canopy height (positive value)
-- `z_soil` Array of soil layer boundaries starting from 0
-- `z_air` Array of air layer boundaries starting from 0
+- `zss` Vector of soil layer boundaries starting from 0
+- `zas` Vector of air layer boundaries starting from 0
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 spac = MonoPalmSPAC{Float64}();
-spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, z_soil = collect(0:-0.1:-2), z_air = collect(0:0.2:13));
+spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat} = (
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
 
     # determine how many layers of roots
     _n_root  = 0;
     _r_index = Int[];
-    for i in eachindex(z_soil)
-        _z = z_soil[i];
+    for i in eachindex(zss)
+        _z = zss[i];
         if _z > zr
             _n_root += 1;
             push!(_r_index, i);
@@ -303,9 +309,9 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     # determine how many layers of canopy
     _n_canopy = 0;
     _c_index  = Int[];
-    for i in 1:(length(z_air)-1)
-        _z0 = z_air[i];
-        _z1 = z_air[i+1];
+    for i in 1:(length(zas)-1)
+        _z0 = zas[i];
+        _z1 = zas[i+1];
         if _z0 <= zt < zc <= _z1
             _n_canopy += 1;
             push!(_c_index, i);
@@ -328,16 +334,16 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     # create evenly distributed root system for now
     _roots = Root{FT}[];
     for i in _r_index
-        _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
+        _Δh = abs(zss[i+1] + zss[i]) / 2;
+        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh=zt, Δl=zt), T_25());
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zt, Δl = zt, ssm = ssm), T_25());
 
     # create leaves
-    _leaves = [Leaf{FT}(psm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
@@ -399,11 +405,11 @@ mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
-    _fs::Array{FT,1}
+    _fs::Vector{FT}
     "Conductances for each root layer at given flow"
-    _ks::Array{FT,1}
+    _ks::Vector{FT}
     "Pressure for each root layer at given flow"
-    _ps::Array{FT,1}
+    _ps::Vector{FT}
 end
 
 
@@ -414,34 +420,36 @@ end
 #     2022-May-25: add constructor function
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-May-31: add steady state mode option to input options
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat}
+    MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies tree system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome (note: there are C4 shrubs)
 - `zr` Maximal root depth (negative value)
 - `zc` Maximal canopy height (positive value)
-- `z_soil` Array of soil layer boundaries starting from 0
-- `z_air` Array of air layer boundaries starting from 0
+- `zss` Vector of soil layer boundaries starting from 0
+- `zas` Vector of air layer boundaries starting from 0
+- `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
 spac = MonoTreeSPAC{Float64}();
-spac = MonoTreeSPAC{Float64}(zr = -1, zt = 11, zc = 1, z_soil = collect(0:-0.1:-2), z_air = collect(0:0.2:13));
+spac = MonoTreeSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, z_soil::Vector = collect(0:-0.25:-2), z_air::Vector = collect(0:0.2:13)) where {FT<:AbstractFloat} = (
+MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
     _n_root  = 0;
     _r_index = Int[];
-    for i in eachindex(z_soil)
-        _z = z_soil[i];
+    for i in eachindex(zss)
+        _z = zss[i];
         if _z > zr
             _n_root += 1;
             push!(_r_index, i);
@@ -453,9 +461,9 @@ MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     # determine how many layers of canopy
     _n_canopy = 0;
     _c_index  = Int[];
-    for i in 1:(length(z_air)-1)
-        _z0 = z_air[i];
-        _z1 = z_air[i+1];
+    for i in 1:(length(zas)-1)
+        _z0 = zas[i];
+        _z1 = zas[i+1];
         if _z0 <= zt < zc <= _z1
             _n_canopy += 1;
             push!(_c_index, i);
@@ -478,24 +486,24 @@ MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     # create evenly distributed root system for now
     _roots = Root{FT}[];
     for i in _r_index
-        _Δh = abs(z_soil[i+1] + z_soil[i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area=1/_n_root, k_x=25/_n_root, Δh=_Δh), T_25());
+        _Δh = abs(zss[i+1] + zss[i]) / 2;
+        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh=zt, Δl=zt), T_25());
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zt, Δl = zt, ssm = ssm), T_25());
 
     # create branches
     _branches = Stem{FT}[];
     for i in _c_index
-        _Δh = (z_air[i] + max(z_air[i+1], zt)) / 2 - zt;
-        _st = Stem{FT}(StemHydraulics{FT}(area=1/_n_canopy, Δh=_Δh), T_25());
+        _Δh = (zas[i] + max(zas[i+1], zt)) / 2 - zt;
+        _st = Stem{FT}(StemHydraulics{FT}(area = 1/_n_canopy, Δh = _Δh, ssm = ssm), T_25());
         push!(_branches, _st);
     end;
 
     # create leaves
-    _leaves = [Leaf{FT}(psm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
