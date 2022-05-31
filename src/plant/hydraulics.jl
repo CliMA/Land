@@ -208,6 +208,8 @@ end
 #     2022-May-25: add root hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-May-31: rename input variable name from steadystate to ssm
+# Bug fixes:
+#     2022-May-31: set the isleaf option to false
 #
 #######################################################################################################################################################################################################
 """
@@ -231,7 +233,7 @@ rhs = RootHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 1, Δl = 2, ssm =
 ```
 """
 RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat} = (
-    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, false));
 
     return RootHydraulics{FT}(
         area,                               # AREA
@@ -329,6 +331,8 @@ end
 #     2022-May-25: add stem hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-May-31: rename input variable name from steadystate to ssm
+# Bug fixes:
+#     2022-May-31: set the isleaf option to false
 #
 #######################################################################################################################################################################################################
 """
@@ -352,7 +356,7 @@ rhs = StemHydraulics{Float64}(N = 5; area = 1, k_x = 50, Δh = 2, ssm = true);
 ```
 """
 StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat} = (
-    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, true));
+    _flow = (ssm ? SteadyStateFlow{FT}(0) : NonSteadyStateFlow{FT}(N, false));
 
     return StemHydraulics{FT}(
         area,                               # AREA
