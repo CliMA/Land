@@ -1,8 +1,37 @@
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: migrate function to new version
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+This function returns the root end pressure and total hydraulic conductance to find flow rates in all roots. The supported methods are
 
+$(METHODLIST)
+
+"""
 function root_pk end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for steady flow mode
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat}
+
+Return the root end pressre and total hydraulic conductance at steady state mode, given
+- `hs` `RootHydraulics` type struct
+- `mode` `SteadyStateFlow` type steady state flow
+- `T` Liquid temperature
+"""
 root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
     @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
 
@@ -45,7 +74,23 @@ root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:Abs
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for non-steady flow mode
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat}
+
+Return the root end pressre and total hydraulic conductance at steady state mode, given
+- `hs` `RootHydraulics` type struct
+- `mode` `NonSteadyStateFlow` type non-steady state flow
+- `T` Liquid temperature
+"""
 root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
     @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
 
@@ -88,26 +133,131 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for root hydraulic system
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    root_pk(hs::RootHydraulics{FT}, T::FT) where {FT<:AbstractFloat}
+
+Return the root end pressre and total hydraulic conductance at steady state mode, given
+- `hs` `RootHydraulics` type struct
+- `T` Liquid temperature
+"""
 root_pk(hs::RootHydraulics{FT}, T::FT) where {FT<:AbstractFloat} = root_pk(hs, hs.FLOW, T);
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: migrate function to new version
+#     2022-May-27: rename the functions (flow_profile! and update_PVF!) to xylem_flow_profile!
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+This function update the flow rate profiles within the plant hydraulic system. The supported methods are
 
+$(METHODLIST)
 
-
-
-
-
-
-
+"""
 function xylem_flow_profile! end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method to set up root flow rate at steady state mode (this function is used to solve for steady state solution)
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    xylem_flow_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat}
+
+Set up flow rate out for root at steady state mode, given
+- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
+- `mode` `SteadyStateFlow` type steady state flow
+- `flow` Target flow rate (guess or solution)
+"""
+xylem_flow_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat} = (
+    mode.flow = flow;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method to set up root flow rate at steady state mode (this function is used to solve for steady state solution)
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_flow_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat}
+
+Set up flow rate out for root at non-steady state mode, given
+- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
+- `mode` `SteadyStateFlow` type steady state flow
+- `f_out` Target flow rate out of the root (guess or solution)
+"""
+xylem_flow_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat} = (
+    mode.f_out = f_out;
+    hs.f_element .= f_out .- mode.f_sum;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for leaf, root, and stem at steady state mode
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, mode::SteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat}
+
+Update organ flow rate profile at steady state mode after setting up the flow rate out (do nothing here), given
+- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
+- `mode` `SteadyStateFlow` type steady state flow
+- `T` Liquid temperature
+- `Δt` Time step length
+"""
 xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, mode::SteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = nothing;
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for leaf at non-steady state mode
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat}
+
+Update leaf flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `LeafHydraulics` type struct
+- `mode` `NonSteadyStateFlow` type non-steady state flow
+- `T` Liquid temperature
+- `Δt` Time step length
+"""
 xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack PVC, V_MAXIMUM = hs;
 
@@ -132,7 +282,24 @@ xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT,
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for root and stem at non-steady state mode
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat}
+
+Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `RootHydraulics` or `StemHydraulics` type struct
+- `mode` `NonSteadyStateFlow` type non-steady state flow
+- `T` Liquid temperature
+- `Δt` Time step length
+"""
 xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack N, PVC, V_MAXIMUM = hs;
 
@@ -148,7 +315,7 @@ xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::Non
             mode.f_buffer[_i] = hs.v_storage[_i] / Δt;
         end;
 
-        mode._f_diff[_i] = _f_sum;
+        mode.f_sum[_i] = _f_sum;
         hs.v_storage[_i] -= mode.f_buffer[_i] * Δt;
         hs.p_storage[_i] = xylem_pressure(PVC, hs.v_storage[_i]/V_MAXIMUM[_i], T);
         mode.f_element[_i] = mode.f_out - _f_sum;
@@ -162,35 +329,68 @@ xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::Non
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for leaf, root, and stem hydraulic system at steady and non-steady state mode (for dispatching purpose)
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
-xylem_flow_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat} = (
-    mode.flow = flow;
+    xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, T::FT, Δt::FT) where {FT<:AbstractFloat}
 
-    return nothing
-);
-
-
-
-xylem_flow_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat} = (
-    mode.f_out = f_out;
-    hs.f_element .= f_out .- mode.q_diff;
-
-    return nothing
-);
-
-
-
+Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
+- `T` Liquid temperature
+- `Δt` Time step length
+"""
 xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, T::FT, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(hs, hs.FLOW, T, Δt);
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for leaf, root, and stem organ at steady and non-steady state mode (for dispatching purpose)
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
-xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, T::FT, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(organ.HS, T, Δt);
+    xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
+
+Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `Leaf`, `Root`, or `Stem` type struct
+- `Δt` Time step length
+"""
+xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(organ.HS, organ.t, Δt);
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method to solve root flow rate partition at both steady and non-steady state modes
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
-xylem_flow_profile!(roots::Vector{RootHydraulics{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
-    # update root buffer rates to get an initial guess (flow rate not changing now)
-    xylem_flow_profile!.(roots, T, FT(0));
+    xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
+
+Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `roots` Vector of `Root` in a multiple roots system
+- `cache_f` Flow rate cache into each root
+- `cache_k` Total conductance cache of each root
+- `cache_p` Root xylem end pressure cache of each root
+- `f_sum` Total
+- `Δt` Time step length
+"""
+xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat} = (
+    # update root buffer rates to get an initial guess (flow rate not changing now as time step is set to 0)
+    xylem_flow_profile!.(roots, FT(0));
 
     # recalculate the flow profiles to make sure sum are the same as f_sum
     _count = 0;
@@ -198,8 +398,8 @@ xylem_flow_profile!(roots::Vector{RootHydraulics{FT}}, cache_f::Vector{FT}, cach
         # sync the values to ks, ps, and qs
         for _i in eachindex(roots)
             _root = roots[_i];
-            xylem_flow_profile!(roots[_i], roots[_i].FLOW, cache_f[_i]);
-            cache_p[_i],cache_k[_i] = root_pk(_root, T);
+            xylem_flow_profile!(roots[_i].HS, roots[_i].FLOW, cache_f[_i]);
+            cache_p[_i],cache_k[_i] = root_pk(_root, _root.T);
         end;
 
         # use ps and ks to compute the Δf to adjust
@@ -221,15 +421,30 @@ xylem_flow_profile!(roots::Vector{RootHydraulics{FT}}, cache_f::Vector{FT}, cach
 
     # update root buffer rates again
     for _i in eachindex(roots)
-        xylem_flow_profile!(roots[_i], roots[_i].FLOW, cache_f[_i]);
-        xylem_flow_profile!(roots[_i], T, Δt);
+        xylem_flow_profile!(roots[_i].HS, roots[_i].FLOW, cache_f[_i]);
     end;
+    xylem_flow_profile!.(roots, Δt);
 
     return nothing
 );
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-May-27: add method for MonoElementSPAC
+#     2022-May-31: add documentation
+#
+#######################################################################################################################################################################################################
+"""
 
+    xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat}
+
+Update flow profiles for the soil-plant-air continuum, given
+- `spac` `MonoElementSPAC` type SPAC system
+- `Δt` Time step length
+"""
 xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
