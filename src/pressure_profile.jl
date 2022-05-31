@@ -500,11 +500,12 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 # Changes to the method
 # General
 #     2022-May-27: add method for StemHydraulics at steady state
+#     2022-May-31: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
+    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
 - `hs` `StemHydraulics` type hydraulic system

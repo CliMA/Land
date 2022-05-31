@@ -41,11 +41,12 @@ clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{F
 # Changes to the method
 # General
 #     2022-May-26: add method for leaf (hydraulic system nested within)
+#     2022-May-31: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
+    clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
 
 Clear the legacy for hydraulic system, given
 - `organ` `Leaf`, `Root`, or `Stem` type structure

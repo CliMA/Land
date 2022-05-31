@@ -105,11 +105,12 @@ capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat} = pvc.K_REF
 # General
 #     2022-May-27: add method for LinearPVCurve
 #     2022-May-31: add documentation
+#     2022-May-31: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    capacitance_buffer(pvc::LinearPVCurve{FT}) where {FT<:AbstractFloat}
+    capacitance_buffer(pvc::SegmentedPVCurve{FT}) where {FT<:AbstractFloat}
 
 Return the relative capacictance buffer rate, given
 - `pv` `SegmentedPVCurve` type pressure volume curve
