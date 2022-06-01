@@ -19,7 +19,8 @@ function update_environment! end
 # Changes to this method
 # General
 #     2022-Apr-19: add the method to update the dignostic variables from air temperature
-#     2022-Apr-19: add options p_H₂O, rh, and t (defaults are nothing)
+#     2022-Apr-19: add options p_CO₂, p_H₂O, rh, t, vpd, and wind (defaults are nothing)
+#     2022-Apr-19: update docs and history log
 #
 #######################################################################################################################################################################################################
 """
@@ -29,8 +30,8 @@ function update_environment! end
                 p_CO₂::Union{FT,Nothing} = nothing,
                 p_H₂O::Union{FT,Nothing} = nothing,
                 rh::Union{FT,Nothing} = nothing,
-                t::Union{FT, Nothing} = nothing,
-                vpd::Union{FT, Nothing} = nothing,
+                t::Union{FT,Nothing} = nothing,
+                vpd::Union{FT,Nothing} = nothing,
                 wind::Union{FT,Nothing} = nothing
     ) where {FT<:AbstractFloat}
 
@@ -48,8 +49,8 @@ update_environment!(
             p_CO₂::Union{FT,Nothing} = nothing,
             p_H₂O::Union{FT,Nothing} = nothing,
             rh::Union{FT,Nothing} = nothing,
-            t::Union{FT, Nothing} = nothing,
-            vpd::Union{FT, Nothing} = nothing,
+            t::Union{FT,Nothing} = nothing,
+            vpd::Union{FT,Nothing} = nothing,
             wind::Union{FT,Nothing} = nothing
 ) where {FT<:AbstractFloat} = (
     if !isnothing(t)     envir.t = t;         end;
