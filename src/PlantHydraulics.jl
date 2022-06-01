@@ -2,6 +2,7 @@ module PlantHydraulics
 
 using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, NonSteadyStateFlow, PowerVC, Root, RootHydraulics,
       SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
+using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, T_25, ρg_MPa
 using Statistics: mean
@@ -19,6 +20,7 @@ export relative_hydraulic_conductance, xylem_flow_profile!, xylem_pressure_profi
 
 
 # include functions
+include("critical_flow.jl"    )
 include("critical_pressure.jl")
 include("flow_profile.jl"     )
 include("legacy.jl"           )

@@ -106,4 +106,11 @@ using Test
             end;
         end;
     end;
+
+    @testset "Critical Flow" begin
+        for FT in [Float32, Float64]
+            lhs = LeafHydraulics{FT}();
+            @test PlantHydraulics.critical_flow(lhs, FT(298.15)) > 0;
+        end;
+    end;
 end;
