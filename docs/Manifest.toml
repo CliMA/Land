@@ -310,10 +310,10 @@ uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 version = "0.2.0"
 
 [[deps.PlantHydraulics]]
-deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "SoilHydraulics", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "65abad072884b62086c5a8063078f4a5ca10aaaa"
+deps = ["ClimaCache", "ConstrainedRootSolvers", "DocStringExtensions", "PkgUtility", "SoilHydraulics", "Statistics", "Test", "UnPack", "WaterPhysics"]
+git-tree-sha1 = "b3a5cde3d6926152db84ad0da8aaa55c4035535a"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]

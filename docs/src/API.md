@@ -68,6 +68,7 @@ The beta functions are generalized with
 The StomataModels module also contains five optimization model schemes:
 
 ```@docs
+xylem_risk
 OSMEller
 OSMSperry
 OSMWang

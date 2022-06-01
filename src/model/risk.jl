@@ -7,7 +7,7 @@
     xylem_risk(hs::LeafHydraulics{FT}, flow::FT) where {FT<:AbstractFloat}
 
 Evaluate the hydraulic risk at the end of leaf xylem, given
-- `hs` [`LeafHydraulics`](@ref) type struct
+- `hs` `LeafHydraulics` type struct
 - `flow` Flow rate (per leaf area)
 - `T` Liquid temperature
 """
