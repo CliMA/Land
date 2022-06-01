@@ -178,7 +178,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = canopyi.ps.PSM.a_net;
         e_1  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        k_1  = xylem_risk(hs, e_1);
+        k_1  = xylem_risk(hs, e_1, canopyi.T);
 
         # update photosynthesis from x
         g_lc = x;
@@ -189,7 +189,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = canopyi.ps.PSM.a_net;
         e_2  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        k_2  = xylem_risk(hs, e_2);
+        k_2  = xylem_risk(hs, e_2, canopyi.T);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (k_1 - k_2) / (e_2 - e_1) * a_2 / k_2;
@@ -251,7 +251,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = canopyi.ps.PSM.a_net;
         e_1  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        k_1  = xylem_risk(hs, e_1);
+        k_1  = xylem_risk(hs, e_1, canopyi.T);
 
         # update photosynthesis from x
         g_lc = x;
@@ -262,7 +262,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = canopyi.ps.PSM.a_net;
         e_2  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        k_2  = xylem_risk(hs, e_2);
+        k_2  = xylem_risk(hs, e_2, canopyi.T);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (k_1 - k_2) / (e_2 - e_1) * a_max / kr_max;
@@ -393,7 +393,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = canopyi.ps.PSM.a_net;
         e_1  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        p_1  = end_pressure(hs, e_1);
+        p_1  = xylem_end_pressure(hs, e_1, canopyi.T);
 
         # update photosynthesis from x
         g_lc = x;
@@ -404,7 +404,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = canopyi.ps.PSM.a_net;
         e_2  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        p_2  = end_pressure(hs, e_2);
+        p_2  = xylem_end_pressure(hs, e_2, canopyi.T);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (-2 * sm.a * p_2 + sm.b) / (e_2 - e_1) * (p_1 - p_2);
@@ -465,7 +465,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_1  = canopyi.ps.PSM.a_net;
         e_1  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        p_1  = end_pressure(hs, e_1);
+        p_1  = xylem_end_pressure(hs, e_1, canopyi.T);
 
         # update photosynthesis from x
         g_lc = x;
@@ -476,7 +476,7 @@ function solution_diff!(
         g_lw = 1 / (1/g_sw + 1/g_bw);
         a_2  = canopyi.ps.PSM.a_net;
         e_2  = g_lw * (p_sat - p_H₂O) / P_AIR;
-        p_2  = end_pressure(hs, e_2);
+        p_2  = xylem_end_pressure(hs, e_2, canopyi.T);
 
         ∂A∂E = (a_2 - a_1) / (e_2 - e_1);
         ∂Θ∂E = (-2 * sm.a * p_2 * a_2) / (e_2 - e_1) * (p_1 - p_2);
