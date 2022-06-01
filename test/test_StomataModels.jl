@@ -135,7 +135,7 @@ println();
         osm_4  = OSMWAP{FT}();
         osm_5  = OSMWAPMod{FT}();
         hs     = LeafHydraulics{FT}();
-        svc    = VanGenuchten{FT}();
+        svc    = ClimaCache.VanGenuchten{FT}("Silt");
 
         # test the solution functions
         for can in [can_3, can_4]
@@ -186,7 +186,7 @@ println();
                 gas_exchange!(can, hs, envir, sm, 1);
                 @test true;
             end
-            gas_exchange!(can, TreeSimple{FT}(), envir, osm_3);
+            gas_exchange!(can, MonoElementSPAC{FT}("C3"), envir, osm_3);
             @test true;
         end
 

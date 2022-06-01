@@ -16,8 +16,8 @@ Calculate the β correction factor, given
 - `hs` `LeafHydraulics` structure
 - `svc` Soil vulnerability curve
 - `bt` [`AbstractBetaFunction`](@ref) type struct
-- `p_leaf` Leaf water potential `[MPa]`
-- `p_soil` Soil water potential `[MPa]`
+- `p_leaf` Leaf xylem pressure corrected to 25 degree `[MPa]`
+- `p_soil` Soil water potential corrected to 25 degree `[MPa]`
 - `swc` Soil water content
 """
 function β_factor(
@@ -28,9 +28,9 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, vc = hs;
+    @unpack VC = hs;
 
-    return xylem_k_ratio(vc, p_leaf/f_st, f_vis)
+    return relative_hydraulic_conductance(VC, p_leaf)
 end
 
 
@@ -44,7 +44,7 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    return soil_k_ratio_p25(svc, p_soil)
+    return relative_hydraulic_conductance(svc, true, p_soil)
 end
 
 

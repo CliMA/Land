@@ -28,21 +28,20 @@ function update_leaf_TP!(
     if T != T_old
         canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
         canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
-        canopyi.LV    = latent_heat_vapor(T) * M_H₂O(FT);
+        canopyi.LV = latent_heat_vapor(T) * M_H₂O(FT);
         canopyi.ps.t  = canopyi.T;
         photosystem_temperature_dependence!(canopyi.ps.PSM, envir, canopyi.ps.t);
         canopyi.ps.p_H₂O_sat = saturation_vapor_pressure(canopyi.ps.t);
-        canopyi.p_sat        = canopyi.ps.p_H₂O_sat;
-        canopyi.ps._t        = canopyi.ps.t;
-        temperature_effects!(hs);
-        hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = critical_flow(hs, canopyi.ec);
+        canopyi.p_sat = canopyi.ps.p_H₂O_sat;
+        canopyi.ps._t = canopyi.ps.t;
+        hs.p_ups = canopyi.p_ups;
+        canopyi.ec = critical_flow(hs, T, canopyi.ec);
         canopyi.T_old = canopyi.T;
         canopyi.p_old = canopyi.p_ups;
     # if only p_ups changes, update ec and p_old
     elseif p_ups != p_old
-        hs.p_ups      = canopyi.p_ups;
-        canopyi.ec    = critical_flow(hs, canopyi.ec);
+        hs.p_ups = canopyi.p_ups;
+        canopyi.ec = critical_flow(hs, T, canopyi.ec);
         canopyi.p_old = canopyi.p_ups;
     end
 
@@ -54,7 +53,7 @@ end
 
 function update_leaf_TP!(
             canopyi::CanopyLayer{FT},
-            hs::TreeSimple{FT},
+            spac::MonoElementSPAC{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # unpack required variables
@@ -65,21 +64,20 @@ function update_leaf_TP!(
     if T != T_old
         canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
         canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
-        canopyi.LV    = latent_heat_vapor(T) * M_H₂O(FT);
-        canopyi.ps.t  = canopyi.T;
+        canopyi.LV = latent_heat_vapor(T) * M_H₂O(FT);
+        canopyi.ps.t = canopyi.T;
         photosystem_temperature_dependence!(canopyi.ps.PSM, envir, canopyi.ps.t);
         canopyi.ps.p_H₂O_sat = saturation_vapor_pressure(canopyi.ps.t);
-        canopyi.p_sat        = canopyi.ps.p_H₂O_sat;
-        canopyi.ps._t        = canopyi.ps.t;
-        temperature_effects!(hs);
-        tree_ec       = critical_flow(hs, canopyi.ec * canopyi.LA);
-        canopyi.ec    = tree_ec / canopyi.LA;
+        canopyi.p_sat = canopyi.ps.p_H₂O_sat;
+        canopyi.ps._t = canopyi.ps.t;
+        tree_ec = critical_flow(spac, canopyi.ec * canopyi.LA);
+        canopyi.ec = tree_ec / canopyi.LA;
         canopyi.T_old = canopyi.T;
         canopyi.p_old = canopyi.p_ups;
     # if only p_ups changes, update ec and p_old
     elseif p_ups != p_old
-        tree_ec       = critical_flow(hs, canopyi.ec * canopyi.LA);
-        canopyi.ec    = tree_ec / canopyi.LA;
+        tree_ec = critical_flow(spac, canopyi.ec * canopyi.LA);
+        canopyi.ec = tree_ec / canopyi.LA;
         canopyi.p_old = canopyi.p_ups;
     end
 
