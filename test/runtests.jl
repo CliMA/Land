@@ -21,6 +21,17 @@ using Test
         end;
     end;
 
+    @testset "Content" begin
+        for FT in [Float32, Float64]
+            vg = VanGenuchten{FT}("Loam");
+            bc = BrooksCorey{FT}(vg);
+            @test vg.Θ_RES < soil_θ(vg, FT(-1)) < vg.Θ_SAT;
+            @test soil_θ(vg, FT(0)) == vg.Θ_SAT;
+            @test bc.Θ_RES < soil_θ(bc, FT(-1)) < bc.Θ_SAT;
+            @test soil_θ(bc, FT(0)) == bc.Θ_SAT;
+        end;
+    end;
+
     @testset "Conductance" begin
         for FT in [Float32, Float64]
             vg = VanGenuchten{FT}("Loam");
