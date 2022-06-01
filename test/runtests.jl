@@ -1,3 +1,4 @@
+using ClimaCache
 using Photosynthesis
 using PkgUtility
 using PlantHydraulics
