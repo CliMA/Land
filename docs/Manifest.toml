@@ -307,7 +307,7 @@ version = "0.2.0"
 deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "SoilHydraulics", "Statistics", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]

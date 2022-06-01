@@ -15,7 +15,7 @@ import SoilHydraulics: relative_hydraulic_conductance
 export ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics, WeibullVC
 
 # export public functions
-export xylem_flow_profile!, xylem_pressure_profile!
+export relative_hydraulic_conductance, xylem_flow_profile!, xylem_pressure_profile!
 
 
 # include functions
