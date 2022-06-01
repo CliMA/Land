@@ -20,12 +20,12 @@ export relative_hydraulic_conductance, xylem_flow_profile!, xylem_pressure_profi
 
 
 # include functions
-include("critical_flow.jl"    )
 include("critical_pressure.jl")
 include("flow_profile.jl"     )
 include("legacy.jl"           )
 include("pressure_profile.jl" )
 include("pressure_volume.jl"  )
+include("target_flow.jl"      )
 include("vulnerability.jl"    )
 
 

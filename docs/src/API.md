@@ -93,4 +93,5 @@ xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:
 ```@docs
 critical_flow
 critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat}
+critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat}
 ```

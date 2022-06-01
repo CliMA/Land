@@ -111,6 +111,8 @@ using Test
         for FT in [Float32, Float64]
             lhs = LeafHydraulics{FT}();
             @test PlantHydraulics.critical_flow(lhs, FT(298.15)) > 0;
+            spac = MonoElementSPAC{FT}("C3");
+            @test PlantHydraulics.critical_flow(spac) > 0;
         end;
     end;
 end;
