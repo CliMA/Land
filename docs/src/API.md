@@ -11,9 +11,7 @@ CurrentModule = CanopyLayers
 Canopy4RT
 CanopyOpticals
 CanopyRads
-IncomingRadiation
 LeafBios
-LeafOpticals
 RTDimensions
 SoilOpticals
 SolarAngles
@@ -43,9 +41,7 @@ create_rt_cache
 create_canopy_opticals
 create_canopy_rads
 create_canopy_rt
-create_incoming_radiation
 create_leaf_bios
-create_leaf_opticals
 create_rt_dims
 create_wave_length
 initialize_rt_module
@@ -70,7 +66,6 @@ canopy_matrices!
 clumping_factor!
 diffusive_S
 diffusive_S!
-fluspect!
 short_wave!
 SIF_fluxes!
 thermal_fluxes!

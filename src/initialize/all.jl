@@ -41,9 +41,6 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
 
     # Create an array of standard leaves
     leaves = [create_leaf_bios(FT, rt_dim) for i in 1:nLayer];
-    for i in 1:nLayer
-        fluspect!(leaves[i], wls);
-    end
 
     # Four Different steps to compute Short-Wave RT
     canopy_geometry!(can, angles, can_opt, rt_con);

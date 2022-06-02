@@ -13,9 +13,6 @@ soil    = SoilOpticals{FT}(wls);
 angles  = SolarAngles{FT}();
 rt_con  = create_rt_cache(FT, rt_dim);
 leaves  = [create_leaf_bios(FT, rt_dim) for i in 1:rt_dim.nLayer];
-for i in 1:rt_dim.nLayer
-    fluspect!(leaves[i], wls);
-end
 
 canopy_geometry!(can, angles, can_opt, rt_con);
 canopy_matrices!(leaves, can_opt);
