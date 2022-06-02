@@ -127,6 +127,7 @@ using Test
 
     @testset "Radiation" begin
         for FT in [Float32, Float64]
+            # Wave length sets
             wls1 = ClimaCache.WaveLengthSet{FT}();
             wls2 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500));
             wls3 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
@@ -135,6 +136,11 @@ using Test
                 # NaN test will not pass because of the NaNs in wls2 and wls3
                 # @test NaN_test(wls);
             end;
+
+            # Sun-sensor geometry
+            ssg = ClimaCache.SunSensorGeometry{FT}();
+            @test FT_test(ssg, FT);
+            @test NaN_test(ssg);
         end;
     end;
 
