@@ -11,4 +11,13 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "Clumping Index" begin
+        for FT in [Float32, Float64]
+            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            angles = ClimaCache.SunSensorGeometry{FT}();
+            CanopyRadiativeTransfer.clumping_index!(can, angles);
+            @test true;
+        end;
+    end;
 end;
