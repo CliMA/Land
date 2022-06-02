@@ -45,6 +45,8 @@ include("util/colimit.jl")
 include("air/air_layer.jl")
 
 # include the radiation types and structures
+include("radiation/canopy_structure.jl"       )
+include("radiation/sun_sensor_geometry.jl"    )
 include("radiation/wave_length_set.jl"        )
 include("radiation/feature_absorption.jl"     )
 include("radiation/hyperspectral_radiation.jl")
