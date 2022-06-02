@@ -36,10 +36,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     "Differential wavelength"
     dWL::Array{FT,1} = diff(sWL)
 
-    "Leaf optical parameter set"
-    optis::LeafOpticals = LeafOpticals{FT}()
     "Wave length `[nm]`"
-    WL  ::Array{FT,1}  = optis.lambda
+    WL  ::Array{FT,1}  = (sWL[1:end-1] + sWL[2:end]) / 2
 
     "Index of WLE in WL"
     iWLE::Array{Int,1} = findall( (WL .>= minwle) .& (WL .<= maxwle) )

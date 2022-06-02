@@ -20,7 +20,6 @@ function create_wave_length(
                     collect(780.0:25.0:2400.1)]
 )
     sWL   = FT.(sWLs);
-    optis = create_leaf_opticals(sWL, OPTI_2021);
 
-    return WaveLengths{FT}(sWL=sWL, optis=optis)
+    return WaveLengths{FT}(sWL=sWL)
 end
