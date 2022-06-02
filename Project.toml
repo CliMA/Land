@@ -4,6 +4,7 @@ authors = ["Yujie Wang <jesiner@gmail.com>"]
 version = "0.1.15"
 
 [deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"

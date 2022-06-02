@@ -34,7 +34,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     # 3. create can_rad, can_opt, and etc from rt_dim and wls
     can_rad = create_canopy_rads(FT, rt_dim);
     can_opt = create_canopy_opticals(FT, rt_dim);
-    in_rad  = create_incoming_radiation(wls);
+    in_rad  = HyperspectralRadiation{FT}();
     soil    = SoilOpticals{FT}(wls);
     angles  = SolarAngles{FT}();
     rt_con  = create_rt_cache(FT, rt_dim);

@@ -260,7 +260,7 @@ Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
 """
 function SIF_fluxes!(
             leaf::LeafBios{FT},
-            in_rad::IncomingRadiation{FT},
+            in_rad::HyperspectralRadiation{FT},
             wls::WaveLengths{FT},
             rt_con::RTCache{FT},
             fqe::FT = FT(0.01);
@@ -270,7 +270,7 @@ function SIF_fluxes!(
     @unpack Mb, Mf = leaf;
     @unpack dWL_iWLE, iWLE, WLE, WLF = wls;
     sf_con = rt_con.sf_con;
-    sf_con.tmp_dwl_iWlE  .= (view(in_rad.E_direct , iWLE, 1) .+ view(in_rad.E_diffuse, iWLE, 1)) .* dWL_iWLE;
+    sf_con.tmp_dwl_iWlE  .= (view(in_rad.e_direct , iWLE, 1) .+ view(in_rad.e_diffuse, iWLE, 1)) .* dWL_iWLE;
     if photon
         sf_con.tmp_dwl_iWlE .*= WLE .* _FAC(FT);
     end;

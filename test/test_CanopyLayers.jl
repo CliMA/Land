@@ -58,7 +58,6 @@ println();
         # test warnings
         @info "Expect warnings here!";
         warn_wls   = create_wave_length(FT, collect(FT,2100:100:2600));
-        warn_inrad = create_incoming_radiation(warn_wls);
         @test true;
 
         # add more tests that has not been used

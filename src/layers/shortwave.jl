@@ -24,7 +24,7 @@ function short_wave!(
             can::Canopy4RT{FT},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
-            in_rad::IncomingRadiation{FT},
+            in_rad::HyperspectralRadiation{FT},
             soil::SoilOpticals{FT},
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
@@ -81,8 +81,8 @@ function short_wave!(
     # 4. flux profile calculation
     # Eq. 19 in mSCOPE paper
     # 4.1 Boundary condition at top: Incoming solar radiation
-    can_opt.Es_[:,1]    .= in_rad.E_direct;
-    can_rad.E_down[:,1] .= in_rad.E_diffuse;
+    can_opt.Es_[:,1]    .= in_rad.e_direct;
+    can_rad.E_down[:,1] .= in_rad.e_diffuse;
 
     # 4.2 from top to bottom
     @inbounds for j=1:nLayer
@@ -128,7 +128,7 @@ function short_wave!(
                      can_opt.vf .* view(can_opt.Po       , 1:nLayer)' .*
                                    view(can_rad.E_up  , :, 1:nLayer)  .+
                      can_opt.w  .* view(can_opt.Pso      , 1:nLayer)' .*
-                                   in_rad.E_direct;
+                                   in_rad.e_direct;
     #sw_con.piLoc  .= iLAI .* view(sum(sw_con.piLoc2, dims=2), :, 1);
     @inbounds for j in eachindex(sw_con.piLoc)
         sw_con.piLoc[j] = iLAI * sum( view(sw_con.piLoc2, j, :) );
@@ -142,8 +142,8 @@ function short_wave!(
 
     # 4.8 Save albedos (hemispheric direct and diffuse and directional (obs))
     # rso and rdo are not computed separately
-    can_rad.alb_obs     .= sw_con.piLo ./ ( in_rad.E_direct .+
-                                            in_rad.E_diffuse );
+    can_rad.alb_obs     .= sw_con.piLo ./ ( in_rad.e_direct .+
+                                            in_rad.e_diffuse );
     can_rad.alb_direct  .= view(can_opt.R_sd, :, 1);
     can_rad.alb_diffuse .= view(can_opt.R_dd, :, 1);
 

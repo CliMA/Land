@@ -32,7 +32,7 @@ function canopy_fluxes!(
             can::Canopy4RT{FT},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
-            in_rad::IncomingRadiation{FT},
+            in_rad::HyperspectralRadiation{FT},
             soil::SoilOpticals{FT},
             leaves::Array{LeafBios{FT},1},
             wls::WaveLengths{FT},
@@ -104,9 +104,9 @@ function canopy_fluxes!(
     # 5. Total PAR
     # TODO considering remove this part, if we are not using it
     #    re-use the PAR_dir and PAR_diff in the rt_con
-    cf_con.E_iPAR .= view(in_rad.E_direct, iPAR);
+    cf_con.E_iPAR .= view(in_rad.e_direct, iPAR);
     e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
-    cf_con.E_iPAR .= view(in_rad.E_diffuse, iPAR);
+    cf_con.E_iPAR .= view(in_rad.e_diffuse, iPAR);
     e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
     can_rad.incomingPAR_direct  = fac * numerical∫(cf_con.PAR_dir , dWL_iPAR);
     can_rad.incomingPAR_diffuse = fac * numerical∫(cf_con.PAR_diff, dWL_iPAR);

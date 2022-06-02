@@ -2,6 +2,7 @@ module CanopyLayers
 
 using LazyArtifacts
 
+using ClimaCache: HyperspectralRadiation
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: TYPEDFIELDS, TYPEDEF
 using LinearAlgebra: mul!, pinv
@@ -37,17 +38,11 @@ const SOIL_GSV  = artifact"land_model_spectrum_V1" * "/GSV.csv";
 
 
 # export public types
-export Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation, LeafBios,
-       LeafOpticals, RTCache, RTDimensions, SoilOpticals, SolarAngles,
-       WaveLengths
+export Canopy4RT, CanopyOpticals, CanopyRads, LeafBios, LeafOpticals, RTCache, RTDimensions, SoilOpticals, SolarAngles, WaveLengths
 
 # export public functions
-export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!,
-       create_canopy_opticals, create_canopy_rads, create_canopy_rt,
-       create_incoming_radiation, create_leaf_bios, create_leaf_opticals,
-       create_rt_cache, create_rt_dims, create_wave_length, diffusive_S,
-       fluspect!, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!,
-       thermal_fluxes!
+export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, create_canopy_opticals, create_canopy_rads, create_canopy_rt, create_leaf_bios, create_leaf_opticals, create_rt_cache,
+       create_rt_dims, create_wave_length, diffusive_S, fluspect!, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
 export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_683,
@@ -66,7 +61,6 @@ include("types/canopy4rt.jl"     )
 include("types/canopyopticals.jl")
 include("types/canopyrads.jl"    )
 include("types/caches.jl"        )
-include("types/incomingrad.jl"   )
 include("types/leafbios.jl"      )
 include("types/leafopticals.jl"  )
 include("types/rtdims.jl"        )
@@ -79,7 +73,6 @@ include("initialize/canopy4rt.jl"     )
 include("initialize/canopyopticals.jl")
 include("initialize/canopyrads.jl"    )
 include("initialize/caches.jl"        )
-include("initialize/incomingrad.jl"   )
 include("initialize/leafbios.jl"      )
 include("initialize/leafopticals.jl"  )
 include("initialize/rtdims.jl"        )
