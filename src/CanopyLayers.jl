@@ -2,7 +2,7 @@ module CanopyLayers
 
 using LazyArtifacts
 
-using ClimaCache: HyperspectralRadiation
+using ClimaCache: HyperspectralRadiation, SunSensorGeometry
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: TYPEDFIELDS, TYPEDEF
 using LinearAlgebra: mul!, pinv
@@ -38,7 +38,7 @@ const SOIL_GSV  = artifact"land_model_spectrum_V1" * "/GSV.csv";
 
 
 # export public types
-export Canopy4RT, CanopyOpticals, CanopyRads, LeafBios, RTCache, RTDimensions, SoilOpticals, SolarAngles, WaveLengths
+export Canopy4RT, CanopyOpticals, CanopyRads, LeafBios, RTCache, RTDimensions, SoilOpticals, WaveLengths
 
 # export public functions
 export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, create_canopy_opticals, create_canopy_rads, create_canopy_rt, create_leaf_bios, create_rt_cache, create_rt_dims,
@@ -63,7 +63,6 @@ include("types/canopyrads.jl"    )
 include("types/caches.jl"        )
 include("types/leafbios.jl"      )
 include("types/rtdims.jl"        )
-include("types/solarangles.jl"   )
 include("types/wavelength.jl"    )
 include("types/soilopticals.jl"  )
 

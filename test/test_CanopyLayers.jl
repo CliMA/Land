@@ -26,35 +26,6 @@ println();
             @test NaN_test(data_set);
         end
 
-        # add more tests
-        angles.sza = 30;
-        angles.raa = 0;
-        can.LAI    = 3;
-        VZA        = collect(FT, -89.5:0.5:89.5);
-        for VZA_ in VZA
-            angles.vza = VZA_;
-            canopy_geometry!(can, angles, can_opt, rt_con);
-            canopy_matrices!(leaves, can_opt);
-            short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
-            SIF_fluxes!(leaves, can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
-        end
-        @test true;
-
-        angles.sza = 48;
-        angles.raa = 0;
-        can.LAI    = FT(3.22);
-        for raa in 0:5:360
-            angles.raa = raa;
-            for VZA in 0:5:85
-                angles.vza = VZA;
-                canopy_geometry!(can, angles, can_opt, rt_con);
-                canopy_matrices!(leaves, can_opt);
-                short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
-                SIF_fluxes!(leaves, can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
-            end
-        end
-        @test true;
-
         # test warnings
         @info "Expect warnings here!";
         warn_wls   = create_wave_length(FT, collect(FT,2100:100:2600));

@@ -14,7 +14,6 @@ CanopyRads
 LeafBios
 RTDimensions
 SoilOpticals
-SolarAngles
 WaveLengths
 ```
 

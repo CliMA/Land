@@ -6,16 +6,16 @@
 """
     clumping_factor!(
                 can::Canopy4RT{FT},
-                angles::SolarAngles{FT}
+                angles::SunSensorGeometry{FT}
     ) where {FT<:AbstractFloat}
 
 Calculate the clumping factor, given
 - `can` [`Canopy4RT`](@ref) type struct
-- `angles` [`SolarAngles`](@ref) type struct
+- `angles` `SunSensorGeometry` type struct
 """
 function clumping_factor!(
             can::Canopy4RT{FT},
-            angles::SolarAngles{FT}
+            angles::SunSensorGeometry{FT}
 ) where {FT<:AbstractFloat}
     @unpack clump_a, clump_b = can;
     @unpack sza = angles;
@@ -42,7 +42,7 @@ end
 """
     canopy_geometry!(
                 can::Canopy4RT{FT},
-                angles::SolarAngles{FT},
+                angles::SunSensorGeometry{FT},
                 can_opt::CanopyOpticals{FT},
                 rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
@@ -52,13 +52,13 @@ Computes canopy optical properties (extinction coefficients for direct and
     leaf inclination and azimuth distribution functions and sun-sensor
     geometry. Canopy clumping Ω is implemented as in Pinty et al (2015), given
 - `can` [`Canopy4RT`](@ref) type struct
-- `angles` [`SolarAngles`](@ref) type struct
+- `angles` `SunSensorGeometry` type struct
 - `can_opt` [`CanopyOpticals`](@ref) type struct
 - `rt_con` [`RTCache`](@ref) type cache
 """
 function canopy_geometry!(
             can::Canopy4RT{FT},
-            angles::SolarAngles{FT},
+            angles::SunSensorGeometry{FT},
             can_opt::CanopyOpticals{FT},
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
@@ -66,7 +66,8 @@ function canopy_geometry!(
     clumping_factor!(can, angles);
 
     # 2. update solor angle dependent variables
-    @unpack sza, vza, raa = angles;
+    @unpack sza, vza, saa, vaa = angles;
+    raa = vaa - saa;
     cos_vza = cosd(vza);
     tan_vza = tand(vza);
     cos_raa = cosd(raa);

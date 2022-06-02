@@ -12,7 +12,7 @@ Initialize the RT module and return the sturctures, given
 - `LAI` Leaf area index
 
 This function initializes and returns
-- `angles` [`SolarAngles`](@ref)
+- `angles`
 - `can` [`Canopy4RT`](@ref)
 - `can_opt` [`CanopyOpticals`](@ref)
 - `can_rad` [`CanopyRads`](@ref)
@@ -36,7 +36,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     can_opt = create_canopy_opticals(FT, rt_dim);
     in_rad  = HyperspectralRadiation{FT}();
     soil    = SoilOpticals{FT}(wls);
-    angles  = SolarAngles{FT}();
+    angles  = SunSensorGeometry{FT}();
     rt_con  = create_rt_cache(FT, rt_dim);
 
     # Create an array of standard leaves
