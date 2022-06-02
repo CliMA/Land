@@ -2,6 +2,52 @@
 #
 # Changes to this type
 # General
+#     2022-Jun-02: add abstract type for LIDF algorithms
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Hierarchy of AbstractLIDFAlgorithm:
+- [`VerhoefLIDF`](@ref)
+"""
+abstract type AbstractLIDFAlgorithm{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
+#     2022-Jun-02: migrate from CanopyLayers
+#     2022-Jun-02: rename Canopy4RT to HyperspectralMLCanopy
+#     2022-Jun-02: abstractize LIDF as a field
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure for Verhoef LIDF algorithm
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct VerhoefLIDF{FT} <: AbstractLIDFAlgorithm{FT}
+    # parameters that do not change with time
+    "Leaf inclination angle distribution function parameter a"
+    A::FT
+    "Leaf inclination angle distribution function parameter b"
+    B::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this type
+# General
 #     2022-Jun-02: add abstract type for canopy structure
 #
 #######################################################################################################################################################################################################
@@ -21,6 +67,7 @@ abstract type AbstractCanopyStructure{FT<:AbstractFloat} end
 # General
 #     2022-Jun-02: migrate from CanopyLayers
 #     2022-Jun-02: rename Canopy4RT to HyperspectralMLCanopy
+#     2022-Jun-02: abstractize LIDF as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -38,10 +85,8 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopyStructure{FT}
     # parameters that do not change with time
     "Hot spot parameter"
     HOT_SPOT::FT
-    "Leaf inclination angle distribution function parameter a"
-    LIDF_A::FT
-    "Leaf inclination angle distribution function parameter b"
-    LIDF_B::FT
+    "Leaf inclination angle distribution function algorithm"
+    LIDF::AbstractLIDFAlgorithm
     "Number of azimuth angles"
     N_AZI::Int
     "Number of inclination angles"
@@ -87,16 +132,8 @@ end
 #
 # Changes to this constructor
 # General
-#     2022-Jan-14: add C3 and C4 constructors
-#     2022-Jan-24: add C3Cytochrome constructor
-#     2022-Jan-24: add p_CO₂_s to the constructor
-#     2022-Jan-24: add documentation
-#     2022-Feb-07: remove fluorescence model from Leaf struct
-#     2022-Feb-11: set default APAR = 1000
-#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
-#     2022-May-25: add leaf hydraulic system into the constructor
-#     2022-May-31: add steady state mode option to input options
-#     2022-May-25: add new field WIDTH
+#     2022-Jun-02: add constructor
+#     2022-Jun-02: abstractize LIDF as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -116,25 +153,24 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Ma
     _x_bnds = collect(FT,0:-1/n_layer:-1-eps(FT));
 
     return HyperspectralMLCanopy{FT}(
-                0.05,           # HOT_SPOT
-                0,              # LIDF_A
-                0,              # LIDF_B
-                36,             # N_AZI
-                _n_incl,        # N_INCL
-                n_layer,        # N_LAYER
-                _p_incl,        # P_INC
-                1,              # Ω_A
-                0,              # Ω_B
-                _θ_azi,         # Θ_AZI
-                _θ_incl,        # Θ_INCL
-                θ_incl_bnds,    # Θ_INCL_BNDS
-                1,              # ci
-                lai,            # lai
-                cosd.(_θ_azi),  # _COS_Θ_AZI
-                cosd.(_θ_incl), # _COS_Θ_INCL
-                sind.(_θ_incl), # _SIN_Θ_INCL
-                cosd.(_θ_azi),  # _cos_θ_azi_raa
-                ones(FT,4),     # _vol_scatter
-                _x_bnds         # _x_bnds
+                0.05,                   # HOT_SPOT
+                VerhoefLIDF{FT}(0,0),   # LIDF
+                36,                     # N_AZI
+                _n_incl,                # N_INCL
+                n_layer,                # N_LAYER
+                _p_incl,                # P_INC
+                1,                      # Ω_A
+                0,                      # Ω_B
+                _θ_azi,                 # Θ_AZI
+                _θ_incl,                # Θ_INCL
+                θ_incl_bnds,            # Θ_INCL_BNDS
+                1,                      # ci
+                lai,                    # lai
+                cosd.(_θ_azi),          # _COS_Θ_AZI
+                cosd.(_θ_incl),         # _COS_Θ_INCL
+                sind.(_θ_incl),         # _SIN_Θ_INCL
+                cosd.(_θ_azi),          # _cos_θ_azi_raa
+                ones(FT,4),             # _vol_scatter
+                _x_bnds                 # _x_bnds
     )
 );
