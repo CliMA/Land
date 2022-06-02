@@ -42,7 +42,7 @@ export Canopy4RT, CanopyOpticals, CanopyRads, LeafBios, RTCache, RTDimensions, S
 
 # export public functions
 export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, create_canopy_opticals, create_canopy_rads, create_canopy_rt, create_leaf_bios, create_rt_cache, create_rt_dims,
-       create_wave_length, diffusive_S, fluspect!, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!, thermal_fluxes!
+       create_wave_length, diffusive_S, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
 export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_683,
@@ -82,7 +82,6 @@ include("layers/canopyfluxes.jl"  )
 include("layers/canopygeometry.jl")
 include("layers/canopymatrices.jl")
 include("layers/diffusives.jl"    )
-include("layers/fluspect.jl"      )
 include("layers/indicies.jl"      )
 include("layers/leaf.jl"          )
 include("layers/shortwave.jl"     )
