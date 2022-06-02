@@ -141,6 +141,11 @@ using Test
             ssg = ClimaCache.SunSensorGeometry{FT}();
             @test FT_test(ssg, FT);
             @test NaN_test(ssg);
+
+            # Canopy structure
+            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            @test FT_test(can, FT);
+            @test NaN_test(can);
         end;
     end;
 

@@ -83,6 +83,9 @@ HyperspectralAbsorption
 HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat}
 SunSensorGeometry
 SunSensorGeometry{FT}(; haa::Number = 0, hsa::Number = 0, saa::Number = 180, sza::Number = 30, vaa::Number = 180, vza::Number = 0) where {FT<:AbstractFloat}
+AbstractCanopyStructure
+HyperspectralMLCanopy
+HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 ```
 
 ## Soil
