@@ -94,7 +94,7 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopyStructure{FT}
     "Number of canopy layers"
     N_LAYER::Int
     "Inclination angle distribution"
-    P_INC::Vector{FT}
+    P_INCL::Vector{FT}
     "Clumping structure a"
     Ω_A::FT
     "Clumping structure b"
@@ -158,7 +158,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Ma
                 36,                     # N_AZI
                 _n_incl,                # N_INCL
                 n_layer,                # N_LAYER
-                _p_incl,                # P_INC
+                _p_incl,                # P_INCL
                 1,                      # Ω_A
                 0,                      # Ω_B
                 _θ_azi,                 # Θ_AZI
