@@ -5,7 +5,7 @@
 ###############################################################################
 """
     thermal_fluxes!(
-                leaves::Array{LeafBios{FT},1},
+                leaves::Array{LeafBiophysics{FT},1},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 can::Canopy4RT{FT},
@@ -20,7 +20,7 @@ Computes 2-stream diffusive radiation transport for thermal radiation (calls
     boundary conditions from the atmosphere and soil emissivity and
     temperature. Currently only uses Stefan Boltzmann law to compute spectrally
     integrated LW but can be easily adjusted to be spectrally resolved.
-- `leaves` Array of [`LeafBios`](@ref) type struct
+- `leaves` Array of `LeafBiophysics` type struct
 - `can_opt` [`CanopyOpticals`](@ref) type struct
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `can` [`Canopy4RT`](@ref) type struct
@@ -29,7 +29,7 @@ Computes 2-stream diffusive radiation transport for thermal radiation (calls
 - `wls` [`WaveLengths`](@ref) type struct
 """
 function thermal_fluxes!(
-            leaves::Array{LeafBios{FT},1},
+            leaves::Array{LeafBiophysics{FT},1},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},

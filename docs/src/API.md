@@ -11,7 +11,6 @@ CurrentModule = CanopyLayers
 Canopy4RT
 CanopyOpticals
 CanopyRads
-LeafBios
 RTDimensions
 SoilOpticals
 WaveLengths
@@ -99,7 +98,6 @@ SWIR
 
 ## Utils
 ```@docs
-calctav
 dcum
 dladgen
 e2phot

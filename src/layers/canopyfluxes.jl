@@ -10,7 +10,7 @@
                 can_rad::CanopyRads{FT},
                 in_rad::IncomingRadiation{FT},
                 soil::SoilOpticals{FT},
-                leaves::Array{LeafBios{FT},1},
+                leaves::Array{LeafBiophysics{FT},1},
                 wls::WaveLengths{FT},
                 rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
@@ -24,7 +24,7 @@ Computes a variety of integrated fluxes from the spectrally resolved
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `in_rad` [`IncomingRadiation`](@ref) type struct
 - `soil` [`SoilOpticals`](@ref) type struct
-- `leaves` Array of [`LeafBios`](@ref) type struct
+- `leaves` Array of `LeafBiophysics` type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `rt_con` [`RTCache`](@ref) type cache
 """
@@ -34,7 +34,7 @@ function canopy_fluxes!(
             can_rad::CanopyRads{FT},
             in_rad::HyperspectralRadiation{FT},
             soil::SoilOpticals{FT},
-            leaves::Array{LeafBios{FT},1},
+            leaves::Array{LeafBiophysics{FT},1},
             wls::WaveLengths{FT},
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
@@ -68,9 +68,9 @@ function canopy_fluxes!(
 
     @inbounds for j in 1:nLayer
         if length(leaves)>1
-            cf_con.kChlrel .= view(leaves[j].kChlrel, iPAR);
+            cf_con.kChlrel .= view(leaves[j].α_cabcar, iPAR);
         else
-            cf_con.kChlrel .= view(leaves[1].kChlrel, iPAR);
+            cf_con.kChlrel .= view(leaves[1].α_cabcar, iPAR);
         end
 
         # for diffuse PAR

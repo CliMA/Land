@@ -17,7 +17,7 @@ This function initializes and returns
 - `can_opt` [`CanopyOpticals`](@ref)
 - `can_rad` [`CanopyRads`](@ref)
 - `in_rad` [`IncomingRadiation`](@ref)
-- `leaves` Array{[`LeafBios`](@ref),1}
+- `leaves` Array{`LeafBiophysics`,1}
 - `rt_con` [`RTCache`](@ref)
 - `rt_dim` [`RTDimensions`](@ref)
 - `soil` [`SoilOpticals`](@ref)
@@ -40,7 +40,8 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     rt_con  = create_rt_cache(FT, rt_dim);
 
     # Create an array of standard leaves
-    leaves = [create_leaf_bios(FT, rt_dim) for i in 1:nLayer];
+    leaves = [LeafBiophysics{FT}() for i in 1:nLayer];
+    # TODO: make sure to recompute leaf spectra
 
     # Four Different steps to compute Short-Wave RT
     canopy_geometry!(can, angles, can_opt, rt_con);
