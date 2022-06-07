@@ -3,7 +3,7 @@
 # Changes to this structure
 # General
 #     2022-Jun-07: add CanopyOptics struct (will be a field for canopy structure)
-#     2022-Jun-07: add more cache fields: fo, fs, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
+#     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
 #
 #######################################################################################################################################################################################################
 """
@@ -27,14 +27,20 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     dob::FT
     "Diffuse -> Outgoing forward scatter weight"
     dof::FT
-    "conversion factor fo for angle towards observer (not sun like fs)"
+    "Conversion factor fo for angle towards observer (not sun like fs)"
     fo::Matrix{FT}
-    "conversion factor fs to compute irradiance on inclined leaf"
+    "Conversion factor fs to compute irradiance on inclined leaf"
     fs::Matrix{FT}
     "Outgoing beam extinction coefficient weight"
     ko ::FT
     "Solar beam extinction coefficient weight"
     ks ::FT
+    "Probability of directly viewing a leaf in solar direction"
+    po::Vector{FT}
+    "Probability of directly viewing a leaf in viewing direction"
+    ps::Vector{FT}
+    "Bi-directional probability of directly viewing a leaf (solar->canopy->viewing)"
+    pso::Vector{FT}
     "Solar -> Diffuse backscatter weight"
     sdb::FT
     "Solar -> Diffuse forward scatter weight"
@@ -85,18 +91,19 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-07: add constructor
-#     2022-Jun-07: add more cache fields: fo, fs, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
+#     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
 #
 #######################################################################################################################################################################################################
 """
 
-    CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
+    CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20) where {FT<:AbstractFloat}
 
 Construct a struct to store canopy optical properties
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
+- `n_layer` Number of canopy layers
 """
-CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat} = (
+CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20) where {FT<:AbstractFloat} = (
     return CanopyOpticalProperty{FT}(
                 0,                      # ddb
                 0,                      # ddf
@@ -106,6 +113,9 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9) where {FT<:Abstrac
                 zeros(FT,n_incl,n_azi), # fs
                 0,                      # ko
                 0,                      # ks
+                zeros(FT,n_layer+1),    # po
+                zeros(FT,n_layer+1),    # ps
+                zeros(FT,n_layer+1),    # pso
                 0,                      # sdb
                 0,                      # sdf
                 0,                      # sob
