@@ -68,6 +68,8 @@ abstract type AbstractCanopyStructure{FT<:AbstractFloat} end
 #     2022-Jun-02: migrate from CanopyLayers
 #     2022-Jun-02: rename Canopy4RT to HyperspectralMLCanopy
 #     2022-Jun-02: abstractize LIDF as a field
+#     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL
+#     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #
 #######################################################################################################################################################################################################
 """
@@ -115,16 +117,16 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopyStructure{FT}
     lai::FT
 
     # caches to speed up calculations
+    "Ones with the length of Θ_AZI"
+    _1_AZI::Vector{FT}
     "Cosine of Θ_AZI"
     _COS_Θ_AZI::Vector{FT}
     "Cosine of Θ_INCL"
     _COS_Θ_INCL::Vector{FT}
+    "Square of cosine of Θ_INCL"
+    _COS²_Θ_INCL::Vector{FT}
     "Sine of Θ_INCL"
     _SIN_Θ_INCL::Vector{FT}
-    "Cosine of Θ_AZI - raa"
-    _cos_θ_azi_raa::Vector{FT}
-    "Cache for volume scatter function"
-    _vol_scatter::Vector{FT}
     "Cache for level boundary locations"
     _x_bnds::Vector{FT}
 end
@@ -136,6 +138,8 @@ end
 # General
 #     2022-Jun-02: add constructor
 #     2022-Jun-02: abstractize LIDF as a field
+#     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL
+#     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #
 #######################################################################################################################################################################################################
 """
@@ -153,7 +157,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Ma
     _p_incl  = ones(_n_incl) / _n_incl;
     _θ_azi   = collect(FT,5:10:360);
     _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
-    _can_opt = CanopyOpticalProperty{FT}(; n_incl = _n_incl);
+    _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl);
 
     return HyperspectralMLCanopy{FT}(
                 0.05,                   # HOT_SPOT
@@ -170,11 +174,11 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Ma
                 θ_incl_bnds,            # Θ_INCL_BNDS
                 1,                      # ci
                 lai,                    # lai
+                ones(FT,36),            # _1_AZI
                 cosd.(_θ_azi),          # _COS_Θ_AZI
                 cosd.(_θ_incl),         # _COS_Θ_INCL
+                cosd.(_θ_incl) .^ 2,    # _COS²_Θ_INCL
                 sind.(_θ_incl),         # _SIN_Θ_INCL
-                cosd.(_θ_azi),          # _cos_θ_azi_raa
-                ones(FT,4),             # _vol_scatter
                 _x_bnds                 # _x_bnds
     )
 );
