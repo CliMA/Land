@@ -93,6 +93,8 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopyStructure{FT}
     N_INCL::Int
     "Number of canopy layers"
     N_LAYER::Int
+    "Canopy optical properties"
+    OPTICS::CanopyOpticalProperty{FT}
     "Inclination angle distribution"
     P_INCL::Vector{FT}
     "Clumping structure a"
@@ -146,11 +148,12 @@ Construct a multiple layer canopy for hyperspectral radiative transfer, given
 - `θ_incl_bnds` Inclination angle boundary values
 """
 HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat} = (
-    _n_incl = size(θ_incl_bnds,1);
-    _θ_incl = FT[(θ_incl_bnds[_i,1] + θ_incl_bnds[_i,2]) / 2 for _i in 1:_n_incl];
-    _p_incl = ones(_n_incl) / _n_incl;
-    _θ_azi  = collect(FT,5:10:360);
-    _x_bnds = collect(FT,0:-1/n_layer:-1-eps(FT));
+    _n_incl  = size(θ_incl_bnds,1);
+    _θ_incl  = FT[(θ_incl_bnds[_i,1] + θ_incl_bnds[_i,2]) / 2 for _i in 1:_n_incl];
+    _p_incl  = ones(_n_incl) / _n_incl;
+    _θ_azi   = collect(FT,5:10:360);
+    _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
+    _can_opt = CanopyOpticalProperty{FT}(; n_incl = _n_incl);
 
     return HyperspectralMLCanopy{FT}(
                 0.05,                   # HOT_SPOT
@@ -158,6 +161,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Ma
                 36,                     # N_AZI
                 _n_incl,                # N_INCL
                 n_layer,                # N_LAYER
+                _can_opt,               # OPTICS
                 _p_incl,                # P_INCL
                 1,                      # Ω_A
                 0,                      # Ω_B
