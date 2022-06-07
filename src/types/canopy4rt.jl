@@ -27,26 +27,12 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     clump_b   ::FT = FT(0.0 )
     "Leaf width"
     leaf_width::FT = FT(0.1 )
-    "Vegetation height"
-    hc        ::FT = FT(2.0 )
     "Leaf Inclination"
     LIDFa     ::FT = FT(0.0 )
     "Variation in leaf inclination"
     LIDFb     ::FT = FT(0.0 )
     "HotSpot parameter (still need to check!)"
     hot       ::FT = FT(0.05)
-
-    # tree/canopy/leaf traits
-    "Canopy height `[m]`"
-    height::FT = FT(20.0  )
-    "Canopy roughness `[m]`"
-    z0m   ::FT = FT(1.0   )
-    "Tree roughtnes `[m]`"
-    z0h   ::FT = FT(-999.0)
-    "Canopy displacement height `[m]`"
-    d     ::FT = FT(-999.0)
-    "m/sqrt(s) turbulent transfer coefficient"
-    Cd    ::FT = FT(0.01  )
 
     # Some more derived parameters:
     "List of mean inclination angles `[°]`"
@@ -70,7 +56,7 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
 
     # This is changed afterwards, ignore here.
     "Inclination angles weight distribution"
-    lidf::Array{FT,1} = dladgen(LIDFa, LIDFb, litab_bnd)
+    lidf::Array{FT,1} = ones(size(litab_bnd,1)) / size(litab_bnd,1)
     "List of level location (level = layer + 1)"
     xl  ::Array{FT,1} = collect(FT, 0:-1.0/nLayer:-1)
     "1/nLayer"

@@ -1,41 +1,5 @@
 ###############################################################################
 #
-# Update clumping factor
-#
-###############################################################################
-"""
-    clumping_factor!(
-                can::Canopy4RT{FT},
-                angles::SunSensorGeometry{FT}
-    ) where {FT<:AbstractFloat}
-
-Calculate the clumping factor, given
-- `can` [`Canopy4RT`](@ref) type struct
-- `angles` `SunSensorGeometry` type struct
-"""
-function clumping_factor!(
-            can::Canopy4RT{FT},
-            angles::SunSensorGeometry{FT}
-) where {FT<:AbstractFloat}
-    @unpack clump_a, clump_b = can;
-    @unpack sza = angles;
-
-    if clump_b > 0
-        can.Ω = clump_a + clump_b * (1 - cosd(sza));
-    end
-
-    return nothing
-end
-
-
-
-
-
-
-
-
-###############################################################################
-#
 # Update canopy geometry
 #
 ###############################################################################
@@ -63,7 +27,7 @@ function canopy_geometry!(
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
     # 1. update clumping factor from zenith angle
-    clumping_factor!(can, angles);
+    # clumping_factor!(can, angles);
 
     # 2. update solor angle dependent variables
     @unpack sza, vza, saa, vaa = angles;
@@ -98,7 +62,7 @@ function canopy_geometry!(
         _ctl = cos_ttli[i];
 
         # interception parameters and ref/trans multipliers
-        volscatt!(can.vol_scatt, sza, vza, psi_vol, _lit);
+        # volscatt!(can.vol_scatt, sza, vza, psi_vol, _lit);
         chi_s, chi_o, frho, ftau = can.vol_scatt;
 
         # Extinction coefficients

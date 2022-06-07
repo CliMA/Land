@@ -30,9 +30,7 @@ Base.@kwdef mutable struct WaveLengths{FT}
 
     # Wave length lists
     "Standard wave length `[nm]`"
-    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
-                        collect(FT(655.0):FT( 5.0):FT( 770.1));
-                        collect(FT(780.0):FT(25.0):FT(2400.1))]
+    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1)); collect(FT(655.0):FT( 5.0):FT( 770.1)); collect(FT(780.0):FT(25.0):FT(2400.1))]
     "Differential wavelength"
     dWL::Array{FT,1} = diff(sWL)
 

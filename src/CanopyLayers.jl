@@ -56,7 +56,6 @@ export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, c
 export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_683, SIF_740, SIF_757, SIF_771, SIF_WL, SWIR
 
 
-include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
