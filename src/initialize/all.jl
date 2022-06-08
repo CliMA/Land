@@ -33,7 +33,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
 
     # 3. create can_rad, can_opt, and etc from rt_dim and wls
     can_rad = create_canopy_rads(FT, rt_dim);
-    can_opt = create_canopy_opticals(FT, rt_dim);
+    can_opt = CanopyOpticals{FT}();
     in_rad  = HyperspectralRadiation{FT}();
     soil    = SoilOpticals{FT}(wls);
     angles  = SunSensorGeometry{FT}();
@@ -45,7 +45,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
 
     # Four Different steps to compute Short-Wave RT
     # canopy_geometry!(can, angles, can_opt, rt_con);
-    canopy_matrices!(leaves, can_opt);
+    # canopy_matrices!(leaves, can_opt);
     short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
     canopy_fluxes!(can, can_opt, can_rad, in_rad, soil, leaves, wls, rt_con);
     SIF_fluxes!(leaves, can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
