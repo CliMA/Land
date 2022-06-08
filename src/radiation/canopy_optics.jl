@@ -4,7 +4,7 @@
 # General
 #     2022-Jun-07: add CanopyOptics struct (will be a field for canopy structure)
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _σ_a
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
 #
 #######################################################################################################################################################################################################
 """
@@ -50,6 +50,10 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     sob::FT
     "Solar -> Outgoing weight of specular2directional forward coefficient"
     sof::FT
+    "Effective reflectance for diffuse->diffuse"
+    ρ_dd::Matrix{FT}
+    "Effective reflectance for diffuse->directional"
+    ρ_dv::Matrix{FT}
     "Backward scattering coefficient for diffuse->diffuse at different layers and wavelength bins"
     σ_ddb::Matrix{FT}
     "Forward scattering coefficient for diffuse->diffuse at different layers and wavelength bins"
@@ -98,8 +102,16 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_mat_incl_azi_1::Matrix{FT}
     "Temporary cache used for matrix adding up purpose (n_incl * n_azi)"
     _tmp_mat_incl_azi_2::Matrix{FT}
-    "Attenuation cache at different layers and wavelength bins"
-    _σ_a::Matrix{FT}
+    "Reflectance for diffuse->diffuse at each canopy layer"
+    _ρ_dd::Matrix{FT}
+    "Reflectance for diffuse->directional at each canopy layer"
+    _ρ_dv::Matrix{FT}
+    "Tranmittance for diffuse->diffuse at each canopy layer"
+    _τ_dd::Matrix{FT}
+    "Tranmittance for diffuse->directional at each canopy layer"
+    _τ_dv::Matrix{FT}
+    "Tranmittance for directional->directional at each canopy layer"
+    _τ_vv::FT
 end
 
 
@@ -109,7 +121,7 @@ end
 # General
 #     2022-Jun-07: add constructor
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _σ_a
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
 #
 #######################################################################################################################################################################################################
 """
@@ -124,44 +136,50 @@ Construct a struct to store canopy optical properties
 """
 CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat} = (
     return CanopyOpticalProperty{FT}(
-                0,                      # ddb
-                0,                      # ddf
-                0,                      # dob
-                0,                      # dof
-                zeros(FT,n_incl,n_azi), # fo
-                zeros(FT,n_incl,n_azi), # fs
-                0,                      # ko
-                0,                      # ks
-                zeros(FT,n_layer+1),    # po
-                zeros(FT,n_layer+1),    # ps
-                zeros(FT,n_layer+1),    # pso
-                0,                      # sdb
-                0,                      # sdf
-                0,                      # sob
-                0,                      # sof
-                zeros(FT,n_λ,n_layer),  # σ_ddb
-                zeros(FT,n_λ,n_layer),  # σ_ddf
-                zeros(FT,n_λ,n_layer),  # σ_dvb
-                zeros(FT,n_λ,n_layer),  # σ_dvf
-                zeros(FT,n_λ,n_layer),  # σ_vdb
-                zeros(FT,n_λ,n_layer),  # σ_vdf
-                zeros(FT,n_λ,n_layer),  # σ_vv
-                zeros(FT,n_incl),       # _Co
-                zeros(FT,n_incl),       # _Cs
-                zeros(FT,n_incl),       # _So
-                zeros(FT,n_incl),       # _Ss
-                zeros(FT,n_incl,n_azi), # _abs_fo
-                zeros(FT,n_incl,n_azi), # _abs_fs
-                zeros(FT,n_incl,n_azi), # _abs_fs_fo
-                0,                      # _bf
-                zeros(FT,n_azi),        # _cos_θ_azi_raa
-                zeros(FT,n_incl,n_azi), # _fs_fo
-                zeros(FT,n_incl),       # _ko
-                zeros(FT,n_incl),       # _ks
-                zeros(FT,n_incl),       # _sb
-                zeros(FT,n_incl),       # _sf
-                zeros(FT,n_incl,n_azi), # _tmp_mat_incl_azi_1
-                zeros(FT,n_incl,n_azi), # _tmp_mat_incl_azi_2
-                zeros(FT,n_λ,n_layer)   # _σ_a
+                0,                          # ddb
+                0,                          # ddf
+                0,                          # dob
+                0,                          # dof
+                zeros(FT,n_incl,n_azi),     # fo
+                zeros(FT,n_incl,n_azi),     # fs
+                0,                          # ko
+                0,                          # ks
+                zeros(FT,n_layer+1),        # po
+                zeros(FT,n_layer+1),        # ps
+                zeros(FT,n_layer+1),        # pso
+                0,                          # sdb
+                0,                          # sdf
+                0,                          # sob
+                0,                          # sof
+                zeros(FT,n_λ,n_layer+1),    # ρ_dd
+                zeros(FT,n_λ,n_layer+1),    # ρ_dv
+                zeros(FT,n_λ,n_layer),      # σ_ddb
+                zeros(FT,n_λ,n_layer),      # σ_ddf
+                zeros(FT,n_λ,n_layer),      # σ_dvb
+                zeros(FT,n_λ,n_layer),      # σ_dvf
+                zeros(FT,n_λ,n_layer),      # σ_vdb
+                zeros(FT,n_λ,n_layer),      # σ_vdf
+                zeros(FT,n_λ,n_layer),      # σ_vv
+                zeros(FT,n_incl),           # _Co
+                zeros(FT,n_incl),           # _Cs
+                zeros(FT,n_incl),           # _So
+                zeros(FT,n_incl),           # _Ss
+                zeros(FT,n_incl,n_azi),     # _abs_fo
+                zeros(FT,n_incl,n_azi),     # _abs_fs
+                zeros(FT,n_incl,n_azi),     # _abs_fs_fo
+                0,                          # _bf
+                zeros(FT,n_azi),            # _cos_θ_azi_raa
+                zeros(FT,n_incl,n_azi),     # _fs_fo
+                zeros(FT,n_incl),           # _ko
+                zeros(FT,n_incl),           # _ks
+                zeros(FT,n_incl),           # _sb
+                zeros(FT,n_incl),           # _sf
+                zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_1
+                zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
+                zeros(FT,n_λ,n_layer),      # _ρ_dd
+                zeros(FT,n_λ,n_layer),      # _ρ_dv
+                zeros(FT,n_λ,n_layer),      # _τ_dd
+                zeros(FT,n_λ,n_layer),      # _τ_dv
+                0                           # _τ_vv
     )
 );

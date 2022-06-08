@@ -54,6 +54,7 @@ include("radiation/hyperspectral_radiation.jl")
 
 # include the soil types and structures
 include("soil/vulnerability.jl")
+include("soil/soil.jl"         )
 
 # include the plant types and structures
 include("plant/temperature_dependency.jl")

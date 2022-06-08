@@ -99,6 +99,8 @@ BrooksCorey
 VanGenuchten
 VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
 VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
+Soil
+Soil{FT}(zs::Vector{FT}; soil_type::String = "Loam", n_λ::Int = 114) where {FT<:AbstractFloat}
 ```
 
 ## SPAC

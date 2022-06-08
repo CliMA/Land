@@ -4,6 +4,14 @@ using Test
 
 
 @testset verbose = true "ClimaCache Test" begin
+    @testset "Soil" begin
+        for FT in [Float32, Float64]
+            soil = ClimaCache.Soil{FT}(FT[0,-1]);
+            @test FT_test(soil, FT);
+            @test NaN_test(soil);
+        end;
+    end;
+
     @testset "Air" begin
         for FT in [Float32, Float64]
             air = ClimaCache.AirLayer{FT}();
