@@ -3,6 +3,23 @@
 # Changes to this function
 # General
 #     2022-Jun-07: migrate the function from CanopyLayers
+#     2022-Jun-08: add documentation
+#
+#######################################################################################################################################################################################################
+"""
+This function updates canopy optical properties for canopy. The supported methods include
+
+$(METHODLIST)
+
+"""
+function canopy_geometry! end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-07: migrate the function from CanopyLayers
 #     2022-Jun-07: clean the function
 #     2022-Jun-08: add documentation
 #
@@ -15,7 +32,7 @@ Updates canopy optical properties (extinction coefficients for direct and diffus
 - `can` `HyperspectralMLCanopy` type struct
 - `angles` `SunSensorGeometry` type struct
 """
-function canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
+canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     @unpack HOT_SPOT, N_LAYER, OPTICS, P_INCL, Θ_AZI = can;
 
     # 1. update the canopy optical properties related to extinction and scattering coefficients
@@ -23,8 +40,8 @@ function canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeome
 
     OPTICS.ko  = P_INCL' * OPTICS._ko;
     OPTICS.ks  = P_INCL' * OPTICS._ks;
-    OPTICS.sob = P_INCL' * OPTICS._sb
-    OPTICS.sof = P_INCL' * OPTICS._sf
+    OPTICS.sob = P_INCL' * OPTICS._sb;
+    OPTICS.sof = P_INCL' * OPTICS._sf;
     OPTICS._bf = P_INCL' * can._COS²_Θ_INCL;
 
     OPTICS.sdb = (OPTICS.ks + OPTICS._bf) / 2;
@@ -74,4 +91,39 @@ function canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeome
     end;
 
     return nothing
-end
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-08: migrate the function from CanopyLayers
+#     2022-Jun-08: rename the function from canopy_matrices! to canopy_geometry!
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_geometry!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat}
+
+Updates canopy optical properties (scattering coefficient matrices), given
+- `can` `HyperspectralMLCanopy` type struct
+- `leaves` Vector of `Leaf`
+"""
+canopy_geometry!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat} = (
+    @unpack N_LAYER, OPTICS = can;
+    @assert length(leaves) == N_LAYER "Number of leaves must be equal to the canopy layers!";
+
+    for _i in eachindex(leaves)
+        OPTICS.σ_ddb[:,_i] .= OPTICS.ddb * leaves[_i].BIO.ρ_SW .+ OPTICS.ddf * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_ddf[:,_i] .= OPTICS.ddf * leaves[_i].BIO.ρ_SW .+ OPTICS.ddb * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_vdb[:,_i] .= OPTICS.sdb * leaves[_i].BIO.ρ_SW .+ OPTICS.sdf * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_vdf[:,_i] .= OPTICS.sdf * leaves[_i].BIO.ρ_SW .+ OPTICS.sdb * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_dvb[:,_i] .= OPTICS.dob * leaves[_i].BIO.ρ_SW .+ OPTICS.dof * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_dvf[:,_i] .= OPTICS.dof * leaves[_i].BIO.ρ_SW .+ OPTICS.dob * leaves[_i].BIO.τ_SW;
+        OPTICS.σ_vv[:,_i]  .= OPTICS.sob * leaves[_i].BIO.ρ_SW .+ OPTICS.sof * leaves[_i].BIO.τ_SW;
+    end;
+    OPTICS._σ_a .= 1 .- OPTICS.σ_ddf;
+
+    return nothing
+);

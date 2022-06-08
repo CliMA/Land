@@ -25,7 +25,11 @@ using Test
         for FT in [Float32, Float64]
             can = ClimaCache.HyperspectralMLCanopy{FT}();
             angles = ClimaCache.SunSensorGeometry{FT}();
+            leaf = ClimaCache.Leaf{FT}("C3");
+            leaves = [deepcopy(leaf) for i in 1:20];
             CanopyRadiativeTransfer.canopy_geometry!(can, angles);
+            @test true;
+            CanopyRadiativeTransfer.canopy_geometry!(can, leaves);
             @test true;
         end;
     end;
