@@ -144,24 +144,26 @@ end
 #     2022-Jun-02: abstractize LIDF as a field
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
+#     2022-Jun-08: add n_λ to options to initialize CanopyOpticalProperty field
 #
 #######################################################################################################################################################################################################
 """
 
-    HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
+    HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 
 Construct a multiple layer canopy for hyperspectral radiative transfer, given
 - `lai` Leaf area index
 - `n_layer` Total canopy layers
+- `n_λ` Number of wavelength bins
 - `θ_incl_bnds` Inclination angle boundary values
 """
-HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat} = (
+HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat} = (
     _n_incl  = size(θ_incl_bnds,1);
     _θ_incl  = FT[(θ_incl_bnds[_i,1] + θ_incl_bnds[_i,2]) / 2 for _i in 1:_n_incl];
     _p_incl  = ones(_n_incl) / _n_incl;
     _θ_azi   = collect(FT,5:10:360);
     _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
-    _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl, n_layer = n_layer);
+    _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl, n_layer = n_layer, n_λ = n_λ);
     _cos_θ   = cosd.(_θ_incl);
     _cos²_θ  = _cos_θ .^ 2;
 
