@@ -44,7 +44,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     # TODO: make sure to recompute leaf spectra
 
     # Four Different steps to compute Short-Wave RT
-    canopy_geometry!(can, angles, can_opt, rt_con);
+    # canopy_geometry!(can, angles, can_opt, rt_con);
     canopy_matrices!(leaves, can_opt);
     short_wave!(can, can_opt, can_rad, in_rad, soil, rt_con);
     canopy_fluxes!(can, can_opt, can_rad, in_rad, soil, leaves, wls, rt_con);
