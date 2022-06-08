@@ -4,13 +4,18 @@
 # General
 #     2022-Jun-07: migrate the function from CanopyLayers
 #     2022-Jun-07: rename the function to be more descriptive extinction_scattering_coefficients
+#     2022-Jun-07: add relative azimuth angle control
+#     2022-Jun-07: return _Co, _Cs, _So, _Ss as well
+# Sources
+#     Verhoef (1998) Theory of radiative transfer models applied in optical remote sensing of vegetation canopies. Chapter 7
 #
 #######################################################################################################################################################################################################
 """
 
     extinction_scattering_coefficients(sza::FT, vza::FT, raa::FT, lia::FT) where {FT<:AbstractFloat}
 
-Return the extinction and scattering coefficients (extinction coefficients from solar and viewing directions, and scattering coefficients for backward and forward directions), given
+Return the extinction and scattering coefficients (extinction coefficients from solar and viewing directions, and scattering coefficients for backward and forward directions, and some sin and cos
+    products: _Co, _Cs, _So, _Ss), given
 - `sza` Solar zenith angle in `°`
 - `vza` Viewing zenith angle in `°`
 - `raa` Relative azimuth angle in `°`
@@ -36,7 +41,7 @@ function extinction_scattering_coefficients(sza::FT, vza::FT, raa::FT, lia::FT) 
     _Δ₁ = abs(_βs - _βo);
     _Δ₂ = _π - abs(_βs + _βo - _π);
 
-    _ψ = deg2rad(raa);
+    _ψ = deg2rad( abs(raa - 360*round(raa/360)) );
     if _ψ <= _Δ₁
         _β₁,_β₂,_β₃ = _ψ,_Δ₁,_Δ₂;
     elseif _Δ₁ < _ψ < _Δ₂
@@ -56,5 +61,33 @@ function extinction_scattering_coefficients(sza::FT, vza::FT, raa::FT, lia::FT) 
     _sb = _F₁ / (2 * _π);
     _sf = _F₂ / (2 * _π);
 
-    return _ks, _ko, _sb, _sf
+    return _ks, _ko, _sb, _sf, _Co, _Cs, _So, _Ss
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
+#     2022-Jun-07: add function to update the extinction and scattering coefficient cache within canopy
+#     2022-Jun-07: update _Co, _Cs, _So, _Ss as well
+#
+#######################################################################################################################################################################################################
+"""
+
+    extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
+
+Update the extinction and scattering coefficients, given
+- `can` `HyperspectralMLCanopy` type canopy
+- `angles` `SunSensorGeometry` type angles
+"""
+function extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
+    @unpack OPTICS, Θ_INCL = can;
+
+    for _i in eachindex(Θ_INCL)
+        OPTICS._ks[_i], OPTICS._ko[_i], OPTICS._sb[_i], OPTICS._sf[_i], OPTICS._Co[_i], OPTICS._Cs[_i], OPTICS._So[_i], OPTICS._Ss[_i] =
+            extinction_scattering_coefficients(angles.sza, angles.vza, angles.vaa - angles.saa, Θ_INCL[_i]);
+    end;
+
+    return nothing
 end

@@ -20,4 +20,13 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "Hyperspectral RT" begin
+        for FT in [Float32, Float64]
+            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            angles = ClimaCache.SunSensorGeometry{FT}();
+            CanopyRadiativeTransfer.canopy_geometry!(can, angles);
+            @test true;
+        end;
+    end;
 end;
