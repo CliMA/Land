@@ -4,7 +4,7 @@
 # General
 #     2022-Jun-07: add CanopyOptics struct (will be a field for canopy structure)
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, τ_dd, τ_dv, _tmp_vec_λ, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
 #
 #######################################################################################################################################################################################################
 """
@@ -68,6 +68,10 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     σ_vdf::Matrix{FT}
     "Bidirectional scattering coefficient at different layers and wavelength bins"
     σ_vv::Matrix{FT}
+    "Effective tranmittance for diffuse->diffuse"
+    τ_dd::Matrix{FT}
+    "Effective tranmittance for diffuse->directional"
+    τ_dv::Matrix{FT}
 
     # caches to speed up calculations
     "cos(inclination) * cos(vza) at different inclination angles"
@@ -102,6 +106,8 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_mat_incl_azi_1::Matrix{FT}
     "Temporary cache used for matrix adding up purpose (n_incl * n_azi)"
     _tmp_mat_incl_azi_2::Matrix{FT}
+    "Temporary cache used for vector operations (n_λ)"
+    _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
     _ρ_dd::Matrix{FT}
     "Reflectance for diffuse->directional at each canopy layer"
@@ -121,7 +127,7 @@ end
 # General
 #     2022-Jun-07: add constructor
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, τ_dd, τ_dv, _tmp_vec_λ, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
 #
 #######################################################################################################################################################################################################
 """
@@ -160,6 +166,8 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_λ,n_layer),      # σ_vdb
                 zeros(FT,n_λ,n_layer),      # σ_vdf
                 zeros(FT,n_λ,n_layer),      # σ_vv
+                zeros(FT,n_λ,n_layer),      # τ_dd
+                zeros(FT,n_λ,n_layer),      # τ_dv
                 zeros(FT,n_incl),           # _Co
                 zeros(FT,n_incl),           # _Cs
                 zeros(FT,n_incl),           # _So
@@ -176,6 +184,7 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl),           # _sf
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_1
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
+                zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
                 zeros(FT,n_λ,n_layer),      # _ρ_dv
                 zeros(FT,n_λ,n_layer),      # _τ_dd
