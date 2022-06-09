@@ -4,7 +4,8 @@
 # General
 #     2022-Jun-07: add CanopyOptics struct (will be a field for canopy structure)
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, τ_dd, τ_dv, _tmp_vec_λ, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
+#     2022-Jun-09: rename variables to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
@@ -20,58 +21,58 @@ $(TYPEDFIELDS)
 """
 mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     # diagnostic variables that change with time
-    "Diffuse -> Diffuse backscatter weight"
+    "Backward diffuse->diffuse scatter weight"
     ddb::FT
-    "Diffuse -> Diffuse forward scatter weight"
+    "Forward diffuse->diffuse scatter weight"
     ddf::FT
-    "Diffuse -> Outgoing backscatter weight"
+    "Backward diffuse->observer scatter weight"
     dob::FT
-    "Diffuse -> Outgoing forward scatter weight"
+    "Forward diffuse->observer scatter weight"
     dof::FT
-    "Conversion factor fo for angle towards observer at different inclination and azimuth angles (not sun like fs)"
+    "Conversion factor fo for angle towards observer at different inclination and azimuth angles"
     fo::Matrix{FT}
-    "Conversion factor fs to compute irradiance on inclined leaf at different inclination and azimuth angles"
+    "Conversion factor fs for angles from solar at different inclination and azimuth angles"
     fs::Matrix{FT}
-    "Outgoing beam extinction coefficient weight"
-    ko ::FT
-    "Solar beam extinction coefficient weight"
-    ks ::FT
-    "Probability of directly viewing a leaf in solar direction at different layer boundaries"
+    "Observer direction beam extinction coefficient weight (diffuse)"
+    ko::FT
+    "Solar direction beam extinction coefficient weight (direct)"
+    ks::FT
+    "Probability of directly viewing a leaf in observer direction at different layer boundaries"
     po::Vector{FT}
-    "Probability of directly viewing a leaf in viewing direction at different layer boundaries"
+    "Probability of directly viewing a leaf in solar direction at different layer boundaries"
     ps::Vector{FT}
-    "Bi-directional probability of directly viewing a leaf at different layer boundaries (solar->canopy->viewing)"
+    "Bi-directional probability of directly viewing a leaf at different layer boundaries (solar->canopy->observer)"
     pso::Vector{FT}
-    "Solar -> Diffuse backscatter weight"
+    "Directional->diffuse backscatter weight"
     sdb::FT
-    "Solar -> Diffuse forward scatter weight"
+    "Directional->diffuse forward scatter weight"
     sdf::FT
-    "Solar -> Outgoing weight of specular2directional backscatter coefficient"
+    "Solar directional->observer weight of specular2directional backscatter coefficient"
     sob::FT
-    "Solar -> Outgoing weight of specular2directional forward coefficient"
+    "Solar directional->observer weight of specular2directional forward coefficient"
     sof::FT
     "Effective reflectance for diffuse->diffuse"
     ρ_dd::Matrix{FT}
-    "Effective reflectance for diffuse->directional"
-    ρ_dv::Matrix{FT}
+    "Effective reflectance for directional->diffuse"
+    ρ_sd::Matrix{FT}
     "Backward scattering coefficient for diffuse->diffuse at different layers and wavelength bins"
     σ_ddb::Matrix{FT}
     "Forward scattering coefficient for diffuse->diffuse at different layers and wavelength bins"
     σ_ddf::Matrix{FT}
-    "Backward scattering coefficient for diffuse->directional at different layers and wavelength bins"
-    σ_dvb::Matrix{FT}
-    "Forward scattering coefficient for diffuse->directional at different layers and wavelength bins"
-    σ_dvf::Matrix{FT}
-    "Backward scattering coefficient for directional->diffuse at different layers and wavelength bins"
-    σ_vdb::Matrix{FT}
-    "Forward scattering coefficient for directional->diffuse at different layers and wavelength bins"
-    σ_vdf::Matrix{FT}
-    "Bidirectional scattering coefficient at different layers and wavelength bins"
-    σ_vv::Matrix{FT}
+    "Backward scattering coefficient for diffuse->observer at different layers and wavelength bins"
+    σ_dob::Matrix{FT}
+    "Forward scattering coefficient for diffuse->observer at different layers and wavelength bins"
+    σ_dof::Matrix{FT}
+    "Backward scattering coefficient for solar directional->diffuse at different layers and wavelength bins"
+    σ_sdb::Matrix{FT}
+    "Forward scattering coefficient for solar directional->diffuse at different layers and wavelength bins"
+    σ_sdf::Matrix{FT}
+    "Bidirectional from solar to observer scattering coefficient at different layers and wavelength bins"
+    σ_so::Matrix{FT}
     "Effective tranmittance for diffuse->diffuse"
     τ_dd::Matrix{FT}
-    "Effective tranmittance for diffuse->directional"
-    τ_dv::Matrix{FT}
+    "Effective tranmittance for solar directional->diffuse"
+    τ_sd::Matrix{FT}
 
     # caches to speed up calculations
     "cos(inclination) * cos(vza) at different inclination angles"
@@ -110,14 +111,14 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
     _ρ_dd::Matrix{FT}
-    "Reflectance for diffuse->directional at each canopy layer"
-    _ρ_dv::Matrix{FT}
+    "Reflectance for solar directional->diffuse at each canopy layer"
+    _ρ_sd::Matrix{FT}
     "Tranmittance for diffuse->diffuse at each canopy layer"
     _τ_dd::Matrix{FT}
-    "Tranmittance for diffuse->directional at each canopy layer"
-    _τ_dv::Matrix{FT}
-    "Tranmittance for directional->directional at each canopy layer"
-    _τ_vv::FT
+    "Tranmittance for solar directional->diffuse at each canopy layer"
+    _τ_sd::Matrix{FT}
+    "Tranmittance for solar directional->directional at each canopy layer"
+    _τ_ss::FT
 end
 
 
@@ -127,8 +128,9 @@ end
 # General
 #     2022-Jun-07: add constructor
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, τ_dd, τ_dv, _tmp_vec_λ, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
+#     2022-Jun-08: add more cache fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: fix documentation
+#     2022-Jun-09: rename variables to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
@@ -159,16 +161,16 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 0,                          # sob
                 0,                          # sof
                 zeros(FT,n_λ,n_layer+1),    # ρ_dd
-                zeros(FT,n_λ,n_layer+1),    # ρ_dv
+                zeros(FT,n_λ,n_layer+1),    # ρ_sd
                 zeros(FT,n_λ,n_layer),      # σ_ddb
                 zeros(FT,n_λ,n_layer),      # σ_ddf
-                zeros(FT,n_λ,n_layer),      # σ_dvb
-                zeros(FT,n_λ,n_layer),      # σ_dvf
-                zeros(FT,n_λ,n_layer),      # σ_vdb
-                zeros(FT,n_λ,n_layer),      # σ_vdf
-                zeros(FT,n_λ,n_layer),      # σ_vv
+                zeros(FT,n_λ,n_layer),      # σ_dob
+                zeros(FT,n_λ,n_layer),      # σ_dof
+                zeros(FT,n_λ,n_layer),      # σ_sdb
+                zeros(FT,n_λ,n_layer),      # σ_sdf
+                zeros(FT,n_λ,n_layer),      # σ_so
                 zeros(FT,n_λ,n_layer),      # τ_dd
-                zeros(FT,n_λ,n_layer),      # τ_dv
+                zeros(FT,n_λ,n_layer),      # τ_sd
                 zeros(FT,n_incl),           # _Co
                 zeros(FT,n_incl),           # _Cs
                 zeros(FT,n_incl),           # _So
@@ -187,9 +189,9 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
-                zeros(FT,n_λ,n_layer),      # _ρ_dv
+                zeros(FT,n_λ,n_layer),      # _ρ_sd
                 zeros(FT,n_λ,n_layer),      # _τ_dd
-                zeros(FT,n_λ,n_layer),      # _τ_dv
-                0                           # _τ_vv
+                zeros(FT,n_λ,n_layer),      # _τ_sd
+                0                           # _τ_ss
     )
 );

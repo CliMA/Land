@@ -43,7 +43,7 @@ Construct a struct to store canopy radiation profiles, given
 - `n_λ` Number of wavelength bins
 """
 CanopyRadiationProfile{FT}(; n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat} = (
-    return CanopyOpticalProperty{FT}(
+    return CanopyRadiationProfile{FT}(
                 zeros(FT,n_λ,n_layer+1),    # e_diffuse_down
                 zeros(FT,n_λ,n_layer+1),    # e_diffuse_up
                 zeros(FT,n_λ,n_layer+1)     # e_direct

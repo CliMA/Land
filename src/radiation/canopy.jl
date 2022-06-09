@@ -70,6 +70,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 #     2022-Jun-02: abstractize LIDF as a field
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
+#     2022-Jun-09: add new field RADIATION
 #
 #######################################################################################################################################################################################################
 """
@@ -99,6 +100,8 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     OPTICS::CanopyOpticalProperty{FT}
     "Inclination angle distribution"
     P_INCL::Vector{FT}
+    "Canopy radiation profiles"
+    RADIATION::CanopyRadiationProfile{FT}
     "Clumping structure a"
     Ω_A::FT
     "Clumping structure b"
@@ -145,6 +148,7 @@ end
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #     2022-Jun-08: add n_λ to options to initialize CanopyOpticalProperty field
+#     2022-Jun-09: add new field RADIATION
 #
 #######################################################################################################################################################################################################
 """
@@ -164,6 +168,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114,
     _θ_azi   = collect(FT,5:10:360);
     _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
     _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl, n_layer = n_layer, n_λ = n_λ);
+    _can_rad = CanopyRadiationProfile{FT}(; n_layer = n_layer, n_λ = n_λ);
     _cos_θ   = cosd.(_θ_incl);
     _cos²_θ  = _cos_θ .^ 2;
 
@@ -175,6 +180,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114,
                 n_layer,                # N_LAYER
                 _can_opt,               # OPTICS
                 _p_incl,                # P_INCL
+                _can_rad,               # RADIATION
                 1,                      # Ω_A
                 0,                      # Ω_B
                 _θ_azi,                 # Θ_AZI
