@@ -1,16 +1,17 @@
 module CanopyRadiativeTransfer
 
-using ClimaCache: HyperspectralMLCanopy, Leaf, SunSensorGeometry, VerhoefLIDF
+using ClimaCache: HyperspectralMLCanopy, Leaf, Soil, SunSensorGeometry, VerhoefLIDF
 using DocStringExtensions: METHODLIST
 using LinearAlgebra: mul!
 using QuadGK: quadgk
 using UnPack: @unpack
 
 
-include("clumping.jl"             )
-include("extinction_scattering.jl")
-include("geometry.jl"             )
-include("inclination_angle.jl"    )
+include("clumping.jl"         )
+include("coefficients.jl"     )
+include("geometry.jl"         )
+include("inclination_angle.jl")
+include("radiation.jl"        )
 
 
 end # module

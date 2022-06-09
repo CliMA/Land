@@ -4,6 +4,7 @@
 # General
 #     2022-Jun-07: migrate the function from CanopyLayers
 #     2022-Jun-08: add documentation
+#     2022-Jun-09: rename function to canopy_optical_properties!
 #
 #######################################################################################################################################################################################################
 """
@@ -12,7 +13,7 @@ This function updates canopy optical properties for canopy. The supported method
 $(METHODLIST)
 
 """
-function canopy_geometry! end
+function canopy_optical_properties! end
 
 
 #######################################################################################################################################################################################################
@@ -22,17 +23,18 @@ function canopy_geometry! end
 #     2022-Jun-07: migrate the function from CanopyLayers
 #     2022-Jun-07: clean the function
 #     2022-Jun-08: add documentation
+#     2022-Jun-09: rename function to canopy_optical_properties!
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
 
 Updates canopy optical properties (extinction coefficients for direct and diffuse light) based on the SAIL model, given
 - `can` `HyperspectralMLCanopy` type struct
 - `angles` `SunSensorGeometry` type struct
 """
-canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     @unpack HOT_SPOT, N_LAYER, OPTICS, P_INCL, Θ_AZI = can;
 
     # 1. update the canopy optical properties related to extinction and scattering coefficients
@@ -99,21 +101,23 @@ canopy_geometry!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) 
 # Changes to this method
 # General
 #     2022-Jun-08: migrate the function from CanopyLayers
-#     2022-Jun-08: rename the function from canopy_matrices! to canopy_geometry!
+#     2022-Jun-09: rename the function from canopy_matrices! to canopy_optical_properties!
+#     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_geometry!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat}
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat}
 
 Updates canopy optical properties (scattering coefficient matrices), given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaves` Vector of `Leaf`
 """
-canopy_geometry!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat} = (
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS = can;
     @assert length(leaves) == N_LAYER "Number of leaves must be equal to the canopy layers!";
 
+    # update the scattering coefficients for different layers
     for _i in eachindex(leaves)
         OPTICS.σ_ddb[:,_i] .= OPTICS.ddb * leaves[_i].BIO.ρ_SW .+ OPTICS.ddf * leaves[_i].BIO.τ_SW;
         OPTICS.σ_ddf[:,_i] .= OPTICS.ddf * leaves[_i].BIO.ρ_SW .+ OPTICS.ddb * leaves[_i].BIO.τ_SW;
@@ -123,7 +127,38 @@ canopy_geometry!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where
         OPTICS.σ_dvf[:,_i] .= OPTICS.dof * leaves[_i].BIO.ρ_SW .+ OPTICS.dob * leaves[_i].BIO.τ_SW;
         OPTICS.σ_vv[:,_i]  .= OPTICS.sob * leaves[_i].BIO.ρ_SW .+ OPTICS.sof * leaves[_i].BIO.τ_SW;
     end;
-    OPTICS._σ_a .= 1 .- OPTICS.σ_ddf;
+
+    # update the transmittance and reflectance for single directions (it was 1 - k*Δx, and we used exp(-k*Δx) as Δx is not infinitesmal)
+    _ilai = can.lai * can.ci / N_LAYER;
+    OPTICS._τ_vv  = exp(-1 * OPTICS.ks * _ilai);
+    OPTICS._τ_dd .= exp.(-1 .* (1 .- OPTICS.σ_ddf) .* _ilai);
+    OPTICS._τ_dv .= OPTICS.σ_dvf .* _ilai;
+    OPTICS._ρ_dd .= OPTICS.σ_ddb .* _ilai;
+    OPTICS._ρ_dv .= OPTICS.σ_dvb .* _ilai;
+
+    # update the effective reflectance per layer
+    OPTICS.ρ_dd[:,end] .= soil.ρ_SW;
+    OPTICS.ρ_dv[:,end] .= soil.ρ_SW;
+    for _i in N_LAYER:-1:1
+        _r_dd__ = view(OPTICS._ρ_dd,:,_i  );    # reflectance without correction
+        _r_dd_i = view(OPTICS.ρ_dd ,:,_i  );    # reflectance of the upper boundary (i)
+        _r_dd_j = view(OPTICS.ρ_dd ,:,_i+1);    # reflectance of the lower boundary (i+1)
+        _r_dv__ = view(OPTICS._ρ_dv,:,_i  );    # reflectance without correction
+        _r_dv_i = view(OPTICS.ρ_dv ,:,_i  );    # reflectance of the upper boundary (i)
+        _r_dv_j = view(OPTICS.ρ_dv ,:,_i+1);    # reflectance of the lower boundary (i+1)
+        _t_dd__ = view(OPTICS._τ_dd,:,_i  );    # transmittance without correction
+        _t_dd_i = view(OPTICS.τ_dd ,:,_i  );    # transmittance of the upper boundary (i)
+        _t_dv__ = view(OPTICS._τ_dv,:,_i  );    # transmittance without correction
+        _t_dv_i = view(OPTICS.τ_dv ,:,_i  );    # transmittance of the upper boundary (i)
+        _t_vv__ = OPTICS._τ_vv;                 # transmittance for directional->directional
+
+        OPTICS._tmp_vec_λ .= 1 .- _r_dd__ .* _r_dd_j;
+
+        _t_dv_i .= (_t_dv__ .+ _r_dd__ .* _r_dv_j .*  _t_vv__) ./ OPTICS._tmp_vec_λ;            # it + ir-jr-it, then rescale
+        _t_dd_i .= _t_dd__ ./ OPTICS._tmp_vec_λ;                                                # it, then rescale
+        _r_dv_i .= _r_dv__ .+ _t_dd__ .* _r_dv_j .* _t_vv__ .+ _t_dd__ .* _r_dd_j .* _t_dv_i;   # ir + it-jr-it(v) + it-jr_dd-it
+        _r_dd_i .= _r_dd__ .+ _t_dd__ .* _r_dd_j .* _t_dd_i;                                    # ir + it-jr-it
+    end;
 
     return nothing
 );

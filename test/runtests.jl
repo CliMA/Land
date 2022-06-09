@@ -27,9 +27,9 @@ using Test
             angles = ClimaCache.SunSensorGeometry{FT}();
             leaf = ClimaCache.Leaf{FT}("C3");
             leaves = [deepcopy(leaf) for i in 1:20];
-            CanopyRadiativeTransfer.canopy_geometry!(can, angles);
+            CanopyRadiativeTransfer.canopy_optical_properties!(can, angles);
             @test true;
-            CanopyRadiativeTransfer.canopy_geometry!(can, leaves);
+            CanopyRadiativeTransfer.canopy_optical_properties!(can, leaves);
             @test true;
         end;
     end;
