@@ -55,10 +55,10 @@ end
 
 $(TYPEDEF)
 
-Hierarchy of AbstractCanopyStructure:
+Hierarchy of AbstractCanopy:
 - [`HyperspectralMLCanopy`](@ref)
 """
-abstract type AbstractCanopyStructure{FT<:AbstractFloat} end
+abstract type AbstractCanopy{FT<:AbstractFloat} end
 
 
 #######################################################################################################################################################################################################
@@ -83,7 +83,7 @@ Structure to save multiple layer hyperspectral canopy parameters
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopyStructure{FT}
+mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     # parameters that do not change with time
     "Hot spot parameter"
     HOT_SPOT::FT

@@ -87,7 +87,7 @@ CanopyOpticalProperty
 CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat}
 AbstractLIDFAlgorithm
 VerhoefLIDF
-AbstractCanopyStructure
+AbstractCanopy
 HyperspectralMLCanopy
 HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 ```

@@ -128,13 +128,14 @@ end
 #     2022-Jun-07: add constructor
 #     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
 #     2022-Jun-08: add more cache fields: ρ_dd, ρ_dv, σ_ddb, σ_ddf, σ_dvb, σ_dvf, σ_vdb, σ_vdf, σ_vv, τ_dd, τ_dv, _tmp_vec_λ, _ρ_dd, _ρ_dv, _τ_dd, _τ_dv
+#     2022-Jun-09: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
     CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat}
 
-Construct a struct to store canopy optical properties
+Construct a struct to store canopy optical properties, given
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
 - `n_layer` Number of canopy layers
