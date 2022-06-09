@@ -63,16 +63,16 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
     α_cab::Vector{FT}
     "Relative absorption by Chlorophyll+Carotenoid `[-]`"
     α_cabcar::Vector{FT}
-    "Shortwave absorption, 1 .- ρ_SW .- τ_SW  `[-]`"
-    α_SW::Vector{FT}
+    "Shortwave absorption, 1 .- ρ_sw .- τ_sw  `[-]`"
+    α_sw::Vector{FT}
     "Broadband thermal reflectance, related to blackbody emittance `[-]`"
-    ρ_LW::FT
+    ρ_lw::FT
     "Shortwave leaf reflectance `[-]`"
-    ρ_SW::Vector{FT}
+    ρ_sw::Vector{FT}
     "Broadband thermal transmission, related to blackbody emittance `[-]`"
-    τ_LW::FT
+    τ_lw::FT
     "Shortwave leaf transmission `[-]`"
-    τ_SW::Vector{FT}
+    τ_sw::Vector{FT}
 end
 
 
