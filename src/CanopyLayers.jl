@@ -49,7 +49,7 @@ const SOIL_GSV  = artifact"land_model_spectrum_V1" * "/GSV.csv";
 export Canopy4RT, CanopyOpticals, CanopyRads, RTCache, RTDimensions, SoilOpticals, WaveLengths
 
 # export public functions
-export big_leaf_partition, canopy_fluxes!, create_canopy_rads, create_canopy_rt, create_rt_cache, create_rt_dims, create_wave_length, diffusive_S, initialize_rt_module, short_wave!, SIF_fluxes!, thermal_fluxes!
+export big_leaf_partition, create_canopy_rads, create_canopy_rt, create_rt_cache, create_rt_dims, create_wave_length, diffusive_S, initialize_rt_module, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
 export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_683, SIF_740, SIF_757, SIF_771, SIF_WL, SWIR
@@ -74,10 +74,8 @@ include("initialize/wavelength.jl")
 
 include("bigleaf/bigleaf.jl")
 
-include("layers/canopyfluxes.jl" )
 include("layers/diffusives.jl"   )
 include("layers/indicies.jl"     )
-include("layers/shortwave.jl"    )
 include("layers/siffluxes.jl"    )
 include("layers/soil.jl"         )
 include("layers/thermalfluxes.jl")
