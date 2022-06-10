@@ -88,6 +88,8 @@ end
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
 #     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_in, par_in_diffuse, par_in_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
 #     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit
+# Bug fix:
+#     2022-Jun-10: fix dimensions of the variables
 #
 #######################################################################################################################################################################################################
 """
@@ -124,11 +126,11 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
                 zeros(FT,n_layer),              # r_net_sw
                 zeros(FT,n_layer),              # r_net_sw_shaded
                 zeros(FT,n_layer),              # r_net_sw_sunlit
-                zeros(FT,n_layer),              # _apar_shaded
-                zeros(FT,n_layer),              # _apar_sunlit
-                zeros(FT,n_layer),              # _par_shaded
-                zeros(FT,n_layer),              # _par_sunlit
-                zeros(FT,n_layer),              # _ppar_shaded
-                zeros(FT,n_layer)               # _ppar_sunlit
+                zeros(FT,n_λ),                  # _apar_shaded
+                zeros(FT,n_λ),                  # _apar_sunlit
+                zeros(FT,n_λ),                  # _par_shaded
+                zeros(FT,n_λ),                  # _par_sunlit
+                zeros(FT,n_λ),                  # _ppar_shaded
+                zeros(FT,n_λ)                   # _ppar_sunlit
     )
 );
