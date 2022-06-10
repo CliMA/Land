@@ -4,6 +4,7 @@
 # General
 #     2022-Jun-09: migrate CanopyRads as CanopyRadiationProfile
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
+#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -31,14 +32,22 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     e_diffuse_up::Matrix{FT}
     "Solar directly radiation at each canopy layer boundary `[mW m⁻² nm⁻¹]`"
     e_direct::Matrix{FT}
-    "Net diffuse radiation at each canopy layer `[mW m⁻² nm⁻¹]`"
+    "Net diffuse radiation at each canopy layer for APAR `[mW m⁻² nm⁻¹]`"
     e_net_diffuse::Matrix{FT}
-    "Net direct radiation at each canopy layer `[mW m⁻² nm⁻¹]`"
+    "Net direct radiation at each canopy layer for APAR `[mW m⁻² nm⁻¹]`"
     e_net_direct::Matrix{FT}
     "Total radiation towards the viewing direction `[mW m⁻² nm⁻¹]`"
     e_o::Vector{FT}
+    "Sum diffuse radiation at each canopy layer for PAR `[mW m⁻² nm⁻¹]`"
+    e_sum_diffuse::Matrix{FT}
+    "Sum direct radiation at each canopy layer for PAR `[mW m⁻² nm⁻¹]`"
+    e_sum_direct::Matrix{FT}
     "Radiation towards the viewing direction per layer (including soil) `[mW m⁻² nm⁻¹]`"
     e_v::Matrix{FT}
+    "Mean PAR for shaded leaves (before absorption) `[μmol m⁻² s⁻¹]`"
+    par_shaded::Vector{FT}
+    "PAR for sunlit leaves (before absorption) `[μmol m⁻² s⁻¹]`"
+    par_sunlit::Array{FT,3}
     "Mean APAR for shaded leaves for photosynthesis `[μmol m⁻² s⁻¹]`"
     ppar_shaded::Vector{FT}
     "APAR for sunlit leaves for photosynthesis `[μmol m⁻² s⁻¹]`"
@@ -49,6 +58,10 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     _apar_shaded::Vector{FT}
     "APAR for sunlit leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _apar_sunlit::Vector{FT}
+    "Mean PAR for shaded leaves per wavelength (before absorption) `[μmol m⁻² s⁻¹ nm⁻¹]`"
+    _ppar_shaded::Vector{FT}
+    "PAR for sunlit leaves per wavelength (before absorption) `[μmol m⁻² s⁻¹ nm⁻¹]`"
+    _ppar_sunlit::Vector{FT}
     "Mean APAR for shaded leaves for photosynthesis per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _ppar_shaded::Vector{FT}
     "APAR for sunlit leaves for photosynthesis per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
@@ -62,6 +75,7 @@ end
 # General
 #     2022-Jun-09: add constructor
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
+#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -85,12 +99,18 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
                 zeros(FT,n_λ,n_layer),          # e_net_diffuse
                 zeros(FT,n_λ,n_layer),          # e_net_direct
                 zeros(FT,n_λ),                  # e_o
+                zeros(FT,n_λ,n_layer),          # e_sum_diffuse
+                zeros(FT,n_λ,n_layer),          # e_sum_direct
                 zeros(FT,n_λ,n_layer+1),        # e_v
+                zeros(FT,n_layer),              # par_shaded
+                zeros(FT,n_incl,n_azi,n_layer), # par_sunlit
                 zeros(FT,n_layer),              # ppar_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # ppar_sunlit
                 0,                              # r_net
                 zeros(FT,n_layer),              # _apar_shaded
                 zeros(FT,n_layer),              # _apar_sunlit
+                zeros(FT,n_layer),              # _par_shaded
+                zeros(FT,n_layer),              # _par_sunlit
                 zeros(FT,n_layer),              # _ppar_shaded
                 zeros(FT,n_layer)               # _ppar_sunlit
     )
