@@ -154,6 +154,7 @@ end
 #     2022-Jun-08: add n_λ to options to initialize CanopyOpticalProperty field
 #     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
 #     2022-Jun-10: remove n_λ from options and use the N in wls
+#     2022-Jun-10: add SIF excitation and fluorescence length control
 #
 #######################################################################################################################################################################################################
 """
@@ -182,8 +183,8 @@ HyperspectralMLCanopy{FT}(
     _p_incl  = ones(_n_incl) / _n_incl;
     _θ_azi   = collect(FT,5:10:360);
     _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
-    _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl, n_layer = n_layer, n_λ = wls.NΛ);
-    _can_rad = CanopyRadiationProfile{FT}(; n_layer = n_layer, n_par = wls.NΛ_PAR, n_λ = wls.NΛ);
+    _can_opt = CanopyOpticalProperty{FT}(; n_azi = 36, n_incl = _n_incl, n_layer = n_layer, n_λ = wls.NΛ, n_λe = wls.NΛ_SIFE, n_λf = wls.NΛ_SIF);
+    _can_rad = CanopyRadiationProfile{FT}(; n_layer = n_layer, n_par = wls.NΛ_PAR, n_λ = wls.NΛ, n_λf = wls.NΛ_SIF);
     _cos_θ   = cosd.(_θ_incl);
     _cos²_θ  = _cos_θ .^ 2;
 

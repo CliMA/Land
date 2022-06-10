@@ -6,7 +6,8 @@
 #     2022-Jun-07: add more fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
 #     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: rename variables to be more descriptive
-#     2022-Jun-10: add more fields: p_sunlit, _tmp_vec_azi, ϵ, ρ_lw, τ_lw, _ρ_lw, _τ_lw
+#     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
+#     2022-Jun-10: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
@@ -102,12 +103,18 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _bf::FT
     "Cosine of Θ_AZI - raa"
     _cos_θ_azi_raa::Vector{FT}
+    "fs * cos Θ_INCL"
+    _fs_cos_θ_incl::Matrix{FT}
     "fs * fo"
     _fs_fo::Matrix{FT}
     "Outgoing beam extinction coefficient weights at different inclination angles"
     _ko::Vector{FT}
     "Solar beam extinction coefficient weights at different inclination angles"
     _ks::Vector{FT}
+    "Downwelling matrix for SIF excitation"
+    _mat_down::Matrix{FT}
+    "Upwelling matrix for SIF excitation"
+    _mat_up::Matrix{FT}
     "Backward scattering coefficients at different inclination angles"
     _sb::Vector{FT}
     "Forward scattering coefficients at different inclination angles"
@@ -118,6 +125,10 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_mat_incl_azi_2::Matrix{FT}
     "Temporary cache used for vector operations (n_azi)"
     _tmp_vec_azi::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_1::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_2::Vector{FT}
     "Temporary cache used for vector operations (n_λ)"
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
@@ -146,20 +157,23 @@ end
 #     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: fix documentation
 #     2022-Jun-09: rename variables to be more descriptive
-#     2022-Jun-10: add more fields: p_sunlit, _tmp_vec_azi, ϵ, ρ_lw, τ_lw, _ρ_lw, _τ_lw
+#     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
+#     2022-Jun-10: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
 
-    CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat}
+    CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat}
 
 Construct a struct to store canopy optical properties, given
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
 - `n_layer` Number of canopy layers
 - `n_λ` Number of wavelength bins
+- `n_λe` Number of SIF excitation wavelength bins
+- `n_λf` Number of SIF wavelength bins
 """
-CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat} = (
+CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat} = (
     return CanopyOpticalProperty{FT}(
                 0,                          # ddb
                 0,                          # ddf
@@ -200,14 +214,19 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl,n_azi),     # _abs_fs_fo
                 0,                          # _bf
                 zeros(FT,n_azi),            # _cos_θ_azi_raa
+                zeros(FT,n_incl,n_azi),     # _fs_cos_θ_incl
                 zeros(FT,n_incl,n_azi),     # _fs_fo
                 zeros(FT,n_incl),           # _ko
                 zeros(FT,n_incl),           # _ks
+                zeros(FT,n_λf,n_λe),        # _mat_down
+                zeros(FT,n_λf,n_λe),        # _mat_up
                 zeros(FT,n_incl),           # _sb
                 zeros(FT,n_incl),           # _sf
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_1
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
                 zeros(FT,n_azi),            # _tmp_vec_azi
+                zeros(FT,n_λe),             # _tmp_vec_sife_1
+                zeros(FT,n_λe),             # _tmp_vec_sife_2
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
                 zeros(FT,n_layer),          # _ρ_lw
