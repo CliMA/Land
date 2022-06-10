@@ -176,6 +176,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
 # Changes to this method
 # General
 #     2022-Jun-10: migrate the function thermal_fluxes! from CanopyLayers
+#     2022-Jun-10: update net lw radiation for leaves and soil
 #
 #######################################################################################################################################################################################################
 """
@@ -225,10 +226,12 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
 
     RADIATION.r_lw_up[end] = RADIATION.r_lw_down[end] * soil.ρ_lw + _r_lw_soil;
 
-    # 4. compute the net longwave radiation per canopy layer
+    # 4. compute the net longwave radiation per canopy layer and soil
     for _i in 1:N_LAYER
-        RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]);
+        RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]) - 2* RADIATION.r_lw[_i];
     end;
+
+    soil.r_net_lw = RADIATION.r_lw_down[end] * (1 - soil.ρ_lw) - _r_lw_soil;
 
     return nothing
 );

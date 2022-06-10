@@ -12,6 +12,7 @@ using UnPack: @unpack
 
 include("clumping.jl"         )
 include("coefficients.jl"     )
+include("fluorescence.jl"     )
 include("geometry.jl"         )
 include("inclination_angle.jl")
 include("radiation.jl"        )
