@@ -32,7 +32,7 @@ function canopy_radiation! end
 
     canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
 
-Updates canopy radiation profiles , given
+Updates canopy radiation profiles for shortwave radiation, given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaves` Vector of `Leaf`
 - `rad` Incoming solar radiation
@@ -165,6 +165,69 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         RADIATION.ppar_shaded[_i] = _Σ_ppar_dif;
         RADIATION.ppar_sunlit[:,:,_i] .= OPTICS._abs_fs_fo .* _Σ_ppar_dir;
         RADIATION.ppar_sunlit[:,:,_i] .+= _Σ_ppar_dif;
+    end;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-10: migrate the function thermal_fluxes! from CanopyLayers
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
+
+Updates canopy radiation profiles for longwave radiation, given
+- `can` `HyperspectralMLCanopy` type struct
+- `leaves` Vector of `Leaf`
+- `rad` Incoming longwave radiation
+- `soil` Bottom soil boundary layer
+"""
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+    @unpack N_LAYER, OPTICS, RADIATION = can;
+
+    # 1. compute longwave radiation out from the leaves and soil
+    for _i in eachindex(leaves)
+        RADIATION.r_lw[_i] = K_STEFAN(FT) * OPTICS.ϵ[_i] * leaves[_i].t ^ 4;
+    end;
+
+    _r_lw_soil = K_STEFAN(FT) * (1 - soil.ρ_lw) * soil.t ^ 4;
+
+    # 2. account for the emission from bottom to up
+    RADIATION._r_emit_up[end] = _r_lw_soil;
+
+    for _i in N_LAYER:-1:1
+        _r__ = OPTICS._ρ_lw[_i];
+        _r_j = OPTICS.ρ_lw[_i+1];
+        _t__ = OPTICS._τ_lw[_i];
+
+        _dnorm = 1 - _r__ * _r_j;
+
+        RADIATION._r_emit_down[_i] = (RADIATION._r_emit_up[_i+1] * _r__ + RADIATION.r_lw[_i]) / _dnorm;
+        RADIATION._r_emit_up[_i] = RADIATION._r_emit_down[_i] * _r_j * _t__ + RADIATION._r_emit_up[_i+1] * _t__ + RADIATION.r_lw[_i];
+    end;
+
+    # 3. account for the solar radiation from up to bottom
+    RADIATION.r_lw_down[1] = rad;
+
+    for _i in 1:N_LAYER
+        _r_i = OPTICS.ρ_lw[_i];
+        _t_i = OPTICS.τ_lw[_i];
+
+        RADIATION.r_lw_down[_i+1] = RADIATION.r_lw_down[_i] * _t_i + RADIATION._r_emit_down[_i];
+        RADIATION.r_lw_up[_i+1] = RADIATION.r_lw_down[_i] * _r_i + RADIATION._r_emit_up[_i];
+    end;
+
+    RADIATION.r_lw_up[end] = RADIATION.r_lw_down[end] * soil.ρ_lw + _r_lw_soil;
+
+    # 4. compute the net longwave radiation per canopy layer
+    for _i in 1:N_LAYER
+        RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]);
     end;
 
     return nothing

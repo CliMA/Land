@@ -106,6 +106,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 #     2022-Jun-09: rename the function from canopy_matrices! to canopy_optical_properties!
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
 #     2022-Jun-10: fix documentation
+#     2022-Jun-10: add function to compute longwave reflectance, transmittance, and emissivity
 #
 #######################################################################################################################################################################################################
 """
@@ -120,8 +121,9 @@ Updates canopy optical properties (scattering coefficient matrices), given
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS = can;
     @assert length(leaves) == N_LAYER "Number of leaves must be equal to the canopy layers!";
+    _ilai = can.lai * can.ci / N_LAYER;
 
-    # update the scattering coefficients for different layers
+    # 1. update the scattering coefficients for different layers
     for _i in eachindex(leaves)
         OPTICS.σ_ddb[:,_i] .= OPTICS.ddb * leaves[_i].BIO.ρ_sw .+ OPTICS.ddf * leaves[_i].BIO.τ_sw;
         OPTICS.σ_ddf[:,_i] .= OPTICS.ddf * leaves[_i].BIO.ρ_sw .+ OPTICS.ddb * leaves[_i].BIO.τ_sw;
@@ -132,17 +134,17 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{F
         OPTICS.σ_so[:,_i]  .= OPTICS.sob * leaves[_i].BIO.ρ_sw .+ OPTICS.sof * leaves[_i].BIO.τ_sw;
     end;
 
-    # update the transmittance and reflectance for single directions (it was 1 - k*Δx, and we used exp(-k*Δx) as Δx is not infinitesmal)
-    _ilai = can.lai * can.ci / N_LAYER;
+    # 2. update the transmittance and reflectance for single directions per layer (it was 1 - k*Δx, and we used exp(-k*Δx) as Δx is not infinitesmal)
     OPTICS._τ_ss  = exp(-1 * OPTICS.ks * _ilai);
     OPTICS._τ_dd .= exp.(-1 .* (1 .- OPTICS.σ_ddf) .* _ilai);
     OPTICS._τ_sd .= OPTICS.σ_sdf .* _ilai;
     OPTICS._ρ_dd .= OPTICS.σ_ddb .* _ilai;
     OPTICS._ρ_sd .= OPTICS.σ_sdb .* _ilai;
 
-    # update the effective reflectance per layer
+    # 3. update the effective reflectance per layer
     OPTICS.ρ_dd[:,end] .= soil.ρ_sw;
     OPTICS.ρ_sd[:,end] .= soil.ρ_sw;
+
     for _i in N_LAYER:-1:1
         _r_dd__ = view(OPTICS._ρ_dd,:,_i  );    # reflectance without correction
         _r_dd_i = view(OPTICS.ρ_dd ,:,_i  );    # reflectance of the upper boundary (i)
@@ -162,6 +164,25 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{F
         _t_dd_i .= _t_dd__ ./ OPTICS._tmp_vec_λ;                                                # it, then rescale
         _r_sd_i .= _r_sd__ .+ _t_ss__ .* _r_sd_j .* _t_dd__ .+ _t_sd_i .* _r_dd_j .* _t_dd__;   # ir + it-jr-it(v) + it-jr_dd-it
         _r_dd_i .= _r_dd__ .+ _t_dd__ .* _r_dd_j .* _t_dd_i;                                    # ir + it-jr-it
+    end;
+
+    # 4. compute longwave effective emissivity, reflectance, and transmittance (it was 1 - k*Δx, and we used exp(-k*Δx) as Δx is not infinitesmal)
+    for _i in eachindex(leaves)
+        _σ_lw_b = OPTICS.ddb * leaves[_i].BIO.ρ_lw + OPTICS.ddf * leaves[_i].BIO.τ_lw;
+        _σ_lw_f = OPTICS.ddf * leaves[_i].BIO.ρ_lw + OPTICS.ddb * leaves[_i].BIO.τ_lw;
+        OPTICS._τ_lw[_i] = exp(-1 * (1 - _σ_lw_f) * _ilai);
+        OPTICS._ρ_lw[_i] = _σ_lw_b * _ilai;
+        OPTICS.ϵ[_i] = 1 - OPTICS._τ_lw[_i] - OPTICS._ρ_lw[_i];
+    end;
+
+    # 5. update the effective longwave reflectance and transmittance
+    OPTICS.ρ_lw[end] = soil.ρ_lw;
+
+    for _i in N_LAYER:-1:1
+        _dnorm = 1 - OPTICS._ρ_lw[_i] * OPTICS.ρ_lw[_i+1];
+
+        OPTICS.τ_lw[_i] = OPTICS._τ_lw[_i] / _dnorm;                                                    # it, then rescale
+        OPTICS.ρ_lw[_i] = OPTICS._ρ_lw[_i] + OPTICS._τ_lw[_i] * OPTICS.ρ_lw[_i+1] * OPTICS.τ_lw[_i];    # ir + it-jr-it
     end;
 
     return nothing

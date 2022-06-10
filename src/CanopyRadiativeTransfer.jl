@@ -4,6 +4,7 @@ using ClimaCache: HyperspectralMLCanopy, HyperspectralRadiation, Leaf, Soil, Sun
 using DocStringExtensions: METHODLIST
 using LeafOptics: photon
 using LinearAlgebra: mul!
+using PkgUtility: K_STEFAN
 using QuadGK: quadgk
 using Statistics: mean
 using UnPack: @unpack
