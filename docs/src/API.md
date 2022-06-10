@@ -89,7 +89,7 @@ AbstractLIDFAlgorithm
 VerhoefLIDF
 AbstractCanopy
 HyperspectralMLCanopy
-HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
+HyperspectralMLCanopy{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 ```
 
 ## Soil

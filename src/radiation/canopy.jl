@@ -70,7 +70,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 #     2022-Jun-02: abstractize LIDF as a field
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
-#     2022-Jun-09: add new field RADIATION
+#     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
 #
 #######################################################################################################################################################################################################
 """
@@ -86,6 +86,8 @@ $(TYPEDFIELDS)
 """
 mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     # parameters that do not change with time
+    "Whether Carotenoid absorption is accounted for in APAR"
+    APAR_CAR::Bool
     "Hot spot parameter"
     HOT_SPOT::FT
     "Leaf inclination angle distribution function algorithm"
@@ -102,6 +104,8 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     P_INCL::Vector{FT}
     "Canopy radiation profiles"
     RADIATION::CanopyRadiationProfile{FT}
+    "Wave length set used to paramertize other variables"
+    WLSET::WaveLengthSet{FT}
     "Clumping structure a"
     Ω_A::FT
     "Clumping structure b"
@@ -148,20 +152,33 @@ end
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #     2022-Jun-08: add n_λ to options to initialize CanopyOpticalProperty field
-#     2022-Jun-09: add new field RADIATION
+#     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
 #
 #######################################################################################################################################################################################################
 """
 
-    HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
+    HyperspectralMLCanopy{FT}(
+                wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+                lai::Number = 3,
+                n_layer::Int = 20,
+                n_λ::Int = 114,
+                θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]
+    ) where {FT<:AbstractFloat} = (
 
 Construct a multiple layer canopy for hyperspectral radiative transfer, given
+- `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
 - `lai` Leaf area index
 - `n_layer` Total canopy layers
 - `n_λ` Number of wavelength bins
 - `θ_incl_bnds` Inclination angle boundary values
 """
-HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat} = (
+HyperspectralMLCanopy{FT}(
+            wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+            lai::Number = 3,
+            n_layer::Int = 20,
+            n_λ::Int = 114,
+            θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]
+) where {FT<:AbstractFloat} = (
     _n_incl  = size(θ_incl_bnds,1);
     _θ_incl  = FT[(θ_incl_bnds[_i,1] + θ_incl_bnds[_i,2]) / 2 for _i in 1:_n_incl];
     _p_incl  = ones(_n_incl) / _n_incl;
@@ -173,6 +190,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114,
     _cos²_θ  = _cos_θ .^ 2;
 
     return HyperspectralMLCanopy{FT}(
+                true,                   # APAR_CAR
                 0.05,                   # HOT_SPOT
                 VerhoefLIDF{FT}(0,0),   # LIDF
                 36,                     # N_AZI
@@ -181,6 +199,7 @@ HyperspectralMLCanopy{FT}(; lai::Number = 3, n_layer::Int = 20, n_λ::Int = 114,
                 _can_opt,               # OPTICS
                 _p_incl,                # P_INCL
                 _can_rad,               # RADIATION
+                wls,                    # WLSET
                 1,                      # Ω_A
                 0,                      # Ω_B
                 _θ_azi,                 # Θ_AZI

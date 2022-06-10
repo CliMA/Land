@@ -3,9 +3,10 @@
 # Changes to this structure
 # General
 #     2022-Jun-07: add CanopyOptics struct (will be a field for canopy structure)
-#     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
+#     2022-Jun-07: add more fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
+#     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: rename variables to be more descriptive
+#     2022-Jun-08: add more fields: p_sunlit, _tmp_vec_azi
 #
 #######################################################################################################################################################################################################
 """
@@ -37,6 +38,8 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     ko::FT
     "Solar direction beam extinction coefficient weight (direct)"
     ks::FT
+    "Probability of directly viewing a leaf in solar direction at different layers"
+    p_sunlit::Vector{FT}
     "Probability of directly viewing a leaf in observer direction at different layer boundaries"
     po::Vector{FT}
     "Probability of directly viewing a leaf in solar direction at different layer boundaries"
@@ -107,6 +110,8 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_mat_incl_azi_1::Matrix{FT}
     "Temporary cache used for matrix adding up purpose (n_incl * n_azi)"
     _tmp_mat_incl_azi_2::Matrix{FT}
+    "Temporary cache used for vector operations (n_azi)"
+    _tmp_vec_azi::Vector{FT}
     "Temporary cache used for vector operations (n_λ)"
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
@@ -127,10 +132,11 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-07: add constructor
-#     2022-Jun-07: add more cache fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
-#     2022-Jun-08: add more cache fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
+#     2022-Jun-07: add more fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
+#     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: fix documentation
 #     2022-Jun-09: rename variables to be more descriptive
+#     2022-Jun-08: add more fields: p_sunlit, _tmp_vec_azi
 #
 #######################################################################################################################################################################################################
 """
@@ -153,6 +159,7 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl,n_azi),     # fs
                 0,                          # ko
                 0,                          # ks
+                zeros(FT,n_layer),          # p_sunlit
                 zeros(FT,n_layer+1),        # po
                 zeros(FT,n_layer+1),        # ps
                 zeros(FT,n_layer+1),        # pso
@@ -187,6 +194,7 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl),           # _sf
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_1
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
+                zeros(FT,n_azi),            # _tmp_vec_azi
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
                 zeros(FT,n_λ,n_layer),      # _ρ_sd
