@@ -6,7 +6,7 @@
 #     2022-Jun-07: add more fields: fo, fs, po, ps, pso, _Co, _Cs, _So, _Ss, _abs_fo, _abs_fs, _abs_fs_fo, _cos_θ_azi_raa, _fs_fo, _tmp_mat_incl_azi_1, _tmp_mat_incl_azi_2
 #     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: rename variables to be more descriptive
-#     2022-Jun-08: add more fields: p_sunlit, _tmp_vec_azi
+#     2022-Jun-10: add more fields: p_sunlit, _tmp_vec_azi, ϵ, ρ_lw, τ_lw, _ρ_lw, _τ_lw
 #
 #######################################################################################################################################################################################################
 """
@@ -54,8 +54,12 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     sob::FT
     "Solar directional->observer weight of specular2directional forward coefficient"
     sof::FT
+    "Effective emissivity for different layers"
+    ϵ::Vector{FT}
     "Effective reflectance for diffuse->diffuse"
     ρ_dd::Matrix{FT}
+    "Effective reflectance for longwave radiation"
+    ρ_lw::Vector{FT}
     "Effective reflectance for directional->diffuse"
     ρ_sd::Matrix{FT}
     "Backward scattering coefficient for diffuse->diffuse at different layers and wavelength bins"
@@ -74,6 +78,8 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     σ_so::Matrix{FT}
     "Effective tranmittance for diffuse->diffuse"
     τ_dd::Matrix{FT}
+    "Effective tranmittance for longwave radiation"
+    τ_lw::Vector{FT}
     "Effective tranmittance for solar directional->diffuse"
     τ_sd::Matrix{FT}
 
@@ -116,10 +122,14 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
     _ρ_dd::Matrix{FT}
+    "Reflectance for longwave radiation at each canopy layer"
+    _ρ_lw::Vector{FT}
     "Reflectance for solar directional->diffuse at each canopy layer"
     _ρ_sd::Matrix{FT}
     "Tranmittance for diffuse->diffuse at each canopy layer"
     _τ_dd::Matrix{FT}
+    "Tranmittance for longwave radiation at each canopy layer"
+    _τ_lw::Vector{FT}
     "Tranmittance for solar directional->diffuse at each canopy layer"
     _τ_sd::Matrix{FT}
     "Tranmittance for solar directional->directional at each canopy layer"
@@ -136,7 +146,7 @@ end
 #     2022-Jun-08: add more fields: ρ_dd, ρ_sd, σ_ddb, σ_ddf, σ_dob, σ_dof, σ_sdb, σ_sdf, σ_so, τ_dd, τ_sd, _tmp_vec_λ, _ρ_dd, _ρ_sd, _τ_dd, _τ_sd
 #     2022-Jun-09: fix documentation
 #     2022-Jun-09: rename variables to be more descriptive
-#     2022-Jun-08: add more fields: p_sunlit, _tmp_vec_azi
+#     2022-Jun-10: add more fields: p_sunlit, _tmp_vec_azi, ϵ, ρ_lw, τ_lw, _ρ_lw, _τ_lw
 #
 #######################################################################################################################################################################################################
 """
@@ -167,7 +177,9 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 0,                          # sdf
                 0,                          # sob
                 0,                          # sof
+                zeros(FT,n_layer),          # ϵ
                 zeros(FT,n_λ,n_layer+1),    # ρ_dd
+                zeros(FT,n_layer+1),        # ρ_lw
                 zeros(FT,n_λ,n_layer+1),    # ρ_sd
                 zeros(FT,n_λ,n_layer),      # σ_ddb
                 zeros(FT,n_λ,n_layer),      # σ_ddf
@@ -177,6 +189,7 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_λ,n_layer),      # σ_sdf
                 zeros(FT,n_λ,n_layer),      # σ_so
                 zeros(FT,n_λ,n_layer),      # τ_dd
+                zeros(FT,n_layer),          # τ_lw
                 zeros(FT,n_λ,n_layer),      # τ_sd
                 zeros(FT,n_incl),           # _Co
                 zeros(FT,n_incl),           # _Cs
@@ -197,8 +210,10 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_azi),            # _tmp_vec_azi
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
+                zeros(FT,n_layer),          # _ρ_lw
                 zeros(FT,n_λ,n_layer),      # _ρ_sd
                 zeros(FT,n_λ,n_layer),      # _τ_dd
+                zeros(FT,n_layer),          # _τ_lw
                 zeros(FT,n_λ,n_layer),      # _τ_sd
                 0                           # _τ_ss
     )
