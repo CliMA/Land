@@ -70,9 +70,9 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     "APAR for sunlit leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _apar_sunlit::Vector{FT}
     "Mean PAR for shaded leaves per wavelength (before absorption) `[μmol m⁻² s⁻¹ nm⁻¹]`"
-    _ppar_shaded::Vector{FT}
+    _par_shaded::Vector{FT}
     "PAR for sunlit leaves per wavelength (before absorption) `[μmol m⁻² s⁻¹ nm⁻¹]`"
-    _ppar_sunlit::Vector{FT}
+    _par_sunlit::Vector{FT}
     "Mean APAR for shaded leaves for photosynthesis per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _ppar_shaded::Vector{FT}
     "APAR for sunlit leaves for photosynthesis per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
