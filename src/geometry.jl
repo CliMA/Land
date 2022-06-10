@@ -24,6 +24,7 @@ function canopy_optical_properties! end
 #     2022-Jun-07: clean the function
 #     2022-Jun-08: add documentation
 #     2022-Jun-09: rename function to canopy_optical_properties!
+#     2022-Jun-09: update p_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -68,11 +69,12 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
     OPTICS._fs_fo .= OPTICS.fs .* OPTICS.fo;
     OPTICS._abs_fs_fo .= abs.(OPTICS._fs_fo);
 
-    # 3. update the viewing fraction ps, po, and pso
+    # 3. update the viewing fraction ps, po, pso, and p_sunlit
     _fac_s = (1 - exp(-OPTICS.ks * can.ci * can.lai / N_LAYER)) / (OPTICS.ks * can.ci * can.lai / N_LAYER);
     _fac_o = (1 - exp(-OPTICS.ko * can.ci * can.lai / N_LAYER)) / (OPTICS.ko * can.ci * can.lai / N_LAYER);
     OPTICS.po .= exp.(can._x_bnds * OPTICS.ko * can.ci * can.lai) * _fac_o;
     OPTICS.ps .= exp.(can._x_bnds * OPTICS.ks * can.ci * can.lai) * _fac_s;
+    OPTICS.p_sunlit .= (view(OPTICS.ps,1:N_LAYER) .+ view(OPTICS.ps,2:N_LAYER+1)) ./ 2;
 
     _dso = sqrt( tand(angles.sza) ^ 2 + tand(angles.vza) ^ 2 - 2 * tand(angles.sza) * tand(angles.vza) * cosd(angles.vaa - angles.saa) );
     @inline _pdf(x::FT) where {FT<:AbstractFloat} = (

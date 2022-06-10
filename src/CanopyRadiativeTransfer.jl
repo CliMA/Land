@@ -2,8 +2,10 @@ module CanopyRadiativeTransfer
 
 using ClimaCache: HyperspectralMLCanopy, HyperspectralRadiation, Leaf, Soil, SunSensorGeometry, VerhoefLIDF
 using DocStringExtensions: METHODLIST
+using LeafOptics: photon
 using LinearAlgebra: mul!
 using QuadGK: quadgk
+using Statistics: mean
 using UnPack: @unpack
 
 
