@@ -33,7 +33,7 @@ using Test
             @test true;
             CanopyRadiativeTransfer.canopy_optical_properties!(can, leaves, soil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(can, rad);
+            CanopyRadiativeTransfer.canopy_radiation!(can, leaves, rad, soil);
             @test true;
         end;
     end;

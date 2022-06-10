@@ -91,8 +91,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _a_d_i .= _p_d_i .* (1 .- _t_dd_i .- _r_dd_i);
     end;
 
-    soil.e_net_direct .= view(RADIATION.e_direct,:,_end) .* (1 .- soil.ρ_SW);
-    soil.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,_end) .* (1 .- soil.ρ_SW);
+    soil.e_net_direct .= view(RADIATION.e_direct,:,_end) .* (1 .- soil.ρ_sw);
+    soil.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,_end) .* (1 .- soil.ρ_sw);
 
     # 3. compute the spectra at the observer direction
     for _i in 1:N_LAYER
@@ -103,7 +103,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _dof_i = view(OPTICS.σ_dob,:,_i);   # scattering coefficient forward for diffuse->observer
         _so__i = view(OPTICS.σ_so ,:,_i);   # bidirectional from solar to observer
 
-        RADIATION.e_v[:,_i] .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.poo[_i] .* _so__i .* rad.e_direct) * _ilai;
+        RADIATION.e_v[:,_i] .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
     end;
     RADIATION.e_v[:,end] .= OPTICS.po[end] .* view(RADIATION.e_diffuse_up,:,_end);
 
@@ -119,14 +119,14 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _Σ_sunlit = view(RADIATION.e_net_direct ,:,_i)' * WLSET.ΔΛ / 1000 / _tlai;
         RADIATION.r_net_sw_shaded[_i] = _Σ_shaded;
         RADIATION.r_net_sw_sunlit[_i] = _Σ_sunlit / OPTICS.p_sunlit[_i] + _Σ_shaded;
-        RADIATION.r_net_sw = _Σ_shaded + _Σ_sunlit;
+        RADIATION.r_net_sw[_i] = _Σ_shaded + _Σ_sunlit;
     end;
 
     soil.r_net_sw = (soil.e_net_direct' * WLSET.ΔΛ + soil.e_net_diffuse' * WLSET.ΔΛ) / 1000;
 
     # 5. compute top-of-canopy and leaf level PAR, APAR, and PPAR
-    RADIATION._par_shaded  .= photon.(WLSET.Λ_PAR, view(rad.e_diffuse,WLSET.IΛ_PAR)) .* 1000;
-    RADIATION._par_sunlit  .= photon.(WLSET.Λ_PAR, view(rad.e_direct ,WLSET.IΛ_PAR)) .* 1000;
+    RADIATION._par_shaded .= photon.(WLSET.Λ_PAR, view(rad.e_diffuse,WLSET.IΛ_PAR)) .* 1000;
+    RADIATION._par_sunlit .= photon.(WLSET.Λ_PAR, view(rad.e_direct ,WLSET.IΛ_PAR)) .* 1000;
     RADIATION.par_in_diffuse = RADIATION._par_shaded' * WLSET.ΔΛ_PAR;
     RADIATION.par_in_direct = RADIATION._par_sunlit' * WLSET.ΔΛ_PAR;
     RADIATION.par_in = RADIATION.par_in_diffuse + RADIATION.par_in_direct;
