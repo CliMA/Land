@@ -105,6 +105,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 #     2022-Jun-08: migrate the function from CanopyLayers
 #     2022-Jun-09: rename the function from canopy_matrices! to canopy_optical_properties!
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
+#     2022-Jun-10: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -114,6 +115,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 Updates canopy optical properties (scattering coefficient matrices), given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaves` Vector of `Leaf`
+- `soil` Bottom soil boundary layer
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS = can;
