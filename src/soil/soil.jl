@@ -4,6 +4,7 @@
 # General
 #     2022-Jun-08: add Soil structure
 #     2022-Jun-09: add fields: e_net_diffuse, e_net_direct
+#     2022-Jun-10: add fields: r_net_sw
 # To do:
 #     TODO: abstractize the albedo types (including leaf)
 #
@@ -39,6 +40,8 @@ mutable struct Soil{FT<:AbstractFloat}
     e_net_diffuse::Vector{FT}
     "Net direct radiation at each canopy layer `[mW m⁻² nm⁻¹]`"
     e_net_direct::Vector{FT}
+    "Net shortwave energy absorption `[W m⁻²]`"
+    r_net_sw::FT
     "Reflectance"
     ρ_sw::Vector{FT}
 end
@@ -50,6 +53,7 @@ end
 # General
 #     2022-Jun-08: add constructor
 #     2022-Jun-09: add fields: e_net_diffuse, e_net_direct
+#     2022-Jun-10: add fields: r_net_sw
 #
 #######################################################################################################################################################################################################
 """
@@ -71,6 +75,7 @@ Soil{FT}(zs::Vector{FT}; soil_type::String = "Loam", n_λ::Int = 114) where {FT<
                 _svc.Θ_SAT,     # θ
                 zeros(FT,n_λ),  # e_net_diffuse
                 zeros(FT,n_λ),  # e_net_direct
+                0,              # r_net_sw
                 zeros(FT,n_λ)   # ρ_sw
     )
 );

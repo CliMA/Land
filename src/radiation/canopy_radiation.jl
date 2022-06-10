@@ -4,7 +4,8 @@
 # General
 #     2022-Jun-09: migrate CanopyRads as CanopyRadiationProfile
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
-#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
+#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_in, par_in_diffuse, par_in_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
+#     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -44,6 +45,12 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     e_sum_direct::Matrix{FT}
     "Radiation towards the viewing direction per layer (including soil) `[mW m⁻² nm⁻¹]`"
     e_v::Matrix{FT}
+    "Total incoming radiation PAR `[μmol m⁻² s⁻¹]`"
+    par_in::FT
+    "Diffuse incoming radiation PAR `[μmol m⁻² s⁻¹]`"
+    par_in_diffuse::FT
+    "Direct incoming radiation PAR `[μmol m⁻² s⁻¹]`"
+    par_in_direct::FT
     "Mean PAR for shaded leaves (before absorption) `[μmol m⁻² s⁻¹]`"
     par_shaded::Vector{FT}
     "PAR for sunlit leaves (before absorption) `[μmol m⁻² s⁻¹]`"
@@ -52,8 +59,12 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     ppar_shaded::Vector{FT}
     "APAR for sunlit leaves for photosynthesis `[μmol m⁻² s⁻¹]`"
     ppar_sunlit::Array{FT,3}
-    "Net energy absorption for shortwave `[W m⁻²]`"
-    r_net::FT
+    "Net energy absorption for all leaves `[W m⁻²]`"
+    r_net_sw::Vector{FT}
+    "Net energy absorption for shaded leaves `[W m⁻²]`"
+    r_net_sw_shaded::Vector{FT}
+    "Net energy absorption for sunlit leaves `[W m⁻²]`"
+    r_net_sw_sunlit::Vector{FT}
     "Mean APAR for shaded leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _apar_shaded::Vector{FT}
     "APAR for sunlit leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
@@ -75,7 +86,8 @@ end
 # General
 #     2022-Jun-09: add constructor
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
-#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
+#     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_in, par_in_diffuse, par_in_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
+#     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -102,11 +114,16 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
                 zeros(FT,n_λ,n_layer),          # e_sum_diffuse
                 zeros(FT,n_λ,n_layer),          # e_sum_direct
                 zeros(FT,n_λ,n_layer+1),        # e_v
+                0,                              # par_in
+                0,                              # par_in_diffuse
+                0,                              # par_in_direct
                 zeros(FT,n_layer),              # par_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # par_sunlit
                 zeros(FT,n_layer),              # ppar_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # ppar_sunlit
-                0,                              # r_net
+                zeros(FT,n_layer),              # r_net_sw
+                zeros(FT,n_layer),              # r_net_sw_shaded
+                zeros(FT,n_layer),              # r_net_sw_sunlit
                 zeros(FT,n_layer),              # _apar_shaded
                 zeros(FT,n_layer),              # _apar_sunlit
                 zeros(FT,n_layer),              # _par_shaded
