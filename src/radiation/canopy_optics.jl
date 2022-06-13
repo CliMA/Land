@@ -8,6 +8,7 @@
 #     2022-Jun-09: rename variables to be more descriptive
 #     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
 #     2022-Jun-10: add more fields for sif calculations
+#     2022-Jun-13: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
@@ -103,6 +104,8 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _bf::FT
     "Cosine of Θ_AZI - raa"
     _cos_θ_azi_raa::Vector{FT}
+    "fo * cos Θ_INCL"
+    _fo_cos_θ_incl::Matrix{FT}
     "fs * cos Θ_INCL"
     _fs_cos_θ_incl::Matrix{FT}
     "fs * fo"
@@ -111,10 +114,10 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _ko::Vector{FT}
     "Solar beam extinction coefficient weights at different inclination angles"
     _ks::Vector{FT}
-    "Downwelling matrix for SIF excitation"
-    _mat_down::Matrix{FT}
     "Upwelling matrix for SIF excitation"
-    _mat_up::Matrix{FT}
+    _mat⁺::Matrix{FT}
+    "Downwelling matrix for SIF excitation"
+    _mat⁻::Matrix{FT}
     "Backward scattering coefficients at different inclination angles"
     _sb::Vector{FT}
     "Forward scattering coefficients at different inclination angles"
@@ -125,10 +128,32 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_mat_incl_azi_2::Matrix{FT}
     "Temporary cache used for vector operations (n_azi)"
     _tmp_vec_azi::Vector{FT}
+    "Temporary cache used for vector operations (n_layer)"
+    _tmp_vec_layer::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_1::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_2::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_3::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_4::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_5::Vector{FT}
+    "Cache variable to store the SIF information"
+    _tmp_vec_sif_6::Vector{FT}
     "Cache variable to store the SIF excitation information"
     _tmp_vec_sife_1::Vector{FT}
     "Cache variable to store the SIF excitation information"
     _tmp_vec_sife_2::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_3::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_4::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_5::Vector{FT}
+    "Cache variable to store the SIF excitation information"
+    _tmp_vec_sife_6::Vector{FT}
     "Temporary cache used for vector operations (n_λ)"
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
@@ -159,6 +184,7 @@ end
 #     2022-Jun-09: rename variables to be more descriptive
 #     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
 #     2022-Jun-10: add more fields for sif calculations
+#     2022-Jun-13: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
@@ -214,19 +240,31 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_incl,n_azi),     # _abs_fs_fo
                 0,                          # _bf
                 zeros(FT,n_azi),            # _cos_θ_azi_raa
+                zeros(FT,n_incl,n_azi),     # _fo_cos_θ_incl
                 zeros(FT,n_incl,n_azi),     # _fs_cos_θ_incl
                 zeros(FT,n_incl,n_azi),     # _fs_fo
                 zeros(FT,n_incl),           # _ko
                 zeros(FT,n_incl),           # _ks
-                zeros(FT,n_λf,n_λe),        # _mat_down
-                zeros(FT,n_λf,n_λe),        # _mat_up
+                zeros(FT,n_λf,n_λe),        # _mat⁺
+                zeros(FT,n_λf,n_λe),        # _mat⁻
                 zeros(FT,n_incl),           # _sb
                 zeros(FT,n_incl),           # _sf
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_1
                 zeros(FT,n_incl,n_azi),     # _tmp_mat_incl_azi_2
                 zeros(FT,n_azi),            # _tmp_vec_azi
+                zeros(FT,n_layer),          # _tmp_vec_layer
+                zeros(FT,n_λf),             # _tmp_vec_sif_1
+                zeros(FT,n_λf),             # _tmp_vec_sif_2
+                zeros(FT,n_λf),             # _tmp_vec_sif_3
+                zeros(FT,n_λf),             # _tmp_vec_sif_4
+                zeros(FT,n_λf),             # _tmp_vec_sif_5
+                zeros(FT,n_λf),             # _tmp_vec_sif_6
                 zeros(FT,n_λe),             # _tmp_vec_sife_1
                 zeros(FT,n_λe),             # _tmp_vec_sife_2
+                zeros(FT,n_λe),             # _tmp_vec_sife_3
+                zeros(FT,n_λe),             # _tmp_vec_sife_4
+                zeros(FT,n_λe),             # _tmp_vec_sife_5
+                zeros(FT,n_λe),             # _tmp_vec_sife_6
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
                 zeros(FT,n_layer),          # _ρ_lw

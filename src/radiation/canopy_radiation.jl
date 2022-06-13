@@ -7,6 +7,7 @@
 #     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_in, par_in_diffuse, par_in_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
 #     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit, r_lw, r_lw_down, r_lw_up, _r_emit_down, _r_emit_up
 #     2022-Jun-10: add more fields for SIF
+#     2022-Jun-13: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
@@ -74,6 +75,24 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     r_net_sw_shaded::Vector{FT}
     "Net shortwave energy absorption for sunlit leaves `[W m⁻²]`"
     r_net_sw_sunlit::Vector{FT}
+    "Downwelling SIF for sunlit leaves at each wavelength for a layer"
+    s_layer_down::Matrix{FT}
+    "Upwelling SIF for sunlit leaves at each wavelength for a layer"
+    s_layer_up::Matrix{FT}
+    "Downwelling SIF"
+    sif_down::Matrix{FT}
+    "SIF at observer direction"
+    sif_obs::Vector{FT}
+    "SIF at observer direction from shaded APAR"
+    sif_obs_shaded::Vector{FT}
+    "SIF at observer direction from scattering"
+    sif_obs_scatter::Vector{FT}
+    "SIF at observer direction from soil reflection"
+    sif_obs_ssoil::Vector{FT}
+    "SIF at observer direction from sunlit APAR"
+    sif_obs_sunlit::Vector{FT}
+    "Upwelling SIF"
+    sif_up::Matrix{FT}
     "Shaded leaf fluorescence quantum yield"
     ϕ_shaded::Vector{FT}
     "Sunlit leaf fluorescence quantum yield"
@@ -94,16 +113,24 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     _r_emit_down::Vector{FT}
     "Upwelling longwave energy flux cache `[W m⁻²]`"
     _r_emit_up::Vector{FT}
-    "Backward directional->diffuse SIF for sunlit leaves"
-    _s_sunlit_sb::Vector{FT}
-    "Forward directional->diffuse SIF for sunlit leaves"
-    _s_sunlit_sf::Vector{FT}
-    "Bidirectional SIF for sunlit leaves"
-    _s_sunlit_ss::Vector{FT}
-    "Downwards bidirectional SIF for sunlit leaves"
-    _s_sunlit_ss_down::Vector{FT}
-    "Upwards bidirectional SIF for sunlit leaves"
-    _s_sunlit_ss_up::Vector{FT}
+    "Downwelling SIF for sunlit leaves at each wavelength"
+    _s_emit_down::Matrix{FT}
+    "Upwelling SIF for sunlit leaves at each wavelength"
+    _s_emit_up::Matrix{FT}
+    "Downwelling SIF for shaded leaves at each wavelength"
+    _s_shaded_down::Vector{FT}
+    "Upwelling SIF for shaded leaves at each wavelength"
+    _s_shaded_up::Vector{FT}
+    "Downwelling SIF for sunlit leaves at each wavelength"
+    _s_sunlit_down::Vector{FT}
+    "Upwelling SIF for sunlit leaves at each wavelength"
+    _s_sunlit_up::Vector{FT}
+    "Cache to compute SIF at observer direction from shaded APAR"
+    _sif_obs_shaded::Matrix{FT}
+    "Cache to compute SIF at observer direction from scattering"
+    _sif_obs_scatter::Matrix{FT}
+    "Cache to compute SIF at observer direction from sunlit APAR"
+    _sif_obs_sunlit::Matrix{FT}
 end
 
 
@@ -117,6 +144,7 @@ end
 #     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit, r_lw, r_lw_down, r_lw_up, _r_emit_down, _r_emit_up
 #     2022-Jun-10: add n_par to options and fix dimensions of the variables
 #     2022-Jun-10: add n_λf for SIF
+#     2022-Jun-13: add more fields for sif calculations
 #
 #######################################################################################################################################################################################################
 """
@@ -159,6 +187,15 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
                 zeros(FT,n_layer),              # r_net_sw
                 zeros(FT,n_layer),              # r_net_sw_shaded
                 zeros(FT,n_layer),              # r_net_sw_sunlit
+                zeros(FT,n_λf,n_layer),         # s_layer_down
+                zeros(FT,n_λf,n_layer),         # s_layer_up
+                zeros(FT,n_λf,n_layer+1),       # sif_down
+                zeros(FT,n_λf),                 # sif_obs
+                zeros(FT,n_λf),                 # sif_obs_shaded
+                zeros(FT,n_λf),                 # sif_obs_scatter
+                zeros(FT,n_λf),                 # sif_obs_soil
+                zeros(FT,n_λf),                 # sif_obs_sunlit
+                zeros(FT,n_λf,n_layer+1),       # sif_up
                 zeros(FT,n_layer),              # ϕ_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # ϕ_sunlit
                 zeros(FT,n_par),                # _apar_shaded
@@ -169,10 +206,14 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
                 zeros(FT,n_par),                # _ppar_sunlit
                 zeros(FT,n_layer),              # _r_emit_down
                 zeros(FT,n_layer+1),            # _r_emit_up
-                zeros(FT,n_λf),                 # _s_sunlit_sb
-                zeros(FT,n_λf),                 # _s_sunlit_sf
-                zeros(FT,n_λf),                 # _s_sunlit_ss
-                zeros(FT,n_λf),                 # _s_sunlit_ss_down
-                zeros(FT,n_λf)                  # _s_sunlit_ss_up
+                zeros(FT,n_λf,n_layer),         # _s_emit_down
+                zeros(FT,n_λf,n_layer+1),       # _s_emit_up
+                zeros(FT,n_λf),                 # _s_shaded_down
+                zeros(FT,n_λf),                 # _s_shaded_up
+                zeros(FT,n_λf),                 # _s_sunlit_down
+                zeros(FT,n_λf),                 # _s_sunlit_up
+                zeros(FT,n_λf,n_layer),         # _sif_obs_shaded
+                zeros(FT,n_λf,n_layer),         # _sif_obs_scatter
+                zeros(FT,n_λf,n_layer)          # _sif_obs_sunlit
     )
 );
