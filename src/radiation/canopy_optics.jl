@@ -9,6 +9,7 @@
 #     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
 #     2022-Jun-10: add more fields for sif calculations
 #     2022-Jun-13: add more fields for sif calculations
+#     2022-Jun-13: remove unnecessary cache variables
 #
 #######################################################################################################################################################################################################
 """
@@ -148,12 +149,6 @@ mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
     _tmp_vec_sife_2::Vector{FT}
     "Cache variable to store the SIF excitation information"
     _tmp_vec_sife_3::Vector{FT}
-    "Cache variable to store the SIF excitation information"
-    _tmp_vec_sife_4::Vector{FT}
-    "Cache variable to store the SIF excitation information"
-    _tmp_vec_sife_5::Vector{FT}
-    "Cache variable to store the SIF excitation information"
-    _tmp_vec_sife_6::Vector{FT}
     "Temporary cache used for vector operations (n_λ)"
     _tmp_vec_λ::Vector{FT}
     "Reflectance for diffuse->diffuse at each canopy layer"
@@ -185,6 +180,7 @@ end
 #     2022-Jun-10: add more fields: p_sunlit, ϵ, ρ_lw, τ_lw, _mat_down, _mat_down, _tmp_vec_azi, _ρ_lw, _τ_lw
 #     2022-Jun-10: add more fields for sif calculations
 #     2022-Jun-13: add more fields for sif calculations
+#     2022-Jun-13: remove unnecessary cache variables
 #
 #######################################################################################################################################################################################################
 """
@@ -262,9 +258,6 @@ CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20,
                 zeros(FT,n_λe),             # _tmp_vec_sife_1
                 zeros(FT,n_λe),             # _tmp_vec_sife_2
                 zeros(FT,n_λe),             # _tmp_vec_sife_3
-                zeros(FT,n_λe),             # _tmp_vec_sife_4
-                zeros(FT,n_λe),             # _tmp_vec_sife_5
-                zeros(FT,n_λe),             # _tmp_vec_sife_6
                 zeros(FT,n_λ),              # _tmp_vec_λ
                 zeros(FT,n_λ,n_layer),      # _ρ_dd
                 zeros(FT,n_layer),          # _ρ_lw
