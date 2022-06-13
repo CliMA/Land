@@ -37,6 +37,8 @@ using Test
             @test true;
             CanopyRadiativeTransfer.canopy_radiation!(can, leaves, FT(100), soil);
             @test true;
+            CanopyRadiativeTransfer.canopy_fluorescence!(can, leaves);
+            @test true;
         end;
     end;
 end;

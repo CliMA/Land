@@ -26,6 +26,7 @@ function canopy_radiation! end
 #     2022-Jun-10: add PAR calculation (before absorption)
 #     2022-Jun-10: add documentation
 #     2022-Jun-10: compute shortwave net radiation
+#     2022-Jun-13: use N_LAYER instead of _end
 #
 #######################################################################################################################################################################################################
 """
@@ -65,8 +66,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _e_u_i .= _r_sd_i .* _e_s_i .+ _r_dd_i .* _e_d_i;
     end;
 
-    _end = lastindex(OPTICS.ρ_sd, 2);
-    RADIATION.e_diffuse_up[:,end] = view(OPTICS.ρ_sd,:,_end) .* view(RADIATION.e_direct,:,_end) .+ view(OPTICS.ρ_dd,:,_end) .* view(RADIATION.e_diffuse_down,:,_end);
+    RADIATION.e_diffuse_up[:,end] = view(OPTICS.ρ_sd,:,N_LAYER+1) .* view(RADIATION.e_direct,:,N_LAYER+1) .+ view(OPTICS.ρ_dd,:,N_LAYER+1) .* view(RADIATION.e_diffuse_down,:,N_LAYER+1);
 
     # 2. update the sunlit and shaded sum radiation and total absorbed radiation per layer and for soil
     for _i in 1:N_LAYER
@@ -91,8 +91,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _a_d_i .= _p_d_i .* (1 .- _t_dd_i .- _r_dd_i);
     end;
 
-    soil.e_net_direct .= view(RADIATION.e_direct,:,_end) .* (1 .- soil.ρ_sw);
-    soil.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,_end) .* (1 .- soil.ρ_sw);
+    soil.e_net_direct .= view(RADIATION.e_direct,:,N_LAYER+1) .* (1 .- soil.ρ_sw);
+    soil.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,N_LAYER+1) .* (1 .- soil.ρ_sw);
 
     # 3. compute the spectra at the observer direction
     for _i in 1:N_LAYER
@@ -105,7 +105,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
 
         RADIATION.e_v[:,_i] .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
     end;
-    RADIATION.e_v[:,end] .= OPTICS.po[end] .* view(RADIATION.e_diffuse_up,:,_end);
+    RADIATION.e_v[:,end] .= OPTICS.po[end] .* view(RADIATION.e_diffuse_up,:,N_LAYER+1);
 
     for _i in eachindex(RADIATION.e_o)
         RADIATION.e_o[_i] = sum(view(RADIATION.e_o,_i,:)) / FT(pi);
