@@ -35,8 +35,8 @@ function leaf_PAR(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::Hyperspe
     _α = (APAR_car ? view(bio.α_cabcar, IΛ_PAR) : view(bio.α_cab, IΛ_PAR));
 
     # PAR energy from direct  and diffuse light
-    _e_par_dir  = view(rad.e_direct , IΛ_PAR) .* view(bio.α_SW, IΛ_PAR);
-    _e_par_diff = view(rad.e_diffuse, IΛ_PAR) .* view(bio.α_SW, IΛ_PAR);
+    _e_par_dir  = view(rad.e_direct , IΛ_PAR) .* view(bio.α_sw, IΛ_PAR);
+    _e_par_diff = view(rad.e_diffuse, IΛ_PAR) .* view(bio.α_sw, IΛ_PAR);
     _par_dir    = photon.(Λ_PAR, _e_par_dir);
     _par_diff   = photon.(Λ_PAR, _e_par_diff);
 
