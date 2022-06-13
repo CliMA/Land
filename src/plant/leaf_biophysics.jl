@@ -63,16 +63,16 @@ mutable struct LeafBiophysics{FT<:AbstractFloat}
     α_cab::Vector{FT}
     "Relative absorption by Chlorophyll+Carotenoid `[-]`"
     α_cabcar::Vector{FT}
-    "Shortwave absorption, 1 .- ρ_SW .- τ_SW  `[-]`"
-    α_SW::Vector{FT}
+    "Shortwave absorption, 1 .- ρ_sw .- τ_sw  `[-]`"
+    α_sw::Vector{FT}
     "Broadband thermal reflectance, related to blackbody emittance `[-]`"
-    ρ_LW::FT
+    ρ_lw::FT
     "Shortwave leaf reflectance `[-]`"
-    ρ_SW::Vector{FT}
+    ρ_sw::Vector{FT}
     "Broadband thermal transmission, related to blackbody emittance `[-]`"
-    τ_LW::FT
+    τ_lw::FT
     "Shortwave leaf transmission `[-]`"
-    τ_SW::Vector{FT}
+    τ_sw::Vector{FT}
 end
 
 
@@ -101,6 +101,27 @@ lbio = LeafBiophysics{Float64}(WaveLengthSet{Float64}(collect(400:50:2400)));
 LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;
 
-    return LeafBiophysics{FT}(1.4, 10, 0, 0, 40, 10, 0, 0, 0.01, 0.012, 0, zeros(FT,NΛ), zeros(FT,NΛ_SIF,NΛ_SIFE), zeros(FT,NΛ_SIF,NΛ_SIFE), zeros(FT,NΛ), zeros(FT,NΛ), zeros(FT,NΛ), 0.01,
-                              zeros(FT,NΛ), 0.01, zeros(FT,NΛ))
+    return LeafBiophysics{FT}(
+                1.4,                        # MESOPHYLL_N
+                10,                         # NDUB
+                0,                          # ant
+                0,                          # brown
+                40,                         # cab
+                10,                         # car
+                0,                          # cbc
+                0,                          # f_zeax
+                0.01,                       # l_H₂O
+                0.012,                      # lma
+                0,                          # pro
+                zeros(FT,NΛ),               # k_all
+                zeros(FT,NΛ_SIF,NΛ_SIFE),   # mat_b
+                zeros(FT,NΛ_SIF,NΛ_SIFE),   # mat_f
+                zeros(FT,NΛ),               # α_cab
+                zeros(FT,NΛ),               # α_cabcar
+                zeros(FT,NΛ),               # α_sw
+                0.01,                       # ρ_lw
+                zeros(FT,NΛ),               # ρ_sw
+                0.01,                       # τ_lw
+                zeros(FT,NΛ)                # τ_sw
+    )
 );

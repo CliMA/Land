@@ -6,7 +6,8 @@
 #     2022-Jan-24: add p_CO₂_s to the structure
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: moved FLM to PRC
-#     2022-May-25: add HS field
+#     2022-May-25: add new field HS
+#     2022-May-25: add new field WIDTH
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -34,6 +35,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     PRC::AbstractReactionCenter{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::AbstractPhotosynthesisModel{FT}
+    "Leaf width"
+    WIDTH::FT
 
     # prognostic variables that change with time
     "Absorbed photosynthetically active radiation `[μmol m⁻² s⁻¹]`"
@@ -74,6 +77,7 @@ end
 #     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
 #     2022-May-25: add leaf hydraulic system into the constructor
 #     2022-May-31: add steady state mode option to input options
+#     2022-May-25: add new field WIDTH
 #
 #######################################################################################################################################################################################################
 """
@@ -119,6 +123,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Boo
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
+                FT(0.05),                           # WIDTH
                 1000,                               # apar
                 0.01,                               # g_H₂O_s
                 T_25(),                             # t
