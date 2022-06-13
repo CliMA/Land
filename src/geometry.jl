@@ -66,6 +66,8 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
     OPTICS.fs .= (OPTICS._tmp_mat_incl_azi_1 .+ OPTICS._tmp_mat_incl_azi_2) ./ cosd(angles.sza);
     OPTICS._abs_fs .= abs.(OPTICS.fs);
 
+    OPTICS._fo_cos_θ_incl .= OPTICS.fo .* can._COS²_Θ_INCL_AZI;
+    OPTICS._fs_cos_θ_incl .= OPTICS.fs .* can._COS²_Θ_INCL_AZI;
     OPTICS._fs_fo .= OPTICS.fs .* OPTICS.fo;
     OPTICS._abs_fs_fo .= abs.(OPTICS._fs_fo);
 

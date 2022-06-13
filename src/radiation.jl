@@ -199,7 +199,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
 
     _r_lw_soil = K_STEFAN(FT) * (1 - soil.ρ_lw) * soil.t ^ 4;
 
-    # 2. account for the emission from bottom to up
+    # 2. account for the longwave emission from bottom to up
     RADIATION._r_emit_up[end] = _r_lw_soil;
 
     for _i in N_LAYER:-1:1
@@ -213,7 +213,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         RADIATION._r_emit_up[_i] = RADIATION._r_emit_down[_i] * _r_j * _t__ + RADIATION._r_emit_up[_i+1] * _t__ + RADIATION.r_lw[_i];
     end;
 
-    # 3. account for the solar radiation from up to bottom
+    # 3. account for the longwave emission from up to bottom
     RADIATION.r_lw_down[1] = rad;
 
     for _i in 1:N_LAYER
