@@ -10,6 +10,12 @@ using Statistics: mean
 using UnPack: @unpack
 
 
+const MODIS_BAND_1 = [ 620,  670];  # RED
+const MODIS_BAND_2 = [ 841,  876];  # NIR
+const MODIS_BAND_3 = [ 459,  479];  # BLUE
+const MODIS_BAND_7 = [2105, 2155];  # SWIR
+
+
 include("clumping.jl"         )
 include("coefficients.jl"     )
 include("fluorescence.jl"     )
