@@ -8,6 +8,7 @@
 #     2022-Feb-07: moved FLM to PRC
 #     2022-May-25: add new field HS
 #     2022-May-25: add new field WIDTH
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -32,9 +33,9 @@ mutable struct Leaf{FT<:AbstractFloat}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
-    PRC::AbstractReactionCenter{FT}
+    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
-    PSM::AbstractPhotosynthesisModel{FT}
+    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
     "Leaf width"
     WIDTH::FT
 

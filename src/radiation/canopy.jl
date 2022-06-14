@@ -71,6 +71,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -91,7 +92,7 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     "Hot spot parameter"
     HOT_SPOT::FT
     "Leaf inclination angle distribution function algorithm"
-    LIDF::AbstractLIDFAlgorithm
+    LIDF::Union{VerhoefLIDF{FT}}
     "Number of azimuth angles"
     N_AZI::Int
     "Number of inclination angles"

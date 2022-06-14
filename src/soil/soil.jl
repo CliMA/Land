@@ -145,6 +145,7 @@ HyperspectralSoilAlbedo{FT}(; n_λ::Int = 114) where {FT<:AbstractFloat} = (
 #     2022-Jun-09: add fields: e_net_diffuse, e_net_direct
 #     2022-Jun-10: add fields: r_net_lw, r_net_sw, ρ_lw
 #     2022-Jun-14: add abstractized soil albedo
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -161,9 +162,9 @@ $(TYPEDFIELDS)
 mutable struct Soil{FT<:AbstractFloat}
     # parameters that do not change with time
     "Albedo related structure"
-    ALBEDO::AbstractSoilAlbedo{FT}
+    ALBEDO::Union{BroadbandSoilAlbedo{FT}, HyperspectralSoilAlbedo{FT}}
     "Soil moisture retention curve"
-    VC::AbstractSoilVC{FT}
+    VC::Union{BrooksCorey{FT}, VanGenuchten{FT}}
     "Mean depth"
     Z::FT
     "Depth boundaries"
