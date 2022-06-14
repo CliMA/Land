@@ -20,6 +20,62 @@ function canopy_radiation! end
 #
 # Changes to this method
 # General
+#     2022-Jun-14: make method work with broadband soil albedo struct
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat}
+
+Updates soil shortwave radiation profiles, given
+- `can` `HyperspectralMLCanopy` type struct
+- `albedo` `BroadbandSoilAlbedo` type soil albedo
+"""
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
+    @unpack N_LAYER, OPTICS, RADIATION, WLSET = can;
+
+    OPTICS._tmp_vec_λ .= view(RADIATION.e_direct,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    albedo.e_net_direct = OPTICS._tmp_vec_λ' * WLSET.ΔΛ / 1000;
+
+    OPTICS._tmp_vec_λ .= view(RADIATION.e_diffuse_down,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    albedo.e_net_diffuse = OPTICS._tmp_vec_λ' * WLSET.ΔΛ / 1000;
+
+    albedo.r_net_sw = albedo.e_net_direct + albedo.e_net_diffuse;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-14: make method work with hyperspectral soil albedo struct
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
+
+Updates soil shortwave radiation profiles, given
+- `can` `HyperspectralMLCanopy` type struct
+- `albedo` `HyperspectralSoilAlbedo` type soil albedo
+"""
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
+    @unpack N_LAYER, RADIATION, WLSET = can;
+
+    albedo.e_net_direct .= view(RADIATION.e_direct,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    albedo.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    albedo.r_net_sw = (albedo.e_net_direct' * WLSET.ΔΛ + albedo.e_net_diffuse' * WLSET.ΔΛ) / 1000;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
 #     2022-Jun-09: migrate the function from CanopyLayers
 #     2022-Jun-09: clean the function
 #     2022-Jun-10: rename PAR/APAR to APAR/PPAR to be more accurate
@@ -41,6 +97,7 @@ Updates canopy radiation profiles for shortwave radiation, given
 """
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack APAR_CAR, N_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
+    @unpack ALBEDO = soil;
     _ilai = can.lai * can.ci / N_LAYER;
     _tlai = can.lai / N_LAYER;
 
@@ -91,9 +148,6 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         _a_d_i .= _p_d_i .* (1 .- _t_dd_i .- _r_dd_i);
     end;
 
-    soil.e_net_direct .= view(RADIATION.e_direct,:,N_LAYER+1) .* (1 .- soil.ρ_sw);
-    soil.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,N_LAYER+1) .* (1 .- soil.ρ_sw);
-
     # 3. compute the spectra at the observer direction
     for _i in 1:N_LAYER
         _e_d_i = view(RADIATION.e_diffuse_down,:,_i);   # downward diffuse radiation at upper boundary
@@ -122,7 +176,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         RADIATION.r_net_sw[_i] = _Σ_shaded + _Σ_sunlit;
     end;
 
-    soil.r_net_sw = (soil.e_net_direct' * WLSET.ΔΛ + soil.e_net_diffuse' * WLSET.ΔΛ) / 1000;
+    canopy_radiation!(can, ALBEDO);
 
     # 5. compute top-of-canopy and leaf level PAR, APAR, and PPAR
     RADIATION._par_shaded .= photon.(WLSET.Λ_PAR, view(rad.e_diffuse,WLSET.IΛ_PAR)) .* 1000;
@@ -191,13 +245,14 @@ Updates canopy radiation profiles for longwave radiation, given
 """
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS, RADIATION = can;
+    @unpack ALBEDO = soil;
 
     # 1. compute longwave radiation out from the leaves and soil
     for _i in eachindex(leaves)
         RADIATION.r_lw[_i] = K_STEFAN(FT) * OPTICS.ϵ[_i] * leaves[_i].t ^ 4;
     end;
 
-    _r_lw_soil = K_STEFAN(FT) * (1 - soil.ρ_lw) * soil.t ^ 4;
+    _r_lw_soil = K_STEFAN(FT) * (1 - ALBEDO.ρ_lw) * soil.t ^ 4;
 
     # 2. account for the longwave emission from bottom to up
     RADIATION._r_emit_up[end] = _r_lw_soil;
@@ -224,14 +279,14 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         RADIATION.r_lw_up[_i+1] = RADIATION.r_lw_down[_i] * _r_i + RADIATION._r_emit_up[_i];
     end;
 
-    RADIATION.r_lw_up[end] = RADIATION.r_lw_down[end] * soil.ρ_lw + _r_lw_soil;
+    RADIATION.r_lw_up[end] = RADIATION.r_lw_down[end] * ALBEDO.ρ_lw + _r_lw_soil;
 
     # 4. compute the net longwave radiation per canopy layer and soil
     for _i in 1:N_LAYER
         RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]) - 2* RADIATION.r_lw[_i];
     end;
 
-    soil.r_net_lw = RADIATION.r_lw_down[end] * (1 - soil.ρ_lw) - _r_lw_soil;
+    ALBEDO.r_net_lw = RADIATION.r_lw_down[end] * (1 - ALBEDO.ρ_lw) - _r_lw_soil;
 
     return nothing
 );

@@ -122,6 +122,7 @@ Updates canopy optical properties (scattering coefficient matrices), given
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS = can;
+    @unpack ALBEDO = soil;
     @assert length(leaves) == N_LAYER "Number of leaves must be equal to the canopy layers!";
     _ilai = can.lai * can.ci / N_LAYER;
 
@@ -144,8 +145,8 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{F
     OPTICS._ρ_sd .= OPTICS.σ_sdb .* _ilai;
 
     # 3. update the effective reflectance per layer
-    OPTICS.ρ_dd[:,end] .= soil.ρ_sw;
-    OPTICS.ρ_sd[:,end] .= soil.ρ_sw;
+    OPTICS.ρ_dd[:,end] .= ALBEDO.ρ_sw;
+    OPTICS.ρ_sd[:,end] .= ALBEDO.ρ_sw;
 
     for _i in N_LAYER:-1:1
         _r_dd__ = view(OPTICS._ρ_dd,:,_i  );    # reflectance without correction
@@ -178,7 +179,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{F
     end;
 
     # 5. update the effective longwave reflectance and transmittance
-    OPTICS.ρ_lw[end] = soil.ρ_lw;
+    OPTICS.ρ_lw[end] = ALBEDO.ρ_lw;
 
     for _i in N_LAYER:-1:1
         _dnorm = 1 - OPTICS._ρ_lw[_i] * OPTICS.ρ_lw[_i+1];
