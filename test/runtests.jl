@@ -6,9 +6,12 @@ using Test
 @testset verbose = true "ClimaCache Test" begin
     @testset "Soil" begin
         for FT in [Float32, Float64]
-            soil = ClimaCache.Soil{FT}(FT[0,-1]);
-            @test FT_test(soil, FT);
-            @test NaN_test(soil);
+            soil1 = ClimaCache.Soil{FT}(FT[0,-1]);
+            soil2 = ClimaCache.Soil{FT}(FT[0,-1]; n_λ = 1);
+            for soil in [soil1, soil2]
+                @test FT_test(soil, FT);
+                @test NaN_test(soil);
+            end;
         end;
     end;
 

@@ -10,9 +10,70 @@
 $(TYPEDEF)
 
 Hierarchy of AbstractSoilAlbedo:
+- [`BroadbandSoilAlbedo`](@ref)
 - [`HyperspectralSoilAlbedo`](@ref)
 """
 abstract type AbstractSoilAlbedo{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
+#     2022-Jun-14: add struct for broadband soil albedo
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure for broadband soil albedo
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct BroadbandSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
+    # diagnostic variables that change with time
+    "Net diffuse radiation at top soil `[W m⁻²]`"
+    e_net_diffuse::FT
+    "Net direct radiation at top soil `[W m⁻²]`"
+    e_net_direct::FT
+    "Net longwave energy absorption `[W m⁻²]`"
+    r_net_lw::FT
+    "Net shortwave energy absorption `[W m⁻²]`"
+    r_net_sw::FT
+    "Reflectance for longwave radiation"
+    ρ_lw::FT
+    "Reflectance for shortwave radiation"
+    ρ_sw::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-14: add constructor
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
+
+Construct a broadband soil albedo struct
+"""
+BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat} = (
+    return BroadbandSoilAlbedo{FT}(
+                0,      # e_net_diffuse
+                0,      # e_net_direct
+                0,      # r_net_lw
+                0,      # r_net_sw
+                0.06,   # ρ_lw
+                0       # ρ_sw
+    )
+);
 
 
 #######################################################################################################################################################################################################
@@ -35,9 +96,9 @@ $(TYPEDFIELDS)
 """
 mutable struct HyperspectralSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
     # diagnostic variables that change with time
-    "Net diffuse radiation at each canopy layer `[mW m⁻² nm⁻¹]`"
+    "Net diffuse radiation at top soil `[mW m⁻² nm⁻¹]`"
     e_net_diffuse::Vector{FT}
-    "Net direct radiation at each canopy layer `[mW m⁻² nm⁻¹]`"
+    "Net direct radiation at top soil `[mW m⁻² nm⁻¹]`"
     e_net_direct::Vector{FT}
     "Net longwave energy absorption `[W m⁻²]`"
     r_net_lw::FT
@@ -137,7 +198,8 @@ Construct a soil struct, given
 """
 Soil{FT}(zs::Vector{FT}; soil_type::String = "Loam", n_λ::Int = 114) where {FT<:AbstractFloat} = (
     _svc = VanGenuchten{FT}(soil_type);
-    _sab = HyperspectralSoilAlbedo{FT}(n_λ = n_λ);
+    _sab = n_λ > 1 ? HyperspectralSoilAlbedo{FT}(n_λ = n_λ) : BroadbandSoilAlbedo{FT}();
+
     return Soil{FT}(
                 _sab,       # ALBEDO
                 _svc,       # VC

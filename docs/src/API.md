@@ -102,6 +102,8 @@ VanGenuchten
 VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
 VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 AbstractSoilAlbedo
+BroadbandSoilAlbedo
+BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
 HyperspectralSoilAlbedo
 HyperspectralSoilAlbedo{FT}(; n_λ::Int = 114) where {FT<:AbstractFloat}
 Soil
