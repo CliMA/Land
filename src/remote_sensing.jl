@@ -78,18 +78,6 @@ read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) 
 # Changes to these functions
 # General
 #     2022-Jun-13: add function to compute MODIS EVI
-#     2022-Jun-13: add function to compute MODIS EVI2
-#     2022-Jun-13: add function to compute MODIS LSWI
-#     2022-Jun-13: add function to compute MODIS NDVI
-#     2022-Jun-13: add function to compute MODIS NIRv
-#     2022-Jun-13: add function to compute OCO2 SIF @ 758.7 nm
-#     2022-Jun-13: add function to compute OCO2 SIF @ 770.0 nm
-#     2022-Jun-13: add function to compute OCO3 SIF @ 758.8 nm
-#     2022-Jun-13: add function to compute OCO3 SIF @ 770.0 nm
-#     2022-Jun-13: add function to compute TROPOMI SIF @ 682.5 nm
-#     2022-Jun-13: add function to compute TROPOMI SIF @ 740.0 nm
-#     2022-Jun-13: add function to compute TROPOMI SIF @ 746.5 nm
-#     2022-Jun-13: add function to compute TROPOMI SIF @ 750.5 nm
 #
 #######################################################################################################################################################################################################
 """
@@ -110,6 +98,14 @@ function MODIS_EVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute MODIS EVI2#     2022-Jun-13: add function to compute MODIS EVI
+
+#
+#######################################################################################################################################################################################################
 """
 
     MODIS_EVI2(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -127,6 +123,13 @@ function MODIS_EVI2(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute MODIS LSWI
+#
+#######################################################################################################################################################################################################
 """
 
     MODIS_LSWI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -144,6 +147,13 @@ function MODIS_LSWI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute MODIS NDVI
+#
+#######################################################################################################################################################################################################
 """
 
     MODIS_NDVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -161,6 +171,13 @@ function MODIS_NDVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute MODIS NIRv
+#
+#######################################################################################################################################################################################################
 """
 
     MODIS_NIRv(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -178,6 +195,13 @@ function MODIS_NIRv(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute OCO2 SIF @ 758.7 nm
+#
+#######################################################################################################################################################################################################
 """
 
     OCO2_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -192,6 +216,13 @@ function OCO2_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute OCO2 SIF @ 770.0 nm
+#
+#######################################################################################################################################################################################################
 """
 
     OCO2_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -206,6 +237,13 @@ function OCO2_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute OCO3 SIF @ 758.8 nm
+#
+#######################################################################################################################################################################################################
 """
 
     OCO3_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -220,6 +258,13 @@ function OCO3_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute OCO3 SIF @ 770.0 nm
+#
+#######################################################################################################################################################################################################
 """
 
     OCO3_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -234,6 +279,14 @@ function OCO3_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 682.5 nm
+#     2022-Jun-13: change the default steps
+#
+#######################################################################################################################################################################################################
 """
 
     TROPOMI_SIF683(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -244,10 +297,17 @@ Return SIF @ 682.5 nm for TROPOMI setup, given
 function TROPOMI_SIF683(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_683[1]), FT(TROPOMI_SIF_683[2]))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_683[1]), FT(TROPOMI_SIF_683[2]); steps=5)
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 740.0 nm
+#
+#######################################################################################################################################################################################################
 """
 
     TROPOMI_SIF740(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -262,6 +322,14 @@ function TROPOMI_SIF740(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 746.5 nm
+#     2022-Jun-13: change the default steps
+#
+#######################################################################################################################################################################################################
 """
 
     TROPOMI_SIF747(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -272,10 +340,18 @@ Return SIF @ 746.5 nm for TROPOMI setup, given
 function TROPOMI_SIF747(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_747[1]), FT(TROPOMI_SIF_747[2]))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_747[1]), FT(TROPOMI_SIF_747[2]); steps=8)
 end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to these functions
+# General
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 750.5 nm
+#     2022-Jun-13: change the default steps
+#
+#######################################################################################################################################################################################################
 """
 
     TROPOMI_SIF751(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -286,5 +362,5 @@ Return SIF @ 750.5 nm for TROPOMI setup, given
 function TROPOMI_SIF751(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_751[1]), FT(TROPOMI_SIF_751[2]))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_751[1]), FT(TROPOMI_SIF_751[2]); steps=5)
 end
