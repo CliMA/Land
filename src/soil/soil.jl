@@ -21,6 +21,7 @@ abstract type AbstractSoilAlbedo{FT<:AbstractFloat} end
 # Changes to this structure
 # General
 #     2022-Jun-14: add struct for broadband soil albedo
+#     2022-Jun-14: make soil albedo a two-element vector for PAR and NIR
 #
 #######################################################################################################################################################################################################
 """
@@ -46,8 +47,8 @@ mutable struct BroadbandSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
     r_net_sw::FT
     "Reflectance for longwave radiation"
     ρ_lw::FT
-    "Reflectance for shortwave radiation"
-    ρ_sw::FT
+    "Reflectance for shortwave radiation (for PAR and NIR)"
+    ρ_sw::Vector{FT}
 end
 
 
@@ -56,6 +57,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-14: add constructor
+#     2022-Jun-14: make soil albedo a two-element vector for PAR and NIR
 #
 #######################################################################################################################################################################################################
 """
@@ -71,7 +73,7 @@ BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat} = (
                 0,      # r_net_lw
                 0,      # r_net_sw
                 0.06,   # ρ_lw
-                0       # ρ_sw
+                [0,0]   # ρ_sw
     )
 );
 
