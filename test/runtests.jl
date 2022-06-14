@@ -41,4 +41,25 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "Remote Sensing" begin
+        for FT in [Float32, Float64]
+            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            for rs in [CanopyRadiativeTransfer.MODIS_EVI(can),
+                       CanopyRadiativeTransfer.MODIS_EVI2(can),
+                       CanopyRadiativeTransfer.MODIS_LSWI(can),
+                       CanopyRadiativeTransfer.MODIS_NDVI(can),
+                       CanopyRadiativeTransfer.MODIS_NIRv(can),
+                       CanopyRadiativeTransfer.OCO2_SIF759(can),
+                       CanopyRadiativeTransfer.OCO2_SIF770(can),
+                       CanopyRadiativeTransfer.OCO3_SIF759(can),
+                       CanopyRadiativeTransfer.OCO3_SIF770(can),
+                       CanopyRadiativeTransfer.TROPOMI_SIF683(can),
+                       CanopyRadiativeTransfer.TROPOMI_SIF740(can),
+                       CanopyRadiativeTransfer.TROPOMI_SIF747(can),
+                       CanopyRadiativeTransfer.TROPOMI_SIF751(can)]
+                @test typeof(rs) == FT;
+            end;
+        end;
+    end;
 end;

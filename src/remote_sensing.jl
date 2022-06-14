@@ -88,6 +88,8 @@ read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) 
 #     2022-Jun-13: add function to compute OCO3 SIF @ 770.0 nm
 #     2022-Jun-13: add function to compute TROPOMI SIF @ 682.5 nm
 #     2022-Jun-13: add function to compute TROPOMI SIF @ 740.0 nm
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 746.5 nm
+#     2022-Jun-13: add function to compute TROPOMI SIF @ 750.5 nm
 #
 #######################################################################################################################################################################################################
 """
@@ -180,13 +182,13 @@ end
 
     OCO2_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 
-Return SIF @ 759 nm for TROPOMI setup, given
+Return SIF @ 759 nm for OCO2 setup, given
 - `can` `HyperspectralMLCanopy` type canopy
 """
 function OCO2_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(758.68))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO2_SIF_759[1]), FT(OCO2_SIF_759[2]); steps=4)
 end
 
 
@@ -194,13 +196,13 @@ end
 
     OCO2_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 
-Return SIF @ 770 nm for TROPOMI setup, given
+Return SIF @ 770 nm for OCO2 setup, given
 - `can` `HyperspectralMLCanopy` type canopy
 """
 function OCO2_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(769.94))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO2_SIF_770[1]), FT(OCO2_SIF_770[2]); steps=4)
 end
 
 
@@ -208,13 +210,13 @@ end
 
     OCO3_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 
-Return SIF @ 759 nm for TROPOMI setup, given
+Return SIF @ 759 nm for OCO3 setup, given
 - `can` `HyperspectralMLCanopy` type canopy
 """
 function OCO3_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(758.77))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO3_SIF_759[1]), FT(OCO3_SIF_759[2]); steps=4)
 end
 
 
@@ -222,13 +224,13 @@ end
 
     OCO3_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
 
-Return SIF @ 770 nm for TROPOMI setup, given
+Return SIF @ 770 nm for OCO3 setup, given
 - `can` `HyperspectralMLCanopy` type canopy
 """
 function OCO3_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(770.005))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO3_SIF_770[1]), FT(OCO3_SIF_770[2]); steps=4)
 end
 
 
@@ -242,7 +244,7 @@ Return SIF @ 682.5 nm for TROPOMI setup, given
 function TROPOMI_SIF683(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(682.5))
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_683[1]), FT(TROPOMI_SIF_683[2]))
 end
 
 
@@ -257,4 +259,32 @@ function TROPOMI_SIF740(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat
     @unpack RADIATION, WLSET = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(740))
+end
+
+
+"""
+
+    TROPOMI_SIF747(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return SIF @ 746.5 nm for TROPOMI setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+"""
+function TROPOMI_SIF747(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_747[1]), FT(TROPOMI_SIF_747[2]))
+end
+
+
+"""
+
+    TROPOMI_SIF751(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return SIF @ 750.5 nm for TROPOMI setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+"""
+function TROPOMI_SIF751(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_751[1]), FT(TROPOMI_SIF_751[2]))
 end

@@ -37,4 +37,17 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; �
 read_spectrum
 read_spectrum(x::Vector{FT}, y::Vector{FT}, target::FT) where {FT<:AbstractFloat}
 read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) where {FT<:AbstractFloat}
+MODIS_EVI
+MODIS_EVI2
+MODIS_LSWI
+MODIS_NDVI
+MODIS_NIRv
+OCO2_SIF759
+OCO2_SIF770
+OCO3_SIF759
+OCO3_SIF770
+TROPOMI_SIF683
+TROPOMI_SIF740
+TROPOMI_SIF747
+TROPOMI_SIF751
 ```
