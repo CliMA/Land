@@ -105,9 +105,10 @@ AbstractSoilAlbedo
 BroadbandSoilAlbedo
 BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
 HyperspectralSoilAlbedo
-HyperspectralSoilAlbedo{FT}(; n_λ::Int = 114) where {FT<:AbstractFloat}
+HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 Soil
-Soil{FT}(zs::Vector{FT}; soil_type::String = "Loam", n_λ::Int = 114) where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 ```
 
 ## SPAC

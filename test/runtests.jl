@@ -7,7 +7,7 @@ using Test
     @testset "Soil" begin
         for FT in [Float32, Float64]
             soil1 = ClimaCache.Soil{FT}(FT[0,-1]);
-            soil2 = ClimaCache.Soil{FT}(FT[0,-1]; n_λ = 1);
+            soil2 = ClimaCache.Soil{FT}(FT[0,-1], true);
             for soil in [soil1, soil2]
                 @test FT_test(soil, FT);
                 @test NaN_test(soil);

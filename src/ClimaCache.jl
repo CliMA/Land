@@ -18,7 +18,7 @@ using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using MAT: matread
-using PkgUtility: P_ATM, T_0, T_25
+using PkgUtility: P_ATM, T_0, T_25, read_csv
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
@@ -35,6 +35,7 @@ using WaterPhysics: saturation_vapor_pressure
 const FILE_SUN    = artifact"land_model_spectrum_V1" * "/sun.mat";
 const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
 const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
+const SOIL_GSV    = artifact"land_model_spectrum_V1" * "/GSV.csv";
 const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
 
 
