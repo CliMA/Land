@@ -30,6 +30,12 @@ leaf_SIF
 average_transmittance
 photon
 photon(λ::FT, E::FT) where {FT<:AbstractFloat}
+photon!
+photon!(λ::Vector{FT}, E::Vector{FT}, phot::Vector{FT}) where {FT<:AbstractFloat}
+photon!(λ::Vector{FT}, E::Vector{FT}) where {FT<:AbstractFloat}
 energy
 energy(λ::FT, phot::FT) where {FT<:AbstractFloat}
+energy!
+energy!(λ::Vector{FT}, phot::Vector{FT}, E::Vector{FT}) where {FT<:AbstractFloat}
+energy!(λ::Vector{FT}, phot::Vector{FT}) where {FT<:AbstractFloat}
 ```
