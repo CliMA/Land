@@ -45,3 +45,29 @@ read_spectrum(x::Vector{FT}, y::Vector{FT}, target::FT) where {FT<:AbstractFloat
 
     return ((x[_ind+1] - target) * y[_ind] + (target - x[_ind]) * y[_ind+1]) / (x[_ind+1] - x[_ind])
 );
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-13: add method to interpolate the spectrum via multiple steps
+#
+#######################################################################################################################################################################################################
+"""
+
+    read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) where {FT<:AbstractFloat}
+
+Return the spectrum value at target wavelength bin, given
+- `x` X-axis of the spectrum
+- `y` Y-axis of the spectrum
+- `x₁` Lower x boundary
+- `x₂` Upper x boundary
+- `steps` The incremental Δx is `(x₂ - x₁) / steps`
+"""
+read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) where {FT<:AbstractFloat} = (
+    _xs = collect(FT,range(x₁, x₂; length=steps+1));
+    _ys = read_spectrum.([x], [y], _xs);
+
+    return mean(_ys)
+);
