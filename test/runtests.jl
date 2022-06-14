@@ -46,4 +46,19 @@ using Test
             @test true;
         end;
     end;
+
+    @testset "Utils" begin
+        for FT in [Float32, Float64]
+            xs = rand(FT,2);
+            ys = rand(FT,2);
+            LeafOptics.photon!(FT[400,500], xs, ys);
+            @test true;
+            LeafOptics.photon!(FT[400,500], xs);
+            @test true;
+            LeafOptics.energy!(FT[400,500], ys, xs);
+            @test true;
+            LeafOptics.energy!(FT[400,500], ys);
+            @test true;
+        end;
+    end;
 end;

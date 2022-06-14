@@ -36,7 +36,7 @@ function leaf_SIF(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::Hyperspe
     @unpack IΛ_SIFE, ΔΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
 
     # calculate the excitation energy and photons
-    _e_excitation = (view(rad.e_direct , IΛ_SIFE) .+ view(rad.e_diffuse, IΛ_SIFE)) .* ΔΛ_SIFE;
+    _e_excitation = (view(rad.e_direct, IΛ_SIFE) .+ view(rad.e_diffuse, IΛ_SIFE)) .* ΔΛ_SIFE;
 
     # convert energy to energy using the matrices
     if !ϕ_photon

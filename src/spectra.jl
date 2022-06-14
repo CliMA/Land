@@ -112,16 +112,16 @@ leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::Hyperspectra
 
     # reflectance & transmittance of the leaf: combine top layer with next N-1 layers
     _denom   = 1 .- _ρ_sub .* _ρ_bottom;
-    bio.τ_SW = _τ_top .* _τ_sub ./ _denom;
-    bio.ρ_SW = _ρ_top .+ _τ_top .* _ρ_sub .* _τ_bottom ./ _denom;
-    bio.α_SW = 1 .- bio.τ_SW .- bio.ρ_SW;
+    bio.τ_sw = _τ_top .* _τ_sub ./ _denom;
+    bio.ρ_sw = _ρ_top .+ _τ_top .* _ρ_sub .* _τ_bottom ./ _denom;
+    bio.α_sw = 1 .- bio.τ_sw .- bio.ρ_sw;
 
     # Doubling method used to calculate fluoresence is now only applied to the part of the leaf where absorption takes place, that is, the part exclusive of the leaf-air interfaces.
     # The reflectance (rho) and transmittance (tau) of this part of the leaf are now determined by "subtracting" the interfaces.
     # CF Note: All of the below takes about 10 times more time than the RT above. Need to rething speed and accuracy. (10nm is bringing it down a lot!)
-    _ρ_b = (bio.ρ_SW .- _ρ_α) ./ (_τ_α .* _τ₂₁ .+ (bio.ρ_SW - _ρ_α) .* _ρ₂₁);
+    _ρ_b = (bio.ρ_sw .- _ρ_α) ./ (_τ_α .* _τ₂₁ .+ (bio.ρ_sw - _ρ_α) .* _ρ₂₁);
     _tt1 = _τ_α .* _τ₂₁;
-    _tt2 = bio.τ_SW .* (1 .- _ρ_b .* _ρ₂₁);
+    _tt2 = bio.τ_sw .* (1 .- _ρ_b .* _ρ₂₁);
     _z   = _tt2 ./ _tt1;
     _tt1 = _ρ_b - _ρ₂₁ .* _z .^ 2;
     _tt2 = 1 .- (_ρ₂₁.* _z) .^ 2;
@@ -227,12 +227,12 @@ leaf_spectra!(bio, wls, 0.1, 0.45, 0.05, 0.25);
 leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat} = (
     @unpack IΛ_NIR, IΛ_PAR = wls;
 
-    bio.ρ_SW[IΛ_PAR] .= ρ_par;
-    bio.ρ_SW[IΛ_NIR] .= ρ_nir;
-    bio.τ_SW[IΛ_PAR] .= τ_par;
-    bio.τ_SW[IΛ_NIR] .= τ_nir;
+    bio.ρ_sw[IΛ_PAR] .= ρ_par;
+    bio.ρ_sw[IΛ_NIR] .= ρ_nir;
+    bio.τ_sw[IΛ_PAR] .= τ_par;
+    bio.τ_sw[IΛ_NIR] .= τ_nir;
 
-    bio.α_SW = 1 .- bio.τ_SW .- bio.ρ_SW;
+    bio.α_sw = 1 .- bio.τ_sw .- bio.ρ_sw;
 
     return nothing
 );
