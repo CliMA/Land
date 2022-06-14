@@ -16,6 +16,7 @@ include("fluorescence.jl"     )
 include("geometry.jl"         )
 include("inclination_angle.jl")
 include("radiation.jl"        )
+include("remote_sensing.jl"   )
 
 
 end # module
