@@ -53,11 +53,11 @@ using Test
             ys = rand(FT,2);
             LeafOptics.photon!(FT[400,500], xs, ys);
             @test true;
-            LeafOptics.photon!(FT[400,500], ys);
-            @test true;
-            LeafOptics.photon!(FT[400,500], ys, xs);
-            @test true;
             LeafOptics.photon!(FT[400,500], xs);
+            @test true;
+            LeafOptics.energy!(FT[400,500], ys, xs);
+            @test true;
+            LeafOptics.energy!(FT[400,500], ys);
             @test true;
         end;
     end;
