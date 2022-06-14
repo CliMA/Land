@@ -21,6 +21,7 @@ function canopy_radiation! end
 # Changes to this method
 # General
 #     2022-Jun-14: make method work with broadband soil albedo struct
+#     2022-Jun-14: allow method to use broadband PAR and NIR soil albedo values
 #
 #######################################################################################################################################################################################################
 """
@@ -34,10 +35,12 @@ Updates soil shortwave radiation profiles, given
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS, RADIATION, WLSET = can;
 
-    OPTICS._tmp_vec_λ .= view(RADIATION.e_direct,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    OPTICS._tmp_vec_λ[WLSET.IΛ_PAR] .= view(RADIATION.e_direct,WLSET.IΛ_PAR,N_LAYER+1) .* (1 .- albedo.ρ_sw[1]);
+    OPTICS._tmp_vec_λ[WLSET.IΛ_NIR] .= view(RADIATION.e_direct,WLSET.IΛ_NIR,N_LAYER+1) .* (1 .- albedo.ρ_sw[2]);
     albedo.e_net_direct = OPTICS._tmp_vec_λ' * WLSET.ΔΛ / 1000;
 
-    OPTICS._tmp_vec_λ .= view(RADIATION.e_diffuse_down,:,N_LAYER+1) .* (1 .- albedo.ρ_sw);
+    OPTICS._tmp_vec_λ[WLSET.IΛ_PAR] .= view(RADIATION.e_diffuse_down,WLSET.IΛ_PAR,N_LAYER+1) .* (1 .- albedo.ρ_sw[1]);
+    OPTICS._tmp_vec_λ[WLSET.IΛ_NIR] .= view(RADIATION.e_diffuse_down,WLSET.IΛ_NIR,N_LAYER+1) .* (1 .- albedo.ρ_sw[2]);
     albedo.e_net_diffuse = OPTICS._tmp_vec_λ' * WLSET.ΔΛ / 1000;
 
     albedo.r_net_sw = albedo.e_net_direct + albedo.e_net_diffuse;

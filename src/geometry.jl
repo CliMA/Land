@@ -104,6 +104,56 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 #
 # Changes to this method
 # General
+#     2022-Jun-14: add method to use broadband PAR and NIR soil albedo for canopy_optical_properties!
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat}
+
+Updates lower soil boundary reflectance, given
+- `can` `HyperspectralMLCanopy` type struct
+- `albedo` `BroadbandSoilAlbedo` type soil albedo
+"""
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
+    @unpack OPTICS, WLSET = can;
+
+    OPTICS.ρ_dd[WLSET.IΛ_PAR,end] .= albedo.ρ_sw[1];
+    OPTICS.ρ_sd[WLSET.IΛ_NIR,end] .= albedo.ρ_sw[2];
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-14: add method to use hyperspectral soil albedo for canopy_optical_properties!
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
+
+Updates lower soil boundary reflectance, given
+- `can` `HyperspectralMLCanopy` type struct
+- `albedo` `HyperspectralSoilAlbedo` type soil albedo
+"""
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
+    @unpack OPTICS = can;
+
+    OPTICS.ρ_dd[:,end] .= albedo.ρ_sw;
+    OPTICS.ρ_sd[:,end] .= albedo.ρ_sw;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
 #     2022-Jun-08: migrate the function from CanopyLayers
 #     2022-Jun-09: rename the function from canopy_matrices! to canopy_optical_properties!
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
@@ -145,8 +195,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{F
     OPTICS._ρ_sd .= OPTICS.σ_sdb .* _ilai;
 
     # 3. update the effective reflectance per layer
-    OPTICS.ρ_dd[:,end] .= ALBEDO.ρ_sw;
-    OPTICS.ρ_sd[:,end] .= ALBEDO.ρ_sw;
+    canopy_optical_properties!(can, ALBEDO);
 
     for _i in N_LAYER:-1:1
         _r_dd__ = view(OPTICS._ρ_dd,:,_i  );    # reflectance without correction
