@@ -2,7 +2,7 @@ module CanopyRadiativeTransfer
 
 using ClimaCache: HyperspectralMLCanopy, HyperspectralRadiation, Leaf, Soil, SunSensorGeometry, VerhoefLIDF
 using DocStringExtensions: METHODLIST
-using LeafOptics: photon
+using LeafOptics: energy!, photon, photon!
 using LinearAlgebra: mul!
 using PkgUtility: K_STEFAN
 using QuadGK: quadgk

@@ -23,6 +23,7 @@ function canopy_fluorescence! end
 #     2022-Jun-10: use more descriptive variable names
 #     2022-Jun-13: finished migrating the SIF function
 #     2022-Jun-13: fix documentation
+#     2022-Jun-14: convert energy and photon back and forth if using photon mode
 #
 #######################################################################################################################################################################################################
 """
@@ -38,7 +39,7 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; �
     @unpack N_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
     _ilai = can.lai * can.ci / N_LAYER;
 
-    # function tp weight matrices by inclination angles
+    # function to weight matrices by inclination angles
     @inline lidf_weight(mat_0, mat_1) = (
         OPTICS._tmp_mat_incl_azi_1 .= mat_0 .* mat_1;
         mul!(OPTICS._tmp_vec_azi, OPTICS._tmp_mat_incl_azi_1', P_INCL);
@@ -56,16 +57,13 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; �
         OPTICS._tmp_vec_sife_2 .= view(RADIATION.e_diffuse_down,WLSET.IΛ_SIFE,_i) .* WLSET.ΔΛ_SIFE;
         OPTICS._tmp_vec_sife_3 .= view(RADIATION.e_diffuse_up  ,WLSET.IΛ_SIFE,_i) .* WLSET.ΔΛ_SIFE;
 
-        # convert the energy to photons
-        OPTICS._tmp_vec_sife_4 .= photon.(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_1);
-        OPTICS._tmp_vec_sife_5 .= photon.(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_2);
-        OPTICS._tmp_vec_sife_6 .= photon.(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_3);
+        _e_dir, _e_dif_down, _e_dif_up = OPTICS._tmp_vec_sife_1, OPTICS._tmp_vec_sife_2, OPTICS._tmp_vec_sife_3;
 
         # determine which ones to use depending on ϕ_photon
         if ϕ_photon
-            _e_dir, _e_dif_down, _e_dif_up = OPTICS._tmp_vec_sife_4, OPTICS._tmp_vec_sife_5, OPTICS._tmp_vec_sife_6;
-        else
-            _e_dir, _e_dif_down, _e_dif_up = OPTICS._tmp_vec_sife_1, OPTICS._tmp_vec_sife_2, OPTICS._tmp_vec_sife_3;
+            photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_1);
+            photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_2);
+            photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_3);
         end;
 
         # convert the excitation radiation to fluorescence components
@@ -75,6 +73,16 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; �
         mul!(OPTICS._tmp_vec_sif_4, OPTICS._mat⁻, _e_dif_down);     # SIF component from downward diffuse light for backward (before scaling)
         mul!(OPTICS._tmp_vec_sif_5, OPTICS._mat⁺, _e_dif_up);       # SIF component from upward diffuse light for forward (before scaling)
         mul!(OPTICS._tmp_vec_sif_6, OPTICS._mat⁻, _e_dif_up);       # SIF component from upward diffuse light for forward (before scaling)
+
+        # convert the SIF back to energy unit if ϕ_photon is true
+        if ϕ_photon
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_1);
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_2);
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_3);
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_4);
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_5);
+            energy!(WLSET.Λ_SIF, OPTICS._tmp_vec_sif_6);
+        end;
 
         # add up the fluorescence at various wavelength bins for sunlit and (up- and down-ward) diffuse SIF
         _ϕ_sunlit = view(RADIATION.ϕ_sunlit,:,:,_i);

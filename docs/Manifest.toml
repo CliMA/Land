@@ -55,9 +55,9 @@ version = "0.1.3"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "b5d6633ec483671469d6e9b5e99e0dddb51341b7"
+git-tree-sha1 = "035a02c799a62b7d3084c7ba9927183e5df4b470"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "0.3.2"
+version = "0.3.3"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -216,9 +216,9 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LeafOptics]]
 deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "SpecialFunctions", "Test", "UnPack"]
-git-tree-sha1 = "999944de16f60cc74feba68d4f39c181a72ff52b"
+git-tree-sha1 = "5a752bb35fb052f79fbeb01615902bf5eac1afb3"
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
-version = "0.1.1"
+version = "0.1.2"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
