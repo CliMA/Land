@@ -1,17 +1,26 @@
 #######################################################################################################################################################################################################
 #
+# Changes to this type
+# General
+#     2022-Jun-15: add abstract type for leaf biophysics
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Hierarchy of AbstractSoilAlbedo:
+- [`BroadbandLeafBiophysics`](@ref)
+- [`HyperspectralLeafBiophysics`](@ref)
+"""
+abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
 # Changes to this structure
 # General
-#     2021-Aug-04: refactor the structure with constants, variables, and temporary cache
-#     2021-Aug-04: add concentrations and characteristic curves altogether
-#     2021-Aug-10: add CBC and PRO supoort
-#     2021-Agu-10: add constructors within the structure rather than initialize it externally
-#     2021-Sep-30: rename LeafBio to LeafBiophysics to be more specific
-#     2021-Oct-19: sort variable to prognostic and dignostic catergories
-#     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
-#     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
-#     2022-Jan-24: fix documentation
-#     2022-Mar-01: fix documentation
+#     2022-Jun-15: add struct for broadband leaf biophysics
 #
 #######################################################################################################################################################################################################
 """
@@ -25,7 +34,60 @@ Struct that contains leaf biophysical traits used to run leaf reflectance and tr
 $(TYPEDFIELDS)
 
 """
-mutable struct LeafBiophysics{FT<:AbstractFloat}
+mutable struct BroadbandLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
+    # parameters that do not change with time
+    "Broadband absorption fraction at the NIR region"
+    Α_NIR::FT
+    "Broadband absorption fraction at the PAR region"
+    Α_PAR::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-15: add constructor
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
+
+Construct a broadband leaf biophysics struct
+"""
+BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysics{FT}(0.2, 0.8);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
+#     2021-Aug-04: refactor the structure with constants, variables, and temporary cache
+#     2021-Aug-04: add concentrations and characteristic curves altogether
+#     2021-Aug-10: add CBC and PRO supoort
+#     2021-Agu-10: add constructors within the structure rather than initialize it externally
+#     2021-Sep-30: rename LeafBio to LeafBiophysics to be more specific
+#     2021-Oct-19: sort variable to prognostic and dignostic catergories
+#     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
+#     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
+#     2022-Jan-24: fix documentation
+#     2022-Mar-01: fix documentation
+#     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct that contains leaf biophysical traits used to run leaf reflectance and transmittance.
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct HyperspectralLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     # parameters that do not change with time
     "Leaf mesophyll structural parameter that describes mesophyll reflectance and transmittance"
     MESOPHYLL_N::FT
@@ -82,26 +144,27 @@ end
 # General
 #     2021-Nov-24: migrate the constructor from CanopyLayers
 #     2022-Jan-24: fix documentation
+#     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
 #
 #######################################################################################################################################################################################################
 """
 
-    LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+    HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 
-Constructor for `LeafBiophysics`, given
+Constructor for `HyperspectralLeafBiophysics`, given
 - `wls` [`WaveLengthSet`](@ref) type structure
 
 ---
 # Examples
 ```julia
-lbio = LeafBiophysics{Float64}();
-lbio = LeafBiophysics{Float64}(WaveLengthSet{Float64}(collect(400:50:2400)));
+lbio = HyperspectralLeafBiophysics{Float64}();
+lbio = HyperspectralLeafBiophysics{Float64}(WaveLengthSet{Float64}(collect(400:50:2400)));
 ```
 """
-LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
+HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;
 
-    return LeafBiophysics{FT}(
+    return HyperspectralLeafBiophysics{FT}(
                 1.4,                        # MESOPHYLL_N
                 10,                         # NDUB
                 0,                          # ant

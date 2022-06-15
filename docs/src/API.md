@@ -42,9 +42,12 @@ StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number =
 ### Leaf Level
 ```@docs
 Leaf
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
-LeafBiophysics
-LeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+AbstractLeafBiophysics
+BroadbandLeafBiophysics
+BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
+HyperspectralLeafBiophysics
+HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 VanDerTolFluorescenceModel
 VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
 AbstractReactionCenter
@@ -77,6 +80,9 @@ Q10
 ```@docs
 WaveLengthSet
 WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat}
+AbstractRadiation
+BroadbandRadiation
+BroadbandRadiation{FT}() where {FT<:AbstractFloat}
 HyperspectralRadiation
 HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat}
 HyperspectralAbsorption
@@ -90,6 +96,8 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
 AbstractLIDFAlgorithm
 VerhoefLIDF
 AbstractCanopy
+BroadbandSLCanopy
+BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 HyperspectralMLCanopy
 HyperspectralMLCanopy{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 ```
@@ -101,8 +109,14 @@ BrooksCorey
 VanGenuchten
 VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
 VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
+AbstractSoilAlbedo
+BroadbandSoilAlbedo
+BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
+HyperspectralSoilAlbedo
+HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 Soil
-Soil{FT}(zs::Vector{FT}; soil_type::String = "Loam", n_λ::Int = 114) where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 ```
 
 ## SPAC
@@ -113,11 +127,11 @@ Stem
 Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 AbstractSPACSystem
 MonoElementSPAC
-MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat}
+MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoGrassSPAC
-MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoPalmSPAC
-MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoTreeSPAC
-MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 ```

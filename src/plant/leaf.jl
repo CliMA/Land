@@ -8,6 +8,8 @@
 #     2022-Feb-07: moved FLM to PRC
 #     2022-May-25: add new field HS
 #     2022-May-25: add new field WIDTH
+#     2022-Jun-14: use Union instead of Abstract... for type definition
+#     2022-Jun-15: add support to BroadbandLeafBiophysics and HyperspectralLeafBiophysics types
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -27,14 +29,14 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
-    "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::LeafBiophysics{FT}
+    "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
+    BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
-    PRC::AbstractReactionCenter{FT}
+    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
-    PSM::AbstractPhotosynthesisModel{FT}
+    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
     "Leaf width"
     WIDTH::FT
 
@@ -78,15 +80,18 @@ end
 #     2022-May-25: add leaf hydraulic system into the constructor
 #     2022-May-31: add steady state mode option to input options
 #     2022-May-25: add new field WIDTH
+#     2022-Jun-15: add broadband as an option (default is false)
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `Leaf`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `broadband` Whether leaf biophysics is in broadband mode
+- `colimit` Whether to colimit the photosynthetic rates and electron transport rates
 - `ssm` Whether the flow rate is at steady state
 
 ---
@@ -104,7 +109,7 @@ leaf_c4 = Leaf{Float64}("C4", wls);
 leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -118,8 +123,14 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Boo
         _psm = C4VJPModel{FT}(colimit = colimit);
     end;
 
+    if broadband
+        _bio = BroadbandLeafBiophysics{FT}();
+    else
+        _bio = HyperspectralLeafBiophysics{FT}(wls);
+    end;
+
     return Leaf{FT}(
-                LeafBiophysics{FT}(wls),            # BIO
+                _bio,                               # BIO
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM

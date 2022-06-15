@@ -23,6 +23,7 @@ abstract type AbstractHydraulicSystem{FT<:AbstractFloat} end
 # General
 #     2022-May-25: add leaf hydraulic system
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -41,7 +42,7 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Leaf area"
     AREA::FT
     "Flow profile"
-    FLOW::AbstractFlowProfile{FT}
+    FLOW::Union{SteadyStateFlow{FT}, NonSteadyStateFlow{FT}}
     "Maximal extra-xylary hydraulic conductance `[mol s⁻¹ MPa⁻¹ m⁻²]`"
     K_OX::FT
     "Maximal leaf xylem hydraulic conductance per leaf area `[mol s⁻¹ MPa⁻¹ m⁻²]`"
@@ -49,11 +50,11 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
-    PVC::AbstractPVCurve{FT}
+    PVC::Union{LinearPVCurve{FT}, SegmentedPVCurve{FT}}
     "Total capaciatance at Ψ = 0 `[mol m⁻²]`"
     V_MAXIMUM::FT
     "Vulnerability curve"
-    VC::AbstractXylemVC{FT}
+    VC::Union{LogisticVC{FT}, PowerVC{FT}, WeibullVC{FT}, ComplexVC{FT}}
 
     # prognostic variables that change with time
     "Leaf xylem water pressure at the downstream end of leaf xylem `[MPa]`"
@@ -137,6 +138,7 @@ LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::N
 #     2022-May-25: add root hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -155,7 +157,7 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Root cross-section area `[m²]`"
     AREA::FT
     "Flow profile"
-    FLOW::AbstractFlowProfile{FT}
+    FLOW::Union{SteadyStateFlow{FT}, NonSteadyStateFlow{FT}}
     "Maximal hydraulic conductance `[mol s⁻¹ MPa⁻¹]`"
     K_MAX::FT
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
@@ -167,13 +169,13 @@ mutable struct RootHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
-    PVC::AbstractPVCurve{FT}
+    PVC::Union{LinearPVCurve{FT}, SegmentedPVCurve{FT}}
     "Soil hydraulics"
-    SH::AbstractSoilVC{FT}
+    SH::Union{BrooksCorey{FT}, VanGenuchten{FT}}
     "Maximal storage per element `[mol]`"
     V_MAXIMUM::Vector{FT}
     "Vulnerability curve"
-    VC::AbstractXylemVC{FT}
+    VC::Union{LogisticVC{FT}, PowerVC{FT}, WeibullVC{FT}, ComplexVC{FT}}
     "Root z difference `[m]`"
     ΔH::FT
 
@@ -268,6 +270,7 @@ RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number =
 #     2022-May-25: add stem hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #     2022-May-27: move flow rates to a field FLOW
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -286,7 +289,7 @@ mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Root cross-section area `[m²]`"
     AREA::FT
     "Flow profile"
-    FLOW::AbstractFlowProfile{FT}
+    FLOW::Union{SteadyStateFlow{FT}, NonSteadyStateFlow{FT}}
     "Maximal hydraulic conductance `[mol s⁻¹ MPa⁻¹]`"
     K_MAX::FT
     "Maximal xylem hydraulic conductivity (per root depth) `[mol s⁻¹ MPa⁻¹ m⁻²]`"
@@ -296,11 +299,11 @@ mutable struct StemHydraulics{FT} <: AbstractHydraulicSystem{FT}
     "Number of xylem slices"
     N::Int
     "Pressure volume curve for storage"
-    PVC::AbstractPVCurve{FT}
+    PVC::Union{LinearPVCurve{FT}, SegmentedPVCurve{FT}}
     "Maximal storage per element `[mol]`"
     V_MAXIMUM::Vector{FT}
     "Vulnerability curve"
-    VC::AbstractXylemVC{FT}
+    VC::Union{LogisticVC{FT}, PowerVC{FT}, WeibullVC{FT}, ComplexVC{FT}}
     "Root z difference `[m]`"
     ΔH::FT
 

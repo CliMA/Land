@@ -56,9 +56,88 @@ end
 $(TYPEDEF)
 
 Hierarchy of AbstractCanopy:
+- [`BroadbandSLCanopy`](@ref)
 - [`HyperspectralMLCanopy`](@ref)
 """
 abstract type AbstractCanopy{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
+#     2022-Jun-15: add struct for broadband radiative transfer scheme such as two leaf model
+#     2022-Jun-15: add more cache variables
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure to save single layer broadband canopy parameters
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct BroadbandSLCanopy{FT} <: AbstractCanopy{FT}
+    # parameters that do not change with time
+    "Leaf inclination angle distribution function algorithm"
+    LIDF::Union{VerhoefLIDF{FT}}
+    "Inclination angle distribution"
+    P_INCL::Vector{FT}
+    "Ratio of average projected areas of canopy elements on horizontal and vertical surfaces"
+    RAIO_HV::FT
+    "Mean inclination angles `[°]`"
+    Θ_INCL::Vector{FT}
+
+    # prognostic variables that change with time
+    "Clumping index"
+    ci::FT
+    "Leaf area index"
+    lai::FT
+
+    # caches to speed up calculations
+    "Cosine of Θ_INCL"
+    _COS_Θ_INCL::Vector{FT}
+    "Sine of Θ_INCL"
+    _SIN_Θ_INCL::Vector{FT}
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-15: add constructor
+#     2022-Jun-15: add more cache variables
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
+
+Construct a single layer canopy for hyperspectral radiative transfer, given
+- `lai` Leaf area index
+- `θ_incl_bnds` Inclination angle boundary values
+"""
+BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat} = (
+    _n_incl = size(θ_incl_bnds,1);
+    _θ_incl = FT[(θ_incl_bnds[_i,1] + θ_incl_bnds[_i,2]) / 2 for _i in 1:_n_incl];
+    _p_incl = ones(_n_incl) / _n_incl;
+
+    return BroadbandSLCanopy{FT}(
+                VerhoefLIDF{FT}(0,0),   # LIDF
+                _p_incl,                # P_INCL
+                1,                      # RAIO_HV
+                _θ_incl,                # Θ_INCL
+                1,                      # ci
+                lai,                    # lai
+                cosd.(_θ_incl),         # _COS_Θ_INCL
+                sind.(_θ_incl)          # _SIN_Θ_INCL
+    )
+);
 
 
 #######################################################################################################################################################################################################
@@ -71,6 +150,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 #     2022-Jun-07: add cache variable _1_AZI, _COS²_Θ_INCL, _COS_Θ_INCL_AZI, _COS²_Θ_INCL_AZI
 #     2022-Jun-07: remove cache variable _cos_θ_azi_raa, _vol_scatter
 #     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -91,7 +171,7 @@ mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
     "Hot spot parameter"
     HOT_SPOT::FT
     "Leaf inclination angle distribution function algorithm"
-    LIDF::AbstractLIDFAlgorithm
+    LIDF::Union{VerhoefLIDF{FT}}
     "Number of azimuth angles"
     N_AZI::Int
     "Number of inclination angles"
@@ -155,6 +235,7 @@ end
 #     2022-Jun-09: add new field: APAR_CAR, RADIATION, WLSET
 #     2022-Jun-10: remove n_λ from options and use the N in wls
 #     2022-Jun-10: add SIF excitation and fluorescence length control
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -164,7 +245,7 @@ end
                 lai::Number = 3,
                 n_layer::Int = 20,
                 θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]
-    ) where {FT<:AbstractFloat} = (
+    ) where {FT<:AbstractFloat}
 
 Construct a multiple layer canopy for hyperspectral radiative transfer, given
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings

@@ -97,6 +97,8 @@ mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
     ϕ_shaded::Vector{FT}
     "Sunlit leaf fluorescence quantum yield"
     ϕ_sunlit::Array{FT,3}
+
+    # caches to speed up calculations
     "Mean APAR for shaded leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _apar_shaded::Vector{FT}
     "APAR for sunlit leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"

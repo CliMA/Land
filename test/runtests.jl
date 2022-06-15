@@ -6,9 +6,12 @@ using Test
 @testset verbose = true "ClimaCache Test" begin
     @testset "Soil" begin
         for FT in [Float32, Float64]
-            soil = ClimaCache.Soil{FT}(FT[0,-1]);
-            @test FT_test(soil, FT);
-            @test NaN_test(soil);
+            soil1 = ClimaCache.Soil{FT}(FT[0,-1]);
+            soil2 = ClimaCache.Soil{FT}(FT[0,-1], true);
+            for soil in [soil1, soil2]
+                @test FT_test(soil, FT);
+                @test NaN_test(soil);
+            end;
         end;
     end;
 
@@ -71,9 +74,10 @@ using Test
             end;
 
             # LeafBiophysics
-            lbio1 = ClimaCache.LeafBiophysics{FT}();
-            lbio2 = ClimaCache.LeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));
-            for lbio in [lbio1, lbio2]
+            lbio1 = ClimaCache.HyperspectralLeafBiophysics{FT}();
+            lbio2 = ClimaCache.HyperspectralLeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));
+            lbio3 = ClimaCache.BroadbandLeafBiophysics{FT}();
+            for lbio in [lbio1, lbio2, lbio3]
                 @test FT_test(lbio, FT);
                 @test NaN_test(lbio);
             end;

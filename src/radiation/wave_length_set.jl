@@ -98,8 +98,8 @@ WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT
         _wo    = findall( swl[_i] .<= _λ_opti .< swl[_i+1] );
         _λ[_i] = mean(_λ_opti[_wo]);
     end;
-    _iλ_nir  = findall( 700 .<= _λ .<= 2500 );
     _iλ_par  = findall( 400 .<= _λ .<= 700  );
+    _iλ_nir  = findall( 700 .<  _λ .<= 2500 );
     _iλ_sif  = findall( 640 .<= _λ .<= 850  );
     _iλ_sife = findall( 400 .<= _λ .<= 750  );
 

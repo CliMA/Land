@@ -33,6 +33,7 @@ abstract type AbstractPhotosynthesisModel{FT<:AbstractFloat} end
 #     2022-Mar-01: move η_c and η_l from reaction center to photosynthesis model
 #     2022-Mar-01: move k_q from prognostic to dignostic section
 #     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -49,31 +50,31 @@ $(TYPEDFIELDS)
 mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::AbstractColimit{FT}
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::AbstractColimit{FT}
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractColimit`](@ref) type colimitation method for J"
-    COLIMIT_J::AbstractColimit{FT}
+    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_2::FT
     "[`AbstractTemperatureDependency`](@ref) type Kc temperature dependency"
-    TD_KC::AbstractTemperatureDependency{FT}
+    TD_KC::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Ko temperature dependency"
-    TD_KO::AbstractTemperatureDependency{FT}
+    TD_KO::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Kq temperature dependency"
-    TD_KQ::AbstractTemperatureDependency{FT}
+    TD_KQ::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type respiration temperature dependency"
-    TD_R::AbstractTemperatureDependency{FT}
+    TD_R::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
-    TD_VCMAX::AbstractTemperatureDependency{FT}
+    TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Γ* temperature dependency"
-    TD_Γ::AbstractTemperatureDependency{FT}
+    TD_Γ::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Η_C temperature dependency"
-    TD_ΗC::AbstractTemperatureDependency{FT}
+    TD_ΗC::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Η_L temperature dependency"
-    TD_ΗL::AbstractTemperatureDependency{FT}
+    TD_ΗL::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
 
     # prognostic variables that change with time
     "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"
@@ -218,6 +219,7 @@ C3CytochromeModel{FT}(; v_cmax25::Number = 50, r_d25::Number = 0.75, colimit::Bo
 #     2022-Jan-25: fix documentation
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ, COLIMIT_IP, and COLIMIT_J (minor breaking)
 #     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 #
 #######################################################################################################################################################################################################
 """
@@ -234,27 +236,27 @@ $(TYPEDFIELDS)
 mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::AbstractColimit{FT}
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::AbstractColimit{FT}
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractColimit`](@ref) type colimitation method for J"
-    COLIMIT_J::AbstractColimit{FT}
+    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "Coefficient 4.0/4.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
     EFF_2::FT
     "[`AbstractTemperatureDependency`](@ref) type Jmax temperature dependency"
-    TD_JMAX::AbstractTemperatureDependency{FT}
+    TD_JMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Kc temperature dependency"
-    TD_KC::AbstractTemperatureDependency{FT}
+    TD_KC::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Ko temperature dependency"
-    TD_KO::AbstractTemperatureDependency{FT}
+    TD_KO::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type respiration temperature dependency"
-    TD_R::AbstractTemperatureDependency{FT}
+    TD_R::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
-    TD_VCMAX::AbstractTemperatureDependency{FT}
+    TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Γ* temperature dependency"
-    TD_Γ::AbstractTemperatureDependency{FT}
+    TD_Γ::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
 
     # prognostic variables that change with time
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
@@ -383,6 +385,7 @@ C3VJPModel{FT}(; v_cmax25::Number = 50, j_max25::Number = 83.5, r_d25::Number = 
 #     2022-Feb-11: remove j from the struct
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
+#     2022-Jun-13: use Union instead of Abstract... for type definition
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl (not necessary)
 #
@@ -401,17 +404,17 @@ $(TYPEDFIELDS)
 mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::AbstractColimit{FT}
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::AbstractColimit{FT}
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Kpep temperature dependency"
-    TD_KPEP::AbstractTemperatureDependency{FT}
+    TD_KPEP::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type  respiration temperature dependency"
-    TD_R::AbstractTemperatureDependency{FT}
+    TD_R::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
-    TD_VCMAX::AbstractTemperatureDependency{FT}
+    TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
     "[`AbstractTemperatureDependency`](@ref) type Vpmax temperature dependency"
-    TD_VPMAX::AbstractTemperatureDependency{FT}
+    TD_VPMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
 
     # prognostic variables that change with time
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"

@@ -1,9 +1,75 @@
 #######################################################################################################################################################################################################
 #
+# Changes to this type
+# General
+#     2022-Jun-15: add abstract type for incoming solar radiation
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Hierarchy of AbstractRadiation:
+- [`BroadbandRadiation`](@ref)
+- [`HyperspectralRadiation`](@ref)
+"""
+abstract type AbstractRadiation{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-15: add broadband solar radiation
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure that stores broadband radiation information
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct BroadbandRadiation{FT} <: AbstractRadiation{FT}
+    # prognostic variables that change with time
+    "Diffuse radiation from NIR region `[W m⁻²]`"
+    e_diffuse_nir::Vector{FT}
+    "Diffuse radiation from PAR region `[W m⁻²]`"
+    e_diffuse_par::Vector{FT}
+    "Direct radiation from NIR region `[W m⁻²]`"
+    e_direct_nir::Vector{FT}
+    "Direct radiation from PAR region `[W m⁻²]`"
+    e_direct_par::Vector{FT}
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2021-Oct-22: add constructor
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandRadiation{FT}() where {FT<:AbstractFloat}
+
+Constructor for [`BroadbandRadiation`](@ref)
+"""
+BroadbandRadiation{FT}() where {FT<:AbstractFloat} = BroadbandRadiation{FT}(0, 0, 0, 0);
+
+
+#######################################################################################################################################################################################################
+#
 # Changes to this struct
 # General
 #     2021-Oct-22: refactor the structure with renamed fields
 #     2021-Oct-22: add a constructor to define the structure from wavelength sets and prescribed wave shape
+#     2022-Jun-15: change the order of variables
 #
 #######################################################################################################################################################################################################
 """
@@ -17,12 +83,12 @@ Structure that stores hyperspectral radiation information
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralRadiation{FT<:AbstractFloat}
+mutable struct HyperspectralRadiation{FT} <: AbstractRadiation{FT}
     # prognostic variables that change with time
-    "Direct radiation `[mW m⁻² nm⁻¹]`"
-    e_direct::Vector{FT}
     "Diffuse radiation `[mW m⁻² nm⁻¹]`"
     e_diffuse::Vector{FT}
+    "Direct radiation `[mW m⁻² nm⁻¹]`"
+    e_direct::Vector{FT}
 end
 
 
@@ -32,6 +98,7 @@ end
 # General
 #     2021-Oct-22: add constructor
 #     2022-May-25: fix documentation
+#     2022-Jun-15: change the order of variables
 #
 #######################################################################################################################################################################################################
 """
@@ -74,5 +141,5 @@ HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::Strin
         end;
     end;
 
-    return HyperspectralRadiation{FT}(_e_direct, _e_diffuse)
+    return HyperspectralRadiation{FT}(_e_diffuse, _e_direct)
 );

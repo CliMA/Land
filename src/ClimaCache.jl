@@ -1,7 +1,7 @@
 #######################################################################################################################################################################################################
 #
 # Style Guide
-# 1. Types and modules start with upper case letters for each word, such as LeafBiophysics
+# 1. Types and modules start with upper case letters for each word, such as HyperspectralLeafBiophysics
 # 2. Functions are lower case words connected using _, such as leaf_biophysics
 # 3. Constants are defined using all upper cases, such as LEAF_BIOPHYSICS
 # 4. Variables are defined using all lower cases, such as leaf_bio_para
@@ -18,7 +18,7 @@ using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using MAT: matread
-using PkgUtility: P_ATM, T_0, T_25
+using PkgUtility: P_ATM, T_0, T_25, read_csv
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
@@ -35,6 +35,7 @@ using WaterPhysics: saturation_vapor_pressure
 const FILE_SUN    = artifact"land_model_spectrum_V1" * "/sun.mat";
 const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
 const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
+const SOIL_GSV    = artifact"land_model_spectrum_V1" * "/GSV.csv";
 const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
 
 
@@ -45,13 +46,13 @@ include("util/colimit.jl")
 include("air/air_layer.jl")
 
 # include the radiation types and structures
-include("radiation/canopy_optics.jl"          )
-include("radiation/canopy_radiation.jl"       )
-include("radiation/wave_length_set.jl"        )
-include("radiation/canopy.jl"                 )
-include("radiation/sun_sensor_geometry.jl"    )
-include("radiation/feature_absorption.jl"     )
-include("radiation/hyperspectral_radiation.jl")
+include("radiation/canopy_optics.jl"      )
+include("radiation/canopy_radiation.jl"   )
+include("radiation/wave_length_set.jl"    )
+include("radiation/canopy.jl"             )
+include("radiation/sun_sensor_geometry.jl")
+include("radiation/feature_absorption.jl" )
+include("radiation/solar_radiation.jl"    )
 
 # include the soil types and structures
 include("soil/vulnerability.jl")
