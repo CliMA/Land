@@ -73,10 +73,11 @@ using Test
                 # @test NaN_test(leaf);
             end;
 
-            # HyperspectralLeafBiophysics
+            # LeafBiophysics
             lbio1 = ClimaCache.HyperspectralLeafBiophysics{FT}();
             lbio2 = ClimaCache.HyperspectralLeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));
-            for lbio in [lbio1, lbio2]
+            lbio3 = ClimaCache.BroadbandLeafBiophysics{FT}();
+            for lbio in [lbio1, lbio2, lbio3]
                 @test FT_test(lbio, FT);
                 @test NaN_test(lbio);
             end;

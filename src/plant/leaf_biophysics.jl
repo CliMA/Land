@@ -20,6 +20,49 @@ abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
 #
 # Changes to this structure
 # General
+#     2022-Jun-15: add struct for broadband leaf biophysics
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct that contains leaf biophysical traits used to run leaf reflectance and transmittance.
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct BroadbandLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
+    # parameters that do not change with time
+    "Broadband absorption fraction at the NIR region"
+    Α_NIR::FT
+    "Broadband absorption fraction at the PAR region"
+    Α_PAR::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-15: add constructor
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
+
+Construct a broadband leaf biophysics struct
+"""
+BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysics{FT}(0.2, 0.8);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
 #     2021-Aug-04: refactor the structure with constants, variables, and temporary cache
 #     2021-Aug-04: add concentrations and characteristic curves altogether
 #     2021-Aug-10: add CBC and PRO supoort
@@ -44,7 +87,7 @@ Struct that contains leaf biophysical traits used to run leaf reflectance and tr
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat}
+mutable struct HyperspectralLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     # parameters that do not change with time
     "Leaf mesophyll structural parameter that describes mesophyll reflectance and transmittance"
     MESOPHYLL_N::FT

@@ -64,20 +64,21 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoElementSPAC{FT}(psm::String; ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a `MonoElementSPAC` type toy SPAC system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
+- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 """
-MonoElementSPAC{FT}(psm::String; ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     return MonoElementSPAC{FT}(
-                Leaf{FT}(psm; ssm = ssm),   # LEAF
-                Root{FT}(ssm = ssm),        # ROOT
-                Stem{FT}(ssm = ssm),        # STEM
-                ones(FT,4)                  # _krs
+                Leaf{FT}(psm; broadband = broadband, ssm = ssm),    # LEAF
+                Root{FT}(ssm = ssm),                                # ROOT
+                Stem{FT}(ssm = ssm),                                # STEM
+                ones(FT,4)                                          # _krs
     )
 );
 
@@ -139,7 +140,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies grass system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
@@ -147,6 +148,7 @@ Construct a SPAC system for monospecies grass system, given
 - `zc` Maximal canopy height (positive value)
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
+- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 
 ---
@@ -156,7 +158,7 @@ spac = MonoGrassSPAC{Float64}();
 spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, zss = collect(0:-0.1:-1), zas = collect(0:0.05:1.01));
 ```
 """
-MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
@@ -194,7 +196,7 @@ MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector 
     end;
 
     # create leaves
-    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
@@ -273,7 +275,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies palm system, given
 - `psm` Photosynthesis model, must be C3 or C3Cytochrome
@@ -281,6 +283,7 @@ Construct a SPAC system for monospecies palm system, given
 - `zc` Maximal canopy height (positive value)
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
+- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 
 ---
@@ -290,7 +293,7 @@ spac = MonoPalmSPAC{Float64}();
 spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
 
     # determine how many layers of roots
@@ -343,7 +346,7 @@ MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zt, Δl = zt, ssm = ssm), T_25());
 
     # create leaves
-    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
@@ -425,7 +428,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies tree system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome (note: there are C4 shrubs)
@@ -433,6 +436,7 @@ Construct a SPAC system for monospecies tree system, given
 - `zc` Maximal canopy height (positive value)
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
+- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 
 ---
@@ -442,7 +446,7 @@ spac = MonoTreeSPAC{Float64}();
 spac = MonoTreeSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
@@ -503,7 +507,7 @@ MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12,
     end;
 
     # create leaves
-    _leaves = [Leaf{FT}(psm; ssm = ssm) for i in 1:_n_canopy];
+    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;

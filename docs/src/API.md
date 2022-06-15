@@ -42,7 +42,10 @@ StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number =
 ### Leaf Level
 ```@docs
 Leaf
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+AbstractLeafBiophysics
+BroadbandLeafBiophysics
+BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
 HyperspectralLeafBiophysics
 HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 VanDerTolFluorescenceModel
@@ -119,11 +122,11 @@ Stem
 Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 AbstractSPACSystem
 MonoElementSPAC
-MonoElementSPAC{FT}(psm::String) where {FT<:AbstractFloat}
+MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoGrassSPAC
-MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoPalmSPAC
-MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoTreeSPAC
-MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 ```
