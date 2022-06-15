@@ -10,6 +10,7 @@
 #     2022-Jun-10: add more fields for sif calculations
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-13: remove unnecessary cache variables
+#     2022-Jun-15: rename to HyperspectralMLCanopyOpticalProperty
 #
 #######################################################################################################################################################################################################
 """
@@ -23,7 +24,7 @@ Structure for Verhoef LIDF algorithm
 $(TYPEDFIELDS)
 
 """
-mutable struct CanopyOpticalProperty{FT<:AbstractFloat}
+mutable struct HyperspectralMLCanopyOpticalProperty{FT<:AbstractFloat}
     # diagnostic variables that change with time
     "Backward diffuse->diffuse scatter weight"
     ddb::FT
@@ -181,11 +182,12 @@ end
 #     2022-Jun-10: add more fields for sif calculations
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-13: remove unnecessary cache variables
+#     2022-Jun-15: rename to HyperspectralMLCanopyOpticalProperty
 #
 #######################################################################################################################################################################################################
 """
 
-    CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat}
+    HyperspectralMLCanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat}
 
 Construct a struct to store canopy optical properties, given
 - `n_azi` Number of azimuth angles
@@ -195,8 +197,8 @@ Construct a struct to store canopy optical properties, given
 - `n_λe` Number of SIF excitation wavelength bins
 - `n_λf` Number of SIF wavelength bins
 """
-CanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat} = (
-    return CanopyOpticalProperty{FT}(
+HyperspectralMLCanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114, n_λe::Int = 45, n_λf::Int = 29) where {FT<:AbstractFloat} = (
+    return HyperspectralMLCanopyOpticalProperty{FT}(
                 0,                          # ddb
                 0,                          # ddf
                 0,                          # dob

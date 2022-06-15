@@ -2,12 +2,13 @@
 #
 # Changes to this structure
 # General
-#     2022-Jun-09: migrate CanopyRads as CanopyRadiationProfile
+#     2022-Jun-09: migrate CanopyRads as HyperspectralMLCanopyRadiationProfile
 #     2022-Jun-09: add fields: albedo, apar_shaded, apar_sunlit, e_net_diffuse, e_net_direct, e_o, e_v, par_shaded, par_sunlit, r_net
 #     2022-Jun-10: add fields: e_sum_diffuse, e_sum_direct, par_in, par_in_diffuse, par_in_direct, par_shaded, par_sunlit, _par_shaded, _par_sunlit
 #     2022-Jun-10: add fields: r_net_sw, r_net_sw_shaded, r_net_sw_sunlit, r_lw, r_lw_down, r_lw_up, _r_emit_down, _r_emit_up
 #     2022-Jun-10: add more fields for SIF
 #     2022-Jun-13: add more fields for sif calculations
+#     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
 #
 #######################################################################################################################################################################################################
 """
@@ -21,7 +22,7 @@ Structure to store canopy radiation profiles
 $(TYPEDFIELDS)
 
 """
-mutable struct CanopyRadiationProfile{FT<:AbstractFloat}
+mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFloat}
     # diagnostic variables that change with time
     "Albedo towards the viewing direction"
     albedo::Vector{FT}
@@ -147,11 +148,12 @@ end
 #     2022-Jun-10: add n_par to options and fix dimensions of the variables
 #     2022-Jun-10: add n_λf for SIF
 #     2022-Jun-13: add more fields for sif calculations
+#     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
 #
 #######################################################################################################################################################################################################
 """
 
-    CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_par::Int = 35, n_λ::Int = 114, n_λf::Int = 29) where {FT<:AbstractFloat}
+    HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_par::Int = 35, n_λ::Int = 114, n_λf::Int = 29) where {FT<:AbstractFloat}
 
 Construct a struct to store canopy radiation profiles, given
 - `n_azi` Number of azimuth angles
@@ -161,8 +163,8 @@ Construct a struct to store canopy radiation profiles, given
 - `n_λ` Number of wavelength bins
 - `n_λf` Number of SIF wavelength bins
 """
-CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_par::Int = 35, n_λ::Int = 114, n_λf::Int = 29) where {FT<:AbstractFloat} = (
-    return CanopyRadiationProfile{FT}(
+HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_par::Int = 35, n_λ::Int = 114, n_λf::Int = 29) where {FT<:AbstractFloat} = (
+    return HyperspectralMLCanopyRadiationProfile{FT}(
                 zeros(FT,n_λ),                  # albedo
                 zeros(FT,n_layer),              # apar_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # apar_sunlit

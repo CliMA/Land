@@ -136,11 +136,20 @@ end
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoGrassSPAC{FT}(
+                psm::String;
+                zr::Number = -0.2,
+                zc::Number = 0.5,
+                zss::Vector = collect(0:-0.1:-1),
+                zas::Vector = collect(0:0.05:1),
+                broadband::Bool = false,
+                ssm::Bool = true
+    ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies grass system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
@@ -158,7 +167,15 @@ spac = MonoGrassSPAC{Float64}();
 spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, zss = collect(0:-0.1:-1), zas = collect(0:0.05:1.01));
 ```
 """
-MonoGrassSPAC{FT}(psm::String; zr::Number = -0.2, zc::Number = 0.5, zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoGrassSPAC{FT}(
+            psm::String;
+            zr::Number = -0.2,
+            zc::Number = 0.5,
+            zss::Vector = collect(0:-0.1:-1),
+            zas::Vector = collect(0:0.05:1),
+            broadband::Bool = false,
+            ssm::Bool = true
+) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
@@ -271,15 +288,26 @@ end
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoPalmSPAC{FT}(
+                psm::String;
+                zr::Number = -1,
+                zt::Number = 10,
+                zc::Number = 12,
+                zss::Vector = collect(0:-0.25:-2),
+                zas::Vector = collect(0:0.2:13),
+                broadband::Bool = false,
+                ssm::Bool = true
+    ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies palm system, given
 - `psm` Photosynthesis model, must be C3 or C3Cytochrome
 - `zr` Maximal root depth (negative value)
+- `zt` Maximum trunk height
 - `zc` Maximal canopy height (positive value)
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
@@ -293,7 +321,16 @@ spac = MonoPalmSPAC{Float64}();
 spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoPalmSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoPalmSPAC{FT}(
+            psm::String;
+            zr::Number = -1,
+            zt::Number = 10,
+            zc::Number = 12,
+            zss::Vector = collect(0:-0.25:-2),
+            zas::Vector = collect(0:0.2:13),
+            broadband::Bool = false,
+            ssm::Bool = true
+) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
 
     # determine how many layers of roots
@@ -424,15 +461,26 @@ end
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoTreeSPAC{FT}(
+                psm::String;
+                zr::Number = -1,
+                zt::Number = 10,
+                zc::Number = 12,
+                zss::Vector = collect(0:-0.25:-2),
+                zas::Vector = collect(0:0.2:13),
+                broadband::Bool = false,
+                ssm::Bool = true
+    ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies tree system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome (note: there are C4 shrubs)
 - `zr` Maximal root depth (negative value)
+- `zt` Maximum trunk height
 - `zc` Maximal canopy height (positive value)
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
@@ -446,7 +494,16 @@ spac = MonoTreeSPAC{Float64}();
 spac = MonoTreeSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
 ```
 """
-MonoTreeSPAC{FT}(psm::String; zr::Number = -1, zt::Number = 10, zc::Number = 12, zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoTreeSPAC{FT}(
+            psm::String;
+            zr::Number = -1,
+            zt::Number = 10,
+            zc::Number = 12,
+            zss::Vector = collect(0:-0.25:-2),
+            zas::Vector = collect(0:0.2:13),
+            broadband::Bool = false,
+            ssm::Bool = true
+) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
