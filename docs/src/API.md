@@ -20,6 +20,10 @@ clumping_index!
 
 ## Hyperspectral Canopy RT
 ```@docs
+soil_albedo!
+soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
+soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::HyperspectralSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
+soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
 extinction_scattering_coefficients
 extinction_scattering_coefficients!
 canopy_optical_properties!

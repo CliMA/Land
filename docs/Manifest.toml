@@ -36,7 +36,7 @@ uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.10.4"
 
 [[deps.CanopyRadiativeTransfer]]
-deps = ["ClimaCache", "DocStringExtensions", "LeafOptics", "LinearAlgebra", "PkgUtility", "QuadGK", "Statistics", "Test", "UnPack"]
+deps = ["ClimaCache", "ConstrainedRootSolvers", "DocStringExtensions", "LeafOptics", "LinearAlgebra", "PkgUtility", "QuadGK", "Statistics", "Test", "UnPack"]
 path = ".."
 uuid = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
 version = "0.1.0"
@@ -74,6 +74,12 @@ version = "3.45.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+
+[[deps.ConstrainedRootSolvers]]
+deps = ["DocStringExtensions", "PkgUtility", "Test", "UnPack"]
+git-tree-sha1 = "2e70a3e65ac454367376d70eb88163ad6ae9edaf"
+uuid = "7e2492bd-0955-4089-8696-9df2af57a479"
+version = "0.1.4"
 
 [[deps.Crayons]]
 git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"

@@ -28,7 +28,7 @@ using Test
             leaf = ClimaCache.Leaf{FT}("C3");
             leaves = [deepcopy(leaf) for i in 1:20];
             hsoil = ClimaCache.Soil{FT}(FT[0,-1]);
-            bsoil = ClimaCache.Soil{FT}(FT[0,-1]; n_λ = 1);
+            bsoil = ClimaCache.Soil{FT}(FT[0,-1], true);
             rad = ClimaCache.HyperspectralRadiation{FT}();
             CanopyRadiativeTransfer.canopy_optical_properties!(can, angles);
             @test true;
@@ -45,6 +45,10 @@ using Test
             CanopyRadiativeTransfer.canopy_radiation!(can, leaves, FT(100), bsoil);
             @test true;
             CanopyRadiativeTransfer.canopy_fluorescence!(can, leaves);
+            @test true;
+            CanopyRadiativeTransfer.soil_albedo!(can, hsoil);
+            @test true;
+            CanopyRadiativeTransfer.soil_albedo!(can, bsoil);
             @test true;
         end;
     end;
