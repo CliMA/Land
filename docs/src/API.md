@@ -93,6 +93,8 @@ CanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20
 AbstractLIDFAlgorithm
 VerhoefLIDF
 AbstractCanopy
+BroadbandSLCanopy
+BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 HyperspectralMLCanopy
 HyperspectralMLCanopy{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 ```
