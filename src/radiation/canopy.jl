@@ -67,6 +67,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 # Changes to this structure
 # General
 #     2022-Jun-15: add struct for broadband radiative transfer scheme such as two leaf model
+#     2022-Jun-15: add more cache variables
 #
 #######################################################################################################################################################################################################
 """
@@ -96,6 +97,12 @@ mutable struct BroadbandSLCanopy{FT} <: AbstractCanopy{FT}
     ci::FT
     "Leaf area index"
     lai::FT
+
+    # caches to speed up calculations
+    "Cosine of Θ_INCL"
+    _COS_Θ_INCL::Vector{FT}
+    "Sine of Θ_INCL"
+    _SIN_Θ_INCL::Vector{FT}
 end
 
 
@@ -104,6 +111,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-15: add constructor
+#     2022-Jun-15: add more cache variables
 #
 #######################################################################################################################################################################################################
 """
@@ -126,6 +134,8 @@ BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80
                 _θ_incl,                # Θ_INCL
                 1,                      # ci
                 lai,                    # lai
+                cosd.(_θ_incl),         # _COS_Θ_INCL
+                sind.(_θ_incl)          # _SIN_Θ_INCL
     )
 );
 

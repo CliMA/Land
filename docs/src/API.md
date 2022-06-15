@@ -80,6 +80,9 @@ Q10
 ```@docs
 WaveLengthSet
 WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat}
+AbstractRadiation
+BroadbandRadiation
+BroadbandRadiation{FT}() where {FT<:AbstractFloat}
 HyperspectralRadiation
 HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat}
 HyperspectralAbsorption
