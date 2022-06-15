@@ -50,10 +50,11 @@ photon(λ::FT, E::FT) where {FT<:AbstractFloat} = E * λ * FT(FAC);
 # Changes made to this function
 # General
 #     2022-Jun-13: add function
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-This function convert energy to photons based the wavelength and save it to provided variable (2D+). Supported methods are
+This function convert energy to photons based the wavelength and save it to provided variable (1D+). Supported methods are
 
 $(METHODLIST)
 
@@ -168,10 +169,11 @@ energy(λ::FT, phot::FT) where {FT<:AbstractFloat} = phot / (λ * FT(FAC));
 # Changes made to this function
 # General
 #     2022-Jun-13: add function
+#     2022-Jun-15: fix documentation
 #
 #######################################################################################################################################################################################################
 """
-This function convert photons to energy based the wavelength and save it to provided variable (2D+). Supported methods are
+This function convert photons to energy based the wavelength and save it to provided variable (1D+). Supported methods are
 
 $(METHODLIST)
 

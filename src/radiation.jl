@@ -6,14 +6,15 @@
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
 #     2022-Feb-02: unpack CONSTANTS only
+#     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_PAR(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
+    leaf_PAR(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
 
 Return leaf level PAR and APAR, given
-- `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
+- `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
 - `wls` `ClimaCache.WaveLengthSet` type struct that contains wave length bins
 - `rad` `ClimaCache.HyperspectralRadiation` type struct that contains incoming radiation information
 - `APAR_car` If true (default), account carotenoid absorption as APAR; otherwise, APAR is only by chlorophyll
@@ -22,13 +23,13 @@ Return leaf level PAR and APAR, given
 # Examples
 ```julia
 wls = WaveLengthSet{Float64}();
-bio = LeafBiophysics{Float64}(wls);
+bio = HyperspectralLeafBiophysics{Float64}(wls);
 rad = HyperspectralRadiation{Float64}();
 par,apar = leaf_PAR(bio, wls, rad);
 par,apar = leaf_PAR(bio, wls, rad; APAR_car=false);
 ```
 """
-function leaf_PAR(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
+function leaf_PAR(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
     @unpack IΛ_PAR, ΔΛ_PAR, Λ_PAR = wls;
 
     # APAR absorption feature
