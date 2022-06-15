@@ -73,6 +73,40 @@ function inclination_angles! end
 #
 # Changes to this method
 # General
+#     2022-Jun-15: add support to BroadbandSLCanopy
+#
+#######################################################################################################################################################################################################
+"""
+
+    inclination_angles!(can::BroadbandSLCanopy{FT}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat}
+
+Update the frequency of leaf inclination angles and ratio between project horizontal and vertical areas, given
+- `can` `BroadbandSLCanopy` type multiple layer canopy
+- `lidf` `VerhoefLIDF` type algorithm
+"""
+inclination_angles!(can::BroadbandSLCanopy{FT}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat} = (
+    @unpack Θ_INCL_BNDS = can;
+
+    for _i in eachindex(can.P_INCL)
+        can.P_INCL[_i] = lidf_cdf(lidf, Θ_INCL_BNDS[_i,2]) - lidf_cdf(lidf, Θ_INCL_BNDS[_i,1]);
+    end;
+
+    _area_h::FT = 0;
+    _area_v::FT = 0;
+    for _i in eachindex(can.P_INCL)
+        _area_h += can._COS_Θ_INCL[_i] * can.P_INCL[_i];
+        _area_v += can._SIN_Θ_INCL[_i] * can.P_INCL[_i];
+    end;
+    can.RATIO_HV = _area_h / _area_v;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
 #     2022-Jun-02: add method for VerhoefLIDF algorithm
 #
 #######################################################################################################################################################################################################
@@ -100,19 +134,20 @@ inclination_angles!(can::HyperspectralMLCanopy{FT}, lidf::VerhoefLIDF{FT}) where
 # Changes to this method
 # General
 #     2022-Jun-02: add method for VerhoefLIDF algorithm
+#     2022-Jun-02: add support to BroadbandSLCanopy besides HyperspectralMLCanopy
 #
 #######################################################################################################################################################################################################
 """
 
-    inclination_angles!(can::HyperspectralMLCanopy{FT}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat}
+    inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat}
 
 Update the frequency of leaf inclination angles, given
-- `can` `HyperspectralMLCanopy` type multiple layer canopy
+- `can` `BroadbandSLCanopy` or `HyperspectralMLCanopy` type multiple layer canopy
 - `lidf` `VerhoefLIDF` type algorithm
 - `a` `VerhoefLIDF` parameter A
 - `b` `VerhoefLIDF` parameter B
 """
-inclination_angles!(can::HyperspectralMLCanopy{FT}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat} = (
+inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat} = (
     lidf.A = a;
     lidf.B = b;
     inclination_angles!(can, lidf);
