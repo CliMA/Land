@@ -26,6 +26,7 @@ function leaf_spectra! end
 #     2021-Nov-29: separate HyperspectralAbsorption as constant struct
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
+#     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 # Bug fix
 #     2021-Aug-06: If bio.CBC and bio.PRO are not zero, they are accounted for twice in bio.LMA, thus the spectrum from LMA need to subtract the contribution from CBC and PRO
 # To do
@@ -36,10 +37,10 @@ function leaf_spectra! end
 #######################################################################################################################################################################################################
 """
 
-    leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat}
+    leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat}
 
 Update leaf reflectance and transmittance spectra, and fluorescence spectrum matrices, given
-- `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
+- `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
 - `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `lha` `ClimaCache.HyperspectralAbsorption` type struct that contains absorption characteristic curves
 - `APAR_car` If true, carotenoid absorption is accounted for in APAR, default is `true`
@@ -48,14 +49,14 @@ Update leaf reflectance and transmittance spectra, and fluorescence spectrum mat
 # Examples
 ```julia
 wls = WaveLengthSet{Float64}();
-bio = LeafBiophysics{Float64}(wls);
+bio = HyperspectralLeafBiophysics{Float64}(wls);
 lha = HyperspectralAbsorption{Float64}(wls);
 leaf_spectra!(bio, wls, lha);
 leaf_spectra!(bio, wls, lha; APAR_car=false);
 leaf_spectra!(bio, wls, lha; APAR_car=false, α=59.0);
 ```
 """
-leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat} = (
+leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat} = (
     @unpack MESOPHYLL_N, NDUB = bio;
     @unpack K_ANT, K_BROWN, K_CAB, K_CAR_V, K_CAR_Z, K_CBC, K_H₂O, K_LMA, K_PRO, K_PS, NR = lha;
     @unpack IΛ_SIF, IΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
@@ -203,14 +204,15 @@ leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::Hyperspectra
 #     2021-Nov-29: separate HyperspectralAbsorption as constant struct
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
+#     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat}
+    leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat}
 
 Update leaf reflectance and transmittance (e.g., prescribe broadband PAR and NIR values), given
-- `bio` `ClimaCache.LeafBiophysics` type struct that contains leaf biophysical parameters
+- `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
 - `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `ρ_par` Reflectance at PAR region
 - `ρ_nir` Reflectance at NIR region
@@ -220,11 +222,11 @@ Update leaf reflectance and transmittance (e.g., prescribe broadband PAR and NIR
 # Examples
 ```julia
 wls = WaveLengthSet{Float64}();
-bio = LeafBiophysics{Float64}(wls);
+bio = HyperspectralLeafBiophysics{Float64}(wls);
 leaf_spectra!(bio, wls, 0.1, 0.45, 0.05, 0.25);
 ```
 """
-leaf_spectra!(bio::LeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat} = (
+leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat} = (
     @unpack IΛ_NIR, IΛ_PAR = wls;
 
     bio.ρ_sw[IΛ_PAR] .= ρ_par;
