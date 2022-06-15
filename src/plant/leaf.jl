@@ -28,8 +28,8 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
-    "[`LeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::LeafBiophysics{FT}
+    "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
+    BIO::HyperspectralLeafBiophysics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
@@ -120,7 +120,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Boo
     end;
 
     return Leaf{FT}(
-                LeafBiophysics{FT}(wls),            # BIO
+                HyperspectralLeafBiophysics{FT}(wls),            # BIO
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM

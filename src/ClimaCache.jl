@@ -1,7 +1,7 @@
 #######################################################################################################################################################################################################
 #
 # Style Guide
-# 1. Types and modules start with upper case letters for each word, such as LeafBiophysics
+# 1. Types and modules start with upper case letters for each word, such as HyperspectralLeafBiophysics
 # 2. Functions are lower case words connected using _, such as leaf_biophysics
 # 3. Constants are defined using all upper cases, such as LEAF_BIOPHYSICS
 # 4. Variables are defined using all lower cases, such as leaf_bio_para
