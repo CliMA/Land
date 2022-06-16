@@ -7,9 +7,9 @@ using Test
     @testset "Leaf Inclination Angles" begin
         for FT in [Float32, Float64]
             can1 = ClimaCache.HyperspectralMLCanopy{FT}();
-            can2 = ClimaCache.BroadbandMLCanopy{FT}();
-            CanopyRadiativeTransfer.inclination_angles!(can1, can.LIDF, FT(0), FT(0));
-            CanopyRadiativeTransfer.inclination_angles!(can2, can.LIDF, FT(0), FT(0));
+            can2 = ClimaCache.BroadbandSLCanopy{FT}();
+            CanopyRadiativeTransfer.inclination_angles!(can1, can1.LIDF, FT(0), FT(0));
+            CanopyRadiativeTransfer.inclination_angles!(can2, can2.LIDF, FT(0), FT(0));
             @test true;
         end;
     end;
