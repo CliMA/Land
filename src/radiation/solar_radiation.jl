@@ -37,13 +37,13 @@ $(TYPEDFIELDS)
 mutable struct BroadbandRadiation{FT} <: AbstractRadiation{FT}
     # prognostic variables that change with time
     "Diffuse radiation from NIR region `[W m⁻²]`"
-    e_diffuse_nir::Vector{FT}
+    e_diffuse_nir::FT
     "Diffuse radiation from PAR region `[W m⁻²]`"
-    e_diffuse_par::Vector{FT}
+    e_diffuse_par::FT
     "Direct radiation from NIR region `[W m⁻²]`"
-    e_direct_nir::Vector{FT}
+    e_direct_nir::FT
     "Direct radiation from PAR region `[W m⁻²]`"
-    e_direct_par::Vector{FT}
+    e_direct_par::FT
 end
 
 
