@@ -22,6 +22,7 @@ abstract type AbstractCanopyRadiationProfile{FT<:AbstractFloat} end
 # General
 #     2022-Jun-15: add struct for broadband radiation
 #     2022-Jun-16: add cache values for diffuse and direct radiation
+#     2022-Jun-16: add more variable to store partitions and radiations
 #
 #######################################################################################################################################################################################################
 """
@@ -37,10 +38,26 @@ $(TYPEDFIELDS)
 """
 mutable struct BroadbandSLCanopyRadiationProfile{FT} <: AbstractCanopyRadiationProfile{FT}
     # diagnostic variables that change with time
+    "Mean shaded leaf APAR (per leaf area) in μmol m⁻² s⁻¹"
+    apar_shaded::FT
+    "Mean sunlit leaf APAR (per leaf area) in μmol m⁻² s⁻¹"
+    apar_sunlit::FT
     "Weighted extinction coefficient for diffuse radiation (ratio between projected area to true leaf area)"
     k_diffuse::FT
     "Weighted extinction coefficient for direct radiation (ratio between projected area to true leaf area)"
     k_direct::FT
+    "Total shaded leaf area index"
+    lai_shaded::FT
+    "Total sunlit leaf area index"
+    lai_sunlit::FT
+    "Mean shaded leaf PAR (per leaf area) in μmol m⁻² s⁻¹"
+    par_shaded::FT
+    "Mean sunlit leaf PAR (per leaf area) in μmol m⁻² s⁻¹"
+    par_sunlit::FT
+    "Net absorbed radiation for shaded leaves `[W m⁻²]`"
+    r_net_shaded::FT
+    "Net absorbed radiation for sunlit leaves `[W m⁻²]`"
+    r_net_sunlit::FT
 
     # caches to speed up calculations
     "Extinction coefficient for diffuse radiation at different leaf inclination angles"
@@ -56,6 +73,7 @@ end
 # General
 #     2022-Jun-15: add constructor
 #     2022-Jun-16: add cache values for diffuse and direct radiation
+#     2022-Jun-16: add more variable to store partitions and radiations
 #
 #######################################################################################################################################################################################################
 """
@@ -67,8 +85,16 @@ Construct a struct to store broadband canopy radiation profiles, given
 """
 BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat} = (
     return BroadbandSLCanopyRadiationProfile{FT}(
+                0,                  # apar_shaded
+                0,                  # apar_sunlit
                 0,                  # k_diffuse
                 0,                  # k_direct
+                0,                  # lai_shaded
+                0,                  # lai_sunlit
+                0,                  # par_shaded
+                0,                  # par_sunlit
+                0,                  # r_net_shaded
+                0,                  # r_net_sunlit
                 zeros(FT,n_incl),   # _k_diffuse
                 zeros(FT,n_incl)    # _k_direct
     )
