@@ -9,8 +9,7 @@ CurrentModule = CanopyRadiativeTransfer
 lidf_cdf
 lidf_cdf(lidf::VerhoefLIDF{FT}, θ::FT) where {FT<:AbstractFloat}
 inclination_angles!
-inclination_angles!(can::BroadbandSLCanopy{FT}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat}
-inclination_angles!(can::HyperspectralMLCanopy{FT}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat}
+inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat}
 inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat}
 ```
 
@@ -25,8 +24,13 @@ soil_albedo!
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::HyperspectralSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
-extinction_scattering_coefficients
+extinction_coefficient
+extinction_coefficient(sza::FT, lia::FT) where {FT<:AbstractFloat}
+extinction_coefficient(lia::FT) where {FT<:AbstractFloat}
+extinction_coefficient(sza::FT, vza::FT, raa::FT, lia::FT) where {FT<:AbstractFloat}
 extinction_scattering_coefficients!
+extinction_scattering_coefficients!(can::BroadbandSLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
+extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
 canopy_optical_properties!
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat}
