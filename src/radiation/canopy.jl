@@ -71,6 +71,7 @@ abstract type AbstractCanopy{FT<:AbstractFloat} end
 #     2022-Jun-15: add radiation profile
 #     2022-Jun-15: remove RATIO_HV to compute the coefficient numerically
 #     2022-Jun-16: remove some cache variables
+#     2022-Jun-16: add fields: Θ_INCL_BNDS
 #
 #######################################################################################################################################################################################################
 """
@@ -94,6 +95,8 @@ mutable struct BroadbandSLCanopy{FT} <: AbstractCanopy{FT}
     RADIATION::BroadbandSLCanopyRadiationProfile{FT}
     "Mean inclination angles `[°]`"
     Θ_INCL::Vector{FT}
+    "Bounds of inclination angles `[°]`"
+    Θ_INCL_BNDS::Matrix{FT}
 
     # prognostic variables that change with time
     "Clumping index"
@@ -112,6 +115,7 @@ end
 #     2022-Jun-15: add radiation profile
 #     2022-Jun-15: remove RATIO_HV to compute the coefficient numerically
 #     2022-Jun-16: remove some cache variables
+#     2022-Jun-16: add fields: Θ_INCL_BNDS
 #
 #######################################################################################################################################################################################################
 """
@@ -133,6 +137,7 @@ BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80
                 _p_incl,                # P_INCL
                 _rad,                   # RADIATION
                 _θ_incl,                # Θ_INCL
+                θ_incl_bnds,            # Θ_INCL_BNDS
                 1,                      # ci
                 lai                     # lai
     )
