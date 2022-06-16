@@ -1,5 +1,82 @@
 #######################################################################################################################################################################################################
 #
+# Changes to this type
+# General
+#     2022-Jun-15: add abstract type for canopy radiation profile
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Hierarchy of AbstractCanopy:
+- [`BroadbandSLCanopyRadiationProfile`](@ref)
+- [`HyperspectralMLCanopyRadiationProfile`](@ref)
+"""
+abstract type AbstractCanopyRadiationProfile{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
+#     2022-Jun-15: add struct for broadband radiation
+#     2022-Jun-16: add cache values for diffuse and direct radiation
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure to store canopy radiation profiles
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct BroadbandSLCanopyRadiationProfile{FT} <: AbstractCanopyRadiationProfile{FT}
+    # diagnostic variables that change with time
+    "Weighted extinction coefficient for diffuse radiation (ratio between projected area to true leaf area)"
+    k_diffuse::FT
+    "Weighted extinction coefficient for direct radiation (ratio between projected area to true leaf area)"
+    k_direct::FT
+
+    # caches to speed up calculations
+    "Extinction coefficient for diffuse radiation at different leaf inclination angles"
+    _k_diffuse::Vector{FT}
+    "Extinction coefficient for direct radiation at different leaf inclination angles"
+    _k_direct::Vector{FT}
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-15: add constructor
+#     2022-Jun-16: add cache values for diffuse and direct radiation
+#
+#######################################################################################################################################################################################################
+"""
+
+    BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat}
+
+Construct a struct to store broadband canopy radiation profiles, given
+- `n_incl` Number of inclination angles
+"""
+BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat} = (
+    return BroadbandSLCanopyRadiationProfile{FT}(
+                0,                  # k_diffuse
+                0,                  # k_direct
+                zeros(FT,n_incl),   # _k_diffuse
+                zeros(FT,n_incl)    # _k_direct
+    )
+);
+
+
+#######################################################################################################################################################################################################
+#
 # Changes to this structure
 # General
 #     2022-Jun-09: migrate CanopyRads as HyperspectralMLCanopyRadiationProfile
@@ -22,7 +99,7 @@ Structure to store canopy radiation profiles
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFloat}
+mutable struct HyperspectralMLCanopyRadiationProfile{FT} <: AbstractCanopyRadiationProfile{FT}
     # diagnostic variables that change with time
     "Albedo towards the viewing direction"
     albedo::Vector{FT}
@@ -149,13 +226,14 @@ end
 #     2022-Jun-10: add n_λf for SIF
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
+#     2022-Jun-16: fox documentation
 #
 #######################################################################################################################################################################################################
 """
 
     HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_par::Int = 35, n_λ::Int = 114, n_λf::Int = 29) where {FT<:AbstractFloat}
 
-Construct a struct to store canopy radiation profiles, given
+Construct a struct to store hyperspectral canopy radiation profiles, given
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
 - `n_layer` Number of canopy layers
