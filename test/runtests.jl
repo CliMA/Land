@@ -23,34 +23,39 @@ using Test
         end;
     end;
 
-    @testset "Hyperspectral RT" begin
+    @testset "Canopy RT" begin
         for FT in [Float32, Float64]
-            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            hcan = ClimaCache.HyperspectralMLCanopy{FT}();
+            bcan = ClimaCache.BroadbandSLCanopy{FT}();
             angles = ClimaCache.SunSensorGeometry{FT}();
-            leaf = ClimaCache.Leaf{FT}("C3");
-            leaves = [deepcopy(leaf) for i in 1:20];
+            hleaf = ClimaCache.Leaf{FT}("C3");
+            bleaf = ClimaCache.Leaf{FT}("C3"; broadband = true);
+            leaves = [deepcopy(hleaf) for i in 1:20];
             hsoil = ClimaCache.Soil{FT}(FT[0,-1]);
             bsoil = ClimaCache.Soil{FT}(FT[0,-1], true);
-            rad = ClimaCache.HyperspectralRadiation{FT}();
-            CanopyRadiativeTransfer.canopy_optical_properties!(can, angles);
+            hrad = ClimaCache.HyperspectralRadiation{FT}();
+            brad = ClimaCache.BroadbandRadiation{FT}();
+            CanopyRadiativeTransfer.canopy_optical_properties!(hcan, angles);
             @test true;
-            CanopyRadiativeTransfer.canopy_optical_properties!(can, leaves, hsoil);
+            CanopyRadiativeTransfer.canopy_optical_properties!(hcan, leaves, hsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_optical_properties!(can, leaves, bsoil);
+            CanopyRadiativeTransfer.canopy_optical_properties!(hcan, leaves, bsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(can, leaves, rad, hsoil);
+            CanopyRadiativeTransfer.canopy_radiation!(hcan, leaves, hrad, hsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(can, leaves, rad, bsoil);
+            CanopyRadiativeTransfer.canopy_radiation!(hcan, leaves, hrad, bsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(can, leaves, FT(100), hsoil);
+            CanopyRadiativeTransfer.canopy_radiation!(hcan, leaves, FT(100), hsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(can, leaves, FT(100), bsoil);
+            CanopyRadiativeTransfer.canopy_radiation!(hcan, leaves, FT(100), bsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_fluorescence!(can, leaves);
+            CanopyRadiativeTransfer.canopy_radiation!(bcan, bleaf, brad);
             @test true;
-            CanopyRadiativeTransfer.soil_albedo!(can, hsoil);
+            CanopyRadiativeTransfer.canopy_fluorescence!(hcan, leaves);
             @test true;
-            CanopyRadiativeTransfer.soil_albedo!(can, bsoil);
+            CanopyRadiativeTransfer.soil_albedo!(hcan, hsoil);
+            @test true;
+            CanopyRadiativeTransfer.soil_albedo!(hcan, bsoil);
             @test true;
         end;
     end;
