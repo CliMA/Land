@@ -45,6 +45,7 @@ extinction_coefficient(sza::FT, lia::FT) where {FT<:AbstractFloat} = (
 # Changes to this method
 # General
 #     2022-Jun-16: add method for diffuse radiation
+#     2022-Jun-21: add a sin(sza) weight to the diffuse light coefficient
 #
 #######################################################################################################################################################################################################
 """
@@ -58,7 +59,7 @@ extinction_coefficient(lia::FT) where {FT<:AbstractFloat} = (
     # compute the mean extinction coefficient for diffuse solar radiation from 18 angles
     _kd::FT = 0;
     for _sza in 0:5:89
-        _kd += extinction_coefficient(_sza + FT(2.5), lia);
+        _kd += extinction_coefficient(_sza + FT(2.5), lia) * sind(_sza);
     end;
 
     return _kd / 18
