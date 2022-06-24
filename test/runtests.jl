@@ -49,7 +49,7 @@ using Test
             @test true;
             CanopyRadiativeTransfer.canopy_radiation!(hcan, leaves, FT(100), bsoil);
             @test true;
-            CanopyRadiativeTransfer.canopy_radiation!(bcan, bleaf, brad);
+            CanopyRadiativeTransfer.canopy_radiation!(bcan, bleaf, brad, bsoil);
             @test true;
             CanopyRadiativeTransfer.canopy_fluorescence!(hcan, leaves);
             @test true;

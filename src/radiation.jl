@@ -24,9 +24,9 @@ function canopy_radiation! end
 #     2022-Jun-16: finalize the two leaf radiation
 #     2022-Jun-21: make par and apar per leaf area
 #     2022-Jun-21: redo the mean rates by weighing them by sunlit fraction
+#     2022-Jun-25: finalize the soil shortwave reflection
 # To do:
 #     TODO: make sure leaves are using broadband biophysics
-#     TODO: add soil and canopy longwave out
 #
 #######################################################################################################################################################################################################
 """
@@ -48,9 +48,9 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadi
     RADIATION.lai_sunlit = (1 - exp(-RADIATION.k_direct * can.lai * can.ci)) / RADIATION.k_direct;
     RADIATION.lai_shaded = can.lai - RADIATION.lai_sunlit;
 
-    # theory
-    #     q_sunlit(x) = q_sun_direct * k_direct + q_diffuse(x) + q_scatter(x)
-    #     q_shaded(x) = q_diffuse(x) + q_scatter(x)
+    # theory for solar radiation
+    #     q_sunlit(x) = q_sun_direct * k_direct + q_diffuse(x) + q_scatter(x) + sr(x)
+    #     q_shaded(x) = q_diffuse(x) + q_scatter(x) + sr(x)
     #
     #     τ_directs(x) = exp(-sqrt(α) * k_direct * ci * x)
     #     τ_direct(x)  = exp(-k_direct * ci * x)
@@ -60,13 +60,16 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadi
     #     q_direct(x)  = τ_direct(x)  * q_sun_direct   # direct only
     #     q_diffuse(x) = τ_diffuse(x) * q_sun_diffuse
     #     q_scatter(x) = q_directs(x) - q_direct(x)
-    #     q_soil_all   = τ_directs(LAI) * q_sun_direct + τ_diffuse(LAI) * q_sun_diffuse
+    #     q_soil_all   = q_directs(LAI) + q_diffuse(LAI)
     #     q_soil(x)    = τ_diffuse(LAI-x) * q_soil_all
     #
     # need to compute the leaf area weighted mean
     #     mean(q_direct)  = ∫q_direct(x)⋅dL / ∫dx
     #     mean(q_directs) = ∫q_directs(x)⋅dL / ∫dx
     #     mean(q_diffuse) = ∫q_diffuse(x)⋅dL / ∫dx
+    #
+    # theory for soil reflection (all diffuse radation)
+    #     sr(x) = s *
     #
     @inline shaded_integral(k::FT, α::FT) where {FT<:AbstractFloat} = (
         return (1 - exp(-sqrt(α) * k * can.ci * can.lai)) / (sqrt(α) * k * can.ci) - (1 - exp(-(sqrt(α) * k + RADIATION.k_direct) * can.ci * can.lai)) / (sqrt(α) * k + RADIATION.k_direct)
@@ -75,33 +78,48 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadi
         return (1 - exp(-(sqrt(α) * k + RADIATION.k_direct) * can.ci * can.lai)) / (sqrt(α) * k + RADIATION.k_direct)
     );
 
-    # shortwave for shaded leaves
+    # solar radiation reaching soil and the canopy (averaged)
+    _soil_par = rad.e_diffuse_par * exp(-sqrt(BIO.Α_PAR) * RADIATION.k_diffuse * can.ci * can.lai) + rad.e_direct_par * exp(-sqrt(BIO.Α_PAR) * RADIATION.k_direct * can.ci * can.lai);
+    _soil_nir = rad.e_diffuse_nir * exp(-sqrt(BIO.Α_NIR) * RADIATION.k_diffuse * can.ci * can.lai) + rad.e_direct_nir * exp(-sqrt(BIO.Α_NIR) * RADIATION.k_direct * can.ci * can.lai);
+    _sunlit_s_par = _soil_par * (1 - ALBEDO.ρ_sw[1]) * exp(-sqrt(BIO.Α_PAR) * RADIATION.k_diffuse * can.ci * can.lai) / (RADIATION.k_direct + sqrt(BIO.Α_PAR) * RADIATION.k_diffuse) *
+                    (exp((RADIATION.k_direct + sqrt(BIO.Α_PAR) * RADIATION.k_diffuse) * can.ci * can.lai) - 1);
+    _shaded_s_par = _soil_par * (1 - ALBEDO.ρ_sw[1]) / (sqrt(BIO.Α_PAR) * RADIATION.k_diffuse * can.ci) * (1 - exp(-sqrt(BIO.Α_PAR) * RADIATION.k_diffuse * can.ci * can.lai)) - _sunlit_s_par;
+    _sunlit_s_nir = _soil_nir * (1 - ALBEDO.ρ_sw[2]) * exp(-sqrt(BIO.Α_NIR) * RADIATION.k_diffuse * can.ci * can.lai) / (RADIATION.k_direct + sqrt(BIO.Α_NIR) * RADIATION.k_diffuse) *
+                    (exp((RADIATION.k_direct + sqrt(BIO.Α_NIR) * RADIATION.k_diffuse) * can.ci * can.lai) - 1);
+    _shaded_s_nir = _soil_nir * (1 - ALBEDO.ρ_sw[2]) / (sqrt(BIO.Α_NIR) * RADIATION.k_diffuse * can.ci) * (1 - exp(-sqrt(BIO.Α_NIR) * RADIATION.k_diffuse * can.ci * can.lai)) - _sunlit_s_nir;
+
+    # net radiation for soil
+    ALBEDO.r_net_sw = _soil_par * (1 - ALBEDO.ρ_sw[1]) + _soil_nir * (1 - ALBEDO.ρ_sw[2]);
+
+    # absorbed PAR for shaded leaves from solar radiation and soil reflection
     _shaded_q_diffuse = rad.e_diffuse_par * shaded_integral(RADIATION.k_diffuse, BIO.Α_PAR);
     _shaded_q_direct  = rad.e_direct_par  * shaded_integral(RADIATION.k_direct , FT(1));
     _shaded_q_directs = rad.e_direct_par  * shaded_integral(RADIATION.k_direct , BIO.Α_PAR);
-    RADIATION.par_shaded  = (_shaded_q_diffuse + _shaded_q_directs - _shaded_q_direct) / FT(0.235) / RADIATION.lai_shaded;
+    RADIATION.par_shaded  = (_shaded_q_diffuse + _shaded_q_directs - _shaded_q_direct + _shaded_s_par) / FT(0.235) / RADIATION.lai_shaded;
     RADIATION.apar_shaded = RADIATION.par_shaded * BIO.Α_PAR;
 
-    # shortwave for sunlit leaves
+    # absorbed PAR for sunlit leaves from solar radiation and soil reflection
     _sunlit_q_diffuse = rad.e_diffuse_par * sunlit_integral(RADIATION.k_diffuse, BIO.Α_PAR);
     _sunlit_q_direct  = rad.e_direct_par  * sunlit_integral(RADIATION.k_direct , FT(1));
     _sunlit_q_directs = rad.e_direct_par  * sunlit_integral(RADIATION.k_direct , BIO.Α_PAR);
-    RADIATION.par_sunlit  = (rad.e_direct_par * RADIATION.k_direct + (_sunlit_q_diffuse + _sunlit_q_directs - _sunlit_q_direct) / RADIATION.lai_sunlit) / FT(0.235);
+    RADIATION.par_sunlit  = (rad.e_direct_par * RADIATION.k_direct + (_sunlit_q_diffuse + _sunlit_q_directs - _sunlit_q_direct + _sunlit_s_par) / FT(0.235) / RADIATION.lai_sunlit);
     RADIATION.apar_sunlit = RADIATION.par_sunlit * BIO.Α_PAR;
 
-    # longwave for shaded leaves
+    # absorbed NIR for shaded leaves
     _shaded_r_diffuse = rad.e_diffuse_nir * shaded_integral(RADIATION.k_diffuse, BIO.Α_NIR);
     _shaded_r_direct  = rad.e_direct_nir  * shaded_integral(RADIATION.k_direct , FT(1));
     _shaded_r_directs = rad.e_direct_nir  * shaded_integral(RADIATION.k_direct , BIO.Α_NIR);
-    RADIATION.r_net_shaded = (_shaded_q_diffuse + _shaded_q_directs - _shaded_q_direct) / RADIATION.lai_shaded * BIO.Α_PAR +
-                             (_shaded_r_diffuse + _shaded_r_directs - _shaded_r_direct) / RADIATION.lai_shaded * BIO.Α_NIR;
 
-    # longwave for sunlit leaves
+    # absorbed NIR for sunlit leaves
     _sunlit_r_diffuse = rad.e_diffuse_nir * sunlit_integral(RADIATION.k_diffuse, BIO.Α_NIR);
     _sunlit_r_direct  = rad.e_direct_nir  * sunlit_integral(RADIATION.k_direct , FT(1));
     _sunlit_r_directs = rad.e_direct_nir  * sunlit_integral(RADIATION.k_direct , BIO.Α_NIR);
-    RADIATION.r_net_sunlit = (rad.e_direct_par * RADIATION.k_direct + (_sunlit_q_diffuse + _sunlit_q_directs - _sunlit_q_direct) / RADIATION.lai_sunlit) * BIO.Α_PAR +
-                             (rad.e_direct_nir * RADIATION.k_direct + (_sunlit_r_diffuse + _sunlit_r_directs - _sunlit_r_direct) / RADIATION.lai_sunlit) * BIO.Α_NIR;
+
+    # net radiation in-out for sunlit and shaded leaves
+    RADIATION.r_net_shaded = (_shaded_q_diffuse + _shaded_q_directs - _shaded_q_direct + _shaded_s_par) / RADIATION.lai_shaded * BIO.Α_PAR +    # PAR region
+                             (_shaded_r_diffuse + _shaded_r_directs - _shaded_r_direct + _shaded_s_nir) / RADIATION.lai_shaded * BIO.Α_NIR;     # NIR region
+    RADIATION.r_net_sunlit = (rad.e_direct_par * RADIATION.k_direct + (_sunlit_q_diffuse + _sunlit_q_directs - _sunlit_q_direct + _sunlit_s_par) / RADIATION.lai_sunlit) * BIO.Α_PAR +
+                             (rad.e_direct_nir * RADIATION.k_direct + (_sunlit_r_diffuse + _sunlit_r_directs - _sunlit_r_direct + _sunlit_s_nir) / RADIATION.lai_sunlit) * BIO.Α_NIR;
 
     return nothing
 );
