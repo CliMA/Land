@@ -51,6 +51,8 @@ using Test
             @test true;
             CanopyRadiativeTransfer.canopy_radiation!(bcan, bleaf, brad, bsoil);
             @test true;
+            CanopyRadiativeTransfer.canopy_radiation!(bcan, bleaf, FT(100), bsoil);
+            @test true;
             CanopyRadiativeTransfer.canopy_fluorescence!(hcan, leaves);
             @test true;
             CanopyRadiativeTransfer.soil_albedo!(hcan, hsoil);
