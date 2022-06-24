@@ -21,6 +21,7 @@ abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
 # Changes to this structure
 # General
 #     2022-Jun-15: add struct for broadband leaf biophysics
+#     2022-Jun-24: add leaf emissivity constant
 #
 #######################################################################################################################################################################################################
 """
@@ -40,6 +41,8 @@ mutable struct BroadbandLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     Α_NIR::FT
     "Broadband absorption fraction at the PAR region"
     Α_PAR::FT
+    "Emissivity for longwave radiation"
+    Ε_LW::FT
 end
 
 
@@ -48,6 +51,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-15: add constructor
+#     2022-Jun-24: add leaf emissivity constant
 #
 #######################################################################################################################################################################################################
 """
@@ -56,7 +60,7 @@ end
 
 Construct a broadband leaf biophysics struct
 """
-BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysics{FT}(0.2, 0.8);
+BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysics{FT}(0.2, 0.8, 0.97);
 
 
 #######################################################################################################################################################################################################

@@ -149,6 +149,14 @@ using Test
                 # @test NaN_test(wls);
             end;
 
+            # Solar radiation
+            rad1 = ClimaCache.BroadbandRadiation{FT}();
+            rad2 = ClimaCache.HyperspectralRadiation{FT}();
+            for rad in [rad1, rad2]
+                @test FT_test(rad, FT);
+                @test NaN_test(rad);
+            end;
+
             # Sun-sensor geometry
             ssg = ClimaCache.SunSensorGeometry{FT}();
             @test FT_test(ssg, FT);
