@@ -19,7 +19,7 @@ function leaf_spectra! end
 #
 # Changes made to this method
 # General
-#     2020-Mar-30: account for carotenoid absorption as APAR as well as chlorophyll
+#     2020-Mar-30: account for carotenoid absorption as PPAR as well as chlorophyll
 #     2020-Mar-31: use 40° rather than 59° for _τ_α calculation (following PROSPECT-D)
 #     2021-Aug-07: replace function `expint` with that from SpecialFunctions
 #     2021-Oct-21: add α to input parameters so that one can roll back to 50° for _τ_α calculation
@@ -27,6 +27,7 @@ function leaf_spectra! end
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Feb-02: fix documentation
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
+#     2022-Jun-27: fix documentation
 # Bug fix
 #     2021-Aug-06: If bio.CBC and bio.PRO are not zero, they are accounted for twice in bio.LMA, thus the spectrum from LMA need to subtract the contribution from CBC and PRO
 # To do
@@ -43,7 +44,7 @@ Update leaf reflectance and transmittance spectra, and fluorescence spectrum mat
 - `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
 - `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `lha` `ClimaCache.HyperspectralAbsorption` type struct that contains absorption characteristic curves
-- `APAR_car` If true, carotenoid absorption is accounted for in APAR, default is `true`
+- `APAR_car` If true, carotenoid absorption is accounted for in PPAR, default is `true`
 - `α` Optimum angle of incidence (default is 40° as in PROSPECT-D, SCOPE uses 59°)
 
 # Examples

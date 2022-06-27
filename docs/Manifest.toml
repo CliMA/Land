@@ -18,10 +18,9 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[deps.BufferedStreams]]
-deps = ["Compat", "Test"]
-git-tree-sha1 = "5d55b9486590fdda5905c275bb21ce1f0754020f"
+git-tree-sha1 = "bb065b14d7f941b8617bc323063dbe79f55d16ea"
 uuid = "e1450e63-4bb3-523b-b2a4-4ffa8c0fd77d"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.CLIMAParameters]]
 deps = ["Test"]
@@ -49,9 +48,9 @@ version = "0.1.3"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "MAT", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "4c4327d62daef6a7a4c4e742600282f8f32bfd38"
+git-tree-sha1 = "10986cea3c8efd7c0c0ae940cbae565bdbbd85db"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "0.3.4"
+version = "0.3.5"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -212,7 +211,7 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "SpecialFunctions", "Test", "UnPack"]
 path = ".."
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
-version = "0.1.3"
+version = "0.2.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -285,9 +284,9 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "ab05aa4cc89736e95915b01e7279e61b1bfe33b8"
+git-tree-sha1 = "9a36165cf84cff35851809a40a928e1103702013"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.14+0"
+version = "1.1.16+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -404,9 +403,9 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "8977b17906b0a1cc74ab2e3a05faa16cf08a8291"
+git-tree-sha1 = "642f08bf9ff9e39ccc7b710b2eb9a24971b52b1a"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.16"
+version = "0.33.17"
 
 [[deps.TOML]]
 deps = ["Dates"]
