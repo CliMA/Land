@@ -75,6 +75,8 @@ Leaf
 Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 Leaves1D
 Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaves2D
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat}
 ```
 
 
