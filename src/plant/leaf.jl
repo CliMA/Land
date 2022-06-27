@@ -152,6 +152,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 # Changes to this structure
 # General
 #     2022-Jun-27: add new structure for leaves with 1D Vector of parameters, such as leaves for sunlit and shaded partitions
+#     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -169,8 +170,8 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaves1D{FT<:AbstractFloat}
     # parameters that do not change with time
-    "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
+    "[`BroadbandLeafBiophysics`](@ref) type leaf biophysical parameters"
+    BIO::BroadbandLeafBiophysics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
@@ -211,16 +212,15 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-27: add constructor for Leaves1D
+#     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `Leaves1D`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
-- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
-- `broadband` Whether leaf biophysics is in broadband mode
 - `colimit` Whether to colimit the photosynthetic rates and electron transport rates
 - `ssm` Whether the flow rate is at steady state
 
@@ -233,13 +233,9 @@ leaves_cy = Leaves1D{Float64}("C3Cytochrome");
 leaves_c3 = Leaves1D{Float64}("C3"; colimit = true);
 leaves_c4 = Leaves1D{Float64}("C4"; colimit = true);
 leaves_cy = Leaves1D{Float64}("C3Cytochrome"; colimit = true);
-wls = WaveLengthSet{FT}(collect(400:10:2500));
-leaves_c3 = Leaves1D{Float64}("C3", wls);
-leaves_c4 = Leaves1D{Float64}("C4", wls);
-leaves_cy = Leaves1D{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -253,11 +249,7 @@ Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadban
         _psm = C4VJPModel{FT}(colimit = colimit);
     end;
 
-    if broadband
-        _bio = BroadbandLeafBiophysics{FT}();
-    else
-        _bio = HyperspectralLeafBiophysics{FT}(wls);
-    end;
+    _bio = BroadbandLeafBiophysics{FT}();
 
     return Leaves1D{FT}(
                 _bio,                               # BIO
@@ -282,6 +274,7 @@ Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadban
 # Changes to this structure
 # General
 #     2022-Jun-27: add new structure for leaves with 2D Matrix of parameters for sunlit partitioning and point value for shaded partitioning
+#     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -300,8 +293,8 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaves2D{FT<:AbstractFloat}
     # parameters that do not change with time
-    "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
+    "[`HyperspectralLeafBiophysics`](@ref) type leaf biophysical parameters"
+    BIO::HyperspectralLeafBiophysics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
@@ -348,16 +341,16 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-27: add constructor for Leaves2D
+#     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Constructor for `Leaves2D`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
-- `broadband` Whether leaf biophysics is in broadband mode
 - `colimit` Whether to colimit the photosynthetic rates and electron transport rates
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
@@ -378,7 +371,7 @@ leaves_c4 = Leaves2D{Float64}("C4", wls);
 leaves_cy = Leaves2D{Float64}("C3Cytochrome", wls);
 ```
 """
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -392,11 +385,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadban
         _psm = C4VJPModel{FT}(colimit = colimit);
     end;
 
-    if broadband
-        _bio = BroadbandLeafBiophysics{FT}();
-    else
-        _bio = HyperspectralLeafBiophysics{FT}(wls);
-    end;
+    _bio = HyperspectralLeafBiophysics{FT}(wls);
 
     return Leaves2D{FT}(
                 _bio,                               # BIO
