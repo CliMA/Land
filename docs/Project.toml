@@ -1,3 +1,4 @@
 [deps]
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 LeafOptics = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"

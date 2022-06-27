@@ -28,9 +28,9 @@ using Test
             bio = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
             rad = ClimaCache.HyperspectralRadiation{FT}();
 
-            par,apar = leaf_PAR(bio, wls, rad);
+            par,apar,ppar = leaf_PAR(bio, wls, rad);
             @test true;
-            par,apar = leaf_PAR(bio, wls, rad; APAR_car=false);
+            par,apar,ppar = leaf_PAR(bio, wls, rad; APAR_car=false);
             @test true;
         end;
     end;

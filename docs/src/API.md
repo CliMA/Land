@@ -13,7 +13,7 @@ leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_p
 ```
 
 
-## Leaf PAR and APAR
+## Leaf PAR, APAR, and PPAR
 ```@docs
 leaf_PAR
 ```
