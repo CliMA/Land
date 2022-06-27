@@ -8,7 +8,7 @@ using UnPack: @unpack
 import ClimaCache: BrooksCorey
 
 
-export BrooksCorey, VanGenuchten, relative_hydraulic_conductance, soil_ψ_25
+export BrooksCorey, VanGenuchten, relative_hydraulic_conductance,  soil_ψ_25, soil_θ
 
 
 include("vulnerability.jl")
