@@ -73,6 +73,23 @@ using Test
                 # @test NaN_test(leaf);
             end;
 
+            # Leaves
+            leaves_c3 = ClimaCache.Leaves1D{FT}("C3");
+            leaves_c4 = ClimaCache.Leaves1D{FT}("C4");
+            leaves_cy = ClimaCache.Leaves1D{FT}("C3Cytochrome");
+            leaves_d3 = ClimaCache.Leaves1D{FT}("C3", colimit = true);
+            leaves_d4 = ClimaCache.Leaves1D{FT}("C4", colimit = true);
+            leaves_dy = ClimaCache.Leaves1D{FT}("C3Cytochrome", colimit = true);
+            wls       = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
+            leaves_e3 = ClimaCache.Leaves1D{FT}("C3", wls);
+            leaves_e4 = ClimaCache.Leaves1D{FT}("C4", wls);
+            leaves_ey = ClimaCache.Leaves1D{FT}("C3Cytochrome", wls);
+            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_d3, leaves_d4, leaves_dy, leaves_e3, leaves_e4, leaves_ey]
+                @test FT_test(leaves, FT);
+                # NaN test will not pass because of the NaNs in temperature dependency structures
+                # @test NaN_test(leaf);
+            end;
+
             # LeafBiophysics
             lbio1 = ClimaCache.HyperspectralLeafBiophysics{FT}();
             lbio2 = ClimaCache.HyperspectralLeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));

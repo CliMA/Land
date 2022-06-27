@@ -41,8 +41,6 @@ StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number =
 
 ### Leaf Level
 ```@docs
-Leaf
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 AbstractLeafBiophysics
 BroadbandLeafBiophysics
 BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
@@ -73,6 +71,10 @@ AbstractTemperatureDependency
 Arrhenius
 ArrheniusPeak
 Q10
+Leaf
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaves1D
+Leaves1D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 ```
 
 
