@@ -97,6 +97,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Feb-28: use updated light_limited_rate! function
 #     2022-Feb-28: use updated photosystem_electron_transport! function (twice in thf function)
 #     2022-Feb-28: add support to C3CytochromeModel
+#     2022-Jun-27: remove apar from input variable list of light_limited_rate!
 # Bug fixes
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
@@ -135,7 +136,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     end;
     photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar, leaf.p_CO₂_i);
     rubisco_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
-    light_limited_rate!(leaf.PSM, leaf.PRC, air, leaf.apar, leaf.g_CO₂);
+    light_limited_rate!(leaf.PSM, leaf.PRC, air, leaf.g_CO₂);
     product_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     colimit_photosynthesis!(leaf.PSM);
 
