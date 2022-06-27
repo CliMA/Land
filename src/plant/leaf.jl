@@ -20,7 +20,7 @@
 
 $(TYPEDEF)
 
-Structure to save leaf parameters
+Structure to save leaf parameters. This structure is meant for leaf level research and canopy radiative transfer scheme without sunlit and shaded partitioning (ppar and ppar-dependent variables).
 
 # Fields
 
@@ -41,10 +41,10 @@ mutable struct Leaf{FT<:AbstractFloat}
     WIDTH::FT
 
     # prognostic variables that change with time
-    "Absorbed photosynthetically active radiation `[μmol m⁻² s⁻¹]`"
-    apar::FT
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
     g_H₂O_s::FT
+    "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
+    ppar::FT
     "Current leaf temperature"
     t::FT
 
@@ -135,8 +135,8 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
                 _prc,                               # PRC
                 _psm,                               # PSM
                 FT(0.05),                           # WIDTH
-                1000,                               # apar
                 0.01,                               # g_H₂O_s
+                1000,                               # ppar
                 T_25(),                             # t
                 0.01,                               # g_CO₂
                 3.0,                                # g_CO₂_b

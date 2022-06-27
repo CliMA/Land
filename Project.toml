@@ -1,7 +1,7 @@
 name = "ClimaCache"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.5"
+version = "0.4.0"
 
 [deps]
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
