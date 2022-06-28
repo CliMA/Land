@@ -93,6 +93,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 # Changes to this function
 # General
 #     2022-Jun-28: add method for Leaves1D
+#     2022-Jun-28: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -110,7 +111,7 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and
 leaves = Leaves1D{Float64}("C3");
 air    = AirLayer{Float64}();
 mode   = PCO₂Mode();
-leaf_photosynthesis!(leaf, air, mode);
+leaf_photosynthesis!(leaves, air, mode);
 ```
 """
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat} = (
@@ -135,6 +136,76 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
         leaves.a_net[_i] = PSM.a_net;
         leaves.a_gross[_i] = PSM.a_gross;
     end;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
+#     2022-Jun-28: add method for Leaves1D
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat}
+
+Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and shaded leaves, given
+- `leaves` `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
+- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
+- `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+
+---
+# Examples
+```julia
+leaves = Leaves2D{Float64}("C3");
+air    = AirLayer{Float64}();
+mode   = PCO₂Mode();
+leaf_photosynthesis!(leaves, air, mode);
+```
+"""
+leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat} = (
+    @unpack PRC, PSM = leaves;
+
+    # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
+    if leaves.t != leaves._t
+        photosystem_temperature_dependence!(PSM, air, leaves.t);
+    end;
+
+    # loop through the ppars for sunlit leaves
+    for _i in eachindex(leaves.ppar_sunlit)
+        # calculate the photosynthetic rates
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]);
+        rubisco_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]);
+        light_limited_rate!(PSM);
+        product_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]);
+        colimit_photosynthesis!(PSM);
+
+        # update the fluorescence related parameters
+        photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]);
+
+        # save the rates and to leaves
+        leaves.a_net_sunlit[_i] = PSM.a_net;
+        leaves.a_gross_sunlit[_i] = PSM.a_gross;
+        leaves.ϕ_f_sunlit[_i] = PRC.ϕ_f;
+    end;
+
+    # run the model for shaded leaves
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded);
+    rubisco_limited_rate!(PSM, leaves.p_CO₂_i_shaded);
+    light_limited_rate!(PSM);
+    product_limited_rate!(PSM, leaves.p_CO₂_i_shaded);
+    colimit_photosynthesis!(PSM);
+
+    # update the fluorescence related parameters
+    photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded);
+
+    # save the rates and to leaves
+    leaves.a_net_shaded = PSM.a_net;
+    leaves.a_gross_shaded = PSM.a_gross;
+    leaves.ϕ_f_shaded = PRC.ϕ_f;
 
     return nothing
 );

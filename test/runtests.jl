@@ -57,15 +57,17 @@ using Test
         end;
     end;
 
-    @testset "Leaves1D" begin
+    @testset "1D+2D Leaves" begin
         for FT in [Float32, Float64]
             air    = AirLayer{FT}();
             p_mode = PCO₂Mode();
             g_mode = GCO₂Mode();
             for LT in ["C3", "C4", "C3Cytochrome"]
-                leaves_1 = Leaf{FT}(LT);
-                leaves_2 = Leaf{FT}(LT);
-                leaf_photosynthesis!(leaves_2, air, p_mode);
+                leaves_1d = Leaves1D{FT}(LT);
+                leaves_2d = Leaves2D{FT}(LT);
+                leaf_photosynthesis!(leaves_1d, air, p_mode);
+                @test true
+                leaf_photosynthesis!(leaves_2d, air, p_mode);
                 @test true
             end;
         end;
