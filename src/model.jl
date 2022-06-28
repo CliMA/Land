@@ -38,6 +38,7 @@ function leaf_photosynthesis! end
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
+#     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 # Bug fixes
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
@@ -71,14 +72,14 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(leaf.PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar, p_i);
+    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.ppar, p_i);
     rubisco_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     light_limited_rate!(leaf.PSM);
     product_limited_rate!(leaf.PSM, leaf.p_CO₂_i);
     colimit_photosynthesis!(leaf.PSM);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.apar);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.ppar);
 
     return nothing
 );
@@ -98,6 +99,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 #     2022-Feb-28: use updated photosystem_electron_transport! function (twice in thf function)
 #     2022-Feb-28: add support to C3CytochromeModel
 #     2022-Jun-27: remove apar from input variable list of light_limited_rate!
+#     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 # Bug fixes
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 # To do
@@ -134,7 +136,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(leaf.PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar, leaf.p_CO₂_i);
+    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.ppar, leaf.p_CO₂_i);
     rubisco_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
     light_limited_rate!(leaf.PSM, leaf.PRC, air, leaf.g_CO₂);
     product_limited_rate!(leaf.PSM, air, leaf.g_CO₂);
@@ -145,10 +147,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     leaf.p_CO₂_s = air.p_CO₂ - leaf.PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
     # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.apar, leaf.p_CO₂_i);
+    photosystem_electron_transport!(leaf.PSM, leaf.PRC, leaf.ppar, leaf.p_CO₂_i);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.apar);
+    photosystem_coefficients!(leaf.PSM, leaf.PRC, leaf.ppar);
 
     return nothing
 );
