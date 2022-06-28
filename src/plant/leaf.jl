@@ -280,6 +280,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-27: add new structure for leaves with 2D Matrix of parameters for sunlit partitioning and point value for shaded partitioning
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
+#     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -322,6 +323,14 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     t::FT
 
     # dignostic variables that change with time
+    "Gross photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
+    a_gross_shaded::FT
+    "Gross photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
+    a_gross_sunlit::Matrix{FT}
+    "Net photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
+    a_net_shaded::FT
+    "Net photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
+    a_net_sunlit::Matrix{FT}
     "Total leaf diffusive conductance to CO₂ for shaed leaves `[mol m⁻² s⁻¹]`"
     g_CO₂_shaded::FT
     "Total leaf diffusive conductance to CO₂ for sunlit leaves `[mol m⁻² s⁻¹]`"
@@ -338,6 +347,10 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     p_CO₂_s_sunlit::Matrix{FT}
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
+    "Fluorescence quantum yield for shaded leaves `[-]`"
+    ϕ_f_shaded::FT
+    "Fluorescence quantum yield for sunlit leaves `[-]`"
+    ϕ_f_sunlit::Matrix{FT}
 
     # caches to speed up calculations
     "Last leaf temperature. If different from t, then make temperature correction"
@@ -352,6 +365,7 @@ end
 #     2022-Jun-27: add constructor for Leaves2D
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
+#     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 #
 #######################################################################################################################################################################################################
 """
@@ -408,6 +422,10 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 100,                                # ppar_shaded
                 zeros(FT,n_incl,n_azi) .* 100,      # ppar_sunlit
                 T_25(),                             # t
+                0,                                  # a_gross_shaded
+                zeros(FT,n_incl,n_azi),             # a_gross_sunlit
+                0,                                  # a_net_shaded
+                zeros(FT,n_incl,n_azi),             # a_net_sunlit
                 0.01,                               # g_CO₂_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_CO₂_sunlit
                 3.0,                                # g_CO₂_b
@@ -416,5 +434,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 40,                                 # p_CO₂_s_shaded
                 zeros(FT,n_incl,n_azi) .+ 40,       # p_CO₂_s_sunlit
                 saturation_vapor_pressure(T_25()),  # p_H₂O_sat
+                0,                                  # ϕ_f_shaded
+                zeros(FT,n_incl,n_azi),             # ϕ_f_sunlit
                 0)                                  # _t
 );
