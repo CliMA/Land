@@ -65,7 +65,11 @@ using Test
             for LT in ["C3", "C4", "C3Cytochrome"]
                 leaves_1d = Leaves1D{FT}(LT);
                 leaves_2d = Leaves2D{FT}(LT);
+                leaf_photosynthesis!(leaves_1d, air, g_mode);
+                @test true
                 leaf_photosynthesis!(leaves_1d, air, p_mode);
+                @test true
+                leaf_photosynthesis!(leaves_2d, air, g_mode);
                 @test true
                 leaf_photosynthesis!(leaves_2d, air, p_mode);
                 @test true
