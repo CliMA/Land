@@ -112,6 +112,7 @@ BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloa
 #     2022-Jun-10: add more fields for SIF
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
+#     2022-Jun-27: move ppar_sunlit and ppar_shaded to Leaves2D
 #
 #######################################################################################################################################################################################################
 """
@@ -161,10 +162,6 @@ mutable struct HyperspectralMLCanopyRadiationProfile{FT} <: AbstractCanopyRadiat
     par_shaded::Vector{FT}
     "PAR for sunlit leaves (before absorption) `[μmol m⁻² s⁻¹]`"
     par_sunlit::Array{FT,3}
-    "Mean APAR for shaded leaves for photosynthesis `[μmol m⁻² s⁻¹]`"
-    ppar_shaded::Vector{FT}
-    "APAR for sunlit leaves for photosynthesis `[μmol m⁻² s⁻¹]`"
-    ppar_sunlit::Array{FT,3}
     "Longwave energy flux from leaves per leaf area (one side) `[W m⁻²]`"
     r_lw::Vector{FT}
     "Downwelling longwave energy flux `[W m⁻²]`"
@@ -253,6 +250,7 @@ end
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
 #     2022-Jun-16: fox documentation
+#     2022-Jun-27: move ppar_sunlit and ppar_shaded to Leaves2D
 #
 #######################################################################################################################################################################################################
 """
@@ -286,8 +284,6 @@ HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_
                 0,                              # par_in_direct
                 zeros(FT,n_layer),              # par_shaded
                 zeros(FT,n_incl,n_azi,n_layer), # par_sunlit
-                zeros(FT,n_layer),              # ppar_shaded
-                zeros(FT,n_incl,n_azi,n_layer), # ppar_sunlit
                 zeros(FT,n_layer),              # r_lw
                 zeros(FT,n_layer+1),            # r_lw_down
                 zeros(FT,n_layer+1),            # r_lw_up

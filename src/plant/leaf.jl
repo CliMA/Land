@@ -275,6 +275,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 # General
 #     2022-Jun-27: add new structure for leaves with 2D Matrix of parameters for sunlit partitioning and point value for shaded partitioning
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
+#     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -309,6 +310,10 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     g_H₂O_s_shaded::FT
     "Stomatal conductance to water vapor for sunlit leaves `[mol m⁻² s⁻¹]`"
     g_H₂O_s_sunlit::Matrix{FT}
+    "Absorbed photosynthetically active radiation used for photosynthesis for shaded leaves `[μmol m⁻² s⁻¹]`"
+    ppar_shaded::FT
+    "Absorbed photosynthetically active radiation used for photosynthesis for sunlit leaves `[μmol m⁻² s⁻¹]`"
+    ppar_sunlit::Matrix{FT}
     "Current leaf temperature"
     t::FT
 
@@ -342,6 +347,7 @@ end
 # General
 #     2022-Jun-27: add constructor for Leaves2D
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
+#     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 #
 #######################################################################################################################################################################################################
 """
@@ -395,6 +401,8 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 FT(0.05),                           # WIDTH
                 0.01,                               # g_H₂O_s_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_H₂O_s_sunlit
+                100,                                # ppar_shaded
+                zeros(FT,n_incl,n_azi) .* 100,      # ppar_sunlit
                 T_25(),                             # t
                 0.01,                               # g_CO₂_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_CO₂_sunlit
