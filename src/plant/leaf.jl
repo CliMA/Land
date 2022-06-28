@@ -153,6 +153,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 # General
 #     2022-Jun-27: add new structure for leaves with 1D Vector of parameters, such as leaves for sunlit and shaded partitions
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
+#     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -187,9 +188,13 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
     ppar::Vector{FT}
     "Current leaf temperature"
-    t::FT
+    t::Vector{FT}
 
     # dignostic variables that change with time
+    "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_gross::Vector{FT}
+    "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_net::Vector{FT}
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂::Vector{FT}
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -200,10 +205,6 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     p_CO₂_s::Vector{FT}
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
-
-    # caches to speed up calculations
-    "Last leaf temperature. If different from t, then make temperature correction"
-    _t::FT
 end
 
 
@@ -213,6 +214,7 @@ end
 # General
 #     2022-Jun-27: add constructor for Leaves1D
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
+#     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 #
 #######################################################################################################################################################################################################
 """
@@ -259,13 +261,15 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 FT(0.05),                           # WIDTH
                 FT[0.01, 0.01],                     # g_H₂O_s
                 FT[1000, 200],                      # ppar
-                T_25(),                             # t
+                FT[T_25(), T_25()],                 # t
+                zeros(FT,2),                        # a_gross
+                zeros(FT,2),                        # a_net
                 FT[0.01, 0.01],                     # g_CO₂
                 FT[3.0, 3.0],                       # g_CO₂_b
                 FT[20, 20],                         # p_CO₂_i
                 FT[40, 40],                         # p_CO₂_s
-                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
-                0)                                  # _t
+                saturation_vapor_pressure(T_25())   # p_H₂O_sat
+    )
 );
 
 
