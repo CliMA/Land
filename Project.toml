@@ -11,7 +11,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-ClimaCache = "0.4.0"
+ClimaCache = "0.4.1"
 DocStringExtensions = "0.8.6, 0.9.0"
 PkgUtility = "0.1.10, 0.2.0"
 UnPack = "1.0"
