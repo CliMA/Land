@@ -1,14 +1,11 @@
 module Photosynthesis
 
-using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter, GCO₂Mode, Leaf, Leaves1D, Leaves2D, MinimumColimit, PCO₂Mode,
-      VJPReactionCenter, Q10, QuadraticColimit, SerialColimit, VanDerTolFluorescenceModel
+using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter, GCO₂Mode, Leaf, Leaves1D, Leaves2D, MinimumColimit, MonoElementSPAC,
+      MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, PCO₂Mode, Q10, QuadraticColimit, SerialColimit, VJPReactionCenter, VanDerTolFluorescenceModel
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, lower_quadratic, upper_quadratic
 using UnPack: @unpack
 
-
-# export types from ClimaCache
-export AirLayer, GCO₂Mode, Leaf, Leaves1D, Leaves2D, PCO₂Mode
 
 # export function from this module
 export leaf_photosynthesis!

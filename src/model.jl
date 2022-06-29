@@ -424,3 +424,53 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
 
     return nothing
 );
+
+
+######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-29: add method for MonoElementSPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+
+Updates leaf photosynthetic rates for SPAC, given
+- `spac` `MonoElementSPAC` type SPAC
+- `mode` `GCO₂Mode` or `PCO₂Mode`
+"""
+leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
+    @unpack AIR, LEAF = spac;
+
+    leaf_photosynthesis!(LEAF, AIR, mode);
+
+    return nothing
+);
+
+
+######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+
+Updates leaf photosynthetic rates for SPAC, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
+- `mode` `GCO₂Mode` or `PCO₂Mode`
+"""
+leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
+    @unpack AIR, LEAVES, LEAVES_INDEX = spac;
+
+    for _i in eachindex(LEAVES)
+        leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode);
+    end;
+
+    return nothing
+);
