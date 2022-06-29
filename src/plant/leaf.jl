@@ -10,6 +10,7 @@
 #     2022-May-25: add new field WIDTH
 #     2022-Jun-14: use Union instead of Abstract... for type definition
 #     2022-Jun-15: add support to BroadbandLeafBiophysics and HyperspectralLeafBiophysics types
+#     2022-Jun-29: add APAR_CAR as a field
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -29,6 +30,8 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaf{FT<:AbstractFloat}
     # parameters that do not change with time
+    "Whether APAR absorbed by carotenoid is counted as PPAR"
+    APAR_CAR::Bool
     "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
@@ -81,6 +84,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-May-25: add new field WIDTH
 #     2022-Jun-15: add broadband as an option (default is false)
+#     2022-Jun-29: add APAR_CAR as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -130,6 +134,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
     end;
 
     return Leaf{FT}(
+                true,                               # APAR_CAR
                 _bio,                               # BIO
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
@@ -281,6 +286,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
+#     2022-Jun-29: add APAR_CAR as a field
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -299,6 +305,8 @@ $(TYPEDFIELDS)
 """
 mutable struct Leaves2D{FT<:AbstractFloat}
     # parameters that do not change with time
+    "Whether APAR absorbed by carotenoid is counted as PPAR"
+    APAR_CAR::Bool
     "[`HyperspectralLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::HyperspectralLeafBiophysics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
@@ -366,6 +374,7 @@ end
 #     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
+#     2022-Jun-29: add APAR_CAR as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -412,6 +421,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
     _bio = HyperspectralLeafBiophysics{FT}(wls);
 
     return Leaves2D{FT}(
+                true,                               # APAR_CAR
                 _bio,                               # BIO
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
