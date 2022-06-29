@@ -72,20 +72,20 @@ light_limited_rate!(psm::Union{C3CytochromeModel{FT}, C4VJPModel{FT}}) where {FT
 # General
 #     2022-Feb-28: add C3CytochromeModel support
 #     2022-Mar-01: j_psi, η_c, and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
+#     2022-Jun-27: remove apar from input variable list
 #
 #######################################################################################################################################################################################################
 """
 
-    light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
+    light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
 - `psm` `C3CytochromeModel` structure for C3 photosynthesis model
 - `rc` `CytochromeReactionCenter` type photosynthesis system reaction center
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`
 """
-light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat} = (
+light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSI, Φ_PSI_MAX = rc;
 
@@ -121,20 +121,20 @@ light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}
 #     2022-Jan-24: fix a bug in field name e_to_c in psm
 #     2022-Jan-24: fix documentation
 #     2022-Feb-28: move e_to_c calculation to photosystem_electron_transport!
+#     2022-Jun-27: remove apar from input variable list
 #
 #######################################################################################################################################################################################################
 """
 
-    light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
+    light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
 - `psm` `C3VJPModel` structure for C3 photosynthesis model
 - `rc` `VJPReactionCenter` type photosynthesis system reaction center, not used in this methid
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`, not used in this methid
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`
 """
-light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat} = (
+light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
     _a = psm.j;
     _b = psm.j * psm.γ_star;
     _c = psm.EFF_1;
@@ -162,20 +162,20 @@ light_limited_rate!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLaye
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: remove duplicated j (using j_pot is enough)
 #     2022-Feb-28: move e_to_c calculation to photosystem_electron_transport!
+#     2022-Jun-27: remove apar from input variable list
 #
 #######################################################################################################################################################################################################
 """
 
-    light_limited_rate!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat}
+    light_limited_rate!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat}
 
 Update the electron transport limited photosynthetic rate in conductance mode, given
 - `psm` `C4VJPModel` structure for C3 photosynthesis model
 - `rc` `VJPReactionCenter` type photosynthesis system reaction center, not used in this methid
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure, not used in this methid
-- `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`, not used in this methid
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, not used in this methid
 """
-light_limited_rate!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, apar::FT, g_lc::FT) where {FT<:AbstractFloat} = (
+light_limited_rate!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT) where {FT<:AbstractFloat} = (
     psm.a_j = psm.j_pot * psm.e_to_c;
 
     return nothing
