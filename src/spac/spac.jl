@@ -367,7 +367,7 @@ MonoMLPalmSPAC{FT}(
             zas::Vector = collect(0:0.2:13),
             ssm::Bool = true
 ) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
+    @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model must be within [C3, C3CytochromeModel, C4]";
 
     # determine how many layers of roots
     _n_root = 0;
