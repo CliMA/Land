@@ -3,6 +3,7 @@
 # Changes to this type
 # General
 #     2022-May-25: add abstract type for soil-plant-air continuum
+#     2022-Jun-29: rename grass, palm, and tree SPAC to ML*SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -11,9 +12,9 @@ $(TYPEDEF)
 
 Hierarchy of AbstractSPACSystem:
 - [`MonoElementSPAC`](@ref)
-- [`MonoGrassSPAC`](@ref)
-- [`MonoPalmSPAC`](@ref)
-- [`MonoTreeSPAC`](@ref)
+- [`MonoMLGrassSPAC`](@ref)
+- [`MonoMLPalmSPAC`](@ref)
+- [`MonoMLTreeSPAC`](@ref)
 """
 abstract type AbstractSPACSystem{FT<:AbstractFloat} end
 
@@ -90,6 +91,8 @@ MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) wher
 #     2022-May-25: SPAC system for monospecies grass
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
@@ -103,10 +106,12 @@ Struct for monospecies grass SPAC system
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoGrassSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
-    "Leaf hydrualic system"
-    LEAVES::Vector{Leaf{FT}}
+    "Canopy used for radiation calculations"
+    CANOPY::HyperspectralMLCanopy{FT}
+    "Leaf per layer"
+    LEAVES::Vector{Leaves2D{FT}}
     "Corresponding air layer per canopy layer"
     LEAVES_INDEX::Vector{Int}
     "Number of canopy layers"
@@ -117,6 +122,11 @@ mutable struct MonoGrassSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
+    Z::Vector{FT}
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT}
+    "Soil boundaries `[m]`"
+    Z_SOIL::Vector{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -137,24 +147,25 @@ end
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
+#     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoGrassSPAC{FT}(
-                psm::String;
-                zr::Number = -0.2,
-                zc::Number = 0.5,
+    MonoMLGrassSPAC{FT}(
+                psm::String,
+                wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+                zs::Vector = [-0.2,0.5],
                 zss::Vector = collect(0:-0.1:-1),
                 zas::Vector = collect(0:0.05:1),
-                broadband::Bool = false,
                 ssm::Bool = true
     ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies grass system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
-- `zr` Maximal root depth (negative value)
-- `zc` Maximal canopy height (positive value)
+- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `zs` Vector of Maximal root depth (negative value), and canopy height
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
 - `broadband` Whether leaf biophysics is in broadband mode
@@ -163,29 +174,26 @@ Construct a SPAC system for monospecies grass system, given
 ---
 # Examples
 ```julia
-spac = MonoGrassSPAC{Float64}();
-spac = MonoGrassSPAC{Float64}(zr = -0.3, zc = 1, zss = collect(0:-0.1:-1), zas = collect(0:0.05:1.01));
+spac = MonoMLGrassSPAC{Float64}("C3");
 ```
 """
-MonoGrassSPAC{FT}(
-            psm::String;
-            zr::Number = -0.2,
-            zc::Number = 0.5,
+MonoMLGrassSPAC{FT}(
+            psm::String,
+            wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+            zs::Vector = [-0.2,0.5],
             zss::Vector = collect(0:-0.1:-1),
             zas::Vector = collect(0:0.05:1),
-            broadband::Bool = false,
             ssm::Bool = true
 ) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
-    _n_root  = 0;
-    _r_index = Int[];
-    for i in eachindex(zss)
-        _z = zss[i];
-        if _z > zr
+    _n_root = 0;
+    _r_inds = Int[];
+    for _i in eachindex(zss)
+        if zss[_i] > zs[1]
             _n_root += 1;
-            push!(_r_index, i);
+            push!(_r_inds, _i);
         else
             break
         end;
@@ -193,39 +201,45 @@ MonoGrassSPAC{FT}(
 
     # determine how many layers of canopy
     _n_canopy = 0;
-    _c_index  = Int[];
-    for i in eachindex(zas)
-        _z = zas[i]
-        if _z < zc
+    _c_inds = Int[];
+    for _i in eachindex(zas)
+        if zas[_i] < zs[2]
             _n_canopy += 1;
-            push!(_c_index, i);
-        elseif _z >= zc
+            push!(_c_inds, _i);
+        else
             break
         end;
     end;
 
     # create evenly distributed root system for now
     _roots = Root{FT}[];
-    for i in _r_index
-        _Δh = abs(zss[i+1] + zss[i]) / 2;
+    for _i in _r_inds
+        _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
         _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
-    # create leaves
-    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
+    # create leaves from bottom canopy (trunk) to top canopy
+    _leaves = [Leaves2D{FT}(psm, wls; ssm = ssm) for _i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
 
+    # create canopy to use for radiative transfer
+    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+
     # return plant
-    return MonoGrassSPAC{FT}(
+    return MonoMLGrassSPAC{FT}(
+                _canopy,            # CANOPY
                 _leaves,            # LEAVES
-                _c_index,           # LEVES_INDEX
+                _c_inds,            # LEAVES_INDEX
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
-                _r_index,           # ROOTS_INDEX
+                _r_inds,            # ROOTS_INDEX
+                FT.(zs),            # Z
+                FT.(zas),           # Z_AIR
+                FT.(zss),           # Z_SOIL
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
@@ -240,6 +254,8 @@ MonoGrassSPAC{FT}(
 #     2022-May-25: SPAC system for monospecies palm
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
@@ -253,10 +269,12 @@ Struct for monospecies palm SPAC system (with trunk)
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
-    "Leaf hydrualic system"
-    LEAVES::Vector{Leaf{FT}}
+    "Canopy used for radiation calculations"
+    CANOPY::HyperspectralMLCanopy{FT}
+    "Leaf per layer"
+    LEAVES::Vector{Leaves2D{FT}}
     "Corresponding air layer per canopy layer"
     LEAVES_INDEX::Vector{Int}
     "Number of canopy layers"
@@ -269,6 +287,12 @@ mutable struct MonoPalmSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS_INDEX::Vector{Int}
     "Trunk hydraulic system"
     TRUNK::Stem{FT}
+    "Depth and height information `[m]`"
+    Z::Vector{FT}
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT}
+    "Soil boundaries `[m]`"
+    Z_SOIL::Vector{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -289,114 +313,122 @@ end
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
+#     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoPalmSPAC{FT}(
-                psm::String;
-                zr::Number = -1,
-                zt::Number = 10,
-                zc::Number = 12,
+    MonoMLPalmSPAC{FT}(
+                psm::String,
+                wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+                zs::Vector = [-1,6,12],
                 zss::Vector = collect(0:-0.25:-2),
                 zas::Vector = collect(0:0.2:13),
-                broadband::Bool = false,
                 ssm::Bool = true
     ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies palm system, given
 - `psm` Photosynthesis model, must be C3 or C3Cytochrome
-- `zr` Maximal root depth (negative value)
-- `zt` Maximum trunk height
-- `zc` Maximal canopy height (positive value)
+- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `zs` Vector of Maximal root depth (negative value), trunk height, and canopy height
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
-- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
-spac = MonoPalmSPAC{Float64}();
-spac = MonoPalmSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
+spac = MonoMLPalmSPAC{Float64}("C3");
 ```
 """
-MonoPalmSPAC{FT}(
-            psm::String;
-            zr::Number = -1,
-            zt::Number = 10,
-            zc::Number = 12,
+MonoMLPalmSPAC{FT}(
+            psm::String,
+            wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+            zs::Vector = [-1,6,12],
             zss::Vector = collect(0:-0.25:-2),
             zas::Vector = collect(0:0.2:13),
-            broadband::Bool = false,
             ssm::Bool = true
 ) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome"] "Photosynthesis model must be within [C3, C3CytochromeModel]";
 
     # determine how many layers of roots
-    _n_root  = 0;
-    _r_index = Int[];
-    for i in eachindex(zss)
-        _z = zss[i];
-        if _z > zr
+    _n_root = 0;
+    _r_inds = Int[];
+    for _i in eachindex(zss)
+        if zss[_i] > zs[1]
             _n_root += 1;
-            push!(_r_index, i);
+            push!(_r_inds, _i);
         else
             break
         end;
     end;
 
     # determine how many layers of canopy
-    _n_canopy = 0;
-    _c_index  = Int[];
-    for i in 1:(length(zas)-1)
-        _z0 = zas[i];
-        _z1 = zas[i+1];
-        if _z0 <= zt < zc <= _z1
+    _n_canopy= 0;
+    _c_inds = Int[];
+    for _i in 1:(length(zas)-1)
+        # if the entire canopy is within the same layer
+        if zas[_i] <= zs[2] < zs[3] <= zas[_i+1]
             _n_canopy += 1;
-            push!(_c_index, i);
+            push!(_c_inds, _i);
             break
-        elseif _z0 < zt < _z1 < zc
+
+        # if the lower canopy boundary (trunk top) is within the layer
+        elseif zas[_i] < zs[2] < zas[_i+1] < zs[3]
             _n_canopy += 1;
-            push!(_c_index, i);
-        elseif zt <= _z0 < _z1 < zc
+            push!(_c_inds, _i);
+
+        # if the layer is within the canopy
+        elseif zs[2] <= zas[_i] < zas[_i+1] < zs[3]
             _n_canopy += 1;
-            push!(_c_index, i);
-        elseif zt <= _z0 <= zc < _z1
+            push!(_c_inds, _i);
+
+        # if the upper canopy boundary is within the layer
+        elseif zs[2] <= zas[_i] <= zs[3] < zas[_i+1]
             _n_canopy += 1;
-            push!(_c_index, i-1);
+            push!(_c_inds, _i-1);
             break
-        elseif zc <= _z0 < _z1
+
+        # if the entire canopy is below the layer
+        elseif zs[3] <= zas[_i] < zas[_i+1]
             break
         end;
     end;
 
-    # create evenly distributed root system for now
+    # create evenly distributed root system from top soil to deep soil
     _roots = Root{FT}[];
-    for i in _r_index
-        _Δh = abs(zss[i+1] + zss[i]) / 2;
+    for _i in _r_inds
+        _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
         _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
-    # create trunk
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zt, Δl = zt, ssm = ssm), T_25());
+    # create trunk with the height of entire canopy
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zs[3], Δl = zs[3], ssm = ssm), T_25());
 
-    # create leaves
-    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
+    # create leaves from bottom canopy (trunk) to top canopy
+    _leaves = [Leaves2D{FT}(psm, wls; ssm = ssm) for _i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
 
+    # create canopy to use for radiative transfer
+    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+
     # return plant
-    return MonoPalmSPAC{FT}(
+    return MonoMLPalmSPAC{FT}(
+                _canopy,            # CANOPY
                 _leaves,            # LEAVES
-                _c_index,           # LEVES_INDEX
+                _c_inds,            # LEAVES_INDEX
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
-                _r_index,           # ROOTS_INDEX
+                _r_inds,            # ROOTS_INDEX
                 _trunk,             # TRUNK
+                FT.(zs),            # Z
+                FT.(zas),           # Z_AIR
+                FT.(zss),           # Z_SOIL
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
@@ -411,6 +443,8 @@ MonoPalmSPAC{FT}(
 #     2022-May-25: SPAC system for monospecies tree
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
+#     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
@@ -424,12 +458,14 @@ Struct for monospecies tree SPAC system (with trunk and branches)
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Branch hydraulic system"
     BRANCHES::Vector{Stem{FT}}
-    "Leaf hydrualic system"
-    LEAVES::Vector{Leaf{FT}}
+    "Canopy used for radiation calculations"
+    CANOPY::HyperspectralMLCanopy{FT}
+    "Leaf per layer"
+    LEAVES::Vector{Leaves2D{FT}}
     "Corresponding air layer per canopy layer"
     LEAVES_INDEX::Vector{Int}
     "Number of canopy layers"
@@ -442,6 +478,12 @@ mutable struct MonoTreeSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS_INDEX::Vector{Int}
     "Trunk hydraulic system"
     TRUNK::Stem{FT}
+    "Depth and height information `[m]`"
+    Z::Vector{FT}
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT}
+    "Soil boundaries `[m]`"
+    Z_SOIL::Vector{FT}
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -462,123 +504,131 @@ end
 #     2022-May-31: rename _qs to _fs
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
+#     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
+#     2022-Jun-29: add HyperspectralMLCanopy, and Zs
 #
 #######################################################################################################################################################################################################
 """
 
-    MonoTreeSPAC{FT}(
-                psm::String;
-                zr::Number = -1,
-                zt::Number = 10,
-                zc::Number = 12,
+    MonoMLTreeSPAC{FT}(
+                psm::String,
+                wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+                zs::Vector = [-1,6,12],
                 zss::Vector = collect(0:-0.25:-2),
-                zas::Vector = collect(0:0.2:13),
-                broadband::Bool = false,
+                zas::Vector = collect(0:0.5:13),
                 ssm::Bool = true
     ) where {FT<:AbstractFloat}
 
 Construct a SPAC system for monospecies tree system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome (note: there are C4 shrubs)
-- `zr` Maximal root depth (negative value)
-- `zt` Maximum trunk height
-- `zc` Maximal canopy height (positive value)
+- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
+- `zs` Vector of Maximal root depth (negative value), trunk height, and canopy height
 - `zss` Vector of soil layer boundaries starting from 0
 - `zas` Vector of air layer boundaries starting from 0
-- `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 
 ---
 # Examples
 ```julia
-spac = MonoTreeSPAC{Float64}();
-spac = MonoTreeSPAC{Float64}(zr = -1, zt = 11, zc = 1, zss = collect(0:-0.1:-2), zas = collect(0:0.2:13));
+spac = MonoMLTreeSPAC{Float64}("C3");
 ```
 """
-MonoTreeSPAC{FT}(
-            psm::String;
-            zr::Number = -1,
-            zt::Number = 10,
-            zc::Number = 12,
+MonoMLTreeSPAC{FT}(
+            psm::String,
+            wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
+            zs::Vector = [-1,6,12],
             zss::Vector = collect(0:-0.25:-2),
-            zas::Vector = collect(0:0.2:13),
-            broadband::Bool = false,
+            zas::Vector = collect(0:0.5:13),
             ssm::Bool = true
 ) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     # determine how many layers of roots
-    _n_root  = 0;
-    _r_index = Int[];
-    for i in eachindex(zss)
-        _z = zss[i];
-        if _z > zr
+    _n_root = 0;
+    _r_inds = Int[];
+    for _i in eachindex(zss)
+        if zss[_i] > zs[1]
             _n_root += 1;
-            push!(_r_index, i);
+            push!(_r_inds, _i);
         else
             break
         end;
     end;
 
     # determine how many layers of canopy
-    _n_canopy = 0;
-    _c_index  = Int[];
-    for i in 1:(length(zas)-1)
-        _z0 = zas[i];
-        _z1 = zas[i+1];
-        if _z0 <= zt < zc <= _z1
+    _n_canopy= 0;
+    _c_inds = Int[];
+    for _i in 1:(length(zas)-1)
+        # if the entire canopy is within the same layer
+        if zas[_i] <= zs[2] < zs[3] <= zas[_i+1]
             _n_canopy += 1;
-            push!(_c_index, i);
+            push!(_c_inds, _i);
             break
-        elseif _z0 < zt < _z1 < zc
+
+        # if the lower canopy boundary (trunk top) is within the layer
+        elseif zas[_i] < zs[2] < zas[_i+1] < zs[3]
             _n_canopy += 1;
-            push!(_c_index, i);
-        elseif zt <= _z0 < _z1 < zc
+            push!(_c_inds, _i);
+
+        # if the layer is within the canopy
+        elseif zs[2] <= zas[_i] < zas[_i+1] < zs[3]
             _n_canopy += 1;
-            push!(_c_index, i);
-        elseif zt <= _z0 <= zc < _z1
+            push!(_c_inds, _i);
+
+        # if the upper canopy boundary is within the layer
+        elseif zs[2] <= zas[_i] <= zs[3] < zas[_i+1]
             _n_canopy += 1;
-            push!(_c_index, i-1);
+            push!(_c_inds, _i-1);
             break
-        elseif zc <= _z0 < _z1
+
+        # if the entire canopy is below the layer
+        elseif zs[3] <= zas[_i] < zas[_i+1]
             break
         end;
     end;
 
-    # create evenly distributed root system for now
+    # create evenly distributed root system from top soil to deep soil
     _roots = Root{FT}[];
-    for i in _r_index
-        _Δh = abs(zss[i+1] + zss[i]) / 2;
+    for _i in _r_inds
+        _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
         _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zt, Δl = zt, ssm = ssm), T_25());
+    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zs[2], Δl = zs[2], ssm = ssm), T_25());
 
-    # create branches
+    # create branches from bottom canopy (trunk) to top canopy
     _branches = Stem{FT}[];
-    for i in _c_index
-        _Δh = (zas[i] + max(zas[i+1], zt)) / 2 - zt;
+    for _i in _c_inds
+        _Δh = (max(zas[_i], zs[2]) + min(zas[_i+1], zs[3])) / 2 - zs[2];
         _st = Stem{FT}(StemHydraulics{FT}(area = 1/_n_canopy, Δh = _Δh, ssm = ssm), T_25());
         push!(_branches, _st);
     end;
 
-    # create leaves
-    _leaves = [Leaf{FT}(psm; broadband = broadband, ssm = ssm) for i in 1:_n_canopy];
+    # create leaves from bottom canopy (trunk) to top canopy
+    _leaves = [Leaves2D{FT}(psm, wls; ssm = ssm) for _i in 1:_n_canopy];
     for _leaf in _leaves
         _leaf.HS.AREA = 1500 / _n_canopy;
     end;
 
+    # create canopy to use for radiative transfer
+    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+
     # return plant
-    return MonoTreeSPAC{FT}(
+    return MonoMLTreeSPAC{FT}(
                 _branches,          # BRANCHES
+                _canopy,            # CANOPY
                 _leaves,            # LEAVES
-                _c_index,           # LEVES_INDEX
+                _c_inds,            # LEAVES_INDEX
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
-                _r_index,           # ROOTS_INDEX
+                _r_inds,            # ROOTS_INDEX
                 _trunk,             # TRUNK
+                FT.(zs),            # Z
+                FT.(zas),           # Z_AIR
+                FT.(zss),           # Z_SOIL
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
