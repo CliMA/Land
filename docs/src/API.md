@@ -33,16 +33,17 @@ extinction_scattering_coefficients!(can::BroadbandSLCanopy{FT}, angles::SunSenso
 extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
 canopy_optical_properties!
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
-canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat}
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat}
 canopy_radiation!
-canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
-canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
+canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
+canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat}
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
-canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
-canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 canopy_fluorescence!
-canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat}
+canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat}
 ```
 
 ## Remote Sensing Applications

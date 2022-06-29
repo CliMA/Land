@@ -1,3 +1,4 @@
 [deps]
 CanopyRadiativeTransfer = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"

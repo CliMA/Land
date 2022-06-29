@@ -26,21 +26,20 @@ function canopy_radiation! end
 #     2022-Jun-21: redo the mean rates by weighing them by sunlit fraction
 #     2022-Jun-25: finalize the soil shortwave reflection
 #     2022-Jun-25: clean the calculations
-# To do:
-#     TODO: make sure leaves are using broadband biophysics
+#     2022-Jun-29: use Leaves1D for the broadband RT
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates soil shortwave radiation profiles, given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaf` `Leaf` type struct
+- `leaf` `Leaves1D` type struct
 - `rad` `BroadbandRadiation` solar radiation
 - `soil` `Soil` type struct
 """
-canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack RADIATION = can;
     @unpack BIO = leaf;
     @unpack ALBEDO = soil;
@@ -136,19 +135,21 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::BroadbandRadi
 # Changes to this method
 # General
 #     2022-Jun-25: add method for longwave radation for two leaf RT
+#     2022-Jun-29: use Leaves1D for the broadband RT
+#     2022-Jun-29: use sunlit and shaded temperatures for the longwave out
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates soil longwave radiation profiles, given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaf` `Leaf` type struct
+- `leaf` `Leaves1D` type struct
 - `rad` Incoming longwave radiation
 - `soil` `Soil` type struct
 """
-canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack RADIATION = can;
     @unpack BIO = leaf;
     @unpack ALBEDO = soil;
@@ -181,8 +182,8 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::FT, soil::Soi
 
     # longwave radiation reaching soil and the canopy (averaged)
     _soil_lw_in_solar  = rad * exp(-sqrt(BIO.Ε_LW) * RADIATION.k_diffuse * can.ci * can.lai);
-    _soil_lw_in_sunlit = BIO.Ε_LW * K_STEFAN(FT) * leaf.t ^ 4 * sunlit_integral_down(RADIATION.k_diffuse, BIO.Ε_LW);
-    _soil_lw_in_shaded = BIO.Ε_LW * K_STEFAN(FT) * leaf.t ^ 4 * shaded_integral_down(RADIATION.k_diffuse, BIO.Ε_LW);
+    _soil_lw_in_sunlit = BIO.Ε_LW * K_STEFAN(FT) * leaf.t[1] ^ 4 * sunlit_integral_down(RADIATION.k_diffuse, BIO.Ε_LW);
+    _soil_lw_in_shaded = BIO.Ε_LW * K_STEFAN(FT) * leaf.t[2] ^ 4 * shaded_integral_down(RADIATION.k_diffuse, BIO.Ε_LW);
     _soil_lw_in        = _soil_lw_in_solar + _soil_lw_in_sunlit + _soil_lw_in_shaded;
     _soil_lw_out       = _soil_lw_in * ALBEDO.ρ_lw + (1 - ALBEDO.ρ_lw) * K_STEFAN(FT) + soil.t ^ 4;
     ALBEDO.r_net_lw    = _soil_lw_in - _soil_lw_out;
@@ -194,8 +195,8 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaf{FT}, rad::FT, soil::Soi
     _sunlit_in_soil   = _soil_lw_out * sunlit_integral_down(RADIATION.k_diffuse, BIO.Ε_LW);
 
     # lognwave radiation out from sunlit and shaded leaves
-    _shaded_out_solar = BIO.Ε_LW * K_STEFAN(FT) * leaf.t ^ 4 * shaded_integral_top(RADIATION.k_diffuse, BIO.Ε_LW);
-    _sunlit_out_solar = BIO.Ε_LW * K_STEFAN(FT) * leaf.t ^ 4 * sunlit_integral_top(RADIATION.k_diffuse, BIO.Ε_LW);
+    _shaded_out_solar = BIO.Ε_LW * K_STEFAN(FT) * leaf.t[1] ^ 4 * shaded_integral_top(RADIATION.k_diffuse, BIO.Ε_LW);
+    _sunlit_out_solar = BIO.Ε_LW * K_STEFAN(FT) * leaf.t[2] ^ 4 * sunlit_integral_top(RADIATION.k_diffuse, BIO.Ε_LW);
     _sunlit_out_soil  = _soil_lw_in_sunlit;
 
     # net radiation in-out for sunlit and shaded leaves for shortwave radation
@@ -276,21 +277,20 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 #     2022-Jun-10: add documentation
 #     2022-Jun-10: compute shortwave net radiation
 #     2022-Jun-13: use N_LAYER instead of _end
-# To do:
-#     TODO: make sure leaves are using hyperspectral biophysics
+#     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates canopy radiation profiles for shortwave radiation, given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaf`
+- `leaves` Vector of `Leaves2D`
 - `rad` Incoming solar radiation
 - `soil` Bottom soil boundary layer
 """
-canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack APAR_CAR, N_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
     @unpack ALBEDO = soil;
     _ilai = can.lai * can.ci / N_LAYER;
@@ -411,9 +411,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
         # PPAR for leaves
         _Σ_ppar_dif = RADIATION._apar_shaded' * WLSET.ΔΛ_PAR;
         _Σ_ppar_dir = RADIATION._apar_sunlit' * WLSET.ΔΛ_PAR * _normi;
-        RADIATION.ppar_shaded[_i] = _Σ_ppar_dif;
-        RADIATION.ppar_sunlit[:,:,_i] .= OPTICS._abs_fs_fo .* _Σ_ppar_dir;
-        RADIATION.ppar_sunlit[:,:,_i] .+= _Σ_ppar_dif;
+        leaves[_i].ppar_shaded  = _Σ_ppar_dif;
+        leaves[_i].ppar_sunlit .= OPTICS._abs_fs_fo .* _Σ_ppar_dir .+ _Σ_ppar_dif;
     end;
 
     return nothing
@@ -426,19 +425,20 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad:
 # General
 #     2022-Jun-10: migrate the function thermal_fluxes! from CanopyLayers
 #     2022-Jun-10: update net lw radiation for leaves and soil
+#     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates canopy radiation profiles for longwave radiation, given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaf`
+- `leaves` Vector of `Leaves2D`
 - `rad` Incoming longwave radiation
 - `soil` Bottom soil boundary layer
 """
-canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS, RADIATION = can;
     @unpack ALBEDO = soil;
 

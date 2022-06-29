@@ -1,6 +1,7 @@
 module CanopyRadiativeTransfer
 
-using ClimaCache: BroadbandRadiation, BroadbandSLCanopy, BroadbandSoilAlbedo, HyperspectralMLCanopy, HyperspectralRadiation, HyperspectralSoilAlbedo, Leaf, Soil, SunSensorGeometry, VerhoefLIDF
+using ClimaCache: BroadbandRadiation, BroadbandSLCanopy, BroadbandSoilAlbedo, HyperspectralMLCanopy, HyperspectralRadiation, HyperspectralSoilAlbedo, Leaves1D, Leaves2D, Soil, SunSensorGeometry,
+      VerhoefLIDF
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: METHODLIST
 using LeafOptics: energy!, photon, photon!

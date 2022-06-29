@@ -159,18 +159,19 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::Hyperspectral
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
 #     2022-Jun-10: fix documentation
 #     2022-Jun-10: add function to compute longwave reflectance, transmittance, and emissivity
+#     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}) where {FT<:AbstractFloat}
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates canopy optical properties (scattering coefficient matrices), given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaf`
+- `leaves` Vector of `Leaves2D`
 - `soil` Bottom soil boundary layer
 """
-canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
+canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS = can;
     @unpack ALBEDO = soil;
     @assert length(leaves) == N_LAYER "Number of leaves must be equal to the canopy layers!";

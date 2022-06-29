@@ -24,18 +24,19 @@ function canopy_fluorescence! end
 #     2022-Jun-13: finished migrating the SIF function
 #     2022-Jun-13: fix documentation
 #     2022-Jun-14: convert energy and photon back and forth if using photon mode
+#     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #
 #######################################################################################################################################################################################################
 """
 
-    canopy_fluorescence!(can::HyperspectralMLCanopy{FT}; ϕ_photon::Bool = true) where {FT<:AbstractFloat}
+    canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat}
 
 Updates canopy radiation profiles for shortwave radiation, given
 - `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaf`
+- `leaves` Vector of `Leaves2D`
 - `ϕ_photon` If true (default), convert photon to photon when computing SIF; otherwise, convert energy to energy
 """
-canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaf{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat} = (
+canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat} = (
     @unpack N_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
     _ilai = can.lai * can.ci / N_LAYER;
 

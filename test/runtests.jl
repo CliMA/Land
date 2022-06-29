@@ -28,8 +28,8 @@ using Test
             hcan = ClimaCache.HyperspectralMLCanopy{FT}();
             bcan = ClimaCache.BroadbandSLCanopy{FT}();
             angles = ClimaCache.SunSensorGeometry{FT}();
-            hleaf = ClimaCache.Leaf{FT}("C3");
-            bleaf = ClimaCache.Leaf{FT}("C3"; broadband = true);
+            hleaf = ClimaCache.Leaves2D{FT}("C3");
+            bleaf = ClimaCache.Leaves1D{FT}("C3");
             leaves = [deepcopy(hleaf) for i in 1:20];
             hsoil = ClimaCache.Soil{FT}(FT[0,-1]);
             bsoil = ClimaCache.Soil{FT}(FT[0,-1], true);
