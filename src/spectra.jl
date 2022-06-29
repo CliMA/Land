@@ -239,3 +239,28 @@ leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_p
 
     return nothing
 );
+
+
+#######################################################################################################################################################################################################
+#
+# Changes made to this method
+# General
+#     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, and MonoMLTreeSPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Update leaf reflectance and transmittance for SPAC, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, and `MonoMLTreeSPAC` type SPAC
+"""
+leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack LEAVES, LHA, WLSET = spac;
+
+    for _leaf in LEAVES
+        leaf_spectra!(_leaf.BIO, WLSET, LHA; APAR_car = _leaf.APAR_CAR);
+    end;
+
+    return nothing
+);

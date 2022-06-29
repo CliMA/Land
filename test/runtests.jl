@@ -6,9 +6,10 @@ using Test
 @testset verbose = true "LeafOptics Test" begin
     @testset "Spectra" begin
         for FT in [Float32, Float64]
-            wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
-            lha = ClimaCache.HyperspectralAbsorption{FT}(wls);
+            wls  = ClimaCache.WaveLengthSet{FT}();
+            bio  = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
+            lha  = ClimaCache.HyperspectralAbsorption{FT}(wls);
+            spac = ClimaCache.MonoMLTreeSPAC{FT}("C3", wls);
 
             leaf_spectra!(bio, wls, lha);
             @test true;
@@ -18,6 +19,9 @@ using Test
             @test true;
 
             leaf_spectra!(bio, wls, FT(0.1), FT(0.45), FT(0.05), FT(0.25));
+            @test true;
+
+            leaf_spectra!(spac);
             @test true;
         end;
     end;
