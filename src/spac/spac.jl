@@ -25,6 +25,7 @@ abstract type AbstractSPACSystem{FT<:AbstractFloat} end
 # General
 #     2022-May-25: toy SPAC system
 #     2022-May-25: use Root and Stem structures with temperatures
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -40,6 +41,8 @@ $(TYPEDFIELDS)
 """
 mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
+    "Air conditions"
+    AIR::AirLayer{FT}
     "Leaf system"
     LEAF::Leaf{FT}
     "Root system"
@@ -61,6 +64,7 @@ end
 #     2022-May-25: add psm to constructor option
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: add steady state mode option to input options
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -76,6 +80,7 @@ MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) wher
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
     return MonoElementSPAC{FT}(
+                AirLayer{FT}(),                                     # AIR
                 Leaf{FT}(psm; broadband = broadband, ssm = ssm),    # LEAF
                 Root{FT}(ssm = ssm),                                # ROOT
                 Stem{FT}(ssm = ssm),                                # STEM
@@ -93,6 +98,7 @@ MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) wher
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -108,6 +114,8 @@ $(TYPEDFIELDS)
 """
 mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
+    "Air for each layer (may be more than canopy layer)"
+    AIR::Vector{AirLayer{FT}}
     "Canopy used for radiation calculations"
     CANOPY::HyperspectralMLCanopy{FT}
     "Leaf per layer"
@@ -149,6 +157,7 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -228,8 +237,12 @@ MonoMLGrassSPAC{FT}(
     # create canopy to use for radiative transfer
     _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
 
+    # create air layers for all provided layers from bottom to top
+    _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
+
     # return plant
     return MonoMLGrassSPAC{FT}(
+                _airs,              # AIR
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
@@ -256,6 +269,7 @@ MonoMLGrassSPAC{FT}(
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -271,6 +285,8 @@ $(TYPEDFIELDS)
 """
 mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
+    "Air for each layer (more than canopy layer)"
+    AIR::Vector{AirLayer{FT}}
     "Canopy used for radiation calculations"
     CANOPY::HyperspectralMLCanopy{FT}
     "Leaf per layer"
@@ -315,6 +331,7 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -416,8 +433,12 @@ MonoMLPalmSPAC{FT}(
     # create canopy to use for radiative transfer
     _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
 
+    # create air layers for all provided layers from bottom to top
+    _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
+
     # return plant
     return MonoMLPalmSPAC{FT}(
+                _airs,              # AIR
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
@@ -445,6 +466,7 @@ MonoMLPalmSPAC{FT}(
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -460,6 +482,8 @@ $(TYPEDFIELDS)
 """
 mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
+    "Air for each layer (more than canopy layer)"
+    AIR::Vector{AirLayer{FT}}
     "Branch hydraulic system"
     BRANCHES::Vector{Stem{FT}}
     "Canopy used for radiation calculations"
@@ -506,6 +530,7 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add HyperspectralMLCanopy, and Zs
+#     2022-Jun-29: add AirLayer to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -615,8 +640,12 @@ MonoMLTreeSPAC{FT}(
     # create canopy to use for radiative transfer
     _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
 
+    # create air layers for all provided layers from bottom to top
+    _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
+
     # return plant
     return MonoMLTreeSPAC{FT}(
+                _airs,              # AIR
                 _branches,          # BRANCHES
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
