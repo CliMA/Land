@@ -166,10 +166,10 @@ using Test
             end;
 
             # Beta function
-            β_1 = ClimaCache.BetaFunctionLeafK(ClimaCache.BetaParameterG1());
-            β_2 = ClimaCache.BetaFunctionLeafK(ClimaCache.BetaParameterVcmax());
-            β_3 = ClimaCache.BetaFunctionSoilK(ClimaCache.BetaParameterG1());
-            β_4 = ClimaCache.BetaFunctionSoilK(ClimaCache.BetaParameterVcmax());
+            β_1 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKleaf(), param_y = ClimaCache.BetaParameterG1());
+            β_2 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKleaf(), param_y = ClimaCache.BetaParameterVcmax());
+            β_3 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKsoil(), param_y = ClimaCache.BetaParameterG1());
+            β_4 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKsoil(), param_y = ClimaCache.BetaParameterVcmax());
             for td in [β_1, β_2, β_3, β_4]
                 @test FT_test(td, FT);
                 @test NaN_test(td);
