@@ -194,10 +194,6 @@ mutable struct HyperspectralMLCanopyRadiationProfile{FT} <: AbstractCanopyRadiat
     sif_obs_sunlit::Vector{FT}
     "Upwelling SIF"
     sif_up::Matrix{FT}
-    "Shaded leaf fluorescence quantum yield"
-    ϕ_shaded::Vector{FT}
-    "Sunlit leaf fluorescence quantum yield"
-    ϕ_sunlit::Array{FT,3}
 
     # caches to speed up calculations
     "Mean APAR for shaded leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
@@ -251,6 +247,7 @@ end
 #     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
 #     2022-Jun-16: fox documentation
 #     2022-Jun-27: move ppar_sunlit and ppar_shaded to Leaves2D
+#     2022-Jun-29: move ϕ_sunlit and ϕ_shaded to Leaves2D
 #
 #######################################################################################################################################################################################################
 """
@@ -300,8 +297,6 @@ HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_
                 zeros(FT,n_λf),                 # sif_obs_soil
                 zeros(FT,n_λf),                 # sif_obs_sunlit
                 zeros(FT,n_λf,n_layer+1),       # sif_up
-                zeros(FT,n_layer),              # ϕ_shaded
-                zeros(FT,n_incl,n_azi,n_layer), # ϕ_sunlit
                 zeros(FT,n_par),                # _apar_shaded
                 zeros(FT,n_par),                # _apar_sunlit
                 zeros(FT,n_par),                # _par_shaded

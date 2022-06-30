@@ -97,7 +97,7 @@ MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) wher
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -129,6 +129,10 @@ mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     N_CANOPY::Int
     "Number of root layers"
     N_ROOT::Int
+    "Downwelling longwave radiation `[W m⁻²]`"
+    RAD_LW::FT
+    "Downwelling shortwave radiation"
+    RAD_SW::HyperspectralRadiation{FT}
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
@@ -141,8 +145,8 @@ mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     Z::Vector{FT}
     "Air boundaries `[m]`"
     Z_AIR::Vector{FT}
-    "Soil boundaries `[m]`"
-    Z_SOIL::Vector{FT}
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -164,7 +168,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -256,6 +260,9 @@ MonoMLGrassSPAC{FT}(
     # create soil
     _soil = Soil{FT}(FT.(zss), wls);
 
+    # create shortwave radiation
+    _rad_sw = HyperspectralRadiation{FT}(wls);
+
     # return plant
     return MonoMLGrassSPAC{FT}(
                 _airs,              # AIR
@@ -266,13 +273,15 @@ MonoMLGrassSPAC{FT}(
                 _lha,               # LHA
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
+                100,                # RAD_LW
+                _rad_sw,            # RAD_SW
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
                 _soil,              # SOIL
                 wls,                # WLSET
                 FT.(zs),            # Z
                 FT.(zas),           # Z_AIR
-                FT.(zss),           # Z_SOIL
+                true,               # Φ_PHOTON
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
@@ -288,7 +297,7 @@ MonoMLGrassSPAC{FT}(
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -320,6 +329,10 @@ mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     N_CANOPY::Int
     "Number of root layers"
     N_ROOT::Int
+    "Downwelling longwave radiation `[W m⁻²]`"
+    RAD_LW::FT
+    "Downwelling shortwave radiation"
+    RAD_SW::HyperspectralRadiation{FT}
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
@@ -334,8 +347,8 @@ mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     Z::Vector{FT}
     "Air boundaries `[m]`"
     Z_AIR::Vector{FT}
-    "Soil boundaries `[m]`"
-    Z_SOIL::Vector{FT}
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -357,7 +370,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -471,6 +484,9 @@ MonoMLPalmSPAC{FT}(
     # create soil
     _soil = Soil{FT}(FT.(zss), wls);
 
+    # create shortwave radiation
+    _rad_sw = HyperspectralRadiation{FT}(wls);
+
     # return plant
     return MonoMLPalmSPAC{FT}(
                 _airs,              # AIR
@@ -481,6 +497,8 @@ MonoMLPalmSPAC{FT}(
                 _lha,               # LHA
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
+                100,                # RAD_LW
+                _rad_sw,            # RAD_SW
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
                 _soil,              # SOIL
@@ -488,7 +506,7 @@ MonoMLPalmSPAC{FT}(
                 wls,                # WLSET
                 FT.(zs),            # Z
                 FT.(zas),           # Z_AIR
-                FT.(zss),           # Z_SOIL
+                true,               # Φ_PHOTON
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
@@ -504,7 +522,7 @@ MonoMLPalmSPAC{FT}(
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -538,6 +556,10 @@ mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     N_CANOPY::Int
     "Number of root layers"
     N_ROOT::Int
+    "Downwelling longwave radiation `[W m⁻²]`"
+    RAD_LW::FT
+    "Downwelling shortwave radiation"
+    RAD_SW::HyperspectralRadiation{FT}
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
@@ -552,8 +574,8 @@ mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     Z::Vector{FT}
     "Air boundaries `[m]`"
     Z_AIR::Vector{FT}
-    "Soil boundaries `[m]`"
-    Z_SOIL::Vector{FT}
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool
 
     # caches to speed up calculations
     "Flow rate per root layer"
@@ -575,7 +597,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -697,6 +719,9 @@ MonoMLTreeSPAC{FT}(
     # create soil
     _soil = Soil{FT}(FT.(zss), wls);
 
+    # create shortwave radiation
+    _rad_sw = HyperspectralRadiation{FT}(wls);
+
     # return plant
     return MonoMLTreeSPAC{FT}(
                 _airs,              # AIR
@@ -708,6 +733,8 @@ MonoMLTreeSPAC{FT}(
                 _lha,               # LHA
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
+                100,                # RAD_LW
+                _rad_sw,            # RAD_SW
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
                 _soil,              # SOIL
@@ -715,7 +742,7 @@ MonoMLTreeSPAC{FT}(
                 wls,                # WLSET
                 FT.(zs),            # Z
                 FT.(zas),           # Z_AIR
-                FT.(zss),           # Z_SOIL
+                true,               # Φ_PHOTON
                 zeros(FT,_n_root),  # _fs
                 zeros(FT,_n_root),  # _ks
                 zeros(FT,_n_root)   # _ps
