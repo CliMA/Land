@@ -213,7 +213,7 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "SpecialFunctions", "Test", "UnPack"]
 path = ".."
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
