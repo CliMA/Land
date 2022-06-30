@@ -612,13 +612,49 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 #######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `organ` `Leaf`, `Root`, or `Stem` type organ
+- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type organ
 - `update` If true, update xylem cavitation legacy
 """
-xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = xylem_pressure_profile!(organ.HS, organ.HS.FLOW, organ.t; update = update);
+xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t; update = update);
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-Jun-30: add method for Leaves1D
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat}
+
+Update xylem pressure profile (flow profile needs to be updated a priori), given
+- `organ` `Leaves1D` type organ
+- `update` If true, update xylem cavitation legacy
+"""
+xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS, HS2 = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t[1]; update = update);
+    HS2.k_history .= HS.k_history;
+    HS2.p_history .= HS.p_history;
+
+    xylem_pressure_profile!(HS2, HS2.FLOW, organ.t[2]; update = update);
+    HS.k_history .= HS2.k_history;
+    HS.p_history .= HS2.p_history;
+
+    return nothing
+)
 
 
 #######################################################################################################################################################################################################
