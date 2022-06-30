@@ -25,6 +25,7 @@ function canopy_fluorescence! end
 #     2022-Jun-13: fix documentation
 #     2022-Jun-14: convert energy and photon back and forth if using photon mode
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
+#     2022-Jun-29: use ϕ_f in Leaves2D
 #
 #######################################################################################################################################################################################################
 """
@@ -86,8 +87,8 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}
         end;
 
         # add up the fluorescence at various wavelength bins for sunlit and (up- and down-ward) diffuse SIF
-        _ϕ_sunlit = view(RADIATION.ϕ_sunlit,:,:,_i);
-        _ϕ_shaded = RADIATION.ϕ_shaded[_i];
+        _ϕ_sunlit = leaves[_i].ϕ_f_sunlit;
+        _ϕ_shaded = leaves[_i].ϕ_f_shaded;
 
         # compute the weights
         _sh_1_ = lidf_weight(_ϕ_shaded, 1);
@@ -179,6 +180,29 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}
     mul!(RADIATION.sif_obs_scatter, RADIATION._sif_obs_scatter, OPTICS._tmp_vec_layer);
 
     RADIATION.sif_obs .= RADIATION.sif_obs_sunlit .+ RADIATION.sif_obs_shaded .+ RADIATION.sif_obs_scatter .+ view(RADIATION.sif_up,:,N_LAYER+1) ./ OPTICS.po[end] ./ FT(pi);
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-29: add method for SPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Updates canopy fluorescence, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
+"""
+canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, LEAVES, Φ_PHOTON = spac;
+
+    canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
 
     return nothing
 );

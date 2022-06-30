@@ -35,6 +35,7 @@ using Test
             bsoil = ClimaCache.Soil{FT}(FT[0,-1], true);
             hrad = ClimaCache.HyperspectralRadiation{FT}();
             brad = ClimaCache.BroadbandRadiation{FT}();
+            spac = ClimaCache.MonoMLTreeSPAC{FT}("C3");
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, angles);
             @test true;
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, leaves, hsoil);
@@ -58,6 +59,10 @@ using Test
             CanopyRadiativeTransfer.soil_albedo!(hcan, hsoil);
             @test true;
             CanopyRadiativeTransfer.soil_albedo!(hcan, bsoil);
+            @test true;
+            CanopyRadiativeTransfer.canopy_radiation!(spac);
+            @test true;
+            CanopyRadiativeTransfer.canopy_fluorescence!(spac);
             @test true;
         end;
     end;

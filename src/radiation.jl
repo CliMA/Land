@@ -485,3 +485,29 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 
     return nothing
 );
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jun-29: add method for SPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Updates canopy radiation profiles for shortwave and longwave radiation, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
+"""
+canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL = spac;
+
+    canopy_optical_properties!(CANOPY, ANGLES);
+    canopy_optical_properties!(CANOPY, LEAVES, SOIL);
+    canopy_radiation!(CANOPY, LEAVES, RAD_SW, SOIL);
+    canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
+
+    return nothing
+);
