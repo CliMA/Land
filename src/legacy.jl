@@ -42,16 +42,34 @@ clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{F
 # General
 #     2022-May-26: add method for leaf (hydraulic system nested within)
 #     2022-May-31: fix documentation
+#     2022-Jun-30: add compatibility to Leaves1D and Leaves2D
 #
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
+    clear_legacy!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
 
 Clear the legacy for hydraulic system, given
-- `organ` `Leaf`, `Root`, or `Stem` type structure
+- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type structure
 """
-clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
+clear_legacy!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = clear_legacy!(organ.HS);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-Jun-30: add method for Leaves1D
+#
+#######################################################################################################################################################################################################
+"""
+
+    clear_legacy!(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
+
+Clear the legacy for hydraulic system, given
+- `organ` `Leaves1D` type structure
+"""
+clear_legacy!(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (clear_legacy!(organ.HS); clear_legacy!(organ.HS2));
 
 
 #######################################################################################################################################################################################################

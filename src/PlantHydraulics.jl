@@ -1,7 +1,7 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, NonSteadyStateFlow, PowerVC, Root, RootHydraulics,
-      SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
+using ClimaCache: ComplexVC, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, NonSteadyStateFlow, PowerVC, Root,
+      RootHydraulics, SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, T_25, ρg_MPa
