@@ -132,7 +132,8 @@ struct BetaParameterΘ <: AbstractBetaParameter end
 #
 # Changes to this struct
 # General
-#     2022-Jun-30: add struct to tune stomatal response based on leaf hydraulic conductance
+#     2022-Jun-30: add struct for modular beta function
+#     2022-Jun-30: add more types to PARAM_X
 #
 #######################################################################################################################################################################################################
 """
@@ -151,7 +152,7 @@ mutable struct BetaFunction
     "Function to turn variables to β tuning factor"
     FUNC::Function
     "Input parameter to base on"
-    PARAM_X::Union{BetaParameterKleaf, BetaParameterKsoil}
+    PARAM_X::Union{BetaParameterKleaf, BetaParameterKsoil, BetaParameterPleaf, BetaParameterPsoil, BetaParameterΘ}
     "Target parameter to tune"
     PARAM_Y::Union{BetaParameterG1, BetaParameterVcmax}
 end
@@ -162,18 +163,19 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-30: add constructor function
+#     2022-Jun-30: fix function definition
 #
 #######################################################################################################################################################################################################
 """
 
-    BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter, param_y::AbstractBetaParameter = BetaParameterG1())
+    BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKsoil(), param_y::AbstractBetaParameter = BetaParameterG1())
 
 Construct a `BetaFunction` type beta function, given
 - `f` Function
 - `param_x` `AbstractBetaParameter` type to indicate which parameter to base on
 - `param_y` `AbstractBetaParameter` type to indicate which parameter to tune
 """
-BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter, param_y::AbstractBetaParameter = BetaParameterG1()) = BetaFunction(f, param_x, param_y);
+BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKsoil(), param_y::AbstractBetaParameter = BetaParameterG1()) = BetaFunction(f, param_x, param_y);
 
 
 #######################################################################################################################################################################################################
@@ -192,7 +194,27 @@ Hierarchy of AbstractStomataModel:
 abstract type AbstractStomataModel{FT<:AbstractFloat} end
 
 
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Ball Berry model
+#
+#######################################################################################################################################################################################################
+"""
 
+$(TYPEDEF)
+
+Struct for Ball Berry stomatal model. The equation used for Ball-Berry type model is
+```math
+gs = g0 + g1 ⋅ RH ⋅ \\dfrac{A}{Cs}
+```
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
 mutable struct BallBerrySM{FT} <: AbstractStomataModel{FT}
     # parameters that do not change with time
     "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
@@ -202,3 +224,19 @@ mutable struct BallBerrySM{FT} <: AbstractStomataModel{FT}
     "Beta function to force stomatal response tp soil moisture"
     Β::BetaFunction
 end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    BallBerrySM{FT}() where {FT<:AbstractFloat}
+
+Construct a `BallBerrySM` type stomatal model
+"""
+BallBerrySM{FT}() where {FT<:AbstractFloat} = BallBerrySM{FT}(0.025, 9, BetaFunction());

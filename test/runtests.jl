@@ -166,13 +166,26 @@ using Test
             end;
 
             # Beta function
-            β_1 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKleaf(), param_y = ClimaCache.BetaParameterG1());
-            β_2 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKleaf(), param_y = ClimaCache.BetaParameterVcmax());
-            β_3 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKsoil(), param_y = ClimaCache.BetaParameterG1());
-            β_4 = ClimaCache.BetaFunction(param_x = ClimaCache.BetaParameterKsoil(), param_y = ClimaCache.BetaParameterVcmax());
-            for td in [β_1, β_2, β_3, β_4]
-                @test FT_test(td, FT);
-                @test NaN_test(td);
+            param_1 = ClimaCache.BetaParameterKleaf();
+            param_2 = ClimaCache.BetaParameterKsoil();
+            param_3 = ClimaCache.BetaParameterPleaf();
+            param_4 = ClimaCache.BetaParameterPsoil();
+            param_5 = ClimaCache.BetaParameterΘ();
+            param_y = ClimaCache.BetaParameterG1();
+            param_z = ClimaCache.BetaParameterVcmax();
+            for p_y in [param_y, param_z]
+                for p_x in [param_1, param_2, param_3, param_4, param_5]
+                    β = ClimaCache.BetaFunction(param_x = p_x, param_y = p_y);
+                    @test FT_test(β, FT);
+                    @test NaN_test(β);
+                end;
+            end;
+
+            # Stomatal Models
+            sm_1 = ClimaCache.BallBerrySM{FT}();
+            for sm in [sm_1]
+                @test FT_test(β, FT);
+                @test NaN_test(β);
             end;
         end;
     end;
