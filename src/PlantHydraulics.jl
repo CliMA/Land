@@ -1,6 +1,6 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, NonSteadyStateFlow, PowerVC, Root, RootHydraulics,
+using ClimaCache: ComplexVC, Leaf, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, NonSteadyStateFlow, PowerVC, Root, RootHydraulics,
       SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: METHODLIST
@@ -11,9 +11,6 @@ using WaterPhysics: relative_surface_tension, relative_viscosity
 
 import SoilHydraulics: relative_hydraulic_conductance
 
-
-# export public types from ClimaCache
-export ComplexVC, LeafHydraulics, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoGrassSPAC, MonoPalmSPAC, MonoTreeSPAC, PowerVC, RootHydraulics, SegmentedPVCurve, StemHydraulics, WeibullVC
 
 # export public functions
 export relative_hydraulic_conductance, xylem_flow_profile!, xylem_pressure_profile!

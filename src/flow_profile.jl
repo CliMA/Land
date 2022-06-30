@@ -604,17 +604,18 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 # Changes to the method
 # General
 #     2022-May-31: add method for MonoGrassSPAC
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow_profile!(spac::MonoGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+    xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
 Update flow profiles for the soil-plant-air continuum (after setting up leaf flow rate), given
-- `spac` `MonoGrassSPAC` type SPAC system
+- `spac` `MonoMLGrassSPAC` type SPAC system
 - `Δt` Time step length
 """
-xylem_flow_profile!(spac::MonoGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack LEAVES, ROOTS = spac;
 
     # 1. update the leaf flow profile
@@ -633,17 +634,18 @@ xylem_flow_profile!(spac::MonoGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} 
 # Changes to the method
 # General
 #     2022-May-31: add method for MonoPalmSPAC
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+    xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
 Update flow profiles for the soil-plant-air continuum (after setting up leaf flow rate), given
-- `spac` `MonoPalmSPAC` type SPAC system
+- `spac` `MonoMLPalmSPAC` type SPAC system
 - `Δt` Time step length
 """
-xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack LEAVES, ROOTS, TRUNK = spac;
 
     # 1. update the leaf flow profile
@@ -666,17 +668,18 @@ xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} =
 # General
 #     2022-May-31: add method for MonoTreeSPAC
 #     2022-May-31: add documentation
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+    xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
 Update flow profiles for the soil-plant-air continuum (after setting up leaf flow rate), given
-- `spac` `MonoTreeSPAC` type SPAC system
+- `spac` `MonoMLTreeSPAC` type SPAC system
 - `Δt` Time step length
 """
-xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack BRANCHES, LEAVES, ROOTS, TRUNK = spac;
 
     # 1. update the leaf flow profile

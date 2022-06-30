@@ -82,16 +82,17 @@ clear_legacy!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
 # Changes to the method
 # General
 #     2022-May-26: add method for SPAC system (hydraulic system nested within)
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoGrassSPAC` type structure
+- `spac` `MonoMLGrassSPAC` type structure
 """
-clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!.(spac.LEAVES);
 
@@ -104,16 +105,17 @@ clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat} = (
 # Changes to the method
 # General
 #     2022-May-26: add method for SPAC system (hydraulic system nested within)
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoPalmSPAC` type structure
+- `spac` `MonoMLPalmSPAC` type structure
 """
-clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!(spac.TRUNK);
     clear_legacy!.(spac.LEAVES);
@@ -127,16 +129,17 @@ clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat} = (
 # Changes to the method
 # General
 #     2022-May-26: add method for SPAC system (hydraulic system nested within)
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    clear_legacy!(spac::MonoTreeSPAC{FT}) where {FT<:AbstractFloat}
+    clear_legacy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat}
 
 Clear the legacy for SPAC system, given
-- `spac` `MonoTreeSPAC` type structure
+- `spac` `MonoMLTreeSPAC` type structure
 """
-clear_legacy!(spac::MonoTreeSPAC{FT}) where {FT<:AbstractFloat} = (
+clear_legacy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
     clear_legacy!.(spac.ROOTS);
     clear_legacy!(spac.TRUNK);
     clear_legacy!.(spac.BRANCHES);

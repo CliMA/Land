@@ -655,17 +655,18 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
 # General
 #     2022-May-27: add method for MonoGrassSPAC
 #     2022-May-31: pass the test
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoGrassSPAC` type organ
+- `spac` `MonoMLGrassSPAC` type organ
 - `update` If true, update xylem cavitation legacy
 """
-xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack LEAVES, N_ROOT, ROOTS = spac;
 
     # update the profile in roots
@@ -692,17 +693,18 @@ xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<
 # General
 #     2022-May-27: add method for MonoPalmSPAC
 #     2022-May-31: pass the test
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoPalmSPAC` type organ
+- `spac` `MonoMLPalmSPAC` type organ
 - `update` If true, update xylem cavitation legacy
 """
-xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack LEAVES, N_ROOT, ROOTS, TRUNK = spac;
 
     # update the profile in roots
@@ -733,17 +735,18 @@ xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:
 # General
 #     2022-May-27: add method for MonoTreeSPAC
 #     2022-May-31: pass the test
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoTreeSPAC` type organ
+- `spac` `MonoMLTreeSPAC` type organ
 - `update` If true, update xylem cavitation legacy
 """
-xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack BRANCHES, LEAVES, N_ROOT, ROOTS, TRUNK = spac;
 
     # update the profile in roots

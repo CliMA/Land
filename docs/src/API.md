@@ -33,9 +33,9 @@ clear_legacy!
 clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat}
 clear_legacy!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
 clear_legacy!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat}
-clear_legacy!(spac::MonoGrassSPAC{FT}) where {FT<:AbstractFloat}
-clear_legacy!(spac::MonoPalmSPAC{FT}) where {FT<:AbstractFloat}
-clear_legacy!(spac::MonoTreeSPAC{FT}) where {FT<:AbstractFloat}
+clear_legacy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat}
+clear_legacy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat}
+clear_legacy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat}
 ```
 
 ## FLow profile
@@ -61,9 +61,9 @@ xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydrau
 xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
 xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
 xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
-xylem_flow_profile!(spac::MonoGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
-xylem_flow_profile!(spac::MonoPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
-xylem_flow_profile!(spac::MonoTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 ```
 
 ## Pressure profile
@@ -84,9 +84,9 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
 xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 ```
 
 ## Critical flow
