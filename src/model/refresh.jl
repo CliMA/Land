@@ -53,6 +53,36 @@ end
 
 function update_leaf_TP!(
             canopyi::CanopyLayer{FT},
+            envir::AirLayer{FT}
+) where {FT<:AbstractFloat}
+    # unpack required variables
+    @unpack g_max25, g_min25, p_ups, p_old, T, T_old = canopyi;
+
+    # if T changes, update TD and ec, then T_old
+    if T != T_old
+        canopyi.g_max = g_max25 * relative_diffusive_coefficient(T);
+        canopyi.g_min = g_min25 * relative_diffusive_coefficient(T);
+        canopyi.LV = latent_heat_vapor(T) * M_H₂O(FT);
+        canopyi.ps.t  = canopyi.T;
+        photosystem_temperature_dependence!(canopyi.ps.PSM, envir, canopyi.ps.t);
+        canopyi.ps.p_H₂O_sat = saturation_vapor_pressure(canopyi.ps.t);
+        canopyi.p_sat = canopyi.ps.p_H₂O_sat;
+        canopyi.ps._t = canopyi.ps.t;
+        canopyi.T_old = canopyi.T;
+        canopyi.p_old = canopyi.p_ups;
+    # if only p_ups changes, update ec and p_old
+    elseif p_ups != p_old
+        canopyi.p_old = canopyi.p_ups;
+    end
+
+    return nothing
+end
+
+
+
+
+function update_leaf_TP!(
+            canopyi::CanopyLayer{FT},
             spac::MonoElementSPAC{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
