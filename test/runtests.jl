@@ -186,7 +186,12 @@ using Test
             sm_2 = ClimaCache.GentineSM{FT}();
             sm_3 = ClimaCache.LeuningSM{FT}();
             sm_4 = ClimaCache.MedlynSM{FT}();
-            for sm in [sm_1, sm_2, sm_3, sm_4]
+            sm_5 = ClimaCache.AndereggSM{FT}();
+            sm_6 = ClimaCache.EllerSM{FT}();
+            sm_7 = ClimaCache.SperrySM{FT}();
+            sm_8 = ClimaCache.WangSM{FT}();
+            sm_9 = ClimaCache.Wang2SM{FT}();
+            for sm in [sm_1, sm_2, sm_3, sm_4, sm_5, sm_6, sm_7, sm_8, sm_9]
                 @test FT_test(sm, FT);
                 @test NaN_test(sm);
             end;

@@ -198,6 +198,52 @@ abstract type AbstractStomataModel{FT<:AbstractFloat} end
 #
 # Changes to this struct
 # General
+#     2022-Jun-30: add struct for Anderegg model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct for Anderegg stomatal model. The equation used for Anderegg type model is
+```math
+\\dfrac{∂Θ}{∂E} = \\dfrac{2aP + b}{K}
+```
+where K is ``\\dfrac{∂E}{∂P}``.
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct AndereggSM{FT} <: AbstractStomataModel{FT}
+    "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
+    A::FT
+    "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻¹]`"
+    B::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    AndereggSM{FT}() where {FT<:AbstractFloat}
+
+Construct a `AndereggSM` type stomatal model
+"""
+AndereggSM{FT}() where {FT<:AbstractFloat} = AndereggSM{FT}(0.5, 2);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
 #     2022-Jun-30: add struct for Ball Berry model
 #
 #######################################################################################################################################################################################################
@@ -240,6 +286,26 @@ end
 Construct a `BallBerrySM` type stomatal model
 """
 BallBerrySM{FT}() where {FT<:AbstractFloat} = BallBerrySM{FT}(0.025, 9, BetaFunction());
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Eller model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Empty struct for Eller stomatal model. The equation used for Eller type model is
+```math
+\\dfrac{∂Θ}{∂E} = -\\dfrac{∂K}{∂E} ⋅ \\dfrac{A}{K}
+```
+where K is ``\\dfrac{∂E}{∂P}``.
+"""
+struct EllerSM{FT} <: AbstractStomataModel{FT} end
 
 
 #######################################################################################################################################################################################################
@@ -384,3 +450,86 @@ end
 Construct a `MedlynSM` type stomatal model
 """
 MedlynSM{FT}() where {FT<:AbstractFloat} = MedlynSM{FT}(0.025, 125, BetaFunction());
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Sperry model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Empty struct for Sperry stomatal model. The equation used for Sperry type model is
+```math
+\\dfrac{∂Θ}{∂E} = -\\dfrac{∂K}{∂E} ⋅ \\dfrac{A_{max}}{K_{max}}
+```
+where K is ``\\dfrac{∂E}{∂P}``.
+"""
+struct SperrySM{FT} <: AbstractStomataModel{FT} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Wang model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Empty struct for Wang stomatal model. The equation used for Wang type model is
+```math
+\\dfrac{∂Θ}{∂E} = \\dfrac{A}{E_{crit} - E}
+```
+"""
+struct WangSM{FT} <: AbstractStomataModel{FT} end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Wang model modified from Anderegg model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Empty struct for a new Wang stomatal model modified from Anderegg model. The equation used for new Wang2SM type model is
+```math
+\\dfrac{∂Θ}{∂E} = \\dfrac{aAP}{K}
+```
+where K is ``\\dfrac{∂E}{∂P}``.
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct Wang2SM{FT} <: AbstractStomataModel{FT}
+    "Quadratic equation parameter `[MPa⁻²]`"
+    A::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    Wang2SM{FT}() where {FT<:AbstractFloat}
+
+Construct a `Wang2SM` type stomatal model
+"""
+Wang2SM{FT}() where {FT<:AbstractFloat} = Wang2SM{FT}(0.1);
