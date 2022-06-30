@@ -240,3 +240,147 @@ end
 Construct a `BallBerrySM` type stomatal model
 """
 BallBerrySM{FT}() where {FT<:AbstractFloat} = BallBerrySM{FT}(0.025, 9, BetaFunction());
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Gentine model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct for Gentine stomatal model. The equation used for Gentine type model is
+```math
+gs = g0 + g1 ⋅ \\dfrac{k_{leaf}}{k_{max}} ⋅ \\dfrac{A}{Ca}.
+```
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct GentineSM{FT} <: AbstractStomataModel{FT}
+    # parameters that do not change with time
+    "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
+    G0::FT
+    "Slope of conductance-photosynthesis correlation `[-]`"
+    G1::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    GentineSM{FT}() where {FT<:AbstractFloat}
+
+Construct a `GentineSM` type stomatal model
+"""
+GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Leuning model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct for Leuning stomatal model. The equation used for Leuning type model is
+```math
+gs = g0 + g1 ⋅ \\dfrac{A}{Cs - Γ^{*}} ⋅ \\dfrac{1}{1 + \\dfrac{VPD}{d0}}
+```
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct LeuningSM{FT} <: AbstractStomataModel{FT}
+    # parameters that do not change with time
+    "Fitting parameter of d/d0 below the fraction, same unit as vpd `[Pa]`"
+    D0::FT
+    "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
+    G0::FT
+    "Slope of conductance-photosynthesis correlation `[-]`"
+    G1::FT
+    "Beta function to force stomatal response tp soil moisture"
+    Β::BetaFunction
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    LeuningSM{FT}() where {FT<:AbstractFloat}
+
+Construct a `LeuningSM` type stomatal model
+"""
+LeuningSM{FT}() where {FT<:AbstractFloat} = LeuningSM{FT}(3000, 0.025, 8, BetaFunction());
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jun-30: add struct for Medlyn model
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Struct for Medlyn stomatal model. The equation used for Medlyn type model is
+```math
+gs = g0 + 1.6 ⋅ \\left( 1 + \\dfrac{g1}{\\sqrt{VPD}} \\right) ⋅ \\dfrac{A}{Ca}
+```
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+mutable struct MedlynSM{FT} <: AbstractStomataModel{FT}
+    # parameters that do not change with time
+    "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
+    G0::FT
+    "Slope of conductance-photosynthesis correlation `[sqrt(Pa)]`"
+    G1::FT
+    "Beta function to force stomatal response tp soil moisture"
+    Β::BetaFunction
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this constructor
+# General
+#     2022-Jun-30: add constructor function
+#
+#######################################################################################################################################################################################################
+"""
+
+    MedlynSM{FT}() where {FT<:AbstractFloat}
+
+Construct a `MedlynSM` type stomatal model
+"""
+MedlynSM{FT}() where {FT<:AbstractFloat} = MedlynSM{FT}(0.025, 125, BetaFunction());

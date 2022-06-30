@@ -183,9 +183,12 @@ using Test
 
             # Stomatal Models
             sm_1 = ClimaCache.BallBerrySM{FT}();
-            for sm in [sm_1]
-                @test FT_test(β, FT);
-                @test NaN_test(β);
+            sm_2 = ClimaCache.GentineSM{FT}();
+            sm_3 = ClimaCache.LeuningSM{FT}();
+            sm_4 = ClimaCache.MedlynSM{FT}();
+            for sm in [sm_1, sm_2, sm_3, sm_4]
+                @test FT_test(sm, FT);
+                @test NaN_test(sm);
             end;
         end;
     end;
