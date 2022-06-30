@@ -159,6 +159,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jun-27: add new structure for leaves with 1D Vector of parameters, such as leaves for sunlit and shaded partitions
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
+#     2022-Jun-30: add a second HS2 for shaded leaves
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -180,6 +181,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     BIO::BroadbandLeafBiophysics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
+    "[`LeafHydraulics`](@ref) type leaf hydraulic system used for other calculations (say sunlit and shaded leaf partitioning)"
+    HS2::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
     PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
@@ -220,6 +223,7 @@ end
 #     2022-Jun-27: add constructor for Leaves1D
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
+#     2022-Jun-30: add a second HS2 for shaded leaves
 #
 #######################################################################################################################################################################################################
 """
@@ -261,6 +265,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
     return Leaves1D{FT}(
                 _bio,                               # BIO
                 LeafHydraulics{FT}(ssm = ssm),      # HS
+                LeafHydraulics{FT}(ssm = ssm),      # HS2
                 _prc,                               # PRC
                 _psm,                               # PSM
                 FT(0.05),                           # WIDTH
@@ -273,7 +278,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 FT[3.0, 3.0],                       # g_CO₂_b
                 FT[20, 20],                         # p_CO₂_i
                 FT[40, 40],                         # p_CO₂_s
-                saturation_vapor_pressure(T_25())   # p_H₂O_sat
+                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
     )
 );
 
@@ -287,6 +292,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 #     2022-Jun-29: add APAR_CAR as a field
+#     2022-Jun-30: fix documentation
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -339,7 +345,7 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     a_net_shaded::FT
     "Net photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
     a_net_sunlit::Matrix{FT}
-    "Total leaf diffusive conductance to CO₂ for shaed leaves `[mol m⁻² s⁻¹]`"
+    "Total leaf diffusive conductance to CO₂ for shaded leaves `[mol m⁻² s⁻¹]`"
     g_CO₂_shaded::FT
     "Total leaf diffusive conductance to CO₂ for sunlit leaves `[mol m⁻² s⁻¹]`"
     g_CO₂_sunlit::Matrix{FT}
