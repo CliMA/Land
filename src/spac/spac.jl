@@ -97,7 +97,7 @@ MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) wher
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -115,6 +115,8 @@ mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (may be more than canopy layer)"
     AIR::Vector{AirLayer{FT}}
+    "Sun sensor geometry"
+    ANGLES::SunSensorGeometry{FT}
     "Canopy used for radiation calculations"
     CANOPY::HyperspectralMLCanopy{FT}
     "Leaf per layer"
@@ -131,6 +133,8 @@ mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
+    "Soil component"
+    SOIL::Soil{FT}
     "Wavelength sets to use with hyperspectral radiation"
     WLSET::WaveLengthSet{FT}
     "Depth and height information `[m]`"
@@ -160,7 +164,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -246,9 +250,16 @@ MonoMLGrassSPAC{FT}(
     # create leaf hyperspectral absorption features
     _lha = HyperspectralAbsorption{FT}(wls);
 
+    # create sun sensor geometry
+    _angles = SunSensorGeometry{FT}();
+
+    # create soil
+    _soil = Soil{FT}(FT.(zss), wls);
+
     # return plant
     return MonoMLGrassSPAC{FT}(
                 _airs,              # AIR
+                _angles,            # ANGLES
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
@@ -257,6 +268,7 @@ MonoMLGrassSPAC{FT}(
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
+                _soil,              # SOIL
                 wls,                # WLSET
                 FT.(zs),            # Z
                 FT.(zas),           # Z_AIR
@@ -276,7 +288,7 @@ MonoMLGrassSPAC{FT}(
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -294,6 +306,8 @@ mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}}
+    "Sun sensor geometry"
+    ANGLES::SunSensorGeometry{FT}
     "Canopy used for radiation calculations"
     CANOPY::HyperspectralMLCanopy{FT}
     "Leaf per layer"
@@ -310,6 +324,8 @@ mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
+    "Soil component"
+    SOIL::Soil{FT}
     "Trunk hydraulic system"
     TRUNK::Stem{FT}
     "Wavelength sets to use with hyperspectral radiation"
@@ -341,7 +357,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -449,9 +465,16 @@ MonoMLPalmSPAC{FT}(
     # create leaf hyperspectral absorption features
     _lha = HyperspectralAbsorption{FT}(wls);
 
+    # create sun sensor geometry
+    _angles = SunSensorGeometry{FT}();
+
+    # create soil
+    _soil = Soil{FT}(FT.(zss), wls);
+
     # return plant
     return MonoMLPalmSPAC{FT}(
                 _airs,              # AIR
+                _angles,            # ANGLES
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
@@ -460,6 +483,7 @@ MonoMLPalmSPAC{FT}(
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
+                _soil,              # SOIL
                 _trunk,             # TRUNK
                 wls,                # WLSET
                 FT.(zs),            # Z
@@ -480,7 +504,7 @@ MonoMLPalmSPAC{FT}(
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -498,6 +522,8 @@ mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}}
+    "Sun sensor geometry"
+    ANGLES::SunSensorGeometry{FT}
     "Branch hydraulic system"
     BRANCHES::Vector{Stem{FT}}
     "Canopy used for radiation calculations"
@@ -516,6 +542,8 @@ mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     ROOTS::Vector{Root{FT}}
     "Corresponding soil layer per root layer"
     ROOTS_INDEX::Vector{Int}
+    "Soil component"
+    SOIL::Soil{FT}
     "Trunk hydraulic system"
     TRUNK::Stem{FT}
     "Wavelength sets to use with hyperspectral radiation"
@@ -547,7 +575,7 @@ end
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
-#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, and LHA to SPAC
+#     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -663,9 +691,16 @@ MonoMLTreeSPAC{FT}(
     # create leaf hyperspectral absorption features
     _lha = HyperspectralAbsorption{FT}(wls);
 
+    # create sun sensor geometry
+    _angles = SunSensorGeometry{FT}();
+
+    # create soil
+    _soil = Soil{FT}(FT.(zss), wls);
+
     # return plant
     return MonoMLTreeSPAC{FT}(
                 _airs,              # AIR
+                _angles,            # ANGLES
                 _branches,          # BRANCHES
                 _canopy,            # CANOPY
                 _leaves,            # LEAVES
@@ -675,6 +710,7 @@ MonoMLTreeSPAC{FT}(
                 _n_root,            # N_ROOT
                 _roots,             # ROOTS
                 _r_inds,            # ROOTS_INDEX
+                _soil,              # SOIL
                 _trunk,             # TRUNK
                 wls,                # WLSET
                 FT.(zs),            # Z
