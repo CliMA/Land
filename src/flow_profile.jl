@@ -70,16 +70,34 @@ xylem_flow(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}
 # Changes to the method
 # General
 #     2022-May-31: add method to extract flow rate from organ
+#     2022-Jun-30: add support for Leaves2D
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
+    xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
 
 Return the flow rate, given
-- `organ` `Leaf`, `Root`, or `Stem` type struct
+- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type struct
 """
-xylem_flow(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS.FLOW);
+xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS.FLOW);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-Jun-30: add method to extract flow rate from Leaves1D
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
+
+Return the flow rates from sunlit and shaded leaves, given
+- `organ` `Leaves1D` type struct
+"""
+xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (xylem_flow(organ.HS.FLOW), xylem_flow(organ.HS2.FLOW));
 
 
 #######################################################################################################################################################################################################
@@ -87,16 +105,17 @@ xylem_flow(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
 # Changes to the method
 # General
 #     2022-May-31: add method to extract flow rate from leaves
+#     2022-Jun-30: rename Leaf to Leaves2D ti support ML*SPAC
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow(organs::Vector{Leaf{FT}}) where {FT<:AbstractFloat}
+    xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat}
 
 Return the sum flow rate, given
 - `organs` Vector of `Leaf` type struct
 """
-xylem_flow(organs::Vector{Leaf{FT}}) where {FT<:AbstractFloat} = (
+xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
     for _i in eachindex(organs)
         _f_sum += xylem_flow(organs[_i]) * organs[_i].HS.AREA;
@@ -316,7 +335,6 @@ function xylem_flow_profile! end
     xylem_flow_profile!(mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat}
 
 Set up flow rate out for root at steady state mode, given
-- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
 - `mode` `SteadyStateFlow` type steady state flow
 - `flow` Target flow rate (guess or solution)
 """
@@ -341,7 +359,6 @@ xylem_flow_profile!(mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat} =
     xylem_flow_profile!(mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat}
 
 Set up flow rate out for root at non-steady state mode, given
-- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
 - `mode` `SteadyStateFlow` type steady state flow
 - `f_out` Target flow rate out of the root (guess or solution)
 """
@@ -469,13 +486,14 @@ xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::Non
 # General
 #     2022-May-27: add method for leaf, root, and stem hydraulic system at steady and non-steady state mode (for dispatching purpose)
 #     2022-May-31: add documentation
+#     2022-Jun-30: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
     xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, T::FT, Δt::FT) where {FT<:AbstractFloat}
 
-Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+Update leaf, root or stem flow rate at non-steady state mode after setting up the flow rate out, given
 - `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
 - `T` Liquid temperature
 - `Δt` Time step length
@@ -489,17 +507,43 @@ xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydrau
 # General
 #     2022-May-27: add method for leaf, root, and stem organ at steady and non-steady state mode (for dispatching purpose)
 #     2022-May-31: add documentation
+#     2022-Jun-30: add support to Leaves2D
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
+    xylem_flow_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
 
-Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
-- `hs` `Leaf`, `Root`, or `Stem` type struct
+Update leaf, root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `Leaf`, `Leaves2D`, `Root`, or `Stem` type struct
 - `Δt` Time step length
 """
-xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(organ.HS, organ.t, Δt);
+xylem_flow_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(organ.HS, organ.t, Δt);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the method
+# General
+#     2022-Jun-30: add method Leaves1D
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_flow_profile!(organ::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat}
+
+Update leaf, root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+- `hs` `Leaves1D` type struct
+- `Δt` Time step length
+"""
+xylem_flow_profile!(organ::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+    @unpack HS, HS2 = organ;
+
+    xylem_flow_profile!(HS, organ.t[1], Δt);
+    xylem_flow_profile!(HS2, organ.t[2], Δt);
+
+    return nothing
+);
 
 
 #######################################################################################################################################################################################################
@@ -509,13 +553,14 @@ xylem_flow_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {
 #     2022-May-27: add method to solve root flow rate partition at both steady and non-steady state modes
 #     2022-May-31: add documentation
 #     2022-May-31: use reformulate methods for setting up flow rate
+#     2022-Jun-30: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
     xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
 
-Update root or stem flow rate at non-steady state mode after setting up the flow rate out, given
+Update root flow rate at non-steady state mode after setting up the flow rate out, given
 - `roots` Vector of `Root` in a multiple roots system
 - `cache_f` Flow rate cache into each root
 - `cache_k` Total conductance cache of each root
