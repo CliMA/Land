@@ -164,6 +164,16 @@ using Test
                 @test FT_test(td, FT);
                 @test NaN_test(td);
             end;
+
+            # Beta function
+            β_1 = ClimaCache.BetaFunctionLeafK(ClimaCache.BetaParameterG1());
+            β_2 = ClimaCache.BetaFunctionLeafK(ClimaCache.BetaParameterVcmax());
+            β_3 = ClimaCache.BetaFunctionSoilK(ClimaCache.BetaParameterG1());
+            β_4 = ClimaCache.BetaFunctionSoilK(ClimaCache.BetaParameterVcmax());
+            for td in [β_1, β_2, β_3, β_4]
+                @test FT_test(td, FT);
+                @test NaN_test(td);
+            end;
         end;
     end;
 
