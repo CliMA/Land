@@ -12,6 +12,7 @@
 #     2022-Jun-15: add support to BroadbandLeafBiophysics and HyperspectralLeafBiophysics types
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -35,6 +36,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     APAR_CAR::Bool
     "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
+    "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
+    G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
@@ -89,6 +92,7 @@ end
 #     2022-Jun-15: add broadband as an option (default is false)
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -140,6 +144,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
     return Leaf{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
+                FT[0.01,0.3],                       # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
@@ -166,6 +171,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 #     2022-Jun-30: add a second HS2 for shaded leaves
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -185,6 +191,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     # parameters that do not change with time
     "[`BroadbandLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::BroadbandLeafBiophysics{FT}
+    "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
+    G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system used for other calculations (say sunlit and shaded leaf partitioning)"
@@ -233,6 +241,7 @@ end
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 #     2022-Jun-30: add a second HS2 for shaded leaves
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -273,6 +282,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 
     return Leaves1D{FT}(
                 _bio,                               # BIO
+                FT[0.01,0.3],                       # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 LeafHydraulics{FT}(ssm = ssm),      # HS2
                 _prc,                               # PRC
@@ -304,6 +314,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: fix documentation
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -326,6 +337,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     APAR_CAR::Bool
     "[`HyperspectralLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::HyperspectralLeafBiophysics{FT}
+    "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
+    G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
     HS::LeafHydraulics{FT}
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
@@ -395,6 +408,7 @@ end
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
+#     2022-Jul-01: add G_LIMITS as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -443,6 +457,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
     return Leaves2D{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
+                FT[0.01,0.3],                       # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
