@@ -11,6 +11,7 @@
 #     2022-Jun-14: use Union instead of Abstract... for type definition
 #     2022-Jun-15: add support to BroadbandLeafBiophysics and HyperspectralLeafBiophysics types
 #     2022-Jun-29: add APAR_CAR as a field
+#     2022-Jun-30: add SM as a field
 # Bug fixes:
 #     2022-Jan-24: add FT control to p_CO₂_i
 # To do
@@ -40,6 +41,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    "Stomatal model"
+    SM::AbstractStomataModel{FT}
     "Leaf width"
     WIDTH::FT
 
@@ -85,6 +88,7 @@ end
 #     2022-May-25: add new field WIDTH
 #     2022-Jun-15: add broadband as an option (default is false)
 #     2022-Jun-29: add APAR_CAR as a field
+#     2022-Jun-30: add SM as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -139,6 +143,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
+                WangSM{FT}(),                       # SM
                 FT(0.05),                           # WIDTH
                 0.01,                               # g_H₂O_s
                 1000,                               # ppar
@@ -160,6 +165,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 #     2022-Jun-30: add a second HS2 for shaded leaves
+#     2022-Jun-30: add SM as a field
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -187,6 +193,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    "Stomatal model"
+    SM::AbstractStomataModel{FT}
     "Leaf width"
     WIDTH::FT
 
@@ -224,6 +232,7 @@ end
 #     2022-Jun-27: make BIO BroadbandLeafBiophysics only
 #     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
 #     2022-Jun-30: add a second HS2 for shaded leaves
+#     2022-Jun-30: add SM as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -268,6 +277,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 LeafHydraulics{FT}(ssm = ssm),      # HS2
                 _prc,                               # PRC
                 _psm,                               # PSM
+                WangSM{FT}(),                       # SM
                 FT(0.05),                           # WIDTH
                 FT[0.01, 0.01],                     # g_H₂O_s
                 FT[1000, 200],                      # ppar
@@ -293,6 +303,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: fix documentation
+#     2022-Jun-30: add SM as a field
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -321,6 +332,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    "Stomatal model"
+    SM::AbstractStomataModel{FT}
     "Leaf width"
     WIDTH::FT
 
@@ -381,6 +394,7 @@ end
 #     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
 #     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
 #     2022-Jun-29: add APAR_CAR as a field
+#     2022-Jun-30: add SM as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -432,6 +446,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
+                WangSM{FT}(),                       # SM
                 FT(0.05),                           # WIDTH
                 0.01,                               # g_H₂O_s_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_H₂O_s_sunlit
