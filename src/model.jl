@@ -80,7 +80,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     rubisco_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
     light_limited_rate!(PSM);
     product_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
-    colimit_photosynthesis!(PSM);
+    colimit_photosynthesis!(PSM; β = β);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
@@ -130,7 +130,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; 
         rubisco_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
         light_limited_rate!(PSM);
         product_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
-        colimit_photosynthesis!(PSM);
+        colimit_photosynthesis!(PSM; β = β);
 
         # update the fluorescence related parameters
         photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]; β = β);
@@ -186,7 +186,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; 
         rubisco_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
         light_limited_rate!(PSM);
         product_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
-        colimit_photosynthesis!(PSM);
+        colimit_photosynthesis!(PSM; β = β);
 
         # update the fluorescence related parameters
         photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]; β = β);
@@ -202,7 +202,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; 
     rubisco_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
     light_limited_rate!(PSM);
     product_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
-    colimit_photosynthesis!(PSM);
+    colimit_photosynthesis!(PSM; β = β);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded; β = β);
@@ -275,7 +275,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     rubisco_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
     light_limited_rate!(PSM, PRC, air, leaf.g_CO₂; β = β);
     product_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
-    colimit_photosynthesis!(PSM);
+    colimit_photosynthesis!(PSM; β = β);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
     leaf.p_CO₂_i = air.p_CO₂ - PSM.a_net / leaf.g_CO₂   * air.P_AIR * FT(1e-6);
@@ -329,7 +329,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; 
         rubisco_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
         light_limited_rate!(PSM, PRC, air, leaves.g_CO₂[_i]; β = β);
         product_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
-        colimit_photosynthesis!(PSM);
+        colimit_photosynthesis!(PSM; β = β);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
         leaves.p_CO₂_i[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂[_i]   * air.P_AIR * FT(1e-6);
@@ -392,7 +392,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; 
         rubisco_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
         light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_sunlit[_i]; β = β);
         product_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
-        colimit_photosynthesis!(PSM);
+        colimit_photosynthesis!(PSM; β = β);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
         leaves.p_CO₂_i_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_sunlit[_i] * air.P_AIR * FT(1e-6);
@@ -415,7 +415,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; 
     rubisco_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
     light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_shaded; β = β);
     product_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
-    colimit_photosynthesis!(PSM);
+    colimit_photosynthesis!(PSM; β = β);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
     leaves.p_CO₂_i_shaded = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_shaded * air.P_AIR * FT(1e-6);
