@@ -18,7 +18,7 @@ function β_factor end
 #
 # Changes to this method
 # General
-#     2022-Junl-01: add method to tune stomatal opening based on relative hydraulic conductance at leaf xylem end
+#     2022-Jul-01: add method to tune stomatal opening based on relative hydraulic conductance at leaf xylem end
 #
 #######################################################################################################################################################################################################
 """
@@ -37,7 +37,7 @@ Return the β factor based on relative leaf hydraulic conductance at xylem end, 
 #
 # Changes to this method
 # General
-#     2022-Junl-01: add method to tune stomatal opening based on relative hydraulic conductance of the soil
+#     2022-Jul-01: add method to tune stomatal opening based on relative hydraulic conductance of the soil
 #
 #######################################################################################################################################################################################################
 """
@@ -56,7 +56,8 @@ Return the β factor based on relative hydraulic conductance of the soil, given
 #
 # Changes to this method
 # General
-#     2022-Junl-01: add method to tune stomatal opening based on soil potential or leaf pressure
+#     2022-Jul-01: add method to tune stomatal opening based on soil potential or leaf pressure
+#     2022-Jul-01: fix a typo in function call
 #
 #######################################################################################################################################################################################################
 """
@@ -67,4 +68,4 @@ Return the β factor based on soil water potential, leaf xylem pressure, or soil
 - `f` Function to translate x to β, for example f(x) = x, f(x) = x², and f(x) = sqrt(x) for x in [0,1]
 - `x_25` Leaf xylem pressure corrected to 25 °C, soil water potential corrected to 25 °C (forcing on roots), or soil water content
 """
-β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = β_factor(f, x_25);
+β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = FT(f(x_25));
