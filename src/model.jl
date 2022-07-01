@@ -35,26 +35,27 @@ function leaf_photosynthesis! end
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 #     2022-Jan-18: add p_i to electron transport function input variables
+#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
 #     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 #     2022-Jun-28: unpack the constant fields
-# Bug fixes
-#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ partial pressure, given
 - `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
 - `p_i` Internal CO₂ partial pressure in `Pa`, default is `leaf.p_CO₂_i`
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 ---
 # Examples
@@ -66,7 +67,7 @@ leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 30.0);
 ```
 """
-leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
 
     leaf.p_CO₂_i = p_i;
@@ -75,14 +76,14 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, p_i);
-    rubisco_limited_rate!(PSM, leaf.p_CO₂_i);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, p_i; β = β);
+    rubisco_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
     light_limited_rate!(PSM);
-    product_limited_rate!(PSM, leaf.p_CO₂_i);
+    product_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
     colimit_photosynthesis!(PSM);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(PSM, PRC, leaf.ppar);
+    photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
 
     return nothing
 );
@@ -94,16 +95,18 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 # General
 #     2022-Jun-28: add method for Leaves1D
 #     2022-Jun-28: fix documentation
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and shaded leaves, given
 - `leaves` `Leaves1D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 ---
 # Examples
@@ -114,7 +117,7 @@ mode   = PCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # loop through the ppars
@@ -123,14 +126,14 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
         photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
 
         # calculate the photosynthetic rates
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]);
-        rubisco_limited_rate!(PSM, leaves.p_CO₂_i[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
+        rubisco_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
         light_limited_rate!(PSM);
-        product_limited_rate!(PSM, leaves.p_CO₂_i[_i]);
+        product_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
         colimit_photosynthesis!(PSM);
 
         # update the fluorescence related parameters
-        photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]);
+        photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]; β = β);
 
         # save the rates and to leaves
         leaves.a_net[_i] = PSM.a_net;
@@ -146,16 +149,18 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
 # Changes to this method
 # General
 #     2022-Jun-28: add method for Leaves1D
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and shaded leaves, given
 - `leaves` `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 ---
 # Examples
@@ -166,7 +171,7 @@ mode   = PCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
@@ -177,14 +182,14 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
     # loop through the ppars for sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
         # calculate the photosynthetic rates
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]);
-        rubisco_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
+        rubisco_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
         light_limited_rate!(PSM);
-        product_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]);
+        product_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
         colimit_photosynthesis!(PSM);
 
         # update the fluorescence related parameters
-        photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]);
+        photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]; β = β);
 
         # save the rates and to leaves
         leaves.a_net_sunlit[_i] = PSM.a_net;
@@ -193,14 +198,14 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
     end;
 
     # run the model for shaded leaves
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded);
-    rubisco_limited_rate!(PSM, leaves.p_CO₂_i_shaded);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
+    rubisco_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
     light_limited_rate!(PSM);
-    product_limited_rate!(PSM, leaves.p_CO₂_i_shaded);
+    product_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
     colimit_photosynthesis!(PSM);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded);
+    photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded; β = β);
 
     # save the rates and to leaves
     leaves.a_net_shaded = PSM.a_net;
@@ -219,6 +224,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
+#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
@@ -227,21 +233,21 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode) 
 #     2022-Jun-27: remove apar from input variable list of light_limited_rate!
 #     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 #     2022-Jun-28: unpack the constant fields
-# Bug fixes
-#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
 - `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 Note that CO₂ partial pressures at leaf surface (stomatal opening) and in leaf internal airspace are updated, and then electron transport is updated again based on this CO₂ partial pressure.
 
@@ -255,7 +261,7 @@ leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 0.1);
 ```
 """
-leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
 
     leaf.g_CO₂ = g_lc;
@@ -265,10 +271,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i);
-    rubisco_limited_rate!(PSM, air, leaf.g_CO₂);
-    light_limited_rate!(PSM, PRC, air, leaf.g_CO₂);
-    product_limited_rate!(PSM, air, leaf.g_CO₂);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
+    rubisco_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
+    light_limited_rate!(PSM, PRC, air, leaf.g_CO₂; β = β);
+    product_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
     colimit_photosynthesis!(PSM);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
@@ -276,10 +282,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
     leaf.p_CO₂_s = air.p_CO₂ - PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
     # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(PSM, PRC, leaf.ppar);
+    photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
 
     return nothing
 );
@@ -290,16 +296,18 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
 # Changes to this method
 # General
 #     2022-Jun-28: add method for Leaves1D
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
 - `leaves` `Leaves1D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 ---
 # Examples
@@ -310,17 +318,17 @@ mode   = GCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through the leaves.ppar
     for _i in eachindex(leaves.ppar)
         photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]);
-        rubisco_limited_rate!(PSM, air, leaves.g_CO₂[_i]);
-        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂[_i]);
-        product_limited_rate!(PSM, air, leaves.g_CO₂[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
+        rubisco_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
+        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂[_i]; β = β);
+        product_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
         colimit_photosynthesis!(PSM);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
@@ -328,10 +336,10 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
         leaves.p_CO₂_s[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b[_i] * air.P_AIR * FT(1e-6);
 
         # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
 
         # update the fluorescence related parameters
-        photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]);
+        photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]; β = β);
 
         # save the rates and to leaves
         leaves.a_net[_i] = PSM.a_net;
@@ -347,16 +355,18 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
 # Changes to this method
 # General
 #     2022-Jun-28: add method for Leaves2D
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
 - `leaves` `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 ---
 # Examples
@@ -367,7 +377,7 @@ mode   = GCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
@@ -378,10 +388,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
     # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]);
-        rubisco_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]);
-        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_sunlit[_i]);
-        product_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
+        rubisco_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
+        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_sunlit[_i]; β = β);
+        product_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
         colimit_photosynthesis!(PSM);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
@@ -389,10 +399,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
         leaves.p_CO₂_s_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b          * air.P_AIR * FT(1e-6);
 
         # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
 
         # update the fluorescence related parameters
-        photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]);
+        photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]; β = β);
 
         # save the rates and to leaves
         leaves.a_net_sunlit[_i] = PSM.a_net;
@@ -401,10 +411,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
     end;
 
     # run the model for shaded leaves
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded);
-    rubisco_limited_rate!(PSM, air, leaves.g_CO₂_shaded);
-    light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_shaded);
-    product_limited_rate!(PSM, air, leaves.g_CO₂_shaded);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
+    rubisco_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
+    light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_shaded; β = β);
+    product_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
     colimit_photosynthesis!(PSM);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
@@ -412,10 +422,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
     leaves.p_CO₂_s_shaded = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b      * air.P_AIR * FT(1e-6);
 
     # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
 
     # update the fluorescence related parameters
-    photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded);
+    photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded; β = β);
 
     # save the rates and to leaves
     leaves.a_net_shaded = PSM.a_net;
@@ -431,20 +441,22 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode) 
 # Changes to this method
 # General
 #     2022-Jun-29: add method for MonoElementSPAC
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates for SPAC, given
 - `spac` `MonoElementSPAC` type SPAC
 - `mode` `GCO₂Mode` or `PCO₂Mode`
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 """
-leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack AIR, LEAF = spac;
 
-    leaf_photosynthesis!(LEAF, AIR, mode);
+    leaf_photosynthesis!(LEAF, AIR, mode; β = β);
 
     return nothing
 );
@@ -455,21 +467,24 @@ leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mo
 # Changes to this method
 # General
 #     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
+#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}; β::Union{FT, Vector{FT}} = FT(1)) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates for SPAC, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
 - `mode` `GCO₂Mode` or `PCO₂Mode`
+- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 """
-leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}; β::Union{FT, Vector{FT}} = FT(1)) where {FT<:AbstractFloat} = (
     @unpack AIR, LEAVES, LEAVES_INDEX = spac;
 
     for _i in eachindex(LEAVES)
-        leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode);
+        _β = (typeof(β) == FT) ? β : β[_i];
+        leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode; β = _β);
     end;
 
     return nothing

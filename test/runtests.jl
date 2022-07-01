@@ -67,13 +67,13 @@ using Test
                 leaves_1d = ClimaCache.Leaves1D{FT}(LT);
                 leaves_2d = ClimaCache.Leaves2D{FT}(LT);
                 leaf_photosynthesis!(leaves_1d, air, g_mode);
-                @test true
+                @test true;
                 leaf_photosynthesis!(leaves_1d, air, p_mode);
-                @test true
+                @test true;
                 leaf_photosynthesis!(leaves_2d, air, g_mode);
-                @test true
+                @test true;
                 leaf_photosynthesis!(leaves_2d, air, p_mode);
-                @test true
+                @test true;
             end;
         end;
     end
@@ -108,9 +108,9 @@ using Test
                 spac4 = ClimaCache.MonoMLTreeSPAC{FT}(LT);
                 for spac in [spac1, spac2, spac3, spac4]
                     leaf_photosynthesis!(spac, g_mode);
-                    @test true
+                    @test true;
                     leaf_photosynthesis!(spac, p_mode);
-                    @test true
+                    @test true;
                 end;
             end;
         end;
