@@ -1,7 +1,6 @@
 module StomataModels
 
-using ClimaCache: AbstractSoilVC, BetaFunction, BetaParameterKleaf, BetaParameterKsoil, BetaParameterPleaf, BetaParameterPsoil, BetaParameterΘ, LeafHydraulics, MonoElementSPAC, MonoMLGrassSPAC,
-      MonoMLPalmSPAC, MonoMLTreeSPAC
+using ClimaCache: AbstractSoilVC, AbstractXylemVC
 using DocStringExtensions: METHODLIST
 using PlantHydraulics: relative_hydraulic_conductance
 using SoilHydraulics: relative_hydraulic_conductance
@@ -10,7 +9,8 @@ using WaterPhysics: relative_surface_tension
 
 
 # include files
-include("beta.jl")
+include("beta.jl"  )
+include("limits.jl")
 
 
 end # module
