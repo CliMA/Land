@@ -11,6 +11,7 @@ PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
 SoilHydraulics = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
+WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
 ClimaCache = "0.5.0"
@@ -19,4 +20,5 @@ PkgUtility = "0.2.0"
 PlantHydraulics = "0.3.0"
 SoilHydraulics = "0.1.2"
 UnPack = "1.0.2"
+WaterPhysics = "0.1.4"
 julia = "1.6"
