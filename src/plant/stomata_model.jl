@@ -246,6 +246,7 @@ AndereggSM{FT}() where {FT<:AbstractFloat} = AndereggSM{FT}(0.5, 2);
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Ball Berry model
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -270,6 +271,8 @@ mutable struct BallBerrySM{FT} <: AbstractStomataModel{FT}
     G1::FT
     "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
+    "Time constant for the prognostic stomatal conductance `[s]`"
+    Τ::FT
 end
 
 
@@ -278,6 +281,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-30: add constructor function
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -286,7 +290,7 @@ end
 
 Construct a `BallBerrySM` type stomatal model
 """
-BallBerrySM{FT}() where {FT<:AbstractFloat} = BallBerrySM{FT}(0.025, 9, BetaFunction());
+BallBerrySM{FT}() where {FT<:AbstractFloat} = BallBerrySM{FT}(0.025, 9, BetaFunction(), 600);
 
 
 #######################################################################################################################################################################################################
@@ -315,6 +319,7 @@ struct EllerSM{FT} <: AbstractStomataModel{FT} end
 # General
 #     2022-Jun-30: add struct for Gentine model
 #     2022-Jul-07: add field Β to generalize the model
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -339,6 +344,8 @@ mutable struct GentineSM{FT} <: AbstractStomataModel{FT}
     G1::FT
     "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
+    "Time constant for the prognostic stomatal conductance `[s]`"
+    Τ::FT
 end
 
 
@@ -348,6 +355,7 @@ end
 # General
 #     2022-Jun-30: add constructor function
 #     2022-Jul-07: add field Β to generalize the model (fix the function, param_x, and param_y types)
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -356,7 +364,7 @@ end
 
 Construct a `GentineSM` type stomatal model
 """
-GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9, BetaFunction(x -> x; param_x = BetaParameterKleaf(), param_y = BetaParameterG1()));
+GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9, BetaFunction(x -> x; param_x = BetaParameterKleaf(), param_y = BetaParameterG1()), 600);
 
 
 #######################################################################################################################################################################################################
@@ -364,6 +372,7 @@ GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9, BetaFunction
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Leuning model
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -390,6 +399,8 @@ mutable struct LeuningSM{FT} <: AbstractStomataModel{FT}
     G1::FT
     "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
+    "Time constant for the prognostic stomatal conductance `[s]`"
+    Τ::FT
 end
 
 
@@ -398,6 +409,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-30: add constructor function
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -406,7 +418,7 @@ end
 
 Construct a `LeuningSM` type stomatal model
 """
-LeuningSM{FT}() where {FT<:AbstractFloat} = LeuningSM{FT}(3000, 0.025, 8, BetaFunction());
+LeuningSM{FT}() where {FT<:AbstractFloat} = LeuningSM{FT}(3000, 0.025, 8, BetaFunction(), 600);
 
 
 #######################################################################################################################################################################################################
@@ -414,6 +426,7 @@ LeuningSM{FT}() where {FT<:AbstractFloat} = LeuningSM{FT}(3000, 0.025, 8, BetaFu
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Medlyn model
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -438,6 +451,8 @@ mutable struct MedlynSM{FT} <: AbstractStomataModel{FT}
     G1::FT
     "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
+    "Time constant for the prognostic stomatal conductance `[s]`"
+    Τ::FT
 end
 
 
@@ -446,6 +461,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-30: add constructor function
+#     2022-Jul-07: add time constant
 #
 #######################################################################################################################################################################################################
 """
@@ -454,7 +470,7 @@ end
 
 Construct a `MedlynSM` type stomatal model
 """
-MedlynSM{FT}() where {FT<:AbstractFloat} = MedlynSM{FT}(0.025, 125, BetaFunction());
+MedlynSM{FT}() where {FT<:AbstractFloat} = MedlynSM{FT}(0.025, 125, BetaFunction(), 600);
 
 
 #######################################################################################################################################################################################################
