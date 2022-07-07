@@ -29,28 +29,6 @@ Update g_sw prognostically, given
 """
 function prognostic_gsw!(
             clayer::CanopyLayer{FT},
-            envir::AirLayer{FT},
-            sm::EmpiricalStomatalModel{FT},
-            β::FT,
-            Δt::FT
-) where {FT<:AbstractFloat}
-    # unpack values
-    @unpack g_sw, n_leaf = clayer;
-
-    # update g_sw
-    for iLF in 1:n_leaf
-        gsw_ss = max(sm.g0, stomatal_conductance(sm, clayer, envir, β, iLF));
-        g_sw[iLF] += (gsw_ss - g_sw[iLF]) / clayer.τ_esm * Δt;
-    end
-
-    return nothing
-end
-
-
-
-
-function prognostic_gsw!(
-            clayer::CanopyLayer{FT},
             hs::LeafHydraulics{FT},
             envir::AirLayer{FT},
             sm::OSMWang{FT},
