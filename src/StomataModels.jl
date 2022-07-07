@@ -14,6 +14,7 @@ include("beta.jl"       )
 include("conductance.jl")
 include("empirical.jl"  )
 include("limits.jl"     )
+include("optimality.jl" )
 
 
 end # module

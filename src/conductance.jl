@@ -183,7 +183,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}, Δt::FT; β::FT =
 #
 # Changes to this method
 # General
-#     2022-Jul-07: add new method to update stomatal conductance prognostically
+#     2022-Jul-07: add new method to update stomatal conductance for CO₂ based on that of H₂O
 #
 #######################################################################################################################################################################################################
 """

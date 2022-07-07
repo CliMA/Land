@@ -1,47 +1,5 @@
-###############################################################################
-#
-# Diff function to minimize by ConstrainedRootSolvers
-# Useful for Ballberry, Leuning, and Medlyn models
-#
-###############################################################################
-"""
-    solution_diff!(x::FT,
-                canopyi::CanopyLayer{FT},
-                hs::LeafHydraulics{FT},
-                svc::AbstractSoilVC{FT},
-                psoil::FT,
-                swc::FT,
-                envir::AirLayer{FT},
-                sm::OptimizationStomatalModel{FT},
-                bt::AbstractBetaFunction{FT},
-                mode::GlcDrive,
-                ind::Int
-    ) where {FT<:AbstractFloat}
-    solution_diff!(x::FT,
-                canopyi::CanopyLayer{FT},
-                hs::LeafHydraulics{FT},
-                envir::AirLayer{FT},
-                sm::AbstractStomatalModel{FT},
-                mode::AbstractDrive,
-                ind::Int
-    ) where {FT<:AbstractFloat}
-
-Calculate the difference to be minimized for a given
-- `x` Assumed leaf diffusive conductance or stomatal conductance, depending on
-    `mode`
-- `canopyi`[`CanopyLayer`](@ref) type struct
-- `hs` Leaf hydraulic system
-- `psoil` Soil water potential `[MPa]`
-- `swc` Soil water content
-- `envir`[`AirLayer`] type struct
-- `sm` [`EmpiricalStomatalModel`](@ref) or [`OptimizationStomatalModel`](@ref)
-- `bt` [`AbstractBetaFunction`](@ref) type struct
-- `mode` [`GlcDrive`](@ref) or [`GswDrive`](@ref) mode
-- `ind` Nth leaf in the canopy layer
-
-The former function works for all empirical stomatal models, and the latter
-    works for all optimization based models.
-"""
+# These functions are supposed to be in SPAC.jl
+#=
 function solution_diff!(
             x::FT,
             canopyi::CanopyLayer{FT},
@@ -73,35 +31,6 @@ function solution_diff!(
 
     return g_lm - x
 end
-
-
-
-
-function solution_diff!(
-            x::FT,
-            canopyi::CanopyLayer{FT},
-            envir::AirLayer{FT},
-            sm::EmpiricalStomatalModel{FT},
-            ind::Int
-) where {FT<:AbstractFloat}
-    # unpack variables
-    @unpack ps = canopyi;
-    g_bc  = canopyi.g_bc[ind];
-    g_m   = canopyi.g_m[ind];
-
-    # update photosynthesis for ps
-    leaf_photosynthesis!(ps, envir, GCO₂Mode(), x);
-
-    # calculate g_sw from stomatal model
-    g_md = stomatal_conductance(sm, ps, envir, FT(1));
-    g_md = min(canopyi.g_max, g_md);
-
-    # calculate model predicted g_lc
-    g_lm = 1 / (FT(1.6)/g_md + 1/g_bc + 1/g_m);
-
-    return g_lm - x
-end
-
 
 
 
@@ -162,6 +91,7 @@ function solution_diff!(
 
     return g_lm - x
 end
+=#
 
 
 
