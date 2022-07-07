@@ -172,6 +172,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jun-30: add a second HS2 for shaded leaves
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
+#     2022-Jul-07: make p_H₂O_sat a vector
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -228,7 +229,7 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     "Leaf surface CO₂ partial pressure `[Pa]`"
     p_CO₂_s::Vector{FT}
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
-    p_H₂O_sat::FT
+    p_H₂O_sat::Vector{FT}
 end
 
 
@@ -242,6 +243,7 @@ end
 #     2022-Jun-30: add a second HS2 for shaded leaves
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
+#     2022-Jul-07: make p_H₂O_sat a vector
 #
 #######################################################################################################################################################################################################
 """
@@ -280,25 +282,27 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 
     _bio = BroadbandLeafBiophysics{FT}();
 
+    _svp = [saturation_vapor_pressure(T_25()) for _i in 1:2];
+
     return Leaves1D{FT}(
-                _bio,                               # BIO
-                FT[0.01,0.3],                       # G_LIMITS
-                LeafHydraulics{FT}(ssm = ssm),      # HS
-                LeafHydraulics{FT}(ssm = ssm),      # HS2
-                _prc,                               # PRC
-                _psm,                               # PSM
-                WangSM{FT}(),                       # SM
-                FT(0.05),                           # WIDTH
-                FT[0.01, 0.01],                     # g_H₂O_s
-                FT[1000, 200],                      # ppar
-                FT[T_25(), T_25()],                 # t
-                zeros(FT,2),                        # a_gross
-                zeros(FT,2),                        # a_net
-                FT[0.01, 0.01],                     # g_CO₂
-                FT[3.0, 3.0],                       # g_CO₂_b
-                FT[20, 20],                         # p_CO₂_i
-                FT[40, 40],                         # p_CO₂_s
-                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
+                _bio,                           # BIO
+                FT[0.01,0.3],                   # G_LIMITS
+                LeafHydraulics{FT}(ssm = ssm),  # HS
+                LeafHydraulics{FT}(ssm = ssm),  # HS2
+                _prc,                           # PRC
+                _psm,                           # PSM
+                WangSM{FT}(),                   # SM
+                FT(0.05),                       # WIDTH
+                FT[0.01, 0.01],                 # g_H₂O_s
+                FT[1000, 200],                  # ppar
+                FT[T_25(), T_25()],             # t
+                zeros(FT,2),                    # a_gross
+                zeros(FT,2),                    # a_net
+                FT[0.01, 0.01],                 # g_CO₂
+                FT[3.0, 3.0],                   # g_CO₂_b
+                FT[20, 20],                     # p_CO₂_i
+                FT[40, 40],                     # p_CO₂_s
+                _svp                            # p_H₂O_sat
     )
 );
 

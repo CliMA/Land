@@ -164,18 +164,19 @@ end
 # General
 #     2022-Jun-30: add constructor function
 #     2022-Jun-30: fix function definition
+#     2022-Jul-07: use BetaParameterKleaf as the default param_x
 #
 #######################################################################################################################################################################################################
 """
 
-    BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKsoil(), param_y::AbstractBetaParameter = BetaParameterG1())
+    BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKleaf(), param_y::AbstractBetaParameter = BetaParameterG1())
 
 Construct a `BetaFunction` type beta function, given
 - `f` Function
 - `param_x` `AbstractBetaParameter` type to indicate which parameter to base on
 - `param_y` `AbstractBetaParameter` type to indicate which parameter to tune
 """
-BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKsoil(), param_y::AbstractBetaParameter = BetaParameterG1()) = BetaFunction(f, param_x, param_y);
+BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKleaf(), param_y::AbstractBetaParameter = BetaParameterG1()) = BetaFunction(f, param_x, param_y);
 
 
 #######################################################################################################################################################################################################
@@ -267,7 +268,7 @@ mutable struct BallBerrySM{FT} <: AbstractStomataModel{FT}
     G0::FT
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT
-    "Beta function to force stomatal response tp soil moisture"
+    "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
 end
 
@@ -313,6 +314,7 @@ struct EllerSM{FT} <: AbstractStomataModel{FT} end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Gentine model
+#     2022-Jul-07: add field Β to generalize the model
 #
 #######################################################################################################################################################################################################
 """
@@ -321,7 +323,7 @@ $(TYPEDEF)
 
 Struct for Gentine stomatal model. The equation used for Gentine type model is
 ```math
-gs = g0 + g1 ⋅ \\dfrac{k_{leaf}}{k_{max}} ⋅ \\dfrac{A}{Ca}.
+gs = g0 + g1 ⋅ \\dfrac{k_{leaf}}{k_{max}} ⋅ \\dfrac{A}{Ci}.
 ```
 
 # Fields
@@ -335,6 +337,8 @@ mutable struct GentineSM{FT} <: AbstractStomataModel{FT}
     G0::FT
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT
+    "Beta function to force stomatal response to soil moisture"
+    Β::BetaFunction
 end
 
 
@@ -343,6 +347,7 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-30: add constructor function
+#     2022-Jul-07: add field Β to generalize the model (fix the function, param_x, and param_y types)
 #
 #######################################################################################################################################################################################################
 """
@@ -351,7 +356,7 @@ end
 
 Construct a `GentineSM` type stomatal model
 """
-GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9);
+GentineSM{FT}() where {FT<:AbstractFloat} = GentineSM{FT}(0.025, 9, BetaFunction(x -> x; param_x = BetaParameterKleaf(), param_y = BetaParameterG1()));
 
 
 #######################################################################################################################################################################################################
@@ -383,7 +388,7 @@ mutable struct LeuningSM{FT} <: AbstractStomataModel{FT}
     G0::FT
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT
-    "Beta function to force stomatal response tp soil moisture"
+    "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
 end
 
@@ -431,7 +436,7 @@ mutable struct MedlynSM{FT} <: AbstractStomataModel{FT}
     G0::FT
     "Slope of conductance-photosynthesis correlation `[sqrt(Pa)]`"
     G1::FT
-    "Beta function to force stomatal response tp soil moisture"
+    "Beta function to force stomatal response to soil moisture"
     Β::BetaFunction
 end
 
