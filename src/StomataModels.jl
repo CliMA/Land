@@ -10,10 +10,10 @@ using WaterPhysics: relative_diffusive_coefficient, relative_surface_tension
 
 
 # include files
-include("beta.jl"      )
-include("empirical.jl" )
-include("limits.jl"    )
-include("prognostic.jl")
+include("beta.jl"       )
+include("conductance.jl")
+include("empirical.jl"  )
+include("limits.jl"     )
 
 
 end # module
