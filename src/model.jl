@@ -42,6 +42,7 @@ function leaf_photosynthesis! end
 #     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 #     2022-Jun-28: unpack the constant fields
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
+#     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -84,6 +85,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::F
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
+
+    # save the rates and to leaf
+    leaf.a_net = PSM.a_net;
+    leaf.a_gross = PSM.a_gross;
 
     return nothing
 );
@@ -234,6 +239,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; 
 #     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 #     2022-Jun-28: unpack the constant fields
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
+#     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -286,6 +292,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
+
+    # save the rates and to leaf
+    leaf.a_net = PSM.a_net;
+    leaf.a_gross = PSM.a_gross;
 
     return nothing
 );
