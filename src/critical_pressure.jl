@@ -10,10 +10,10 @@
 #     2022-Feb-02: add method for ComplexVC
 #     2022-Feb-02: add a reference kr for more customized calculations
 #     2022-May-25: iterate through VCS rather than its indices for ComplexVC
+#     2022-Jul-08: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
-This function returns the critical xylem water pressure (at 25 °C) that triggers 99.triggers a given amount of loss of hydraulic conductance. The supported methods are
 
     critical_pressure(vc::ComplexVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat}
     critical_pressure(vc::LogisticVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat}
@@ -23,9 +23,9 @@ This function returns the critical xylem water pressure (at 25 °C) that trigger
 Return the critical xylem water pressure at 25 °C that triggers a given amount of loss of conductance, given
 - `vc` `ComplexVC`, `LogisticVC`, `PowerVC`, or `WeibullVC` type struct
 - `kr` Reference conductance, default is 0.001
+
 """
 function critical_pressure end
-
 
 critical_pressure(vc::LogisticVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = log(kr / (vc.A + 1 - kr * vc.A)) / vc.B;
 
