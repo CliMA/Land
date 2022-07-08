@@ -4,6 +4,7 @@
 # General
 #     2022-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
 #     2022-Jan-24: add p_CO₂_s to the structure
+#     2022-Jan-24: add FT control to p_CO₂_i
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: moved FLM to PRC
 #     2022-May-25: add new field HS
@@ -13,8 +14,7 @@
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
-# Bug fixes:
-#     2022-Jan-24: add FT control to p_CO₂_i
+#     2022-Jul-01: add fields: a_gross and a_net
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -97,6 +97,7 @@ end
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
+#     2022-Jul-01: add fields: a_gross and a_net
 #
 #######################################################################################################################################################################################################
 """
@@ -157,6 +158,8 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
                 0.01,                               # g_H₂O_s
                 1000,                               # ppar
                 T_25(),                             # t
+                0,                                  # a_gross
+                0,                                  # a_net
                 0.01,                               # g_CO₂
                 3.0,                                # g_CO₂_b
                 20,                                 # p_CO₂_i

@@ -215,8 +215,6 @@ end
 #     2022-May-25: add root hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-May-31: rename input variable name from steadystate to ssm
-# Bug fixes:
-#     2022-May-31: set the isleaf option to false
 #
 #######################################################################################################################################################################################################
 """
@@ -339,8 +337,6 @@ end
 #     2022-May-25: add stem hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-May-31: rename input variable name from steadystate to ssm
-# Bug fixes:
-#     2022-May-31: set the isleaf option to false
 #
 #######################################################################################################################################################################################################
 """
