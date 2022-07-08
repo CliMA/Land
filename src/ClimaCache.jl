@@ -40,7 +40,8 @@ const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25
 
 
 # include the utility types and structures
-include("util/colimit.jl")
+include("util/colimit.jl"  )
+include("util/constants.jl")
 
 # include the air types and structures
 include("air/air_layer.jl")
