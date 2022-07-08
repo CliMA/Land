@@ -1,8 +1,9 @@
 module StomataModels
 
-using ClimaCache: AbstractSoilVC, AbstractXylemVC, AirLayer, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, C4VJPModel, GentineSM, Leaf, LeafHydraulics, Leaves1D, Leaves2D,
+using ClimaCache: AbstractSoilVC, AbstractXylemVC, AirLayer, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, C4VJPModel, GCO₂Mode, GentineSM, Leaf, LeafHydraulics, Leaves1D, Leaves2D,
       LeuningSM, MedlynSM
 using DocStringExtensions: METHODLIST
+using Photosynthesis: leaf_photosynthesis!
 using PlantHydraulics: relative_hydraulic_conductance
 using SoilHydraulics: relative_hydraulic_conductance
 using UnPack: @unpack

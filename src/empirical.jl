@@ -20,6 +20,7 @@ function empirical_equation end
 # Changes to this method
 # General
 #     2022-Jul-07: add method for BallBerrySM
+#     2022-Jul-07: use a_net stored in Leaf
 #
 #######################################################################################################################################################################################################
 """
@@ -34,10 +35,9 @@ Return the stomatal conductance computed from empirical model formulation, given
 """
 empirical_equation(sm::BallBerrySM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
-    @unpack PSM = leaf;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.rh * PSM.a_net * FT(1e-6) / leaf.p_CO₂_s * P_AIR
+    return G0 + β * G1 * air.rh * leaf.a_net * FT(1e-6) / leaf.p_CO₂_s * P_AIR
 );
 
 
@@ -123,6 +123,7 @@ empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT},
 # Changes to this method
 # General
 #     2022-Jul-07: add method for GentineSM
+#     2022-Jul-07: use a_net stored in Leaf
 #
 #######################################################################################################################################################################################################
 """
@@ -137,10 +138,9 @@ Return the stomatal conductance computed from empirical model formulation, given
 """
 empirical_equation(sm::GentineSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
-    @unpack PSM = leaf;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * PSM.a_net * FT(1e-6) / leaf.p_CO₂_i * P_AIR
+    return G0 + β * G1 * leaf.a_net * FT(1e-6) / leaf.p_CO₂_i * P_AIR
 );
 
 
@@ -226,6 +226,7 @@ empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, i
 # Changes to this method
 # General
 #     2022-Jul-07: add method for LeuningSM
+#     2022-Jul-07: use a_net stored in Leaf
 #
 #######################################################################################################################################################################################################
 """
@@ -245,7 +246,7 @@ empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT 
 
     _γ_s = (typeof(PSM) <: C4VJPModel) ? 0 : PSM.γ_star;
 
-    return G0 + β * G1 / (1 + (leaf.p_H₂O_sat - air.p_H₂O) / D0) * PSM.a_net * FT(1e-6) / (leaf.p_CO₂_s - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (leaf.p_H₂O_sat - air.p_H₂O) / D0) * leaf.a_net * FT(1e-6) / (leaf.p_CO₂_s - _γ_s) * P_AIR
 );
 
 
@@ -354,10 +355,9 @@ Return the stomatal conductance computed from empirical model formulation, given
 """
 empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
-    @unpack PSM = leaf;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaf.p_H₂O_sat - air.p_H₂O)) * PSM.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaf.p_H₂O_sat - air.p_H₂O)) * leaf.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
