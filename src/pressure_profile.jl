@@ -237,6 +237,8 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 # General
 #     2022-May-27: migrate function to version v0.3
 #     2022-May-27: rename the function to xylem_pressure_profile!
+# To do
+#     TODO: compute e_crit for leaves
 #
 #######################################################################################################################################################################################################
 """
