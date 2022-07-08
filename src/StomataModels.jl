@@ -4,7 +4,7 @@ using ClimaCache: AbstractSoilVC, AbstractXylemVC, AirLayer, AndereggSM, BallBer
       LeafHydraulics, Leaves1D, Leaves2D, LeuningSM, MedlynSM, SperrySM, WangSM, Wang2SM
 using DocStringExtensions: METHODLIST
 using Photosynthesis: leaf_photosynthesis!
-using PlantHydraulics: relative_hydraulic_conductance, xylem_end_pressure
+using PlantHydraulics: relative_hydraulic_conductance, ∂E∂P
 using SoilHydraulics: relative_hydraulic_conductance
 using UnPack: @unpack
 using WaterPhysics: relative_diffusive_coefficient, relative_surface_tension, relative_viscosity
