@@ -50,8 +50,8 @@ using Test
             spac = ClimaCache.MonoElementSPAC{FT}("C3");
             p = PlantHydraulics.xylem_end_pressure(spac, FT(2.0));
             @test true;
-            p1,p2 = PlantHydraulics.xylem_end_pressure(spac, FT(1.0), FT(0.5), FT(0.5));
-            @test true;
+            # p1,p2 = PlantHydraulics.xylem_end_pressure(spac, FT(1.0), FT(0.5), FT(0.5));
+            # @test true;
         end;
     end;
 

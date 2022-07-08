@@ -4,33 +4,38 @@
 # General
 #     2022-May-25: migrate function to version v0.3
 #     2022-May-25: rename the function to xylem_end_pressure
+#     2022-May-25: add method for LeafHydraulics
+#     2022-May-25: add method for RootHydraulics
+#     2022-May-25: add method for StemHydraulics
+#     2022-May-25: add method for Leaf, Root, and Stem
+#     2022-May-25: add method for MonoElementSPAC (without partitioning)
 #
 #######################################################################################################################################################################################################
 """
-This function returns the xylem end water pressure. The supported methods are
 
-$(METHODLIST)
+    xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat}
+    xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat}
+
+Return the xylem end water pressure in MPa, given
+- `organ` `Leaf`, `Root`, or `Stem` type struct
+- `flow` Flow rate (per leaf area for Leaf) `[mol (m⁻²) s⁻¹]`
+- `spac` `MonoElementSPAC` type struct
 
 """
 function xylem_end_pressure end
 
+xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAF, ROOT, STEM = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for LeafHydraulics
-#
-#######################################################################################################################################################################################################
-"""
+    # calculate the p_dos for root and stem
+    STEM.HS.p_ups = xylem_end_pressure(ROOT, flow);
+    LEAF.HS.p_ups = xylem_end_pressure(STEM, flow);
 
-    xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
+    return xylem_end_pressure(LEAF, flow / LEAF.HS.AREA);
+);
 
-Return the xylem end water pressure in MPa, given
-- `hs` `LeafHydraulics` type struct
-- `flow` Flow rate per leaf area `[mol m⁻² s⁻¹]`
-- `T` Temperature
-"""
+xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat} = xylem_end_pressure(organ.HS, flow, organ.t);
+
 xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
     @unpack K_SLA, N, VC = hs;
 
@@ -56,23 +61,6 @@ xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
     return _p_end
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for RootHydraulics
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `hs` `RootHydraulics` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-- `T` Temperature
-"""
 xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
     @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
 
@@ -110,23 +98,6 @@ xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
     return _p_end
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for StemHydraulics
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `hs` `StemHydraulics` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-- `T` Temperature
-"""
 xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
     @unpack K_MAX, N, VC, ΔH = hs;
 
@@ -153,57 +124,15 @@ xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for Leaf, Root, and Stem
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `organ` `Leaf`, `Root`, or `Stem` type struct
-- `flow` Flow rate (per leaf area for Leaf) `[mol (m⁻²) s⁻¹]`
-"""
-xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat} = xylem_end_pressure(organ.HS, flow, organ.t);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for MonoElementSPAC (without partitioning)
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `spac` `MonoElementSPAC` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-"""
-xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
-
-    # calculate the p_dos for root and stem
-    STEM.HS.p_ups = xylem_end_pressure(ROOT, flow);
-    LEAF.HS.p_ups = xylem_end_pressure(STEM, flow);
-
-    return xylem_end_pressure(LEAF, flow / LEAF.HS.AREA);
-);
-
-
+#=
 #######################################################################################################################################################################################################
 #
 # Changes to the method
 # General
 #     2022-May-25: add method for MonoElementSPAC (with sunlit and shaded partitioning)
-# Todos
+# To do
 #     TODO: abstractize the flow rates with canopy RT module
+#     TODO: make this method for Leaves1D
 #
 #######################################################################################################################################################################################################
 """
@@ -229,6 +158,7 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 
     return p_sl, p_sh
 );
+=#
 
 
 #######################################################################################################################################################################################################
@@ -237,38 +167,68 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 # General
 #     2022-May-27: migrate function to version v0.3
 #     2022-May-27: rename the function to xylem_pressure_profile!
+#     2022-May-27: add method for LeafHydraulics at steady state
+#     2022-May-27: add method for LeafHydraulics at non steady state
+#     2022-May-27: add method for RootHydraulics at steady state
+#     2022-May-27: add method for RootHydraulics at non steady state
+#     2022-May-27: add method for StemHydraulics at steady state
+#     2022-May-27: add method for StemHydraulics at non steady state
+#     2022-May-27: add method for Leaf, Root, and Stem (for both steady and non-steady states)
+#     2022-Jun-30: add support to Leaves2D
+#     2022-Jun-30: add method for Leaves1D
+#     2022-May-27: add method for MonoElementSPAC
+#     2022-May-27: add method for MonoGrassSPAC
+#     2022-May-27: add method for MonoPalmSPAC
+#     2022-May-27: add method for MonoTreeSPAC
+#     2022-May-31: pass the test
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
+#     2022-Jul-08: deflate documentations
 # To do
 #     TODO: compute e_crit for leaves
+#     TODO: add leaf extra-xylary vulnerability curve
 #
 #######################################################################################################################################################################################################
 """
-This function updates the xylem water pressure profile. The supported methods are
-
-$(METHODLIST)
+This function is designed for the following purposes:
+- Update organ pressre profile
+- Update pressre profile for the entire SPAC
 
 """
 function xylem_pressure_profile! end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for LeafHydraulics at steady state
-# Todos
-#     TODO: add leaf extra-xylary vulnerability curve
-#
-#######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `LeafHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
+- `organ` `Leaf`, `Leaves1D`, `Leaves2D`, `Root`, or `Stem` type organ
 - `update` If true, update xylem cavitation legacy
+
 """
+xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t; update = update);
+
+    return nothing
+);
+
+xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS, HS2 = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t[1]; update = update);
+    HS2.k_history .= HS.k_history;
+    HS2.p_history .= HS.p_history;
+
+    xylem_pressure_profile!(HS2, HS2.FLOW, organ.t[2]; update = update);
+    HS.k_history .= HS2.k_history;
+    HS.p_history .= HS2.p_history;
+
+    return nothing
+);
+
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_SLA, N, VC = hs;
 
@@ -307,26 +267,6 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for LeafHydraulics at non steady state
-# Todos
-#     TODO: add leaf extra-xylary vulnerability curve
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `LeafHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_SLA, N, VC = hs;
 
@@ -365,24 +305,6 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for RootHydraulics at steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `RootHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
 
@@ -430,24 +352,6 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for RootHydraulics at non steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `RootHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
 
@@ -496,25 +400,6 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for StemHydraulics at steady state
-#     2022-May-31: fix documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `StemHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_MAX, N, VC, ΔH = hs;
 
@@ -550,24 +435,6 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for StemHydraulics at non steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `StemHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack K_MAX, N, VC, ΔH = hs;
 
@@ -604,75 +471,17 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for Leaf, Root, and Stem (for both steady and non-steady states)
-#     2022-May-31: pass the test
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack HS = organ;
-
-    xylem_pressure_profile!(HS, HS.FLOW, organ.t; update = update);
-
-    return nothing
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-Jun-30: add method for Leaves1D
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `organ` `Leaves1D` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = organ;
-
-    xylem_pressure_profile!(HS, HS.FLOW, organ.t[1]; update = update);
-    HS2.k_history .= HS.k_history;
-    HS2.p_history .= HS.p_history;
-
-    xylem_pressure_profile!(HS2, HS2.FLOW, organ.t[2]; update = update);
-    HS.k_history .= HS2.k_history;
-    HS.p_history .= HS2.p_history;
-
-    return nothing
-)
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoElementSPAC
-#
-#######################################################################################################################################################################################################
 """
 
     xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoElementSPAC` type organ
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type spac
 - `update` If true, update xylem cavitation legacy
+
 """
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack LEAF, ROOT, STEM = spac;
@@ -686,24 +495,6 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoGrassSPAC
-#     2022-May-31: pass the test
-#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoMLGrassSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack LEAVES, N_ROOT, ROOTS = spac;
 
@@ -724,24 +515,6 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoPalmSPAC
-#     2022-May-31: pass the test
-#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoMLPalmSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack LEAVES, N_ROOT, ROOTS, TRUNK = spac;
 
@@ -766,24 +539,6 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoTreeSPAC
-#     2022-May-31: pass the test
-#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoMLTreeSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
     @unpack BRANCHES, LEAVES, N_ROOT, ROOTS, TRUNK = spac;
 

@@ -4,7 +4,6 @@ using ClimaCache: ComplexVC, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LinearPVC
       RootHydraulics, SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
 using ClimaCache: GAS_R, T_25, ρg_MPa
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
-using DocStringExtensions: METHODLIST
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity

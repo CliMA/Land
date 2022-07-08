@@ -3,24 +3,20 @@
 # Changes to the function
 # General
 #     2022-Jun-01: migrate the function
+#     2022-Jun-01: add method for LeafHydraulics
+#     2022-Jun-01: add method for MonoElementSPAC
+#     2022-Jul-08: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
-This function returns the critical flow rate that triggers 99.triggers a given amount of loss of hydraulic conductance. The supported methods are
-
-$(METHODLIST)
+This function returns the critical flow rate that triggers a given amount of loss of hydraulic conductance for
+- Leaf hydraulic system
+- Mono element SPAC system
 
 """
 function critical_flow end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-Jun-01: add method for LeafHydraulics
-#
-#######################################################################################################################################################################################################
 """
 
     critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat}
@@ -61,13 +57,6 @@ critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.00
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-Jun-01: add method for MonoElementSPAC
-#
-#######################################################################################################################################################################################################
 """
 
     critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat}
