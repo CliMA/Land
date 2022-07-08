@@ -58,6 +58,10 @@ mutable struct Leaf{FT<:AbstractFloat}
     t::FT
 
     # dignostic variables that change with time
+    "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_gross::FT
+    "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
+    a_net::FT
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂::FT
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"

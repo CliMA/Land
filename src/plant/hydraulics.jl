@@ -24,6 +24,7 @@ abstract type AbstractHydraulicSystem{FT<:AbstractFloat} end
 #     2022-May-25: add leaf hydraulic system
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-Jun-13: use Union instead of Abstract... for type definition
+#     2022-Jul-07: add e_crit as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -69,6 +70,8 @@ mutable struct LeafHydraulics{FT} <: AbstractHydraulicSystem{FT}
     v_storage::FT
 
     # dignostic variables that change with time
+    "Critical flow rate `[mol s⁻¹ m⁻²]`"
+    e_crit::FT
     "Vector of leaf kr history per element"
     k_history::Vector{FT}
     "Vector of xylem water pressure `[MPa]`"
@@ -85,6 +88,7 @@ end
 #     2022-May-25: add leaf hydraulics constructor
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-May-31: rename input variable name from steadystate to ssm
+#     2022-Jul-07: add e_crit as a field
 #
 #######################################################################################################################################################################################################
 """
@@ -124,6 +128,7 @@ LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::N
                 0,                      # p_storage
                 0,                      # p_ups
                 v_max,                  # v_storage
+                0,                      # e_crit
                 ones(FT,N),             # k_history
                 zeros(FT,N),            # p_element
                 zeros(FT,N)             # p_history
