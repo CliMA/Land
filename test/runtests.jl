@@ -75,7 +75,7 @@ using Test
             spacy.LEAVES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
             spacy.TRUNK.HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
             for spac in [spac1, spac2, spac3, spac4, spac5, spac6, spac7, spac8, spacx, spacy]
-                xylem_flow_profile!(spac, FT(10));
+                PlantHydraulics.xylem_flow_profile!(spac, FT(10));
                 @test true;
             end;
         end;
@@ -101,7 +101,7 @@ using Test
             spacy.LEAVES[1].HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
             spacy.TRUNK.HS.FLOW = ClimaCache.SteadyStateFlow{FT}(0);
             for spac in [spac1, spac2, spac3, spac4, spac5, spac6, spac7, spac8, spacx, spacy]
-                xylem_pressure_profile!(spac);
+                PlantHydraulics.xylem_pressure_profile!(spac);
                 @test true;
             end;
         end;
