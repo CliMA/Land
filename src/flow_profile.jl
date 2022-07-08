@@ -3,118 +3,47 @@
 # Changes to the function
 # General
 #     2022-May-27: add function to extract flow rate
+#     2022-May-31: add method to extract flow rate from steady state flow to use with upstream flow
+#     2022-May-31: add method to extract flow rate from non-steady state flow to use with upstream flow
+#     2022-May-31: add method to extract flow rate from hydraulic system
+#     2022-May-31: add method to extract flow rate from organ
+#     2022-May-31: add method to extract flow rate from leaves
+#     2022-May-31: add method to extract flow rate from branches
+#     2022-Jun-30: add method to extract flow rate from Leaves1D
+#     2022-Jun-30: add support for Leaves2D
+#     2022-Jun-30: rename Leaf to Leaves2D to support ML*SPAC
 #
 #######################################################################################################################################################################################################
 """
 This function returns the sum flow rate of the downstream organs. The supported methods are
 
-$(METHODLIST)
+    xylem_flow(mode::Union{SteadyStateFlow{FT}) where {FT<:AbstractFloat}
+    xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat}
+    xylem_flow(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat}
+    xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
+    xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
+    xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat}
+    xylem_flow(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat}
 
+Return the flow rate, given
+- `mode` `SteadyStateFlow`, or `NonSteadyStateFlow` type flow profile
+- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
+- `organ` `Leaf`, `Leaves1D`, `Leaves2D`, `Root`, or `Stem` type struct
+- `organs` Vector of `Leaves2D` or `Stem` type struct
 """
 function xylem_flow end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from steady state flow to use with upstream flow
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(mode::SteadyStateFlow{FT}) where {FT<:AbstractFloat}
-
-Return the flow rate, given
-- `mode` `SteadyStateFlow` type flow profile
-"""
 xylem_flow(mode::SteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.flow;
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from non-steady state flow to use with upstream flow
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat}
-
-Return the flow rate, given
-- `mode` `NonSteadyStateFlow` type flow profile
-"""
 xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from hydraulic system
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat}
-
-Return the flow rate, given
-- `hs` `LeafHydraulics`, `RootHydraulics`, or `StemHydraulics` type struct
-"""
 xylem_flow(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat} = xylem_flow(hs.FLOW);
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from organ
-#     2022-Jun-30: add support for Leaves2D
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
-
-Return the flow rate, given
-- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type struct
-"""
 xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS.FLOW);
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-Jun-30: add method to extract flow rate from Leaves1D
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
-
-Return the flow rates from sunlit and shaded leaves, given
-- `organ` `Leaves1D` type struct
-"""
 xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (xylem_flow(organ.HS.FLOW), xylem_flow(organ.HS2.FLOW));
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from leaves
-#     2022-Jun-30: rename Leaf to Leaves2D ti support ML*SPAC
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat}
-
-Return the sum flow rate, given
-- `organs` Vector of `Leaf` type struct
-"""
 xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
     for _i in eachindex(organs)
@@ -124,21 +53,6 @@ xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
     return _f_sum
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-31: add method to extract flow rate from branches
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat}
-
-Return the sum flow rate, given
-- `organs` Vector of `Stem` type struct
-"""
 xylem_flow(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
     for _i in eachindex(organs)
