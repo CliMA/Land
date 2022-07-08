@@ -18,7 +18,7 @@ using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
 using MAT: matread
-using PkgUtility: P_ATM, T_0, T_25, read_csv
+using PkgUtility: read_csv
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
