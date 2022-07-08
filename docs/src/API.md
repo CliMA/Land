@@ -37,6 +37,7 @@ xylem_end_pressure
 xylem_pressure_profile!
 xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+∂E∂P
 ```
 
 ## Critical flow

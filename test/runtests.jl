@@ -107,6 +107,20 @@ using Test
         end;
     end;
 
+    @testset "∂E∂P" begin
+        for FT in [Float32, Float64]
+            leaf1 = ClimaCache.Leaf{FT}("C3");
+            leaf2 = ClimaCache.Leaves1D{FT}("C3");
+            leaf3 = ClimaCache.Leaves2D{FT}("C3");
+            PlantHydraulics.∂E∂P(leaf1, FT(0));
+            @test true;
+            PlantHydraulics.∂E∂P(leaf2, FT(0), 1);
+            @test true;
+            PlantHydraulics.∂E∂P(leaf3, FT(0));
+            @test true;
+        end;
+    end;
+
     @testset "Critical Flow" begin
         for FT in [Float32, Float64]
             lhs = ClimaCache.LeafHydraulics{FT}();
