@@ -194,6 +194,7 @@ Return the marginal risk for stomatal opening, given
 - `leaf` `Leaf` type struct
 - `air` `AirLayer` for environmental conditions
 - `δe` Incremental flow rate to compute ∂E∂P
+
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     @unpack A, B = sm;
@@ -303,6 +304,7 @@ Return the marginal risk for stomatal opening, given
 - `air` `AirLayer` for environmental conditions
 - `ind` Leaf index (1 for sunlit and 2 for shaded)
 - `δe` Incremental flow rate to compute ∂E∂P
+
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     @unpack A, B = sm;
@@ -419,6 +421,7 @@ Return the marginal risk for stomatal opening, given
 - `leaves` `Leaves2D` type struct
 - `air` `AirLayer` for environmental conditions
 - `δe` Incremental flow rate to compute ∂E∂P
+
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     @unpack A, B = sm;
@@ -527,6 +530,7 @@ Return the marginal risk for stomatal opening, given
 - `leaf` `Leaf` type struct
 - `air` `AirLayer` for environmental conditions
 - `δe` Incremental flow rate to compute ∂E∂P
+
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     @unpack A, B = sm;
@@ -608,4 +612,88 @@ Return the marginal risk for stomatal opening, given
     _∂E∂P = ∂E∂P(leaves, _e; δe = δe);
 
     return (-1 * A * HS.p_element[end] * leaves.a_net_sunlit[ind]) / _∂E∂P
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
+#     2022-Jul-11: add function for nocturnal stomatal conductance
+#
+#######################################################################################################################################################################################################
+"""
+This function returns the ∂Θₙ∂E for nocturnal stomatal opening. Currently this function only supports WangSM which has been published for the purpose of computing nocturnal stomatal conductance.
+    Supports to other optimality models will be added later when I am ready to test those.
+"""
+function ∂Θₙ∂E end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jul-11: add method for WangSM model on Leaf for nocturnal transpiration
+#     2022-Jul-11: add method for WangSM model on Leaves1D for nocturnal transpiration
+#     2022-Jul-11: add method for WangSM model on Leaves2D for nocturnal transpiration
+#
+#######################################################################################################################################################################################################
+"""
+
+    ∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat}
+
+Return the ∂Θ∂E for nocturnal stomatal opening, given
+- `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+- `air` `AirLayer` type environmental conditions
+- `ppar_mem` Memory PPAR
+
+"""
+∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = ∂Θₙ∂E(lf.SM, lf, air, ppar_mem);
+
+∂Θₙ∂E(sm::WangSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+    @unpack F_FITNESS = sm;
+    @unpack HS = leaf;
+    @unpack P_AIR = air;
+
+    # compute the A and E at the current setting
+    _gs = leaf.g_H₂O_s;
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaf.g_CO₂_b));
+    _gc = 1 / (FT(1.6) / _gs + 1 / leaf.g_CO₂_b);
+    _e  = _gh * (leaf.p_H₂O_sat - air.p_H₂O) / P_AIR;
+    leaf_photosynthesis!(leaf, air, _gc, ppar_mem);
+    _a  = leaf.PSM.a_net;
+
+    return _a / (HS.e_crit - _e) * F_FITNESS
+);
+
+∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+    @unpack F_FITNESS = sm;
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the A and E at the current setting
+    _gs = leaves.g_H₂O_s[1];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b[1]));
+    _gc = 1 / (FT(1.6) / _gs + 1 / leaves.g_CO₂_b[1]);
+    _e  = _gh * (leaves.p_H₂O_sat[1] - air.p_H₂O) / P_AIR;
+    leaf_photosynthesis!(leaves, air, _gc, ppar_mem);
+    _a  = leaves.PSM.a_net;
+
+    return _a / (HS.e_crit - _e) * F_FITNESS
+);
+
+∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+    @unpack F_FITNESS = sm;
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the A and E at the current setting
+    _gs = leaves.g_H₂O_s_shaded;
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _gc = 1 / (FT(1.6) / _gs + 1 / leaves.g_CO₂_b);
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+    leaf_photosynthesis!(leaves, air, _gc, ppar_mem);
+    _a  = leaves.PSM.a_net;
+
+    return _a / (HS.e_crit - _e) * F_FITNESS
 );
