@@ -113,6 +113,48 @@ function ∂A∂E end
 #
 # Changes to this function
 # General
+#     2022-Jul-11: add function to compute ∂T∂E
+#
+#######################################################################################################################################################################################################
+"""
+
+    ∂T∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat}
+
+Returns the marginal increase in leaf temperature per transpiration rate, given
+- `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+- `air` `AirLayer` type environmental conditions
+- `f_view` Ratio that leaf area is exposed to external sources/sinks (not other leaves, e.g., 2/LAI for canopy on average)
+
+"""
+function ∂T∂E end
+
+∂T∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(lf.BIO, lf, air, f_view);
+
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, bio.Ε_LW);
+
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, 1 - bio.τ_lw);
+
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, bio.Ε_LW);
+
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, 1 - bio.τ_lw);
+
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, bio.Ε_LW);
+
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, 1 - bio.τ_lw);
+
+∂T∂E(f_view::FT, t::FT, width::FT, wind::FT, ϵ::FT) where {FT<:AbstractFloat} = (
+    _λ = latent_heat_vapor(t) * M_H₂O(FT);
+    _g = FT(0.189) * sqrt(wind / (FT(0.72) * width));
+    _d = 2 * CP_D_MOL(FT) * _g + 4 * f_view * K_STEFAN(FT) * ϵ * t ^ 3;
+
+    return _λ / _d
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Jul-07: migrate function from older version
 #     2022-Jul-11: add docs
 #
