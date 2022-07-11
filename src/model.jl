@@ -30,6 +30,39 @@ function leaf_photosynthesis! end
 #
 # Changes to this method
 # General
+#     2022-Jul-07: add method to compute photosynthetic rates only
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat}
+
+Updates leaf photosynthetic rates based on CO₂ partial pressure, given
+- `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
+- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
+- `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
+- `ppar` APAR used for photosynthesis
+"""
+leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat} = (
+    @unpack PRC, PSM = lf;
+
+    if lf.t != lf._t
+        photosystem_temperature_dependence!(PSM, air, lf.t);
+    end;
+    photosystem_electron_transport!(PSM, PRC, ppar, lf.p_CO₂_i; β = FT(1));
+    rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
+    light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
+    product_limited_rate!(PSM, air, g_lc; β = FT(1));
+    colimit_photosynthesis!(PSM; β = FT(1));
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
 #     2022-Jan-14: set a default p_i from leaf to combine two methods
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
