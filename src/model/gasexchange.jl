@@ -272,26 +272,4 @@ function gas_exchange!(
 
     return nothing
 end
-
-
-
-
-function gas_exchange!(
-            canopyi::CanopyLayer{FT},
-            spac::MonoElementSPAC{FT},
-            envir::AirLayer{FT},
-            sm::OSMWang{FT}
-) where {FT<:AbstractFloat}
-    # update the temperature dependent parameters and maximal a and kr
-    update_leaf_TP!(canopyi, spac, envir);
-    update_leaf_AK!(canopyi, spac.LEAF.HS, envir);
-
-    # calculate optimal solution for each leaf
-    for ind in eachindex(canopyi.APAR)
-        canopyi.ps.apar = canopyi.APAR[ind];
-        gas_exchange!(canopyi, spac.LEAF.HS, envir, sm, ind);
-    end
-
-    return nothing
-end
 =#

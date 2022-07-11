@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Diff function to minimize by ConstrainedRootSolvers
@@ -47,8 +48,7 @@ function dTdE(
     lambda = latent_heat_vapor(T) * M_H₂O(FT);
     gbe    = FT(0.189 * sqrt(wind/(0.72*width)));
     emis   = FT(0.97);
-    denom  = 2 * CP_D_MOL(FT) * gbe +
-             4 / tLAI * K_STEFAN(FT) * emis * T^3;
+    denom  = 2 * CP_D_MOL(FT) * gbe + 4 / tLAI * K_STEFAN(FT) * emis * T^3;
     ∂T∂E   = lambda / denom;
 
     return ∂T∂E
@@ -87,33 +87,4 @@ function dΘdE(
 
     return clayer.ps_m.PSM.a_net / (ec - flow) * ff
 end
-
-
-
-
-"""
-    nocturnal_diff!(
-                x::FT,
-                clayer::CanopyLayer{FT},
-                envir::AirLayer{FT},
-                sm::OSMWang{FT}()
-    ) where {FT<:AbstractFloat}
-
-Calculate the difference between marginal gain and risk of nighttime
-    transpiration, given
-- `x` Given leaf level stomatal conductance
-- `clayer` [`CanopyLayer`](@ref) type of struct
-- `envir` `AirLayer` type struct
-- `sm` [`OSMWang`](@ref) type stomatal model
-"""
-function nocturnal_diff!(
-            x::FT,
-            clayer::CanopyLayer{FT},
-            envir::AirLayer{FT},
-            sm::OSMWang{FT}
-) where {FT<:AbstractFloat}
-    ∂R∂E = dRdE(clayer, envir);
-    ∂Θ∂E = dΘdE(clayer, sm, x);
-
-    return ∂R∂E - ∂Θ∂E
-end
+=#
