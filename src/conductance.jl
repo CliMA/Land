@@ -7,8 +7,10 @@
 #
 #######################################################################################################################################################################################################
 """
-This function returns the stomatal conductance change slope. Supported methods are
-
+This function returns the stomatal conductance change slope. Supported functionalities are
+- Leaf
+- Leaves1D (ind=1 for sunlit, ind=2 for shaded leaves)
+- Leaves2D (ind=NA for shaded, ind>1 for sunlit leaves)
 
 """
 function ∂g∂t end;
@@ -21,108 +23,39 @@ function ∂g∂t end;
 #     2022-Jul-07: add general method for empirical models
 #     2022-Jul-07: clarify that this method is only for Leaf and shaded leaves of Leaves2D
 #     2022-Jul-11: deflate documentations
+#     2022-Jul-11: make this method specific for Leaf
 #
 #######################################################################################################################################################################################################
 """
 
-    ∂g∂t(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    ∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
 
-A wrapper function to return the marginal increase of stomatal conductance for H₂O, given
-- `leaf` `Leaf`, and `Leaves2D` (shaded fraction) type leaf
+Return the marginal increase of stomatal conductance, given
+- `leaf` `Leaf` type struct
 - `air` `AirLayer` type environmental conditions
-- `β` Tuning factor for G1 or Vcmax
+- `β` Tuning factor (only used for empirical models)
+- `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
 """
-∂g∂t(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = ∂g∂t(lf.SM, lf, air; β = β);
+∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaf.SM, leaf, air; β = β, δe = δe);
 
+∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    return ∂g∂t(sm, leaf, air, sm.Β.PARAM_Y; β = β)
+);
 
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} =
-    ∂g∂t(sm, lf, air, sm.Β.PARAM_Y; β = β);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = β);
 
     return (_gsw - leaf.g_H₂O_s) / sm.Τ
 );
 
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = FT(1));
 
     return (_gsw - leaf.g_H₂O_s) / sm.Τ
 );
 
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air; β = β);
-
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.Τ
-);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air; β = FT(1));
-
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.Τ
-);
-
-# add δe as an option
-∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return sm.K * (∂A∂E(leaves, air) - ∂Θ∂E(sm, leaves, air))
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-07: add general method for empirical models
-#     2022-Jul-07: clarify that this method is only for Leaves1D and sunlit leaves of Leaves2D
-#     2022-Jul-11: deflate documentations
-#
-#######################################################################################################################################################################################################
-"""
-
-    ∂g∂t(lf::Union{Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-A wrapper function to return the marginal increase of stomatal conductance for H₂O, given
-- `leaf` `Leaves1D`, and `Leaves2D` (sunlit fraction) type leaf
-- `air` `AirLayer` type environmental conditions
-- `ind` Index of the leaves (1 for sunlit and 2 for shaded for Leaves1D, all sunlit for Leaves2D)
-- `β` Tuning factor for G1 or Vcmax
-"""
-∂g∂t(lf::Union{Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = ∂g∂t(lf.SM, lf, air, ind; β = β);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, lf::Union{Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} =
-    ∂g∂t(sm, lf, air, sm.Β.PARAM_Y, ind; β = β);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air, ind; β = β);
-
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.Τ
-);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
-
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.Τ
-);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air, ind; β = β);
-
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.Τ
-);
-
-
-∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
-
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.Τ
+∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    return sm.K * (∂A∂E(leaf, air) - ∂Θ∂E(sm, leaf, air; δe = δe))
 );
 
 
