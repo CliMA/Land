@@ -459,3 +459,111 @@ Return the marginal risk for stomatal opening, given
 
     return (-1 * A * HS.p_element[end] * leaves.a_net_shaded) / _∂E∂P
 );
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jul-11: add method for AndereggSM model on Leaves2D for sunlit leaves
+#     2022-Jul-11: add method for EllerSM model on Leaves2D for sunlit leaves
+#     2022-Jul-11: add method for SperrySM model on Leaves2D for sunlit leaves
+#     2022-Jul-11: add method for WangSM model on Leaves2D for sunlit leaves
+#     2022-Jul-11: add method for Wang2SM model on Leaves2D for sunlit leaves
+#
+#######################################################################################################################################################################################################
+"""
+
+    ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
+    ∂Θ∂E(sm::EllerSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
+    ∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
+    ∂Θ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
+    ∂Θ∂E(sm::Wang2SM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat}
+
+Return the marginal risk for stomatal opening, given
+- `sm` `AndereggSM`, `EllerSM`, `SperrySM`, `WangSM`, or `Wang2SM` type optimality model
+- `leaf` `Leaf` type struct
+- `air` `AirLayer` for environmental conditions
+- `δe` Incremental flow rate to compute ∂E∂P
+"""
+∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    @unpack A, B = sm;
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the E at the current setting
+    _gs = leaves.g_H₂O_s_sunlit[ind];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+
+    _∂E∂P = ∂E∂P(leaves, _e; δe = δe);
+
+    return (-2 * A * HS.p_element[end] + B) / _∂E∂P
+);
+
+∂Θ∂E(sm::EllerSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the E at the current setting
+    _gs = leaves.g_H₂O_s_sunlit[ind];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+
+    _∂E∂P_1 = ∂E∂P(leaves, _e; δe = δe);
+    _∂E∂P_2 = ∂E∂P(leaves, _e; δe = -δe);
+    _∂K∂E   = (_∂E∂P_2 - _∂E∂P_1) / δe;
+
+    return _∂K∂E * leaves.a_net / _∂E∂P_1
+);
+
+∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the E at the current setting
+    _gs = leaves.g_H₂O_s_sunlit[ind];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+
+    _∂E∂P_1 = ∂E∂P(leaves, _e; δe = δe);
+    _∂E∂P_2 = ∂E∂P(leaves, _e; δe = -δe);
+    _∂E∂P_m = ∂E∂P(leaves, FT(0); δe = δe);
+    _∂K∂E   = (_∂E∂P_2 - _∂E∂P_1) / δe;
+
+    # compute maximum A
+    _ghm = HS.e_crit / (leaves.p_H₂O_sat - air.p_H₂O) * P_AIR;
+    _gsm = 1 / (1 / _ghm - 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _gcm = 1 / (FT(1.6) / _gsm + 1 / leaves.g_CO₂_b);
+    leaf_photosynthesis!(leaves, air, _gcm, leaves.ppar_sunlit[ind]);
+    _am = leaves.PSM.a_net;
+
+    return _∂K∂E * _am / _∂E∂P_m
+);
+
+∂Θ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the A and E at the current setting
+    _gs = leaves.g_H₂O_s_sunlit[ind];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+
+    return leaves.a_net_sunlit[ind] / (HS.e_crit - _e)
+);
+
+∂Θ∂E(sm::Wang2SM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    @unpack A = sm;
+    @unpack HS = leaves;
+    @unpack P_AIR = air;
+
+    # compute the E at the current setting
+    _gs = leaves.g_H₂O_s_sunlit[ind];
+    _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+
+    _∂E∂P = ∂E∂P(leaves, _e; δe = δe);
+
+    return (-1 * A * HS.p_element[end] * leaves.a_net_sunlit[ind]) / _∂E∂P
+);
