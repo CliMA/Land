@@ -7,6 +7,7 @@
 #     2022-Jul-01: add method to tune stomatal opening based on relative hydraulic conductance of the soil
 #     2022-Jul-01: add method to tune stomatal opening based on soil potential or leaf pressure
 #     2022-Jul-01: fix a typo in function call
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """

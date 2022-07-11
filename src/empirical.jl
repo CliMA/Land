@@ -4,12 +4,14 @@
 # General
 #     2022-Jul-01: migrate function from older version
 #     2022-Jul-01: rename the function from stomatal_conductance to empirical_equation
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
-This function returns the stomatal conductance computed from empirical stomatal models. This is not the solution! Supported methods are
-
-$(METHODLIST)
+This function returns the stomatal conductance computed from empirical stomatal models. This is not the solution! Supported methods are for
+- Leaf
+- Leaves1D (ind=1 for sunlit, ind=2 for shaded leaves)
+- Leaves2D (ind=NA for shaded, ind>1 for sunlit leaves)
 
 """
 function empirical_equation end
@@ -24,6 +26,7 @@ function empirical_equation end
 #     2022-Jul-07: add method for GentineSM
 #     2022-Jul-07: add method for LeuningSM
 #     2022-Jul-07: add method for MedlynSM
+#     2022-Jul-11: deflate documentations
 # Bug fix:
 #     2022-Jul-07: add the factor 1.6 for Medlyn model
 #
@@ -81,6 +84,7 @@ empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT =
 #     2022-Jul-07: add method for GentineSM using Leaves1D
 #     2022-Jul-07: add method for LeuningSM using Leaves1D
 #     2022-Jul-07: add method for MedlynSM using Leaves1D
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -136,6 +140,7 @@ empirical_equation(sm::MedlynSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, in
 #     2022-Jul-07: add method for GentineSM using Leaves2D for shaded leaves
 #     2022-Jul-07: add method for LeuningSM using Leaves2D for shaded leaves
 #     2022-Jul-07: add method for MedlynSM using Leaves2D for shaded leaves
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -190,6 +195,7 @@ empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β
 #     2022-Jul-07: add method for GentineSM using Leaves2D for sunlit leaves
 #     2022-Jul-07: add method for LeuningSM using Leaves2D for sunlit leaves
 #     2022-Jul-07: add method for MedlynSM using Leaves2D for sunlit leaves
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """

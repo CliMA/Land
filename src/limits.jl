@@ -4,31 +4,25 @@
 # General
 #     2022-Jul-01: migrate function from older version
 #     2022-Jul-01: rename the function from gsw_control! to limit_stomatal_conductance!
-#
-#######################################################################################################################################################################################################
-"""
-This function limits the stomatal conductance for H₂O within a physiological range (temperature dependent). Supported methods are
-
-$(METHODLIST)
-
-"""
-function limit_stomatal_conductance! end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
 #     2022-Jul-01: add method for Leaf
+#     2022-Jul-01: add method for Leaves1D
+#     2022-Jul-01: add method for Leaves2D
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
 
     limit_stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    limit_stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat}
+    limit_stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat}
 
 Limit stomatal conductance for H₂O for
 - `leaf` `Leaf` type struct
+- `leaves` `Leaves1D` type struct
+
 """
+function limit_stomatal_conductance! end
+
 limit_stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     @unpack G_LIMITS = leaf;
 
@@ -49,21 +43,6 @@ limit_stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-01: add method for Leaves1D
-#
-#######################################################################################################################################################################################################
-"""
-
-    limit_stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat}
-
-Limit stomatal conductance for H₂O for sunlit and shaded leaves within
-- `leaves` `Leaves1D` type struct
-"""
 limit_stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
     @unpack G_LIMITS = leaves;
 
@@ -93,21 +72,6 @@ limit_stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-01: add method for Leaves2D
-#
-#######################################################################################################################################################################################################
-"""
-
-    limit_stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat}
-
-Limit stomatal conductance for H₂O for sunlit and shaded leaves within
-- `leaves` `Leaves2D` type struct
-"""
 limit_stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat} = (
     @unpack G_LIMITS = leaves;
 

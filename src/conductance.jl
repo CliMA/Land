@@ -3,12 +3,12 @@
 # Changes to this function
 # General
 #     2022-Jul-07: add new function
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
 This function returns the stomatal conductance change slope. Supported methods are
 
-$(METHODLIST)
 
 """
 function ∂g∂t end;
@@ -20,6 +20,7 @@ function ∂g∂t end;
 # General
 #     2022-Jul-07: add general method for empirical models
 #     2022-Jul-07: clarify that this method is only for Leaf and shaded leaves of Leaves2D
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -65,6 +66,11 @@ A wrapper function to return the marginal increase of stomatal conductance for H
     return (_gsw - leaves.g_H₂O_s_shaded) / sm.Τ
 );
 
+# add δe as an option
+∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    return sm.K * (∂A∂E(leaves, air) - ∂Θ∂E(sm, leaves, air))
+);
+
 
 #######################################################################################################################################################################################################
 #
@@ -72,6 +78,7 @@ A wrapper function to return the marginal increase of stomatal conductance for H
 # General
 #     2022-Jul-07: add general method for empirical models
 #     2022-Jul-07: clarify that this method is only for Leaves1D and sunlit leaves of Leaves2D
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -124,12 +131,13 @@ A wrapper function to return the marginal increase of stomatal conductance for H
 # Changes to this function
 # General
 #     2022-Jul-07: add new function
+#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
-This function returns the stomatal conductance change slope. Supported methods are
-
-$(METHODLIST)
+This function updates stomatal conductance for H₂O and CO₂. Supported functionalities are
+- Update conductance for H₂O prognostically
+- Update conductance for CO₂ based on that for H₂O
 
 """
 function stomatal_conductance! end
@@ -160,14 +168,12 @@ stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)
     return nothing
 );
 
-
 stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     leaves.g_H₂O_s[1] += ∂g∂t(leaves, air, 1; β = β) * Δt;
     leaves.g_H₂O_s[2] += ∂g∂t(leaves, air, 2; β = β) * Δt;
 
     return nothing
 );
-
 
 stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     leaves.g_H₂O_s_shaded += ∂g∂t(leaves, air; β = β) * Δt;
@@ -194,6 +200,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}, Δt::FT; β::FT =
 
 Update stomatal conductance for CO₂ based on that of H₂O, given
 - `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+
 """
 stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaf);
@@ -203,7 +210,6 @@ stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
 
-
 stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaves);
 
@@ -212,7 +218,6 @@ stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
 
     return nothing
 );
-
 
 stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaves);

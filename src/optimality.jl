@@ -3,35 +3,31 @@
 # Changes to this function
 # General
 #     2022-Jul-07: migrate function from older version
+#     2022-Jul-07: add the method for Leaf
+#     2022-Jul-07: add the method for Leaves1D
+#     2022-Jul-07: add the method for Leaves2D (shaded leaves)
+#     2022-Jul-07: add the method for Leaves2D (sunlit leaves)
+#     2022-Jul-11: deflate documentations
 # To do
 #     TODO: figure out why the ratios are 1.35 and 1.6, and make them more accurate
 #
 #######################################################################################################################################################################################################
 """
-This function returns the partial derivative of photosynthetic rate per transpiration rate. Supported methods are
 
-$(METHODLIST)
+    ∂A∂E(leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat}
+    ∂A∂E(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
+    ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat}
+    ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
+
+Return the partial derivative of A per E, given
+- `leaf` `Leaf` type leaf
+- `air` `AirLayer` type environmental conditions
+- `leaves` `Leaves1D`, and `Leaves2D` type leaf
+- `ind` Index of the leaves (1 for sunlit and 2 for shaded for Leaves1D, all sunlit for Leaves2D)
 
 """
 function ∂A∂E end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-07: add the method for Leaf and Leaves2D (shaded leaves)
-#
-#######################################################################################################################################################################################################
-"""
-
-    ∂A∂E(leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat}
-    ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat}
-
-Return the partial derivative of A per E, given
-- `leaf` `Leaf`, and `Leaves2D` (shaded fraction) type leaf
-- `air` `AirLayer` type environmental conditions
-"""
 ∂A∂E(leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
     @unpack P_AIR = air;
 
@@ -52,45 +48,6 @@ Return the partial derivative of A per E, given
     return (_a2 - _a1) / (_e2 - _e1)
 );
 
-
-∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack P_AIR = air;
-
-    # compute the A and E at the current setting
-    _gs1 = leaves.g_H₂O_s_shaded;
-    _gh1 = 1 / (1 / _gs1 + 1 / (FT(1.35) * leaves.g_CO₂_b));
-    _e1  = _gh1 * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
-    _a1  = leaves.a_net_shaded;
-
-    # compute the A and E when g_sw increases by 0.0001 mol m⁻² s⁻¹
-    _gs2 = _gs1 + FT(0.0001);
-    _gh2 = 1 / (1 / _gs2 + 1 / (FT(1.35) * leaves.g_CO₂_b));
-    _gc2 = 1 / (FT(1.6) / _gs2 + 1 / leaves.g_CO₂_b);
-    leaf_photosynthesis!(leaves, air, _gc2, leaves.ppar_shaded);
-    _e2 = _gh2 * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
-    _a2 = leaves.PSM.a_net;
-
-    return (_a2 - _a1) / (_e2 - _e1)
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-07: add the method for Leaves1D and Leaves2D (sunlit leaves)
-#
-#######################################################################################################################################################################################################
-"""
-
-    ∂A∂E(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
-    ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat}
-
-Return the partial derivative of A per E, given
-- `leaf` `Leaves1D`, and `Leaves2D` (sunlit fraction) type leaf
-- `air` `AirLayer` type environmental conditions
-- `ind` Index of the leaves (1 for sunlit and 2 for shaded for Leaves1D, all sunlit for Leaves2D)
-"""
 ∂A∂E(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat} = (
     @unpack P_AIR = air;
 
@@ -111,6 +68,25 @@ Return the partial derivative of A per E, given
     return (_a2 - _a1) / (_e2 - _e1)
 );
 
+∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
+    @unpack P_AIR = air;
+
+    # compute the A and E at the current setting
+    _gs1 = leaves.g_H₂O_s_shaded;
+    _gh1 = 1 / (1 / _gs1 + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _e1  = _gh1 * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+    _a1  = leaves.a_net_shaded;
+
+    # compute the A and E when g_sw increases by 0.0001 mol m⁻² s⁻¹
+    _gs2 = _gs1 + FT(0.0001);
+    _gh2 = 1 / (1 / _gs2 + 1 / (FT(1.35) * leaves.g_CO₂_b));
+    _gc2 = 1 / (FT(1.6) / _gs2 + 1 / leaves.g_CO₂_b);
+    leaf_photosynthesis!(leaves, air, _gc2, leaves.ppar_shaded);
+    _e2 = _gh2 * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
+    _a2 = leaves.PSM.a_net;
+
+    return (_a2 - _a1) / (_e2 - _e1)
+);
 
 ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat} = (
     @unpack P_AIR = air;
@@ -133,7 +109,17 @@ Return the partial derivative of A per E, given
 );
 
 
-
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
+#     2022-Jul-07: migrate function from older version
+#     2022-Jul-08: add method for Leaf
+#     2022-Jul-08: use ∂E∂P from PlantHydraulics.jl
+#
+#######################################################################################################################################################################################################
+"""
+"""
 function ∂Θ∂E end
 
 
