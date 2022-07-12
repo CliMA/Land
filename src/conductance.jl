@@ -224,38 +224,80 @@ function stomatal_conductance! end
 #
 # Changes to this method
 # General
-#     2022-Jul-07: add new method to update stomatal conductance prognostically
+#     2022-Jul-12: add new method to compute marginal stomatal conductance increase
 #
 #######################################################################################################################################################################################################
 """
 
-    stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Update stomatal conductance for H₂O, given
 - `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
 - `air` `AirLayer` type environmental conditions
-- `Δt` Time step length `[s]`
 - `β` Tuning factor for G1 or Vcmax (only for empirical models)
+
 """
-stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    leaf.g_H₂O_s += ∂g∂t(leaf, air; β = β) * Δt;
+stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    leaf.∂g∂t = ∂g∂t(leaf, air; β = β);
 
     return nothing
 );
 
-stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    leaves.g_H₂O_s[1] += ∂g∂t(leaves, air, 1; β = β) * Δt;
-    leaves.g_H₂O_s[2] += ∂g∂t(leaves, air, 2; β = β) * Δt;
+stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    leaves.∂g∂t[1] = ∂g∂t(leaves, air, 1; β = β);
+    leaves.∂g∂t[2] = ∂g∂t(leaves, air, 2; β = β);
 
     return nothing
 );
 
-stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}, Δt::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    leaves.g_H₂O_s_shaded += ∂g∂t(leaves, air; β = β) * Δt;
+stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    leaves.∂g∂t_shaded = ∂g∂t(leaves, air; β = β);
+    for _i in eachindex(leaves.∂g∂t_sunlit)
+        leaves.∂g∂t_sunlit[_i] = ∂g∂t(leaves, air, _i; β = β);
+    end;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2022-Jul-07: add new method to update stomatal conductance prognostically
+#     2022-Jul-12: move ∂g∂t to another method
+#
+#######################################################################################################################################################################################################
+"""
+
+    stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat}
+    stomatal_conductance!(leaves::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat}
+    stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat}
+
+Update stomatal conductance for H₂O, given
+- `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+- `Δt` Time step length `[s]`
+
+"""
+stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+    leaf.g_H₂O_s += leaf.∂g∂t * Δt;
+
+    return nothing
+);
+
+stomatal_conductance!(leaves::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+    leaves.g_H₂O_s[1] += leaves.∂g∂t[1] * Δt;
+    leaves.g_H₂O_s[2] += leaves.∂g∂t[2] * Δt;
+
+    return nothing
+);
+
+stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+    leaves.g_H₂O_s_shaded += leaves.∂g∂t_shaded * Δt;
     for _i in eachindex(leaves.g_H₂O_s_sunlit)
-        leaves.g_H₂O_s_sunlit[_i] += ∂g∂t(leaves, air, _i; β = β) * Δt;
+        leaves.g_H₂O_s_sunlit[_i] += leaves.∂g∂t_sunlit[_i] * Δt;
     end;
 
     return nothing
