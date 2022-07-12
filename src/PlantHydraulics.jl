@@ -1,7 +1,7 @@
 module PlantHydraulics
 
-using ClimaCache: ComplexVC, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, NonSteadyStateFlow, PowerVC, Root,
-      RootHydraulics, SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
+using ClimaCache: AbstractSoilVC, AbstractXylemVC, ComplexVC, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LinearPVCurve, LogisticVC, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC,
+      NonSteadyStateFlow, PowerVC, Root, RootHydraulics, SegmentedPVCurve, SteadyStateFlow, Stem, StemHydraulics, WeibullVC
 using ClimaCache: GAS_R, T_25, ρg_MPa
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using Statistics: mean
@@ -12,6 +12,7 @@ import SoilHydraulics: relative_hydraulic_conductance
 
 
 # include functions
+include("beta.jl"             )
 include("critical_pressure.jl")
 include("derivative.jl"       )
 include("flow_profile.jl"     )

@@ -29,9 +29,9 @@ Return the flow rate, given
 """
 function xylem_flow end
 
-xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS.FLOW);
+xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS);
 
-xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (xylem_flow(organ.HS.FLOW), xylem_flow(organ.HS2.FLOW));
+xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (xylem_flow(organ.HS), xylem_flow(organ.HS2));
 
 xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
@@ -195,7 +195,7 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 #     2022-Jun-30: add method for Leaves1D
 #     2022-Jun-30: fix documentation
 #     2022-Jul-08: deflate documentations
-#     2022-Jul-12: add method to update leaf mean flow rates
+#     2022-Jul-12: add method to update leaf hydraulic flow rates per canopy layer based on stomatal conductance
 #
 #######################################################################################################################################################################################################
 """
@@ -438,6 +438,7 @@ xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
     @unpack AIR, LEAF = spac;
 
+    # update the
     _g = 1 / (1 / LEAF.g_H₂O_s + 1 / (FT(1.35) * LEAF.g_CO₂_b));
     _d = LEAF.p_H₂O_sat - AIR.p_H₂O;
     _f = _g * _d / AIR.P_AIR;
