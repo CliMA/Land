@@ -15,6 +15,7 @@
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-01: add fields: a_gross and a_net
+#     2022-Jul-12: add field: ∂g∂t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -72,6 +73,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     p_CO₂_s::FT
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
+    "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
+    ∂g∂t::FT
 
     # caches to speed up calculations
     "Last leaf temperature. If different from t, then make temperature correction"
@@ -98,6 +101,7 @@ end
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-01: add fields: a_gross and a_net
+#     2022-Jul-12: add field: ∂g∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -165,6 +169,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
                 20,                                 # p_CO₂_i
                 40,                                 # p_CO₂_s
                 saturation_vapor_pressure(T_25()),  # p_H₂O_sat
+                0,                                  # ∂g∂t
                 0)                                  # _t
 );
 
@@ -180,6 +185,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-07: make p_H₂O_sat a vector
+#     2022-Jul-12: add field: ∂g∂t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -237,6 +243,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     p_CO₂_s::Vector{FT}
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::Vector{FT}
+    "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
+    ∂g∂t::Vector{FT}
 end
 
 
@@ -251,6 +259,7 @@ end
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-07: make p_H₂O_sat a vector
+#     2022-Jul-12: add field: ∂g∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -309,7 +318,8 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 FT[3.0, 3.0],                   # g_CO₂_b
                 FT[20, 20],                     # p_CO₂_i
                 FT[40, 40],                     # p_CO₂_s
-                _svp                            # p_H₂O_sat
+                _svp,                           # p_H₂O_sat
+                zeros(FT,2)                     # ∂g∂t
     )
 );
 
@@ -326,6 +336,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-30: fix documentation
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
+#     2022-Jul-12: add fields: ∂g∂t_shaded and ∂g∂t_sunlit
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -402,6 +413,10 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     ϕ_f_shaded::FT
     "Fluorescence quantum yield for sunlit leaves `[-]`"
     ϕ_f_sunlit::Matrix{FT}
+    "Marginal increase of conductance per time for shaded leaves `[mol m⁻² s⁻²]`"
+    ∂g∂t_shaded::FT
+    "Marginal increase of conductance per time for sunlit leaves `[mol m⁻² s⁻²]`"
+    ∂g∂t_sunlit::Matrix{FT}
 
     # caches to speed up calculations
     "Last leaf temperature. If different from t, then make temperature correction"
@@ -420,6 +435,7 @@ end
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
+#     2022-Jul-12: add fields: ∂g∂t_shaded and ∂g∂t_sunlit
 #
 #######################################################################################################################################################################################################
 """
@@ -493,5 +509,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 saturation_vapor_pressure(T_25()),  # p_H₂O_sat
                 0,                                  # ϕ_f_shaded
                 zeros(FT,n_incl,n_azi),             # ϕ_f_sunlit
+                0,                                  # ∂g∂t_shaded
+                zeros(FT,n_incl,n_azi),             # ∂g∂t_sunlit
                 0)                                  # _t
 );
