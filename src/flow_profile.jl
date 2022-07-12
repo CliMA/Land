@@ -62,6 +62,35 @@ xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 #
 # Changes to the function
 # General
+#     2022-Jul-12: add method for SteadyStateFlow mode
+#     2022-Jul-12: add method for NonSteadyStateFlow mode
+#     2022-Jul-12: add method for LeafHydraulics, StemHydraulics, RootHydraulics
+#     2022-Jul-12: add function to update the flow rate in a hydraulic organ
+#
+#######################################################################################################################################################################################################
+"""
+
+    xylem_flow!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, f::FT) where {FT<:AbstractFloat}
+
+Return the flow rate, given
+- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type struct
+
+"""
+function xylem_flow! end
+
+xylem_flow!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, f::FT) where {FT<:AbstractFloat} = xylem_flow!(organ.HS.FLOW, f);
+
+xylem_flow!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, f::FT) where {FT<:AbstractFloat} = xylem_flow!(hs.FLOW, f);
+
+xylem_flow!(mode::SteadyStateFlow{FT}, flow::FT) where {FT<:AbstractFloat} = (mode.flow = flow; return nothing);
+
+xylem_flow!(mode::NonSteadyStateFlow{FT}, f_in::FT) where {FT<:AbstractFloat} = (mode.f_in = f_in; return nothing);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
 #     2022-May-27: migrate function to new version
 #     2022-May-27: add method for steady flow mode
 #     2022-May-27: add method for non-steady flow mode
