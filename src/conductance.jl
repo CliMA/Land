@@ -225,20 +225,39 @@ function stomatal_conductance! end
 # Changes to this method
 # General
 #     2022-Jul-12: add new method to compute marginal stomatal conductance increase
+#     2022-Jul-12: add new method to update marginal stomatal conductance for SPAC
+# To do
+#     TODO: be careful with the β here (need to used the value stored in empirical SM)
 #
 #######################################################################################################################################################################################################
 """
 
-    stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves1D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat}
 
-Update stomatal conductance for H₂O, given
-- `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
-- `air` `AirLayer` type environmental conditions
-- `β` Tuning factor for G1 or Vcmax (only for empirical models)
+Update marginal stomatal conductance, given
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type struct
+- `β` Tuning factor
 
 """
+stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    @unpack AIR, LEAF = spac;
+
+    stomatal_conductance!(LEAF, AIR; β = β);
+
+    return nothing
+);
+
+stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    @unpack AIR, LEAVES, LEAVES_INDEX = spac;
+
+    for _i in eachindex(LEAVES_INDEX)
+        stomatal_conductance!(LEAVES[_i], AIR[LEAVES_INDEX[_i]]; β = β);
+    end;
+
+    return nothing
+);
+
 stomatal_conductance!(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     leaf.∂g∂t = ∂g∂t(leaf, air; β = β);
 
@@ -266,21 +285,38 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) w
 #
 # Changes to this method
 # General
+#     2022-Jul-07: add new method to update stomatal conductance for CO₂ based on that of H₂O
 #     2022-Jul-07: add new method to update stomatal conductance prognostically
 #     2022-Jul-12: move ∂g∂t to another method
+#     2022-Jul-12: add method to update g for SPAC
 #
 #######################################################################################################################################################################################################
 """
 
-    stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat}
 
-Update stomatal conductance for H₂O, given
-- `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+Update marginal stomatal conductance, given
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type struct
 - `Δt` Time step length `[s]`
 
 """
+stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAF = spac;
+
+    stomatal_conductance!(LEAF, Δt);
+
+    return nothing
+);
+
+stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, Δt::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAVES = spac;
+
+    stomatal_conductance!.(LEAVES, Δt);
+
+    return nothing
+);
+
 stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     leaf.g_H₂O_s += leaf.∂g∂t * Δt;
 
@@ -303,24 +339,6 @@ stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat} =
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jul-07: add new method to update stomatal conductance for CO₂ based on that of H₂O
-#
-#######################################################################################################################################################################################################
-"""
-
-    stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat}
-    stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat}
-
-Update stomatal conductance for CO₂ based on that of H₂O, given
-- `leaf` or `leaves` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
-
-"""
 stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaf);
 

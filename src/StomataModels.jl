@@ -1,7 +1,8 @@
 module StomataModels
 
 using ClimaCache: AbstractSoilVC, AbstractXylemVC, AirLayer, AndereggSM, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, BroadbandLeafBiophysics, C4VJPModel, EllerSM, GCO₂Mode,
-      GentineSM, HyperspectralLeafBiophysics, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LeuningSM, MedlynSM, SperrySM, WangSM, Wang2SM
+      GentineSM, HyperspectralLeafBiophysics, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LeuningSM, MedlynSM, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, SperrySM, WangSM,
+      Wang2SM
 using ClimaCache: CP_D_MOL, K_STEFAN, M_H₂O
 using Photosynthesis: leaf_photosynthesis!, ∂R∂T
 using PlantHydraulics: relative_hydraulic_conductance, ∂E∂P
