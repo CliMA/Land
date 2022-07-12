@@ -113,6 +113,29 @@ function ∂A∂E end
 #
 # Changes to this function
 # General
+#     2022-Jul-11: add function to compute ∂R∂E
+#
+#######################################################################################################################################################################################################
+"""
+
+    ∂R∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat}
+
+Returns the marginal increase in leaf respiration rate per transpiration rate, given
+- `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
+- `air` `AirLayer` type environmental conditions
+
+"""
+function ∂R∂E end
+
+∂R∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂R∂E(lf.SM, lf, air);
+
+∂R∂E(sm::WangSM{FT}, lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂R∂T(lf) * ∂T∂E(lf, air, sm.f_view);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Jul-11: add function to compute ∂T∂E
 #
 #######################################################################################################################################################################################################
@@ -640,17 +663,16 @@ function ∂Θₙ∂E end
 #######################################################################################################################################################################################################
 """
 
-    ∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat}
+    ∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat}
 
 Return the ∂Θ∂E for nocturnal stomatal opening, given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type leaf
 - `air` `AirLayer` type environmental conditions
-- `ppar_mem` Memory PPAR
 
 """
-∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = ∂Θₙ∂E(lf.SM, lf, air, ppar_mem);
+∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂Θₙ∂E(lf.SM, lf, air);
 
-∂Θₙ∂E(sm::WangSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+∂Θₙ∂E(sm::WangSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
     @unpack F_FITNESS = sm;
     @unpack HS = leaf;
     @unpack P_AIR = air;
@@ -660,13 +682,13 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
     _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaf.g_CO₂_b));
     _gc = 1 / (FT(1.6) / _gs + 1 / leaf.g_CO₂_b);
     _e  = _gh * (leaf.p_H₂O_sat - air.p_H₂O) / P_AIR;
-    leaf_photosynthesis!(leaf, air, _gc, ppar_mem);
+    leaf_photosynthesis!(leaf, air, _gc, sm.ppar_mem);
     _a  = leaf.PSM.a_net;
 
     return _a / (HS.e_crit - _e) * F_FITNESS
 );
 
-∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
     @unpack F_FITNESS = sm;
     @unpack HS = leaves;
     @unpack P_AIR = air;
@@ -676,13 +698,13 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
     _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b[1]));
     _gc = 1 / (FT(1.6) / _gs + 1 / leaves.g_CO₂_b[1]);
     _e  = _gh * (leaves.p_H₂O_sat[1] - air.p_H₂O) / P_AIR;
-    leaf_photosynthesis!(leaves, air, _gc, ppar_mem);
+    leaf_photosynthesis!(leaves, air, _gc, sm.ppar_mem);
     _a  = leaves.PSM.a_net;
 
     return _a / (HS.e_crit - _e) * F_FITNESS
 );
 
-∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ppar_mem::FT) where {FT<:AbstractFloat} = (
+∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
     @unpack F_FITNESS = sm;
     @unpack HS = leaves;
     @unpack P_AIR = air;
@@ -692,7 +714,7 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
     _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b));
     _gc = 1 / (FT(1.6) / _gs + 1 / leaves.g_CO₂_b);
     _e  = _gh * (leaves.p_H₂O_sat - air.p_H₂O) / P_AIR;
-    leaf_photosynthesis!(leaves, air, _gc, ppar_mem);
+    leaf_photosynthesis!(leaves, air, _gc, sm.ppar_mem);
     _a  = leaves.PSM.a_net;
 
     return _a / (HS.e_crit - _e) * F_FITNESS

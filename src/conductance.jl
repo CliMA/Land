@@ -182,25 +182,25 @@ Return the marginal increase of stomatal conductance, given
 
 #######################################################################################################################################################################################################
 #
-# Changes to this method
+# Changes to this function
 # General
 #     2022-Jul-11: add method for nocturnal transpiration for WangSM model
+#     2022-Jul-11: rename function to ∂gₙ∂t
 #
 #######################################################################################################################################################################################################
 """
 
-    ∂g∂t(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT, ppar_mem::FT) where {FT<:AbstractFloat}
+    ∂gₙ∂t(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat}
 
 Return the marginal increase of stomatal conductance, given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type struct
 - `air` `AirLayer` type environmental conditions
-- `f_view` Ratio that leaf area is exposed to external sources/sinks (not other leaves, e.g., 2/LAI for canopy on average)
-- `ppar_mem` Memory PPAR
 """
-∂g∂t(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT, ppar_mem::FT) where {FT<:AbstractFloat} = ∂g∂t(lf.SM, lf, air, f_view, ppar_mem);
+function ∂gₙ∂t end
 
-∂g∂t(sm::WangSM{FT}, lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT, ppar_mem::FT) where {FT<:AbstractFloat} =
-    sm.K * (∂R∂T(lf) * ∂T∂E(lf, air, f_view) - ∂Θₙ∂E(lf, air, ppar_mem));
+∂gₙ∂t(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂gₙ∂t(lf.SM, lf, air);
+
+∂gₙ∂t(sm::WangSM{FT}, lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = sm.K * (∂R∂E(lf, air) - ∂Θₙ∂E(lf, air));
 
 
 #######################################################################################################################################################################################################
