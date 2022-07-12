@@ -185,7 +185,8 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 #     2022-May-31: pass the test
 #     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #     2022-Jul-08: deflate documentations
-#     2022-Jul-12: compute e_crit for leaves if update is true
+#     2022-Jul-12: compute e_crit for leaves
+#     2022-Jul-12: compute β for leaves (only for empirical models)
 # To do
 #     TODO: add leaf extra-xylary vulnerability curve
 #
@@ -266,10 +267,8 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.flow / hs.K_OX;
 
-    # if update is true, update the e_crit
-    if update
-        hs.e_crit = critical_flow(hs, T, hs.e_crit);
-    end;
+    # update the e_crit
+    hs.e_crit = critical_flow(hs, T, hs.e_crit);
 
     return nothing
 );
@@ -309,10 +308,8 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.f_out / hs.K_OX;
 
-    # if update is true, update the e_crit
-    if update
-        hs.e_crit = critical_flow(hs, T, hs.e_crit);
-    end;
+    # update the e_crit
+    hs.e_crit = critical_flow(hs, T, hs.e_crit);
 
     return nothing
 );
@@ -504,6 +501,9 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
     LEAF.HS.p_ups = STEM.HS.p_dos;
     xylem_pressure_profile!(LEAF; update = update);
 
+    # update the β factor for empirical models
+    β_factor!(spac);
+
     return nothing
 );
 
@@ -523,6 +523,9 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
         _leaf.HS.p_ups = _p_mean;
         xylem_pressure_profile!(_leaf; update = update);
     end;
+
+    # update the β factor for empirical models
+    β_factor!(spac);
 
     return nothing
 );
@@ -547,6 +550,9 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
         _leaf.HS.p_ups = TRUNK.HS.p_dos;
         xylem_pressure_profile!(_leaf; update = update);
     end;
+
+    # update the β factor for empirical models
+    β_factor!(spac);
 
     return nothing
 );
@@ -575,6 +581,9 @@ xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT
         _leaf.HS.p_ups = _stem.HS.p_dos;
         xylem_pressure_profile!(_leaf; update = update);
     end;
+
+    # update the β factor for empirical models
+    β_factor!(spac);
 
     return nothing
 );
