@@ -185,8 +185,8 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 #     2022-May-31: pass the test
 #     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #     2022-Jul-08: deflate documentations
+#     2022-Jul-12: compute e_crit for leaves if update is true
 # To do
-#     TODO: compute e_crit for leaves
 #     TODO: add leaf extra-xylary vulnerability curve
 #
 #######################################################################################################################################################################################################
@@ -206,7 +206,7 @@ function xylem_pressure_profile! end
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
 - `organ` `Leaf`, `Leaves1D`, `Leaves2D`, `Root`, or `Stem` type organ
-- `update` If true, update xylem cavitation legacy
+- `update` If true, update xylem cavitation legacy and leaf critical flow (e_crit)
 
 """
 xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
@@ -266,6 +266,11 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.flow / hs.K_OX;
 
+    # if update is true, update the e_crit
+    if update
+        hs.e_crit = critical_flow(hs, T, hs.e_crit);
+    end;
+
     return nothing
 );
 
@@ -303,6 +308,11 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.f_out / hs.K_OX;
+
+    # if update is true, update the e_crit
+    if update
+        hs.e_crit = critical_flow(hs, T, hs.e_crit);
+    end;
 
     return nothing
 );
