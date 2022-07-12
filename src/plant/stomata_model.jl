@@ -429,6 +429,7 @@ end
 # General
 #     2022-Jun-30: add struct for Wang model
 #     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-11: add field fitness factor
 #
 #######################################################################################################################################################################################################
 """
@@ -441,8 +442,17 @@ Empty struct for Wang stomatal model. The equation used for Wang type model is
 ```
 """
 Base.@kwdef mutable struct WangSM{FT} <: AbstractStomataModel{FT}
+    # parameters that do not change with time
+    "Fitness factor"
+    F_FITNESS::FT = 0.1
     "Slope constant `[mol² m⁻² s⁻¹ μmol⁻¹]`"
     K::FT = 1e-7
+
+    # diagnostic variables that change with time
+    "Ratio that leaf area is exposed to external sources/sinks (not other leaves, e.g., 2/LAI for canopy on average, used for nocturnal transpiration)"
+    f_view::FT = 2
+    "Memory PPAR `[μmol m⁻² s⁻¹]`"
+    ppar_mem::FT = 100
 end
 
 
