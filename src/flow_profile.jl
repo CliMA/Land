@@ -62,35 +62,6 @@ xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 #
 # Changes to the function
 # General
-#     2022-Jul-12: add method for SteadyStateFlow mode
-#     2022-Jul-12: add method for NonSteadyStateFlow mode
-#     2022-Jul-12: add method for LeafHydraulics, StemHydraulics, RootHydraulics
-#     2022-Jul-12: add function to update the flow rate in a hydraulic organ
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_flow!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, f::FT) where {FT<:AbstractFloat}
-
-Return the flow rate, given
-- `organ` `Leaf`, `Leaves2D`, `Root`, or `Stem` type struct
-
-"""
-function xylem_flow! end
-
-xylem_flow!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, f::FT) where {FT<:AbstractFloat} = xylem_flow!(organ.HS.FLOW, f);
-
-xylem_flow!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, f::FT) where {FT<:AbstractFloat} = xylem_flow!(hs.FLOW, f);
-
-xylem_flow!(mode::SteadyStateFlow{FT}, flow::FT) where {FT<:AbstractFloat} = (mode.flow = flow; return nothing);
-
-xylem_flow!(mode::NonSteadyStateFlow{FT}, f_in::FT) where {FT<:AbstractFloat} = (mode.f_in = f_in; return nothing);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the function
-# General
 #     2022-May-27: migrate function to new version
 #     2022-May-27: add method for steady flow mode
 #     2022-May-27: add method for non-steady flow mode
@@ -224,6 +195,7 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 #     2022-Jun-30: add method for Leaves1D
 #     2022-Jun-30: fix documentation
 #     2022-Jul-08: deflate documentations
+#     2022-Jul-12: add method to update leaf mean flow rates
 #
 #######################################################################################################################################################################################################
 """
@@ -378,13 +350,16 @@ xylem_flow_profile!(mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloa
     xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
     xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
-Update flow profiles for the soil-plant-air continuum (after setting up leaf flow rate), given
+Update flow profiles for the soil-plant-air continuum (set up leaf flow rate from stomatal conductance first), given
 - `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type SPAC system
 - `Δt` Time step length
 
 """
 xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack LEAF, ROOT, STEM = spac;
+
+    # 0. update leaf flow or f_out from stomatal conductance
+    xylem_flow_profile!(spac);
 
     # 1. update the leaf flow profile
     xylem_flow_profile!(LEAF, Δt);
@@ -403,6 +378,9 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack LEAVES, ROOTS = spac;
 
+    # 0. update leaf flow or f_out from stomatal conductance
+    xylem_flow_profile!(spac);
+
     # 1. update the leaf flow profile
     xylem_flow_profile!.(LEAVES, Δt);
 
@@ -415,6 +393,9 @@ xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 
 xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack LEAVES, ROOTS, TRUNK = spac;
+
+    # 0. update leaf flow or f_out from stomatal conductance
+    xylem_flow_profile!(spac);
 
     # 1. update the leaf flow profile
     xylem_flow_profile!.(LEAVES, Δt);
@@ -432,6 +413,9 @@ xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     @unpack BRANCHES, LEAVES, ROOTS, TRUNK = spac;
 
+    # 0. update leaf flow or f_out from stomatal conductance
+    xylem_flow_profile!(spac);
+
     # 1. update the leaf flow profile
     xylem_flow_profile!.(LEAVES, Δt);
 
@@ -447,6 +431,40 @@ xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
     # 4. set up root flow rate and profile
     xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, xylem_flow(TRUNK), Δt);
+
+    return nothing
+);
+
+xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
+    @unpack AIR, LEAF = spac;
+
+    _g = 1 / (1 / LEAF.g_H₂O_s + 1 / (FT(1.35) * LEAF.g_CO₂_b));
+    _d = LEAF.p_H₂O_sat - AIR.p_H₂O;
+    _f = _g * _d / AIR.P_AIR;
+    xylem_flow_profile!(LEAF.HS.FLOW, _f);
+
+    return nothing
+);
+
+xylem_flow_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY = spac;
+
+    for _i in eachindex(LEAVES)
+        _p_sl = CANOPY.OPTICS.p_sunlit[N_CANOPY-_i];
+
+        _g_sh = 1 / (1 /LEAVES[_i].g_H₂O_s_shaded + 1 / (FT(1.35) * LEAVES[_i].g_CO₂_b));
+        _g_sl = 0;
+        for _j in eachindex(LEAVES[_i].g_H₂O_s_sunlit)
+            _g_sl += 1 / (1 /LEAVES[_i].g_H₂O_s_sunlit[_j] + 1 / (FT(1.35) * LEAVES[_i].g_CO₂_b));
+        end;
+        _g_sl /= length(LEAVES[_i].g_H₂O_s_sunlit);
+
+        _g = _g_sh * (1 - _p_sl) + _g_sl * _p_sl;
+        _d = LEAVES[_i].p_H₂O_sat - AIR[LEAVES_INDEX[_i]].p_H₂O;
+        _f = _g * _d / AIR[LEAVES_INDEX[_i]].P_AIR;
+
+        xylem_flow_profile!(LEAVES[_i].HS.FLOW, _f);
+    end;
 
     return nothing
 );
