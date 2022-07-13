@@ -16,9 +16,9 @@
 $(TYPEDEF)
 
 Hierarchy of `AbstractColimit`
-- `MinimumColimit`
-- `QuadraticColimit`
-- `SerialColimit`
+- [`MinimumColimit`](@ref)
+- [`QuadraticColimit`](@ref)
+- [`SerialColimit`](@ref)
 
 """
 abstract type AbstractColimit{FT<:AbstractFloat} end

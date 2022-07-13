@@ -12,6 +12,7 @@ $(TYPEDEF)
 Hierarchy of AbstractSoilAlbedo:
 - [`BroadbandSoilAlbedo`](@ref)
 - [`HyperspectralSoilAlbedo`](@ref)
+
 """
 abstract type AbstractSoilAlbedo{FT<:AbstractFloat} end
 
@@ -22,6 +23,7 @@ abstract type AbstractSoilAlbedo{FT<:AbstractFloat} end
 # General
 #     2022-Jun-14: add struct for broadband soil albedo
 #     2022-Jun-14: make soil albedo a two-element vector for PAR and NIR
+#     2022-Jul-13: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -35,47 +37,21 @@ Structure for broadband soil albedo
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
+Base.@kwdef mutable struct BroadbandSoilAlbedo{FT<:AbstractFloat} <: AbstractSoilAlbedo{FT}
     # diagnostic variables that change with time
     "Net diffuse radiation at top soil `[W m⁻²]`"
-    e_net_diffuse::FT
+    e_net_diffuse::FT = 0
     "Net direct radiation at top soil `[W m⁻²]`"
-    e_net_direct::FT
+    e_net_direct::FT = 0
     "Net longwave energy absorption `[W m⁻²]`"
-    r_net_lw::FT
+    r_net_lw::FT = 0
     "Net shortwave energy absorption `[W m⁻²]`"
-    r_net_sw::FT
+    r_net_sw::FT = 0
     "Reflectance for longwave radiation"
-    ρ_lw::FT
+    ρ_lw::FT = 0.06
     "Reflectance for shortwave radiation (for PAR and NIR)"
-    ρ_sw::Vector{FT}
+    ρ_sw::Vector{FT} = FT[0,0]
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-14: add constructor
-#     2022-Jun-14: make soil albedo a two-element vector for PAR and NIR
-#
-#######################################################################################################################################################################################################
-"""
-
-    BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
-
-Construct a broadband soil albedo struct
-"""
-BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat} = (
-    return BroadbandSoilAlbedo{FT}(
-                0,      # e_net_diffuse
-                0,      # e_net_direct
-                0,      # r_net_lw
-                0,      # r_net_sw
-                0.06,   # ρ_lw
-                [0,0]   # ρ_sw
-    )
-);
 
 
 #######################################################################################################################################################################################################
@@ -83,7 +59,9 @@ BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat} = (
 # Changes to this structure
 # General
 #     2022-Jun-14: add struct for hyperspectral soil albedo
+#     2022-Jun-14: add constructor
 #     2022-Jun-14: add fields to compute soil hyperspectral albedo in CanopyRadiativeTransfer.jl
+#     2022-Jun-14: add wls in constructor function and remove n_λ
 #
 #######################################################################################################################################################################################################
 """
@@ -97,7 +75,7 @@ Structure for hyperspectral soil albedo
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
+mutable struct HyperspectralSoilAlbedo{FT<:AbstractFloat} <: AbstractSoilAlbedo{FT}
     # diagnostic variables that change with time
     "Net diffuse radiation at top soil `[mW m⁻² nm⁻¹]`"
     e_net_diffuse::Vector{FT}
@@ -124,21 +102,13 @@ mutable struct HyperspectralSoilAlbedo{FT} <: AbstractSoilAlbedo{FT}
 end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-14: add constructor
-#     2022-Jun-14: add fields to compute soil hyperspectral albedo in CanopyRadiativeTransfer.jl
-#     2022-Jun-14: add wls in constructor function and remove n_λ
-#
-#######################################################################################################################################################################################################
 """
 
     HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 
 Construct a hyperspectral soil albedo struct, given
-    - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
+- `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
+
 """
 HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @unpack IΛ_NIR, NΛ, SΛ = wls;
@@ -193,12 +163,51 @@ HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {
 #
 # Changes to this structure
 # General
+#     2022-Jul-13: add SoilLayer structure
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Structure for soil layer
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
+    # parameters that do not change with time
+    "Soil moisture retention curve"
+    VC::Union{BrooksCorey{FT}, VanGenuchten{FT}} = VanGenuchten{FT}("Loam")
+    "Mean depth"
+    Z::FT = -0.5
+    "Depth boundaries"
+    ZS::Vector{FT} = FT[0,-1]
+
+    # prognostic variables that change with time
+    "Temperature"
+    t::FT = T_25()
+    "Soil water content"
+    θ::FT = VC.Θ_SAT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this structure
+# General
 #     2022-Jun-08: add Soil structure
+#     2022-Jun-08: add constructor
 #     2022-Jun-09: add fields: e_net_diffuse, e_net_direct
 #     2022-Jun-10: add fields: r_net_lw, r_net_sw, ρ_lw
 #     2022-Jun-14: add abstractized soil albedo
 #     2022-Jun-13: use Union instead of Abstract... for type definition
 #     2022-Jun-14: add field for soil color class
+#     2022-Jun-14: separate the constructor for hyperspectral albedo
+#     2022-Jun-14: separate the constructor for broadband albedo
+#     2022-Jul-13: move VC, Z, t, and θ to SoilLayer
 #
 #######################################################################################################################################################################################################
 """
@@ -218,85 +227,50 @@ mutable struct Soil{FT<:AbstractFloat}
     ALBEDO::Union{BroadbandSoilAlbedo{FT}, HyperspectralSoilAlbedo{FT}}
     "Color class as in CLM"
     COLOR::Int
-    "Soil moisture retention curve"
-    VC::Union{BrooksCorey{FT}, VanGenuchten{FT}}
-    "Mean depth"
-    Z::FT
-    "Depth boundaries"
-    ZS::Vector{FT}
-
-    # prognostic variables that change with time
-    "Temperature"
-    t::FT
-    "Soil water content"
-    θ::FT
+    "Soil layers"
+    LAYERS::Vector{SoilLayer{FT}}
 end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-08: add constructor
-#     2022-Jun-09: add fields: e_net_diffuse, e_net_direct
-#     2022-Jun-10: add fields: r_net_lw, r_net_sw, ρ_lw
-#     2022-Jun-14: add abstractized soil albedo
-#     2022-Jun-14: add field for soil color class
-#     2022-Jun-14: separate the function to create hyperspectral soil albedo
-#
-#######################################################################################################################################################################################################
 """
 
     Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
 
-Construct a soil struct, given
+Construct a soil struct with hyperspectral albedo, given
 - `zs` Soil upper and lower boundaries
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
 - `soil_type` Soil type name
+
 """
 Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat} = (
-    _svc = VanGenuchten{FT}(soil_type);
+    _layers = SoilLayer{FT}[];
+    for _i in 1:length(zs-1)
+        push!(_layers, SoilLayer{FT}(VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
+    end;
+
     _sab = HyperspectralSoilAlbedo{FT}(wls);
 
-    return Soil{FT}(
-                _sab,       # ALBEDO
-                1,          # COLOR
-                _svc,       # VC
-                mean(zs),   # Z
-                zs,         # ZS
-                T_25(FT),   # t
-                _svc.Θ_SAT  # θ
-    )
+    return Soil{FT}(_sab, 1, _layers)
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-14: separate the method for broadband albedo
-#
-#######################################################################################################################################################################################################
 """
 
     Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 
-Construct a soil struct, given
+Construct a soil struct with broadband albedo, given
 - `zs` Soil upper and lower boundaries
 - `broadband` Indicating broadband soil albedo
 - `soil_type` Soil type name
+
 """
 Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat} = (
-    _svc = VanGenuchten{FT}(soil_type);
+    _layers = SoilLayer{FT}[];
+    for _i in 1:length(zs-1)
+        push!(_layers, SoilLayer{FT}(VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
+    end;
+
     _sab = BroadbandSoilAlbedo{FT}();
 
-    return Soil{FT}(
-                _sab,       # ALBEDO
-                1,          # COLOR
-                _svc,       # VC
-                mean(zs),   # Z
-                zs,         # ZS
-                T_25(FT),   # t
-                _svc.Θ_SAT  # θ
-    )
+    return Soil{FT}(_sab, 1, _layers)
 );
