@@ -154,7 +154,7 @@ leaf_photosynthesis!(
     leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat}
     leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat}
 
-Updates leaf photosynthetic rates (this function is not meant for public use), given
+Updates leaf photosynthetic rates (this method not meant for public usage, use it with caution), given
 - `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `leaves` `Leaves1D` or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure

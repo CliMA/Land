@@ -36,6 +36,7 @@ Update the RubisCO limited photosynthetic rate, given
 - `psm` `C3CytochromeModel`, `C3VJPModel`, or `C4VJPModel` structure for photosynthesis model
 - `p_i` Internal CO₂ partial pressure in `Pa`
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
+
 """
 rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT},C3VJPModel{FT}}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     psm.a_c = β * psm.v_cmax * (p_i - psm.γ_star) / (p_i + psm.k_m);
@@ -69,6 +70,7 @@ Update the RubisCO limited photosynthetic rate in conductance mode, given
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
+
 """
 rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _a = β * psm.v_cmax;

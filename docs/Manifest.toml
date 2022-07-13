@@ -292,7 +292,7 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.3.2"
 
 [[deps.Photosynthesis]]
-deps = ["ClimaCache", "DocStringExtensions", "PkgUtility", "Test", "UnPack"]
+deps = ["ClimaCache", "PkgUtility", "Test", "UnPack"]
 path = ".."
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
 version = "0.3.9"

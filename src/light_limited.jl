@@ -40,9 +40,9 @@ Update the electron transport limited photosynthetic rate, given
 - `psm` `C3CytochromeModel`, `C3VJPModel`, or `C4VJPModel` structure for C3 photosynthesis model
 
 """
-light_limited_rate!(psm::C3VJPModel{FT}) where {FT<:AbstractFloat} = (psm.a_j = psm.j * psm.e_to_c; return nothing);
-
 light_limited_rate!(psm::Union{C3CytochromeModel{FT}, C4VJPModel{FT}}) where {FT<:AbstractFloat} = (psm.a_j = psm.j_pot * psm.e_to_c; return nothing);
+
+light_limited_rate!(psm::C3VJPModel{FT}) where {FT<:AbstractFloat} = (psm.a_j = psm.j * psm.e_to_c; return nothing);
 
 
 #######################################################################################################################################################################################################

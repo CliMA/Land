@@ -5,14 +5,12 @@ version = "0.3.9"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
-DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 PkgUtility = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 ClimaCache = "0.5.0"
-DocStringExtensions = "0.8.6, 0.9.0"
 PkgUtility = "0.1.10, 0.2.0"
 UnPack = "1.0"
 julia = "1.6"
