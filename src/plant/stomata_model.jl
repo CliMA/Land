@@ -3,6 +3,14 @@
 # Changes to this type
 # General
 #     2022-Jun-30: add abstract type for which parameter to tune
+#     2022-Jun-30: add struct to tune G1
+#     2022-Jun-30: add struct to base on Kleaf
+#     2022-Jun-30: add struct to base on Ksoil
+#     2022-Jun-30: add struct to base on Pleaf
+#     2022-Jun-30: add struct to base on Psoil
+#     2022-Jun-30: add struct to tune Vcmax
+#     2022-Jun-30: add struct to base on Θ (SWC)
+#     2022-Jul-12: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -10,121 +18,28 @@
 $(TYPEDEF)
 
 Hierarchy of `AbstractBetaParameter`:
-- [`BetaParameterG1`](@ref)
-- [`BetaParameterVcmax`](@ref)
+- `BetaParameterG1` PARAM_Y
+- `BetaParameterKleaf` PARAM_X
+- `BetaParameterKsoil` PARAM_X
+- `BetaParameterPleaf` PARAM_X
+- `BetaParameterPsoil` PARAM_X
+- `BetaParameterVcmax` PARAM_Y
+- `BetaParameterΘ` PARAM_X
 """
 abstract type AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to tune G1
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1
-"""
 struct BetaParameterG1 <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to base on Kleaf
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1 or Vcmax based on Kleaf
-"""
 struct BetaParameterKleaf <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to base on Ksoil
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1 or Vcmax based on Ksoil
-"""
 struct BetaParameterKsoil <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to base on Pleaf
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1 or Vcmax based on Pleaf
-"""
 struct BetaParameterPleaf <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to base on Psoil
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1 or Vcmax based on Psoil
-"""
 struct BetaParameterPsoil <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to tune Vcmax
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune Vcmax
-"""
 struct BetaParameterVcmax <: AbstractBetaParameter end
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jun-30: add struct to base on Θ (SWC)
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty struct to indicate to tune G1 or Vcmax based on Θ (SWC)
-"""
 struct BetaParameterΘ <: AbstractBetaParameter end
 
 
@@ -134,6 +49,10 @@ struct BetaParameterΘ <: AbstractBetaParameter end
 # General
 #     2022-Jun-30: add struct for modular beta function
 #     2022-Jun-30: add more types to PARAM_X
+#     2022-Jul-07: use BetaParameterKleaf as the default param_x
+#     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-12: add FT control to struct
+#     2022-Jul-12: add fields β for stomatal models
 #
 #######################################################################################################################################################################################################
 """
@@ -147,36 +66,21 @@ Struct to tune G1 or Vcmax based on leaf hydraulic conductance
 $(TYPEDFIELDS)
 
 """
-mutable struct BetaFunction
+Base.@kwdef mutable struct BetaFunction{FT<:AbstractFloat}
     # parameters that do not change with time
     "Function to turn variables to β tuning factor"
-    FUNC::Function
+    FUNC::Function = (x -> x)
     "Input parameter to base on"
-    PARAM_X::Union{BetaParameterKleaf, BetaParameterKsoil, BetaParameterPleaf, BetaParameterPsoil, BetaParameterΘ}
+    PARAM_X::Union{BetaParameterKleaf, BetaParameterKsoil, BetaParameterPleaf, BetaParameterPsoil, BetaParameterΘ} = BetaParameterKleaf()
     "Target parameter to tune"
-    PARAM_Y::Union{BetaParameterG1, BetaParameterVcmax}
+    PARAM_Y::Union{BetaParameterG1, BetaParameterVcmax} = BetaParameterG1()
+
+    # dignostic variables that changes with time
+    "Tuning factor computed"
+    β₁::FT = 1
+    "Tuning factor computed for HS2"
+    β₂::FT = 1
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-30: add constructor function
-#     2022-Jun-30: fix function definition
-#     2022-Jul-07: use BetaParameterKleaf as the default param_x
-#
-#######################################################################################################################################################################################################
-"""
-
-    BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKleaf(), param_y::AbstractBetaParameter = BetaParameterG1())
-
-Construct a `BetaFunction` type beta function, given
-- `f` Function
-- `param_x` `AbstractBetaParameter` type to indicate which parameter to base on
-- `param_y` `AbstractBetaParameter` type to indicate which parameter to tune
-"""
-BetaFunction(f::Function = (func(x) = x); param_x::AbstractBetaParameter = BetaParameterKleaf(), param_y::AbstractBetaParameter = BetaParameterG1()) = BetaFunction(f, param_x, param_y);
 
 
 #######################################################################################################################################################################################################

@@ -60,6 +60,8 @@ end
 #     2022-May-31: remove unneeded variables from struct
 #     2022-May-31: add documentation
 #     2022-May-31: add f_sum field
+# Bug fix
+#     2022-Jul-13: do not save a pre-defined array into two fields, redefine or deepcopy
 #
 #######################################################################################################################################################################################################
 """
@@ -71,18 +73,14 @@ Construct a non-steady state flow struct, given
 - `isleaf` Bool to indicate if the organ is a leaf
 """
 NonSteadyStateFlow{FT}(N::Int, isleaf::Bool = true) where {FT<:AbstractFloat} = (
-    if isleaf
-        _zeros = zeros(FT,1);
-    else
-        _zeros = zeros(FT,N);
-    end;
+    _n = isleaf ? 1 : N;
 
     return NonSteadyStateFlow{FT}(
-                _zeros,     # f_buffer
-                _zeros,     # f_element
-                0,          # f_in
-                0,          # f_out
-                _zeros      # f_sum
+                zeros(FT,_n),   # f_buffer
+                zeros(FT,_n),   # f_element
+                0,              # f_in
+                0,              # f_out
+                zeros(FT,_n)    # f_sum
     )
 );
 
