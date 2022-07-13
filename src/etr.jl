@@ -25,8 +25,8 @@
 #######################################################################################################################################################################################################
 """
 
-    photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
     photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
+    photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
     photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Update the electron transport rates, given
@@ -39,17 +39,6 @@ Update the electron transport rates, given
 """
 function photosystem_electron_transport! end
 
-photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSII, Φ_PSII_MAX = rc;
-
-    psm.e_to_c = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
-    psm.j_pot  = F_PSII * Φ_PSII_MAX * apar;
-    psm.j      = colimited_rate(psm.j_pot, β * psm.j_max, psm.COLIMIT_J);
-
-    return nothing
-);
-
 photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSI, Φ_PSI_MAX = rc;
@@ -58,6 +47,17 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
     psm.j_psi  = colimited_rate(β * psm.v_qmax, apar * F_PSI * Φ_PSI_MAX, psm.COLIMIT_J);
     psm.η      = 1 - psm.η_l / psm.η_c + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / psm.η_c;
     psm.j_pot  = psm.j_psi / psm.η;
+
+    return nothing
+);
+
+photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+    @unpack EFF_1, EFF_2 = psm;
+    @unpack F_PSII, Φ_PSII_MAX = rc;
+
+    psm.e_to_c = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
+    psm.j_pot  = F_PSII * Φ_PSII_MAX * apar;
+    psm.j      = colimited_rate(psm.j_pot, β * psm.j_max, psm.COLIMIT_J);
 
     return nothing
 );
