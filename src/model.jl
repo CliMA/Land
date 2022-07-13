@@ -63,6 +63,56 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLa
 #
 # Changes to this method
 # General
+#     2022-Jul-12: add method to account for tuning factor at leaf level
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+
+Updates leaf photosynthetic rates based on CO₂ partial pressure or CO₂ conductance, given
+- `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
+- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
+- `mode` `GCO₂Mode` or `PCO₂Mode` that uses CO₂ conductance or partial pressure to compute photosynthetic rates
+
+"""
+leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, lf.SM);
+
+leaf_photosynthesis!(
+            lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
+            air::AirLayer{FT},
+            mode::Union{GCO₂Mode, PCO₂Mode},
+            sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, FT(1));
+
+leaf_photosynthesis!(
+            lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
+            air::AirLayer{FT},
+            mode::Union{GCO₂Mode, PCO₂Mode},
+            sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, sm.Β, sm.Β.PARAM_Y);
+
+leaf_photosynthesis!(
+            lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
+            air::AirLayer{FT},
+            mode::Union{GCO₂Mode, PCO₂Mode},
+            β::BetaFunction{FT},
+            param_y::BetaParameterG1
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, FT(1));
+
+leaf_photosynthesis!(
+            lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
+            air::AirLayer{FT},
+            mode::Union{GCO₂Mode, PCO₂Mode},
+            β::BetaFunction{FT},
+            param_y::BetaParameterVcmax
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, β.β₁);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
 #     2022-Jan-14: set a default p_i from leaf to combine two methods
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
@@ -76,6 +126,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLa
 #     2022-Jun-28: unpack the constant fields
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
+#     2022-Jul-12: use β as a must have option (and thus this function becomes a core function of the one above)
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -101,16 +152,14 @@ leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 30.0);
 ```
 """
-leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
-
-    leaf.p_CO₂_i = p_i;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, p_i; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
     rubisco_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
     light_limited_rate!(PSM);
     product_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
@@ -155,7 +204,7 @@ mode   = PCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # loop through the ppars
@@ -209,7 +258,7 @@ mode   = PCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
@@ -300,10 +349,8 @@ leaf_photosynthesis!(leaf, air, mode);
 leaf_photosynthesis!(leaf, air, mode, 0.1);
 ```
 """
-leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
-
-    leaf.g_CO₂ = g_lc;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
     # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
@@ -361,7 +408,7 @@ mode   = GCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
@@ -420,7 +467,7 @@ mode   = GCO₂Mode();
 leaf_photosynthesis!(leaves, air, mode);
 ```
 """
-leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
@@ -485,24 +532,19 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; 
 # General
 #     2022-Jun-29: add method for MonoElementSPAC
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
+#     2022-Jul-13: redirect the wrapper function to the method at leaf level
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates for SPAC, given
 - `spac` `MonoElementSPAC` type SPAC
 - `mode` `GCO₂Mode` or `PCO₂Mode`
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
+
 """
-leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack AIR, LEAF = spac;
-
-    leaf_photosynthesis!(LEAF, AIR, mode; β = β);
-
-    return nothing
-);
+leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(spac.LEAF, spac.AIR, mode);
 
 
 ######################################################################################################################################################################################################
@@ -520,14 +562,13 @@ leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mo
 Updates leaf photosynthetic rates for SPAC, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
 - `mode` `GCO₂Mode` or `PCO₂Mode`
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
+
 """
-leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}; β::Union{FT, Vector{FT}} = FT(1)) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
     @unpack AIR, LEAVES, LEAVES_INDEX = spac;
 
     for _i in eachindex(LEAVES)
-        _β = (typeof(β) == FT) ? β : β[_i];
-        leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode; β = _β);
+        leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode);
     end;
 
     return nothing

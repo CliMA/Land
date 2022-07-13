@@ -1,7 +1,8 @@
 module Photosynthesis
 
-using ClimaCache: AirLayer, Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter, GCO₂Mode, Leaf, Leaves1D, Leaves2D, MinimumColimit, MonoElementSPAC,
-      MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, PCO₂Mode, Q10, QuadraticColimit, SerialColimit, VJPReactionCenter, VanDerTolFluorescenceModel
+using ClimaCache: AirLayer, AndereggSM, Arrhenius, ArrheniusPeak, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, C3VJPModel, C3CytochromeModel, C4VJPModel, CytochromeReactionCenter,
+      EllerSM, GentineSM, GCO₂Mode, Leaf, Leaves1D, Leaves2D, LeuningSM, MedlynSM, MinimumColimit, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, PCO₂Mode, Q10, QuadraticColimit,
+      SerialColimit, SperrySM, VJPReactionCenter, VanDerTolFluorescenceModel, WangSM, Wang2SM
 using DocStringExtensions: METHODLIST
 using PkgUtility: GAS_R, lower_quadratic, upper_quadratic
 using UnPack: @unpack

@@ -87,8 +87,10 @@ using Test
                 leaf_1 = ClimaCache.Leaf{FT}(LT);
                 leaf_2 = ClimaCache.Leaf{FT}(LT);
                 for glc in collect(0.05:0.05:0.3)
-                    leaf_photosynthesis!(leaf_1, air, g_mode, FT(glc));
-                    leaf_photosynthesis!(leaf_2, air, p_mode, leaf_1.p_CO₂_i);
+                    leaf_1.g_CO₂ = glc;
+                    leaf_photosynthesis!(leaf_1, air, g_mode);
+                    leaf_2.p_CO₂_i = leaf_1.p_CO₂_i;
+                    leaf_photosynthesis!(leaf_2, air, p_mode);
                     @test leaf_1.PSM.a_gross ≈ leaf_2.PSM.a_gross;
                     @test leaf_1.PSM.e_to_c ≈ leaf_2.PSM.e_to_c;
                     @test leaf_1.PRC.ϕ_f ≈ leaf_2.PRC.ϕ_f;
