@@ -8,7 +8,6 @@ CurrentModule = ClimaCache
 ## Air
 ```@docs
 AirLayer
-AirLayer{FT}() where {FT<:AbstractFloat}
 ```
 
 
@@ -63,10 +62,6 @@ C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0
 AbstractPhotosynthesisMode
 GCO₂Mode
 PCO₂Mode
-AbstractColimit
-MinimumColimit
-QuadraticColimit
-SerialColimit
 AbstractTemperatureDependency
 Arrhenius
 ArrheniusPeak
@@ -141,4 +136,46 @@ MonoMLPalmSPAC
 MonoMLPalmSPAC{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
 MonoMLTreeSPAC
 MonoMLTreeSPAC{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.5:13), ssm::Bool = true) where {FT<:AbstractFloat}
+```
+
+
+## Utils
+
+### Colimitation Methods
+```@docs
+AbstractColimit
+MinimumColimit
+QuadraticColimit
+SerialColimit
+```
+
+### Universal Constants
+```@docs
+UniversalConstants
+AVOGADRO
+CP_D
+CP_D_MOL
+CP_L
+CP_V
+GAS_R
+GRAVITY
+H_PLANCK
+K_BOLTZMANN
+K_STEFAN
+K_VON_KARMAN
+LH_V0
+LIGHT_SPEED
+M_DRYAIR
+M_H₂O
+P_ATM
+PRESS_TRIPLE
+R_V
+RT_25
+T_0
+T_25
+T_TRIPLE
+V_H₂O
+YEAR_D
+ρ_H₂O
+ρg_MPa
 ```

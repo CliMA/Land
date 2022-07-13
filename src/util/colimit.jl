@@ -2,8 +2,13 @@
 #
 # Changes to this type
 # General
+#     2022-Jan-14: add minimum colimitation struct
+#     2022-Jan-14: add quadratic colimitation struct
+#     2022-Feb-28: add serial colimitation struct
 #     2022-Jan-18: add abstract colimitation type
 #     2022-Jan-25: add documentation
+#     2022-Jul-13: use @kwdef for the constructor
+#     2022-Jul-13: add structs description
 #
 #######################################################################################################################################################################################################
 """
@@ -11,84 +16,24 @@
 $(TYPEDEF)
 
 Hierarchy of `AbstractColimit`
-- [`MinimumColimit`](@ref)
-- [`QuadraticColimit`](@ref)
-- [`SerialColimit`](@ref)
+- `MinimumColimit`
+- `QuadraticColimit`
+- `SerialColimit`
+
 """
 abstract type AbstractColimit{FT<:AbstractFloat} end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jan-14: add minimum colimitation struct
-#     2022-Jan-25: add documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty structure to indicate minimum colimitation.
-
----
-# Examples
-```julia
-col = MinimumColimit{Float64}();
-```
-"""
+""" Empty structure to indicate minimum colimitation: `x = min(x₁, x₂)` """
 struct MinimumColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jan-14: add quadratic colimitation struct
-#     2022-Jan-25: add documentation
-#     2022-Mar-01: add documentation to field
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Structure to indicate quadratic colimitation.
-
-# Fields
-
-$(TYPEDFIELDS)
-
----
-# Examples
-```julia
-col = QuadraticColimit{Float64}(0.98);
-```
-"""
-mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimit{FT}
+""" Structure to indicate quadratic colimitation (contains field `CURVATURE`): `θ⋅x² - (x₁ + x₂)⋅x + x₁x₂ = 0` """
+Base.@kwdef mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimit{FT}
     "Curvature factor"
-    CURVATURE::FT
+    CURVATURE::FT = 0.98
 end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Feb-28: add serial colimitation struct
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-Empty structure to indicate serial colimitation.
-
----
-# Examples
-```julia
-col = SerialColimit{Float64}();
-```
-"""
+""" Empty structure to indicate serial colimitation: `x = 1 / (1/x₁ + 1/x₂)` """
 struct SerialColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end

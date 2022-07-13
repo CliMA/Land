@@ -8,6 +8,7 @@
 #     2022-Jan-24: fix documentation
 #     2022-Mar-09: add t, p_H₂O, p_H₂O_sat, rh, and wind fields
 #     2022-Apr-19: move p_H₂O and wind to prognostic fields
+#     2022-Jul-13: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -21,61 +22,26 @@ Structure that stores air layer information
 $(TYPEDFIELDS)
 
 """
-mutable struct AirLayer{FT<:AbstractFloat}
+Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
     # parameters that do not change with time
     "Atmospheric pressure `[Pa]`"
-    P_AIR::FT
+    P_AIR::FT = P_ATM()
     "O₂ partial pressure `[Pa]`"
-    P_O₂::FT
+    P_O₂::FT = P_ATM() * 0.209
 
     # prognostic variables that change with time
     "CO₂ partial pressure `[Pa]`"
-    p_CO₂::FT
+    p_CO₂::FT = 40
     "H₂O partial pressure `[Pa]`"
-    p_H₂O::FT
+    p_H₂O::FT = 1500
     "Temperature"
-    t::FT
+    t::FT = T_25()
     "Wind speed `[m s⁻¹]`"
-    wind::FT
+    wind::FT = 1
 
     # diagnodtic variables that change with time
     "Saturated H₂O partial pressure `[Pa]`"
-    p_H₂O_sat::FT
+    p_H₂O_sat::FT = saturation_vapor_pressure(t)
     "relative humidity"
-    rh::FT
+    rh::FT = p_H₂O / p_H₂O_sat
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
-#     2022-Jan-24: add p_CO₂ to the constructors
-#     2022-Mar-09: add t, p_H₂O, p_H₂O_sat, rh, and wind fields
-#     2022-Apr-19: move p_H₂O and wind to prognostic fields
-#
-#######################################################################################################################################################################################################
-"""
-
-    AirLayer{FT}() where {FT<:AbstractFloat}
-
-Constructor for AirLayer
-
----
-# Examples
-```julia
-air = AirLayer{Float64}();
-```
-"""
-AirLayer{FT}() where {FT<:AbstractFloat} = (
-    return AirLayer{FT}(
-                P_ATM(FT),                                  # P_AIR
-                P_ATM(FT) * 0.209,                          # P_O₂
-                40,                                         # p_CO₂
-                1500,                                       # p_H₂O
-                T_25(FT),                                   # t
-                1,                                          # wind
-                saturation_vapor_pressure(T_25(FT)),        # p_H₂O_sat
-                1500 / saturation_vapor_pressure(T_25(FT))) # rh
-);
