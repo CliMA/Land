@@ -47,6 +47,8 @@ mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
     LEAF::Leaf{FT}
     "Root system"
     ROOT::Root{FT}
+    "Soil component"
+    SOIL::Soil{FT}
     "Stem system"
     STEM::Stem{FT}
 
@@ -69,20 +71,26 @@ end
 #######################################################################################################################################################################################################
 """
 
-    MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 
 Construct a `MonoElementSPAC` type toy SPAC system, given
 - `psm` Photosynthesis model, must be C3, C4, or C3Cytochrome
+- `zs` Vector of Maximal root depth (negative value), and canopy height
+- `area` Surface area of the soil (per tree for MonoML*SPAC)
 - `broadband` Whether leaf biophysics is in broadband mode
 - `ssm` Whether the flow rate is at steady state
 """
-MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
+
+    _stem = Stem{FT}(ssm = ssm);
+    _stem.HS.ΔH = zs[2];
 
     return MonoElementSPAC{FT}(
                 AirLayer{FT}(),                                     # AIR
                 Leaf{FT}(psm; broadband = broadband, ssm = ssm),    # LEAF
                 Root{FT}(ssm = ssm),                                # ROOT
+                Soil{FT}([0,zs[1]], area, true);                    # SOIL
                 Stem{FT}(ssm = ssm),                                # STEM
                 ones(FT,4)                                          # _krs
     )

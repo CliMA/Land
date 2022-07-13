@@ -164,6 +164,7 @@ HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {
 # Changes to this structure
 # General
 #     2022-Jul-13: add SoilLayer structure
+#     2022-Jul-13: add field K_MAX, K_REF, k, ψ, and ∂θ∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -179,6 +180,10 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     # parameters that do not change with time
+    "Maximum soil hydraulic conductivity at 25 °C `[mol m⁻¹ s⁻¹ MPa⁻¹]`"
+    K_MAX::Vector{FT} = 10000
+    "Reference soil hydraulic conductance at 25 °C `[mol m⁻² s⁻¹ MPa⁻¹]`"
+    K_REF::Vector{FT} = 10000
     "Soil moisture retention curve"
     VC::Union{BrooksCorey{FT}, VanGenuchten{FT}} = VanGenuchten{FT}("Loam")
     "Mean depth"
@@ -187,10 +192,16 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     ZS::Vector{FT} = FT[0,-1]
 
     # prognostic variables that change with time
+    "Soil hydraulic conductance per layer `[mol s⁻¹ MPa⁻¹]`"
+    k::Vector{FT}
     "Temperature"
     t::FT = T_25()
+    "Matric potential `[MPa]`"
+    ψ::FT = 0
     "Soil water content"
     θ::FT = VC.Θ_SAT
+    "Marginal increase in soil water content per layer"
+    ∂θ∂t::FT = 0
 end
 
 
@@ -208,6 +219,7 @@ end
 #     2022-Jun-14: separate the constructor for hyperspectral albedo
 #     2022-Jun-14: separate the constructor for broadband albedo
 #     2022-Jul-13: move VC, Z, t, and θ to SoilLayer
+#     2022-Jul-13: add field AREA, _k, _q, and _δψ
 #
 #######################################################################################################################################################################################################
 """
@@ -225,52 +237,72 @@ mutable struct Soil{FT<:AbstractFloat}
     # parameters that do not change with time
     "Albedo related structure"
     ALBEDO::Union{BroadbandSoilAlbedo{FT}, HyperspectralSoilAlbedo{FT}}
+    "Total area of the soil `[m²]`"
+    AREA::FT
     "Color class as in CLM"
     COLOR::Int
     "Soil layers"
     LAYERS::Vector{SoilLayer{FT}}
+    "Number of soil layers"
+    N_LAYER::Int
+
+    # cache used for calculations
+    "Soil hydraulic conductance between layers `[mol s⁻¹ MPa⁻¹]`"
+    _k::Vector{FT}
+    "Flow rates between layers `[mol s⁻¹]`"
+    _q::Vector{FT}
+    "Soil metric potential difference between layers `[MPa]`"
+    _δψ::Vector{FT}
 end
 
 
 """
 
-    Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+    Soil{FT}(zs::Vector{FT}, area::Number{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
 
 Construct a soil struct with hyperspectral albedo, given
 - `zs` Soil upper and lower boundaries
+- `area` Surface area of the soil (per tree for MonoML*SPAC)
 - `wls` [`WaveLengthSet`](@ref) type struct that defines wavelength settings
 - `soil_type` Soil type name
 
 """
-Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat} = (
-    _layers = SoilLayer{FT}[];
-    for _i in 1:length(zs-1)
-        push!(_layers, SoilLayer{FT}(VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
-    end;
+Soil{FT}(zs::Vector{FT}, area::Number{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat} = (
+    _soil = Soil{FT}(zs, area, true; soil_type = soil_type);
+    _soil.ALBEDO = HyperspectralSoilAlbedo{FT}(wls);
 
-    _sab = HyperspectralSoilAlbedo{FT}(wls);
-
-    return Soil{FT}(_sab, 1, _layers)
+    return _soil
 );
 
 
 """
 
-    Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
+    Soil{FT}(zs::Vector{FT}, area::Number{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 
 Construct a soil struct with broadband albedo, given
 - `zs` Soil upper and lower boundaries
+- `area` Surface area of the soil (per tree for MonoML*SPAC)
 - `broadband` Indicating broadband soil albedo
 - `soil_type` Soil type name
 
 """
-Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat} = (
+Soil{FT}(zs::Vector{FT}, area::Number{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat} = (
     _layers = SoilLayer{FT}[];
-    for _i in 1:length(zs-1)
-        push!(_layers, SoilLayer{FT}(VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
+    _n_layer = length(zs) - 1;
+    for _i in 1:_n_layer
+        push!(_layers, SoilLayer{FT}(K_MAX = 1e4, K_REF = 1e4 / (zs[_i] - zs[_i+1]), VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
     end;
 
     _sab = BroadbandSoilAlbedo{FT}();
 
-    return Soil{FT}(_sab, 1, _layers)
+    return Soil{FT}(
+                _sab,                   # ALBEDO
+                100,                    # AREA
+                1,                      # COLOR
+                _layers,                # LAYERS
+                _n_layer,               # N_LAYER
+                zeros(_n_layer - 1),    # _k
+                zeros(_n_layer - 1),    # _q
+                zeros(_n_layer - 1)     # _δψ
+    )
 );
