@@ -18,10 +18,6 @@ Per refactored Photosynthesis module, the only things one need to know is the pu
 - Calculate gross and net rates using [`colimit_photosynthesis!`](@ref)
 - Update fluorescence related variables using [`photosystem_coefficients!`](@ref)
 
-Supported methods are
-
-$(METHODLIST)
-
 """
 function leaf_photosynthesis! end
 
@@ -31,17 +27,19 @@ function leaf_photosynthesis! end
 # Changes to this method
 # General
 #     2022-Jul-07: add method to compute photosynthetic rates only
+#     2022-Jul-13: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
     leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat}
 
-Updates leaf photosynthetic rates based on CO₂ partial pressure, given
+Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataModels.jl temporary use), given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
 - `ppar` APAR used for photosynthesis
+
 """
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = lf;
@@ -64,6 +62,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLa
 # Changes to this method
 # General
 #     2022-Jul-12: add method to account for tuning factor at leaf level
+#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -74,6 +73,15 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure or CO₂ condu
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `GCO₂Mode` or `PCO₂Mode` that uses CO₂ conductance or partial pressure to compute photosynthetic rates
+
+---
+# Examples
+```julia
+leaf = Leaf{Float64}("C3");
+air  = AirLayer{Float64}();
+mode = PCO₂Mode();
+leaf_photosynthesis!(leaf, air, mode);
+```
 
 """
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, lf.SM);
@@ -117,40 +125,42 @@ leaf_photosynthesis!(
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
 #     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
+#     2022-Jan-14: set a default g_lc from leaf to combine two methods
 #     2022-Jan-18: add p_i to electron transport function input variables
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
 #     2022-Jan-24: fix documentation
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
+#     2022-Feb-28: add support to C3CytochromeModel
+#     2022-Jun-27: remove apar from input variable list of light_limited_rate!
 #     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
 #     2022-Jun-28: unpack the constant fields
+#     2022-Jun-28: add method for Leaves1D
+#     2022-Jun-28: add method for Leaves2D
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
 #     2022-Jul-12: use β as a must have option (and thus this function becomes a core function of the one above)
+#     2022-Jul-13: deflate documentation
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, p_i::FT = leaf.p_CO₂_i; β::FT = FT(1)) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat}
 
-Updates leaf photosynthetic rates based on CO₂ partial pressure, given
+Updates leaf photosynthetic rates (this function is not meant for public use), given
 - `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
+- `leaves` `Leaves1D` or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `p_i` Internal CO₂ partial pressure in `Pa`, default is `leaf.p_CO₂_i`
+- `mode` `GCO₂Mode` or `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
----
-# Examples
-```julia
-leaf = Leaf{Float64}("C3");
-air  = AirLayer{Float64}();
-mode = PCO₂Mode();
-leaf_photosynthesis!(leaf, air, mode);
-leaf_photosynthesis!(leaf, air, mode, 30.0);
-```
 """
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
@@ -175,35 +185,6 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-28: add method for Leaves1D
-#     2022-Jun-28: fix documentation
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and shaded leaves, given
-- `leaves` `Leaves1D` type structure that stores biophysical, reaction center, and photosynthesis model structures
-- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
-
----
-# Examples
-```julia
-leaves = Leaves1D{Float64}("C3");
-air    = AirLayer{Float64}();
-mode   = PCO₂Mode();
-leaf_photosynthesis!(leaves, air, mode);
-```
-"""
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
@@ -230,34 +211,6 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-28: add method for Leaves1D
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates based on CO₂ partial pressure for sunlit and shaded leaves, given
-- `leaves` `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
-- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `PCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
-
----
-# Examples
-```julia
-leaves = Leaves2D{Float64}("C3");
-air    = AirLayer{Float64}();
-mode   = PCO₂Mode();
-leaf_photosynthesis!(leaves, air, mode);
-```
-"""
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
@@ -302,53 +255,6 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jan-14: set a default g_lc from leaf to combine two methods
-#     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
-#     2022-Jan-14: add examples to docs
-#     2022-Jan-14: use colimit function to compute a_gross and a_net
-#     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
-#     2022-Jan-24: fix documentation
-#     2022-Feb-07: use new method of photosystem_coefficients!
-#     2022-Feb-28: use updated light_limited_rate! function
-#     2022-Feb-28: use updated photosystem_electron_transport! function (twice in thf function)
-#     2022-Feb-28: add support to C3CytochromeModel
-#     2022-Jun-27: remove apar from input variable list of light_limited_rate!
-#     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
-#     2022-Jun-28: unpack the constant fields
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
-# To do
-#     TODO: update leaf T in StomataModels module or higher level
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, g_lc::FT = leaf.g_CO₂; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
-- `leaf` `Leaf` type structure that stores biophysical, reaction center, and photosynthesis model structures
-- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
-
-Note that CO₂ partial pressures at leaf surface (stomatal opening) and in leaf internal airspace are updated, and then electron transport is updated again based on this CO₂ partial pressure.
-
----
-# Examples
-```julia
-leaf = Leaf{Float64}("C3");
-air  = AirLayer{Float64}();
-mode = GCO₂Mode();
-leaf_photosynthesis!(leaf, air, mode);
-leaf_photosynthesis!(leaf, air, mode, 0.1);
-```
-"""
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
 
@@ -380,34 +286,6 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-28: add method for Leaves1D
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
-- `leaves` `Leaves1D` type structure that stores biophysical, reaction center, and photosynthesis model structures
-- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
-
----
-# Examples
-```julia
-leaves = Leaves1D{Float64}("C3");
-air    = AirLayer{Float64}();
-mode   = GCO₂Mode();
-leaf_photosynthesis!(leaves, air, mode);
-```
-"""
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
@@ -439,34 +317,6 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-28: add method for Leaves2D
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode; β::FT = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates based on CO₂ diffusive conductance, given
-- `leaves` `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
-- `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `mode` `GCO₂Mode` that uses CO₂ partial pressure to compute photosynthetic rates
-- `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
-
----
-# Examples
-```julia
-leaves = Leaves2D{Float64}("C3");
-air    = AirLayer{Float64}();
-mode   = GCO₂Mode();
-leaf_photosynthesis!(leaves, air, mode);
-```
-"""
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
@@ -531,39 +381,24 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
 # Changes to this method
 # General
 #     2022-Jun-29: add method for MonoElementSPAC
+#     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-13: redirect the wrapper function to the method at leaf level
+#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
 
     leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates for SPAC, given
-- `spac` `MonoElementSPAC` type SPAC
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type SPAC
 - `mode` `GCO₂Mode` or `PCO₂Mode`
 
 """
 leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(spac.LEAF, spac.AIR, mode);
 
-
-######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
-#     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#
-#######################################################################################################################################################################################################
-"""
-
-    leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}; β::Union{FT, Vector{FT}} = FT(1)) where {FT<:AbstractFloat}
-
-Updates leaf photosynthetic rates for SPAC, given
-- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
-- `mode` `GCO₂Mode` or `PCO₂Mode`
-
-"""
 leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
     @unpack AIR, LEAVES, LEAVES_INDEX = spac;
 
