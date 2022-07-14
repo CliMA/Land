@@ -1,7 +1,7 @@
 module SoilHydraulics
 
 using ClimaCache: MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, NonSteadyStateFlow, Root, SteadyStateFlow, VanGenuchten
-using ClimaCache: ρg_MPa
+using ClimaCache: CP_L, Λ_THERMAL_H₂O, ρ_H₂O, ρg_MPa
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: METHODLIST
 using UnPack: @unpack
