@@ -3,6 +3,7 @@
 # Changes to this function
 # General
 #     2022-Jul-12: add function to run soil plant air continuum at a time step
+#     2022-Jul-13: use soil_energy! and soil_water! for soil water and energy budget
 #
 #######################################################################################################################################################################################################
 """
@@ -26,17 +27,17 @@ soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = fals
     # 1. run canopy RT
     canopy_radiation!(spac);
 
-    # 2. run plant hydraulic model (TODO: compute β factor here!)
+    # 2. run plant hydraulic model
     xylem_pressure_profile!(spac; update = update);
 
-    # 3. run photosynthesis model (TODO: compute β factor for empirical models)
+    # 3. run photosynthesis model
     leaf_photosynthesis!(spac, GCO₂Mode());
 
-    # 4. run soil water budget
-    # place holder for the function (should be SoilHydraulics.jl)
+    # 4. run soil water budget (TODO: add top soil evaporation)
+    soil_water!(spac);
 
     # 5. run soil energy budget
-    # place holder for the function (in SoilHydraulics.jl or the SPAC module)
+    soil_energy!(spac);
 
     # 6. run leaf stomatal conductance
     stomatal_conductance!(spac);
