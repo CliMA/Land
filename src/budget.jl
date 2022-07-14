@@ -78,6 +78,7 @@ root_sink(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 # General
 #     2022-Jun-14: add function for soil energy budget
 #     2022-Jun-14: use METEO.rain and METEO.t_precip
+#     2022-Jun-14: add net radiation energy to top soil
 #
 #######################################################################################################################################################################################################
 """
@@ -102,7 +103,8 @@ soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
     end;
 
     # update k, δt, and flow rate among layers (upper - lower)
-    LAYERS[1].∂e∂t = METEO.rain / LAYERS[1].ΔZ * METEO.t_precip;
+    LAYERS[1].∂e∂t += METEO.rain / LAYERS[1].ΔZ * METEO.t_precip;
+    LAYERS[1].∂e∂t += SOIL.ALBEDO.r_net_lw + SOIL.ALBEDO.r_net_sw;
     for _i in SOIL.N_LAYER-1
         SOIL._λ_thermal[_i] = 1 / (2 / LAYERS[_i].λ_thermal + 2 / LAYERS[_i+1].λ_thermal);
         SOIL._δt[_i] = LAYERS[_i].t - LAYERS[_i+1].t;
