@@ -75,7 +75,7 @@ xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 
     root_pk(root::Root{FT}) where {FT<:AbstractFloat}
 
-Return the root end pressre and total hydraulic conductance to find solution of flow rates in all roots, given
+Return the root end pressure and total hydraulic conductance to find solution of flow rates in all roots, given
 - `root` `Root` type struct
 
 """

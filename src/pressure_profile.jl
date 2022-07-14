@@ -187,14 +187,15 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 #     2022-Jul-08: deflate documentations
 #     2022-Jul-12: compute e_crit for leaves
 #     2022-Jul-12: compute β for leaves (only for empirical models)
+#     2022-Jul-14: update root p_ups from SOIL
 # To do
 #     TODO: add leaf extra-xylary vulnerability curve
 #
 #######################################################################################################################################################################################################
 """
 This function is designed for the following purposes:
-- Update organ pressre profile
-- Update pressre profile for the entire SPAC
+- Update organ pressure profile
+- Update pressure profile for the entire SPAC
 
 """
 function xylem_pressure_profile! end
@@ -480,6 +481,8 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 );
 
 
+# TODO: make sure to not mixing with top soil that is meant for evaporation
+# TODO: add soil ion concentration
 """
 
     xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
@@ -493,8 +496,12 @@ Update xylem pressure profile (flow profile needs to be updated a priori), given
 
 """
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    @unpack LEAF, ROOT, SOIL, STEM = spac;
 
+    # update water potential from SOIL (TODO: use ROOT_INDEX in the future)
+    ROOT.p_ups = soil_ψ_25(SOIL.LAYERS[1].VC, SOIL.LAYERS[1].θ) * relative_surface_tension(SOIL.LAYERS[1].t);
+
+    # update pressure profiles for organs
     xylem_pressure_profile!(ROOT; update = update);
     STEM.HS.p_ups = ROOT.HS.p_dos;
     xylem_pressure_profile!(STEM; update = update);
@@ -508,7 +515,12 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
 );
 
 xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, N_ROOT, ROOTS = spac;
+    @unpack LEAVES, N_ROOT, ROOTS, ROOTS_INDEX, SOIL = spac;
+
+    # update water potential from SOIL
+    for _i in 1:N_ROOT
+        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;
@@ -531,7 +543,12 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
 );
 
 xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, N_ROOT, ROOTS, TRUNK = spac;
+    @unpack LEAVES, N_ROOT, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+
+    # update water potential from SOIL
+    for _i in 1:N_ROOT
+        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;
@@ -558,7 +575,12 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
 );
 
 xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, LEAVES, N_ROOT, ROOTS, TRUNK = spac;
+    @unpack BRANCHES, LEAVES, N_ROOT, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+
+    # update water potential from SOIL
+    for _i in 1:N_ROOT
+        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;

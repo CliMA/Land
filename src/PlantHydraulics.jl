@@ -5,7 +5,7 @@ using ClimaCache: AbstractSoilVC, AbstractXylemVC, AndereggSM, BallBerrySM, Beta
       NonSteadyStateFlow, PowerVC, Root, RootHydraulics, SegmentedPVCurve, SperrySM, SteadyStateFlow, Stem, StemHydraulics, WangSM, Wang2SM, WeibullVC
 using ClimaCache: GAS_R, T_25, ρg_MPa
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
-using SoilHydraulics: soil_θ
+using SoilHydraulics: soil_θ, soil_ψ_25
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
