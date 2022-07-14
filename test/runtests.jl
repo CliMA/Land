@@ -6,8 +6,8 @@ using Test
 @testset verbose = true "ClimaCache Test" begin
     @testset "Soil" begin
         for FT in [Float32, Float64]
-            soil1 = ClimaCache.Soil{FT}(FT[0,-1]);
-            soil2 = ClimaCache.Soil{FT}(FT[0,-1], true);
+            soil1 = ClimaCache.Soil{FT}(FT[0,-1], 100);
+            soil2 = ClimaCache.Soil{FT}(FT[0,-1], 100, true);
             for soil in [soil1, soil2]
                 @test FT_test(soil, FT);
                 @test NaN_test(soil);
@@ -175,7 +175,7 @@ using Test
             param_z = ClimaCache.BetaParameterVcmax();
             for p_y in [param_y, param_z]
                 for p_x in [param_1, param_2, param_3, param_4, param_5]
-                    β = ClimaCache.BetaFunction(param_x = p_x, param_y = p_y);
+                    β = ClimaCache.BetaFunction{FT}(PARAM_X = p_x, PARAM_Y = p_y);
                     @test FT_test(β, FT);
                     @test NaN_test(β);
                 end;

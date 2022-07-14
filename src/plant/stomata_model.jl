@@ -162,7 +162,7 @@ Base.@kwdef mutable struct BallBerrySM{FT} <: AbstractStomataModel{FT}
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 9
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction()
+    Β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
     Τ::FT = 600
 end
@@ -223,7 +223,7 @@ Base.@kwdef mutable struct GentineSM{FT} <: AbstractStomataModel{FT}
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 9
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction(x -> x; param_x = BetaParameterKleaf(), param_y = BetaParameterG1())
+    Β::BetaFunction = BetaFunction{FT}(FUNC = (x -> x), PARAM_X = BetaParameterKleaf(), PARAM_Y = BetaParameterG1())
     "Time constant for the prognostic stomatal conductance `[s]`"
     Τ::FT = 600
 end
@@ -261,7 +261,7 @@ Base.@kwdef mutable struct LeuningSM{FT} <: AbstractStomataModel{FT}
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 8
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction()
+    Β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
     Τ::FT = 600
 end
@@ -297,7 +297,7 @@ Base.@kwdef mutable struct MedlynSM{FT} <: AbstractStomataModel{FT}
     "Slope of conductance-photosynthesis correlation `[sqrt(Pa)]`"
     G1::FT = 125
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction()
+    Β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
     Τ::FT = 600
 end

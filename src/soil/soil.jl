@@ -184,9 +184,9 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     "Specific heat capacity of soil `[J K⁻¹ kg⁻¹]`"
     CP::FT = 760
     "Maximum soil hydraulic conductivity at 25 °C `[mol m⁻¹ s⁻¹ MPa⁻¹]`"
-    K_MAX::Vector{FT} = 10000
+    K_MAX::FT = 10000
     "Reference soil hydraulic conductance at 25 °C `[mol m⁻² s⁻¹ MPa⁻¹]`"
-    K_REF::Vector{FT} = 10000
+    K_REF::FT = 10000
     "Soil moisture retention curve"
     VC::Union{BrooksCorey{FT}, VanGenuchten{FT}} = VanGenuchten{FT}("Loam")
     "Mean depth"
@@ -208,7 +208,7 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     "Combined specific heat capacity of soil `[J K⁻¹ kg⁻¹]`"
     cp::FT = 0
     "Soil hydraulic conductance per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
-    k::Vector{FT} = 0
+    k::FT = 0
     "Combined soil thermal conductivity `[W m⁻¹ K⁻¹]`"
     λ_thermal::FT = 0
     "Matric potential `[MPa]`"
@@ -273,7 +273,7 @@ end
 
 """
 
-    Soil{FT}(zs::Vector{FT}, area::Number{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+    Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
 
 Construct a soil struct with hyperspectral albedo, given
 - `zs` Soil upper and lower boundaries
@@ -282,7 +282,7 @@ Construct a soil struct with hyperspectral albedo, given
 - `soil_type` Soil type name
 
 """
-Soil{FT}(zs::Vector{FT}, area::Number{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat} = (
+Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat} = (
     _soil = Soil{FT}(zs, area, true; soil_type = soil_type);
     _soil.ALBEDO = HyperspectralSoilAlbedo{FT}(wls);
 
@@ -292,7 +292,7 @@ Soil{FT}(zs::Vector{FT}, area::Number{FT}, wls::WaveLengthSet{FT} = WaveLengthSe
 
 """
 
-    Soil{FT}(zs::Vector{FT}, area::Number{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
+    Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 
 Construct a soil struct with broadband albedo, given
 - `zs` Soil upper and lower boundaries
@@ -301,7 +301,7 @@ Construct a soil struct with broadband albedo, given
 - `soil_type` Soil type name
 
 """
-Soil{FT}(zs::Vector{FT}, area::Number{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat} = (
+Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat} = (
     _layers = SoilLayer{FT}[];
     _n_layer = length(zs) - 1;
     for _i in 1:_n_layer

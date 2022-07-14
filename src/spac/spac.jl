@@ -67,6 +67,7 @@ end
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-May-31: add steady state mode option to input options
 #     2022-Jun-29: add AirLayer to SPAC
+#     2022-Jul-14: add area to constructor function
 #
 #######################################################################################################################################################################################################
 """
@@ -83,15 +84,15 @@ Construct a `MonoElementSPAC` type toy SPAC system, given
 MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C4", "C3Cytochrome"] "Photosynthesis model must be within [C3, C4, C3CytochromeModel]";
 
-    _stem = Stem{FT}(ssm = ssm);
+    _stem = Stem{FT}(; ssm = ssm);
     _stem.HS.ΔH = zs[2];
 
     return MonoElementSPAC{FT}(
                 AirLayer{FT}(),                                     # AIR
                 Leaf{FT}(psm; broadband = broadband, ssm = ssm),    # LEAF
                 Root{FT}(ssm = ssm),                                # ROOT
-                Soil{FT}([0,zs[1]], area, true);                    # SOIL
-                Stem{FT}(ssm = ssm),                                # STEM
+                Soil{FT}([0,zs[1]], area, true),                    # SOIL
+                _stem,                                              # STEM
                 ones(FT,4)                                          # _krs
     )
 );
@@ -177,12 +178,14 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add area to constructor function
 #
 #######################################################################################################################################################################################################
 """
 
     MonoMLGrassSPAC{FT}(
                 psm::String,
+                area::Number = 100,
                 wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
                 zs::Vector = [-0.2,0.5],
                 zss::Vector = collect(0:-0.1:-1),
@@ -207,6 +210,7 @@ spac = MonoMLGrassSPAC{Float64}("C3");
 """
 MonoMLGrassSPAC{FT}(
             psm::String,
+            area::Number = 100,
             wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
             zs::Vector = [-0.2,0.5],
             zss::Vector = collect(0:-0.1:-1),
@@ -266,7 +270,7 @@ MonoMLGrassSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(FT.(zss), wls);
+    _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}(wls);
@@ -379,12 +383,14 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add area to constructor function
 #
 #######################################################################################################################################################################################################
 """
 
     MonoMLPalmSPAC{FT}(
                 psm::String,
+                area::Number = 100,
                 wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
                 zs::Vector = [-1,6,12],
                 zss::Vector = collect(0:-0.25:-2),
@@ -408,6 +414,7 @@ spac = MonoMLPalmSPAC{Float64}("C3");
 """
 MonoMLPalmSPAC{FT}(
             psm::String,
+            area::Number = 100,
             wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
             zs::Vector = [-1,6,12],
             zss::Vector = collect(0:-0.25:-2),
@@ -490,7 +497,7 @@ MonoMLPalmSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(FT.(zss), wls);
+    _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}(wls);
@@ -606,12 +613,14 @@ end
 #     2022-Jun-15: fix documentation
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add area to constructor function
 #
 #######################################################################################################################################################################################################
 """
 
     MonoMLTreeSPAC{FT}(
                 psm::String,
+                area::Number = 100,
                 wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
                 zs::Vector = [-1,6,12],
                 zss::Vector = collect(0:-0.25:-2),
@@ -635,6 +644,7 @@ spac = MonoMLTreeSPAC{Float64}("C3");
 """
 MonoMLTreeSPAC{FT}(
             psm::String,
+            area::Number = 100,
             wls::WaveLengthSet{FT} = WaveLengthSet{FT}();
             zs::Vector = [-1,6,12],
             zss::Vector = collect(0:-0.25:-2),
@@ -725,7 +735,7 @@ MonoMLTreeSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(FT.(zss), wls);
+    _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}(wls);
