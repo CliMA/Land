@@ -165,7 +165,8 @@ HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {
 # General
 #     2022-Jul-13: add SoilLayer structure
 #     2022-Jul-13: add field K_MAX, K_REF, k, ψ, and ∂θ∂t
-#     2022-Jul-14: add field ∂G∂t
+#     2022-Jul-14: remove field K_REF
+#     2022-Jul-14: add field ∂G∂t (renamed to ∂e∂t), ΔZ
 #
 #######################################################################################################################################################################################################
 """
@@ -185,22 +186,22 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     CP::FT = 760
     "Maximum soil hydraulic conductivity at 25 °C `[mol m⁻¹ s⁻¹ MPa⁻¹]`"
     K_MAX::FT = 10000
-    "Reference soil hydraulic conductance at 25 °C `[mol m⁻² s⁻¹ MPa⁻¹]`"
-    K_REF::FT = 10000
     "Soil moisture retention curve"
     VC::Union{BrooksCorey{FT}, VanGenuchten{FT}} = VanGenuchten{FT}("Loam")
     "Mean depth"
     Z::FT = -0.5
     "Depth boundaries"
     ZS::Vector{FT} = FT[0,-1]
+    "Layer thickness `[m]`"
+    ΔZ::FT = ZS[1] - ZS[2]
     "Dry soil density `[kg m⁻³]`"
     Ρ::FT = 2650
     "Soil thermal conductivity `[W m⁻¹ K⁻¹]`"
     Λ_THERMAL::FT = 3
 
     # prognostic variables that change with time
-    "Temperature"
-    t::FT = T_25()
+    "Total stored energy per volume `[J m⁻³]`"
+    e::FT = T_25() * (CP * Ρ + VC.Θ_SAT * CP_L() * ρ_H₂O())
     "Soil water content"
     θ::FT = VC.Θ_SAT
 
@@ -209,12 +210,14 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     cp::FT = 0
     "Soil hydraulic conductance per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
     k::FT = 0
-    "Combined soil thermal conductivity `[W m⁻¹ K⁻¹]`"
+    "Temperature `[K]`"
+    t::FT = T_25()
+    "Combined soil thermal conductance `[W m⁻² K⁻¹]`"
     λ_thermal::FT = 0
     "Matric potential `[MPa]`"
     ψ::FT = 0
     "Marginal increase in energy `[W m⁻²]`"
-    ∂G∂t::FT = 0
+    ∂e∂t::FT = 0
     "Marginal increase in soil water content `[s⁻¹]`"
     ∂θ∂t::FT = 0
 end
@@ -235,6 +238,7 @@ end
 #     2022-Jun-14: separate the constructor for broadband albedo
 #     2022-Jul-13: move VC, Z, t, and θ to SoilLayer
 #     2022-Jul-13: add field AREA, _k, _q, and _δψ
+#     2022-Jul-13: add field _λ_thermal, _q_thermal, and _δt
 #
 #######################################################################################################################################################################################################
 """
@@ -264,10 +268,16 @@ mutable struct Soil{FT<:AbstractFloat}
     # cache used for calculations
     "Soil hydraulic conductance between layers per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
     _k::Vector{FT}
-    "Flow rates between layers per area `[mol m⁻² s⁻¹]`"
+    "Flux between layers per area `[mol m⁻² s⁻¹]`"
     _q::Vector{FT}
+    "Thermal flux between layers per area `[mol m⁻² s⁻¹]`"
+    _q_thermal::Vector{FT}
+    "Soil temperature difference between layers `[MPa]`"
+    _δt::Vector{FT}
     "Soil metric potential difference between layers `[MPa]`"
     _δψ::Vector{FT}
+    "Soil thermal conductance between layers per area `[W m⁻² K⁻¹]`"
+    _λ_thermal::Vector{FT}
 end
 
 
@@ -305,19 +315,21 @@ Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") 
     _layers = SoilLayer{FT}[];
     _n_layer = length(zs) - 1;
     for _i in 1:_n_layer
-        push!(_layers, SoilLayer{FT}(K_MAX = 1e4, K_REF = 1e4 / (zs[_i] - zs[_i+1]), VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
+        push!(_layers, SoilLayer{FT}(K_MAX = 1e4, VC = VanGenuchten{FT}(soil_type), Z = mean(zs[_i:_i+1]), ZS = zs[_i:_i+1]));
     end;
 
     _sab = BroadbandSoilAlbedo{FT}();
 
     return Soil{FT}(
-                _sab,                   # ALBEDO
-                100,                    # AREA
-                1,                      # COLOR
-                _layers,                # LAYERS
-                _n_layer,               # N_LAYER
-                zeros(_n_layer - 1),    # _k
-                zeros(_n_layer - 1),    # _q
-                zeros(_n_layer - 1)     # _δψ
+                _sab,               # ALBEDO
+                100,                # AREA
+                1,                  # COLOR
+                _layers,            # LAYERS
+                _n_layer,           # N_LAYER
+                zeros(_n_layer-1),  # _k
+                zeros(_n_layer-1),  # _q
+                zeros(_n_layer-1),  # _q_thermal
+                zeros(_n_layer-1),  # _δψ
+                zeros(_n_layer-1)   # _k_thermal
     )
 );
