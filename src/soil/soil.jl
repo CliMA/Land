@@ -329,7 +329,8 @@ Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") 
                 zeros(_n_layer-1),  # _k
                 zeros(_n_layer-1),  # _q
                 zeros(_n_layer-1),  # _q_thermal
+                zeros(_n_layer-1),  # _δt
                 zeros(_n_layer-1),  # _δψ
-                zeros(_n_layer-1)   # _k_thermal
+                zeros(_n_layer-1)   # _λ_thermal
     )
 );

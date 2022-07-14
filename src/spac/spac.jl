@@ -26,6 +26,7 @@ abstract type AbstractSPACSystem{FT<:AbstractFloat} end
 #     2022-May-25: toy SPAC system
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-Jun-29: add AirLayer to SPAC
+#     2022-Jul-14: add Meteorology to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -45,6 +46,8 @@ mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
     AIR::AirLayer{FT}
     "Leaf system"
     LEAF::Leaf{FT}
+    "Meteorology information"
+    METEO::Meteorology{FT}
     "Root system"
     ROOT::Root{FT}
     "Soil component"
@@ -90,6 +93,7 @@ MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadb
     return MonoElementSPAC{FT}(
                 AirLayer{FT}(),                                     # AIR
                 Leaf{FT}(psm; broadband = broadband, ssm = ssm),    # LEAF
+                Meteorology{FT}(),                                  # METEO
                 Root{FT}(ssm = ssm),                                # ROOT
                 Soil{FT}([0,zs[1]], area, true),                    # SOIL
                 _stem,                                              # STEM
@@ -107,6 +111,7 @@ MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadb
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add Meteorology to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -134,6 +139,8 @@ mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
     LEAVES_INDEX::Vector{Int}
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT}
+    "Meteorology information"
+    METEO::Meteorology{FT}
     "Number of canopy layers"
     N_CANOPY::Int
     "Number of root layers"
@@ -283,6 +290,7 @@ MonoMLGrassSPAC{FT}(
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
                 _lha,               # LHA
+                Meteorology{FT}(),  # METEO
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 100,                # RAD_LW
@@ -310,6 +318,7 @@ MonoMLGrassSPAC{FT}(
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add Meteorology to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -337,6 +346,8 @@ mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
     LEAVES_INDEX::Vector{Int}
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT}
+    "Meteorology information"
+    METEO::Meteorology{FT}
     "Number of canopy layers"
     N_CANOPY::Int
     "Number of root layers"
@@ -510,6 +521,7 @@ MonoMLPalmSPAC{FT}(
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
                 _lha,               # LHA
+                Meteorology{FT}(),  # METEO
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 100,                # RAD_LW
@@ -538,6 +550,7 @@ MonoMLPalmSPAC{FT}(
 #     2022-May-31: rename _qs to _fs
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
+#     2022-Jul-14: add Meteorology to SPAC
 #
 #######################################################################################################################################################################################################
 """
@@ -567,6 +580,8 @@ mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
     LEAVES_INDEX::Vector{Int}
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT}
+    "Meteorology information"
+    METEO::Meteorology{FT}
     "Number of canopy layers"
     N_CANOPY::Int
     "Number of root layers"
@@ -749,6 +764,7 @@ MonoMLTreeSPAC{FT}(
                 _leaves,            # LEAVES
                 _c_inds,            # LEAVES_INDEX
                 _lha,               # LHA
+                Meteorology{FT}(),  # METEO
                 _n_canopy,          # N_CANOPY
                 _n_root,            # N_ROOT
                 100,                # RAD_LW

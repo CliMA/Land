@@ -44,7 +44,8 @@ include("util/colimit.jl"  )
 include("util/constants.jl")
 
 # include the air types and structures
-include("air/air_layer.jl")
+include("air/air_layer.jl"  )
+include("air/meteorology.jl")
 
 # include the radiation types and structures
 include("radiation/canopy_optics.jl"      )
