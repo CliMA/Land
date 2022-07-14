@@ -165,6 +165,7 @@ HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {
 # General
 #     2022-Jul-13: add SoilLayer structure
 #     2022-Jul-13: add field K_MAX, K_REF, k, ψ, and ∂θ∂t
+#     2022-Jul-14: add field ∂G∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -180,6 +181,8 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     # parameters that do not change with time
+    "Specific heat capacity of soil `[J K⁻¹ kg⁻¹]`"
+    CP::FT = 760
     "Maximum soil hydraulic conductivity at 25 °C `[mol m⁻¹ s⁻¹ MPa⁻¹]`"
     K_MAX::Vector{FT} = 10000
     "Reference soil hydraulic conductance at 25 °C `[mol m⁻² s⁻¹ MPa⁻¹]`"
@@ -190,17 +193,29 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     Z::FT = -0.5
     "Depth boundaries"
     ZS::Vector{FT} = FT[0,-1]
+    "Dry soil density `[kg m⁻³]`"
+    Ρ::FT = 2650
+    "Soil thermal conductivity `[W m⁻¹ K⁻¹]`"
+    Λ_THERMAL::FT = 3
 
     # prognostic variables that change with time
-    "Soil hydraulic conductance per layer `[mol s⁻¹ MPa⁻¹]`"
-    k::Vector{FT}
     "Temperature"
     t::FT = T_25()
-    "Matric potential `[MPa]`"
-    ψ::FT = 0
     "Soil water content"
     θ::FT = VC.Θ_SAT
-    "Marginal increase in soil water content per layer"
+
+    # diagnostic variables that change with time
+    "Combined specific heat capacity of soil `[J K⁻¹ kg⁻¹]`"
+    cp::FT = 0
+    "Soil hydraulic conductance per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
+    k::Vector{FT} = 0
+    "Combined soil thermal conductivity `[W m⁻¹ K⁻¹]`"
+    λ_thermal::FT = 0
+    "Matric potential `[MPa]`"
+    ψ::FT = 0
+    "Marginal increase in energy `[W m⁻²]`"
+    ∂G∂t::FT = 0
+    "Marginal increase in soil water content `[s⁻¹]`"
     ∂θ∂t::FT = 0
 end
 
@@ -247,9 +262,9 @@ mutable struct Soil{FT<:AbstractFloat}
     N_LAYER::Int
 
     # cache used for calculations
-    "Soil hydraulic conductance between layers `[mol s⁻¹ MPa⁻¹]`"
+    "Soil hydraulic conductance between layers per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
     _k::Vector{FT}
-    "Flow rates between layers `[mol s⁻¹]`"
+    "Flow rates between layers per area `[mol m⁻² s⁻¹]`"
     _q::Vector{FT}
     "Soil metric potential difference between layers `[MPa]`"
     _δψ::Vector{FT}

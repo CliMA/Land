@@ -3,6 +3,7 @@
 # Changes to this structure
 # General
 #     2022-Jul-08: add struct for universal constants
+#     2022-Jul-08: add field and thus wrapper for thermal conductivity of liquid water
 #
 #######################################################################################################################################################################################################
 """
@@ -53,6 +54,8 @@ Base.@kwdef mutable struct UniversalConstants
     T_TRIPLE::Float64 = 273.16
     "Mean number of days per year [day]"
     YEAR_D::Float64 = 365.2422222
+    "Thermal conductivity of water `[W m⁻¹ K⁻¹]`"
+    Λ_THERMAL_H₂O::Float64 = 0.57
     "Density of liquid water `[kg m⁻³]`"
     ρ_H₂O::Float64 = 1000
 end
@@ -138,6 +141,9 @@ V_H₂O(FT=Float64) = M_H₂O(FT) / ρ_H₂O(FT);
 
 """ Mean number of days per year [day] """
 YEAR_D(FT=Float64) = FT(UNIVERSAL_CONSTANTS.YEAR_D);
+
+""" Thermal conductivity of water `[W m⁻¹ K⁻¹]` """
+Λ_THERMAL_H₂O(FT=Float64) = FT(UNIVERSAL_CONSTANTS.Λ_THERMAL_H₂O);
 
 """ Density of liquid water `[kg m⁻³]` """
 ρ_H₂O(FT=Float64) = FT(UNIVERSAL_CONSTANTS.ρ_H₂O);
