@@ -5,21 +5,21 @@
 #     2022-Jun-13: add function for water budget
 #     2022-Jun-14: use K_MAX and ΔZ and remove K_REF
 #     2022-Jun-14: rescale rain for layer 1
+#     2022-Jun-14: use METEO.rain
 #
 #######################################################################################################################################################################################################
 """
 
-    soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, rain::FT) where {FT<:AbstractFloat}
+    soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
 
 Update the marginal increase of soil water content per layer, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `rain` Water input from top soil `[mol m⁻² s⁻¹]`
 
 """
 function soil_water! end
 
-soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, rain::FT) where {FT<:AbstractFloat} = (
-    @unpack ROOTS, ROOTS_INDEX, SOIL = spac;
+soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack METEO, ROOTS, ROOTS_INDEX, SOIL = spac;
     LAYERS = SOIL.LAYERS;
 
     # update soil k and ψ for each soil layer
@@ -30,7 +30,7 @@ soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{
     end;
 
     # update k, δψ, and flow rate among layers
-    LAYERS[1].∂θ∂t = rain / LAYERS[1].ΔZ;
+    LAYERS[1].∂θ∂t = METEO.rain / LAYERS[1].ΔZ;
     for _i in 1:SOIL.N_LAYER-1
         SOIL._k[_i] = 1 / (2 / LAYERS[_i].k + 2 / LAYERS[_i+1].k);
         SOIL._δψ[_i] = LAYERS[_i].ψ - LAYERS[_i+1].ψ + ρg_MPa(FT) * (LAYERS[_i].Z - LAYERS[_i+1].Z);
@@ -77,22 +77,21 @@ root_sink(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
 # Changes to the function
 # General
 #     2022-Jun-14: add function for soil energy budget
+#     2022-Jun-14: use METEO.rain and METEO.t_precip
 #
 #######################################################################################################################################################################################################
 """
 
-    soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, rain::FT, t_rain::FT) where {FT<:AbstractFloat}
+    soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
 
 Update the marginal increase of soil energy per layer, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `rain` Water input from top soil `[mol m⁻² s⁻¹]`
-- `t_rain` Water temperature from top soil `[K]`
 
 """
 function soil_energy! end
 
-soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, rain::FT, t_rain::FT) where {FT<:AbstractFloat} = (
-    @unpack ROOTS, ROOTS_INDEX, SOIL = spac;
+soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack METEO, ROOTS, ROOTS_INDEX, SOIL = spac;
     LAYERS = SOIL.LAYERS;
 
     # update soil cp (per m³) and λ_thermal for each soil layer
@@ -103,7 +102,7 @@ soil_energy!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
     end;
 
     # update k, δt, and flow rate among layers (upper - lower)
-    LAYERS[1].∂e∂t = rain / LAYERS[1].ΔZ * t_rain;
+    LAYERS[1].∂e∂t = METEO.rain / LAYERS[1].ΔZ * METEO.t_precip;
     for _i in SOIL.N_LAYER-1
         SOIL._λ_thermal[_i] = 1 / (2 / LAYERS[_i].λ_thermal + 2 / LAYERS[_i+1].λ_thermal);
         SOIL._δt[_i] = LAYERS[_i].t - LAYERS[_i+1].t;
