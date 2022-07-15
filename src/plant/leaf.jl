@@ -16,6 +16,7 @@
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-01: add fields: a_gross and a_net
 #     2022-Jul-12: add field: ∂g∂t
+#     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -37,6 +38,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     APAR_CAR::Bool
     "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
+    "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
+    CP::FT
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
     G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
@@ -51,6 +54,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     WIDTH::FT
 
     # prognostic variables that change with time
+    "Total stored energy per area `[J m⁻²]`"
+    e::FT
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
     g_H₂O_s::FT
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
@@ -63,6 +68,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     a_gross::FT
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_net::FT
+    "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
+    cp::FT
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂::FT
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -73,6 +80,8 @@ mutable struct Leaf{FT<:AbstractFloat}
     p_CO₂_s::FT
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::FT
+    "Marginal increase in energy `[W m⁻²]`"
+    ∂e∂t::FT
     "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
     ∂g∂t::FT
 
@@ -153,22 +162,26 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
     return Leaf{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
+                1780,                               # CP
                 FT[0.01,0.3],                       # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 WangSM{FT}(),                       # SM
                 FT(0.05),                           # WIDTH
+                0,                                  # e (TODO: calculate this based on temperature)
                 0.01,                               # g_H₂O_s
                 1000,                               # ppar
                 T_25(),                             # t
                 0,                                  # a_gross
                 0,                                  # a_net
+                0,                                  # cp
                 0.01,                               # g_CO₂
                 3.0,                                # g_CO₂_b
                 20,                                 # p_CO₂_i
                 40,                                 # p_CO₂_s
                 saturation_vapor_pressure(T_25()),  # p_H₂O_sat
+                0,                                  # ∂e∂t
                 0,                                  # ∂g∂t
                 0)                                  # _t
 );
@@ -186,6 +199,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-07: make p_H₂O_sat a vector
 #     2022-Jul-12: add field: ∂g∂t
+#     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -205,6 +219,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     # parameters that do not change with time
     "[`BroadbandLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::BroadbandLeafBiophysics{FT}
+    "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
+    CP::FT
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
     G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
@@ -221,6 +237,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     WIDTH::FT
 
     # prognostic variables that change with time
+    "Total stored energy per area `[J m⁻²]`"
+    e::Vector{FT}
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
     g_H₂O_s::Vector{FT}
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
@@ -233,6 +251,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     a_gross::Vector{FT}
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_net::Vector{FT}
+    "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
+    cp::Vector{FT}
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂::Vector{FT}
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -243,6 +263,8 @@ mutable struct Leaves1D{FT<:AbstractFloat}
     p_CO₂_s::Vector{FT}
     "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
     p_H₂O_sat::Vector{FT}
+    "Marginal increase in energy `[W m⁻²]`"
+    ∂e∂t::Vector{FT}
     "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
     ∂g∂t::Vector{FT}
 end
@@ -302,6 +324,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 
     return Leaves1D{FT}(
                 _bio,                           # BIO
+                1780,                           # CP
                 FT[0.01,0.3],                   # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),  # HS
                 LeafHydraulics{FT}(ssm = ssm),  # HS2
@@ -309,16 +332,19 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 _psm,                           # PSM
                 WangSM{FT}(),                   # SM
                 FT(0.05),                       # WIDTH
+                FT[0, 0],                       # e (TODO: calculate this based on temperature)
                 FT[0.01, 0.01],                 # g_H₂O_s
                 FT[1000, 200],                  # ppar
                 FT[T_25(), T_25()],             # t
                 zeros(FT,2),                    # a_gross
                 zeros(FT,2),                    # a_net
+                FT[0, 0],                       # cp
                 FT[0.01, 0.01],                 # g_CO₂
                 FT[3.0, 3.0],                   # g_CO₂_b
                 FT[20, 20],                     # p_CO₂_i
                 FT[40, 40],                     # p_CO₂_s
                 _svp,                           # p_H₂O_sat
+                zeros(FT,2)                     # ∂e∂t
                 zeros(FT,2)                     # ∂g∂t
     )
 );
@@ -337,6 +363,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jun-30: add SM as a field
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-12: add fields: ∂g∂t_shaded and ∂g∂t_sunlit
+#     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -359,6 +386,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     APAR_CAR::Bool
     "[`HyperspectralLeafBiophysics`](@ref) type leaf biophysical parameters"
     BIO::HyperspectralLeafBiophysics{FT}
+    "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
+    CP::FT
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
     G_LIMITS::Vector{FT}
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
@@ -373,6 +402,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     WIDTH::FT
 
     # prognostic variables that change with time
+    "Total stored energy per area `[J m⁻²]`"
+    e::FT
     "Stomatal conductance to water vapor for shaded leaves `[mol m⁻² s⁻¹]`"
     g_H₂O_s_shaded::FT
     "Stomatal conductance to water vapor for sunlit leaves `[mol m⁻² s⁻¹]`"
@@ -393,6 +424,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     a_net_shaded::FT
     "Net photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
     a_net_sunlit::Matrix{FT}
+    "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
+    cp::FT
     "Total leaf diffusive conductance to CO₂ for shaded leaves `[mol m⁻² s⁻¹]`"
     g_CO₂_shaded::FT
     "Total leaf diffusive conductance to CO₂ for sunlit leaves `[mol m⁻² s⁻¹]`"
@@ -413,6 +446,8 @@ mutable struct Leaves2D{FT<:AbstractFloat}
     ϕ_f_shaded::FT
     "Fluorescence quantum yield for sunlit leaves `[-]`"
     ϕ_f_sunlit::Matrix{FT}
+    "Marginal increase in energy `[W m⁻²]`"
+    ∂e∂t::FT
     "Marginal increase of conductance per time for shaded leaves `[mol m⁻² s⁻²]`"
     ∂g∂t_shaded::FT
     "Marginal increase of conductance per time for sunlit leaves `[mol m⁻² s⁻²]`"
@@ -484,12 +519,14 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
     return Leaves2D{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
+                1780,                               # CP
                 FT[0.01,0.3],                       # G_LIMITS
                 LeafHydraulics{FT}(ssm = ssm),      # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 WangSM{FT}(),                       # SM
                 FT(0.05),                           # WIDTH
+                0,                                  # e (TODO: calculate this based on temperature)
                 0.01,                               # g_H₂O_s_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_H₂O_s_sunlit
                 100,                                # ppar_shaded
@@ -499,6 +536,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 zeros(FT,n_incl,n_azi),             # a_gross_sunlit
                 0,                                  # a_net_shaded
                 zeros(FT,n_incl,n_azi),             # a_net_sunlit
+                0,                                  # cp
                 0.01,                               # g_CO₂_shaded
                 zeros(FT,n_incl,n_azi) .* FT(0.01), # g_CO₂_sunlit
                 3.0,                                # g_CO₂_b
@@ -509,6 +547,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
                 saturation_vapor_pressure(T_25()),  # p_H₂O_sat
                 0,                                  # ϕ_f_shaded
                 zeros(FT,n_incl,n_azi),             # ϕ_f_sunlit
+                0,                                  # ∂e∂t
                 0,                                  # ∂g∂t_shaded
                 zeros(FT,n_incl,n_azi),             # ∂g∂t_sunlit
                 0)                                  # _t
