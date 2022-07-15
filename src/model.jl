@@ -23,6 +23,7 @@ This function is supposed to have the highest hierarchy, and should support all 
 """
 function soil_plant_air_continuum! end
 
+# TODO: add lite mode later to update energy balance (only longwave radiation and soil+leaf energy budgets)? Or use shorter time steps (will be time consuming, but more accurate)
 soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = false) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
@@ -36,22 +37,22 @@ soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = fals
     # 4. run soil water budget (TODO: add top soil evaporation)
     soil_water!(spac);
 
-    # 5. run soil energy budget
+    # 5. run soil energy budget (TODO: add top soil evaporation)
     soil_energy!(spac);
 
     # 6. run leaf stomatal conductance
     stomatal_conductance!(spac);
 
-    # 7. run leaf energy budget
-    # place holder for the function (in SPAC module)
+    # 7. run plant energy budget
+    plant_energy!(spac);
 
-    # 8. update the prognostic variables
+    # 8. update the prognostic variables (TODO: be careful with surface runoff)
     # update soil water content
     # update soil temperature
     stomatal_conductance!(spac, δt);
     # update leaf temperature
 
-    # 9. update xylem flow profiles from stomatal conductance
+    # 9. update xylem flow profiles from stomatal conductance (TODO: update flow temperature in TRUNK, BRANCK, and LEAVES)
     xylem_flow_profile!(spac, δt);
 
     return nothing
