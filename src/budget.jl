@@ -1,17 +1,35 @@
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-Jul-15: add method for MonoMLGrassSPAC
+#     2022-Jul-15: add method for MonoMLPalmSPAC
+#     2022-Jul-15: add method for MonoMLTreeSPAC
+#     2022-Jul-15: rename function to plant_energy! to be more accurate (ready to add other organs other leaf)
+#     2022-Jul-15: add root, trunk, branch energy budgets
+#
+#######################################################################################################################################################################################################
 """
 
-    leaf_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat}
-    leaf_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat}
-    leaf_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat}
+    plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat}
+    plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat}
+    plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat}
 
 Compute the marginal energy increase in spac, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type SPAC
 
 """
-function leaf_energy! end
+function plant_energy! end
 
-leaf_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, N_ROOT, ROOTS = spac;
+plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
+    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, N_ROOT, ROOTS, ROOTS_INDEX, SOIL = spac;
+
+    # loop through the roots
+    for _i in N_ROOT
+        ROOTS[_i].∂e∂t  = 0;
+        ROOTS[_i].∂e∂t -= flow_out(ROOTS[_i]) * ROOTS[_i].t;
+        ROOTS[_i].∂e∂t += flow_in(ROOTS[_i]) * SOIL.LAYERS[ROOTS_INDEX[_i]].t;
+    end;
 
     # compute the mean temperature from roots (weighted by flow rate)
     _sum_f::FT = 0;
@@ -37,8 +55,20 @@ leaf_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
 
-leaf_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, TRUNK = spac;
+plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
+    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, N_ROOT, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+
+    # loop through the roots
+    TRUNK.∂e∂t = 0;
+    for _i in N_ROOT
+        ROOTS[_i].∂e∂t  = 0;
+        ROOTS[_i].∂e∂t -= flow_out(ROOTS[_i]) * ROOTS[_i].t;
+        ROOTS[_i].∂e∂t += flow_in(ROOTS[_i]) * SOIL.LAYERS[ROOTS_INDEX[_i]].t;
+        TRUNK.∂e∂t     += flow_out(ROOTS[_i]) * ROOTS[_i].t;
+    end;
+
+    # loop through the roots
+    TRUNK.∂e∂t -= flow_out(TRUNK) * TRUNK.t;
 
     # loop through the leaves
     for _i in 1:N_CANOPY
@@ -55,8 +85,27 @@ leaf_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
     return nothing
 );
 
-leaf_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, BRANCHES, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY = spac;
+plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
+    @unpack AIR, BRANCHES, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, N_ROOT, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+
+    # loop through the roots
+    TRUNK.∂e∂t = 0;
+    for _i in N_ROOT
+        ROOTS[_i].∂e∂t  = 0;
+        ROOTS[_i].∂e∂t -= flow_out(ROOTS[_i]) * ROOTS[_i].t;
+        ROOTS[_i].∂e∂t += flow_in(ROOTS[_i]) * SOIL.LAYERS[ROOTS_INDEX[_i]].t;
+        TRUNK.∂e∂t     += flow_out(ROOTS[_i]) * ROOTS[_i].t;
+    end;
+
+    # loop through the roots
+    TRUNK.∂e∂t -= flow_out(TRUNK) * TRUNK.t;
+
+    # loop through the branches
+    for _i in N_CANOPY
+        BRANCHES[_i].∂e∂t  = 0;
+        BRANCHES[_i].∂e∂t -= flow_out(BRANCHES[_i]) * BRANCHES[_i].t;
+        BRANCHES[_i].∂e∂t += flow_in(BRANCHES[_i]) * TRUNK.t;
+    end;
 
     # loop through the leaves
     for _i in 1:N_CANOPY
