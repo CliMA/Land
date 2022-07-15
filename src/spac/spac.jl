@@ -254,7 +254,9 @@ MonoMLGrassSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
+        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _rt = Root{FT}();
+        _rt.HS = _hs;
         push!(_roots, _rt);
     end;
 
@@ -482,12 +484,16 @@ MonoMLPalmSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
+        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _rt = Root{FT}();
+        _rt.HS = _hs;
         push!(_roots, _rt);
     end;
 
     # create trunk with the height of entire canopy
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zs[3], Δl = zs[3], ssm = ssm), T_25());
+    _hs = StemHydraulics{FT}(Δh = zs[3], Δl = zs[3], ssm = ssm);
+    _trunk = Stem{FT}();
+    _trunk.HS = _hs;
 
     # create leaves from bottom canopy (trunk) to top canopy
     _leaves = [Leaves2D{FT}(psm, wls; ssm = ssm) for _i in 1:_n_canopy];
@@ -716,18 +722,24 @@ MonoMLTreeSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _rt = Root{FT}(RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm), T_25());
+        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _rt = Root{FT}();
+        _rt.HS = _hs;
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _trunk = Stem{FT}(StemHydraulics{FT}(Δh = zs[2], Δl = zs[2], ssm = ssm), T_25());
+    _hs = StemHydraulics{FT}(Δh = zs[2], Δl = zs[2], ssm = ssm);
+    _trunk = Stem{FT}();
+    _trunk.HS = _hs;
 
     # create branches from bottom canopy (trunk) to top canopy
     _branches = Stem{FT}[];
     for _i in _c_inds
         _Δh = (max(zas[_i], zs[2]) + min(zas[_i+1], zs[3])) / 2 - zs[2];
-        _st = Stem{FT}(StemHydraulics{FT}(area = 1/_n_canopy, Δh = _Δh, ssm = ssm), T_25());
+        _hs = StemHydraulics{FT}(area = 1/_n_canopy, Δh = _Δh, ssm = ssm);
+        _st = Stem{FT}();
+        _st.HS = _hs;
         push!(_branches, _st);
     end;
 

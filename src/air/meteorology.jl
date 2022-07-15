@@ -23,5 +23,5 @@ Base.@kwdef mutable struct Meteorology{FT<:AbstractFloat}
     "Precipitation in form of snow (before interception) `[mol m⁻²]`"
     snow::FT = 0
     "Precipitation temperature `[K]`"
-    t_precip::FT
+    t_precip::FT = T_25()
 end

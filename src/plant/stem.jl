@@ -2,7 +2,8 @@
 #
 # Changes to this structure
 # General
-#     2022-May-25: add Root structure
+#     2022-May-25: add Stem structure
+#     2022-Jul-15: add fields e, ∂e∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -52,9 +53,9 @@ Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = (
     _hs = StemHydraulics{FT}(ssm = ssm);
 
     return Stem{FT}(
-                _hs,                    # HS
-                T_25() * _hs.v_storage, # e
-                T_25(),                 # t
-                0                       # ∂e∂t
+                _hs,                            # HS
+                T_25() * sum(_hs.v_storage),    # e
+                T_25(),                         # t
+                0                               # ∂e∂t
     )
 );

@@ -344,7 +344,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
                 FT[20, 20],                     # p_CO₂_i
                 FT[40, 40],                     # p_CO₂_s
                 _svp,                           # p_H₂O_sat
-                zeros(FT,2)                     # ∂e∂t
+                zeros(FT,2),                    # ∂e∂t
                 zeros(FT,2)                     # ∂g∂t
     )
 );
