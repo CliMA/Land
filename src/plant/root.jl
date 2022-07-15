@@ -21,9 +21,15 @@ mutable struct Root{FT<:AbstractFloat}
     "[`RootHydraulics`](@ref) type root hydraulic system"
     HS::RootHydraulics{FT}
 
-    # prognostic variables that change with time
+    # prognostic variables that change with time (# TODO: add wood storage as well)
+    "Total stored energy in water `[J]`"
+    e::FT
     "Current temperature"
     t::FT
+
+    # diagnostic variables that change with time
+    "Marginal increase in energy `[W]`"
+    ∂e∂t::FT
 end
 
 
@@ -42,4 +48,13 @@ end
 Construct a Root structure, given
 - `ssm` Whether the flow rate is at steady state
 """
-Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = Root{FT}(RootHydraulics{FT}(ssm = ssm), T_25());
+Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = (
+    _hs = RootHydraulics{FT}(ssm = ssm);
+
+    return Root{FT}(
+                _hs,                    # HS
+                T_25() * _hs.v_storage, # e
+                T_25(),                 # t
+                0                       # ∂e∂t
+    )
+);
