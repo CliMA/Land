@@ -82,6 +82,9 @@ CP_D_MOL(FT=Float64) = GAS_R(FT) / FT(3.5);
 """ Isobaric specific heat of liquid water `[J kg⁻¹ K⁻¹]` """
 CP_L(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_L);
 
+""" Isobaric specific heat of liquid water `[J mol⁻¹ K⁻¹]` """
+CP_L_MOL(FT=Float64) = CP_L(FT) * M_H₂O(FT);
+
 """ Isobaric specific heat of water vapor `[J kg⁻¹ K⁻¹]` """
 CP_V(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_V);
 

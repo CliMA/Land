@@ -53,9 +53,9 @@ Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = (
     _hs = RootHydraulics{FT}(ssm = ssm);
 
     return Root{FT}(
-                _hs,                            # HS
-                T_25() * sum(_hs.v_storage),    # e
-                T_25(),                         # t
-                0                               # ∂e∂t
+                _hs,                                        # HS
+                T_25() * sum(_hs.v_storage) * CP_L_MOL(FT), # e
+                T_25(),                                     # t
+                0                                           # ∂e∂t
     )
 );
