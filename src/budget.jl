@@ -6,8 +6,18 @@
 #     2022-Jun-14: use K_MAX and ΔZ and remove K_REF
 #     2022-Jun-14: rescale rain for layer 1
 #     2022-Jun-14: use METEO.rain
+#     2022-Jun-15: add controller to make sure soil layers do not over saturate
 #
 #######################################################################################################################################################################################################
+"""
+This function have two major features:
+- Compute the marginal change of soil water content
+- Update soil water content without over-saturating or draining the soil
+
+"""
+function soil_water! end
+
+
 """
 
     soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
@@ -16,8 +26,6 @@ Update the marginal increase of soil water content per layer, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 
 """
-function soil_water! end
-
 soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack METEO, ROOTS, ROOTS_INDEX, SOIL = spac;
     LAYERS = SOIL.LAYERS;
@@ -35,6 +43,17 @@ soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{
         SOIL._k[_i] = 1 / (2 / LAYERS[_i].k + 2 / LAYERS[_i+1].k);
         SOIL._δψ[_i] = LAYERS[_i].ψ - LAYERS[_i+1].ψ + ρg_MPa(FT) * (LAYERS[_i].Z - LAYERS[_i+1].Z);
         SOIL._q[_i] = SOIL._k[_i] * SOIL._δψ[_i];
+
+        # if flow into the lower > 0, but the lower layer is already saturated, set the flow to 0
+        if (SOIL._q[_i] > 0) && (SOIL.LAYERS[_i+1].θ >= SOIL.LAYERS[_i+1].VC.Θ_MAX)
+            SOIL._q[_i] = 0;
+        end;
+
+        # if flow into the lower < 0, but the upper layer is already saturated, set the flow to 0
+        if (SOIL._q[_i] < 0) && (SOIL.LAYERS[_i].θ >= SOIL.LAYERS[_i].VC.Θ_MAX)
+            SOIL._q[_i] = 0;
+        end;
+
         LAYERS[_i  ].∂θ∂t -= SOIL._q[_i] / LAYERS[_i].ΔZ;
         LAYERS[_i+1].∂θ∂t += SOIL._q[_i] / LAYERS[_i+1].ΔZ;
     end;
@@ -46,6 +65,78 @@ soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{
 
     return nothing
 );
+
+
+"""
+
+    soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat}
+
+Run soil water budget, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+- `δt` Time step
+
+"""
+soil_water!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat} = (
+    @unpack SOIL = spac;
+
+    # set runoff to 0
+    SOIL.runoff = 0;
+
+    # run the update function until time elapses
+    _t_res = δt;
+    while _t_res <= 0
+        _δt = adjusted_time(spac, _t_res);
+        for _i in 1:SOIL.N_LAYER
+            SOIL.LAYERS[_i].θ += SOIL.LAYERS[_i].∂θ∂t * _δt;
+        end;
+
+        # compute surface runoff
+        if SOIL.LAYERS[1].θ > SOIL.LAYERS[1].VC.Θ_SAT
+            SOIL.runoff += (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ;
+            SOIL.LAYERS[1].θ = SOIL.LAYERS[1].VC.Θ_SAT;
+        end;
+
+        _t_res -= _δt;
+    end;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to the function
+# General
+#     2022-Jun-15: add function to make sure the soil layers do not over saturate or drain
+#
+#######################################################################################################################################################################################################
+"""
+
+    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat}
+
+Return adjusted time that soil does not over saturate or drain, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+- `δt` Time step
+
+"""
+function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat}
+    @unpack SOIL = spac;
+
+    # make sure each layer does not over-saturate or drain
+    _δt = δt;
+    for _i in 1:SOIL.N_LAYER
+        # if top soil is saturated and there is rain, _δt will not change (the rain will be counted as runoff)
+        if (SOIL.LAYERS[_i].∂θ∂t > 0) && (SOIL.LAYERS[_i].θ < SOIL.LAYERS[_i].VC.Θ_SAT)
+            _δt_sat = (SOIL.LAYERS[_i].VC.Θ_SAT - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
+            _δt = min(_δt_sat, _δt);
+        elseif SOIL.LAYERS[_i].∂θ∂t < 0
+            _δt_dra = (SOIL.LAYERS[_i].VC.Θ_RES - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
+            _δt = min(_δt_dra, _δt);
+        end;
+    end;
+
+    return _δt
+end
 
 
 #######################################################################################################################################################################################################
