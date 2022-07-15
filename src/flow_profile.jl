@@ -477,7 +477,7 @@ xylem_flow_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLT
     @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY = spac;
 
     for _i in eachindex(LEAVES)
-        _p_sl = CANOPY.OPTICS.p_sunlit[N_CANOPY-_i];
+        _p_sl = CANOPY.OPTICS.p_sunlit[N_CANOPY + 1 - _i];
 
         _g_sh = 1 / (1 /LEAVES[_i].g_H₂O_s_shaded + 1 / (FT(1.35) * LEAVES[_i].g_CO₂_b));
         _g_sl = 0;

@@ -101,7 +101,7 @@ plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
     TRUNK.∂e∂t -= flow_out(TRUNK) * TRUNK.t;
 
     # loop through the branches
-    for _i in N_CANOPY
+    for _i in 1:N_CANOPY
         BRANCHES[_i].∂e∂t  = 0;
         BRANCHES[_i].∂e∂t -= flow_out(BRANCHES[_i]) * BRANCHES[_i].t;
         BRANCHES[_i].∂e∂t += flow_in(BRANCHES[_i]) * TRUNK.t;
