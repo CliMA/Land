@@ -499,7 +499,7 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
     @unpack LEAF, ROOT, SOIL, STEM = spac;
 
     # update water potential from SOIL (TODO: use ROOT_INDEX in the future)
-    ROOT.p_ups = soil_ψ_25(SOIL.LAYERS[1].VC, SOIL.LAYERS[1].θ) * relative_surface_tension(SOIL.LAYERS[1].t);
+    ROOT.HS.p_ups = soil_ψ_25(SOIL.LAYERS[1].VC, SOIL.LAYERS[1].θ) * relative_surface_tension(SOIL.LAYERS[1].t);
 
     # update pressure profiles for organs
     xylem_pressure_profile!(ROOT; update = update);
@@ -519,7 +519,7 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
 
     # update water potential from SOIL
     for _i in 1:N_ROOT
-        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
     # update the profile in roots
@@ -547,7 +547,7 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
 
     # update water potential from SOIL
     for _i in 1:N_ROOT
-        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
     # update the profile in roots
@@ -579,7 +579,7 @@ xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT
 
     # update water potential from SOIL
     for _i in 1:N_ROOT
-        ROOTS[_i].p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
     # update the profile in roots
