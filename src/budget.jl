@@ -10,6 +10,15 @@
 #
 #######################################################################################################################################################################################################
 """
+This function has two major functionalities:
+- Compute marginal energy increase in each organ
+- Update the temperature in each organ when time step provided
+
+"""
+function plant_energy! end
+
+
+"""
 
     plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat}
     plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat}
@@ -19,8 +28,6 @@ Compute the marginal energy increase in spac, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type SPAC
 
 """
-function plant_energy! end
-
 plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
     @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY, N_ROOT, ROOTS, ROOTS_INDEX, SOIL = spac;
 
@@ -117,6 +124,82 @@ plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
         LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * LEAVES[_i].t;
         LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * BRANCHES[_i].t;
         LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+    end;
+
+    return nothing
+);
+
+
+"""
+
+    plant_energy!(spac::MonoMLGrassSPAC{FT}, δt::FT) where {FT<:AbstractFloat}
+    plant_energy!(spac::MonoMLPalmSPAC{FT}, δt::FT) where {FT<:AbstractFloat}
+    plant_energy!(spac::MonoMLTreeSPAC{FT}, δt::FT) where {FT<:AbstractFloat}
+
+Compute the marginal energy increase in spac, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type SPAC
+- `δt` Time step
+
+"""
+plant_energy!(spac::MonoMLGrassSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAVES, N_CANOPY, N_ROOT, ROOTS = spac;
+
+    # update the temperature for roots
+    for _i in 1:N_ROOT
+        ROOTS[_i].e += ROOTS[_i].∂e∂t * δt;
+        ROOTS[_i].t  = ROOTS[_i].e / (CP_L_MOL(FT) * sum(ROOTS[_i].HS.v_storage));
+    end;
+
+    # update the temperature for leaves
+    for _i in 1:N_CANOPY
+        LEAVES[_i].e += LEAVES[_i].∂e∂t * δt;
+        LEAVES[_i].t  = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
+    end;
+
+    return nothing
+);
+
+plant_energy!(spac::MonoMLPalmSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAVES, N_CANOPY, N_ROOT, ROOTS, TRUNK = spac;
+
+    # update the temperature for roots
+    for _i in 1:N_ROOT
+        ROOTS[_i].e += ROOTS[_i].∂e∂t * δt;
+        ROOTS[_i].t  = ROOTS[_i].e / (CP_L_MOL(FT) * sum(ROOTS[_i].HS.v_storage));
+    end;
+
+    # update the temperature for trunk
+    TRUNK.e += TRUNK.∂e∂t * δt;
+    TRUNK.t  = TRUNK.e / (CP_L_MOL(FT) * sum(TRUNK.HS.v_storage));
+
+    # update the temperature for leaves
+    for _i in 1:N_CANOPY
+        LEAVES[_i].e += LEAVES[_i].∂e∂t * δt;
+        LEAVES[_i].t  = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
+    end;
+
+    return nothing
+);
+
+plant_energy!(spac::MonoMLTreeSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
+    @unpack BRANCHES, LEAVES, N_CANOPY, N_ROOT, ROOTS, TRUNK = spac;
+
+    # update the temperature for roots
+    for _i in 1:N_ROOT
+        ROOTS[_i].e += ROOTS[_i].∂e∂t * δt;
+        ROOTS[_i].t  = ROOTS[_i].e / (CP_L_MOL(FT) * sum(ROOTS[_i].HS.v_storage));
+    end;
+
+    # update the temperature for trunk
+    TRUNK.e += TRUNK.∂e∂t * δt;
+    TRUNK.t  = TRUNK.e / (CP_L_MOL(FT) * sum(TRUNK.HS.v_storage));
+
+    # update the temperature for branches and leaves
+    for _i in 1:N_CANOPY
+        BRANCHES[_i].e += BRANCHES[_i].∂e∂t * δt;
+        BRANCHES[_i].t  = BRANCHES[_i].e / (CP_L_MOL(FT) * sum(BRANCHES[_i].HS.v_storage));
+        LEAVES[_i].e   += LEAVES[_i].∂e∂t * δt;
+        LEAVES[_i].t    = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
     end;
 
     return nothing
