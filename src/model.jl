@@ -11,8 +11,7 @@ This function runs the model using the following steps:
 - Run canopy RT model
 - Run hydraulic model
 - Run photosynthesis model
-- Run soil water budget (calculate ∂Θ∂t only)
-- Run soil energy budget (calculate ∂T∂t only)
+- Run soil water and ebergy budget (calculate ∂Θ∂t and ∂e∂t only)
 - Run leaf stomatal conductances (calculate ∂g∂t only)
 - Run leaf energy budget (calculate ∂T∂t only)
 - Update the prognostic variables (using ∂X∂t * δt)
@@ -35,24 +34,20 @@ soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = fals
     leaf_photosynthesis!(spac, GCO₂Mode());
 
     # 4. run soil water budget (TODO: add top soil evaporation)
-    soil_water!(spac);
+    soil_budget!(spac);
 
-    # 5. run soil energy budget (TODO: add top soil evaporation)
-    soil_energy!(spac);
-
-    # 6. run leaf stomatal conductance
+    # 5. run leaf stomatal conductance
     stomatal_conductance!(spac);
 
-    # 7. run plant energy budget
+    # 6. run plant energy budget
     plant_energy!(spac);
 
-    # 8. update the prognostic variables (TODO: be careful with surface runoff)
-    # update soil water content
-    # update soil temperature
+    # 7. update the prognostic variables (TODO: update flow temperature in TRUNK, BRANCK, and LEAVES)
+    soil_budget!(spac, δt);
     stomatal_conductance!(spac, δt);
     # update leaf temperature
 
-    # 9. update xylem flow profiles from stomatal conductance (TODO: update flow temperature in TRUNK, BRANCK, and LEAVES)
+    # 8. update xylem flow profiles from stomatal conductance
     xylem_flow_profile!(spac, δt);
 
     return nothing
