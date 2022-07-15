@@ -39,6 +39,7 @@ function β_factor end
 # General
 #     2022-Jul-12: add function to update beta factor for empirical models
 #     2022-Jul-12: add methods for MonoElementSPAC
+#     2022-Jul-15: rename xylem_flow to flow_in to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
@@ -158,8 +159,8 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βs = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _βs += β_factor(β.FUNC, roots[_i].HS.SH, roots[_i].HS.p_ups / _f_st) * xylem_flow(roots[_i]);
-        _ws += xylem_flow(roots[_i]);
+        _βs += β_factor(β.FUNC, roots[_i].HS.SH, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
+        _ws += flow_in(roots[_i]);
     end;
 
     β.β₁ = _βs / _ws;
@@ -180,8 +181,8 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βs = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _βs += β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st) * xylem_flow(roots[_i]);
-        _ws += xylem_flow(roots[_i]);
+        _βs += β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
+        _ws += flow_in(roots[_i]);
     end;
 
     β.β₁ = _βs / _ws;
@@ -194,8 +195,8 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βs = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _βs += β_factor(β.FUNC, soil_θ(roots[_i].HS.SH, roots[_i].HS.p_ups / _f_st)) * xylem_flow(roots[_i]);
-        _ws += xylem_flow(roots[_i]);
+        _βs += β_factor(β.FUNC, soil_θ(roots[_i].HS.SH, roots[_i].HS.p_ups / _f_st)) * flow_in(roots[_i]);
+        _ws += flow_in(roots[_i]);
     end;
 
     β.β₁ = _βs / _ws;

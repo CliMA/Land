@@ -13,49 +13,75 @@
 #     2022-Jun-30: add support for Leaves2D
 #     2022-Jun-30: rename Leaf to Leaves2D to support ML*SPAC
 #     2022-Jul-08: deflate documentations
+#     2022-Jul-15: rename xylem_flow to flow_in to be more descriptive
 #
 #######################################################################################################################################################################################################
 """
 
-    xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
-    xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
-    xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat}
-    xylem_flow(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat}
+    flow_in(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat}
+    flow_in(organ::Leaves1D{FT}) where {FT<:AbstractFloat}
+    flow_in(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat}
+    flow_in(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat}
 
 Return the flow rate, given
 - `organ` `Leaf`, `Leaves1D`, `Leaves2D`, `Root`, or `Stem` type struct
 - `organs` Vector of `Leaves2D` or `Stem` type struct
 
 """
-function xylem_flow end
+function flow_in end
 
-xylem_flow(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = xylem_flow(organ.HS);
+flow_in(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = flow_in(organ.HS);
 
-xylem_flow(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (xylem_flow(organ.HS), xylem_flow(organ.HS2));
+flow_in(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (flow_in(organ.HS), flow_in(organ.HS2));
 
-xylem_flow(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
+flow_in(organs::Vector{Leaves2D{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
     for _i in eachindex(organs)
-        _f_sum += xylem_flow(organs[_i]) * organs[_i].HS.AREA;
+        _f_sum += flow_in(organs[_i]) * organs[_i].HS.AREA;
     end;
 
     return _f_sum
 );
 
-xylem_flow(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat} = (
+flow_in(organs::Vector{Stem{FT}}) where {FT<:AbstractFloat} = (
     _f_sum::FT = 0;
     for _i in eachindex(organs)
-        _f_sum += xylem_flow(organs[_i]);
+        _f_sum += flow_in(organs[_i]);
     end;
 
     return _f_sum
 );
 
-xylem_flow(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat} = xylem_flow(hs.FLOW);
+flow_in(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat} = flow_in(hs.FLOW);
 
-xylem_flow(mode::SteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.flow;
+flow_in(mode::SteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.flow;
 
-xylem_flow(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
+flow_in(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_in;
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
+#     2022-Jul-15: add function to read water exiting the leaf
+#     2022-Jul-15: rename to flow_out to be more descriptive
+#
+#######################################################################################################################################################################################################
+"""
+
+    flow_out(lf::Union{Leaf{FT}, Leaves2D{FT}}) where {FT<:AbstractFloat}
+
+Return the net flow that escape from the leaf, given
+- `lf` `Leaf`, `Leaves2D`, `Root`, or `Stem` type organ
+
+"""
+function flow_out end
+
+flow_out(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {FT<:AbstractFloat} = flow_out(organ.HS.FLOW);
+
+flow_out(mode::SteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.flow;
+
+flow_out(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_out;
 
 
 #######################################################################################################################################################################################################
@@ -365,11 +391,11 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
     xylem_flow_profile!(LEAF, Δt);
 
     # 2. set up stem flow rate and profile
-    xylem_flow_profile!(STEM.HS.FLOW, xylem_flow(LEAF) * LEAF.HS.AREA);
+    xylem_flow_profile!(STEM.HS.FLOW, flow_in(LEAF) * LEAF.HS.AREA);
     xylem_flow_profile!(STEM, Δt);
 
     # 3. set up root flow rate and profile
-    xylem_flow_profile!(ROOT.HS.FLOW, xylem_flow(STEM));
+    xylem_flow_profile!(ROOT.HS.FLOW, flow_in(STEM));
     xylem_flow_profile!(STEM, Δt);
 
     return nothing
@@ -385,7 +411,7 @@ xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
     xylem_flow_profile!.(LEAVES, Δt);
 
     # 2. set up root flow rate and profile
-    _f_sum = xylem_flow(LEAVES);
+    _f_sum = flow_in(LEAVES);
     xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, _f_sum, Δt);
 
     return nothing
@@ -401,11 +427,11 @@ xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
     xylem_flow_profile!.(LEAVES, Δt);
 
     # 2. set up trunk flow rate and profile
-    xylem_flow_profile!(TRUNK.HS.FLOW, xylem_flow(LEAVES));
+    xylem_flow_profile!(TRUNK.HS.FLOW, flow_in(LEAVES));
     xylem_flow_profile!(TRUNK, Δt);
 
     # 3. set up root flow rate and profile
-    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, xylem_flow(TRUNK), Δt);
+    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
 
     return nothing
 );
@@ -421,16 +447,16 @@ xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 
     # 2. set up branch flow rate and profile
     for _i in eachindex(LEAVES)
-        xylem_flow_profile!(BRANCHES[_i].HS.FLOW, xylem_flow(LEAVES[_i]) * LEAVES[_i].HS.AREA);
+        xylem_flow_profile!(BRANCHES[_i].HS.FLOW, flow_in(LEAVES[_i]) * LEAVES[_i].HS.AREA);
     end;
     xylem_flow_profile!.(BRANCHES, Δt);
 
     # 3. set up trunk flow rate and profile
-    xylem_flow_profile!(TRUNK.HS.FLOW, xylem_flow(BRANCHES));
+    xylem_flow_profile!(TRUNK.HS.FLOW, flow_in(BRANCHES));
     xylem_flow_profile!(TRUNK, Δt);
 
     # 4. set up root flow rate and profile
-    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, xylem_flow(TRUNK), Δt);
+    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
 
     return nothing
 );

@@ -23,7 +23,7 @@ clear_legacy!
 
 ## FLow profile
 ```@docs
-xylem_flow
+flow_in
 root_pk
 xylem_flow_profile!
 xylem_flow_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
