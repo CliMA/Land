@@ -239,6 +239,7 @@ end
 #     2022-Jul-13: move VC, Z, t, and θ to SoilLayer
 #     2022-Jul-13: add field AREA, _k, _q, and _δψ
 #     2022-Jul-13: add field _λ_thermal, _q_thermal, and _δt
+#     2022-Jul-15: add field runoff
 #
 #######################################################################################################################################################################################################
 """
@@ -264,6 +265,10 @@ mutable struct Soil{FT<:AbstractFloat}
     LAYERS::Vector{SoilLayer{FT}}
     "Number of soil layers"
     N_LAYER::Int
+
+    # diagnostic parameters that changes with time
+    "Surface runoff due to heavy precipitation during the time step `[mol m⁻²]`"
+    runoff::FT
 
     # cache used for calculations
     "Soil hydraulic conductance between layers per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
@@ -326,6 +331,7 @@ Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") 
                 1,                  # COLOR
                 _layers,            # LAYERS
                 _n_layer,           # N_LAYER
+                0,                  # runoff
                 zeros(_n_layer-1),  # _k
                 zeros(_n_layer-1),  # _q
                 zeros(_n_layer-1),  # _q_thermal
