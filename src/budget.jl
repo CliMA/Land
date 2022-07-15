@@ -34,11 +34,10 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
     @unpack METEO, ROOTS, ROOTS_INDEX, SOIL = spac;
     LAYERS = SOIL.LAYERS;
 
-    # update soil k, ψ, and soil cp (per m³), λ_thermal for each soil layer
+    # update soil k, ψ, and λ_thermal for each soil layer
     for _i in 1:SOIL.N_LAYER
         LAYERS[_i].k         = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
         LAYERS[_i].ψ         = soil_ψ_25.(LAYERS[_i].VC, LAYERS[_i].θ) .* relative_surface_tension.(LAYERS[_i].t);
-        LAYERS[_i].cp        = LAYERS[_i].CP * LAYERS[_i].Ρ + LAYERS[_i].θ * CP_L(FT) * ρ_H₂O(FT);
         LAYERS[_i].λ_thermal = (LAYERS[_i].Λ_THERMAL + LAYERS[_i].θ * Λ_THERMAL_H₂O(FT)) / LAYERS[_i].ΔZ;
         LAYERS[_i].∂e∂t = 0;
         LAYERS[_i].∂θ∂t = 0;
@@ -105,12 +104,12 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
         _δt = adjusted_time(spac, _t_res);
         for _i in 1:SOIL.N_LAYER
             SOIL.LAYERS[_i].θ += SOIL.LAYERS[_i].∂θ∂t * _δt;
-            SOIL.LAYERS[_i].e += SOIL.LAYERS[_i].∂e∂t * _δt;
+            SOIL.LAYERS[_i].e += SOIL.LAYERS[_i].∂e∂t * _δt / SOIL.LAYERS[1].ΔZ;
         end;
 
         # compute surface runoff
         if SOIL.LAYERS[1].θ > SOIL.LAYERS[1].VC.Θ_SAT
-            SOIL.runoff += (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ;
+            SOIL.runoff += (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
             SOIL.LAYERS[1].θ = SOIL.LAYERS[1].VC.Θ_SAT;
         end;
 
@@ -118,6 +117,19 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
 
         # if _t_res > 0 rerun the budget function, else break
         _t_res > 0 ? soil_budget!(spac) : break;
+    end;
+
+    # compute top soil temperature and top soil energy out due to runoff
+    if SOIL.runoff > 0
+        _cp = SOIL.LAYERS[1].CP * SOIL.LAYERS[1].Ρ + SOIL.LAYERS[1].θ * ρ_H₂O(FT) * CP_L(FT) + SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT);
+        _t  = SOIL.LAYERS[1].e / _cp;
+        SOIL.LAYERS[1].e -= SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT) * _t;
+    end;
+
+    # update soil temperature at each layer (top layer t will be same as _t above)
+    for _i in 1:SOIL.N_LAYER
+        SOIL.LAYERS[_i].cp = SOIL.LAYERS[_i].CP * SOIL.LAYERS[_i].Ρ + SOIL.LAYERS[_i].θ * ρ_H₂O(FT) * CP_L(FT);
+        SOIL.LAYERS[_i].t  = SOIL.LAYERS[_i].e / SOIL.LAYERS[_i].cp;
     end;
 
     return nothing
