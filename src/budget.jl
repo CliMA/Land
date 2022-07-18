@@ -11,6 +11,7 @@
 #     2022-Jun-14: add net radiation energy to top soil
 #     2022-Jun-15: add controller to make sure soil layers do not over saturate
 #     2022-Jun-15: merge the soil_water! and soil_energy! to soil_budget!
+#     2022-Jun-16: move time stepper controller to SoilPlantAirContinuum.jl
 #
 #######################################################################################################################################################################################################
 """
@@ -95,34 +96,20 @@ Run soil water and energy budget, given
 soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat} = (
     @unpack SOIL = spac;
 
-    # set runoff to 0
-    SOIL.runoff = 0;
-
-    # run the update function until time elapses
-    _t_res = δt;
-    while true
-        _δt = adjusted_time(spac, _t_res);
-        for _i in 1:SOIL.N_LAYER
-            SOIL.LAYERS[_i].θ += SOIL.LAYERS[_i].∂θ∂t * _δt;
-            SOIL.LAYERS[_i].e += SOIL.LAYERS[_i].∂e∂t * _δt / SOIL.LAYERS[1].ΔZ;
-        end;
-
-        # compute surface runoff
-        if SOIL.LAYERS[1].θ > SOIL.LAYERS[1].VC.Θ_SAT
-            SOIL.runoff += (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
-            SOIL.LAYERS[1].θ = SOIL.LAYERS[1].VC.Θ_SAT;
-        end;
-
-        _t_res -= _δt;
-
-        # if _t_res > 0 rerun the budget function, else break
-        _t_res > 0 ? soil_budget!(spac) : break;
+    # run the time step
+    for _i in 1:SOIL.N_LAYER
+        SOIL.LAYERS[_i].θ += SOIL.LAYERS[_i].∂θ∂t * δt;
+        SOIL.LAYERS[_i].e += SOIL.LAYERS[_i].∂e∂t * δt / SOIL.LAYERS[1].ΔZ;
     end;
 
-    # compute top soil temperature and top soil energy out due to runoff
-    if SOIL.runoff > 0
+    # compute surface runoff
+    SOIL.runoff = 0;
+    if SOIL.LAYERS[1].θ > SOIL.LAYERS[1].VC.Θ_SAT
+        # compute top soil temperature and top soil energy out due to runoff
         _cp = SOIL.LAYERS[1].CP * SOIL.LAYERS[1].Ρ + SOIL.LAYERS[1].θ * ρ_H₂O(FT) * CP_L(FT) + SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT);
         _t  = SOIL.LAYERS[1].e / _cp;
+        SOIL.runoff = (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
+        SOIL.LAYERS[1].θ = SOIL.LAYERS[1].VC.Θ_SAT;
         SOIL.LAYERS[1].e -= SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT) * _t;
     end;
 
@@ -134,42 +121,6 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
 
     return nothing
 );
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the function
-# General
-#     2022-Jun-15: add function to make sure the soil layers do not over saturate or drain
-#
-#######################################################################################################################################################################################################
-"""
-
-    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat}
-
-Return adjusted time that soil does not over saturate or drain, given
-- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `δt` Time step
-
-"""
-function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat}
-    @unpack SOIL = spac;
-
-    # make sure each layer does not over-saturate or drain
-    _δt = δt;
-    for _i in 1:SOIL.N_LAYER
-        # if top soil is saturated and there is rain, _δt will not change (the rain will be counted as runoff)
-        if (SOIL.LAYERS[_i].∂θ∂t > 0) && (SOIL.LAYERS[_i].θ < SOIL.LAYERS[_i].VC.Θ_SAT)
-            _δt_sat = (SOIL.LAYERS[_i].VC.Θ_SAT - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
-            _δt = min(_δt_sat, _δt);
-        elseif SOIL.LAYERS[_i].∂θ∂t < 0
-            _δt_dra = (SOIL.LAYERS[_i].VC.Θ_RES - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
-            _δt = min(_δt_dra, _δt);
-        end;
-    end;
-
-    return _δt
-end
 
 
 #######################################################################################################################################################################################################
