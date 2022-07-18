@@ -23,17 +23,18 @@ This function is supposed to have the highest hierarchy, and should support all 
 function soil_plant_air_continuum! end
 
 # TODO: add lite mode later to update energy balance (only longwave radiation and soil+leaf energy budgets)? Or use shorter time steps (will be time consuming, but more accurate)
-soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = false) where {FT<:AbstractFloat} = (
-    # 1. run canopy RT
+# TODO: add top soil evaporation
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false) where {FT<:AbstractFloat} = (
+    # 1. run canopy RT (note to run this again when leaf temperatures change)
     canopy_radiation!(spac);
 
-    # 2. run plant hydraulic model
+    # 2. run plant hydraulic model (must be run before leaf_photosynthesis! as the latter may need β for empirical models)
     xylem_pressure_profile!(spac; update = update);
 
     # 3. run photosynthesis model
     leaf_photosynthesis!(spac, GCO₂Mode());
 
-    # 4. run soil water budget (TODO: add top soil evaporation)
+    # 4. run soil water budget
     soil_budget!(spac);
 
     # 5. run leaf stomatal conductance
@@ -42,12 +43,12 @@ soil_plant_air_continuum!(spac::MonoMLTreeSPAC{FT}, δt::FT; update::Bool = fals
     # 6. run plant energy budget
     plant_energy!(spac);
 
-    # 7. update the prognostic variables (TODO: update flow temperature in TRUNK, BRANCK, and LEAVES)
+    # 7. update the prognostic variables
     soil_budget!(spac, δt);
     stomatal_conductance!(spac, δt);
-    # update leaf temperature
+    plant_energy!(spac, δt);
 
-    # 8. update xylem flow profiles from stomatal conductance
+    # 8. update xylem flow profiles from stomatal conductance (TODO: double check this one?)
     xylem_flow_profile!(spac, δt);
 
     return nothing
