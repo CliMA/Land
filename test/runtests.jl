@@ -35,15 +35,12 @@ using Test
 
             # Plant hydraulic system
             lhs1 = ClimaCache.LeafHydraulics{FT}();
-            lhs2 = ClimaCache.LeafHydraulics{FT}(ssm = true);
-            lhs3 = ClimaCache.LeafHydraulics{FT}(ssm = false);
+            lhs2 = ClimaCache.LeafHydraulics{FT}(FLOW = ClimaCache.NonSteadyStateFlow{FT}(N = 1));
             rhs1 = ClimaCache.RootHydraulics{FT}();
-            rhs2 = ClimaCache.RootHydraulics{FT}(ssm = true);
-            rhs3 = ClimaCache.RootHydraulics{FT}(ssm = false);
+            rhs2 = ClimaCache.RootHydraulics{FT}(FLOW = ClimaCache.NonSteadyStateFlow{FT}(N = 5));
             shs1 = ClimaCache.StemHydraulics{FT}();
-            shs2 = ClimaCache.StemHydraulics{FT}(ssm = true);
-            shs3 = ClimaCache.StemHydraulics{FT}(ssm = false);
-            for hs in [lhs1, lhs2, lhs3, rhs1, rhs2, rhs3, shs1, shs2, shs3]
+            shs2 = ClimaCache.StemHydraulics{FT}(FLOW = ClimaCache.NonSteadyStateFlow{FT}(N = 5));
+            for hs in [lhs1, lhs2, rhs1, rhs2, shs1, shs2]
                 @test FT_test(hs, FT);
                 @test NaN_test(hs);
             end;

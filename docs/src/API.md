@@ -5,9 +5,10 @@ CurrentModule = ClimaCache
 ```
 
 
-## Air
+## Environmental Conditions
 ```@docs
 AirLayer
+Meteorology
 ```
 
 
@@ -28,14 +29,10 @@ WeibullVC
 ComplexVC
 AbstractFlowProfile
 NonSteadyStateFlow
-NonSteadyStateFlow{FT}(N::Int, isleaf::Bool = true) where {FT<:AbstractFloat}
 SteadyStateFlow
 LeafHydraulics
-LeafHydraulics{FT}(N::Int = 5; area::Number = 1500, k_ox::Number = 100, k_sla::Number = 0.04, v_max::Number = 20, ssm::Bool = true) where {FT<:AbstractFloat}
 RootHydraulics
-RootHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat}
 StemHydraulics
-StemHydraulics{FT}(N::Int = 5; area::Number = 1, k_x::Number = 25, Δh::Number = 1, Δl::Number = 1, ssm::Bool = true) where {FT<:AbstractFloat}
 ```
 
 ### Leaf Level
@@ -109,16 +106,14 @@ HyperspectralMLCanopy{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); lai::Num
 AbstractSoilVC
 BrooksCorey
 VanGenuchten
-VanGenuchten{FT}(name::String, α::Number, n::Number, θ_sat::Number, θ_res::Number) where {FT<:AbstractFloat}
 VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 AbstractSoilAlbedo
 BroadbandSoilAlbedo
-BroadbandSoilAlbedo{FT}() where {FT<:AbstractFloat}
 HyperspectralSoilAlbedo
 HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 Soil
-Soil{FT}(zs::Vector{FT}, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
-Soil{FT}(zs::Vector{FT}, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 ```
 
 ## SPAC
@@ -129,13 +124,13 @@ Stem
 Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 AbstractSPACSystem
 MonoElementSPAC
-MonoElementSPAC{FT}(psm::String; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
 MonoMLGrassSPAC
-MonoMLGrassSPAC{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-0.2,0.5], zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoMLGrassSPAC{FT}(psm::String, area::Number = 100, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-0.2,0.5], zss::Vector = collect(0:-0.1:-1), zas::Vector = collect(0:0.05:1), ssm::Bool = true) where {FT<:AbstractFloat}
 MonoMLPalmSPAC
-MonoMLPalmSPAC{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoMLPalmSPAC{FT}(psm::String, area::Number = 100, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.2:13), ssm::Bool = true) where {FT<:AbstractFloat}
 MonoMLTreeSPAC
-MonoMLTreeSPAC{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.5:13), ssm::Bool = true) where {FT<:AbstractFloat}
+MonoMLTreeSPAC{FT}(psm::String, area::Number = 100, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); zs::Vector = [-1,6,12], zss::Vector = collect(0:-0.25:-2), zas::Vector = collect(0:0.5:13), ssm::Bool = true) where {FT<:AbstractFloat}
 ```
 
 

@@ -50,7 +50,11 @@ Construct a Stem structure, given
 - `ssm` Whether the flow rate is at steady state
 """
 Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = (
-    _hs = StemHydraulics{FT}(ssm = ssm);
+    if ssm
+        _hs = StemHydraulics{FT}();
+    else
+        _hs = StemHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 5));
+    end;
 
     return Stem{FT}(
                 _hs,                                        # HS

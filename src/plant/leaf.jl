@@ -159,12 +159,18 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
         _bio = HyperspectralLeafBiophysics{FT}(wls);
     end;
 
+    if ssm
+        _hs = LeafHydraulics{FT}();
+    else
+        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
+    end;
+
     return Leaf{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
                 1780,                               # CP
                 FT[0.01,0.3],                       # G_LIMITS
-                LeafHydraulics{FT}(ssm = ssm),      # HS
+                _hs,                                # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 WangSM{FT}(),                       # SM
@@ -320,14 +326,22 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 
     _bio = BroadbandLeafBiophysics{FT}();
 
+    if ssm
+        _hs = LeafHydraulics{FT}();
+        _hs2 = LeafHydraulics{FT}();
+    else
+        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
+        _hs2 = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
+    end;
+
     _svp = [saturation_vapor_pressure(T_25()) for _i in 1:2];
 
     return Leaves1D{FT}(
                 _bio,                           # BIO
                 1780,                           # CP
                 FT[0.01,0.3],                   # G_LIMITS
-                LeafHydraulics{FT}(ssm = ssm),  # HS
-                LeafHydraulics{FT}(ssm = ssm),  # HS2
+                _hs,                            # HS
+                _hs2,                           # HS2
                 _prc,                           # PRC
                 _psm,                           # PSM
                 WangSM{FT}(),                   # SM
@@ -516,12 +530,18 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
 
     _bio = HyperspectralLeafBiophysics{FT}(wls);
 
+    if ssm
+        _hs = LeafHydraulics{FT}();
+    else
+        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
+    end;
+
     return Leaves2D{FT}(
                 true,                               # APAR_CAR
                 _bio,                               # BIO
                 1780,                               # CP
                 FT[0.01,0.3],                       # G_LIMITS
-                LeafHydraulics{FT}(ssm = ssm),      # HS
+                _hs,                                # HS
                 _prc,                               # PRC
                 _psm,                               # PSM
                 WangSM{FT}(),                       # SM

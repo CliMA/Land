@@ -50,7 +50,11 @@ Construct a Root structure, given
 - `ssm` Whether the flow rate is at steady state
 """
 Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = (
-    _hs = RootHydraulics{FT}(ssm = ssm);
+    if ssm
+        _hs = RootHydraulics{FT}();
+    else
+        _hs = RootHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 5));
+    end;
 
     return Root{FT}(
                 _hs,                                        # HS

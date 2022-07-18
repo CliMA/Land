@@ -254,7 +254,8 @@ MonoMLGrassSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _hs = RootHydraulics{FT}(AREA = 1/_n_root, K_X = 25/_n_root, ΔH = _Δh);
+        if !ssm _hs.FLOW = NonSteadyStateFlow{FT}(N = 5) end;
         _rt = Root{FT}();
         _rt.HS = _hs;
         push!(_roots, _rt);
@@ -484,14 +485,18 @@ MonoMLPalmSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _hs = RootHydraulics{FT}(AREA = 1/_n_root, K_X = 25/_n_root, ΔH = _Δh);
+        if !ssm _hs.FLOW = NonSteadyStateFlow{FT}(N = 5) end;
         _rt = Root{FT}();
         _rt.HS = _hs;
         push!(_roots, _rt);
     end;
 
     # create trunk with the height of entire canopy
-    _hs = StemHydraulics{FT}(Δh = zs[3], Δl = zs[3], ssm = ssm);
+    _hs = StemHydraulics{FT}(L = zs[3], ΔH = zs[3]);
+    if !ssm
+        _hs.FLOW = NonSteadyStateFlow{FT}(N = 5);
+    end;
     _trunk = Stem{FT}();
     _trunk.HS = _hs;
 
@@ -722,14 +727,18 @@ MonoMLTreeSPAC{FT}(
     _roots = Root{FT}[];
     for _i in _r_inds
         _Δh = abs(max(zss[_i+1], zs[1]) + zss[_i]) / 2;
-        _hs = RootHydraulics{FT}(area = 1/_n_root, k_x = 25/_n_root, Δh = _Δh, ssm = ssm);
+        _hs = RootHydraulics{FT}(AREA = 1/_n_root, K_X = 25/_n_root, ΔH = _Δh);
+        if !ssm _hs.FLOW = NonSteadyStateFlow{FT}(N = 5) end;
         _rt = Root{FT}();
         _rt.HS = _hs;
         push!(_roots, _rt);
     end;
 
     # create trunk
-    _hs = StemHydraulics{FT}(Δh = zs[2], Δl = zs[2], ssm = ssm);
+    _hs = StemHydraulics{FT}(L = zs[2], ΔH = zs[2]);
+    if !ssm
+        _hs.FLOW = NonSteadyStateFlow{FT}(N = 5);
+    end;
     _trunk = Stem{FT}();
     _trunk.HS = _hs;
 
@@ -737,7 +746,10 @@ MonoMLTreeSPAC{FT}(
     _branches = Stem{FT}[];
     for _i in _c_inds
         _Δh = (max(zas[_i], zs[2]) + min(zas[_i+1], zs[3])) / 2 - zs[2];
-        _hs = StemHydraulics{FT}(area = 1/_n_canopy, Δh = _Δh, ssm = ssm);
+        _hs = StemHydraulics{FT}(AREA = 1/_n_canopy, ΔH = _Δh);
+        if !ssm
+            _hs.FLOW = NonSteadyStateFlow{FT}(N = 5);
+        end;
         _st = Stem{FT}();
         _st.HS = _hs;
         push!(_branches, _st);
