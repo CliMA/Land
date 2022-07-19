@@ -18,9 +18,7 @@ Meteorology
 ```@docs
 AbstractPVCurve
 LinearPVCurve
-LinearPVCurve{FT}() where {FT<:AbstractFloat}
 SegmentedPVCurve
-SegmentedPVCurve{FT}() where {FT<:AbstractFloat}
 AbstractHydraulicSystem
 AbstractXylemVC
 LogisticVC
@@ -113,9 +111,7 @@ Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") 
 ## SPAC
 ```@docs
 Root
-Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 Stem
-Stem{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
 AbstractSPACSystem
 MonoElementSPAC
 MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadband::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
