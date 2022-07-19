@@ -265,6 +265,7 @@ Leaves1D{FT}(psm::String) where {FT<:AbstractFloat} = (
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 #     2022-Jul-19: use kwdef for the constructor
 #     2022-Jul-19: remove field p_H₂O_sat
+#     2022-Jul-19: add dimension control to struct
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -282,6 +283,12 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
+    # dimensions
+    "Dimension of azimuth angles"
+    DIM_AZI::Int = 36
+    "Dimension of inclination angles"
+    DIM_INCL::Int = 9
+
     # parameters that do not change with time
     "Whether APAR absorbed by carotenoid is counted as PPAR"
     APAR_CAR::Bool = true
@@ -308,11 +315,11 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Stomatal conductance to water vapor for shaded leaves `[mol m⁻² s⁻¹]`"
     g_H₂O_s_shaded::FT = 0.01
     "Stomatal conductance to water vapor for sunlit leaves `[mol m⁻² s⁻¹]`"
-    g_H₂O_s_sunlit::Matrix{FT} = FT(0.01) .* ones(FT, 9, 36)
+    g_H₂O_s_sunlit::Matrix{FT} = FT(0.01) .* ones(FT, DIM_INCL, DIM_AZI)
     "Absorbed photosynthetically active radiation used for photosynthesis for shaded leaves `[μmol m⁻² s⁻¹]`"
     ppar_shaded::FT = 200
     "Absorbed photosynthetically active radiation used for photosynthesis for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    ppar_sunlit::Matrix{FT} = 1000 .* ones(FT, 9, 36)
+    ppar_sunlit::Matrix{FT} = 1000 .* ones(FT, DIM_INCL, DIM_AZI)
     "Current leaf temperature"
     t::FT = T_25()
 
@@ -320,37 +327,37 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Gross photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
     a_gross_shaded::FT = 0
     "Gross photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    a_gross_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    a_gross_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Net photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
     a_net_shaded::FT = 0
     "Net photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    a_net_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    a_net_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
     cp::FT = 0
     "Total leaf diffusive conductance to CO₂ for shaded leaves `[mol m⁻² s⁻¹]`"
     g_CO₂_shaded::FT = 0
     "Total leaf diffusive conductance to CO₂ for sunlit leaves `[mol m⁻² s⁻¹]`"
-    g_CO₂_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    g_CO₂_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
     g_CO₂_b::FT = 3
     "Leaf internal CO₂ partial pressure for shaded leaves `[Pa]`"
     p_CO₂_i_shaded::FT = 0
     "Leaf internal CO₂ partial pressure for sunlit leaves `[Pa]`"
-    p_CO₂_i_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    p_CO₂_i_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Leaf surface CO₂ partial pressure for shaded leaves `[Pa]`"
     p_CO₂_s_shaded::FT = 0
     "Leaf surface CO₂ partial pressure for sunlit leaves `[Pa]`"
-    p_CO₂_s_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    p_CO₂_s_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Fluorescence quantum yield for shaded leaves `[-]`"
     ϕ_f_shaded::FT = 0
     "Fluorescence quantum yield for sunlit leaves `[-]`"
-    ϕ_f_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    ϕ_f_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
     "Marginal increase in energy `[W m⁻²]`"
     ∂e∂t::FT = 0
     "Marginal increase of conductance per time for shaded leaves `[mol m⁻² s⁻²]`"
     ∂g∂t_shaded::FT = 0
     "Marginal increase of conductance per timefor sunlit leaves `[mol m⁻² s⁻²]`"
-    ∂g∂t_sunlit::Matrix{FT} = zeros(FT, 9, 36)
+    ∂g∂t_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
 
     # caches to speed up calculations
     "Last leaf temperature. If different from t, then make temperature correction"
@@ -368,7 +375,7 @@ end
 #######################################################################################################################################################################################################
 """
 
-    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
+    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 
 Constructor for `Leaves2D`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
@@ -377,7 +384,7 @@ Constructor for `Leaves2D`, given
 - `n_incl` Number of inclination angles
 
 """
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat} = (
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -391,18 +398,5 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::I
         _psm = C4VJPModel{FT}();
     end;
 
-    return Leaves2D{FT}(
-                BIO            = HyperspectralLeafBiophysics{FT}(wls),
-                PRC            = _prc,
-                PSM            = _psm,
-                g_H₂O_s_sunlit = zeros(FT,n_incl,n_azi) .* FT(0.01),
-                ppar_sunlit    = zeros(FT,n_incl,n_azi) .* 1000,
-                a_gross_sunlit = zeros(FT,n_incl,n_azi),
-                a_net_sunlit   = zeros(FT,n_incl,n_azi),
-                g_CO₂_sunlit   = zeros(FT,n_incl,n_azi) .* FT(0.01),
-                p_CO₂_i_sunlit = zeros(FT,n_incl,n_azi) .+ 20,
-                p_CO₂_s_sunlit = zeros(FT,n_incl,n_azi) .+ 40,
-                ϕ_f_sunlit     = zeros(FT,n_incl,n_azi),
-                ∂g∂t_sunlit    = zeros(FT,n_incl,n_azi)
-    )
+    return Leaves2D{FT}(BIO = HyperspectralLeafBiophysics{FT}(wls), PRC = _prc, PSM = _psm)
 );

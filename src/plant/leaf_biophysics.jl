@@ -67,6 +67,7 @@ end
 #     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
 #     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
 #     2022-Jul-18: use kwdef for the constructor
+#     2022-Jul-19: add dimension control to struct
 #
 #######################################################################################################################################################################################################
 """
@@ -81,6 +82,14 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat} <: AbstractLeafBiophysics{FT}
+    # dimensions
+    "Dimension of SIF wave length bins"
+    DIM_SIF::Int = 29
+    "Dimension of SIF excitation wave length bins"
+    DIM_SIFE::Int = 45
+    "Dimension of short wave length bins"
+    DIM_WL::Int = 114
+
     # parameters that do not change with time
     "Leaf mesophyll structural parameter that describes mesophyll reflectance and transmittance"
     MESOPHYLL_N::FT = 1.4
@@ -109,25 +118,25 @@ Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat} <: Abs
 
     # dignostic variables that change with time
     "Specific absorption coefficients of all materials"
-    k_all::Vector{FT} = zeros(FT, 114)
+    k_all::Vector{FT} = zeros(FT, DIM_WL)
     "Fluorescence excitation matrix backwards `[-]`"
-    mat_b::Matrix{FT} = zeros(FT, 29, 45)
+    mat_b::Matrix{FT} = zeros(FT, DIM_SIF, DIM_SIFE)
     "Fluorescence excitation matrix forwards `[-]`"
-    mat_f::Matrix{FT} = zeros(FT, 29, 45)
+    mat_f::Matrix{FT} = zeros(FT, DIM_SIF, DIM_SIFE)
     "Relative absorption by Chlorophyll `[-]`"
-    α_cab::Vector{FT} = zeros(FT, 114)
+    α_cab::Vector{FT} = zeros(FT, DIM_WL)
     "Relative absorption by Chlorophyll+Carotenoid `[-]`"
-    α_cabcar::Vector{FT} = zeros(FT, 114)
+    α_cabcar::Vector{FT} = zeros(FT, DIM_WL)
     "Shortwave absorption, 1 .- ρ_sw .- τ_sw  `[-]`"
-    α_sw::Vector{FT} = zeros(FT, 114)
+    α_sw::Vector{FT} = zeros(FT, DIM_WL)
     "Broadband thermal reflectance, related to blackbody emittance `[-]`"
     ρ_lw::FT = 0.01
     "Shortwave leaf reflectance `[-]`"
-    ρ_sw::Vector{FT} = zeros(FT, 114)
+    ρ_sw::Vector{FT} = zeros(FT, DIM_WL)
     "Broadband thermal transmission, related to blackbody emittance `[-]`"
     τ_lw::FT = 0.01
     "Shortwave leaf transmission `[-]`"
-    τ_sw::Vector{FT} = zeros(FT, 114)
+    τ_sw::Vector{FT} = zeros(FT, DIM_WL)
 end
 
 
@@ -148,17 +157,4 @@ Constructor for `HyperspectralLeafBiophysics`, given
 - `wls` [`WaveLengthSet`](@ref) type structure
 
 """
-HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat} = (
-    @unpack NΛ, NΛ_SIF, NΛ_SIFE = wls;
-
-    return HyperspectralLeafBiophysics{FT}(
-                k_all    = zeros(FT, NΛ),
-                mat_b    = zeros(FT, NΛ_SIF, NΛ_SIFE),
-                mat_f    = zeros(FT, NΛ_SIF, NΛ_SIFE),
-                α_cab    = zeros(FT, NΛ),
-                α_cabcar = zeros(FT, NΛ),
-                α_sw     = zeros(FT, NΛ),
-                ρ_sw     = zeros(FT, NΛ),
-                τ_sw     = zeros(FT, NΛ)
-    )
-);
+HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat} = HyperspectralLeafBiophysics{FT}(DIM_SIF = wls.NΛ_SIF, DIM_SIFE = wls.NΛ_SIFE, DIM_WL = wls.NΛ);

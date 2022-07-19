@@ -72,7 +72,7 @@ Leaf{FT}(psm::String) where {FT<:AbstractFloat}
 Leaves1D
 Leaves1D{FT}(psm::String) where {FT<:AbstractFloat}
 Leaves2D
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 ```
 
 ### Stomatal Models
@@ -112,7 +112,6 @@ HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::Stri
 SunSensorGeometry
 SunSensorGeometry{FT}(; haa::Number = 0, hsa::Number = 0, saa::Number = 180, sza::Number = 30, vaa::Number = 180, vza::Number = 0) where {FT<:AbstractFloat}
 HyperspectralMLCanopyOpticalProperty
-HyperspectralMLCanopyOpticalProperty{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat}
 AbstractCanopyRadiationProfile
 BroadbandSLCanopyRadiationProfile
 BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat}

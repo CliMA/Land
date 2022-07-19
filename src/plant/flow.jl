@@ -25,6 +25,7 @@ abstract type AbstractFlowProfile{FT<:AbstractFloat} end
 #     2022-May-31: remove unneeded variables from struct
 #     2022-May-31: add f_sum field
 #     2022-Jul-18: use kwdef for the constructor
+#     2022-Jul-19: add dimension control to struct
 #
 #######################################################################################################################################################################################################
 """
@@ -39,21 +40,21 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct NonSteadyStateFlow{FT<:AbstractFloat} <: AbstractFlowProfile{FT}
-    # parameters that do not change with time
-    "Number of capaciatance elements"
-    N::Int = 1
+    # dimensions
+    "Dimension of capaciatance elements"
+    DIM_CAPACITY::Int = 1
 
     # dignostic variables that change with time
     "Vector of buffer water flow `[mol m⁻²]`"
-    f_buffer::Vector{FT} = zeros(FT, N)
+    f_buffer::Vector{FT} = zeros(FT, DIM_CAPACITY)
     "Vector of xylem water flow `[mol m⁻²]`"
-    f_element::Vector{FT} = zeros(FT, N)
+    f_element::Vector{FT} = zeros(FT, DIM_CAPACITY)
     "Flow rate in `[mol s⁻¹]` or `[mol m⁻² s⁻¹]` (for leaf)"
     f_in::FT = 0
     "Flow rate out `[mol s⁻¹]` or `[mol m⁻² s⁻¹]` (for leaf)"
     f_out::FT = 0
     "Vector of sum buffer water flow `[mol m⁻²]`"
-    f_sum::Vector{FT} = zeros(FT, N)
+    f_sum::Vector{FT} = zeros(FT, DIM_CAPACITY)
 end
 
 
