@@ -9,6 +9,7 @@
 #     2022-Jan-25: add documentation
 #     2022-Jul-13: use @kwdef for the constructor
 #     2022-Jul-13: add structs description
+#     2022-Jul-13: add shortcut constructors for QuadraticColimit
 #
 #######################################################################################################################################################################################################
 """
@@ -33,6 +34,10 @@ Base.@kwdef mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimi
     "Curvature factor"
     CURVATURE::FT = 0.98
 end
+
+ColimitCJCLM(FT) = QuadraticColimit{FT}(0.98);
+ColimitIPCLM(FT) = QuadraticColimit{FT}(0.95);
+ColimitJCLM(FT)  = QuadraticColimit{FT}(0.7);
 
 
 """ Empty structure to indicate serial colimitation: `x = 1 / (1/x₁ + 1/x₂)` """

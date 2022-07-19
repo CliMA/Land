@@ -12,6 +12,7 @@ $(TYPEDEF)
 Hierarchy of AbstractSoilAlbedo:
 - [`BroadbandLeafBiophysics`](@ref)
 - [`HyperspectralLeafBiophysics`](@ref)
+
 """
 abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
 
@@ -22,6 +23,7 @@ abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
 # General
 #     2022-Jun-15: add struct for broadband leaf biophysics
 #     2022-Jun-24: add leaf emissivity constant
+#     2022-Jul-18: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -35,32 +37,15 @@ Struct that contains leaf biophysical traits used to run leaf reflectance and tr
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
+Base.@kwdef mutable struct BroadbandLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     # parameters that do not change with time
     "Broadband absorption fraction at the NIR region"
-    Α_NIR::FT
+    Α_NIR::FT = 0.2
     "Broadband absorption fraction at the PAR region"
-    Α_PAR::FT
+    Α_PAR::FT = 0.8
     "Emissivity for longwave radiation"
-    Ε_LW::FT
+    Ε_LW::FT = 0.97
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-15: add constructor
-#     2022-Jun-24: add leaf emissivity constant
-#
-#######################################################################################################################################################################################################
-"""
-
-    BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat}
-
-Construct a broadband leaf biophysics struct
-"""
-BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysics{FT}(0.2, 0.8, 0.97);
 
 
 #######################################################################################################################################################################################################
@@ -75,9 +60,8 @@ BroadbandLeafBiophysics{FT}() where {FT<:AbstractFloat} = BroadbandLeafBiophysic
 #     2021-Oct-19: sort variable to prognostic and dignostic catergories
 #     2021-Oct-21: rename f_sense and K_SENES to brown and K_BROWN
 #     2021-Nov-24: tease apart the characteristic absorption curves to HyperspectralAbsorption
-#     2022-Jan-24: fix documentation
-#     2022-Mar-01: fix documentation
 #     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
+#     2022-Jul-18: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -91,32 +75,32 @@ Struct that contains leaf biophysical traits used to run leaf reflectance and tr
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
+Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     # parameters that do not change with time
     "Leaf mesophyll structural parameter that describes mesophyll reflectance and transmittance"
-    MESOPHYLL_N::FT
+    MESOPHYLL_N::FT = 1.4
     "Doubling adding layers"
-    NDUB::Int
+    NDUB::Int = 10
 
     # prognostic variables that change with time
     "Anthocyanin content `[μg cm⁻²]`"
-    ant::FT
+    ant::FT = 0
     "Senescent material (brown pigments) fraction `[-]`"
-    brown::FT
+    brown::FT = 0
     "Chlorophyll a and b content `[μg cm⁻²]`"
-    cab::FT
+    cab::FT = 40
     "Carotenoid content `[μg cm⁻²]`"
-    car::FT
+    car::FT = 40 / 7
     "Carbon-based constituents in lma `[g cm⁻²]`"
-    cbc::FT
+    cbc::FT = 0
     "Zeaxanthin fraction in Carotenoid (1=all Zeaxanthin, 0=all Violaxanthin) `[-]`"
-    f_zeax::FT
-    "Equivalent water thickness `[cm]`"
-    l_H₂O::FT
+    f_zeax::FT = 0
+    "Equivalent water thickness `[cm]`" # TODO: remove this and use LeafHydraulics field for the calculation
+    l_H₂O::FT = 0.01
     "Dry matter content (dry leaf mass per unit area) `[g cm⁻²]`"
-    lma::FT
+    lma::FT = 0.012
     "Protein content in lma (pro = lma - cbc) `[g cm⁻²]`"
-    pro::FT
+    pro::FT = 0
 
     # dignostic variables that change with time
     "Specific absorption coefficients of all materials"
@@ -132,11 +116,11 @@ mutable struct HyperspectralLeafBiophysics{FT} <: AbstractLeafBiophysics{FT}
     "Shortwave absorption, 1 .- ρ_sw .- τ_sw  `[-]`"
     α_sw::Vector{FT}
     "Broadband thermal reflectance, related to blackbody emittance `[-]`"
-    ρ_lw::FT
+    ρ_lw::FT = 0.01
     "Shortwave leaf reflectance `[-]`"
     ρ_sw::Vector{FT}
     "Broadband thermal transmission, related to blackbody emittance `[-]`"
-    τ_lw::FT
+    τ_lw::FT = 0.01
     "Shortwave leaf transmission `[-]`"
     τ_sw::Vector{FT}
 end
@@ -147,8 +131,8 @@ end
 # Changes to this constructor
 # General
 #     2021-Nov-24: migrate the constructor from CanopyLayers
-#     2022-Jan-24: fix documentation
 #     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
+#     2022-Jul-18: use external constructor for those 2D matrices based on WaveLengthSet
 #
 #######################################################################################################################################################################################################
 """
@@ -158,37 +142,18 @@ end
 Constructor for `HyperspectralLeafBiophysics`, given
 - `wls` [`WaveLengthSet`](@ref) type structure
 
----
-# Examples
-```julia
-lbio = HyperspectralLeafBiophysics{Float64}();
-lbio = HyperspectralLeafBiophysics{Float64}(WaveLengthSet{Float64}(collect(400:50:2400)));
-```
 """
 HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
-    @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;
+    @unpack NΛ, NΛ_SIF, NΛ_SIFE = wls;
 
     return HyperspectralLeafBiophysics{FT}(
-                1.4,                        # MESOPHYLL_N
-                10,                         # NDUB
-                0,                          # ant
-                0,                          # brown
-                40,                         # cab
-                10,                         # car
-                0,                          # cbc
-                0,                          # f_zeax
-                0.01,                       # l_H₂O
-                0.012,                      # lma
-                0,                          # pro
-                zeros(FT,NΛ),               # k_all
-                zeros(FT,NΛ_SIF,NΛ_SIFE),   # mat_b
-                zeros(FT,NΛ_SIF,NΛ_SIFE),   # mat_f
-                zeros(FT,NΛ),               # α_cab
-                zeros(FT,NΛ),               # α_cabcar
-                zeros(FT,NΛ),               # α_sw
-                0.01,                       # ρ_lw
-                zeros(FT,NΛ),               # ρ_sw
-                0.01,                       # τ_lw
-                zeros(FT,NΛ)                # τ_sw
+                k_all    = zeros(FT, NΛ),
+                mat_b    = zeros(FT, NΛ_SIF, NΛ_SIFE),
+                mat_f    = zeros(FT, NΛ_SIF, NΛ_SIFE),
+                α_cab    = zeros(FT, NΛ),
+                α_cabcar = zeros(FT, NΛ),
+                α_sw     = zeros(FT, NΛ),
+                ρ_sw     = zeros(FT, NΛ),
+                τ_sw     = zeros(FT, NΛ)
     )
 );

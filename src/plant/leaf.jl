@@ -144,10 +144,10 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 
     if psm == "C3"
         _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}(colimit = colimit);
+        _psm = C3VJPModel{FT}();
     elseif psm == "C3Cytochrome"
         _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}(colimit = colimit);
+        _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
         _psm = C4VJPModel{FT}(colimit = colimit);
@@ -315,10 +315,10 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 
     if psm == "C3"
         _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}(colimit = colimit);
+        _psm = C3VJPModel{FT}();
     elseif psm == "C3Cytochrome"
         _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}(colimit = colimit);
+        _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
         _psm = C4VJPModel{FT}(colimit = colimit);
@@ -519,10 +519,10 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
 
     if psm == "C3"
         _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}(colimit = colimit);
+        _psm = C3VJPModel{FT}();
     elseif psm == "C3Cytochrome"
         _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}(colimit = colimit);
+        _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
         _psm = C4VJPModel{FT}(colimit = colimit);
