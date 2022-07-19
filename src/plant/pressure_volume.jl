@@ -64,7 +64,7 @@ Struct that contains information for segmented PV curve
 $(TYPEDFIELDS)
 
 """
-Base.@kwdef mutable struct SegmentedPVCurve{FT} <: AbstractPVCurve{FT}
+Base.@kwdef mutable struct SegmentedPVCurve{FT<:AbstractFloat} <: AbstractPVCurve{FT}
     "n_o / maximum V `[mol m⁻³]`"
     C_ALL::FT = 300
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"

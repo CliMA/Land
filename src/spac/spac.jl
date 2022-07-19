@@ -40,7 +40,7 @@ Struct for simplest SPAC system
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoElementSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoElementSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air conditions"
     AIR::AirLayer{FT}
@@ -125,7 +125,7 @@ Struct for monospecies grass SPAC system
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoMLGrassSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (may be more than canopy layer)"
     AIR::Vector{AirLayer{FT}}
@@ -335,7 +335,7 @@ Struct for monospecies palm SPAC system (with trunk)
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoMLPalmSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}}
@@ -575,7 +575,7 @@ Struct for monospecies tree SPAC system (with trunk and branches)
 $(TYPEDFIELDS)
 
 """
-mutable struct MonoMLTreeSPAC{FT} <: AbstractSPACSystem{FT}
+mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
     # parameters that do not change with time
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}}

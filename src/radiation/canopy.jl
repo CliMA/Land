@@ -35,7 +35,7 @@ Structure for Verhoef LIDF algorithm
 $(TYPEDFIELDS)
 
 """
-mutable struct VerhoefLIDF{FT} <: AbstractLIDFAlgorithm{FT}
+mutable struct VerhoefLIDF{FT<:AbstractFloat} <: AbstractLIDFAlgorithm{FT}
     # parameters that do not change with time
     "Leaf inclination angle distribution function parameter a"
     A::FT
@@ -85,7 +85,7 @@ Structure to save single layer broadband canopy parameters
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandSLCanopy{FT} <: AbstractCanopy{FT}
+mutable struct BroadbandSLCanopy{FT<:AbstractFloat} <: AbstractCanopy{FT}
     # parameters that do not change with time
     "Leaf inclination angle distribution function algorithm"
     LIDF::Union{VerhoefLIDF{FT}}
@@ -170,7 +170,7 @@ Structure to save multiple layer hyperspectral canopy parameters
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralMLCanopy{FT} <: AbstractCanopy{FT}
+mutable struct HyperspectralMLCanopy{FT<:AbstractFloat} <: AbstractCanopy{FT}
     # parameters that do not change with time
     "Whether Carotenoid absorption is accounted for in APAR"
     APAR_CAR::Bool

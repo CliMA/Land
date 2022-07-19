@@ -9,6 +9,18 @@ CurrentModule = ClimaCache
 ```@docs
 AirLayer
 Meteorology
+AbstractSoilVC
+BrooksCorey
+VanGenuchten
+VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
+AbstractSoilAlbedo
+BroadbandSoilAlbedo
+HyperspectralSoilAlbedo
+HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+SoilLayer
+Soil
+Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
+Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 ```
 
 
@@ -63,6 +75,28 @@ Leaves2D
 Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
 ```
 
+### Stomatal Models
+```@docs
+AbstractBetaParameter
+BetaParameterG1
+BetaParameterKleaf
+BetaParameterKsoil
+BetaParameterPleaf
+BetaParameterPsoil
+BetaParameterVcmax
+BetaParameterΘ
+BetaFunction
+AbstractStomataModel
+AndereggSM
+BallBerrySM
+EllerSM
+GentineSM
+LeuningSM
+MedlynSM
+SperrySM
+WangSM
+Wang2SM
+```
 
 ## Radiation
 ```@docs
@@ -91,21 +125,6 @@ BroadbandSLCanopy
 BroadbandSLCanopy{FT}(; lai::Number = 3, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
 HyperspectralMLCanopy
 HyperspectralMLCanopy{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); lai::Number = 3, n_layer::Int = 20, θ_incl_bnds::Matrix = [collect(0:10:80) collect(10:10:90)]) where {FT<:AbstractFloat}
-```
-
-## Soil
-```@docs
-AbstractSoilVC
-BrooksCorey
-VanGenuchten
-VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
-AbstractSoilAlbedo
-BroadbandSoilAlbedo
-HyperspectralSoilAlbedo
-HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
-Soil
-Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
-Soil{FT}(zs::Vector, area::Number, broadband::Bool; soil_type::String = "Loam") where {FT<:AbstractFloat}
 ```
 
 ## SPAC
@@ -141,6 +160,7 @@ AVOGADRO
 CP_D
 CP_D_MOL
 CP_L
+CP_L_MOL
 CP_V
 GAS_R
 GRAVITY
@@ -161,6 +181,7 @@ T_25
 T_TRIPLE
 V_H₂O
 YEAR_D
+Λ_THERMAL_H₂O
 ρ_H₂O
 ρg_MPa
 ```

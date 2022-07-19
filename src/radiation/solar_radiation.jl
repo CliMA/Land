@@ -34,7 +34,7 @@ Structure that stores broadband radiation information
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandRadiation{FT} <: AbstractRadiation{FT}
+mutable struct BroadbandRadiation{FT<:AbstractFloat} <: AbstractRadiation{FT}
     # prognostic variables that change with time
     "Diffuse radiation from NIR region `[W m⁻²]`"
     e_diffuse_nir::FT
@@ -83,7 +83,7 @@ Structure that stores hyperspectral radiation information
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralRadiation{FT} <: AbstractRadiation{FT}
+mutable struct HyperspectralRadiation{FT<:AbstractFloat} <: AbstractRadiation{FT}
     # prognostic variables that change with time
     "Diffuse radiation `[mW m⁻² nm⁻¹]`"
     e_diffuse::Vector{FT}

@@ -36,7 +36,7 @@ Structure to store canopy radiation profiles
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandSLCanopyRadiationProfile{FT} <: AbstractCanopyRadiationProfile{FT}
+mutable struct BroadbandSLCanopyRadiationProfile{FT<:AbstractFloat} <: AbstractCanopyRadiationProfile{FT}
     # diagnostic variables that change with time
     "Mean shaded leaf APAR (per leaf area) in μmol m⁻² s⁻¹"
     apar_shaded::FT
@@ -126,7 +126,7 @@ Structure to store canopy radiation profiles
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralMLCanopyRadiationProfile{FT} <: AbstractCanopyRadiationProfile{FT}
+mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFloat} <: AbstractCanopyRadiationProfile{FT}
     # diagnostic variables that change with time
     "Albedo towards the viewing direction"
     albedo::Vector{FT}
