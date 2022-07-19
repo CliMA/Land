@@ -150,7 +150,7 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
         _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}(colimit = colimit);
+        _psm = C4VJPModel{FT}();
     end;
 
     if broadband
@@ -321,7 +321,7 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
         _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}(colimit = colimit);
+        _psm = C4VJPModel{FT}();
     end;
 
     _bio = BroadbandLeafBiophysics{FT}();
@@ -525,7 +525,7 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
         _psm = C3CytochromeModel{FT}();
     elseif psm == "C4"
         _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}(colimit = colimit);
+        _psm = C4VJPModel{FT}();
     end;
 
     _bio = HyperspectralLeafBiophysics{FT}(wls);

@@ -35,10 +35,12 @@ Base.@kwdef mutable struct QuadraticColimit{FT<:AbstractFloat} <: AbstractColimi
     CURVATURE::FT = 0.98
 end
 
-ColimitCJCLM(FT) = QuadraticColimit{FT}(0.98);
-ColimitIPCLM(FT) = QuadraticColimit{FT}(0.95);
-ColimitJCLM(FT)  = QuadraticColimit{FT}(0.7);
-
 
 """ Empty structure to indicate serial colimitation: `x = 1 / (1/x₁ + 1/x₂)` """
 struct SerialColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end
+
+
+ColimitCJCLMC3(FT) = QuadraticColimit{FT}(CURVATURE = 0.98);
+ColimitCJCLMC4(FT) = QuadraticColimit{FT}(CURVATURE = 0.8);
+ColimitIPCLM(FT) = QuadraticColimit{FT}(CURVATURE = 0.95);
+ColimitJCLM(FT)  = QuadraticColimit{FT}(CURVATURE = 0.7);

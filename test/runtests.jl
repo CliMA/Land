@@ -110,8 +110,8 @@ using Test
             end;
 
             # Fluorescence model
-            vdt1 = ClimaCache.VanDerTolFluorescenceModel{FT}();
-            vdt2 = ClimaCache.VanDerTolFluorescenceModel{FT}(true);
+            vdt1 = ClimaCache.VDTModelAll(FT);
+            vdt2 = ClimaCache.VDTModelDrought(FT);
             for vdt in [vdt1, vdt2]
                 @test FT_test(vdt, FT);
                 @test NaN_test(vdt);
@@ -127,11 +127,11 @@ using Test
 
             # Photosynthesis model
             cy_1 = ClimaCache.C3CytochromeModel{FT}();
-            cy_2 = ClimaCache.C3CytochromeModel{FT}(COLIMIT_CJ = ClimaCache.ColimitCJCLM(FT), COLIMIT_IP = ClimaCache.ColimitIPCLM(FT));
+            cy_2 = ClimaCache.C3CytochromeModel{FT}(COLIMIT_CJ = ClimaCache.ColimitCJCLMC3(FT), COLIMIT_IP = ClimaCache.ColimitIPCLM(FT));
             c3_1 = ClimaCache.C3VJPModel{FT}();
-            c3_2 = ClimaCache.C3VJPModel{FT}(COLIMIT_CJ = ClimaCache.ColimitCJCLM(FT), COLIMIT_IP = ClimaCache.ColimitIPCLM(FT), COLIMIT_J = ClimaCache.ColimitJCLM(FT));
+            c3_2 = ClimaCache.C3VJPModel{FT}(COLIMIT_CJ = ClimaCache.ColimitCJCLMC3(FT), COLIMIT_IP = ClimaCache.ColimitIPCLM(FT), COLIMIT_J = ClimaCache.ColimitJCLM(FT));
             c4_1 = ClimaCache.C4VJPModel{FT}();
-            c4_2 = ClimaCache.C4VJPModel{FT}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1, colimit = true);
+            c4_2 = ClimaCache.C4VJPModel{FT}(COLIMIT_CJ = ClimaCache.ColimitCJCLMC4(FT), COLIMIT_IP = ClimaCache.ColimitIPCLM(FT));
             for st in [cy_1, cy_2, c3_1, c3_2, c4_1, c4_2]
                 for rc in [rc1, rc2]
                     @test FT_test(st, FT);

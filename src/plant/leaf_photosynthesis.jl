@@ -225,11 +225,12 @@ end
 # Changes to this struct
 # General
 #     2022-Jan-14: add C4VJPModel structure for classic C₄ photosynthesis system
-#     2022-Jan-25: fix documentation
 #     2022-Feb-11: remove j from the struct
 #     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
 #     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
 #     2022-Jun-13: use Union instead of Abstract... for type definition
+#     2022-Jul-18: remove v_cmax25_ww (use β instead)
+#     2022-Jul-18: use kwdef for the constructor
 # To do
 #     TODO: add Jmax to C4VJPModel and thus JMAX TD in Photosynthesis.jl (not necessary)
 #
@@ -245,119 +246,53 @@ Structure that stores C4 photosynthesis system information
 $(TYPEDFIELDS)
 
 """
-mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
+Base.@kwdef mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # parameters that do not change with time
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}}
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractTemperatureDependency`](@ref) type Kpep temperature dependency"
-    TD_KPEP::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
+    TD_KPEP::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = KpepTDCLM(FT)
     "[`AbstractTemperatureDependency`](@ref) type  respiration temperature dependency"
-    TD_R::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
+    TD_R::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = RespirationTDCLM(FT)
     "[`AbstractTemperatureDependency`](@ref) type Vcmax temperature dependency"
-    TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
+    TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = VcmaxTDCLM(FT)
     "[`AbstractTemperatureDependency`](@ref) type Vpmax temperature dependency"
-    TD_VPMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}
+    TD_VPMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = VpmaxTDBoyd(FT)
 
     # prognostic variables that change with time
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    r_d25::FT
+    r_d25::FT = 0.75
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_cmax25::FT
-    "Well watered maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_cmax25_ww::FT
+    v_cmax25::FT = 50
     "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_pmax25::FT
+    v_pmax25::FT = 50
 
     # dignostic variables that change with time
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_c::FT
+    a_c::FT = 0
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_gross::FT
+    a_gross::FT = 0
     "Light limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_j::FT
+    a_j::FT = 0
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_net::FT
+    a_net::FT = -r_d25
     "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_p::FT
+    a_p::FT = 0
     "Electron to CO₂ coefficient"
-    e_to_c::FT
+    e_to_c::FT = 1 / 6
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
-    j_pot::FT
+    j_pot::FT = 0
     "PEP coefficient Kpep `[Pa]`"
-    k_pep::FT
+    k_pep::FT = 0
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
-    r_d::FT
+    r_d::FT = r_d25
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
-    v_cmax::FT
+    v_cmax::FT = v_cmax25
     "Maximal PEP carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
-    v_pmax::FT
+    v_pmax::FT = v_pmax25
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2021-Nov-18: add constructor
-#     2022-Jan-25: fix documentation
-#     2022-Feb-11: remove j from the struct
-#     2022-Feb-11: default e_to_c set to 1/6
-#     2022-Feb-11: split COLIMIT to COLIMIT_CJ and COLIMIT_IP (minor breaking)
-#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
-#     2022-Mar-09: add v_cmax25_ww to use with StomataModels.jl
-#
-#######################################################################################################################################################################################################
-"""
-
-    C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat}
-
-Constructor for [`C4VJPModel`](@ref), given
-- `v_cmax25` Maximal carboxylation rate at 298.15 K
-- `v_pmax25` Maximal PEP carboxylation rate at 298.15 K
-- `r_d25` Respiration rate at 298.15 K
-- `colimit` If true, use quadratic colimitations for a_c, a_j, and a_p
-
----
-# Examples
-```julia
-c4 = C4VJPModel{Float64}();
-c4 = C4VJPModel{Float64}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1, colimit = true);
-```
-"""
-C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat} = (
-    if colimit
-        _colim_cj = QuadraticColimit{FT}(0.8);
-        _colim_ip = QuadraticColimit{FT}(0.95);
-    else
-        _colim_cj = MinimumColimit{FT}();
-        _colim_ip = MinimumColimit{FT}();
-    end;
-
-    return C4VJPModel{FT}(
-                _colim_cj,              # COLIMIT_CJ
-                _colim_ip,              # COLIMIT_IP
-                KpepTDCLM(FT),          # TD_KPEP
-                RespirationTDCLM(FT),   # TD_R
-                VcmaxTDCLM(FT),         # TD_VCMAX
-                VpmaxTDBoyd(FT),        # TD_VPMAX
-                r_d25,                  # r_d25
-                v_cmax25,               # v_cmax25
-                v_cmax25,               # v_cmax25_ww
-                v_pmax25,               # v_pmax25
-                0,                      # a_c
-                0,                      # a_gross
-                0,                      # a_j
-                -r_d25,                 # a_net
-                0,                      # a_p
-                1/6,                    # e_to_c
-                0,                      # j_pot
-                0,                      # k_pep
-                r_d25,                  # r_d
-                v_cmax25,               # v_cmax
-                v_pmax25)               # v_pmax
-);
 
 
 #######################################################################################################################################################################################################
@@ -366,61 +301,23 @@ C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0
 # General
 #     2022-Jan-14: add abstract mode type
 #     2022-Jan-14: add Hierarchy description
-#     2022-Jan-25: fix documentation
 #
 #######################################################################################################################################################################################################
 """
 
 $(TYPEDEF)
 
-Hierarchy of AbstractSoilVC:
+Hierarchy of AbstractPhotosynthesisMode:
 - [`GCO₂Mode`](@ref)
 - [`PCO₂Mode`](@ref)
+
 """
 abstract type AbstractPhotosynthesisMode end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jan-14: add CO₂ conductance mode
-#     2022-Jan-25: fix documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-An empty structure to signal the function to calculate photosynthetic rates based on leaf diffusive conductance to CO₂.
-
----
-# Examples
-```julia
-mode = GCO₂Mode();
-```
-"""
+""" An empty structure to signal the function to calculate photosynthetic rates based on leaf diffusive conductance to CO₂ """
 struct GCO₂Mode <: AbstractPhotosynthesisMode end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to this struct
-# General
-#     2022-Jan-14: add CO₂ partial pressure mode
-#     2022-Jan-25: fix documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-$(TYPEDEF)
-
-An empty structure to signal the function to calculate photosynthetic rates based on CO₂ partial pressure.
-
----
-# Examples
-```julia
-mode = PCO₂Mode();
-```
-"""
+""" An empty structure to signal the function to calculate photosynthetic rates based on CO₂ partial pressure """
 struct PCO₂Mode <: AbstractPhotosynthesisMode end

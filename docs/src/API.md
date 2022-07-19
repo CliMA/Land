@@ -40,19 +40,15 @@ StemHydraulics
 AbstractLeafBiophysics
 BroadbandLeafBiophysics
 HyperspectralLeafBiophysics
-HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
+HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat}
 VanDerTolFluorescenceModel
-VanDerTolFluorescenceModel{FT}(drought::Bool = false) where {FT<:AbstractFloat}
 AbstractReactionCenter
-VJPReactionCenter
-VJPReactionCenter{FT}() where {FT<:AbstractFloat}
 CytochromeReactionCenter
-CytochromeReactionCenter{FT}() where {FT<:AbstractFloat}
+VJPReactionCenter
 AbstractPhotosynthesisModel
 C3CytochromeModel
 C3VJPModel
 C4VJPModel
-C4VJPModel{FT}(; v_cmax25::Number = 50, v_pmax25::Number = 50, r_d25::Number = 0.75, colimit::Bool = false) where {FT<:AbstractFloat}
 AbstractPhotosynthesisMode
 GCO₂Mode
 PCO₂Mode
