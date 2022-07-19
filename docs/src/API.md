@@ -56,12 +56,13 @@ AbstractTemperatureDependency
 Arrhenius
 ArrheniusPeak
 Q10
+AbstractLeaf
 Leaf
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaf{FT}(psm::String) where {FT<:AbstractFloat}
 Leaves1D
-Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaves1D{FT}(psm::String) where {FT<:AbstractFloat}
 Leaves2D
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat}
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
 ```
 
 

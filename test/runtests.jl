@@ -57,14 +57,11 @@ using Test
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
             leaf_cy = ClimaCache.Leaf{FT}("C3Cytochrome");
-            leaf_d3 = ClimaCache.Leaf{FT}("C3", colimit = true);
-            leaf_d4 = ClimaCache.Leaf{FT}("C4", colimit = true);
-            leaf_dy = ClimaCache.Leaf{FT}("C3Cytochrome", colimit = true);
             wls     = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
             leaf_e3 = ClimaCache.Leaf{FT}("C3", wls);
             leaf_e4 = ClimaCache.Leaf{FT}("C4", wls);
             leaf_ey = ClimaCache.Leaf{FT}("C3Cytochrome", wls);
-            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_d3, leaf_d4, leaf_dy, leaf_e3, leaf_e4, leaf_ey]
+            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_e3, leaf_e4, leaf_ey]
                 @test FT_test(leaf, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
@@ -74,10 +71,7 @@ using Test
             leaves_c3 = ClimaCache.Leaves1D{FT}("C3");
             leaves_c4 = ClimaCache.Leaves1D{FT}("C4");
             leaves_cy = ClimaCache.Leaves1D{FT}("C3Cytochrome");
-            leaves_d3 = ClimaCache.Leaves1D{FT}("C3", colimit = true);
-            leaves_d4 = ClimaCache.Leaves1D{FT}("C4", colimit = true);
-            leaves_dy = ClimaCache.Leaves1D{FT}("C3Cytochrome", colimit = true);
-            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_d3, leaves_d4, leaves_dy]
+            for leaves in [leaves_c3, leaves_c4, leaves_cy]
                 @test FT_test(leaves, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
@@ -87,14 +81,11 @@ using Test
             leaves_c3 = ClimaCache.Leaves2D{FT}("C3");
             leaves_c4 = ClimaCache.Leaves2D{FT}("C4");
             leaves_cy = ClimaCache.Leaves2D{FT}("C3Cytochrome");
-            leaves_d3 = ClimaCache.Leaves2D{FT}("C3", colimit = true);
-            leaves_d4 = ClimaCache.Leaves2D{FT}("C4", colimit = true);
-            leaves_dy = ClimaCache.Leaves2D{FT}("C3Cytochrome", colimit = true);
             wls       = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
             leaves_e3 = ClimaCache.Leaves2D{FT}("C3", wls);
             leaves_e4 = ClimaCache.Leaves2D{FT}("C4", wls);
             leaves_ey = ClimaCache.Leaves2D{FT}("C3Cytochrome", wls);
-            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_d3, leaves_d4, leaves_dy, leaves_e3, leaves_e4, leaves_ey]
+            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_e3, leaves_e4, leaves_ey]
                 @test FT_test(leaves, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);

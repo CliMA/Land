@@ -24,6 +24,7 @@ abstract type AbstractLeafBiophysics{FT<:AbstractFloat} end
 #     2022-Jun-15: add struct for broadband leaf biophysics
 #     2022-Jun-24: add leaf emissivity constant
 #     2022-Jul-18: use kwdef for the constructor
+#     2022-Jul-19: add field lma
 #
 #######################################################################################################################################################################################################
 """
@@ -45,6 +46,10 @@ Base.@kwdef mutable struct BroadbandLeafBiophysics{FT<:AbstractFloat} <: Abstrac
     Α_PAR::FT = 0.8
     "Emissivity for longwave radiation"
     Ε_LW::FT = 0.97
+
+    # prognostic variables that change with time
+    "Dry matter content (dry leaf mass per unit area) `[g cm⁻²]`"
+    lma::FT = 0.012
 end
 
 

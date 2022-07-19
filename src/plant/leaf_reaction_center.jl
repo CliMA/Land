@@ -48,7 +48,7 @@ VDTModelDrought(FT) = VanDerTolFluorescenceModel{FT}(K_0 = 5.01, K_A = 1.93, K_B
 
 $(TYPEDEF)
 
-Structure that stores reaction center information
+Abstract type for reaction center
 
 Hierarchy of the `AbstractReactionCenter`
 - [`VJPReactionCenter`](@ref)

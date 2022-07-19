@@ -1,22 +1,43 @@
 #######################################################################################################################################################################################################
 #
+# Changes to this type
+# General
+#     2022-Jul-19: abstractize the leaf
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+Abstract type for leaf
+
+Hierarchy of the `AbstractLeaf`
+- [`Leaf`](@ref)
+- [`Leaves1D`](@ref)
+- [`Leaves2D`](@ref)
+
+"""
+abstract type AbstractLeaf{FT<:AbstractFloat} end
+
+
+#######################################################################################################################################################################################################
+#
 # Changes to this structure
 # General
 #     2022-Jan-14: refactor the Leaf structure within BIO, PRC, PSM as fields
 #     2022-Jan-24: add p_CO₂_s to the structure
 #     2022-Jan-24: add FT control to p_CO₂_i
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: moved FLM to PRC
-#     2022-May-25: add new field HS
-#     2022-May-25: add new field WIDTH
+#     2022-May-25: add new field HS, WIDTH
 #     2022-Jun-14: use Union instead of Abstract... for type definition
 #     2022-Jun-15: add support to BroadbandLeafBiophysics and HyperspectralLeafBiophysics types
 #     2022-Jun-29: add APAR_CAR as a field
 #     2022-Jun-30: add SM as a field
-#     2022-Jul-01: add G_LIMITS as a field
-#     2022-Jul-01: add fields: a_gross and a_net
+#     2022-Jul-01: add fields: G_LIMITS, a_gross and a_net
 #     2022-Jul-12: add field: ∂g∂t
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
+#     2022-Jul-19: use kwdef for the constructor
+#     2022-Jul-19: remove field p_H₂O_sat
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -32,62 +53,56 @@ Structure to save leaf parameters. This structure is meant for leaf level resear
 $(TYPEDFIELDS)
 
 """
-mutable struct Leaf{FT<:AbstractFloat}
+Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
     # parameters that do not change with time
     "Whether APAR absorbed by carotenoid is counted as PPAR"
-    APAR_CAR::Bool
+    APAR_CAR::Bool = true
     "[`AbstractLeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}}
+    BIO::Union{BroadbandLeafBiophysics{FT}, HyperspectralLeafBiophysics{FT}} = HyperspectralLeafBiophysics{FT}()
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
-    CP::FT
+    CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT}
+    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
-    HS::LeafHydraulics{FT}
+    HS::LeafHydraulics{FT} = LeafHydraulics{FT}()
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
-    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
+    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}} = VJPReactionCenter{FT}()
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
-    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT}
-    "Leaf width"
-    WIDTH::FT
+    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    "Leaf width `[m]`"
+    WIDTH::FT = 0.05
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::FT
+    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25()
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
-    g_H₂O_s::FT
+    g_H₂O_s::FT = 0.01
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
-    ppar::FT
+    ppar::FT = 1000
     "Current leaf temperature"
-    t::FT
+    t::FT = T_25()
 
     # dignostic variables that change with time
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_gross::FT
+    a_gross::FT = 0
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_net::FT
+    a_net::FT = 0
     "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
-    cp::FT
+    cp::FT = 0
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_CO₂::FT
+    g_CO₂::FT = 0
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_CO₂_b::FT
+    g_CO₂_b::FT = 3
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_CO₂_i::FT
+    p_CO₂_i::FT = 0
     "Leaf surface CO₂ partial pressure `[Pa]`"
-    p_CO₂_s::FT
-    "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
-    p_H₂O_sat::FT
+    p_CO₂_s::FT = 0
     "Marginal increase in energy `[W m⁻²]`"
-    ∂e∂t::FT
+    ∂e∂t::FT = 0
     "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
-    ∂g∂t::FT
-
-    # caches to speed up calculations
-    "Last leaf temperature. If different from t, then make temperature correction"
-    _t::FT
+    ∂g∂t::FT = 0
 end
 
 
@@ -95,101 +110,31 @@ end
 #
 # Changes to this constructor
 # General
-#     2022-Jan-14: add C3 and C4 constructors
-#     2022-Jan-24: add C3Cytochrome constructor
-#     2022-Jan-24: add p_CO₂_s to the constructor
-#     2022-Jan-24: add documentation
-#     2022-Feb-07: remove fluorescence model from Leaf struct
-#     2022-Feb-11: set default APAR = 1000
-#     2022-Feb-11: add colimit option in constructor to enable quick deployment of quadratic colimitation
-#     2022-May-25: add leaf hydraulic system into the constructor
-#     2022-May-31: add steady state mode option to input options
-#     2022-May-25: add new field WIDTH
-#     2022-Jun-15: add broadband as an option (default is false)
-#     2022-Jun-29: add APAR_CAR as a field
-#     2022-Jun-30: add SM as a field
-#     2022-Jul-01: add G_LIMITS as a field
-#     2022-Jul-01: add fields: a_gross and a_net
-#     2022-Jul-12: add field: ∂g∂t
+#     2022-Jul-19: clean the constructor function
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false) where {FT<:AbstractFloat}
 
 Constructor for `Leaf`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
 - `broadband` Whether leaf biophysics is in broadband mode
-- `colimit` Whether to colimit the photosynthetic rates and electron transport rates
-- `ssm` Whether the flow rate is at steady state
 
----
-# Examples
-```julia
-leaf_c3 = Leaf{Float64}("C3");
-leaf_c4 = Leaf{Float64}("C4");
-leaf_cy = Leaf{Float64}("C3Cytochrome");
-leaf_c3 = Leaf{Float64}("C3"; colimit = true);
-leaf_c4 = Leaf{Float64}("C4"; colimit = true);
-leaf_cy = Leaf{Float64}("C3Cytochrome"; colimit = true);
-wls = WaveLengthSet{FT}(collect(400:10:2500));
-leaf_c3 = Leaf{Float64}("C3", wls);
-leaf_c4 = Leaf{Float64}("C4", wls);
-leaf_cy = Leaf{Float64}("C3Cytochrome", wls);
-```
 """
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false, colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
-    if psm == "C3"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}();
-    elseif psm == "C3Cytochrome"
-        _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}();
+    _bio = broadband ? HyperspectralLeafBiophysics{FT}(wls) : BroadbandLeafBiophysics{FT}();
+
+    if psm == "C3Cytochrome"
+        return Leaf{FT}(BIO = _bio, PRC = CytochromeReactionCenter{FT}(), PSM = C3CytochromeModel{FT}())
     elseif psm == "C4"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}();
+        return Leaf{FT}(BIO = _bio, PRC = VJPReactionCenter{FT}(), PSM = C4VJPModel{FT}())
     end;
 
-    if broadband
-        _bio = BroadbandLeafBiophysics{FT}();
-    else
-        _bio = HyperspectralLeafBiophysics{FT}(wls);
-    end;
-
-    if ssm
-        _hs = LeafHydraulics{FT}();
-    else
-        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
-    end;
-
-    return Leaf{FT}(
-                true,                               # APAR_CAR
-                _bio,                               # BIO
-                1780,                               # CP
-                FT[0.01,0.3],                       # G_LIMITS
-                _hs,                                # HS
-                _prc,                               # PRC
-                _psm,                               # PSM
-                WangSM{FT}(),                       # SM
-                FT(0.05),                           # WIDTH
-                0,                                  # e (TODO: calculate this based on temperature)
-                0.01,                               # g_H₂O_s
-                1000,                               # ppar
-                T_25(),                             # t
-                0,                                  # a_gross
-                0,                                  # a_net
-                0,                                  # cp
-                0.01,                               # g_CO₂
-                3.0,                                # g_CO₂_b
-                20,                                 # p_CO₂_i
-                40,                                 # p_CO₂_s
-                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
-                0,                                  # ∂e∂t
-                0,                                  # ∂g∂t
-                0)                                  # _t
+    return Leaf{FT}(BIO = _bio)
 );
 
 
@@ -206,6 +151,8 @@ Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::B
 #     2022-Jul-07: make p_H₂O_sat a vector
 #     2022-Jul-12: add field: ∂g∂t
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
+#     2022-Jul-19: use kwdef for the constructor
+#     2022-Jul-19: remove field p_H₂O_sat
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -221,58 +168,56 @@ Structure to save leaf parameters for a single canopy layer. This structure is m
 $(TYPEDFIELDS)
 
 """
-mutable struct Leaves1D{FT<:AbstractFloat}
+Base.@kwdef mutable struct Leaves1D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     # parameters that do not change with time
     "[`BroadbandLeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::BroadbandLeafBiophysics{FT}
+    BIO::BroadbandLeafBiophysics{FT} = BroadbandLeafBiophysics{FT}()
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
-    CP::FT
+    CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT}
+    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
-    HS::LeafHydraulics{FT}
+    HS::LeafHydraulics{FT} = LeafHydraulics{FT}()
     "[`LeafHydraulics`](@ref) type leaf hydraulic system used for other calculations (say sunlit and shaded leaf partitioning)"
-    HS2::LeafHydraulics{FT}
+    HS2::LeafHydraulics{FT} = LeafHydraulics{FT}()
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
-    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
+    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}} = VJPReactionCenter{FT}()
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
-    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT}
-    "Leaf width"
-    WIDTH::FT
+    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    "Leaf width `[m]`"
+    WIDTH::FT = 0.05
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::Vector{FT}
+    e::Vector{FT} = FT[(CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25(), (CP * BIO.lma * 10 + HS2.v_storage * CP_L_MOL(FT)) * T_25()]
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
-    g_H₂O_s::Vector{FT}
+    g_H₂O_s::Vector{FT} = FT[0.01, 0.01]
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
-    ppar::Vector{FT}
+    ppar::Vector{FT} = FT[1000, 200]
     "Current leaf temperature"
-    t::Vector{FT}
+    t::Vector{FT} = FT[T_25(), T_25()]
 
     # dignostic variables that change with time
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_gross::Vector{FT}
+    a_gross::Vector{FT} = FT[0, 0]
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_net::Vector{FT}
+    a_net::Vector{FT} = FT[0, 0]
     "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
-    cp::Vector{FT}
+    cp::Vector{FT} = FT[0, 0]
     "Total leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_CO₂::Vector{FT}
+    g_CO₂::Vector{FT} = FT[0, 0]
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_CO₂_b::Vector{FT}
+    g_CO₂_b::Vector{FT} = FT[3, 3]
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_CO₂_i::Vector{FT}
+    p_CO₂_i::Vector{FT} = FT[0, 0]
     "Leaf surface CO₂ partial pressure `[Pa]`"
-    p_CO₂_s::Vector{FT}
-    "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
-    p_H₂O_sat::Vector{FT}
+    p_CO₂_s::Vector{FT} = FT[0, 0]
     "Marginal increase in energy `[W m⁻²]`"
-    ∂e∂t::Vector{FT}
+    ∂e∂t::Vector{FT} = FT[0, 0]
     "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
-    ∂g∂t::Vector{FT}
+    ∂g∂t::Vector{FT} = FT[0, 0]
 end
 
 
@@ -280,87 +225,27 @@ end
 #
 # Changes to this constructor
 # General
-#     2022-Jun-27: add constructor for Leaves1D
-#     2022-Jun-27: make BIO BroadbandLeafBiophysics only
-#     2022-Jun-28: add a_gross and a_net, make t a Vector, remove _t
-#     2022-Jun-30: add a second HS2 for shaded leaves
-#     2022-Jun-30: add SM as a field
-#     2022-Jul-01: add G_LIMITS as a field
-#     2022-Jul-07: make p_H₂O_sat a vector
-#     2022-Jul-12: add field: ∂g∂t
+#     2022-Jul-19: clean the constructor function
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaves1D{FT}(psm::String) where {FT<:AbstractFloat}
 
 Constructor for `Leaves1D`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
-- `colimit` Whether to colimit the photosynthetic rates and electron transport rates
-- `ssm` Whether the flow rate is at steady state
 
----
-# Examples
-```julia
-leaves_c3 = Leaves1D{Float64}("C3");
-leaves_c4 = Leaves1D{Float64}("C4");
-leaves_cy = Leaves1D{Float64}("C3Cytochrome");
-leaves_c3 = Leaves1D{Float64}("C3"; colimit = true);
-leaves_c4 = Leaves1D{Float64}("C4"; colimit = true);
-leaves_cy = Leaves1D{Float64}("C3Cytochrome"; colimit = true);
-```
 """
-Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaves1D{FT}(psm::String) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
-    if psm == "C3"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}();
-    elseif psm == "C3Cytochrome"
-        _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}();
+    if psm == "C3Cytochrome"
+        return Leaves1D{FT}(PRC = CytochromeReactionCenter{FT}(), PSM = C3CytochromeModel{FT}())
     elseif psm == "C4"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}();
+        return Leaves1D{FT}(PRC = VJPReactionCenter{FT}(), PSM = C4VJPModel{FT}())
     end;
 
-    _bio = BroadbandLeafBiophysics{FT}();
-
-    if ssm
-        _hs = LeafHydraulics{FT}();
-        _hs2 = LeafHydraulics{FT}();
-    else
-        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
-        _hs2 = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
-    end;
-
-    _svp = [saturation_vapor_pressure(T_25()) for _i in 1:2];
-
-    return Leaves1D{FT}(
-                _bio,                           # BIO
-                1780,                           # CP
-                FT[0.01,0.3],                   # G_LIMITS
-                _hs,                            # HS
-                _hs2,                           # HS2
-                _prc,                           # PRC
-                _psm,                           # PSM
-                WangSM{FT}(),                   # SM
-                FT(0.05),                       # WIDTH
-                FT[0, 0],                       # e (TODO: calculate this based on temperature)
-                FT[0.01, 0.01],                 # g_H₂O_s
-                FT[1000, 200],                  # ppar
-                FT[T_25(), T_25()],             # t
-                zeros(FT,2),                    # a_gross
-                zeros(FT,2),                    # a_net
-                FT[0, 0],                       # cp
-                FT[0.01, 0.01],                 # g_CO₂
-                FT[3.0, 3.0],                   # g_CO₂_b
-                FT[20, 20],                     # p_CO₂_i
-                FT[40, 40],                     # p_CO₂_s
-                _svp,                           # p_H₂O_sat
-                zeros(FT,2),                    # ∂e∂t
-                zeros(FT,2)                     # ∂g∂t
-    )
+    return Leaves1D{FT}()
 );
 
 
@@ -378,6 +263,8 @@ Leaves1D{FT}(psm::String; colimit::Bool = false, ssm::Bool = true) where {FT<:Ab
 #     2022-Jul-01: add G_LIMITS as a field
 #     2022-Jul-12: add fields: ∂g∂t_shaded and ∂g∂t_sunlit
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
+#     2022-Jul-19: use kwdef for the constructor
+#     2022-Jul-19: remove field p_H₂O_sat
 # To do
 #     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
 #
@@ -394,82 +281,80 @@ Structure to save leaf parameters for a single canopy layer. This structure is m
 $(TYPEDFIELDS)
 
 """
-mutable struct Leaves2D{FT<:AbstractFloat}
+Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     # parameters that do not change with time
     "Whether APAR absorbed by carotenoid is counted as PPAR"
-    APAR_CAR::Bool
+    APAR_CAR::Bool = true
     "[`HyperspectralLeafBiophysics`](@ref) type leaf biophysical parameters"
-    BIO::HyperspectralLeafBiophysics{FT}
+    BIO::HyperspectralLeafBiophysics{FT} = HyperspectralLeafBiophysics{FT}()
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
-    CP::FT
+    CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT}
+    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
     "[`LeafHydraulics`](@ref) type leaf hydraulic system"
-    HS::LeafHydraulics{FT}
+    HS::LeafHydraulics{FT} = LeafHydraulics{FT}()
     "[`AbstractReactionCenter`](@ref) type photosynthesis reaction center"
-    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}}
+    PRC::Union{VJPReactionCenter{FT}, CytochromeReactionCenter{FT}} = VJPReactionCenter{FT}()
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
-    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}}
+    PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT}
-    "Leaf width"
-    WIDTH::FT
+    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    "Leaf width `[m]`"
+    WIDTH::FT = 0.05
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::FT
+    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25()
     "Stomatal conductance to water vapor for shaded leaves `[mol m⁻² s⁻¹]`"
-    g_H₂O_s_shaded::FT
+    g_H₂O_s_shaded::FT = 0.01
     "Stomatal conductance to water vapor for sunlit leaves `[mol m⁻² s⁻¹]`"
-    g_H₂O_s_sunlit::Matrix{FT}
+    g_H₂O_s_sunlit::Matrix{FT} = FT(0.01) .* ones(FT, 9, 36)
     "Absorbed photosynthetically active radiation used for photosynthesis for shaded leaves `[μmol m⁻² s⁻¹]`"
-    ppar_shaded::FT
+    ppar_shaded::FT = 200
     "Absorbed photosynthetically active radiation used for photosynthesis for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    ppar_sunlit::Matrix{FT}
+    ppar_sunlit::Matrix{FT} = 1000 .* ones(FT, 9, 36)
     "Current leaf temperature"
-    t::FT
+    t::FT = T_25()
 
     # dignostic variables that change with time
     "Gross photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
-    a_gross_shaded::FT
+    a_gross_shaded::FT = 0
     "Gross photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    a_gross_sunlit::Matrix{FT}
+    a_gross_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Net photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"
-    a_net_shaded::FT
+    a_net_shaded::FT = 0
     "Net photosynthetic rate for sunlit leaves `[μmol m⁻² s⁻¹]`"
-    a_net_sunlit::Matrix{FT}
+    a_net_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Combined specific heat capacity of leaf per area `[J K⁻¹ m⁻²]`"
-    cp::FT
+    cp::FT = 0
     "Total leaf diffusive conductance to CO₂ for shaded leaves `[mol m⁻² s⁻¹]`"
-    g_CO₂_shaded::FT
+    g_CO₂_shaded::FT = 0
     "Total leaf diffusive conductance to CO₂ for sunlit leaves `[mol m⁻² s⁻¹]`"
-    g_CO₂_sunlit::Matrix{FT}
+    g_CO₂_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_CO₂_b::FT
+    g_CO₂_b::FT = 3
     "Leaf internal CO₂ partial pressure for shaded leaves `[Pa]`"
-    p_CO₂_i_shaded::FT
+    p_CO₂_i_shaded::FT = 0
     "Leaf internal CO₂ partial pressure for sunlit leaves `[Pa]`"
-    p_CO₂_i_sunlit::Matrix{FT}
+    p_CO₂_i_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Leaf surface CO₂ partial pressure for shaded leaves `[Pa]`"
-    p_CO₂_s_shaded::FT
+    p_CO₂_s_shaded::FT = 0
     "Leaf surface CO₂ partial pressure for sunlit leaves `[Pa]`"
-    p_CO₂_s_sunlit::Matrix{FT}
-    "Saturation H₂O vapor pressure, need to update with temperature and leaf water pressure `[Pa]`"
-    p_H₂O_sat::FT
+    p_CO₂_s_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Fluorescence quantum yield for shaded leaves `[-]`"
-    ϕ_f_shaded::FT
+    ϕ_f_shaded::FT = 0
     "Fluorescence quantum yield for sunlit leaves `[-]`"
-    ϕ_f_sunlit::Matrix{FT}
+    ϕ_f_sunlit::Matrix{FT} = zeros(FT, 9, 36)
     "Marginal increase in energy `[W m⁻²]`"
-    ∂e∂t::FT
+    ∂e∂t::FT = 0
     "Marginal increase of conductance per time for shaded leaves `[mol m⁻² s⁻²]`"
-    ∂g∂t_shaded::FT
-    "Marginal increase of conductance per time for sunlit leaves `[mol m⁻² s⁻²]`"
-    ∂g∂t_sunlit::Matrix{FT}
+    ∂g∂t_shaded::FT = 0
+    "Marginal increase of conductance per timefor sunlit leaves `[mol m⁻² s⁻²]`"
+    ∂g∂t_sunlit::Matrix{FT} = zeros(FT, 9, 36)
 
     # caches to speed up calculations
     "Last leaf temperature. If different from t, then make temperature correction"
-    _t::FT
+    _t::FT = 0
 end
 
 
@@ -478,43 +363,21 @@ end
 # Changes to this constructor
 # General
 #     2022-Jun-27: add constructor for Leaves2D
-#     2022-Jun-27: make BIO HyperspectralLeafBiophysics only
-#     2022-Jun-27: add sunlit and shaded ppar to struct (remove the ppar in canopy radiation)
-#     2022-Jun-28: add a_gross, a_net, and ϕ_f for sunlit and shaded leaves
-#     2022-Jun-29: add APAR_CAR as a field
-#     2022-Jun-30: add SM as a field
-#     2022-Jul-01: add G_LIMITS as a field
-#     2022-Jul-12: add fields: ∂g∂t_shaded and ∂g∂t_sunlit
+#     2022-Jul-19: clean the constructor function
 #
 #######################################################################################################################################################################################################
 """
 
-    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat}
+    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat}
 
 Constructor for `Leaves2D`, given
 - `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
 - `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
-- `colimit` Whether to colimit the photosynthetic rates and electron transport rates
 - `n_azi` Number of azimuth angles
 - `n_incl` Number of inclination angles
-- `ssm` Whether the flow rate is at steady state
 
----
-# Examples
-```julia
-leaves_c3 = Leaves2D{Float64}("C3");
-leaves_c4 = Leaves2D{Float64}("C4");
-leaves_cy = Leaves2D{Float64}("C3Cytochrome");
-leaves_c3 = Leaves2D{Float64}("C3"; colimit = true);
-leaves_c4 = Leaves2D{Float64}("C4"; colimit = true);
-leaves_cy = Leaves2D{Float64}("C3Cytochrome"; colimit = true);
-wls = WaveLengthSet{FT}(collect(400:10:2500));
-leaves_c3 = Leaves2D{Float64}("C3", wls);
-leaves_c4 = Leaves2D{Float64}("C4", wls);
-leaves_cy = Leaves2D{Float64}("C3Cytochrome", wls);
-```
 """
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit::Bool = false, n_azi::Int = 36, n_incl::Int = 9, ssm::Bool = true) where {FT<:AbstractFloat} = (
+Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); n_azi::Int = 36, n_incl::Int = 9) where {FT<:AbstractFloat} = (
     @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
 
     if psm == "C3"
@@ -528,47 +391,18 @@ Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); colimit:
         _psm = C4VJPModel{FT}();
     end;
 
-    _bio = HyperspectralLeafBiophysics{FT}(wls);
-
-    if ssm
-        _hs = LeafHydraulics{FT}();
-    else
-        _hs = LeafHydraulics{FT}(FLOW = NonSteadyStateFlow{FT}(N = 1));
-    end;
-
     return Leaves2D{FT}(
-                true,                               # APAR_CAR
-                _bio,                               # BIO
-                1780,                               # CP
-                FT[0.01,0.3],                       # G_LIMITS
-                _hs,                                # HS
-                _prc,                               # PRC
-                _psm,                               # PSM
-                WangSM{FT}(),                       # SM
-                FT(0.05),                           # WIDTH
-                0,                                  # e (TODO: calculate this based on temperature)
-                0.01,                               # g_H₂O_s_shaded
-                zeros(FT,n_incl,n_azi) .* FT(0.01), # g_H₂O_s_sunlit
-                100,                                # ppar_shaded
-                zeros(FT,n_incl,n_azi) .* 100,      # ppar_sunlit
-                T_25(),                             # t
-                0,                                  # a_gross_shaded
-                zeros(FT,n_incl,n_azi),             # a_gross_sunlit
-                0,                                  # a_net_shaded
-                zeros(FT,n_incl,n_azi),             # a_net_sunlit
-                0,                                  # cp
-                0.01,                               # g_CO₂_shaded
-                zeros(FT,n_incl,n_azi) .* FT(0.01), # g_CO₂_sunlit
-                3.0,                                # g_CO₂_b
-                20,                                 # p_CO₂_i_shaded
-                zeros(FT,n_incl,n_azi) .+ 20,       # p_CO₂_i_sunlit
-                40,                                 # p_CO₂_s_shaded
-                zeros(FT,n_incl,n_azi) .+ 40,       # p_CO₂_s_sunlit
-                saturation_vapor_pressure(T_25()),  # p_H₂O_sat
-                0,                                  # ϕ_f_shaded
-                zeros(FT,n_incl,n_azi),             # ϕ_f_sunlit
-                0,                                  # ∂e∂t
-                0,                                  # ∂g∂t_shaded
-                zeros(FT,n_incl,n_azi),             # ∂g∂t_sunlit
-                0)                                  # _t
+                BIO            = HyperspectralLeafBiophysics{FT}(wls),
+                PRC            = _prc,
+                PSM            = _psm,
+                g_H₂O_s_sunlit = zeros(FT,n_incl,n_azi) .* FT(0.01),
+                ppar_sunlit    = zeros(FT,n_incl,n_azi) .* 1000,
+                a_gross_sunlit = zeros(FT,n_incl,n_azi),
+                a_net_sunlit   = zeros(FT,n_incl,n_azi),
+                g_CO₂_sunlit   = zeros(FT,n_incl,n_azi) .* FT(0.01),
+                p_CO₂_i_sunlit = zeros(FT,n_incl,n_azi) .+ 20,
+                p_CO₂_s_sunlit = zeros(FT,n_incl,n_azi) .+ 40,
+                ϕ_f_sunlit     = zeros(FT,n_incl,n_azi),
+                ∂g∂t_sunlit    = zeros(FT,n_incl,n_azi)
+    )
 );
