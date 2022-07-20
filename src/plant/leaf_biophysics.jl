@@ -138,23 +138,3 @@ Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat} <: Abs
     "Shortwave leaf transmission `[-]`"
     τ_sw::Vector{FT} = zeros(FT, DIM_WL)
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2021-Nov-24: migrate the constructor from CanopyLayers
-#     2022-Jun-15: rename struct to HyperspectralLeafBiophysics to distinguish from BroadbandLeafBiophysics
-#     2022-Jul-18: use external constructor for those 2D matrices based on WaveLengthSet if different from default WaveLengthSet
-#
-#######################################################################################################################################################################################################
-"""
-
-    HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat}
-
-Constructor for `HyperspectralLeafBiophysics`, given
-- `wls` [`WaveLengthSet`](@ref) type structure
-
-"""
-HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat} = HyperspectralLeafBiophysics{FT}(DIM_SIF = wls.DIM_SIF, DIM_SIFE = wls.DIM_SIFE, DIM_WL = wls.DIM_WL);

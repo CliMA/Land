@@ -211,7 +211,7 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct Soil{FT<:AbstractFloat}
     # dimensions
-    "Number of soil layers"
+    "Dimension of soil layers"
     DIM_SOIL::Int = 5
 
     # parameters that do not change with time

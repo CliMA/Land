@@ -108,38 +108,6 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this constructor
-# General
-#     2022-Jul-19: clean the constructor function
-#
-#######################################################################################################################################################################################################
-"""
-
-    Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false) where {FT<:AbstractFloat}
-
-Constructor for `Leaf`, given
-- `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
-- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
-- `broadband` Whether leaf biophysics is in broadband mode
-
-"""
-Leaf{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); broadband::Bool = false) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
-
-    _bio = broadband ? HyperspectralLeafBiophysics{FT}(wls) : BroadbandLeafBiophysics{FT}();
-
-    if psm == "C3Cytochrome"
-        return Leaf{FT}(BIO = _bio, PRC = CytochromeReactionCenter{FT}(), PSM = C3CytochromeModel{FT}())
-    elseif psm == "C4"
-        return Leaf{FT}(BIO = _bio, PRC = VJPReactionCenter{FT}(), PSM = C4VJPModel{FT}())
-    end;
-
-    return Leaf{FT}(BIO = _bio)
-);
-
-
-#######################################################################################################################################################################################################
-#
 # Changes to this structure
 # General
 #     2022-Jun-27: add new structure for leaves with 1D Vector of parameters, such as leaves for sunlit and shaded partitions
@@ -219,34 +187,6 @@ Base.@kwdef mutable struct Leaves1D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Marginal increase of conductance per time `[mol m⁻² s⁻²]`"
     ∂g∂t::Vector{FT} = FT[0, 0]
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jul-19: clean the constructor function
-#
-#######################################################################################################################################################################################################
-"""
-
-    Leaves1D{FT}(psm::String) where {FT<:AbstractFloat}
-
-Constructor for `Leaves1D`, given
-- `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
-
-"""
-Leaves1D{FT}(psm::String) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
-
-    if psm == "C3Cytochrome"
-        return Leaves1D{FT}(PRC = CytochromeReactionCenter{FT}(), PSM = C3CytochromeModel{FT}())
-    elseif psm == "C4"
-        return Leaves1D{FT}(PRC = VJPReactionCenter{FT}(), PSM = C4VJPModel{FT}())
-    end;
-
-    return Leaves1D{FT}()
-);
 
 
 #######################################################################################################################################################################################################
@@ -363,40 +303,3 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Last leaf temperature. If different from t, then make temperature correction"
     _t::FT = 0
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-27: add constructor for Leaves2D
-#     2022-Jul-19: clean the constructor function
-#
-#######################################################################################################################################################################################################
-"""
-
-    Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat}
-
-Constructor for `Leaves2D`, given
-- `psm` Photosynthesis model type, must be `C3`, `C3Cytochrome`, or `C4`
-- `wls` [`WaveLengthSet`](@ref) type structure that determines the dimensions of leaf parameters
-- `n_azi` Number of azimuth angles
-- `n_incl` Number of inclination angles
-
-"""
-Leaves2D{FT}(psm::String, wls::WaveLengthSet{FT} = WaveLengthSet{FT}()) where {FT<:AbstractFloat} = (
-    @assert psm in ["C3", "C3Cytochrome", "C4"] "Photosynthesis model ID must be C3, C4, or C3Cytochrome!";
-
-    if psm == "C3"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C3VJPModel{FT}();
-    elseif psm == "C3Cytochrome"
-        _prc = CytochromeReactionCenter{FT}();
-        _psm = C3CytochromeModel{FT}();
-    elseif psm == "C4"
-        _prc = VJPReactionCenter{FT}();
-        _psm = C4VJPModel{FT}();
-    end;
-
-    return Leaves2D{FT}(BIO = HyperspectralLeafBiophysics{FT}(wls), PRC = _prc, PSM = _psm)
-);
