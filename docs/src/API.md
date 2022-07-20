@@ -116,7 +116,6 @@ AbstractCanopyRadiationProfile
 BroadbandSLCanopyRadiationProfile
 BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat}
 HyperspectralMLCanopyRadiationProfile
-HyperspectralMLCanopyRadiationProfile{FT}(; n_azi::Int = 36, n_incl::Int = 9, n_layer::Int = 20, n_λ::Int = 114) where {FT<:AbstractFloat}
 AbstractLIDFAlgorithm
 VerhoefLIDF
 AbstractCanopy

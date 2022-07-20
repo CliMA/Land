@@ -17,14 +17,14 @@
 
 $(TYPEDEF)
 
-Struct that contains leaf biophysical traits used to run leaf reflection and transmittance.
+Immutable struct that contains leaf biophysical traits used to run leaf reflection and transmittance.
 
 # Fields
 
 $(TYPEDFIELDS)
 
 """
-mutable struct HyperspectralAbsorption{FT<:AbstractFloat}
+struct HyperspectralAbsorption{FT<:AbstractFloat}
     # parameters that do not change with time
     "Specific absorption coefficients of anthocynanin `[-]`"
     K_ANT::Vector{FT}
@@ -56,7 +56,8 @@ end
 # Changes to this constructor
 # General
 #     2021-Nov-24: add constructor
-#     2022-May-25: fix documentation
+# To do
+#     TODO: use Netcdf for the MAT artifact (as MAT is not easily accessible)
 #
 #######################################################################################################################################################################################################
 """
@@ -67,13 +68,6 @@ Constructor for [`HyperspectralAbsorption`](@ref), given
 - `wls` [`WaveLengthSet`](@ref) type structure
 - `opti` Path to leaf optical properties
 
----
-# Examples
-```julia
-ha = HyperspectralAbsorption{FT}();
-ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)));
-ha = HyperspectralAbsorption{FT}(WaveLengthSet{FT}(collect(400:50:2400)); opti=ClimaCache.OPTI_2017);
-```
 """
 HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat} = (
     @unpack NΛ, NΛ_SIF, NΛ_SIFE, SΛ = wls;

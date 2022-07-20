@@ -33,6 +33,8 @@ using WaterPhysics: saturation_vapor_pressure
 #
 #######################################################################################################################################################################################################
 const FILE_SUN    = artifact"land_model_spectrum_V1" * "/sun.mat";
+const LAND_2017   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2017.nc";
+const LAND_2021   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.nc";
 const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
 const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
 const SOIL_GSV    = artifact"land_model_spectrum_V1" * "/GSV.csv";

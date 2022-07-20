@@ -12,6 +12,7 @@ $(TYPEDEF)
 Hierarchy of AbstractRadiation:
 - [`BroadbandRadiation`](@ref)
 - [`HyperspectralRadiation`](@ref)
+
 """
 abstract type AbstractRadiation{FT<:AbstractFloat} end
 
@@ -21,6 +22,7 @@ abstract type AbstractRadiation{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2022-Jun-15: add broadband solar radiation
+#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -34,33 +36,17 @@ Structure that stores broadband radiation information
 $(TYPEDFIELDS)
 
 """
-mutable struct BroadbandRadiation{FT<:AbstractFloat} <: AbstractRadiation{FT}
+Base.@kwdef mutable struct BroadbandRadiation{FT<:AbstractFloat} <: AbstractRadiation{FT}
     # prognostic variables that change with time
     "Diffuse radiation from NIR region `[W m⁻²]`"
-    e_diffuse_nir::FT
+    e_diffuse_nir::FT = 0
     "Diffuse radiation from PAR region `[W m⁻²]`"
-    e_diffuse_par::FT
+    e_diffuse_par::FT = 0
     "Direct radiation from NIR region `[W m⁻²]`"
-    e_direct_nir::FT
+    e_direct_nir::FT = 0
     "Direct radiation from PAR region `[W m⁻²]`"
-    e_direct_par::FT
+    e_direct_par::FT = 0
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2021-Oct-22: add constructor
-#
-#######################################################################################################################################################################################################
-"""
-
-    BroadbandRadiation{FT}() where {FT<:AbstractFloat}
-
-Constructor for [`BroadbandRadiation`](@ref)
-"""
-BroadbandRadiation{FT}() where {FT<:AbstractFloat} = BroadbandRadiation{FT}(0, 0, 0, 0);
 
 
 #######################################################################################################################################################################################################
