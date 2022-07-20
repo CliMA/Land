@@ -95,7 +95,7 @@ MonoElementSPAC{FT}(psm::String, zs::Vector = [-0.2,1], area::Number = 1; broadb
                 Leaf{FT}(psm; broadband = broadband),   # LEAF
                 Meteorology{FT}(),                      # METEO
                 Root{FT}(),                             # ROOT
-                Soil{FT}([0,zs[1]], area, true),        # SOIL
+                Soil{FT}(ZS = [0,zs[1]]),               # SOIL
                 _stem,                                  # STEM
                 ones(FT,4)                              # _krs
     )
@@ -268,7 +268,7 @@ MonoMLGrassSPAC{FT}(
     end;
 
     # create canopy to use for radiative transfer
-    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+    _canopy = HyperspectralMLCanopy{FT}();
 
     # create air layers for all provided layers from bottom to top
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
@@ -280,7 +280,7 @@ MonoMLGrassSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(zss, area, wls);
+    _soil = Soil{FT}(ZS = zss);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}();
@@ -507,7 +507,7 @@ MonoMLPalmSPAC{FT}(
     end;
 
     # create canopy to use for radiative transfer
-    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+    _canopy = HyperspectralMLCanopy{FT}();
 
     # create air layers for all provided layers from bottom to top
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
@@ -519,7 +519,7 @@ MonoMLPalmSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(zss, area, wls);
+    _soil = Soil{FT}(ZS = zss);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}();
@@ -762,7 +762,7 @@ MonoMLTreeSPAC{FT}(
     end;
 
     # create canopy to use for radiative transfer
-    _canopy = HyperspectralMLCanopy{FT}(wls; n_layer = _n_canopy);
+    _canopy = HyperspectralMLCanopy{FT}();
 
     # create air layers for all provided layers from bottom to top
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
@@ -774,7 +774,7 @@ MonoMLTreeSPAC{FT}(
     _angles = SunSensorGeometry{FT}();
 
     # create soil
-    _soil = Soil{FT}(zss, area, wls);
+    _soil = Soil{FT}(ZS = zss);
 
     # create shortwave radiation
     _rad_sw = HyperspectralRadiation{FT}();

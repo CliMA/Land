@@ -5,6 +5,7 @@
 #     2022-Jun-02: migrate from CanopyLayers
 #     2022-Jun-02: rename SolarAngles to SunSensorGeometry
 #     2022-Jun-02: add extra fields HAA, HSA, saa, and vaa, and remove field raa (relative azimuth angle, will be computed based on saa and vaa)
+#     2022-Jul-20: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -18,51 +19,20 @@ Structure that stores sun sensor geometry information.
 $(TYPEDFIELDS)
 
 """
-mutable struct SunSensorGeometry{FT<:AbstractFloat}
+Base.@kwdef mutable struct SunSensorGeometry{FT<:AbstractFloat}
     # parameters that do not change with time
     "Hill facing azimuth angle `[°]`, 0 for North, 180 for south"
-    HAA::FT
+    HAA::FT = 0
     "Hill slope angle `[°]`"
-    HSA::FT
+    HSA::FT = 0
 
     # parameters that do not change with time
     "Solar azimuth angle `[°]`, a function of time"
-    saa::FT
+    saa::FT = 180
     "Solar zenith angle `[°]`, a function of lat and time"
-    sza::FT
+    sza::FT = 30
     "Viewing azimuth angle `[°]`"
-    vaa::FT
+    vaa::FT = 180
     "Viewing zenith angle `[°]`"
-    vza::FT
+    vza::FT = 0
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jun-02: add constructor
-#
-#######################################################################################################################################################################################################
-"""
-
-    SunSensorGeometry{FT}(; haa::Number = 0, hsa::Number = 0, saa::Number = 180, sza::Number = 30, vaa::Number = 180, vza::Number = 0) where {FT<:AbstractFloat}
-
-Constructor for [`SunSensorGeometry`](@ref), given
-- `haa` Hill facing azimuth angle
-- `hsa` Hill slope angle
-- `saa` Solar azimuth angle
-- `sza` Solar zenith angle
-- `vaa` Viewing azimuth angle
-- `vza` Viewing zenith angle
-"""
-SunSensorGeometry{FT}(; haa::Number = 0, hsa::Number = 0, saa::Number = 180, sza::Number = 30, vaa::Number = 180, vza::Number = 0) where {FT<:AbstractFloat} = (
-    return SunSensorGeometry{FT}(
-                haa,    # HAA
-                hsa,    # HSA
-                saa,    # saa
-                sza,    # sza
-                vaa,    # vaa
-                vza     # vza
-    )
-);
