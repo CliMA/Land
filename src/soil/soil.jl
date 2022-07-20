@@ -156,7 +156,7 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
 
     # prognostic variables that change with time
     "Total stored energy per volume `[J m⁻³]`"
-    e::FT = T_25() * (CP * Ρ + VC.Θ_SAT * CP_L() * ρ_H₂O())
+    e::FT = T₂₅() * (CP * Ρ + VC.Θ_SAT * CP_L() * ρ_H₂O())
     "Soil water content"
     θ::FT = VC.Θ_SAT
 
@@ -166,7 +166,7 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     "Soil hydraulic conductance per area `[mol m⁻² s⁻¹ MPa⁻¹]`"
     k::FT = 0
     "Temperature `[K]`"
-    t::FT = T_25()
+    t::FT = T₂₅()
     "Combined soil thermal conductance `[W m⁻² K⁻¹]`"
     λ_thermal::FT = 0
     "Matric potential `[MPa]`"

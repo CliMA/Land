@@ -25,9 +25,9 @@ Base.@kwdef mutable struct Root{FT<:AbstractFloat}
 
     # prognostic variables that change with time (# TODO: add wood storage as well)
     "Total stored energy in water `[J]`"
-    e::FT = T_25() * sum(HS.v_storage) * CP_L_MOL(FT)
+    e::FT = T₂₅() * sum(HS.v_storage) * CP_L_MOL(FT)
     "Current temperature"
-    t::FT = T_25()
+    t::FT = T₂₅()
 
     # diagnostic variables that change with time
     "Marginal increase in energy `[W]`"

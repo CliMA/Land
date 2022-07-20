@@ -4,6 +4,8 @@
 # General
 #     2022-Jul-08: add struct for universal constants
 #     2022-Jul-08: add field and thus wrapper for thermal conductivity of liquid water
+#     2022-Jul-20: add fields F_O₂, CP_D, CP_I
+#     2022-Jul-20: rename field LH_V0 to LH_V₀, T_0 to T₀
 #
 #######################################################################################################################################################################################################
 """
@@ -20,10 +22,16 @@ $(TYPEDFIELDS)
 Base.@kwdef mutable struct UniversalConstants
     "Avogadro's number `[molecule mol⁻¹]`"
     AVOGADRO::Float64 = 6.02214076e23
+    "Isobaric specific heat of dry air `[J kg⁻¹ K⁻¹]`"
+    CP_D::Float64 = 1003.5
+    "Isobaric specific heat of ice water `[J kg⁻¹ K⁻¹]`"
+    CP_I::Float64 = 2108
     "Isobaric specific heat of liquid water `[J kg⁻¹ K⁻¹]`"
     CP_L::Float64 = 4181
     "Isobaric specific heat of water vapor `[J kg⁻¹ K⁻¹]`"
     CP_V::Float64 = 1859
+    "O₂ fraction in air `[-]`"
+    F_O₂::Float64 = 0.2095
     "Universal gas constant `[J mol⁻¹ K⁻¹]`"
     GAS_R::Float64 = 8.3144598
     "Gravity of the Earth `[m s⁻²]`"
@@ -36,8 +44,8 @@ Base.@kwdef mutable struct UniversalConstants
     K_STEFAN::Float64 = 5.670e-8
     "Von Karman constant `[-]`"
     K_VON_KARMAN::Float64 = 0.4
-    "Latent heat vaporization at ``T_0`` `[K kg⁻¹]`"
-    LH_V0::Float64 = 2.5008e6
+    "Latent heat vaporization at T₀ `[K kg⁻¹]`"
+    LH_V₀::Float64 = 2.5008e6
     "Light speed in vacuum `[m s⁻¹]`"
     LIGHT_SPEED::Float64 = 2.99792458e8
     "Molar mass of dry air `[kg mol⁻¹]`"
@@ -49,7 +57,7 @@ Base.@kwdef mutable struct UniversalConstants
     "Water vapor pressure at triple temperature `[Pa]`"
     PRESS_TRIPLE::Float64 = 611.657
     "Freezing temperature of water `[K]`"
-    T_0::Float64 = 273.15
+    T₀::Float64 = 273.15
     "Triple temperature of water `[K]`"
     T_TRIPLE::Float64 = 273.16
     "Mean number of days per year [day]"
@@ -74,19 +82,31 @@ const UNIVERSAL_CONSTANTS = UniversalConstants();
 AVOGADRO(FT=Float64) = FT(UNIVERSAL_CONSTANTS.AVOGADRO);
 
 """ Isobaric specific heat of dry air `[J kg⁻¹ K⁻¹]` """
-CP_D(FT=Float64) = GAS_R(FT) / M_DRYAIR(FT) / FT(3.5);
+CP_D(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_D);;
 
-""" Isobaric specific heat of dry air `[J mol⁻¹ K⁻¹]` """
-CP_D_MOL(FT=Float64) = GAS_R(FT) / FT(3.5);
+""" Isobaric specific heat of dry air per mole `[J mol⁻¹ K⁻¹]` """
+CP_D_MOL(FT=Float64) = CP_D(FT) * M_DRYAIR(FT);
+
+""" Isobaric specific heat of ice water `[J kg⁻¹ K⁻¹]` """
+CP_I(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_I);
+
+""" Isobaric specific heat of ice water per mole `[J mol⁻¹ K⁻¹]` """
+CP_I_MOL(FT=Float64) = CP_I(FT) * M_H₂O(FT);
 
 """ Isobaric specific heat of liquid water `[J kg⁻¹ K⁻¹]` """
 CP_L(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_L);
 
-""" Isobaric specific heat of liquid water `[J mol⁻¹ K⁻¹]` """
+""" Isobaric specific heat of liquid water per mole `[J mol⁻¹ K⁻¹]` """
 CP_L_MOL(FT=Float64) = CP_L(FT) * M_H₂O(FT);
 
 """ Isobaric specific heat of water vapor `[J kg⁻¹ K⁻¹]` """
 CP_V(FT=Float64) = FT(UNIVERSAL_CONSTANTS.CP_V);
+
+""" Isobaric specific heat of water vapor per mole `[J mol⁻¹ K⁻¹]` """
+CP_V_MOL(FT=Float64) = CP_V(FT) * M_H₂O(FT);
+
+""" O₂ fraction in air `[-]` """
+F_O₂(FT=Float64) = FT(UNIVERSAL_CONSTANTS.F_O₂);
 
 """ Universal gas constant `[J mol⁻¹ K⁻¹]` """
 GAS_R(FT=Float64) = FT(UNIVERSAL_CONSTANTS.GAS_R);
@@ -106,8 +126,8 @@ K_STEFAN(FT=Float64) = FT(UNIVERSAL_CONSTANTS.K_STEFAN);
 """ Von Karman constant `[-]` """
 K_VON_KARMAN(FT=Float64) = FT(UNIVERSAL_CONSTANTS.K_VON_KARMAN);
 
-""" Latent heat vaporization at ``T_0`` `[K kg⁻¹]` """
-LH_V0(FT=Float64) = FT(UNIVERSAL_CONSTANTS.LH_V0);
+""" Latent heat vaporization at T₀ `[K kg⁻¹]` """
+LH_V₀(FT=Float64) = FT(UNIVERSAL_CONSTANTS.LH_V₀);
 
 """ Light speed in vacuum `[m s⁻¹]` """
 LIGHT_SPEED(FT=Float64) = FT(UNIVERSAL_CONSTANTS.LIGHT_SPEED);
@@ -128,13 +148,13 @@ PRESS_TRIPLE(FT=Float64) = FT(UNIVERSAL_CONSTANTS.PRESS_TRIPLE);
 R_V(FT=Float64) = GAS_R(FT) / M_H₂O(FT);
 
 """ Gas constant times 298.15 K `[J mol⁻¹]` """
-RT_25(FT=Float64) = GAS_R(FT) * T_25(FT);
+RT₂₅(FT=Float64) = GAS_R(FT) * T₂₅(FT);
 
 """ Freezing temperature of water `[K]` """
-T_0(FT=Float64) = FT(UNIVERSAL_CONSTANTS.T_0);
+T₀(FT=Float64) = FT(UNIVERSAL_CONSTANTS.T₀);
 
 """ Kelvin temperature at 25 Celcius `[K]` """
-T_25(FT=Float64) = T_0(FT) + 25;
+T₂₅(FT=Float64) = T₀(FT) + 25;
 
 """ Triple temperature of water `[K]` """
 T_TRIPLE(FT=Float64) = FT(UNIVERSAL_CONSTANTS.T_TRIPLE);

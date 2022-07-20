@@ -76,13 +76,13 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25()
+    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T₂₅()
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
     g_H₂O_s::FT = 0.01
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
     ppar::FT = 1000
     "Current leaf temperature"
-    t::FT = T_25()
+    t::FT = T₂₅()
 
     # dignostic variables that change with time
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -159,13 +159,13 @@ Base.@kwdef mutable struct Leaves1D{FT<:AbstractFloat} <: AbstractLeaf{FT}
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::Vector{FT} = FT[(CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25(), (CP * BIO.lma * 10 + HS2.v_storage * CP_L_MOL(FT)) * T_25()]
+    e::Vector{FT} = FT[(CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T₂₅(), (CP * BIO.lma * 10 + HS2.v_storage * CP_L_MOL(FT)) * T₂₅()]
     "Stomatal conductance to water vapor `[mol m⁻² s⁻¹]`"
     g_H₂O_s::Vector{FT} = FT[0.01, 0.01]
     "Absorbed photosynthetically active radiation used for photosynthesis `[μmol m⁻² s⁻¹]`"
     ppar::Vector{FT} = FT[1000, 200]
     "Current leaf temperature"
-    t::Vector{FT} = FT[T_25(), T_25()]
+    t::Vector{FT} = FT[T₂₅(), T₂₅()]
 
     # dignostic variables that change with time
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -251,7 +251,7 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
 
     # prognostic variables that change with time
     "Total stored energy per area `[J m⁻²]`"
-    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T_25()
+    e::FT = (CP * BIO.lma * 10 + HS.v_storage * CP_L_MOL(FT)) * T₂₅()
     "Stomatal conductance to water vapor for shaded leaves `[mol m⁻² s⁻¹]`"
     g_H₂O_s_shaded::FT = 0.01
     "Stomatal conductance to water vapor for sunlit leaves `[mol m⁻² s⁻¹]`"
@@ -261,7 +261,7 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Absorbed photosynthetically active radiation used for photosynthesis for sunlit leaves `[μmol m⁻² s⁻¹]`"
     ppar_sunlit::Matrix{FT} = 1000 .* ones(FT, DIM_INCL, DIM_AZI)
     "Current leaf temperature"
-    t::FT = T_25()
+    t::FT = T₂₅()
 
     # dignostic variables that change with time
     "Gross photosynthetic rate for shaded leaves `[μmol m⁻² s⁻¹]`"

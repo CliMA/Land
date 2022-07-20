@@ -53,30 +53,24 @@ using Test
             end;
 
             # Leaf
-            leaf_c3 = ClimaCache.Leaf{FT}("C3");
-            leaf_c4 = ClimaCache.Leaf{FT}("C4");
-            leaf_cy = ClimaCache.Leaf{FT}("C3Cytochrome");
-            for leaf in [leaf_c3, leaf_c4, leaf_cy]
+            leaf_c3 = ClimaCache.Leaf{FT}();
+            for leaf in [leaf_c3]
                 @test FT_test(leaf, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
             end;
 
             # Leaves1D
-            leaves_c3 = ClimaCache.Leaves1D{FT}("C3");
-            leaves_c4 = ClimaCache.Leaves1D{FT}("C4");
-            leaves_cy = ClimaCache.Leaves1D{FT}("C3Cytochrome");
-            for leaves in [leaves_c3, leaves_c4, leaves_cy]
+            leaves_c3 = ClimaCache.Leaves1D{FT}();
+            for leaves in [leaves_c3]
                 @test FT_test(leaves, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
             end;
 
             # Leaves2D
-            leaves_c3 = ClimaCache.Leaves2D{FT}("C3");
-            leaves_c4 = ClimaCache.Leaves2D{FT}("C4");
-            leaves_cy = ClimaCache.Leaves2D{FT}("C3Cytochrome");
-            for leaves in [leaves_c3, leaves_c4, leaves_cy]
+            leaves_c3 = ClimaCache.Leaves2D{FT}();
+            for leaves in [leaves_c3]
                 @test FT_test(leaves, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
