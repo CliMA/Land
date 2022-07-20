@@ -17,8 +17,7 @@ module ClimaCache
 using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
-using MAT: matread
-using PkgUtility: read_csv
+using NetcdfIO: read_nc
 using Statistics: mean
 using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
@@ -30,15 +29,11 @@ using WaterPhysics: saturation_vapor_pressure
 # General
 #     2020-May-30: put the 2017 mat file in an artifact
 #     2020-Aug-30: add the updated 2021 mat file along with that of 2017 into a new artifact
+#     2022-Jul-20: use reprocessed data for the default constructor
 #
 #######################################################################################################################################################################################################
-const FILE_SUN    = artifact"land_model_spectrum_V1" * "/sun.mat";
 const LAND_2017   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2017.nc";
 const LAND_2021   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.nc";
-const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
-const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
-const SOIL_GSV    = artifact"land_model_spectrum_V1" * "/GSV.csv";
-const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
 
 
 # include the utility types and structures

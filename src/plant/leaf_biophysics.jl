@@ -157,4 +157,4 @@ Constructor for `HyperspectralLeafBiophysics`, given
 - `wls` [`WaveLengthSet`](@ref) type structure
 
 """
-HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat} = HyperspectralLeafBiophysics{FT}(DIM_SIF = wls.NΛ_SIF, DIM_SIFE = wls.NΛ_SIFE, DIM_WL = wls.NΛ);
+HyperspectralLeafBiophysics{FT}(wls::WaveLengthSet{FT}) where {FT<:AbstractFloat} = HyperspectralLeafBiophysics{FT}(DIM_SIF = wls.DIM_SIF, DIM_SIFE = wls.DIM_SIFE, DIM_WL = wls.DIM_WL);

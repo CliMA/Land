@@ -266,8 +266,8 @@ HyperspectralMLCanopy{FT}(
     _p_incl  = ones(_n_incl) / _n_incl;
     _θ_azi   = collect(FT,5:10:360);
     _x_bnds  = collect(FT,0:-1/n_layer:-1-eps(FT));
-    _can_opt = HyperspectralMLCanopyOpticalProperty{FT}(DIM_AZI = 36, DIM_INCL = _n_incl, DIM_LAYER = n_layer, DIM_SIF = wls.NΛ_SIF, DIM_SIFE = wls.NΛ_SIFE, DIM_WL = wls.NΛ);
-    _can_rad = HyperspectralMLCanopyRadiationProfile{FT}(DIM_AZI = 36, DIM_INCL = _n_incl, DIM_LAYER = n_layer, DIM_PAR = wls.NΛ_PAR, DIM_SIF = wls.NΛ_SIF, DIM_WL = wls.NΛ);
+    _can_opt = HyperspectralMLCanopyOpticalProperty{FT}(DIM_AZI = 36, DIM_INCL = _n_incl, DIM_LAYER = n_layer, DIM_SIF = wls.DIM_SIF, DIM_SIFE = wls.DIM_SIFE, DIM_WL = wls.DIM_WL);
+    _can_rad = HyperspectralMLCanopyRadiationProfile{FT}(DIM_AZI = 36, DIM_INCL = _n_incl, DIM_LAYER = n_layer, DIM_PAR = wls.DIM_PAR, DIM_SIF = wls.DIM_SIF, DIM_WL = wls.DIM_WL);
     _cos_θ   = cosd.(_θ_incl);
     _cos²_θ  = _cos_θ .^ 2;
 

@@ -16,7 +16,6 @@ VanGenuchten{FT}(name::String) where {FT<:AbstractFloat}
 AbstractSoilAlbedo
 BroadbandSoilAlbedo
 HyperspectralSoilAlbedo
-HyperspectralSoilAlbedo{FT}(wls::WaveLengthSet{FT}= WaveLengthSet{FT}()) where {FT<:AbstractFloat}
 SoilLayer
 Soil
 Soil{FT}(zs::Vector, area::Number, wls::WaveLengthSet{FT} = WaveLengthSet{FT}(); soil_type::String = "Loam") where {FT<:AbstractFloat}
@@ -101,20 +100,15 @@ Wang2SM
 ## Radiation
 ```@docs
 WaveLengthSet
-WaveLengthSet{FT}(swl::Vector = WAVELENGTHS; opti::String = OPTI_2021) where {FT<:AbstractFloat}
 AbstractRadiation
 BroadbandRadiation
-BroadbandRadiation{FT}() where {FT<:AbstractFloat}
 HyperspectralRadiation
-HyperspectralRadiation{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); file::String = FILE_SUN) where {FT<:AbstractFloat}
 HyperspectralAbsorption
-HyperspectralAbsorption{FT}(wls::WaveLengthSet = WaveLengthSet{FT}(); opti::String = OPTI_2021) where {FT<:AbstractFloat}
 SunSensorGeometry
 SunSensorGeometry{FT}(; haa::Number = 0, hsa::Number = 0, saa::Number = 180, sza::Number = 30, vaa::Number = 180, vza::Number = 0) where {FT<:AbstractFloat}
 HyperspectralMLCanopyOpticalProperty
 AbstractCanopyRadiationProfile
 BroadbandSLCanopyRadiationProfile
-BroadbandSLCanopyRadiationProfile{FT}(; n_incl::Int = 9) where {FT<:AbstractFloat}
 HyperspectralMLCanopyRadiationProfile
 AbstractLIDFAlgorithm
 VerhoefLIDF

@@ -274,7 +274,7 @@ MonoMLGrassSPAC{FT}(
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
 
     # create leaf hyperspectral absorption features
-    _lha = HyperspectralAbsorption{FT}(wls);
+    _lha = HyperspectralAbsorption{FT}();
 
     # create sun sensor geometry
     _angles = SunSensorGeometry{FT}();
@@ -283,7 +283,7 @@ MonoMLGrassSPAC{FT}(
     _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
-    _rad_sw = HyperspectralRadiation{FT}(wls);
+    _rad_sw = HyperspectralRadiation{FT}();
 
     # return plant
     return MonoMLGrassSPAC{FT}(
@@ -513,7 +513,7 @@ MonoMLPalmSPAC{FT}(
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
 
     # create leaf hyperspectral absorption features
-    _lha = HyperspectralAbsorption{FT}(wls);
+    _lha = HyperspectralAbsorption{FT}();
 
     # create sun sensor geometry
     _angles = SunSensorGeometry{FT}();
@@ -522,7 +522,7 @@ MonoMLPalmSPAC{FT}(
     _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
-    _rad_sw = HyperspectralRadiation{FT}(wls);
+    _rad_sw = HyperspectralRadiation{FT}();
 
     # return plant
     return MonoMLPalmSPAC{FT}(
@@ -768,7 +768,7 @@ MonoMLTreeSPAC{FT}(
     _airs = [AirLayer{FT}() for _i in 1:length(zas)-1];
 
     # create leaf hyperspectral absorption features
-    _lha = HyperspectralAbsorption{FT}(wls);
+    _lha = HyperspectralAbsorption{FT}();
 
     # create sun sensor geometry
     _angles = SunSensorGeometry{FT}();
@@ -777,7 +777,7 @@ MonoMLTreeSPAC{FT}(
     _soil = Soil{FT}(zss, area, wls);
 
     # create shortwave radiation
-    _rad_sw = HyperspectralRadiation{FT}(wls);
+    _rad_sw = HyperspectralRadiation{FT}();
 
     # return plant
     return MonoMLTreeSPAC{FT}(

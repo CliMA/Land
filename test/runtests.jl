@@ -57,11 +57,7 @@ using Test
             leaf_c3 = ClimaCache.Leaf{FT}("C3");
             leaf_c4 = ClimaCache.Leaf{FT}("C4");
             leaf_cy = ClimaCache.Leaf{FT}("C3Cytochrome");
-            wls     = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
-            leaf_e3 = ClimaCache.Leaf{FT}("C3", wls);
-            leaf_e4 = ClimaCache.Leaf{FT}("C4", wls);
-            leaf_ey = ClimaCache.Leaf{FT}("C3Cytochrome", wls);
-            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_e3, leaf_e4, leaf_ey]
+            for leaf in [leaf_c3, leaf_c4, leaf_cy]
                 @test FT_test(leaf, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
@@ -81,11 +77,7 @@ using Test
             leaves_c3 = ClimaCache.Leaves2D{FT}("C3");
             leaves_c4 = ClimaCache.Leaves2D{FT}("C4");
             leaves_cy = ClimaCache.Leaves2D{FT}("C3Cytochrome");
-            wls       = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
-            leaves_e3 = ClimaCache.Leaves2D{FT}("C3", wls);
-            leaves_e4 = ClimaCache.Leaves2D{FT}("C4", wls);
-            leaves_ey = ClimaCache.Leaves2D{FT}("C3Cytochrome", wls);
-            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_e3, leaves_e4, leaves_ey]
+            for leaves in [leaves_c3, leaves_c4, leaves_cy]
                 @test FT_test(leaves, FT);
                 # NaN test will not pass because of the NaNs in temperature dependency structures
                 # @test NaN_test(leaf);
@@ -93,9 +85,8 @@ using Test
 
             # LeafBiophysics
             lbio1 = ClimaCache.HyperspectralLeafBiophysics{FT}();
-            lbio2 = ClimaCache.HyperspectralLeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));
-            lbio3 = ClimaCache.BroadbandLeafBiophysics{FT}();
-            for lbio in [lbio1, lbio2, lbio3]
+            lbio2 = ClimaCache.BroadbandLeafBiophysics{FT}();
+            for lbio in [lbio1, lbio2]
                 @test FT_test(lbio, FT);
                 @test NaN_test(lbio);
             end;
@@ -190,11 +181,10 @@ using Test
         for FT in [Float32, Float64]
             # Wave length sets
             wls1 = ClimaCache.WaveLengthSet{FT}();
-            wls2 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500));
-            wls3 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
-            for wls in [wls1, wls2, wls3]
+            wls2 = ClimaCache.WaveLengthSet{FT}(DATASET = ClimaCache.LAND_2017);
+            for wls in [wls1, wls2]
                 @test FT_test(wls, FT);
-                # NaN test will not pass because of the NaNs in wls2 and wls3
+                # NaN test will not pass because of the NaNs in wls2
                 # @test NaN_test(wls);
             end;
 
