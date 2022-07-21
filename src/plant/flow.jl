@@ -43,7 +43,7 @@ Base.@kwdef mutable struct NonSteadyStateFlow{FT<:AbstractFloat} <: AbstractFlow
     "Dimension of capaciatance elements"
     DIM_CAPACITY::Int = 1
 
-    # Dignostic variables
+    # Diagnostic variables
     "Flow rate into the organ `[mol s⁻¹]` (for root and stem) or `[mol m⁻² s⁻¹]` (for leaf)"
     f_in::FT = 0
     "Flow rate out of the organ `[mol s⁻¹]` (for root and stem) or `[mol m⁻² s⁻¹]` (for leaf)"
@@ -78,7 +78,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct SteadyStateFlow{FT<:AbstractFloat} <: AbstractFlowProfile{FT}
-    # Dignostic variables
+    # Diagnostic variables
     "Flow rate through the organ `[mol s⁻¹]` (for root and stem) or `[mol m⁻² s⁻¹]` (for leaf)"
     flow::FT = 0
 end

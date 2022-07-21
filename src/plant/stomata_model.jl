@@ -64,8 +64,6 @@ struct BetaParameterΘ <: AbstractBetaParameter end
 #     2022-Jun-30: add struct for modular beta function
 #     2022-Jun-30: add more types to PARAM_X
 #     2022-Jul-07: use BetaParameterKleaf as the default param_x
-#     2022-Jul-08: use @kwdef for the constructor
-#     2022-Jul-12: add FT control to struct
 #     2022-Jul-12: add fields β for stomatal models
 #
 #######################################################################################################################################################################################################
@@ -81,7 +79,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct BetaFunction{FT<:AbstractFloat}
-    # parameters that do not change with time
+    # General model information
     "Function to turn variables to β tuning factor"
     FUNC::Function = (x -> x)
     "Input parameter to base on"
@@ -128,7 +126,6 @@ abstract type AbstractStomataModel{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Anderegg model
-#     2022-Jul-08: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -147,6 +144,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct AndereggSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
+    # General model information
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻²]`"
     A::FT = 0.5
     "Quadratic equation parameter `[μmol m⁻² s⁻¹ MPa⁻¹]`"
@@ -162,7 +160,7 @@ end
 # General
 #     2022-Jun-30: add struct for Ball Berry model
 #     2022-Jul-07: add time constant
-#     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-20: rename Β and Τ (both greek) to β and τ
 #
 #######################################################################################################################################################################################################
 """
@@ -180,15 +178,15 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct BallBerrySM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
-    # parameters that do not change with time
+    # General model information
     "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
     G0::FT = 0.025
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 9
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction{FT}()
+    β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
-    Τ::FT = 600
+    τ::FT = 600
 end
 
 
@@ -197,7 +195,6 @@ end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Eller model
-#     2022-Jul-08: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -211,6 +208,7 @@ Empty struct for Eller stomatal model. The equation used for Eller type model is
 where K is ``\\dfrac{∂E}{∂P}``.
 """
 Base.@kwdef mutable struct EllerSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
+    # General model information
     "Slope constant `[mol² m⁻² s⁻¹ μmol⁻¹]`"
     K::FT = 1e-7
 end
@@ -221,9 +219,9 @@ end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Gentine model
-#     2022-Jul-07: add field Β to generalize the model
+#     2022-Jul-07: add field Β to generalize the model as others
 #     2022-Jul-07: add time constant
-#     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-20: rename Β and Τ (both greek) to β and τ
 #
 #######################################################################################################################################################################################################
 """
@@ -241,15 +239,15 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct GentineSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
-    # parameters that do not change with time
+    # General model information
     "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
     G0::FT = 0.025
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 9
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction{FT}(FUNC = (x -> x), PARAM_X = BetaParameterKleaf(), PARAM_Y = BetaParameterG1())
+    β::BetaFunction = BetaFunction{FT}(FUNC = (x -> x), PARAM_X = BetaParameterKleaf(), PARAM_Y = BetaParameterG1())
     "Time constant for the prognostic stomatal conductance `[s]`"
-    Τ::FT = 600
+    τ::FT = 600
 end
 
 
@@ -259,7 +257,7 @@ end
 # General
 #     2022-Jun-30: add struct for Leuning model
 #     2022-Jul-07: add time constant
-#     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-20: rename Β and Τ (both greek) to β and τ
 #
 #######################################################################################################################################################################################################
 """
@@ -277,7 +275,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct LeuningSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
-    # parameters that do not change with time
+    # General model information
     "Fitting parameter of d/d0 below the fraction, same unit as vpd `[Pa]`"
     D0::FT = 3000
     "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
@@ -285,9 +283,9 @@ Base.@kwdef mutable struct LeuningSM{FT<:AbstractFloat} <: AbstractStomataModel{
     "Slope of conductance-photosynthesis correlation `[-]`"
     G1::FT = 8
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction{FT}()
+    β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
-    Τ::FT = 600
+    τ::FT = 600
 end
 
 
@@ -297,7 +295,7 @@ end
 # General
 #     2022-Jun-30: add struct for Medlyn model
 #     2022-Jul-07: add time constant
-#     2022-Jul-08: use @kwdef for the constructor
+#     2022-Jul-20: rename Β and Τ (both greek) to β and τ
 #
 #######################################################################################################################################################################################################
 """
@@ -315,15 +313,15 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct MedlynSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
-    # parameters that do not change with time
+    # General model information
     "Minimal stomatal conductance `[mol m⁻² s⁻¹]`"
     G0::FT = 0.025
     "Slope of conductance-photosynthesis correlation `[sqrt(Pa)]`"
     G1::FT = 125
     "Beta function to force stomatal response to soil moisture"
-    Β::BetaFunction = BetaFunction{FT}()
+    β::BetaFunction = BetaFunction{FT}()
     "Time constant for the prognostic stomatal conductance `[s]`"
-    Τ::FT = 600
+    τ::FT = 600
 end
 
 
@@ -332,7 +330,6 @@ end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Sperry model
-#     2022-Jul-08: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -346,6 +343,7 @@ Empty struct for Sperry stomatal model. The equation used for Sperry type model 
 where K is ``\\dfrac{∂E}{∂P}``.
 """
 Base.@kwdef mutable struct SperrySM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
+    # General model information
     "Slope constant `[mol² m⁻² s⁻¹ μmol⁻¹]`"
     K::FT = 1e-7
 end
@@ -356,8 +354,7 @@ end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Wang model
-#     2022-Jul-08: use @kwdef for the constructor
-#     2022-Jul-11: add field fitness factor
+#     2022-Jul-11: add fields: F_FITNESS, f_view, and ppar_mem
 #
 #######################################################################################################################################################################################################
 """
@@ -370,13 +367,13 @@ Empty struct for Wang stomatal model. The equation used for Wang type model is
 ```
 """
 Base.@kwdef mutable struct WangSM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
-    # parameters that do not change with time
+    # General model information
     "Fitness factor"
     F_FITNESS::FT = 0.1
     "Slope constant `[mol² m⁻² s⁻¹ μmol⁻¹]`"
     K::FT = 1e-7
 
-    # diagnostic variables that change with time
+    # Diagnostic variables
     "Ratio that leaf area is exposed to external sources/sinks (not other leaves, e.g., 2/LAI for canopy on average, used for nocturnal transpiration)"
     f_view::FT = 2
     "Memory PPAR `[μmol m⁻² s⁻¹]`"
@@ -389,7 +386,6 @@ end
 # Changes to this struct
 # General
 #     2022-Jun-30: add struct for Wang model modified from Anderegg model
-#     2022-Jul-08: use @kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -408,6 +404,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct Wang2SM{FT<:AbstractFloat} <: AbstractStomataModel{FT}
+    # General model information
     "Quadratic equation parameter `[MPa⁻²]`"
     A::FT = 0.1
     "Slope constant `[mol² m⁻² s⁻¹ μmol⁻¹]`"

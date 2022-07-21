@@ -117,7 +117,7 @@ Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat} <: Abs
     "Protein content in lma (pro = lma - cbc) `[g cm⁻²]`"
     pro::FT = 0
 
-    # Dignostic variables
+    # Diagnostic variables
     "Specific absorption coefficients of all materials"
     k_all::Vector{FT} = zeros(FT, DIM_WL)
     "Fluorescence excitation matrix backwards `[-]`"

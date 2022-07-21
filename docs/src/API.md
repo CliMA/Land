@@ -48,6 +48,8 @@ AbstractLeafBiophysics
 BroadbandLeafBiophysics
 HyperspectralLeafBiophysics
 VanDerTolFluorescenceModel
+VDTModelAll
+VDTModelDrought
 AbstractReactionCenter
 CytochromeReactionCenter
 VJPReactionCenter

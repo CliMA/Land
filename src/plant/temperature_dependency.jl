@@ -24,7 +24,6 @@ abstract type AbstractTemperatureDependency{FT<:AbstractFloat} end
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Arrhenius
 #     2022-Jan-13: define the struct mutable, use ΔHA directly in the struct, add field T_REF
-#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -42,7 +41,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct Arrhenius{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
-    # parameters that do not change with time
+    # General model information
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"
@@ -58,7 +57,6 @@ end
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to ArrheniusPeak
 #     2022-Jan-13: define the struct mutable, use ΔHA/ΔHD/ΔSV directly in the struct, add field T_REF/VAL_REF
-#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -78,7 +76,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct ArrheniusPeak{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
-    # parameters that do not change with time
+    # General model information
     "Reference temperature `[K]`"
     T_REF::FT
     "Uncorrected vakye at reference temperature"
@@ -98,7 +96,6 @@ end
 # General
 #     2022-Jan-13: migrate from Photosynthesis.jl, rename to Q10
 #     2022-Jan-14: make structure mutable
-#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -116,7 +113,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct Q10{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
-    # parameters that do not change with time
+    # General model information
     "Power of Q10 correction"
     Q_10::FT
     "Reference temperature `[K]`"
@@ -132,7 +129,6 @@ end
 # General
 #     2022-Jan-14: migrate from Photosynthesis.jl
 #     2022-Feb-11: add temperature dependent Jmax and Vcmax TD from CLM
-#     2022-Jul-19: use kwdef for the constructor
 # Sources
 #     Lavigne and Ryan (1997) Growth and maintenance respiration rates of aspen, blackspruce and jack pine stems at northern and southern BOREAS sites
 #     Bernacchi et al. (2001) Improved temperature response functions for models of Rubisco‐limited photosynthesis

@@ -22,7 +22,6 @@ abstract type AbstractPVCurve{FT<:AbstractFloat} end
 # Changes to this struct
 # General
 #     2022-Apr-20: add linear PV curve
-#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -37,6 +36,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct LinearPVCurve{FT<:AbstractFloat} <: AbstractPVCurve{FT}
+    # General model information
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
     K_REFILL::FT = 1e4
     "Slope of the linear PV curve (relative to maximum) `[MPa⁻¹]`"
@@ -49,8 +49,7 @@ end
 # Changes to this struct
 # General
 #     2022-May-24: add segmented PV curve
-#     2022-May-25: fix floating number type control
-#     2022-Jul-19: use kwdef for the constructor
+#     2022-Jul-20: rename Ε_BULK (greek) to ϵ_BULK
 #
 #######################################################################################################################################################################################################
 """
@@ -65,6 +64,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct SegmentedPVCurve{FT<:AbstractFloat} <: AbstractPVCurve{FT}
+    # General model information
     "n_o / maximum V `[mol m⁻³]`"
     C_ALL::FT = 300
     "Conductance for refilling (relative to maximum) `[MPa⁻¹ s⁻¹]`"
@@ -74,5 +74,5 @@ Base.@kwdef mutable struct SegmentedPVCurve{FT<:AbstractFloat} <: AbstractPVCurv
     "Relative water content at turgor loss point"
     RWC_TLP::FT = 0.8
     "Bulk modulus of elasticity `[MPa]`"
-    Ε_BULK::FT = 20
+    ϵ_BULK::FT = 20
 end

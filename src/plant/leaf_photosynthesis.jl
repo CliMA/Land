@@ -88,7 +88,7 @@ Base.@kwdef mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhoto
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_cmax25::FT = 50
 
-    # Dignostic variables
+    # Diagnostic variables
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_gross::FT = 0
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -195,7 +195,7 @@ Base.@kwdef mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_cmax25::FT = 0.75
 
-    # Dignostic variables
+    # Diagnostic variables
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_gross::FT = 0
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
@@ -282,7 +282,7 @@ Base.@kwdef mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     "Maximal PEP carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     v_pmax25::FT = 50
 
-    # Dignostic variables
+    # Diagnostic variables
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
     a_gross::FT = 0
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
