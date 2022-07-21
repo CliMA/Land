@@ -20,13 +20,12 @@ abstract type AbstractHydraulicSystem{FT<:AbstractFloat} end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this type
+# Changes to this struct
 # General
 #     2022-May-25: add leaf hydraulic system
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-Jun-13: use Union instead of Abstract... for type definition
 #     2022-Jul-07: add e_crit as a field
-#     2022-Jul-18: use kwdef for the constructor
 #     2022-Jul-19: add dimension control to struct
 #
 #######################################################################################################################################################################################################
@@ -42,7 +41,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct LeafHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
-    # dimensions
+    # Dimensions
     "Dimension of xylem slices"
     DIM_XYLEM::Int = 5
 
@@ -92,13 +91,12 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this type
+# Changes to this struct
 # General
 #     2022-May-25: add root hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-Jun-13: use Union instead of Abstract... for type definition
-#     2022-Jul-18: use kwdef for the constructor
 #     2022-Jul-19: add dimension control to struct
 #
 #######################################################################################################################################################################################################
@@ -114,7 +112,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
-    # dimensions
+    # Dimensions
     "Dimension of xylem slices"
     DIM_XYLEM::Int = 5
 
@@ -170,13 +168,12 @@ end
 
 #######################################################################################################################################################################################################
 #
-# Changes to this type
+# Changes to this struct
 # General
 #     2022-May-25: add stem hydraulic system
 #     2022-May-25: rename PV to PVC to be consistent with LeafHydraulics
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-Jun-13: use Union instead of Abstract... for type definition
-#     2022-Jul-18: use kwdef for the constructor
 #     2022-Jul-19: add dimension control to struct
 #
 #######################################################################################################################################################################################################
@@ -192,7 +189,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct StemHydraulics{FT<:AbstractFloat} <: AbstractHydraulicSystem{FT}
-    # dimensions
+    # Dimensions
     "Dimension of xylem slices"
     DIM_XYLEM::Int = 5
 

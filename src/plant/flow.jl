@@ -39,7 +39,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct NonSteadyStateFlow{FT<:AbstractFloat} <: AbstractFlowProfile{FT}
-    # dimensions
+    # Dimensions
     "Dimension of capaciatance elements"
     DIM_CAPACITY::Int = 1
 
