@@ -1,20 +1,16 @@
 name = "LeafOptics"
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
-DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-PkgUtility = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-ClimaCache = "0.3.4, 0.4.0"
-DocStringExtensions = "0.8.6, 0.9.0"
-PkgUtility = "0.2.0"
+ClimaCache = "1.0.0"
 SpecialFunctions = "2.1.0"
 UnPack = "1.0.2"
 julia = "1.6"

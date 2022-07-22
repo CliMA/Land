@@ -4,8 +4,6 @@
 # General
 #     2021-Oct-22: add function to compute leaf level PAR and APAR
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
-#     2022-Feb-02: fix documentation
-#     2022-Feb-02: unpack CONSTANTS only
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #     2022-Jun-27: refactor the function to return PAR, APAR, and PPAR
 #
@@ -29,6 +27,7 @@ rad = HyperspectralRadiation{Float64}();
 par,apar,ppar = leaf_PAR(bio, wls, rad);
 par,apar,ppar = leaf_PAR(bio, wls, rad; APAR_car=false);
 ```
+
 """
 function leaf_PAR(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
     @unpack IΛ_PAR, ΔΛ_PAR, Λ_PAR = wls;
@@ -53,12 +52,12 @@ function leaf_PAR(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, 
     _ppar_diff = photon.(Λ_PAR, _e_ppar_diff);
 
     # total PAR and APAR in μmol photons m⁻² s⁻¹
-    _Σpar_dir   = numerical∫(_par_dir  , ΔΛ_PAR) * 1000;
-    _Σpar_diff  = numerical∫(_par_diff , ΔΛ_PAR) * 1000;
-    _Σapar_dir  = numerical∫(_apar_dir , ΔΛ_PAR) * 1000;
-    _Σapar_diff = numerical∫(_apar_diff, ΔΛ_PAR) * 1000;
-    _Σppar_dir  = numerical∫(_ppar_dir , ΔΛ_PAR) * 1000;
-    _Σppar_diff = numerical∫(_ppar_diff, ΔΛ_PAR) * 1000;
+    _Σpar_dir   = _par_dir'   * ΔΛ_PAR * 1000;
+    _Σpar_diff  = _par_diff'  * ΔΛ_PAR * 1000;
+    _Σapar_dir  = _apar_dir'  * ΔΛ_PAR * 1000;
+    _Σapar_diff = _apar_diff' * ΔΛ_PAR * 1000;
+    _Σppar_dir  = _ppar_dir'  * ΔΛ_PAR * 1000;
+    _Σppar_diff = _ppar_diff' * ΔΛ_PAR * 1000;
 
     return _Σpar_dir + _Σpar_diff, _Σapar_dir + _Σapar_diff, _Σppar_dir + _Σppar_diff
 end

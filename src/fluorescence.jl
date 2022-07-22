@@ -7,8 +7,6 @@
 #     2021-Aug-05: add option to sumulate SIF in photon to photon mode
 #     2021-Oct-22: refactor the function to leaf_SIF to return the SIFs directly
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
-#     2022-Feb-02: fix documentation
-#     2022-Feb-02: unpack CONSTANTS only
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #
 #######################################################################################################################################################################################################
@@ -32,6 +30,7 @@ rad = HyperspectralRadiation{Float64}();
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01);
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01; ϕ_photon=false);
 ```
+
 """
 function leaf_SIF(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}, ϕ::FT = FT(0.01); ϕ_photon::Bool = true) where {FT<:AbstractFloat}
     @unpack IΛ_SIFE, ΔΛ_SIFE, Λ_SIF, Λ_SIFE = wls;

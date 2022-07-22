@@ -6,18 +6,20 @@ using Test
 @testset verbose = true "LeafOptics Test" begin
     @testset "Spectra" begin
         for FT in [Float32, Float64]
-            wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
-            lha = ClimaCache.HyperspectralAbsorption{FT}(wls);
+            wls  = ClimaCache.WaveLengthSet{FT}();
+            bio  = ClimaCache.HyperspectralLeafBiophysics{FT}();
+            lha  = ClimaCache.HyperspectralAbsorption{FT}();
+            spac = ClimaCache.MonoMLTreeSPAC{FT}();
 
-            leaf_spectra!(bio, wls, lha);
+            leaf_spectra!(bio, wls, lha, FT(50));
             @test true;
-            leaf_spectra!(bio, wls, lha; APAR_car=false);
+            leaf_spectra!(bio, wls, lha, FT(50); APAR_car=false);
             @test true;
-            leaf_spectra!(bio, wls, lha; APAR_car=false, α=FT(59));
+            leaf_spectra!(bio, wls, lha, FT(50); APAR_car=false, α=FT(59));
             @test true;
-
             leaf_spectra!(bio, wls, FT(0.1), FT(0.45), FT(0.05), FT(0.25));
+            @test true;
+            leaf_spectra!(spac);
             @test true;
         end;
     end;
@@ -25,7 +27,7 @@ using Test
     @testset "PAR & APAR" begin
         for FT in [Float32, Float64]
             wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
+            bio = ClimaCache.HyperspectralLeafBiophysics{FT}();
             rad = ClimaCache.HyperspectralRadiation{FT}();
 
             par,apar,ppar = leaf_PAR(bio, wls, rad);
@@ -38,7 +40,7 @@ using Test
     @testset "SIF" begin
         for FT in [Float32, Float64]
             wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}(wls);
+            bio = ClimaCache.HyperspectralLeafBiophysics{FT}();
             rad = ClimaCache.HyperspectralRadiation{FT}();
 
             sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01));

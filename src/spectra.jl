@@ -8,8 +8,9 @@
 #######################################################################################################################################################################################################
 """
 This function updates leaf level reflectance, transmittance, and fluorescence spectra related parameters. Supported methods are
-
-$(METHODLIST)
+- Update leaf spectra based on pigment concentrations
+- Update leaf spectra (reflectance and transmittance) to given broadband values
+- Update leaf spectra based on pigment concentrations for the entire SPAC
 
 """
 function leaf_spectra! end
@@ -25,9 +26,8 @@ function leaf_spectra! end
 #     2021-Oct-21: add α to input parameters so that one can roll back to 50° for _τ_α calculation
 #     2021-Nov-29: separate HyperspectralAbsorption as constant struct
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
-#     2022-Feb-02: fix documentation
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
-#     2022-Jun-27: fix documentation
+#     2022-Jul-22: add lwc to function variable list
 # Bug fix
 #     2021-Aug-06: If bio.CBC and bio.PRO are not zero, they are accounted for twice in bio.LMA, thus the spectrum from LMA need to subtract the contribution from CBC and PRO
 # To do
@@ -38,12 +38,13 @@ function leaf_spectra! end
 #######################################################################################################################################################################################################
 """
 
-    leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat}
+    leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}, lwc::FT; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat}
 
 Update leaf reflectance and transmittance spectra, and fluorescence spectrum matrices, given
 - `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
 - `wls` `ClimaCache.WaveLengthSet` type struct that contain wave length bins
 - `lha` `ClimaCache.HyperspectralAbsorption` type struct that contains absorption characteristic curves
+- `lwc` Leaf water content `[mol m⁻²]`
 - `APAR_car` If true, carotenoid absorption is accounted for in PPAR, default is `true`
 - `α` Optimum angle of incidence (default is 40° as in PROSPECT-D, SCOPE uses 59°)
 
@@ -52,26 +53,27 @@ Update leaf reflectance and transmittance spectra, and fluorescence spectrum mat
 wls = WaveLengthSet{Float64}();
 bio = HyperspectralLeafBiophysics{Float64}(wls);
 lha = HyperspectralAbsorption{Float64}(wls);
-leaf_spectra!(bio, wls, lha);
-leaf_spectra!(bio, wls, lha; APAR_car=false);
-leaf_spectra!(bio, wls, lha; APAR_car=false, α=59.0);
+leaf_spectra!(bio, wls, lha, 50.0);
+leaf_spectra!(bio, wls, lha, 50.0; APAR_car=false);
+leaf_spectra!(bio, wls, lha, 50.0; APAR_car=false, α=59.0);
 ```
+
 """
-leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat} = (
+leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}, lwc::FT; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat} = (
     @unpack MESOPHYLL_N, NDUB = bio;
     @unpack K_ANT, K_BROWN, K_CAB, K_CAR_V, K_CAR_Z, K_CBC, K_H₂O, K_LMA, K_PRO, K_PS, NR = lha;
     @unpack IΛ_SIF, IΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
 
     # calculate the average absorption feature and relative Cab and Car partitions
-    bio.k_all    .= (K_CAB   .* bio.cab .+                      # chlorophyll absorption
-                     K_CAR_V .* bio.car .* (1 - bio.f_zeax) .+  # violaxanthin carotenoid absorption
-                     K_CAR_Z .* bio.car .* bio.f_zeax .+        # zeaxanthin carotenoid absorption
-                     K_ANT   .* bio.ant .+                      # anthocynanin absorption absorption
-                     K_BROWN .* bio.brown .+                    # TODO: needs to be a concentration
-                     K_H₂O   .* bio.l_H₂O .+                    # water absorption
-                     K_CBC   .* bio.cbc .+                      # carbon-based constituents absorption
-                     K_PRO   .* bio.pro .+                      # protein absorption
-                     K_LMA   .* (bio.lma - bio.cbc - bio.pro)   # dry mass absorption (if some remained)
+    bio.k_all    .= (K_CAB   .* bio.cab .+                          # chlorophyll absorption
+                     K_CAR_V .* bio.car .* (1 - bio.f_zeax) .+      # violaxanthin carotenoid absorption
+                     K_CAR_Z .* bio.car .* bio.f_zeax .+            # zeaxanthin carotenoid absorption
+                     K_ANT   .* bio.ant .+                          # anthocynanin absorption absorption
+                     K_BROWN .* bio.brown .+                        # TODO: needs to be a concentration
+                     K_H₂O   .* (lwc * M_H₂O() / ρ_H₂O() * 100) .+  # water absorption
+                     K_CBC   .* bio.cbc .+                          # carbon-based constituents absorption
+                     K_PRO   .* bio.pro .+                          # protein absorption
+                     K_LMA   .* (bio.lma - bio.cbc - bio.pro)       # dry mass absorption (if some remained)
                     ) ./ MESOPHYLL_N;
     bio.α_cab    .= (K_CAB .* bio.cab) ./ bio.k_all ./ MESOPHYLL_N;
     bio.α_cabcar .= (K_CAB .* bio.cab .+ K_CAR_V .* bio.car .* (1 - bio.f_zeax) .+ K_CAR_Z .* bio.car .* bio.f_zeax) ./ bio.k_all ./ MESOPHYLL_N;
@@ -204,7 +206,6 @@ leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha:
 #     2021-Oct-22: add another method to prescribe leaf spectra such as transmittance and reflectance from broadband method
 #     2021-Nov-29: separate HyperspectralAbsorption as constant struct
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
-#     2022-Feb-02: fix documentation
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #
 #######################################################################################################################################################################################################
@@ -226,6 +227,7 @@ wls = WaveLengthSet{Float64}();
 bio = HyperspectralLeafBiophysics{Float64}(wls);
 leaf_spectra!(bio, wls, 0.1, 0.45, 0.05, 0.25);
 ```
+
 """
 leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat} = (
     @unpack IΛ_NIR, IΛ_PAR = wls;
@@ -236,6 +238,32 @@ leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_p
     bio.τ_sw[IΛ_NIR] .= τ_nir;
 
     bio.α_sw = 1 .- bio.τ_sw .- bio.ρ_sw;
+
+    return nothing
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes made to this method
+# General
+#     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, and MonoMLTreeSPAC
+#
+#######################################################################################################################################################################################################
+"""
+
+    leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Update leaf reflectance and transmittance for SPAC, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, and `MonoMLTreeSPAC` type SPAC
+
+"""
+leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack LEAVES, LHA, WLSET = spac;
+
+    for _leaf in LEAVES
+        leaf_spectra!(_leaf.BIO, WLSET, LHA, _leaf.HS.v_storage; APAR_car = _leaf.APAR_CAR);
+    end;
 
     return nothing
 );
