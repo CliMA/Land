@@ -2,35 +2,24 @@
 #
 # Changes to this function
 # General
-#     2022-Jun-14: migrate the function from CanopyLayers
 #     2022-Jun-09: rename function to soil_albedo!
-#
-#######################################################################################################################################################################################################
-"""
-This function updates soil albedo values for shortwave PAR and NIR. The supported methods include
-
-$(METHODLIST)
-
-"""
-function soil_albedo! end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-14: add method to update broadband soil albedo
+#     2022-Jun-14: migrate the function from CanopyLayers
+#     2022-Jun-14: add method to update broadband or hyperspectral soil albedo
 #
 #######################################################################################################################################################################################################
 """
 
-    soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
+    soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
 
 Updates lower soil boundary reflectance, given
 - `can` `HyperspectralMLCanopy` type struct
 - `soil` `Soil` type struct
-- `albedo` `BroadbandSoilAlbedo` type soil albedo
+
 """
+function soil_albedo! end
+
+soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = soil_albedo!(can, soil, soil.ALBEDO);
+
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat} = (
     @unpack COLOR, LAYERS = soil;
     @assert 1 <= COLOR <=20;
@@ -52,23 +41,6 @@ soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSo
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-14: add method to update broadband soil albedo
-#
-#######################################################################################################################################################################################################
-"""
-
-    soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::HyperspectralSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat}
-
-Updates lower soil boundary reflectance, given
-- `can` `HyperspectralMLCanopy` type struct
-- `soil` `Soil` type struct
-- `albedo` `HyperspectralSoilAlbedo` type soil albedo
-"""
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::HyperspectralSoilAlbedo{FT}; clm::Bool = false) where {FT<:AbstractFloat} = (
     @unpack WLSET = can;
     @unpack COLOR, LAYERS = soil;
@@ -110,21 +82,3 @@ soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::Hyperspectr
 
     return nothing
 );
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-14: add method to update broadband or hyperspectral soil albedo
-#
-#######################################################################################################################################################################################################
-"""
-
-    soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
-
-Updates lower soil boundary reflectance, given
-- `can` `HyperspectralMLCanopy` type struct
-- `soil` `Soil` type struct
-"""
-soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = soil_albedo!(can, soil, soil.ALBEDO);

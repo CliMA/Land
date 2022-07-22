@@ -4,13 +4,14 @@
 # General
 #     2022-Jun-09: migrate the function from CanopyLayers
 #     2022-Jun-09: rename function to canopy_radiation!
-#     2022-Jun-10: add documentation
 #
 #######################################################################################################################################################################################################
 """
-This function updates canopy radiation profiles. The supported methods include
-
-$(METHODLIST)
+This function updates canopy radiation profiles. The supported methods are to
+- Update shortwave radiation profile for broadband or hyperspectral canopy
+- Updates soil shortwave radiation profiles
+- Update longwave radation profile for broadband or hyperspectral canopy
+- Update radiation profile for SPAC
 
 """
 function canopy_radiation! end
@@ -20,23 +21,25 @@ function canopy_radiation! end
 #
 # Changes to this method
 # General
-#     2022-Jun-15: add prototype function
 #     2022-Jun-16: finalize the two leaf radiation
 #     2022-Jun-21: make par and apar per leaf area
 #     2022-Jun-21: redo the mean rates by weighing them by sunlit fraction
 #     2022-Jun-25: finalize the soil shortwave reflection
 #     2022-Jun-25: clean the calculations
+#     2022-Jun-25: add method for longwave radation for two leaf RT
 #     2022-Jun-29: use Leaves1D for the broadband RT
+#     2022-Jun-29: use sunlit and shaded temperatures for the longwave out
 #
 #######################################################################################################################################################################################################
 """
 
     canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 
-Updates shortwave radiation profiles, given
+Updates shortwave or longwave radiation profiles, given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaf` `Leaves1D` type struct
-- `rad` `BroadbandRadiation` solar radiation
+- `rad` Broadband shortwave or longwave radiation
 - `soil` `Soil` type struct
 
 """
@@ -130,27 +133,6 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::Broadband
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-25: add method for longwave radation for two leaf RT
-#     2022-Jun-29: use Leaves1D for the broadband RT
-#     2022-Jun-29: use sunlit and shaded temperatures for the longwave out
-#
-#######################################################################################################################################################################################################
-"""
-
-    canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
-
-Updates longwave radiation profiles, given
-- `can` `HyperspectralMLCanopy` type struct
-- `leaf` `Leaves1D` type struct
-- `rad` Incoming longwave radiation
-- `soil` `Soil` type struct
-
-"""
 canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack RADIATION = can;
     @unpack BIO = leaf;
@@ -220,10 +202,11 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil:
 """
 
     canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat}
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
 
 Updates soil shortwave radiation profiles, given
 - `can` `HyperspectralMLCanopy` type struct
-- `albedo` `BroadbandSoilAlbedo` type soil albedo
+- `albedo` `BroadbandSoilAlbedo` or `HyperspectralSoilAlbedo` type soil albedo
 
 """
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
@@ -242,23 +225,6 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-14: make method work with hyperspectral soil albedo struct
-#
-#######################################################################################################################################################################################################
-"""
-
-    canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
-
-Updates soil shortwave radiation profiles, given
-- `can` `HyperspectralMLCanopy` type struct
-- `albedo` `HyperspectralSoilAlbedo` type soil albedo
-
-"""
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
     @unpack DIM_LAYER, RADIATION, WLSET = can;
 
@@ -278,8 +244,9 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 #     2022-Jun-09: clean the function
 #     2022-Jun-10: rename PAR/APAR to APAR/PPAR to be more accurate
 #     2022-Jun-10: add PAR calculation (before absorption)
-#     2022-Jun-10: add documentation
 #     2022-Jun-10: compute shortwave net radiation
+#     2022-Jun-10: migrate the function thermal_fluxes! from CanopyLayers
+#     2022-Jun-10: update net lw radiation for leaves and soil
 #     2022-Jun-13: use DIM_LAYER instead of _end
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
 # Bug fix:
@@ -289,11 +256,12 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 """
 
     canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}; APAR_CAR::Bool = true) where {FT<:AbstractFloat}
+    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
 
-Updates canopy radiation profiles for shortwave radiation, given
+Updates canopy radiation profiles for shortwave or longwave radiation, given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaves` Vector of `Leaves2D`
-- `rad` Incoming solar radiation
+- `rad` Incoming shortwave or longwave radiation
 - `soil` Bottom soil boundary layer
 - `APAR_CAR` Whether carotenoid absorption is counted in PPAR, default is true
 
@@ -426,26 +394,6 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-10: migrate the function thermal_fluxes! from CanopyLayers
-#     2022-Jun-10: update net lw radiation for leaves and soil
-#     2022-Jun-29: use Leaves2D for the hyperspectral RT
-#
-#######################################################################################################################################################################################################
-"""
-
-    canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat}
-
-Updates canopy radiation profiles for longwave radiation, given
-- `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaves2D`
-- `rad` Incoming longwave radiation
-- `soil` Bottom soil boundary layer
-"""
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack DIM_LAYER, OPTICS, RADIATION = can;
     @unpack ALBEDO, LAYERS = soil;
@@ -508,6 +456,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 
 Updates canopy radiation profiles for shortwave and longwave radiation, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
+
 """
 canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL = spac;

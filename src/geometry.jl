@@ -3,14 +3,14 @@
 # Changes to this function
 # General
 #     2022-Jun-07: migrate the function from CanopyLayers
-#     2022-Jun-08: add documentation
 #     2022-Jun-09: rename function to canopy_optical_properties!
 #
 #######################################################################################################################################################################################################
 """
-This function updates canopy optical properties for canopy. The supported methods include
-
-$(METHODLIST)
+This function updates canopy optical properties for canopy. The supported methods are to
+- Update the extinction coefficients
+- Update the soil boundary conditions (not public function)
+- Update scattering coefficient matrices
 
 """
 function canopy_optical_properties! end
@@ -21,8 +21,6 @@ function canopy_optical_properties! end
 # Changes to this method
 # General
 #     2022-Jun-07: migrate the function from CanopyLayers
-#     2022-Jun-07: clean the function
-#     2022-Jun-08: add documentation
 #     2022-Jun-09: rename function to canopy_optical_properties!
 #     2022-Jun-09: update p_sunlit
 #
@@ -34,6 +32,7 @@ function canopy_optical_properties! end
 Updates canopy optical properties (extinction coefficients for direct and diffuse light) based on the SAIL model, given
 - `can` `HyperspectralMLCanopy` type struct
 - `angles` `SunSensorGeometry` type struct
+
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     @unpack DIM_LAYER, HOT_SPOT, OPTICS, P_INCL, Θ_AZI = can;
@@ -105,15 +104,18 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 # Changes to this method
 # General
 #     2022-Jun-14: add method to use broadband PAR and NIR soil albedo for canopy_optical_properties!
+#     2022-Jun-14: add method to use hyperspectral soil albedo for canopy_optical_properties!
 #
 #######################################################################################################################################################################################################
 """
 
     canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat}
+    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
 
 Updates lower soil boundary reflectance, given
 - `can` `HyperspectralMLCanopy` type struct
-- `albedo` `BroadbandSoilAlbedo` type soil albedo
+- `albedo` `BroadbandSoilAlbedo` or `HyperspectralSoilAlbedo` type soil albedo
+
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
     @unpack OPTICS, WLSET = can;
@@ -124,22 +126,6 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoil
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-14: add method to use hyperspectral soil albedo for canopy_optical_properties!
-#
-#######################################################################################################################################################################################################
-"""
-
-    canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat}
-
-Updates lower soil boundary reflectance, given
-- `can` `HyperspectralMLCanopy` type struct
-- `albedo` `HyperspectralSoilAlbedo` type soil albedo
-"""
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
     @unpack OPTICS = can;
 
@@ -157,7 +143,6 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::Hyperspectral
 #     2022-Jun-08: migrate the function from CanopyLayers
 #     2022-Jun-09: rename the function from canopy_matrices! to canopy_optical_properties!
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
-#     2022-Jun-10: fix documentation
 #     2022-Jun-10: add function to compute longwave reflectance, transmittance, and emissivity
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #
@@ -170,6 +155,7 @@ Updates canopy optical properties (scattering coefficient matrices), given
 - `can` `HyperspectralMLCanopy` type struct
 - `leaves` Vector of `Leaves2D`
 - `soil` Bottom soil boundary layer
+
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
     @unpack DIM_LAYER, OPTICS = can;

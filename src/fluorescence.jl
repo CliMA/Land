@@ -4,39 +4,31 @@
 # General
 #     2022-Jun-10: migrate the function from CanopyLayers
 #     2022-Jun-10: rename function to canopy_fluorescence!
+#     2022-Jun-13: finished migrating the SIF function
+#     2022-Jun-14: convert energy and photon back and forth if using photon mode
+#     2022-Jun-29: use Leaves2D for the hyperspectral RT
+#     2022-Jun-29: use ϕ_f in Leaves2D
+#     2022-Jun-29: add method for SPAC
 #
 #######################################################################################################################################################################################################
 """
-This function updates canopy fluorescence profiles. The supported methods include
 
-$(METHODLIST)
+    canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Updates canopy fluorescence, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
 
 """
 function canopy_fluorescence! end
 
+canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, LEAVES, Φ_PHOTON = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-10: migrate the function from CanopyLayers
-#     2022-Jun-10: use more descriptive variable names
-#     2022-Jun-13: finished migrating the SIF function
-#     2022-Jun-13: fix documentation
-#     2022-Jun-14: convert energy and photon back and forth if using photon mode
-#     2022-Jun-29: use Leaves2D for the hyperspectral RT
-#     2022-Jun-29: use ϕ_f in Leaves2D
-#
-#######################################################################################################################################################################################################
-"""
+    canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
 
-    canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat}
+    return nothing
+);
 
-Updates canopy radiation profiles for shortwave radiation, given
-- `can` `HyperspectralMLCanopy` type struct
-- `leaves` Vector of `Leaves2D`
-- `ϕ_photon` If true (default), convert photon to photon when computing SIF; otherwise, convert energy to energy
-"""
 canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat} = (
     @unpack DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
     _ilai = can.lai * can.ci / DIM_LAYER;
@@ -180,29 +172,6 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}
     mul!(RADIATION.sif_obs_scatter, RADIATION._sif_obs_scatter, OPTICS._tmp_vec_layer);
 
     RADIATION.sif_obs .= RADIATION.sif_obs_sunlit .+ RADIATION.sif_obs_shaded .+ RADIATION.sif_obs_scatter .+ view(RADIATION.sif_up,:,DIM_LAYER+1) ./ OPTICS.po[end] ./ FT(pi);
-
-    return nothing
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-29: add method for SPAC
-#
-#######################################################################################################################################################################################################
-"""
-
-    canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
-
-Updates canopy fluorescence, given
-- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, `MonoMLTreeSPAC` type SPAC
-"""
-canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, LEAVES, Φ_PHOTON = spac;
-
-    canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
 
     return nothing
 );
