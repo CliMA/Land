@@ -3,6 +3,8 @@
 # Changes to this structure
 # General
 #     2022-May-25: add Root structure
+#     2022-Jul-15: add fields e, ∂e∂t
+#     2022-Jul-19: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -16,30 +18,18 @@ Structure to save root parameters
 $(TYPEDFIELDS)
 
 """
-mutable struct Root{FT<:AbstractFloat}
-    # parameters that do not change with time
+Base.@kwdef mutable struct Root{FT<:AbstractFloat}
+    # Embedded structures
     "[`RootHydraulics`](@ref) type root hydraulic system"
-    HS::RootHydraulics{FT}
+    HS::RootHydraulics{FT} = RootHydraulics{FT}()
 
-    # prognostic variables that change with time
-    "Current temperature"
-    t::FT
+    # Prognostic variables (not used for ∂y∂t)
+    "Current temperature `[K]`"
+    t::FT = T₂₅()
+
+    # Prognostic variables (used for ∂y∂t)
+    "Total stored energy in water `[J]`" # TODO: add wood storage as well
+    e::FT = sum(HS.v_storage) * CP_L_MOL(FT) * t
+    "Marginal increase in energy `[W]`"
+    ∂e∂t::FT = 0
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-May-25: add constructor
-#     2022-May-31: add steady state mode option to input options
-#
-#######################################################################################################################################################################################################
-"""
-
-    Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat}
-
-Construct a Root structure, given
-- `ssm` Whether the flow rate is at steady state
-"""
-Root{FT}(; ssm::Bool = true) where {FT<:AbstractFloat} = Root{FT}(RootHydraulics{FT}(ssm = ssm), T_25());

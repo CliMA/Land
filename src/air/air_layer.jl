@@ -5,9 +5,10 @@
 #     2022-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
 #     2022-Jan-14: rename P_A to P_AIR, P_O2 to P_O₂
 #     2022-Jan-14: add p_CO₂ to the structure
-#     2022-Jan-24: fix documentation
 #     2022-Mar-09: add t, p_H₂O, p_H₂O_sat, rh, and wind fields
-#     2022-Apr-19: move p_H₂O and wind to prognostic fields
+#     2022-Jul-13: remove fields p_H₂O_sat and rh to avoid update issues
+#     2022-Jul-20: remove fields P_O₂ to avoid update issues
+#     2022-Jul-20: add fields: Z, ΔZ, e, n_CO₂, n_H₂O, ∂e∂t, ∂CO₂∂t, and ∂H₂O∂t
 #
 #######################################################################################################################################################################################################
 """
@@ -21,61 +22,38 @@ Structure that stores air layer information
 $(TYPEDFIELDS)
 
 """
-mutable struct AirLayer{FT<:AbstractFloat}
-    # parameters that do not change with time
+Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
+    # Location and geometry of the air layer
+    "Mean height of the layer `[m]`"
+    Z::FT = 0.5
+    "Layer thickness `[m]`"
+    ΔZ::FT = 1
+
+    # Parameters that are not supposed to change with time
     "Atmospheric pressure `[Pa]`"
-    P_AIR::FT
-    "O₂ partial pressure `[Pa]`"
-    P_O₂::FT
+    P_AIR::FT = P_ATM()
 
-    # prognostic variables that change with time
+    # Prognostic variables (not used for ∂y∂t)
     "CO₂ partial pressure `[Pa]`"
-    p_CO₂::FT
+    p_CO₂::FT = 40
     "H₂O partial pressure `[Pa]`"
-    p_H₂O::FT
-    "Temperature"
-    t::FT
+    p_H₂O::FT = 1500
+    "Temperature `[K]`"
+    t::FT = T₂₅()
     "Wind speed `[m s⁻¹]`"
-    wind::FT
+    wind::FT = 1
 
-    # diagnodtic variables that change with time
-    "Saturated H₂O partial pressure `[Pa]`"
-    p_H₂O_sat::FT
-    "relative humidity"
-    rh::FT
+    # Prognostic variables (used for ∂y∂t)
+    "Total energy within the air layer `[J m⁻²]`"
+    e::FT = CP_D_MOL() * (P_AIR - p_H₂O) * ΔZ / GAS_R() + CP_V_MOL() * p_H₂O * ΔZ / GAS_R()
+    "Mole of CO₂ per surface area `[mol m⁻²]`"
+    n_CO₂::FT = p_CO₂ * ΔZ / (GAS_R() * t)
+    "Mole of H₂O per surface area `[mol m⁻²]`"
+    n_H₂O::FT = p_H₂O * ΔZ / (GAS_R() * t)
+    "Marginal increase in total energy `[J m⁻² s⁻¹]`"
+    ∂e∂t::FT = 0
+    "Marginal increase in total moles of CO₂ `[mol m⁻² s⁻¹]`"
+    ∂CO₂∂t::FT = 0
+    "Marginal increase in total moles of H₂O `[mol m⁻² s⁻¹]`"
+    ∂H₂O∂t::FT = 0
 end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this constructor
-# General
-#     2022-Jan-14: Move the structure from Photosynthesis.jl, only P_A and P_O2 for now
-#     2022-Jan-24: add p_CO₂ to the constructors
-#     2022-Mar-09: add t, p_H₂O, p_H₂O_sat, rh, and wind fields
-#     2022-Apr-19: move p_H₂O and wind to prognostic fields
-#
-#######################################################################################################################################################################################################
-"""
-
-    AirLayer{FT}() where {FT<:AbstractFloat}
-
-Constructor for AirLayer
-
----
-# Examples
-```julia
-air = AirLayer{Float64}();
-```
-"""
-AirLayer{FT}() where {FT<:AbstractFloat} = (
-    return AirLayer{FT}(
-                P_ATM(FT),                                  # P_AIR
-                P_ATM(FT) * 0.209,                          # P_O₂
-                40,                                         # p_CO₂
-                1500,                                       # p_H₂O
-                T_25(FT),                                   # t
-                1,                                          # wind
-                saturation_vapor_pressure(T_25(FT)),        # p_H₂O_sat
-                1500 / saturation_vapor_pressure(T_25(FT))) # rh
-);

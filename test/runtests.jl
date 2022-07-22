@@ -3,216 +3,201 @@ using PkgUtility
 using Test
 
 
-@testset verbose = true "ClimaCache Test" begin
-    @testset "Soil" begin
-        for FT in [Float32, Float64]
-            soil1 = ClimaCache.Soil{FT}(FT[0,-1]);
-            soil2 = ClimaCache.Soil{FT}(FT[0,-1], true);
-            for soil in [soil1, soil2]
-                @test FT_test(soil, FT);
-                @test NaN_test(soil);
-            end;
-        end;
-    end;
-
+@testset verbose = true "ClimaCache CI Coverage" begin
+    # Folder air
     @testset "Air" begin
         for FT in [Float32, Float64]
-            air = ClimaCache.AirLayer{FT}();
-            @test FT_test(air, FT);
-            @test NaN_test(air);
+            for var in [ClimaCache.AirLayer{FT}(),
+                        ClimaCache.Meteorology{FT}()]
+                @test FT_test(var, FT);
+                @test NaN_test(var);
+            end;
         end;
     end;
 
+    # Folder plant
     @testset "Plant" begin
         for FT in [Float32, Float64]
-            # Pressure volume curve
-            pvc1 = ClimaCache.LinearPVCurve{FT}();
-            pvc2 = ClimaCache.SegmentedPVCurve{FT}();
-            for pvc in [pvc1, pvc2]
-                @test FT_test(pvc, FT);
-                @test NaN_test(pvc);
+            for var in [ClimaCache.NonSteadyStateFlow{FT}(),
+                        ClimaCache.SteadyStateFlow{FT}(),
+                        ClimaCache.LeafHydraulics{FT}(),
+                        ClimaCache.RootHydraulics{FT}(),
+                        ClimaCache.StemHydraulics{FT}(),
+                        ClimaCache.BroadbandLeafBiophysics{FT}(),
+                        ClimaCache.HyperspectralLeafBiophysics{FT}(),
+                        ClimaCache.GCO₂Mode(),
+                        ClimaCache.PCO₂Mode(),
+                        ClimaCache.VDTModelAll(FT),
+                        ClimaCache.VDTModelDrought(FT),
+                        ClimaCache.VJPReactionCenter{FT}(),
+                        ClimaCache.CytochromeReactionCenter{FT}(),
+                        ClimaCache.LinearPVCurve{FT}(),
+                        ClimaCache.SegmentedPVCurve{FT}(),
+                        ClimaCache.Root{FT}(),
+                        ClimaCache.Stem{FT}(),
+                        ClimaCache.BetaParameterG1(),
+                        ClimaCache.BetaParameterKleaf(),
+                        ClimaCache.BetaParameterKsoil(),
+                        ClimaCache.BetaParameterPleaf(),
+                        ClimaCache.BetaParameterPsoil(),
+                        ClimaCache.BetaParameterVcmax(),
+                        ClimaCache.BetaParameterΘ(),
+                        ClimaCache.BetaFunction{FT}(),
+                        ClimaCache.AndereggSM{FT}(),
+                        ClimaCache.BallBerrySM{FT}(),
+                        ClimaCache.EllerSM{FT}(),
+                        ClimaCache.GentineSM{FT}(),
+                        ClimaCache.LeuningSM{FT}(),
+                        ClimaCache.MedlynSM{FT}(),
+                        ClimaCache.SperrySM{FT}(),
+                        ClimaCache.WangSM{FT}(),
+                        ClimaCache.Wang2SM{FT}(),
+                        ClimaCache.KcTDBernacchi(FT),
+                        ClimaCache.KcTDCLM(FT),
+                        ClimaCache.KoTDBernacchi(FT),
+                        ClimaCache.KoTDCLM(FT),
+                        ClimaCache.KpepTDCLM(FT),
+                        ClimaCache.KpepTDBoyd(FT),
+                        ClimaCache.KqTDJohnson(FT),
+                        ClimaCache.ΓStarTDBernacchi(FT),
+                        ClimaCache.ΓStarTDCLM(FT),
+                        ClimaCache.ηCTDJohnson(FT),
+                        ClimaCache.ηLTDJohnson(FT),
+                        ClimaCache.Q10TDAngiosperm(FT),
+                        ClimaCache.Q10TDGymnosperm(FT),
+                        ClimaCache.LogisticVC{FT}(),
+                        ClimaCache.PowerVC{FT}(),
+                        ClimaCache.WeibullVC{FT}(),
+                        ClimaCache.ComplexVC{FT}()]
+                @test FT_test(var, FT);
+                @test NaN_test(var);
             end;
 
-            # Plant hydraulic system
-            lhs1 = ClimaCache.LeafHydraulics{FT}();
-            lhs2 = ClimaCache.LeafHydraulics{FT}(ssm = true);
-            lhs3 = ClimaCache.LeafHydraulics{FT}(ssm = false);
-            rhs1 = ClimaCache.RootHydraulics{FT}();
-            rhs2 = ClimaCache.RootHydraulics{FT}(ssm = true);
-            rhs3 = ClimaCache.RootHydraulics{FT}(ssm = false);
-            shs1 = ClimaCache.StemHydraulics{FT}();
-            shs2 = ClimaCache.StemHydraulics{FT}(ssm = true);
-            shs3 = ClimaCache.StemHydraulics{FT}(ssm = false);
-            for hs in [lhs1, lhs2, lhs3, rhs1, rhs2, rhs3, shs1, shs2, shs3]
-                @test FT_test(hs, FT);
-                @test NaN_test(hs);
-            end;
-
-            # Root and Stem
-            root = ClimaCache.Root{FT}();
-            stem = ClimaCache.Stem{FT}();
-            for hs in [root, stem]
-                @test FT_test(hs, FT);
-                @test NaN_test(hs);
-            end;
-
-            # Leaf
-            leaf_c3 = ClimaCache.Leaf{FT}("C3");
-            leaf_c4 = ClimaCache.Leaf{FT}("C4");
-            leaf_cy = ClimaCache.Leaf{FT}("C3Cytochrome");
-            leaf_d3 = ClimaCache.Leaf{FT}("C3", colimit = true);
-            leaf_d4 = ClimaCache.Leaf{FT}("C4", colimit = true);
-            leaf_dy = ClimaCache.Leaf{FT}("C3Cytochrome", colimit = true);
-            wls     = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
-            leaf_e3 = ClimaCache.Leaf{FT}("C3", wls);
-            leaf_e4 = ClimaCache.Leaf{FT}("C4", wls);
-            leaf_ey = ClimaCache.Leaf{FT}("C3Cytochrome", wls);
-            for leaf in [leaf_c3, leaf_c4, leaf_cy, leaf_d3, leaf_d4, leaf_dy, leaf_e3, leaf_e4, leaf_ey]
-                @test FT_test(leaf, FT);
-                # NaN test will not pass because of the NaNs in temperature dependency structures
-                # @test NaN_test(leaf);
-            end;
-
-            # Leaves1D
-            leaves_c3 = ClimaCache.Leaves1D{FT}("C3");
-            leaves_c4 = ClimaCache.Leaves1D{FT}("C4");
-            leaves_cy = ClimaCache.Leaves1D{FT}("C3Cytochrome");
-            leaves_d3 = ClimaCache.Leaves1D{FT}("C3", colimit = true);
-            leaves_d4 = ClimaCache.Leaves1D{FT}("C4", colimit = true);
-            leaves_dy = ClimaCache.Leaves1D{FT}("C3Cytochrome", colimit = true);
-            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_d3, leaves_d4, leaves_dy]
-                @test FT_test(leaves, FT);
-                # NaN test will not pass because of the NaNs in temperature dependency structures
-                # @test NaN_test(leaf);
-            end;
-
-            # Leaves2D
-            leaves_c3 = ClimaCache.Leaves2D{FT}("C3");
-            leaves_c4 = ClimaCache.Leaves2D{FT}("C4");
-            leaves_cy = ClimaCache.Leaves2D{FT}("C3Cytochrome");
-            leaves_d3 = ClimaCache.Leaves2D{FT}("C3", colimit = true);
-            leaves_d4 = ClimaCache.Leaves2D{FT}("C4", colimit = true);
-            leaves_dy = ClimaCache.Leaves2D{FT}("C3Cytochrome", colimit = true);
-            wls       = ClimaCache.WaveLengthSet{FT}(collect(400:10:2500));
-            leaves_e3 = ClimaCache.Leaves2D{FT}("C3", wls);
-            leaves_e4 = ClimaCache.Leaves2D{FT}("C4", wls);
-            leaves_ey = ClimaCache.Leaves2D{FT}("C3Cytochrome", wls);
-            for leaves in [leaves_c3, leaves_c4, leaves_cy, leaves_d3, leaves_d4, leaves_dy, leaves_e3, leaves_e4, leaves_ey]
-                @test FT_test(leaves, FT);
-                # NaN test will not pass because of the NaNs in temperature dependency structures
-                # @test NaN_test(leaf);
-            end;
-
-            # LeafBiophysics
-            lbio1 = ClimaCache.HyperspectralLeafBiophysics{FT}();
-            lbio2 = ClimaCache.HyperspectralLeafBiophysics{FT}(ClimaCache.WaveLengthSet{FT}(collect(400:50:2400)));
-            lbio3 = ClimaCache.BroadbandLeafBiophysics{FT}();
-            for lbio in [lbio1, lbio2, lbio3]
-                @test FT_test(lbio, FT);
-                @test NaN_test(lbio);
-            end;
-
-            # Fluorescence model
-            vdt1 = ClimaCache.VanDerTolFluorescenceModel{FT}();
-            vdt2 = ClimaCache.VanDerTolFluorescenceModel{FT}(true);
-            for vdt in [vdt1, vdt2]
-                @test FT_test(vdt, FT);
-                @test NaN_test(vdt);
-            end;
-
-            # Reaction center
-            rc1 = ClimaCache.VJPReactionCenter{FT}();
-            rc2 = ClimaCache.CytochromeReactionCenter{FT}();
-            for rc in [rc1, rc2]
-                @test FT_test(rc, FT);
-                @test NaN_test(rc);
-            end;
-
-            # Photosynthesis model
-            cy_1 = ClimaCache.C3CytochromeModel{FT}();
-            cy_2 = ClimaCache.C3CytochromeModel{FT}(v_cmax25 = 30, r_d25 = 1, colimit = true);
-            c3_1 = ClimaCache.C3VJPModel{FT}();
-            c3_2 = ClimaCache.C3VJPModel{FT}(v_cmax25 = 30, j_max25 = 50, r_d25 = 1, colimit = true);
-            c4_1 = ClimaCache.C4VJPModel{FT}();
-            c4_2 = ClimaCache.C4VJPModel{FT}(v_cmax25 = 30, v_pmax25 = 40, r_d25 = 1, colimit = true);
-            for st in [cy_1, cy_2, c3_1, c3_2, c4_1, c4_2]
-                for rc in [rc1, rc2]
-                    @test FT_test(st, FT);
-                    # NaN test will not pass because of the NaNs in temperature dependency structures
-                    # @test NaN_test(st);
-                end;
-            end;
-
-            # Mode and colimitations
-            mod1 = ClimaCache.GCO₂Mode();
-            mod2 = ClimaCache.PCO₂Mode();
-            col1 = ClimaCache.MinimumColimit{FT}();
-            col2 = ClimaCache.QuadraticColimit{FT}(0.98);
-            col3 = ClimaCache.SerialColimit{FT}();
-            for st in [mod1, mod2, col1, col2, col3]
-                for rc in [rc1, rc2]
-                    @test FT_test(st, FT);
-                    @test NaN_test(st);
-                end;
-            end;
-
-            # Temperature dependency
-            td_1 = ClimaCache.Arrhenius{FT}(298.15, 41.0, 79430.0);
-            td_2 = ClimaCache.ArrheniusPeak{FT}(298.15, 1.0, 57500.0, 439000.0, 1400.0);
-            td_3 = ClimaCache.Q10{FT}(298.15, 0.0140/8760, 1.4);
-            for td in [td_1, td_2, td_3]
-                @test FT_test(td, FT);
-                @test NaN_test(td);
+            for var in [ClimaCache.C3CytochromeModel{FT}(),
+                        ClimaCache.C3VJPModel{FT}(),
+                        ClimaCache.C4VJPModel{FT}(),
+                        ClimaCache.Leaf{FT}(),
+                        ClimaCache.Leaves1D{FT}(),
+                        ClimaCache.Leaves2D{FT}(),
+                        ClimaCache.RespirationTDBernacchi(FT),
+                        ClimaCache.VcmaxTDBernacchi(FT),
+                        ClimaCache.VomaxTDBernacchi(FT),
+                        ClimaCache.JmaxTDBernacchi(FT),
+                        ClimaCache.JmaxTDCLM(FT),
+                        ClimaCache.JmaxTDLeuning(FT),
+                        ClimaCache.RespirationTDCLM(FT),
+                        ClimaCache.VcmaxTDCLM(FT),
+                        ClimaCache.VcmaxTDLeuning(FT),
+                        ClimaCache.VpmaxTDBoyd(FT)]
+                @test FT_test(var, FT);
             end;
         end;
     end;
 
+    # Folder radiation
     @testset "Radiation" begin
         for FT in [Float32, Float64]
-            # Wave length sets
-            wls1 = ClimaCache.WaveLengthSet{FT}();
-            wls2 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500));
-            wls3 = ClimaCache.WaveLengthSet{FT}(collect(400:5:2500); opti=ClimaCache.OPTI_2017);
-            for wls in [wls1, wls2, wls3]
-                @test FT_test(wls, FT);
-                # NaN test will not pass because of the NaNs in wls2 and wls3
-                # @test NaN_test(wls);
+            for var in [ClimaCache.HyperspectralMLCanopyOpticalProperty{FT}(),
+                        ClimaCache.BroadbandSLCanopyRadiationProfile{FT}(),
+                        ClimaCache.HyperspectralMLCanopyRadiationProfile{FT}(),
+                        ClimaCache.VerhoefLIDF{FT}(),
+                        ClimaCache.BroadbandSLCanopy{FT}(),
+                        ClimaCache.HyperspectralMLCanopy{FT}(),
+                        ClimaCache.HyperspectralAbsorption{FT}(),
+                        ClimaCache.HyperspectralRadiation{FT}(),
+                        ClimaCache.SunSensorGeometry{FT}(),
+                        ClimaCache.WaveLengthSet{FT}()]
+                @test FT_test(var, FT);
+                @test NaN_test(var);
             end;
-
-            # Solar radiation
-            rad1 = ClimaCache.BroadbandRadiation{FT}();
-            rad2 = ClimaCache.HyperspectralRadiation{FT}();
-            for rad in [rad1, rad2]
-                @test FT_test(rad, FT);
-                @test NaN_test(rad);
-            end;
-
-            # Sun-sensor geometry
-            ssg = ClimaCache.SunSensorGeometry{FT}();
-            @test FT_test(ssg, FT);
-            @test NaN_test(ssg);
-
-            # Canopy structure
-            can = ClimaCache.HyperspectralMLCanopy{FT}();
-            @test FT_test(can, FT);
-            @test NaN_test(can);
         end;
     end;
 
+    # Folder soil
+    @testset "Soil" begin
+        for FT in [Float32, Float64]
+            for var in [ClimaCache.BroadbandSoilAlbedo{FT}(),
+                        ClimaCache.HyperspectralSoilAlbedo{FT}(),
+                        ClimaCache.SoilLayer{FT}(),
+                        ClimaCache.Soil{FT}(),
+                        ClimaCache.BrooksCorey{FT}(1,"Test",1,1,1),
+                        ClimaCache.VanGenuchten{FT}("Sand"),
+                        ClimaCache.VanGenuchten{FT}("Loamy Sand"),
+                        ClimaCache.VanGenuchten{FT}("Sandy Loam"),
+                        ClimaCache.VanGenuchten{FT}("Loam"),
+                        ClimaCache.VanGenuchten{FT}("Sandy Clay Loam"),
+                        ClimaCache.VanGenuchten{FT}("Silt Loam"),
+                        ClimaCache.VanGenuchten{FT}("Silt"),
+                        ClimaCache.VanGenuchten{FT}("Clay Loam"),
+                        ClimaCache.VanGenuchten{FT}("Silty Clay Loam"),
+                        ClimaCache.VanGenuchten{FT}("Sandy Clay"),
+                        ClimaCache.VanGenuchten{FT}("Silty Clay"),
+                        ClimaCache.VanGenuchten{FT}("Clay"),
+                        ClimaCache.VanGenuchten{FT}("NA")]
+                @test FT_test(var, FT);
+                @test NaN_test(var);
+            end;
+        end;
+    end;
+
+    # Folder spac
     @testset "SPAC" begin
         for FT in [Float32, Float64]
-            spac1 = ClimaCache.MonoElementSPAC{FT}("C3");
-            spac2 = ClimaCache.MonoGrassSPAC{FT}("C3");
-            spac3 = ClimaCache.MonoPalmSPAC{FT}("C3");
-            spac4 = ClimaCache.MonoTreeSPAC{FT}("C3");
-            spac5 = ClimaCache.MonoElementSPAC{FT}("C3"; ssm = false);
-            spac6 = ClimaCache.MonoGrassSPAC{FT}("C3"; ssm = false);
-            spac7 = ClimaCache.MonoPalmSPAC{FT}("C3"; ssm = false);
-            spac8 = ClimaCache.MonoTreeSPAC{FT}("C3"; ssm = false);
-            for spac in [spac1, spac2, spac3, spac4, spac5, spac6, spac7, spac8]
-                @test FT_test(spac, FT);
-                # NaN test will not pass because of the NaNs in temperature dependency structures
-                # @test NaN_test(wls);
+            for var in [ClimaCache.MonoElementSPAC{FT}(),
+                        ClimaCache.MonoMLGrassSPAC{FT}(),
+                        ClimaCache.MonoMLPalmSPAC{FT}(),
+                        ClimaCache.MonoMLTreeSPAC{FT}()]
+                @test FT_test(var, FT);
+            end;
+        end;
+    end;
+
+    # Folder util
+    @testset "Utils" begin
+        constants = ClimaCache.UniversalConstants();
+        @test true;
+
+        for FT in [Float32, Float64]
+            for var in [ClimaCache.MinimumColimit{FT}(),
+                        ClimaCache.SerialColimit{FT}(),
+                        ClimaCache.ColimitCJCLMC3(FT),
+                        ClimaCache.ColimitCJCLMC4(FT),
+                        ClimaCache.ColimitIPCLM(FT),
+                        ClimaCache.ColimitJCLM(FT),
+                        ClimaCache.AVOGADRO(FT),
+                        ClimaCache.CP_D(FT),
+                        ClimaCache.CP_D_MOL(FT),
+                        ClimaCache.CP_I(FT),
+                        ClimaCache.CP_I_MOL(FT),
+                        ClimaCache.CP_L(FT),
+                        ClimaCache.CP_L_MOL(FT),
+                        ClimaCache.CP_V(FT),
+                        ClimaCache.CP_V_MOL(FT),
+                        ClimaCache.F_O₂(FT),
+                        ClimaCache.GAS_R(FT),
+                        ClimaCache.GRAVITY(FT),
+                        ClimaCache.H_PLANCK(FT),
+                        ClimaCache.K_BOLTZMANN(FT),
+                        ClimaCache.K_STEFAN(FT),
+                        ClimaCache.K_VON_KARMAN(FT),
+                        ClimaCache.LH_V₀(FT),
+                        ClimaCache.LIGHT_SPEED(FT),
+                        ClimaCache.M_DRYAIR(FT),
+                        ClimaCache.M_H₂O(FT),
+                        ClimaCache.P_ATM(FT),
+                        ClimaCache.PRESS_TRIPLE(FT),
+                        ClimaCache.R_V(FT),
+                        ClimaCache.RT₂₅(FT),
+                        ClimaCache.T₀(FT),
+                        ClimaCache.T₂₅(FT),
+                        ClimaCache.T_TRIPLE(FT),
+                        ClimaCache.V_H₂O(FT),
+                        ClimaCache.YEAR_D(FT),
+                        ClimaCache.Λ_THERMAL_H₂O(FT),
+                        ClimaCache.ρ_H₂O(FT),
+                        ClimaCache.ρg_MPa(FT)]
+                @test FT_test(var, FT);
+                @test NaN_test(var);
             end;
         end;
     end;

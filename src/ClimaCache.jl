@@ -17,11 +17,7 @@ module ClimaCache
 using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
-using MAT: matread
-using PkgUtility: P_ATM, T_0, T_25, read_csv
-using Statistics: mean
-using UnPack: @unpack
-using WaterPhysics: saturation_vapor_pressure
+using NetcdfIO: read_nc
 
 
 #######################################################################################################################################################################################################
@@ -30,20 +26,20 @@ using WaterPhysics: saturation_vapor_pressure
 # General
 #     2020-May-30: put the 2017 mat file in an artifact
 #     2020-Aug-30: add the updated 2021 mat file along with that of 2017 into a new artifact
+#     2022-Jul-20: use reprocessed data for the default constructor
 #
 #######################################################################################################################################################################################################
-const FILE_SUN    = artifact"land_model_spectrum_V1" * "/sun.mat";
-const OPTI_2017   = artifact"land_model_spectrum_V1" * "/Optipar2017_ProspectD.mat";
-const OPTI_2021   = artifact"land_model_spectrum_V1" * "/Optipar2021_ProspectPRO_CX.mat";
-const SOIL_GSV    = artifact"land_model_spectrum_V1" * "/GSV.csv";
-const WAVELENGTHS = [collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)];
+const LAND_2017 = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2017.nc";
+const LAND_2021 = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.nc";
 
 
 # include the utility types and structures
-include("util/colimit.jl")
+include("util/colimit.jl"  )
+include("util/constants.jl")
 
 # include the air types and structures
-include("air/air_layer.jl")
+include("air/air_layer.jl"  )
+include("air/meteorology.jl")
 
 # include the radiation types and structures
 include("radiation/canopy_optics.jl"      )
@@ -67,6 +63,7 @@ include("plant/pressure_volume.jl"       )
 include("plant/flow.jl"                  )
 include("plant/vulnerability.jl"         )
 include("plant/hydraulics.jl"            )
+include("plant/stomata_model.jl"         )
 include("plant/leaf.jl"                  )
 include("plant/root.jl"                  )
 include("plant/stem.jl"                  )
