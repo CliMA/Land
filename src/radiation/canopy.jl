@@ -104,7 +104,7 @@ Base.@kwdef mutable struct BroadbandSLCanopy{FT<:AbstractFloat} <: AbstractCanop
     "Bounds of inclination angles `[°]`"
     Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(0, 90; length=DIM_INCL+1))[1:end-1] collect(FT, range(0, 90; length=DIM_INCL+1))[2:end] ]
     "Mean inclination angles `[°]`"
-    Θ_INCL::Vector{FT} = [ mean(Θ_INCL_BNDS[_i,:]) for _i in 1:DIM_INCL ]
+    Θ_INCL::Vector{FT} = [ (Θ_INCL_BNDS[_i,1] + Θ_INCL_BNDS[_i,2]) / 2 for _i in 1:DIM_INCL ]
 
     # Prognostic variables
     "Clumping index"
@@ -172,7 +172,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopy{FT<:AbstractFloat} <: AbstractC
     "Bounds of inclination angles `[°]`"
     Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(0, 90; length=DIM_INCL+1))[1:end-1] collect(FT, range(0, 90; length=DIM_INCL+1))[2:end] ]
     "Mean inclination angles `[°]`"
-    Θ_INCL::Vector{FT} = [ mean(Θ_INCL_BNDS[_i,:]) for _i in 1:DIM_INCL ]
+    Θ_INCL::Vector{FT} = [ (Θ_INCL_BNDS[_i,1] + Θ_INCL_BNDS[_i,2]) / 2 for _i in 1:DIM_INCL ]
     "Clumping structure a"
     Ω_A::FT = 1
     "Clumping structure b"

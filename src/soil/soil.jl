@@ -156,7 +156,7 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     "Depth boundaries `[m]`"
     ZS::Vector{FT} = FT[0,-1]
     "Mean depth `[m]`"
-    Z::FT = mean(ZS)
+    Z::FT = (ZS[1] + ZS[2]) / 2
     "Layer thickness `[m]`"
     ΔZ::FT = ZS[1] - ZS[2]
 

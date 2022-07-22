@@ -48,7 +48,7 @@ uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.4"
 
 [[deps.ClimaCache]]
-deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Statistics", "Test", "UnPack", "WaterPhysics"]
+deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
 path = ".."
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
 version = "1.0.0"
@@ -420,19 +420,8 @@ version = "0.9.6"
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
-[[deps.UnPack]]
-git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
-uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
-version = "1.0.2"
-
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-
-[[deps.WaterPhysics]]
-deps = ["DocStringExtensions", "PkgUtility", "Test", "UnPack"]
-git-tree-sha1 = "621ddd55a029c81fa3e776d3ee1383b1d51287c8"
-uuid = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
-version = "0.1.4"
 
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
