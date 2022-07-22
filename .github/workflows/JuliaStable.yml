@@ -27,12 +27,14 @@ jobs:
           version: "1"
       - name: Use Github Registry for Linux and Mac-OS
         if: runner.os != 'Windows'
-        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+        run: |
+          julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
       - name: Use Github Registry for Windows
         if: runner.os == 'Windows'
-        run: julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
-      - name: Install Dependencies
-        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+        run: |
+          julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
+          julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
       - name: Process Coverage
