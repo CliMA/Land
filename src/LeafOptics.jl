@@ -1,8 +1,7 @@
 module LeafOptics
 
-using ClimaCache: HyperspectralAbsorption, HyperspectralRadiation, HyperspectralLeafBiophysics, Leaves2D, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, WaveLengthSet
-using DocStringExtensions: METHODLIST
-using PkgUtility: H_PLANCK, LIGHT_SPEED, AVOGADRO, numerical∫
+using ClimaCache: HyperspectralAbsorption, HyperspectralRadiation, HyperspectralLeafBiophysics, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC, WaveLengthSet
+using ClimaCache: AVOGADRO, H_PLANCK, LIGHT_SPEED, M_H₂O, ρ_H₂O
 using SpecialFunctions: expint
 using UnPack: @unpack
 

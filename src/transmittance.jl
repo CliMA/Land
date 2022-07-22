@@ -4,7 +4,6 @@
 # General
 #     2020-Mar-30: migrate the function from SCOPE
 #     2021-Oct-21: rename the function to average_transmittance
-#     2022-Feb-02: fix documentation
 # To do
 #     TODO: figure out where does this equation comes from
 #
@@ -20,6 +19,7 @@ Return the average transmittance of isotropic radiation across an interface betw
 # References
 - Stern (1964) Transmission of isotropic radiation across an interface between two dielectrics. Applied Optics 3(1): 111-113.
 - Allen (1973) Transmission of isotropic light across a dielectric surface in two and three dimensions. Journal of the Optical Society of America 63(6): 664-666.
+
 """
 function average_transmittance(α::FT, nr::FT) where {FT<:AbstractFloat}
     @assert 0 < α <= 90;
