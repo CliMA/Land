@@ -102,7 +102,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFloat} <: AbstractCanopyRadiationProfile{FT}
-    # dimensions
+    # Dimensions
     "Dimension of azimuth angles"
     DIM_AZI::Int = 36
     "Dimension of inclination angles"
@@ -116,7 +116,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFlo
     "Dimension of short wave length bins"
     DIM_WL::Int = 114
 
-    # diagnostic variables that change with time
+    # Diagnostic variables
     "Albedo towards the viewing direction"
     albedo::Vector{FT} = zeros(FT, DIM_WL)
     "Mean APAR for shaded leaves `[μmol m⁻² s⁻¹]`"
@@ -184,7 +184,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFlo
     "Upwelling SIF"
     sif_up::Matrix{FT} = zeros(FT, DIM_SIF, DIM_LAYER+1)
 
-    # caches to speed up calculations
+    # Cache variables
     "Mean APAR for shaded leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"
     _apar_shaded::Vector{FT} = zeros(FT, DIM_PAR)
     "APAR for sunlit leaves per wavelength `[μmol m⁻² s⁻¹ nm⁻¹]`"

@@ -30,7 +30,7 @@ Base.@kwdef struct HyperspectralAbsorption{FT<:AbstractFloat}
     "File path to the Netcdf dataset"
     DATASET::String = LAND_2021
 
-    # parameters that do not change with time
+    # Constant features
     "Specific absorption coefficients of anthocynanin `[-]`"
     K_ANT::Vector{FT} = read_nc(DATASET, "K_ANT")
     "Specific absorption coefficients of senescent material (brown pigments) `[-]`"

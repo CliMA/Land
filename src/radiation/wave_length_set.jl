@@ -25,7 +25,7 @@ Base.@kwdef struct WaveLengthSet{FT<:AbstractFloat}
     "File path to the Netcdf dataset"
     DATASET::String = LAND_2021
 
-    # parameters that do not change with time
+    # Constants
     "Wavelength limits for NIR `[nm]`"
     WL_NIR::Vector{FT} = FT[700, 2500]
     "Wavelength limits for PAR `[nm]`"
@@ -41,7 +41,7 @@ Base.@kwdef struct WaveLengthSet{FT<:AbstractFloat}
     "Upper boundary wavelength `[nm]`"
     Λ_UPPER::Vector{FT} = read_nc(DATASET, "WL_UPPER")
 
-    # indices
+    # Indices
     "Indicies of Λ_NIR in Λ"
     IΛ_NIR::Vector{Int} = findall( WL_NIR[1] .<= Λ .<= WL_NIR[2] )
     "Indicies of Λ_PAR in Λ"
@@ -51,7 +51,7 @@ Base.@kwdef struct WaveLengthSet{FT<:AbstractFloat}
     "Indicies of Λ_SIFE in Λ"
     IΛ_SIFE::Vector{Int} = findall( WL_SIFE[1] .<= Λ .<= WL_SIFE[2] )
 
-    # dimensions
+    # Dimensions
     "Number of wavelength bins for NIR"
     DIM_NIR::Int = length(IΛ_NIR)
     "Number of wavelength bins for PAR"
@@ -63,7 +63,7 @@ Base.@kwdef struct WaveLengthSet{FT<:AbstractFloat}
     "Number of wavelength bins"
     DIM_WL::Int = length(Λ)
 
-    # parameters that are based on the ones above
+    # Constants based on the ones above
     "Differential wavelength `[nm]`"
     ΔΛ::Vector{FT} = Λ_UPPER .- Λ_LOWER
     "Differential wavelength for PAR `[nm]`"

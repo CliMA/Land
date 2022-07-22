@@ -27,7 +27,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct HyperspectralMLCanopyOpticalProperty{FT<:AbstractFloat}
-    # dimensions
+    # Dimensions
     "Dimension of azimuth angles"
     DIM_AZI::Int = 36
     "Dimension of inclination angles"
@@ -41,7 +41,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopyOpticalProperty{FT<:AbstractFloa
     "Dimension of short wave length bins"
     DIM_WL::Int = 114
 
-    # diagnostic variables that change with time
+    # Diagnostic variables
     "Backward diffuse->diffuse scatter weight"
     ddb::FT = 0
     "Forward diffuse->diffuse scatter weight"
@@ -103,7 +103,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopyOpticalProperty{FT<:AbstractFloa
     "Effective tranmittance for solar directional->diffuse"
     τ_sd::Matrix{FT} = zeros(FT, DIM_WL, DIM_LAYER)
 
-    # caches to speed up calculations
+    # Cache variables
     "cos(inclination) * cos(vza) at different inclination angles"
     _Co::Vector{FT} = zeros(FT, DIM_INCL)
     "cos(inclination) * cos(sza) at different inclination angles"

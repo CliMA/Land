@@ -47,7 +47,7 @@ Base.@kwdef mutable struct BroadbandLeafBiophysics{FT<:AbstractFloat} <: Abstrac
     "Emissivity for longwave radiation"
     ϵ_LW::FT = 0.97
 
-    # prognostic variables that change with time
+    # Prognostic variables
     "Dry matter content (dry leaf mass per unit area) `[g cm⁻²]`"
     lma::FT = 0.012
 end

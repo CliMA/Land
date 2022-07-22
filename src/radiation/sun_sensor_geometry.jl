@@ -20,13 +20,13 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct SunSensorGeometry{FT<:AbstractFloat}
-    # parameters that do not change with time
+    # General site information
     "Hill facing azimuth angle `[°]`, 0 for North, 180 for south"
     HAA::FT = 0
     "Hill slope angle `[°]`"
     HSA::FT = 0
 
-    # parameters that do not change with time
+    # Prognostic variables
     "Solar azimuth angle `[°]`, a function of time"
     saa::FT = 180
     "Solar zenith angle `[°]`, a function of lat and time"

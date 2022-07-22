@@ -71,7 +71,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct HyperspectralRadiation{FT<:AbstractFloat} <: AbstractRadiation{FT}
-    # prognostic variables that change with time
+    # Prognostic variables
     "Diffuse radiation `[mW m⁻² nm⁻¹]`"
     e_diffuse::Vector{FT} = read_nc(LAND_2021, "E_DIFF")
     "Direct radiation `[mW m⁻² nm⁻¹]`"

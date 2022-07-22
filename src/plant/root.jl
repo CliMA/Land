@@ -19,17 +19,17 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct Root{FT<:AbstractFloat}
-    # parameters that do not change with time
+    # Embedded structures
     "[`RootHydraulics`](@ref) type root hydraulic system"
     HS::RootHydraulics{FT} = RootHydraulics{FT}()
 
-    # prognostic variables that change with time (# TODO: add wood storage as well)
-    "Total stored energy in water `[J]`"
-    e::FT = T₂₅() * sum(HS.v_storage) * CP_L_MOL(FT)
-    "Current temperature"
+    # Prognostic variables (not used for ∂y∂t)
+    "Current temperature `[K]`"
     t::FT = T₂₅()
 
-    # diagnostic variables that change with time
+    # Prognostic variables (used for ∂y∂t)
+    "Total stored energy in water `[J]`" # TODO: add wood storage as well
+    e::FT = sum(HS.v_storage) * CP_L_MOL(FT) * t
     "Marginal increase in energy `[W]`"
     ∂e∂t::FT = 0
 end
