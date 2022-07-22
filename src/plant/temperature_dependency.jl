@@ -160,8 +160,8 @@ RespirationTDCLM(FT)              = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF
 VcmaxTDCLM(FT, t::Number = T₂₅()) = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = NaN , ΔHA = 72000.0, ΔHD = 200000.0, ΔSV = 668.39 - 1.07 * (t - T₀()) );
 VcmaxTDLeuning(FT)                = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = NaN , ΔHA = 73637.0, ΔHD = 149252.0, ΔSV = 486.0 );
 VpmaxTDBoyd(FT)                   = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = NaN , ΔHA = 94800.0, ΔHD = 73300.0 , ΔSV = 250.0 );
-ΗCTDJohnson(FT)                   = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = 1.0 , ΔHA = 0.0    , ΔHD = 220000.0, ΔSV = 710.0 );
-ΗLTDJohnson(FT)                   = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = 0.75, ΔHA = 0.0    , ΔHD = 220000.0, ΔSV = 710.0 );
+ηCTDJohnson(FT)                   = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = 1.0 , ΔHA = 0.0    , ΔHD = 220000.0, ΔSV = 710.0 );
+ηLTDJohnson(FT)                   = ArrheniusPeak{FT}(T_REF = T₂₅(), VAL_REF = 0.75, ΔHA = 0.0    , ΔHD = 220000.0, ΔSV = 710.0 );
 
 Q10TDAngiosperm(FT) = Q10{FT}(Q_10 = 1.4, T_REF = T₂₅(), VAL_REF = 0.0140/8760);
 Q10TDGymnosperm(FT) = Q10{FT}(Q_10 = 1.7, T_REF = T₂₅(), VAL_REF = 0.0425/8760);

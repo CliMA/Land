@@ -75,10 +75,10 @@ Base.@kwdef mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhoto
     TD_VCMAX::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = VcmaxTDCLM(FT)
     "[`AbstractTemperatureDependency`](@ref) type Γ* temperature dependency"
     TD_Γ::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = ΓStarTDCLM(FT)
-    "[`AbstractTemperatureDependency`](@ref) type Η_C temperature dependency"
-    TD_ηC::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = ΗCTDJohnson(FT)
-    "[`AbstractTemperatureDependency`](@ref) type Η_L temperature dependency"
-    TD_ηL::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = ΗLTDJohnson(FT)
+    "[`AbstractTemperatureDependency`](@ref) type η_C temperature dependency"
+    TD_ηC::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = ηCTDJohnson(FT)
+    "[`AbstractTemperatureDependency`](@ref) type η_L temperature dependency"
+    TD_ηL::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}} = ηLTDJohnson(FT)
 
     # Prognostic variables
     "Total concentration of Cytochrome b₆f `[μmol m⁻²]`"

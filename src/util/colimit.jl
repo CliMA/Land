@@ -6,9 +6,6 @@
 #     2022-Jan-14: add quadratic colimitation struct
 #     2022-Feb-28: add serial colimitation struct
 #     2022-Jan-18: add abstract colimitation type
-#     2022-Jan-25: add documentation
-#     2022-Jul-13: use @kwdef for the constructor
-#     2022-Jul-13: add structs description
 #     2022-Jul-13: add shortcut constructors for QuadraticColimit
 #
 #######################################################################################################################################################################################################

@@ -28,7 +28,6 @@ abstract type AbstractSPACSystem{FT<:AbstractFloat} end
 #     2022-May-25: use Root and Stem structures with temperatures
 #     2022-Jun-29: add AirLayer to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
-#     2022-Jul-20: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -43,7 +42,7 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct MonoElementSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
-    # parameters that do not change with time
+    # Embedded structures
     "Air conditions"
     AIR::AirLayer{FT} = AirLayer{FT}()
     "Leaf system"
@@ -57,7 +56,7 @@ Base.@kwdef mutable struct MonoElementSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     "Stem system"
     STEM::Stem{FT} = Stem{FT}()
 
-    # caches to speed up calculations
+    # Cache variables
     "Relative hydraulic conductance"
     _krs::Vector{FT} = ones(FT, 4)
 end
@@ -73,7 +72,6 @@ end
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
-#     2022-Jul-20: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -88,17 +86,29 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
-    # dimensions
+    # Dimensions
     "Dimension of air layers"
     DIM_AIR::Int = 25
     "Dimension of canopy layers"
     DIM_LAYER::Int = 20
     "Dimension of root layers"
     DIM_ROOT::Int = 5
-    "Dimension of soil layers"
-    DIM_SOIL::Int = 5
 
-    # parameters that do not change with time
+    # General model information
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool = true
+
+    # Geometry information
+    "Corresponding air layer per canopy layer"
+    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
+    "Corresponding soil layer per root layer"
+    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
+    "Depth and height information `[m]`"
+    Z::Vector{FT} = FT[-0.2, 0.5]
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT} = collect(FT, 0:0.05:1)
+
+    # Embedded structures
     "Air for each layer (may be more than canopy layer)" # TODO: add air ZS
     AIR::Vector{AirLayer{FT}} = AirLayer{FT}[AirLayer{FT}() for _i in 1:DIM_AIR]
     "Sun sensor geometry"
@@ -107,8 +117,6 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Corresponding air layer per canopy layer"
-    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
@@ -119,20 +127,12 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     RAD_SW::HyperspectralRadiation{FT} = HyperspectralRadiation{FT}()
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}} = Root{FT}[Root{FT}() for _i in 1:DIM_ROOT]
-    "Corresponding soil layer per root layer"
-    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
     "Soil component"
     SOIL::Soil{FT} = Soil{FT}()
     "Wavelength sets to use with hyperspectral radiation"
     WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
-    "Depth and height information `[m]`"
-    Z::Vector{FT} = FT[-0.2, 0.5]
-    "Air boundaries `[m]`"
-    Z_AIR::Vector{FT} = collect(FT, 0:0.05:1)
-    "Whether to convert energy to photons when computing fluorescence"
-    Φ_PHOTON::Bool = true
 
-    # caches to speed up calculations
+    # Cache variables
     "Flow rate per root layer"
     _fs::Vector{FT} = zeros(FT, DIM_ROOT)
     "Conductances for each root layer at given flow"
@@ -152,7 +152,6 @@ end
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
-#     2022-Jul-20: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -167,17 +166,29 @@ $(TYPEDFIELDS)
 
 """
 Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSystem{FT}
-    # dimensions
+    # Dimensions
     "Dimension of air layers"
     DIM_AIR::Int = 25
     "Dimension of canopy layers"
     DIM_LAYER::Int = 20
     "Dimension of root layers"
     DIM_ROOT::Int = 5
-    "Dimension of soil layers"
-    DIM_SOIL::Int = 5
 
-    # parameters that do not change with time
+    # General model information
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool = true
+
+    # Geometry information
+    "Corresponding air layer per canopy layer"
+    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
+    "Corresponding soil layer per root layer"
+    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
+    "Depth and height information `[m]`"
+    Z::Vector{FT} = FT[-1, 6, 12]
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT} = collect(FT, 0:0.2:13)
+
+    # Embedded structures
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}} = AirLayer{FT}[AirLayer{FT}() for _i in 1:DIM_AIR]
     "Sun sensor geometry"
@@ -186,8 +197,6 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Corresponding air layer per canopy layer"
-    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
@@ -198,22 +207,14 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     RAD_SW::HyperspectralRadiation{FT} = HyperspectralRadiation{FT}()
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}} = Root{FT}[Root{FT}() for _i in 1:DIM_ROOT]
-    "Corresponding soil layer per root layer"
-    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
     "Soil component"
     SOIL::Soil{FT} = Soil{FT}()
     "Trunk hydraulic system"
     TRUNK::Stem{FT} = Stem{FT}()
     "Wavelength sets to use with hyperspectral radiation"
     WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
-    "Depth and height information `[m]`"
-    Z::Vector{FT} = FT[-1, 6, 12]
-    "Air boundaries `[m]`"
-    Z_AIR::Vector{FT} = collect(FT, 0:0.2:13)
-    "Whether to convert energy to photons when computing fluorescence"
-    Φ_PHOTON::Bool = true
 
-    # caches to speed up calculations
+    # Cache variables
     "Flow rate per root layer"
     _fs::Vector{FT} = zeros(FT, DIM_ROOT)
     "Conductances for each root layer at given flow"
@@ -233,7 +234,6 @@ end
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
-#     2022-Jul-20: use kwdef for the constructor
 #
 #######################################################################################################################################################################################################
 """
@@ -255,8 +255,22 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     DIM_LAYER::Int = 20
     "Dimension of root layers"
     DIM_ROOT::Int = 5
-    "Dimension of soil layers"
-    DIM_SOIL::Int = 5
+
+    # General model information
+    "Whether to convert energy to photons when computing fluorescence"
+    Φ_PHOTON::Bool = true
+
+    # Geometry information
+    "Corresponding air layer per canopy layer"
+    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
+    "Corresponding soil layer per root layer"
+    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
+    "Depth and height information `[m]`"
+    Z::Vector{FT} = FT[-1, 6, 12]
+    "Air boundaries `[m]`"
+    Z_AIR::Vector{FT} = collect(FT, 0:0.2:13)
+
+    # Embedded structures
 
     # parameters that do not change with time
     "Air for each layer (more than canopy layer)"
@@ -269,8 +283,6 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Corresponding air layer per canopy layer"
-    LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
     "Hyperspectral absorption features of different leaf components"
     LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
@@ -281,22 +293,14 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     RAD_SW::HyperspectralRadiation{FT} = HyperspectralRadiation{FT}()
     "Root hydraulic system"
     ROOTS::Vector{Root{FT}} = Root{FT}[Root{FT}() for _i in 1:DIM_ROOT]
-    "Corresponding soil layer per root layer"
-    ROOTS_INDEX::Vector{Int} = collect(Int, 1:DIM_ROOT)
     "Soil component"
     SOIL::Soil{FT} = Soil{FT}()
     "Trunk hydraulic system"
     TRUNK::Stem{FT} = Stem{FT}()
     "Wavelength sets to use with hyperspectral radiation"
     WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
-    "Depth and height information `[m]`"
-    Z::Vector{FT} = FT[-1, 6, 12]
-    "Air boundaries `[m]`"
-    Z_AIR::Vector{FT} = collect(FT, 0:0.2:13)
-    "Whether to convert energy to photons when computing fluorescence"
-    Φ_PHOTON::Bool = true
 
-    # caches to speed up calculations
+    # Cache variables
     "Flow rate per root layer"
     _fs::Vector{FT} = zeros(FT, DIM_ROOT)
     "Conductances for each root layer at given flow"
