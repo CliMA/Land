@@ -6,9 +6,10 @@
 #
 #######################################################################################################################################################################################################
 """
-This function compute the extinction coefficients for direct and diffuse radiation for given leaf inclination. Supported methods are
-
-$(METHODLIST)
+This function compute the extinction coefficients for direct and diffuse radiation for given leaf inclination. Supported methods are to
+- Compute the coefficient for given direct solar zenith angle (SZA) and leaf inclination angle (LIA)
+- Compute the coefficient for diffuse light at given LIA
+- Compute the coefficients for given sun-sensor geometry
 
 """
 function extinction_coefficient end
@@ -28,6 +29,7 @@ function extinction_coefficient end
 Return the extinction coefficient for direct radiation, given
 - `sza` Solar zenith angle in `°`
 - `lia` Leaf inclination angle in `°`
+
 """
 extinction_coefficient(sza::FT, lia::FT) where {FT<:AbstractFloat} = (
     _π = FT(pi);
@@ -54,6 +56,7 @@ extinction_coefficient(sza::FT, lia::FT) where {FT<:AbstractFloat} = (
 
 Return the extinction coefficient for diffuse radiation (unifrom 18 average angles from 2.5° to 87.5°), given
 - `sza` Solar zenith angle in `°`
+
 """
 extinction_coefficient(lia::FT) where {FT<:AbstractFloat} = (
     # compute the mean extinction coefficient for diffuse solar radiation from 18 angles
@@ -89,6 +92,7 @@ Return the extinction and scattering coefficients (extinction coefficients from 
 - `vza` Viewing zenith angle in `°`
 - `raa` Relative azimuth angle in `°`
 - `lia` Leaf inclination angle in `°`
+
 """
 extinction_coefficient(sza::FT, vza::FT, raa::FT, lia::FT) where {FT<:AbstractFloat} = (
     _π = FT(pi);
@@ -143,9 +147,9 @@ extinction_coefficient(sza::FT, vza::FT, raa::FT, lia::FT) where {FT<:AbstractFl
 #
 #######################################################################################################################################################################################################
 """
-This function updates the extinction (and scattering) coefficients for canopy. Supported methods are
-
-$(METHODLIST)
+This function updates the extinction (and scattering) coefficients for canopy. Supported methods are to
+- Update coefficients for broadband single layer canopy
+- Update coefficients for hyperspectral mutiple layers canopy
 
 """
 function extinction_scattering_coefficients! end
@@ -165,6 +169,7 @@ function extinction_scattering_coefficients! end
 Update the extinction and scattering coefficients, given
 - `can` `BroadbandSLCanopy` type canopy
 - `angles` `SunSensorGeometry` type angles
+
 """
 extinction_scattering_coefficients!(can::BroadbandSLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     @unpack P_INCL, RADIATION, Θ_INCL = can;
@@ -196,6 +201,7 @@ extinction_scattering_coefficients!(can::BroadbandSLCanopy{FT}, angles::SunSenso
 Update the extinction and scattering coefficients, given
 - `can` `HyperspectralMLCanopy` type canopy
 - `angles` `SunSensorGeometry` type angles
+
 """
 extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     @unpack OPTICS, Θ_INCL = can;

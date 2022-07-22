@@ -6,29 +6,16 @@
 #
 #######################################################################################################################################################################################################
 """
-This function returns cumulative distribution frequency. Supported methods are
-
-$(METHODLIST)
-
-"""
-function lidf_cdf end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-02: generalize the function from CanopyLayers.dcum to lidf_cdf
-#
-#######################################################################################################################################################################################################
-"""
 
     lidf_cdf(lidf::VerhoefLIDF{FT}, θ::FT) where {FT<:AbstractFloat}
 
 Return the cumulative distribution frequency, given
 - `lidf` `VerhoefLIDF` type algorithm
 - `θ` Leaf inclination angle in `[°]`
+
 """
+function lidf_cdf end
+
 lidf_cdf(lidf::VerhoefLIDF{FT}, θ::FT) where {FT<:AbstractFloat} = (
     @unpack A, B = lidf;
 
@@ -58,21 +45,6 @@ lidf_cdf(lidf::VerhoefLIDF{FT}, θ::FT) where {FT<:AbstractFloat} = (
 # Changes to this function
 # General
 #     2022-Jun-02: generalize the function from CanopyLayers.dladgen to inclination_angles!
-#
-#######################################################################################################################################################################################################
-"""
-This function updates cumulative distribution frequency within the canopy. Supported methods are
-
-$(METHODLIST)
-
-"""
-function inclination_angles! end
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
 #     2022-Jun-02: add method for VerhoefLIDF algorithm
 #     2022-Jun-15: add support to BroadbandSLCanopy
 #
@@ -84,40 +56,16 @@ function inclination_angles! end
 Update the frequency of leaf inclination angles, given
 - `can` `HyperspectralMLCanopy` type multiple layer canopy
 - `lidf` `VerhoefLIDF` type algorithm
+
 """
+function inclination_angles! end
+
 inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat} = (
     @unpack Θ_INCL_BNDS = can;
 
     for _i in eachindex(can.P_INCL)
         can.P_INCL[_i] = lidf_cdf(lidf, Θ_INCL_BNDS[_i,2]) - lidf_cdf(lidf, Θ_INCL_BNDS[_i,1]);
     end;
-
-    return nothing
-);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to this method
-# General
-#     2022-Jun-02: add method for VerhoefLIDF algorithm
-#     2022-Jun-02: add support to BroadbandSLCanopy besides HyperspectralMLCanopy
-#
-#######################################################################################################################################################################################################
-"""
-
-    inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat}
-
-Update the frequency of leaf inclination angles, given
-- `can` `BroadbandSLCanopy` or `HyperspectralMLCanopy` type multiple layer canopy
-- `lidf` `VerhoefLIDF` type algorithm
-- `a` `VerhoefLIDF` parameter A
-- `b` `VerhoefLIDF` parameter B
-"""
-inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}, a::FT, b::FT) where {FT<:AbstractFloat} = (
-    lidf.A = a;
-    lidf.B = b;
-    inclination_angles!(can, lidf);
 
     return nothing
 );

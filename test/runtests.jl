@@ -8,8 +8,8 @@ using Test
         for FT in [Float32, Float64]
             can1 = ClimaCache.HyperspectralMLCanopy{FT}();
             can2 = ClimaCache.BroadbandSLCanopy{FT}();
-            CanopyRadiativeTransfer.inclination_angles!(can1, can1.LIDF, FT(0), FT(0));
-            CanopyRadiativeTransfer.inclination_angles!(can2, can2.LIDF, FT(0), FT(0));
+            CanopyRadiativeTransfer.inclination_angles!(can1, can1.LIDF);
+            CanopyRadiativeTransfer.inclination_angles!(can2, can2.LIDF);
             @test true;
         end;
     end;
@@ -28,13 +28,14 @@ using Test
             hcan = ClimaCache.HyperspectralMLCanopy{FT}();
             bcan = ClimaCache.BroadbandSLCanopy{FT}();
             angles = ClimaCache.SunSensorGeometry{FT}();
-            hleaf = ClimaCache.Leaf{FT}("C3");
-            bleaf = ClimaCache.Leaf{FT}("C3"; broadband = true);
+            hleaf = ClimaCache.Leaves2D{FT}();
+            bleaf = ClimaCache.Leaves1D{FT}();
             leaves = [deepcopy(hleaf) for i in 1:20];
-            hsoil = ClimaCache.Soil{FT}(FT[0,-1]);
-            bsoil = ClimaCache.Soil{FT}(FT[0,-1], true);
+            hsoil = ClimaCache.Soil{FT}();
+            bsoil = ClimaCache.Soil{FT}(ZS = FT[0,-1], ALBEDO = ClimaCache.BroadbandSoilAlbedo{FT}());
             hrad = ClimaCache.HyperspectralRadiation{FT}();
             brad = ClimaCache.BroadbandRadiation{FT}();
+            spac = ClimaCache.MonoMLTreeSPAC{FT}();
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, angles);
             @test true;
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, leaves, hsoil);
@@ -59,26 +60,30 @@ using Test
             @test true;
             CanopyRadiativeTransfer.soil_albedo!(hcan, bsoil);
             @test true;
+            CanopyRadiativeTransfer.canopy_radiation!(spac);
+            @test true;
+            CanopyRadiativeTransfer.canopy_fluorescence!(spac);
+            @test true;
         end;
     end;
 
     @testset "Remote Sensing" begin
         for FT in [Float32, Float64]
             can = ClimaCache.HyperspectralMLCanopy{FT}();
-            for rs in [CanopyRadiativeTransfer.MODIS_EVI(can),
-                       CanopyRadiativeTransfer.MODIS_EVI2(can),
-                       CanopyRadiativeTransfer.MODIS_LSWI(can),
-                       CanopyRadiativeTransfer.MODIS_NDVI(can),
-                       CanopyRadiativeTransfer.MODIS_NIRv(can),
-                       CanopyRadiativeTransfer.OCO2_SIF759(can),
-                       CanopyRadiativeTransfer.OCO2_SIF770(can),
-                       CanopyRadiativeTransfer.OCO3_SIF759(can),
-                       CanopyRadiativeTransfer.OCO3_SIF770(can),
-                       CanopyRadiativeTransfer.TROPOMI_SIF683(can),
-                       CanopyRadiativeTransfer.TROPOMI_SIF740(can),
-                       CanopyRadiativeTransfer.TROPOMI_SIF747(can),
-                       CanopyRadiativeTransfer.TROPOMI_SIF751(can)]
-                @test typeof(rs) == FT;
+            for var in [CanopyRadiativeTransfer.MODIS_EVI(can),
+                        CanopyRadiativeTransfer.MODIS_EVI2(can),
+                        CanopyRadiativeTransfer.MODIS_LSWI(can),
+                        CanopyRadiativeTransfer.MODIS_NDVI(can),
+                        CanopyRadiativeTransfer.MODIS_NIRv(can),
+                        CanopyRadiativeTransfer.OCO2_SIF759(can),
+                        CanopyRadiativeTransfer.OCO2_SIF770(can),
+                        CanopyRadiativeTransfer.OCO3_SIF759(can),
+                        CanopyRadiativeTransfer.OCO3_SIF770(can),
+                        CanopyRadiativeTransfer.TROPOMI_SIF683(can),
+                        CanopyRadiativeTransfer.TROPOMI_SIF740(can),
+                        CanopyRadiativeTransfer.TROPOMI_SIF747(can),
+                        CanopyRadiativeTransfer.TROPOMI_SIF751(can)]
+                @test typeof(var) == FT;
             end;
         end;
     end;
