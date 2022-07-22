@@ -32,8 +32,8 @@ using WaterPhysics: saturation_vapor_pressure
 #     2022-Jul-20: use reprocessed data for the default constructor
 #
 #######################################################################################################################################################################################################
-const LAND_2017   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2017.nc";
-const LAND_2021   = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.nc";
+const LAND_2017 = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2017.nc";
+const LAND_2021 = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.nc";
 
 
 # include the utility types and structures
