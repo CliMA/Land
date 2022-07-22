@@ -102,7 +102,7 @@ Base.@kwdef mutable struct BroadbandSLCanopy{FT<:AbstractFloat} <: AbstractCanop
     "Inclination angle distribution"
     P_INCL::Vector{FT} = ones(FT, DIM_INCL) ./ DIM_INCL
     "Bounds of inclination angles `[°]`"
-    Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(start=0, stop=90, length=DIM_INCL+1))[1:end-1] collect(FT, range(start=0, stop=90, length=DIM_INCL+1))[2:end] ]
+    Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(0, 90; length=DIM_INCL+1))[1:end-1] collect(FT, range(0, 90; length=DIM_INCL+1))[2:end] ]
     "Mean inclination angles `[°]`"
     Θ_INCL::Vector{FT} = [ mean(Θ_INCL_BNDS[_i,:]) for _i in 1:DIM_INCL ]
 
@@ -168,9 +168,9 @@ Base.@kwdef mutable struct HyperspectralMLCanopy{FT<:AbstractFloat} <: AbstractC
     "Inclination angle distribution"
     P_INCL::Vector{FT} = ones(FT, DIM_INCL) ./ DIM_INCL
     "Mean azimuth angles `[°]`"
-    Θ_AZI::Vector{FT} = collect(FT, range(start=0, stop=360, length=DIM_AZI+1))[1:end-1] .+ 360 / DIM_AZI / 2
+    Θ_AZI::Vector{FT} = collect(FT, range(0, 360; length=DIM_AZI+1))[1:end-1] .+ 360 / DIM_AZI / 2
     "Bounds of inclination angles `[°]`"
-    Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(start=0, stop=90, length=DIM_INCL+1))[1:end-1] collect(FT, range(start=0, stop=90, length=DIM_INCL+1))[2:end] ]
+    Θ_INCL_BNDS::Matrix{FT} = FT[ collect(FT, range(0, 90; length=DIM_INCL+1))[1:end-1] collect(FT, range(0, 90; length=DIM_INCL+1))[2:end] ]
     "Mean inclination angles `[°]`"
     Θ_INCL::Vector{FT} = [ mean(Θ_INCL_BNDS[_i,:]) for _i in 1:DIM_INCL ]
     "Clumping structure a"
@@ -194,5 +194,5 @@ Base.@kwdef mutable struct HyperspectralMLCanopy{FT<:AbstractFloat} <: AbstractC
     "Square of cosine of Θ_INCL at different azimuth angles"
     _COS²_Θ_INCL_AZI::Matrix{FT} = (cosd.(Θ_INCL) .^ 2) * _1_AZI'
     "Cache for level boundary locations"
-    _x_bnds::Vector{FT} = collect(FT, range(start=0, stop=-1, length=DIM_LAYER+1))
+    _x_bnds::Vector{FT} = collect(FT, range(0, -1; length=DIM_LAYER+1))
 end
