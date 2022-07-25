@@ -300,7 +300,7 @@ version = "2.3.2"
 deps = ["ClimaCache", "PkgUtility", "Test", "UnPack"]
 path = ".."
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
-version = "0.4.0"
+version = "0.4.1"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]

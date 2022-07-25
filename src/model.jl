@@ -3,7 +3,6 @@
 # Changes to this function
 # General
 #     2022-Jan-14: refactor the function leaf_photosynthesis!
-#     2022-Jan-24: fix documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -27,27 +26,42 @@ function leaf_photosynthesis! end
 # Changes to this method
 # General
 #     2022-Jul-07: add method to compute photosynthetic rates only
-#     2022-Jul-13: fix documentation
+#     2022-Jul-25: abstractize method to support Leaves1D
 #
 #######################################################################################################################################################################################################
 """
 
-    leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT = lf.t) where {FT<:AbstractFloat}
+    leaf_photosynthesis!(lf::Leaves1D{FT}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT) where {FT<:AbstractFloat}
 
 Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataModels.jl temporary use), given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf._g_CO₂`
 - `ppar` APAR used for photosynthesis
+- `t` Leaf temperature in `[K]`
 
 """
-leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT) where {FT<:AbstractFloat} = (
+leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT = lf.t) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = lf;
 
-    if lf.t != lf._t
-        photosystem_temperature_dependence!(PSM, air, lf.t);
+    if t != lf._t
+        photosystem_temperature_dependence!(PSM, air, t);
     end;
-    photosystem_electron_transport!(PSM, PRC, ppar, lf._p_CO₂_i; β = FT(1));
+    photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
+    rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
+    light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
+    product_limited_rate!(PSM, air, g_lc; β = FT(1));
+    colimit_photosynthesis!(PSM; β = FT(1));
+
+    return nothing
+);
+
+leaf_photosynthesis!(lf::Leaves1D{FT}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT) where {FT<:AbstractFloat} = (
+    @unpack PRC, PSM = lf;
+
+    photosystem_temperature_dependence!(PSM, air, t);
+    photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
     product_limited_rate!(PSM, air, g_lc; β = FT(1));
@@ -62,7 +76,6 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLa
 # Changes to this method
 # General
 #     2022-Jul-12: add method to account for tuning factor at leaf level
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -128,7 +141,6 @@ leaf_photosynthesis!(
 #     2022-Jan-14: set a default g_lc from leaf to combine two methods
 #     2022-Jan-18: add p_i to electron transport function input variables
 #     2022-Jan-24: fix PSM abstraction in colimit_photosynthesis! function
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
 #     2022-Feb-28: add support to C3CytochromeModel
@@ -140,7 +152,6 @@ leaf_photosynthesis!(
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
 #     2022-Jul-12: use β as a must have option (and thus this function becomes a core function of the one above)
-#     2022-Jul-13: deflate documentation
 # To do
 #     TODO: update leaf T in StomataModels module or higher level
 #
@@ -384,7 +395,6 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
 #     2022-Jun-29: add method for MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-13: redirect the wrapper function to the method at leaf level
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
