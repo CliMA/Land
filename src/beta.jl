@@ -73,7 +73,7 @@ Update the beta factor for the LEAF component in SPAC, given
 
     _f_st = relative_surface_tension(LEAF.t);
 
-    β.β₁ = β_factor(β.FUNC, LEAF.HS.VC, LEAF.HS.p_element[end] / _f_st);
+    β.β₁ = β_factor(β.FUNC, LEAF.HS.VC, LEAF.HS._p_element[end] / _f_st);
 
     return nothing
 );
@@ -93,7 +93,7 @@ Update the beta factor for the LEAF component in SPAC, given
 
     _f_st = relative_surface_tension(LEAF.t);
 
-    β.β₁ = β_factor(β.FUNC, LEAF.HS.p_element[end] / _f_st);
+    β.β₁ = β_factor(β.FUNC, LEAF.HS._p_element[end] / _f_st);
 
     return nothing
 );
@@ -149,7 +149,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterKleaf) where {FT<:AbstractFloat} = (
     _f_st = relative_surface_tension(leaves.t);
 
-    β.β₁ = β_factor(β.FUNC, leaves.HS.VC, leaves.HS.p_element[end] / _f_st);
+    β.β₁ = β_factor(β.FUNC, leaves.HS.VC, leaves.HS._p_element[end] / _f_st);
 
     return nothing
 );
@@ -171,7 +171,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterPleaf) where {FT<:AbstractFloat} = (
     _f_st = relative_surface_tension(leaves.t);
 
-    β.β₁ = β_factor(β.FUNC, leaves.HS.p_element[end] / _f_st);
+    β.β₁ = β_factor(β.FUNC, leaves.HS._p_element[end] / _f_st);
 
     return nothing
 );

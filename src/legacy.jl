@@ -38,4 +38,4 @@ clear_legacy!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}) where {F
 
 clear_legacy!(organ::Leaves1D{FT}) where {FT<:AbstractFloat} = (clear_legacy!(organ.HS); clear_legacy!(organ.HS2););
 
-clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat} = (hs.k_history .= 1; hs.p_history .= 0; return nothing);
+clear_legacy!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}) where {FT<:AbstractFloat} = (hs._k_history .= 1; hs.p_history .= 0; return nothing);

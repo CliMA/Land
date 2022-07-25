@@ -21,18 +21,18 @@ function plant_conductances!(tree::MonoElementSPAC{FT}) where {FT<:AbstractFloat
     r_root = FT(0);
     r_stem = FT(0);
     r_leaf = FT(0);
-    for i in 1:tree.root.N
-        r_root += (tree.root).k_history[i];
+    for i in 1:tree.root.DIM_XYLEM
+        r_root += (tree.root)._k_history[i];
     end
-    for i in 1:tree.stem.N
-        r_stem += (tree.stem).k_history[i];
+    for i in 1:tree.stem.DIM_XYLEM
+        r_stem += (tree.stem)._k_history[i];
     end
-    for i in 1:tree.leaf.N
-        r_leaf += (tree.leaf).k_history[i];
+    for i in 1:tree.leaf.DIM_XYLEM
+        r_leaf += (tree.leaf)._k_history[i];
     end
-    r_root /= tree.root.N;
-    r_stem /= tree.stem.N;
-    r_leaf /= tree.leaf.N;
+    r_root /= tree.root.DIM_XYLEM;
+    r_stem /= tree.stem.DIM_XYLEM;
+    r_leaf /= tree.leaf.DIM_XYLEM;
     r_tree  = r_root * r_m_root + r_stem * r_m_stem + r_leaf * r_m_leaf;
 
     # Update the kr info

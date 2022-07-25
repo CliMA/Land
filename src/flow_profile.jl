@@ -112,8 +112,9 @@ root_pk(root::Root{FT}) where {FT<:AbstractFloat} = root_pk(root.HS, root.t);
 root_pk(hs::RootHydraulics{FT}, T::FT) where {FT<:AbstractFloat} = root_pk(hs, hs.FLOW, T);
 
 root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
@@ -130,22 +131,22 @@ root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:Abs
     end;
 
     # convert the end pressure back to that at liquid pressure to be matric potential
-    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T_25(FT);
+    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T₂₅(FT);
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
         _r_all += 1 / _k;
     end;
 
@@ -153,8 +154,9 @@ root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:Abs
 );
 
 root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
@@ -171,22 +173,22 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
     end;
 
     # convert the end pressure back to that at liquid pressure to be matric potential
-    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T_25(FT);
+    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T₂₅(FT);
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.f_element[_i] / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode._f_element[_i] / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
         _r_all += 1 / _k;
     end;
 
@@ -265,43 +267,43 @@ xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT,
     _f_vis = relative_viscosity(T);
 
     # compute the flow rate from capacitance buffer
-    mode.f_buffer[1] = (hs.p_storage - hs.p_leaf) * capacitance_buffer(PVC) / _f_vis * V_MAXIMUM;
+    mode._f_buffer[1] = (hs._p_storage - hs.p_leaf) * capacitance_buffer(PVC) / _f_vis * V_MAXIMUM;
 
     # make sure the buffer rate does not drain or overflow the capacictance
-    if (mode.f_buffer[1] > 0) && (hs.v_storage <= mode.f_buffer[1] * Δt)
-        mode.f_buffer[1] = (hs.v_storage - eps(FT)) / Δt;
+    if (mode._f_buffer[1] > 0) && (hs.v_storage <= mode._f_buffer[1] * Δt)
+        mode._f_buffer[1] = (hs.v_storage - eps(FT)) / Δt;
     end;
 
     # update storage and the tissue pressure (p_storage)
-    hs.v_storage -= mode.f_buffer[1] * Δt;
-    hs.p_storage = xylem_pressure(PVC, hs.v_storage/V_MAXIMUM, T);
+    hs.v_storage -= mode._f_buffer[1] * Δt;
+    hs._p_storage = xylem_pressure(PVC, hs.v_storage/V_MAXIMUM, T);
 
     # update flow into the tissue
-    mode.f_in = mode.f_out - mode.f_buffer[1];
+    mode.f_in = mode.f_out - mode._f_buffer[1];
 
     return nothing
 );
 
 xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack N, PVC, V_MAXIMUM = hs;
+    @unpack DIM_XYLEM, PVC, V_MAXIMUM = hs;
 
     _f_vis = relative_viscosity(T);
 
     # update storage volume and pressure per slice
     _f_sum::FT = 0;
-    for _i in N:-1:1
-        mode.f_buffer[_i] = (hs.p_storage[_i] - hs.p_element[_i]) * capacitance_buffer(PVC) / _f_vis * V_MAXIMUM[_i];
+    for _i in DIM_XYLEM:-1:1
+        mode._f_buffer[_i] = (hs._p_storage[_i] - hs._p_element[_i]) * capacitance_buffer(PVC) / _f_vis * V_MAXIMUM[_i];
 
         # make sure the buffer rate does not drain or overflow the capacictance
-        if (mode.f_buffer[_i] > 0) && (hs.v_storage[_i] <= mode.f_buffer[_i] * Δt)
-            mode.f_buffer[_i] = hs.v_storage[_i] / Δt;
+        if (mode._f_buffer[_i] > 0) && (hs.v_storage[_i] <= mode._f_buffer[_i] * Δt)
+            mode._f_buffer[_i] = hs.v_storage[_i] / Δt;
         end;
 
-        mode.f_sum[_i] = _f_sum;
-        hs.v_storage[_i] -= mode.f_buffer[_i] * Δt;
-        hs.p_storage[_i] = xylem_pressure(PVC, hs.v_storage[_i]/V_MAXIMUM[_i], T);
-        mode.f_element[_i] = mode.f_out - _f_sum;
-        _f_sum += mode.f_buffer[_i];
+        mode._f_sum[_i] = _f_sum;
+        hs.v_storage[_i] -= mode._f_buffer[_i] * Δt;
+        hs._p_storage[_i] = xylem_pressure(PVC, hs.v_storage[_i]/V_MAXIMUM[_i], T);
+        mode._f_element[_i] = mode.f_out - _f_sum;
+        _f_sum += mode._f_buffer[_i];
     end;
 
     # update flow into the tissue
@@ -366,7 +368,7 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vecto
 
 xylem_flow_profile!(mode::SteadyStateFlow, flow::FT) where {FT<:AbstractFloat} = (mode.flow = flow; return nothing);
 
-xylem_flow_profile!(mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat} = (mode.f_out = f_out; mode.f_element .= f_out .- mode.f_sum; return nothing);
+xylem_flow_profile!(mode::NonSteadyStateFlow, f_out::FT) where {FT<:AbstractFloat} = (mode.f_out = f_out; mode._f_element .= f_out .- mode._f_sum; return nothing);
 
 
 """
@@ -466,7 +468,7 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
 
     # update the
     _g = 1 / (1 / LEAF.g_H₂O_s + 1 / (FT(1.35) * LEAF.g_CO₂_b));
-    _d = LEAF.p_H₂O_sat - AIR.p_H₂O;
+    _d = saturation_vapor_pressure(LEAF.t) - AIR.p_H₂O;
     _f = _g * _d / AIR.P_AIR;
     xylem_flow_profile!(LEAF.HS.FLOW, _f);
 
@@ -474,10 +476,10 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
 );
 
 xylem_flow_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, LEAVES, LEAVES_INDEX, N_CANOPY = spac;
+    @unpack AIR, CANOPY, DIM_LAYER, LEAVES, LEAVES_INDEX = spac;
 
     for _i in eachindex(LEAVES)
-        _p_sl = CANOPY.OPTICS.p_sunlit[N_CANOPY + 1 - _i];
+        _p_sl = CANOPY.OPTICS.p_sunlit[DIM_LAYER + 1 - _i];
 
         _g_sh = 1 / (1 /LEAVES[_i].g_H₂O_s_shaded + 1 / (FT(1.35) * LEAVES[_i].g_CO₂_b));
         _g_sl = 0;
@@ -487,7 +489,7 @@ xylem_flow_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLT
         _g_sl /= length(LEAVES[_i].g_H₂O_s_sunlit);
 
         _g = _g_sh * (1 - _p_sl) + _g_sl * _p_sl;
-        _d = LEAVES[_i].p_H₂O_sat - AIR[LEAVES_INDEX[_i]].p_H₂O;
+        _d = saturation_vapor_pressure(LEAVES[_i].t) - AIR[LEAVES_INDEX[_i]].p_H₂O;
         _f = _g * _d / AIR[LEAVES_INDEX[_i]].P_AIR;
 
         xylem_flow_profile!(LEAVES[_i].HS.FLOW, _f);

@@ -70,8 +70,8 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
     @unpack LEAF, ROOT, STEM = spac;
 
     # read out the conductances
-    _kr = ROOT.HS.K_MAX / relative_viscosity(ROOT.t);
-    _ks = STEM.HS.K_MAX / relative_viscosity(STEM.t);
+    _kr = ROOT.HS.AREA * ROOT.HS.K_X / ROOT.HS.L / relative_viscosity(ROOT.t);
+    _ks = STEM.HS.AREA * STEM.HS.K_X / STEM.HS.L / relative_viscosity(STEM.t);
     _kl = LEAF.HS.K_SLA / relative_viscosity(LEAF.t) * LEAF.HS.AREA;
     _kt = 1 / (1 / _kr + 1 / _ks + 1 / _kl);
 
