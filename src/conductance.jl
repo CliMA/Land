@@ -293,8 +293,8 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) w
 #######################################################################################################################################################################################################
 """
 
-    stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:AbstractFloat}
-    stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
+    stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, Δt::FT) where {FT<:AbstractFloat}
 
 Update marginal stomatal conductance, given
 - `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type struct

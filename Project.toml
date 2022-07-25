@@ -15,7 +15,7 @@ WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
 ClimaCache = "1.0.0"
-Photosynthesis = "0.4.0"
+Photosynthesis = "0.4.1"
 PkgUtility = "0.2.0"
 PlantHydraulics = "0.4.0"
 SoilHydraulics = "0.2.0"

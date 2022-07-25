@@ -42,4 +42,18 @@ using Test
             end;
         end;
     end;
+
+    @testset "Prognostic Conductance" begin
+        for FT in [Float32, Float64]
+            for spac in [ClimaCache.MonoElementSPAC{FT}(),
+                         ClimaCache.MonoMLGrassSPAC{FT}(),
+                         ClimaCache.MonoMLPalmSPAC{FT}(),
+                         ClimaCache.MonoMLTreeSPAC{FT}()]
+                StomataModels.stomatal_conductance!(spac);
+                @test true;
+                StomataModels.stomatal_conductance!(spac, FT(1));
+                @test true;
+            end;
+        end;
+    end;
 end;
