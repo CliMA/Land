@@ -48,7 +48,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc:
     if t != lf._t
         photosystem_temperature_dependence!(PSM, air, t);
     end;
-    photosystem_electron_transport!(PSM, PRC, ppar, lf._p_CO₂_i; β = FT(1));
+    photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
     product_limited_rate!(PSM, air, g_lc; β = FT(1));
@@ -61,7 +61,7 @@ leaf_photosynthesis!(lf::Leaves1D{FT}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t:
     @unpack PRC, PSM = lf;
 
     photosystem_temperature_dependence!(PSM, air, t);
-    photosystem_electron_transport!(PSM, PRC, ppar, lf._p_CO₂_i; β = FT(1));
+    photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
     product_limited_rate!(PSM, air, g_lc; β = FT(1));
