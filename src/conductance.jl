@@ -39,19 +39,19 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaf.SM, leaf, air; β = β, δe = δe);
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return ∂g∂t(sm, leaf, air, sm.Β.PARAM_Y; β = β)
+    return ∂g∂t(sm, leaf, air, sm.β.PARAM_Y; β = β)
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = β);
 
-    return (_gsw - leaf.g_H₂O_s) / sm.Τ
+    return (_gsw - leaf.g_H₂O_s) / sm.τ
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = FT(1));
 
-    return (_gsw - leaf.g_H₂O_s) / sm.Τ
+    return (_gsw - leaf.g_H₂O_s) / sm.τ
 );
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -80,19 +80,19 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return ∂g∂t(sm, leaves, air, sm.Β.PARAM_Y, ind; β = β)
+    return ∂g∂t(sm, leaves, air, sm.β.PARAM_Y, ind; β = β)
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = β);
 
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s[ind]) / sm.τ
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s[ind]) / sm.τ
 );
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -120,19 +120,19 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air; β = β, δe = δe);
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return ∂g∂t(sm, leaves, air, sm.Β.PARAM_Y; β = β)
+    return ∂g∂t(sm, leaves, air, sm.β.PARAM_Y; β = β)
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air; β = β);
 
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s_shaded) / sm.τ
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s_shaded) / sm.τ
 );
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -161,19 +161,19 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return ∂g∂t(sm, leaves, air, sm.Β.PARAM_Y, ind; β = β)
+    return ∂g∂t(sm, leaves, air, sm.β.PARAM_Y, ind; β = β)
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = β);
 
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.Τ
+    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ
 );
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} =

@@ -48,14 +48,14 @@ empirical_equation(sm::BallBerrySM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::F
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.rh * leaf.a_net * FT(1e-6) / leaf.p_CO₂_s * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaf.a_net * FT(1e-6) / leaf._p_CO₂_s * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * leaf.a_net * FT(1e-6) / leaf.p_CO₂_i * P_AIR
+    return G0 + β * G1 * leaf.a_net * FT(1e-6) / leaf._p_CO₂_i * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -63,16 +63,16 @@ empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT 
     @unpack PSM = leaf;
     @unpack P_AIR = air;
 
-    _γ_s = (typeof(PSM) <: C4VJPModel) ? 0 : PSM.γ_star;
+    _γ_s = (typeof(PSM) <: C4VJPModel) ? 0 : PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (leaf.p_H₂O_sat - air.p_H₂O) / D0) * leaf.a_net * FT(1e-6) / (leaf.p_CO₂_s - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaf.t) - air.p_H₂O) / D0) * leaf.a_net * FT(1e-6) / (leaf._p_CO₂_s - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaf.p_H₂O_sat - air.p_H₂O)) * leaf.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaf.t) - air.p_H₂O)) * leaf.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -105,30 +105,30 @@ empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT},
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.rh * leaves.a_net[ind] * FT(1e-6) / leaves.p_CO₂_s[ind] * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net[ind] * FT(1e-6) / leaves._p_CO₂_s[ind] * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * leaves.a_net[ind] * FT(1e-6) / leaves.p_CO₂_i[ind] * P_AIR
+    return G0 + β * G1 * leaves.a_net[ind] * FT(1e-6) / leaves._p_CO₂_i[ind] * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack D0, G0, G1 = sm;
     @unpack P_AIR = air;
 
-    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM.γ_star;
+    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (leaves.p_H₂O_sat[ind] - air.p_H₂O) / D0) * leaves.a_net[ind] * FT(1e-6) / (leaves.p_CO₂_s[ind] - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O) / D0) * leaves.a_net[ind] * FT(1e-6) / (leaves._p_CO₂_s[ind] - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaves.p_H₂O_sat[ind] - air.p_H₂O)) * leaves.a_net[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O)) * leaves.a_net[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -160,7 +160,7 @@ empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT};
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.rh * leaves.a_net_shaded * FT(1e-6) / leaves.p_CO₂_s_shaded * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_shaded * FT(1e-6) / leaves.p_CO₂_s_shaded * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -174,16 +174,16 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; �
     @unpack D0, G0, G1 = sm;
     @unpack P_AIR = air;
 
-    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM.γ_star;
+    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (leaves.p_H₂O_sat - air.p_H₂O) / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves.p_CO₂_s_shaded - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves.p_CO₂_s_shaded - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaves.p_H₂O_sat - air.p_H₂O)) * leaves.a_net_shaded * FT(1e-6) / air.p_CO₂ * P_AIR
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t) - air.p_H₂O)) * leaves.a_net_shaded * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -216,7 +216,7 @@ empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT},
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.rh * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves.p_CO₂_s_sunlit[ind] * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves.p_CO₂_s_sunlit[ind] * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -230,14 +230,14 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, i
     @unpack D0, G0, G1 = sm;
     @unpack P_AIR = air;
 
-    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM.γ_star;
+    _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (leaves.p_H₂O_sat - air.p_H₂O) / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves.p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves.p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(leaves.p_H₂O_sat - air.p_H₂O)) * leaves.a_net_sunlit[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t) - air.p_H₂O)) * leaves.a_net_sunlit[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
 );
