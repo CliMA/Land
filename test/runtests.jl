@@ -45,4 +45,14 @@ using Test
             @test SoilHydraulics.relative_hydraulic_conductance(bc, true, FT(0.01)) == 1;
         end;
     end;
+
+    @testset "Budgets" begin
+        for FT in [Float32, Float64]
+            spac = ClimaCache.MonoMLTreeSPAC{FT}();
+            SoilHydraulics.soil_budget!(spac);
+            @test true;
+            SoilHydraulics.soil_budget!(spac, FT(1));
+            @test true;
+        end;
+    end;
 end;
