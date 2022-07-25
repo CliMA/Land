@@ -43,6 +43,21 @@ using Test
         end;
     end;
 
+    @testset "∂gₙ∂t" begin
+        for FT in [Float32, Float64]
+            lf_1 = ClimaCache.Leaf{FT}();
+            lf_2 = ClimaCache.Leaves1D{FT}();
+            lf_3 = ClimaCache.Leaves2D{FT}();
+            air  = ClimaCache.AirLayer{FT}();
+            StomataModels.∂gₙ∂t(lf_1, air);
+            @test true;
+            StomataModels.∂gₙ∂t(lf_2, air);
+            @test true;
+            StomataModels.∂gₙ∂t(lf_3, air);
+            @test true;
+        end;
+    end;
+
     @testset "Prognostic Conductance" begin
         for FT in [Float32, Float64]
             for spac in [ClimaCache.MonoElementSPAC{FT}(),

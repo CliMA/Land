@@ -228,6 +228,7 @@ function stomatal_conductance! end
 #     2022-Jul-12: add new method to update marginal stomatal conductance for SPAC
 # To do
 #     TODO: be careful with the β here (need to used the value stored in empirical SM)
+#     TODO: use ∂gₙ∂t for nighttime conditions
 #
 #######################################################################################################################################################################################################
 """

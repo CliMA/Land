@@ -153,17 +153,17 @@ function ∂T∂E end
 
 ∂T∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(lf.BIO, lf, air, f_view);
 
-∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, bio.Ε_LW);
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, bio.ϵ_LW);
 
-∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, 1 - bio.τ_lw);
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaf::Leaf{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaf.t, leaf.WIDTH, air.wind, 1 - bio.τ_LW);
 
-∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, bio.Ε_LW);
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, bio.ϵ_LW);
 
-∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, 1 - bio.τ_lw);
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t[1], leaves.WIDTH, air.wind, 1 - bio.τ_LW);
 
-∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, bio.Ε_LW);
+∂T∂E(bio::BroadbandLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, bio.ϵ_LW);
 
-∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, 1 - bio.τ_lw);
+∂T∂E(bio::HyperspectralLeafBiophysics{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, f_view::FT) where {FT<:AbstractFloat} = ∂T∂E(f_view, leaves.t, leaves.WIDTH, air.wind, 1 - bio.τ_LW);
 
 ∂T∂E(f_view::FT, t::FT, width::FT, wind::FT, ϵ::FT) where {FT<:AbstractFloat} = (
     _λ = latent_heat_vapor(t) * M_H₂O(FT);
@@ -697,7 +697,7 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
     _gs = leaves.g_H₂O_s[1];
     _gh = 1 / (1 / _gs + 1 / (FT(1.35) * leaves.g_CO₂_b[1]));
     _gc = 1 / (FT(1.6) / _gs + 1 / leaves.g_CO₂_b[1]);
-    _e  = _gh * (saturation_vapor_pressure(leaves.t)[1] - air.p_H₂O) / P_AIR;
+    _e  = _gh * (saturation_vapor_pressure(leaves.t[1]) - air.p_H₂O) / P_AIR;
     leaf_photosynthesis!(leaves, air, _gc, sm.ppar_mem, leaves.t[1]);
     _a  = leaves.PSM.a_net;
 
