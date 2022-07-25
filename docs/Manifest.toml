@@ -49,9 +49,7 @@ version = "0.1.4"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
-git-tree-sha1 = "5f25f4d6cd18facc03796a311928e52240693cd5"
-repo-rev = "wyujie"
-repo-url = "https://github.com/Yujie-W/ClimaCache.jl"
+git-tree-sha1 = "8c4ecce24cff25ddf2a6145aafd0a7135baa7eb0"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
 version = "1.0.0"
 
@@ -377,8 +375,6 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 [[deps.SoilHydraulics]]
 deps = ["ClimaCache", "ConstrainedRootSolvers", "Test", "UnPack", "WaterPhysics"]
 git-tree-sha1 = "d2ba3f1694184e50cba5ffb134d5d564bab4b054"
-repo-rev = "wyujie"
-repo-url = "https://github.com/Yujie-W/SoilHydraulics.jl"
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
 version = "0.2.0"
 

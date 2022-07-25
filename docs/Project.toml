@@ -1,5 +1,3 @@
 [deps]
-ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-SoilHydraulics = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
