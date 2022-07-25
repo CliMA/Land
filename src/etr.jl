@@ -17,7 +17,7 @@
 #     2022-Feb-07: move e_to_c calculation back to light_limited_rate!
 #     2022-Feb-07: remove duplicated j (using j_pot is enough) for C4VJPModel
 #     2022-Feb-28: move e_to_c calculation back into this function to get aligned with C3CytochromeModel at GCO₂Mode analytically
-#     2022-Mar-01: save PSI J to psm.j_psi
+#     2022-Mar-01: save PSI J to psm._j_psi
 #     2022-Mar-01: use η_c and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-13: deflate documentation
@@ -43,10 +43,10 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSI, Φ_PSI_MAX = rc;
 
-    psm.e_to_c = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
-    psm.j_psi  = colimited_rate(β * psm.v_qmax, apar * F_PSI * Φ_PSI_MAX, psm.COLIMIT_J);
-    psm.η      = 1 - psm.η_l / psm.η_c + (3*p_i + 7*psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star) / psm.η_c;
-    psm.j_pot  = psm.j_psi / psm.η;
+    psm._e_to_c = (p_i - psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star);
+    psm._j_psi  = colimited_rate(β * psm._v_qmax, apar * F_PSI * Φ_PSI_MAX, psm.COLIMIT_J);
+    psm._η      = 1 - psm._η_l / psm._η_c + (3*p_i + 7*psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star) / psm._η_c;
+    psm._j_pot  = psm._j_psi / psm._η;
 
     return nothing
 );
@@ -55,9 +55,9 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
     @unpack EFF_1, EFF_2 = psm;
     @unpack F_PSII, Φ_PSII_MAX = rc;
 
-    psm.e_to_c = (p_i - psm.γ_star) / (EFF_1*p_i + EFF_2*psm.γ_star);
-    psm.j_pot  = F_PSII * Φ_PSII_MAX * apar;
-    psm.j      = colimited_rate(psm.j_pot, β * psm.j_max, psm.COLIMIT_J);
+    psm._e_to_c = (p_i - psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star);
+    psm._j_pot  = F_PSII * Φ_PSII_MAX * apar;
+    psm._j      = colimited_rate(psm._j_pot, β * psm._j_max, psm.COLIMIT_J);
 
     return nothing
 );
@@ -65,8 +65,8 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, apar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack F_PSII, Φ_PSII_MAX = rc;
 
-    psm.e_to_c = 1 / 6;
-    psm.j_pot  = F_PSII * Φ_PSII_MAX * apar;
+    psm._e_to_c = 1 / 6;
+    psm._j_pot  = F_PSII * Φ_PSII_MAX * apar;
 
     return nothing
 );

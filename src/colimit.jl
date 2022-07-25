@@ -31,9 +31,9 @@ colimit_photosynthesis!(
             colim_ip::Union{MinimumColimit{FT}, QuadraticColimit{FT}};
             β::FT = FT(1)
 ) where {FT<:AbstractFloat} = (
-    _a_i        = colimited_rate(psm.a_c, psm.a_j, colim_cj);
-    psm.a_gross = colimited_rate(psm.a_p, _a_i, colim_ip);
-    psm.a_net   = psm.a_gross - β * psm.r_d;
+    _a_i        = colimited_rate(psm._a_c, psm._a_j, colim_cj);
+    psm.a_gross = colimited_rate(psm._a_p, _a_i, colim_ip);
+    psm.a_net   = psm.a_gross - β * psm._r_d;
 
     return nothing
 );

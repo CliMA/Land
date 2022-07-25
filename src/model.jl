@@ -37,7 +37,7 @@ function leaf_photosynthesis! end
 Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataModels.jl temporary use), given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type structure that stores biophysical, reaction center, and photosynthesis model structures
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
-- `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf.g_CO₂`
+- `g_lc` Leaf diffusive conductance to CO₂ in `[mol m⁻² s⁻¹]`, default is `leaf._g_CO₂`
 - `ppar` APAR used for photosynthesis
 
 """
@@ -47,7 +47,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLa
     if lf.t != lf._t
         photosystem_temperature_dependence!(PSM, air, lf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, ppar, lf.p_CO₂_i; β = FT(1));
+    photosystem_electron_transport!(PSM, PRC, ppar, lf._p_CO₂_i; β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
     product_limited_rate!(PSM, air, g_lc; β = FT(1));
@@ -169,10 +169,10 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
-    rubisco_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
+    rubisco_limited_rate!(PSM, leaf._p_CO₂_i; β = β);
     light_limited_rate!(PSM);
-    product_limited_rate!(PSM, leaf.p_CO₂_i; β = β);
+    product_limited_rate!(PSM, leaf._p_CO₂_i; β = β);
     colimit_photosynthesis!(PSM; β = β);
 
     # update the fluorescence related parameters
@@ -194,10 +194,10 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
         photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
 
         # calculate the photosynthetic rates
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
-        rubisco_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves._p_CO₂_i[_i]; β = β);
+        rubisco_limited_rate!(PSM, leaves._p_CO₂_i[_i]; β = β);
         light_limited_rate!(PSM);
-        product_limited_rate!(PSM, leaves.p_CO₂_i[_i]; β = β);
+        product_limited_rate!(PSM, leaves._p_CO₂_i[_i]; β = β);
         colimit_photosynthesis!(PSM; β = β);
 
         # update the fluorescence related parameters
@@ -222,10 +222,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
     # loop through the ppars for sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
         # calculate the photosynthetic rates
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
-        rubisco_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves._p_CO₂_i_sunlit[_i]; β = β);
+        rubisco_limited_rate!(PSM, leaves._p_CO₂_i_sunlit[_i]; β = β);
         light_limited_rate!(PSM);
-        product_limited_rate!(PSM, leaves.p_CO₂_i_sunlit[_i]; β = β);
+        product_limited_rate!(PSM, leaves._p_CO₂_i_sunlit[_i]; β = β);
         colimit_photosynthesis!(PSM; β = β);
 
         # update the fluorescence related parameters
@@ -238,10 +238,10 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
     end;
 
     # run the model for shaded leaves
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
-    rubisco_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves._p_CO₂_i_shaded; β = β);
+    rubisco_limited_rate!(PSM, leaves._p_CO₂_i_shaded; β = β);
     light_limited_rate!(PSM);
-    product_limited_rate!(PSM, leaves.p_CO₂_i_shaded; β = β);
+    product_limited_rate!(PSM, leaves._p_CO₂_i_shaded; β = β);
     colimit_photosynthesis!(PSM; β = β);
 
     # update the fluorescence related parameters
@@ -259,22 +259,22 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT
     @unpack PRC, PSM = leaf;
 
     # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
-    # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
+    # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     if leaf.t != leaf._t
         photosystem_temperature_dependence!(PSM, air, leaf.t);
     end;
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
-    rubisco_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
-    light_limited_rate!(PSM, PRC, air, leaf.g_CO₂; β = β);
-    product_limited_rate!(PSM, air, leaf.g_CO₂; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
+    rubisco_limited_rate!(PSM, air, leaf._g_CO₂; β = β);
+    light_limited_rate!(PSM, PRC, air, leaf._g_CO₂; β = β);
+    product_limited_rate!(PSM, air, leaf._g_CO₂; β = β);
     colimit_photosynthesis!(PSM; β = β);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
-    leaf.p_CO₂_i = air.p_CO₂ - PSM.a_net / leaf.g_CO₂   * air.P_AIR * FT(1e-6);
-    leaf.p_CO₂_s = air.p_CO₂ - PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
+    leaf._p_CO₂_i = air.p_CO₂ - PSM.a_net / leaf._g_CO₂   * air.P_AIR * FT(1e-6);
+    leaf._p_CO₂_s = air.p_CO₂ - PSM.a_net / leaf.g_CO₂_b * air.P_AIR * FT(1e-6);
 
     # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf.p_CO₂_i; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaf.ppar; β = β);
@@ -289,22 +289,22 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
-    # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
+    # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through the leaves.ppar
     for _i in eachindex(leaves.ppar)
         photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
-        rubisco_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
-        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂[_i]; β = β);
-        product_limited_rate!(PSM, air, leaves.g_CO₂[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves._p_CO₂_i[_i]; β = β);
+        rubisco_limited_rate!(PSM, air, leaves._g_CO₂[_i]; β = β);
+        light_limited_rate!(PSM, PRC, air, leaves._g_CO₂[_i]; β = β);
+        product_limited_rate!(PSM, air, leaves._g_CO₂[_i]; β = β);
         colimit_photosynthesis!(PSM; β = β);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
-        leaves.p_CO₂_i[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂[_i]   * air.P_AIR * FT(1e-6);
-        leaves.p_CO₂_s[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b[_i] * air.P_AIR * FT(1e-6);
+        leaves._p_CO₂_i[_i] = air.p_CO₂ - PSM.a_net / leaves._g_CO₂[_i]   * air.P_AIR * FT(1e-6);
+        leaves._p_CO₂_s[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b[_i] * air.P_AIR * FT(1e-6);
 
         # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves.p_CO₂_i[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves._p_CO₂_i[_i]; β = β);
 
         # update the fluorescence related parameters
         photosystem_coefficients!(PSM, PRC, leaves.ppar[_i]; β = β);
@@ -325,21 +325,21 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
         photosystem_temperature_dependence!(PSM, air, leaves.t);
     end;
 
-    # leaf.p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
+    # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
-        rubisco_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
-        light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_sunlit[_i]; β = β);
-        product_limited_rate!(PSM, air, leaves.g_CO₂_sunlit[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves._p_CO₂_i_sunlit[_i]; β = β);
+        rubisco_limited_rate!(PSM, air, leaves._g_CO₂_sunlit[_i]; β = β);
+        light_limited_rate!(PSM, PRC, air, leaves._g_CO₂_sunlit[_i]; β = β);
+        product_limited_rate!(PSM, air, leaves._g_CO₂_sunlit[_i]; β = β);
         colimit_photosynthesis!(PSM; β = β);
 
         # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
-        leaves.p_CO₂_i_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_sunlit[_i] * air.P_AIR * FT(1e-6);
-        leaves.p_CO₂_s_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b          * air.P_AIR * FT(1e-6);
+        leaves._p_CO₂_i_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves._g_CO₂_sunlit[_i] * air.P_AIR * FT(1e-6);
+        leaves._p_CO₂_s_sunlit[_i] = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b          * air.P_AIR * FT(1e-6);
 
         # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves.p_CO₂_i_sunlit[_i]; β = β);
+        photosystem_electron_transport!(PSM, PRC, leaves.ppar_sunlit[_i], leaves._p_CO₂_i_sunlit[_i]; β = β);
 
         # update the fluorescence related parameters
         photosystem_coefficients!(PSM, PRC, leaves.ppar_sunlit[_i]; β = β);
@@ -351,18 +351,18 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
     end;
 
     # run the model for shaded leaves
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
-    rubisco_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
-    light_limited_rate!(PSM, PRC, air, leaves.g_CO₂_shaded; β = β);
-    product_limited_rate!(PSM, air, leaves.g_CO₂_shaded; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves._p_CO₂_i_shaded; β = β);
+    rubisco_limited_rate!(PSM, air, leaves._g_CO₂_shaded; β = β);
+    light_limited_rate!(PSM, PRC, air, leaves._g_CO₂_shaded; β = β);
+    product_limited_rate!(PSM, air, leaves._g_CO₂_shaded; β = β);
     colimit_photosynthesis!(PSM; β = β);
 
     # update CO₂ partial pressures at the leaf surface and internal airspace (evaporative front)
-    leaves.p_CO₂_i_shaded = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_shaded * air.P_AIR * FT(1e-6);
-    leaves.p_CO₂_s_shaded = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b      * air.P_AIR * FT(1e-6);
+    leaves._p_CO₂_i_shaded = air.p_CO₂ - PSM.a_net / leaves._g_CO₂_shaded * air.P_AIR * FT(1e-6);
+    leaves._p_CO₂_s_shaded = air.p_CO₂ - PSM.a_net / leaves.g_CO₂_b      * air.P_AIR * FT(1e-6);
 
     # update leaf ETR again to ensure that j_pot and e_to_c are correct for C3CytochromeModel
-    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves.p_CO₂_i_shaded; β = β);
+    photosystem_electron_transport!(PSM, PRC, leaves.ppar_shaded, leaves._p_CO₂_i_shaded; β = β);
 
     # update the fluorescence related parameters
     photosystem_coefficients!(PSM, PRC, leaves.ppar_shaded; β = β);

@@ -92,37 +92,37 @@ Update the temperature dependencies of C3 photosynthesis model, given
 function photosystem_temperature_dependence! end
 
 photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
-    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
-    psm.k_q    = temperature_corrected_value(psm.TD_KQ, t);
-    psm.γ_star = temperature_corrected_value(psm.TD_Γ , t);
-    psm.η_c    = temperature_corrected_value(psm.TD_ΗC, t);
-    psm.η_l    = temperature_corrected_value(psm.TD_ΗL, t);
-    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
-    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
-    psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
-    psm.v_qmax = psm.b₆f * psm.k_q;
+    psm._k_c    = temperature_corrected_value(psm.TD_KC, t);
+    psm._k_o    = temperature_corrected_value(psm.TD_KO, t);
+    psm._k_q    = temperature_corrected_value(psm.TD_KQ, t);
+    psm._γ_star = temperature_corrected_value(psm.TD_Γ , t);
+    psm._η_c    = temperature_corrected_value(psm.TD_ηC, t);
+    psm._η_l    = temperature_corrected_value(psm.TD_ηL, t);
+    psm._r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm._v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm._k_m    = psm._k_c * (1 + air.P_AIR * F_O₂(FT) / psm._k_o);
+    psm._v_qmax = psm.b₆f * psm._k_q;
 
     return nothing
 );
 
 photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    psm.k_c    = temperature_corrected_value(psm.TD_KC, t);
-    psm.k_o    = temperature_corrected_value(psm.TD_KO, t);
-    psm.γ_star = temperature_corrected_value(psm.TD_Γ , t);
-    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
-    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
-    psm.j_max  = psm.j_max25  * temperature_correction(psm.TD_JMAX, t);
-    psm.k_m    = psm.k_c * (1 + air.P_O₂ / psm.k_o);
+    psm._k_c    = temperature_corrected_value(psm.TD_KC, t);
+    psm._k_o    = temperature_corrected_value(psm.TD_KO, t);
+    psm._γ_star = temperature_corrected_value(psm.TD_Γ , t);
+    psm._r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm._v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm._j_max  = psm.j_max25  * temperature_correction(psm.TD_JMAX, t);
+    psm._k_m    = psm._k_c * (1 + air.P_AIR * F_O₂(FT) / psm._k_o);
 
     return nothing
 );
 
 photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
-    psm.k_pep  = temperature_corrected_value(psm.TD_KPEP, t);
-    psm.r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
-    psm.v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
-    psm.v_pmax = psm.v_pmax25 * temperature_correction(psm.TD_VPMAX, t);
+    psm._k_pep  = temperature_corrected_value(psm.TD_KPEP, t);
+    psm._r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
+    psm._v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
+    psm._v_pmax = psm.v_pmax25 * temperature_correction(psm.TD_VPMAX, t);
 
     return nothing
 );

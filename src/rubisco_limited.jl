@@ -39,12 +39,12 @@ Update the RubisCO limited photosynthetic rate, given
 
 """
 rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT},C3VJPModel{FT}}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    psm.a_c = β * psm.v_cmax * (p_i - psm.γ_star) / (p_i + psm.k_m);
+    psm._a_c = β * psm._v_cmax * (p_i - psm._γ_star) / (p_i + psm._k_m);
 
     return nothing
 );
 
-rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm.a_c = β * psm.v_cmax; return nothing);
+rubisco_limited_rate!(psm::C4VJPModel{FT}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm._a_c = β * psm._v_cmax; return nothing);
 
 
 #######################################################################################################################################################################################################
@@ -73,21 +73,21 @@ Update the RubisCO limited photosynthetic rate in conductance mode, given
 
 """
 rubisco_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _a = β * psm.v_cmax;
-    _b = β * psm.v_cmax * psm.γ_star;
-    _d = psm.k_m;
+    _a = β * psm._v_cmax;
+    _b = β * psm._v_cmax * psm._γ_star;
+    _d = psm._k_m;
     _f = air.P_AIR / g_lc * FT(1e-6);
     _p = air.p_CO₂;
-    _r = β * psm.r_d;
+    _r = β * psm._r_d;
 
     _qa = _f;
     _qb = _f*_r - _p - _d - _a*_f;
     _qc = _a*_p - _b - _r*(_p + _d);
     _an = lower_quadratic(_qa, _qb, _qc);
 
-    psm.a_c = _an + _r;
+    psm._a_c = _an + _r;
 
     return nothing
 );
 
-rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm.a_c = β * psm.v_cmax; return nothing);
+rubisco_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm._a_c = β * psm._v_cmax; return nothing);

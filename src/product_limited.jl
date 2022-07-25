@@ -38,9 +38,9 @@ Update the product limited photosynthetic rate, given
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 """
-product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm.a_p = β * psm.v_cmax / 2; return nothing);
+product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm._a_p = β * psm._v_cmax / 2; return nothing);
 
-product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm.a_p = β * psm.v_pmax * p_i / (p_i + psm.k_pep); return nothing);
+product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm._a_p = β * psm._v_pmax * p_i / (p_i + psm._k_pep); return nothing);
 
 
 #######################################################################################################################################################################################################
@@ -67,21 +67,21 @@ Update the electron transport limited photosynthetic rate in conductance mode, g
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 """
-product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm.a_p = β * psm.v_cmax / 2; return nothing);
+product_limited_rate!(psm::Union{C3CytochromeModel{FT}, C3VJPModel{FT}}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (psm._a_p = β * psm._v_cmax / 2; return nothing);
 
 product_limited_rate!(psm::C4VJPModel{FT}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    _a = β * psm.v_pmax;
-    _d = psm.k_pep;
+    _a = β * psm._v_pmax;
+    _d = psm._k_pep;
     _f = air.P_AIR / g_lc * FT(1e-6);
     _p = air.p_CO₂;
-    _r = β * psm.r_d;
+    _r = β * psm._r_d;
 
     _qa = _f;
     _qb = _f*_r - _p - _d - _a*_f;
     _qc = _a*_p - _r*(_p + _d);
     _an = lower_quadratic(_qa, _qb, _qc);
 
-    psm.a_p = _an + _r;
+    psm._a_p = _an + _r;
 
     return nothing
 );

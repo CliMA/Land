@@ -44,10 +44,10 @@ photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCent
     @unpack F_PSI, K_D, K_F, K_PSI, K_PSII, K_U, K_X, Φ_PSI_MAX = rc;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/blob/main/scripts/model_fun.m
-    _ϕ_P1_a = psm.a_gross * psm.η / (psm.e_to_c * apar * F_PSI);
-    _ϕ_P2_a = psm.a_gross / (psm.e_to_c * apar * (1 - F_PSI));
+    _ϕ_P1_a = psm.a_gross * psm._η / (psm._e_to_c * apar * F_PSI);
+    _ϕ_P2_a = psm.a_gross / (psm._e_to_c * apar * (1 - F_PSI));
     _q1     = _ϕ_P1_a / Φ_PSI_MAX;
-    _q2     = 1 - psm.j_psi / (β * psm.v_qmax);
+    _q2     = 1 - psm._j_psi / (β * psm._v_qmax);
 
     # solve PSII K_N
     _k_sum_na = _ϕ_P2_a;
@@ -101,25 +101,25 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
     @unpack F_PSII, K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
 
     # calculate photochemical yield
-    rc.ϕ_p = psm.a_gross / (psm.e_to_c * F_PSII * apar);
+    rc.ϕ_p = psm.a_gross / (psm._e_to_c * F_PSII * apar);
 
     # calculate rate constants
-    _x           = max(0, 1 - rc.ϕ_p / Φ_PSII_MAX);
-    _xᵅ          = _x ^ K_A;
-    rc.k_npq_rev = K_0 * (1 + K_B) * _xᵅ / (K_B + _xᵅ);
-    rc.k_p       = max(0, rc.ϕ_p * (K_F + K_D + rc.k_npq_rev + rc.k_npq_sus) / (1 - rc.ϕ_p) );
+    _x            = max(0, 1 - rc.ϕ_p / Φ_PSII_MAX);
+    _xᵅ           = _x ^ K_A;
+    rc._k_npq_rev = K_0 * (1 + K_B) * _xᵅ / (K_B + _xᵅ);
+    rc._k_p       = max(0, rc.ϕ_p * (K_F + K_D + rc._k_npq_rev + rc.k_npq_sus) / (1 - rc.ϕ_p) );
 
     # calculate fluorescence quantum yield
-    rc.f_o  = K_F / (K_F + K_P_MAX + K_D);
-    rc.f_o′ = K_F / (K_F + K_P_MAX + K_D + rc.k_npq_rev + rc.k_npq_sus);
-    rc.f_m  = K_F / (K_F + K_D);
-    rc.f_m′ = K_F / (K_F + K_D + rc.k_npq_rev + rc.k_npq_sus);
-    rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);
+    rc._f_o  = K_F / (K_F + K_P_MAX + K_D);
+    rc._f_o′ = K_F / (K_F + K_P_MAX + K_D + rc._k_npq_rev + rc.k_npq_sus);
+    rc._f_m  = K_F / (K_F + K_D);
+    rc._f_m′ = K_F / (K_F + K_D + rc._k_npq_rev + rc.k_npq_sus);
+    rc.ϕ_f   = rc._f_m′ * (1 - rc.ϕ_p);
 
     # calculate quenching rates
-    rc.q_e = 1 - (rc.f_m - rc.f_o′) / (rc.f_m′ - rc.f_o);
-    rc.q_p = 1 - (rc.ϕ_f - rc.f_o′) / (rc.f_m - rc.f_o′);
-    rc.npq = (rc.k_npq_rev + rc.k_npq_sus) / (K_F + K_D);
+    rc._q_e = 1 - (rc._f_m - rc._f_o′) / (rc._f_m′ - rc._f_o);
+    rc._q_p = 1 - (rc.ϕ_f - rc._f_o′) / (rc._f_m - rc._f_o′);
+    rc._npq = (rc._k_npq_rev + rc.k_npq_sus) / (K_F + K_D);
 
     return nothing
 );
