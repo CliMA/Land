@@ -4,50 +4,57 @@
 # General
 #     2022-May-25: migrate function to version v0.3
 #     2022-May-25: rename the function to xylem_end_pressure
+#     2022-May-25: add method for LeafHydraulics
+#     2022-May-25: add method for RootHydraulics
+#     2022-May-25: add method for StemHydraulics
+#     2022-May-25: add method for Leaf, Root, and Stem
+#     2022-May-25: add method for MonoElementSPAC (without partitioning)
+# To do
+#     TODO: add method for NonSteadyStateFlow
 #
 #######################################################################################################################################################################################################
 """
-This function returns the xylem end water pressure. The supported methods are
 
-$(METHODLIST)
+    xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat}
+    xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat}
+
+Return the xylem end water pressure in MPa, given
+- `organ` `Leaf`, `Root`, or `Stem` type struct
+- `flow` Flow rate (per leaf area for Leaf) `[mol (m⁻²) s⁻¹]`
+- `spac` `MonoElementSPAC` type struct
 
 """
 function xylem_end_pressure end
 
+xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
+    @unpack LEAF, ROOT, STEM = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for LeafHydraulics
-#
-#######################################################################################################################################################################################################
-"""
+    # calculate the p_dos for root and stem
+    STEM.HS.p_ups = xylem_end_pressure(ROOT, flow);
+    LEAF.HS.p_ups = xylem_end_pressure(STEM, flow);
 
-    xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
+    return xylem_end_pressure(LEAF, flow / LEAF.HS.AREA);
+);
 
-Return the xylem end water pressure in MPa, given
-- `hs` `LeafHydraulics` type struct
-- `flow` Flow rate per leaf area `[mol m⁻² s⁻¹]`
-- `T` Temperature
-"""
+xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat} = xylem_end_pressure(organ.HS, flow, organ.t);
+
 xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack K_SLA, N, VC = hs;
+    @unpack DIM_XYLEM, K_SLA, VC = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature and history, then update the pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * K_SLA * N;
+            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * K_SLA * DIM_XYLEM;
         else
-            _k = _k_mem / _f_vis * K_SLA * N;
+            _k = _k_mem / _f_vis * K_SLA * DIM_XYLEM;
         end;
 
         _p_end -= flow / _k;
@@ -56,26 +63,10 @@ xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
     return _p_end
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for RootHydraulics
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `hs` `RootHydraulics` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-- `T` Temperature
-"""
 xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
@@ -90,120 +81,62 @@ xylem_end_pressure(hs::RootHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
     end;
 
     # convert the end pressure back to that at liquid pressure to be matric potential
-    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T_25(FT);
+    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T₂₅(FT);
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * K_MAX * N;
+            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= flow / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= flow / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
     end;
 
     return _p_end
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for StemHydraulics
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `hs` `StemHydraulics` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-- `T` Temperature
-"""
 xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, N, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * K_MAX * N;
+            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= flow / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= flow / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
     end;
 
     return _p_end
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for Leaf, Root, and Stem
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `organ` `Leaf`, `Root`, or `Stem` type struct
-- `flow` Flow rate (per leaf area for Leaf) `[mol (m⁻²) s⁻¹]`
-"""
-xylem_end_pressure(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}, flow::FT) where {FT<:AbstractFloat} = xylem_end_pressure(organ.HS, flow, organ.t);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-25: add method for MonoElementSPAC (without partitioning)
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat}
-
-Return the xylem end water pressure in MPa, given
-- `spac` `MonoElementSPAC` type struct
-- `flow` Flow rate `[mol s⁻¹]`
-"""
-xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
-
-    # calculate the p_dos for root and stem
-    STEM.HS.p_ups = xylem_end_pressure(ROOT, flow);
-    LEAF.HS.p_ups = xylem_end_pressure(STEM, flow);
-
-    return xylem_end_pressure(LEAF, flow / LEAF.HS.AREA);
-);
-
-
+#=
 #######################################################################################################################################################################################################
 #
 # Changes to the method
 # General
 #     2022-May-25: add method for MonoElementSPAC (with sunlit and shaded partitioning)
-# Todos
+# To do
 #     TODO: abstractize the flow rates with canopy RT module
+#     TODO: make this method for Leaves1D
 #
 #######################################################################################################################################################################################################
 """
@@ -229,6 +162,7 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 
     return p_sl, p_sh
 );
+=#
 
 
 #######################################################################################################################################################################################################
@@ -237,153 +171,156 @@ xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) wher
 # General
 #     2022-May-27: migrate function to version v0.3
 #     2022-May-27: rename the function to xylem_pressure_profile!
+#     2022-May-27: add method for LeafHydraulics at steady state
+#     2022-May-27: add method for LeafHydraulics at non steady state
+#     2022-May-27: add method for RootHydraulics at steady state
+#     2022-May-27: add method for RootHydraulics at non steady state
+#     2022-May-27: add method for StemHydraulics at steady state
+#     2022-May-27: add method for StemHydraulics at non steady state
+#     2022-May-27: add method for Leaf, Root, and Stem (for both steady and non-steady states)
+#     2022-Jun-30: add support to Leaves2D
+#     2022-Jun-30: add method for Leaves1D
+#     2022-May-27: add method for MonoElementSPAC
+#     2022-May-27: add method for MonoGrassSPAC
+#     2022-May-27: add method for MonoPalmSPAC
+#     2022-May-27: add method for MonoTreeSPAC
+#     2022-May-31: pass the test
+#     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
+#     2022-Jul-08: deflate documentations
+#     2022-Jul-12: compute e_crit for leaves
+#     2022-Jul-12: compute β for leaves (only for empirical models)
+#     2022-Jul-14: update root p_ups from SOIL
+# To do
+#     TODO: add leaf extra-xylary vulnerability curve
 #
 #######################################################################################################################################################################################################
 """
-This function updates the xylem water pressure profile. The supported methods are
-
-$(METHODLIST)
+This function is designed for the following purposes:
+- Update organ pressure profile
+- Update pressure profile for the entire SPAC
 
 """
 function xylem_pressure_profile! end
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for LeafHydraulics at steady state
-# Todos
-#     TODO: add leaf extra-xylary vulnerability curve
-#
-#######################################################################################################################################################################################################
 """
 
-    xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `LeafHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
+- `organ` `Leaf`, `Leaves1D`, `Leaves2D`, `Root`, or `Stem` type organ
+- `update` If true, update xylem cavitation legacy and leaf critical flow (e_crit)
+
 """
+xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t; update = update);
+
+    return nothing
+);
+
+xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack HS, HS2 = organ;
+
+    xylem_pressure_profile!(HS, HS.FLOW, organ.t[1]; update = update);
+    HS2._k_history .= HS._k_history;
+    HS2.p_history .= HS.p_history;
+
+    xylem_pressure_profile!(HS2, HS2.FLOW, organ.t[2]; update = update);
+    HS._k_history .= HS2._k_history;
+    HS.p_history .= HS2.p_history;
+
+    return nothing
+);
+
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_SLA, N, VC = hs;
+    @unpack DIM_XYLEM, K_SLA, VC = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature and history, then update the pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_SLA * N;
+            _k = _kr / _f_vis * K_SLA * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_SLA * N;
+            _k = _k_mem / _f_vis * K_SLA * DIM_XYLEM;
         end;
 
         _p_end -= mode.flow / _k;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
-    hs.p_dos = _p_end;
+    hs._p_dos = _p_end;
 
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.flow / hs.K_OX;
 
+    # update the e_crit
+    hs._e_crit = critical_flow(hs, T, hs._e_crit);
+
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for LeafHydraulics at non steady state
-# Todos
-#     TODO: add leaf extra-xylary vulnerability curve
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `LeafHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_SLA, N, VC = hs;
+    @unpack DIM_XYLEM, K_SLA, VC = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature and history, then update the pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_SLA * N;
+            _k = _kr / _f_vis * K_SLA * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_SLA * N;
+            _k = _k_mem / _f_vis * K_SLA * DIM_XYLEM;
         end;
 
         _p_end -= mode.f_in / _k;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
-    hs.p_dos = _p_end;
+    hs._p_dos = _p_end;
 
     # update the leaf water potential based on extra-xylary conductance
     hs.p_leaf = _p_end - mode.f_out / hs.K_OX;
 
+    # update the e_crit
+    hs._e_crit = critical_flow(hs, T, hs._e_crit);
+
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for RootHydraulics at steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `RootHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
@@ -398,28 +335,28 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     end;
 
     # convert the end pressure back to that at liquid pressure to be matric potential
-    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T_25(FT);
+    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T₂₅(FT);
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
@@ -428,27 +365,10 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for RootHydraulics at non steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `RootHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, K_RHIZ, N, SH, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
@@ -463,29 +383,29 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
     end;
 
     # convert the end pressure back to that at liquid pressure to be matric potential
-    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T_25(FT);
-    hs.p_rhiz = _p_end;
+    _p_end = _p_25 * _f_st + hs.ψ_osm * T / T₂₅(FT);
+    hs._p_rhiz = _p_end;
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.f_element[_i] / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode._f_element[_i] / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
@@ -494,52 +414,34 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for StemHydraulics at steady state
-#     2022-May-31: fix documentation
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `StemHydraulics` type hydraulic system
-- `mode` `SteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, N, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode.flow / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
@@ -548,51 +450,34 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
     return nothing
 );
 
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for StemHydraulics at non steady state
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `hs` `StemHydraulics` type hydraulic system
-- `mode` `NonSteadyStateFlow` struct with steady state flow
-- `T` Water temperature
-- `update` If true, update xylem cavitation legacy
-"""
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack K_MAX, N, VC, ΔH = hs;
+    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
 
+    _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
     _p_end::FT = hs.p_ups;
 
     # compute k from temperature, history, and gravity, then update pressure
-    for _i in eachindex(hs.k_history)
+    for _i in eachindex(hs._k_history)
         _p_mem = hs.p_history[_i];
-        _k_mem = hs.k_history[_i];
+        _k_mem = hs._k_history[_i];
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
             _kr = relative_hydraulic_conductance(hs.VC, _p_25);
-            _k = _kr / _f_vis * K_MAX * N;
+            _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
-                hs.k_history[_i] = _kr;
+                hs._k_history[_i] = _kr;
             end;
         else
-            _k = _k_mem / _f_vis * K_MAX * N;
+            _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
 
-        _p_end -= mode.f_element[_i] / _k + ρg_MPa(FT) * ΔH / N;
+        _p_end -= mode._f_element[_i] / _k + ρg_MPa(FT) * ΔH / DIM_XYLEM;
 
-        hs.p_element[_i] = _p_end;
+        hs._p_element[_i] = _p_end;
     end;
 
     # update the xylem end pressure
@@ -602,71 +487,46 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 );
 
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for Leaf, Root, and Stem (for both steady and non-steady states)
-#     2022-May-31: pass the test
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `organ` `Leaf`, `Root`, or `Stem` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(organ::Union{Leaf{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = xylem_pressure_profile!(organ.HS, organ.HS.FLOW, organ.t; update = update);
-
-
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoElementSPAC
-#
-#######################################################################################################################################################################################################
+# TODO: make sure to not mixing with top soil that is meant for evaporation
+# TODO: add soil ion concentration
 """
 
     xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
+    xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 
 Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoElementSPAC` type organ
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type spac
 - `update` If true, update xylem cavitation legacy
+
 """
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    @unpack LEAF, ROOT, SOIL, STEM = spac;
 
+    # update water potential from SOIL (TODO: use ROOT_INDEX in the future)
+    ROOT.HS.p_ups = soil_ψ_25(SOIL.LAYERS[1].VC, SOIL.LAYERS[1].θ) * relative_surface_tension(SOIL.LAYERS[1].t);
+
+    # update pressure profiles for organs
     xylem_pressure_profile!(ROOT; update = update);
     STEM.HS.p_ups = ROOT.HS.p_dos;
     xylem_pressure_profile!(STEM; update = update);
     LEAF.HS.p_ups = STEM.HS.p_dos;
     xylem_pressure_profile!(LEAF; update = update);
 
+    # update the β factor for empirical models
+    β_factor!(spac);
+
     return nothing
 );
 
+xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoGrassSPAC
-#     2022-May-31: pass the test
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoGrassSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, N_ROOT, ROOTS = spac;
+    # update water potential from SOIL
+    for _i in 1:DIM_ROOT
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;
@@ -674,7 +534,7 @@ xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<
         xylem_pressure_profile!(_root; update = update);
         _p_mean += _root.HS.p_dos;
     end;
-    _p_mean /= N_ROOT;
+    _p_mean /= DIM_ROOT;
 
     # update the profile in leaves
     for _leaf in LEAVES
@@ -682,28 +542,19 @@ xylem_pressure_profile!(spac::MonoGrassSPAC{FT}; update::Bool = true) where {FT<
         xylem_pressure_profile!(_leaf; update = update);
     end;
 
+    # update the β factor for empirical models
+    β_factor!(spac);
+
     return nothing
 );
 
+xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoPalmSPAC
-#     2022-May-31: pass the test
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoPalmSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, N_ROOT, ROOTS, TRUNK = spac;
+    # update water potential from SOIL
+    for _i in 1:DIM_ROOT
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;
@@ -711,7 +562,7 @@ xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:
         xylem_pressure_profile!(_root; update = update);
         _p_mean += _root.HS.p_dos;
     end;
-    _p_mean /= N_ROOT;
+    _p_mean /= DIM_ROOT;
 
     # update the profile in trunk
     TRUNK.HS.p_ups = _p_mean;
@@ -723,28 +574,19 @@ xylem_pressure_profile!(spac::MonoPalmSPAC{FT}; update::Bool = true) where {FT<:
         xylem_pressure_profile!(_leaf; update = update);
     end;
 
+    # update the β factor for empirical models
+    β_factor!(spac);
+
     return nothing
 );
 
+xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
+    @unpack BRANCHES, DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
-#######################################################################################################################################################################################################
-#
-# Changes to the method
-# General
-#     2022-May-27: add method for MonoTreeSPAC
-#     2022-May-31: pass the test
-#
-#######################################################################################################################################################################################################
-"""
-
-    xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
-
-Update xylem pressure profile (flow profile needs to be updated a priori), given
-- `spac` `MonoTreeSPAC` type organ
-- `update` If true, update xylem cavitation legacy
-"""
-xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, LEAVES, N_ROOT, ROOTS, TRUNK = spac;
+    # update water potential from SOIL
+    for _i in 1:DIM_ROOT
+        ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
+    end;
 
     # update the profile in roots
     _p_mean::FT = 0;
@@ -752,7 +594,7 @@ xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:
         xylem_pressure_profile!(_root; update = update);
         _p_mean += _root.HS.p_dos;
     end;
-    _p_mean /= N_ROOT;
+    _p_mean /= DIM_ROOT;
 
     # update the profile in trunk
     TRUNK.HS.p_ups = _p_mean;
@@ -767,6 +609,9 @@ xylem_pressure_profile!(spac::MonoTreeSPAC{FT}; update::Bool = true) where {FT<:
         _leaf.HS.p_ups = _stem.HS.p_dos;
         xylem_pressure_profile!(_leaf; update = update);
     end;
+
+    # update the β factor for empirical models
+    β_factor!(spac);
 
     return nothing
 );
