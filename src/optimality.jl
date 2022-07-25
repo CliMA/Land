@@ -167,7 +167,7 @@ function ∂T∂E end
 
 ∂T∂E(f_view::FT, t::FT, width::FT, wind::FT, ϵ::FT) where {FT<:AbstractFloat} = (
     _λ = latent_heat_vapor(t) * M_H₂O(FT);
-    _g = FT(0.189) * sqrt(wind / (FT(0.72) * width));
+    _g = FT(1.4) * FT(0.135) * sqrt(wind / (FT(0.72) * width));
     _d = 2 * CP_D_MOL(FT) * _g + 4 * f_view * K_STEFAN(FT) * ϵ * t ^ 3;
 
     return _λ / _d
