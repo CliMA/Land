@@ -191,9 +191,9 @@ Base.@kwdef mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     "Maximal electron transport rate at 298.15 K `[μmol m⁻² s⁻¹]`"
     j_max25::FT = 83.5
     "Respiration rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    r_d25::FT = 50
+    r_d25::FT = 0.75
     "Maximal carboxylation rate at 298.15 K `[μmol m⁻² s⁻¹]`"
-    v_cmax25::FT = 0.75
+    v_cmax25::FT = 50
 
     # Diagnostic variables
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
