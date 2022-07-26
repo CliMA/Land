@@ -91,6 +91,12 @@ using Test
                         ClimaCache.VpmaxTDBoyd(FT)]
                 @test FT_test(var, FT);
             end;
+
+            # test the beta function
+            tf = ClimaCache.BetaFunction{FT}();
+            sm = ClimaCache.GentineSM{FT}();
+            @test tf.FUNC(0.5) == 0.5;
+            @test sm.β.FUNC(0.5) == 0.5;
         end;
     end;
 
@@ -120,7 +126,7 @@ using Test
                         ClimaCache.HyperspectralSoilAlbedo{FT}(),
                         ClimaCache.SoilLayer{FT}(),
                         ClimaCache.Soil{FT}(),
-                        ClimaCache.BrooksCorey{FT}(1,"Test",1,1,1),
+                        ClimaCache.BrooksCorey{FT}(500,1,"Test",1,1,1),
                         ClimaCache.VanGenuchten{FT}("Sand"),
                         ClimaCache.VanGenuchten{FT}("Loamy Sand"),
                         ClimaCache.VanGenuchten{FT}("Sandy Loam"),

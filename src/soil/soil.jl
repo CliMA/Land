@@ -124,6 +124,7 @@ end
 #     2022-Jul-13: add field K_MAX, K_REF, k, ψ, and ∂θ∂t
 #     2022-Jul-14: remove field K_REF
 #     2022-Jul-14: add field ∂G∂t (renamed to ∂e∂t), ΔZ
+#     2022-Jul-26: move field K_MAX to structure VanGenuchten and BrooksCorey
 #
 #######################################################################################################################################################################################################
 """
@@ -141,8 +142,6 @@ Base.@kwdef mutable struct SoilLayer{FT<:AbstractFloat}
     # Constants
     "Specific heat capacity of soil `[J K⁻¹ kg⁻¹]`"
     CP::FT = 760
-    "Maximum soil hydraulic conductivity at 25 °C `[mol m⁻¹ s⁻¹ MPa⁻¹]`"
-    K_MAX::FT = 10000
     "Soil thermal conductivity `[W m⁻¹ K⁻¹]`"
     Λ_THERMAL::FT = 3
     "Dry soil density `[kg m⁻³]`"
@@ -233,7 +232,7 @@ Base.@kwdef mutable struct Soil{FT<:AbstractFloat}
     "Albedo related structure"
     ALBEDO::Union{BroadbandSoilAlbedo{FT}, HyperspectralSoilAlbedo{FT}} = HyperspectralSoilAlbedo{FT}()
     "Soil layers"
-    LAYERS::Vector{SoilLayer{FT}} = SoilLayer{FT}[SoilLayer{FT}(K_MAX = 1e4, VC = VanGenuchten{FT}("Loam"), ZS = ZS[_i:_i+1]) for _i in 1:length(ZS)-1]
+    LAYERS::Vector{SoilLayer{FT}} = SoilLayer{FT}[SoilLayer{FT}(VC = VanGenuchten{FT}("Loam"), ZS = ZS[_i:_i+1]) for _i in 1:length(ZS)-1]
 
     # Diagnostic variables
     "Surface runoff due to heavy precipitation during the time step `[mol m⁻²]`"
