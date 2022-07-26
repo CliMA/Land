@@ -7,6 +7,7 @@
 #     2022-Jul-15: add method for MonoMLTreeSPAC
 #     2022-Jul-15: rename function to plant_energy! to be more accurate (ready to add other organs other leaf)
 #     2022-Jul-15: add root, trunk, branch energy budgets
+#     2022-Jul-26: add leaf LMA to the denominator
 #
 #######################################################################################################################################################################################################
 """
@@ -153,7 +154,7 @@ plant_energy!(spac::MonoMLGrassSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
     # update the temperature for leaves
     for _i in 1:DIM_LAYER
         LEAVES[_i].e += LEAVES[_i].∂e∂t * δt;
-        LEAVES[_i].t  = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
+        LEAVES[_i].t  = LEAVES[_i].e / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
     end;
 
     return nothing
@@ -175,7 +176,7 @@ plant_energy!(spac::MonoMLPalmSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
     # update the temperature for leaves
     for _i in 1:DIM_LAYER
         LEAVES[_i].e += LEAVES[_i].∂e∂t * δt;
-        LEAVES[_i].t  = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
+        LEAVES[_i].t  = LEAVES[_i].e / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
     end;
 
     return nothing
@@ -199,7 +200,7 @@ plant_energy!(spac::MonoMLTreeSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
         BRANCHES[_i].e += BRANCHES[_i].∂e∂t * δt;
         BRANCHES[_i].t  = BRANCHES[_i].e / (CP_L_MOL(FT) * sum(BRANCHES[_i].HS.v_storage));
         LEAVES[_i].e   += LEAVES[_i].∂e∂t * δt;
-        LEAVES[_i].t    = LEAVES[_i].e / (CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
+        LEAVES[_i].t    = LEAVES[_i].e / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage);
     end;
 
     return nothing
