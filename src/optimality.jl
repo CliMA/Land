@@ -583,7 +583,7 @@ Return the marginal risk for stomatal opening, given
     _∂E∂P_2 = ∂E∂P(leaves, _e; δe = -δe);
     _∂K∂E   = (_∂E∂P_2 - _∂E∂P_1) / δe;
 
-    return _∂K∂E * leaves.a_net / _∂E∂P_1
+    return _∂K∂E * leaves.a_net_sunlit[ind] / _∂E∂P_1
 );
 
 ∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -648,6 +648,7 @@ Return the marginal risk for stomatal opening, given
 """
 This function returns the ∂Θₙ∂E for nocturnal stomatal opening. Currently this function only supports WangSM which has been published for the purpose of computing nocturnal stomatal conductance.
     Supports to other optimality models will be added later when I am ready to test those.
+
 """
 function ∂Θₙ∂E end
 

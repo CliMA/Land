@@ -35,6 +35,7 @@ Return the marginal increase of stomatal conductance, given
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaf.SM, leaf, air; β = β, δe = δe);
 
@@ -76,6 +77,7 @@ Return the marginal increase of stomatal conductance, given
 - `ind` Leaf index (1 for sunlit and 2 for shaded)
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
@@ -116,6 +118,7 @@ Return the marginal increase of stomatal conductance, given
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air; β = β, δe = δe);
 
@@ -157,6 +160,7 @@ Return the marginal increase of stomatal conductance, given
 - `ind` Sunlit leaf index within the leaf angular distribution
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
@@ -195,6 +199,7 @@ Return the marginal increase of stomatal conductance, given
 Return the marginal increase of stomatal conductance, given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type struct
 - `air` `AirLayer` type environmental conditions
+
 """
 function ∂gₙ∂t end
 

@@ -22,16 +22,37 @@ using Test
             lf_2 = ClimaCache.Leaves1D{FT}();
             lf_3 = ClimaCache.Leaves2D{FT}();
             air  = ClimaCache.AirLayer{FT}();
-            for stm in [ClimaCache.BallBerrySM{FT}(),
-                        ClimaCache.GentineSM{FT}(),
-                        ClimaCache.LeuningSM{FT}(),
-                        ClimaCache.MedlynSM{FT}(),
-                        ClimaCache.AndereggSM{FT}(),
-                        ClimaCache.EllerSM{FT}(),
-                        ClimaCache.SperrySM{FT}(),
-                        ClimaCache.WangSM{FT}(),
-                        ClimaCache.Wang2SM{FT}()]
+            for stm in [ClimaCache.BallBerrySM{FT}(), ClimaCache.LeuningSM{FT}(), ClimaCache.MedlynSM{FT}()]
+                for β_y in [ClimaCache.BetaParameterG1(), ClimaCache.BetaParameterVcmax()]
+                    stm.β.PARAM_Y = β_y;
+                    lf_1.SM = stm;
+                    lf_2.SM = stm;
+                    lf_3.SM = stm;
+                    StomataModels.∂g∂t(lf_1, air);
+                    @test true;
+                    StomataModels.∂g∂t(lf_2, air, 1);
+                    @test true;
+                    StomataModels.∂g∂t(lf_3, air);
+                    StomataModels.∂g∂t(lf_3, air, 1);
+                    @test true;
+                end;
+            end;
+            for stm in [ClimaCache.GentineSM{FT}()]
                 lf_1.SM = stm;
+                lf_2.SM = stm;
+                lf_3.SM = stm;
+                StomataModels.∂g∂t(lf_1, air);
+                @test true;
+                StomataModels.∂g∂t(lf_2, air, 1);
+                @test true;
+                StomataModels.∂g∂t(lf_3, air);
+                StomataModels.∂g∂t(lf_3, air, 1);
+                @test true;
+            end;
+            for stm in [ClimaCache.AndereggSM{FT}(), ClimaCache.EllerSM{FT}(), ClimaCache.SperrySM{FT}(), ClimaCache.WangSM{FT}(), ClimaCache.Wang2SM{FT}()]
+                lf_1.SM = stm;
+                lf_2.SM = stm;
+                lf_3.SM = stm;
                 StomataModels.∂g∂t(lf_1, air);
                 @test true;
                 StomataModels.∂g∂t(lf_2, air, 1);
@@ -69,6 +90,14 @@ using Test
                 StomataModels.stomatal_conductance!(spac, FT(1));
                 @test true;
             end;
+
+            # TODO: add SPAC with Leaves1D in the future
+            lvs = ClimaCache.Leaves1D{FT}();
+            air = ClimaCache.AirLayer{FT}();
+            StomataModels.stomatal_conductance!(lvs, air);
+            @test true;
+            StomataModels.stomatal_conductance!(lvs, air, FT(1));
+            @test true;
         end;
     end;
 end;
