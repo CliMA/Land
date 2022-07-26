@@ -370,7 +370,7 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 deps = ["ClimaCache", "ConstrainedRootSolvers", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -394,9 +394,9 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
+git-tree-sha1 = "0005d75f43ff23688914536c5e9d5ac94f8077f7"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.19"
+version = "0.33.20"
 
 [[deps.TOML]]
 deps = ["Dates"]
