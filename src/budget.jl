@@ -12,6 +12,7 @@
 #     2022-Jun-15: add controller to make sure soil layers do not over saturate
 #     2022-Jun-15: merge the soil_water! and soil_energy! to soil_budget!
 #     2022-Jun-16: move time stepper controller to SoilPlantAirContinuum.jl
+#     2022-Jun-26: fix the unit of rain, mass flow, and root extraction (all in mol s⁻¹)
 #
 #######################################################################################################################################################################################################
 """
@@ -37,16 +38,16 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
 
     # update soil k, ψ, and λ_thermal for each soil layer
     for _i in 1:SOIL.DIM_SOIL
-        LAYERS[_i].k          = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
+        LAYERS[_i].k          = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].VC.K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
         LAYERS[_i].ψ          = soil_ψ_25(LAYERS[_i].VC, LAYERS[_i].θ) * relative_surface_tension(LAYERS[_i].t);
         LAYERS[_i]._λ_thermal = (LAYERS[_i].Λ_THERMAL + LAYERS[_i].θ * Λ_THERMAL_H₂O(FT)) / LAYERS[_i].ΔZ;
-        LAYERS[_i].∂e∂t = 0;
-        LAYERS[_i].∂θ∂t = 0;
+        LAYERS[_i].∂e∂t       = 0;
+        LAYERS[_i].∂θ∂t       = 0;
     end;
 
     # update k, δψ, and flow rate among layers
-    LAYERS[1].∂θ∂t += METEO.rain / LAYERS[1].ΔZ;
-    LAYERS[1].∂e∂t += METEO.rain / LAYERS[1].ΔZ * METEO.t_precip;
+    LAYERS[1].∂θ∂t += METEO.rain * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[1].ΔZ;
+    LAYERS[1].∂e∂t += LAYERS[1].∂θ∂t * METEO.t_precip;
     LAYERS[1].∂e∂t += SOIL.ALBEDO.r_net_lw + SOIL.ALBEDO.r_net_sw;
     for _i in 1:SOIL.DIM_SOIL-1
         SOIL._k[_i]         = 1 / (2 / LAYERS[_i].k + 2 / LAYERS[_i+1].k);
@@ -66,18 +67,18 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
             SOIL._q[_i] = 0;
         end;
 
-        LAYERS[_i  ].∂θ∂t -= SOIL._q[_i] / LAYERS[_i].ΔZ;
-        LAYERS[_i+1].∂θ∂t += SOIL._q[_i] / LAYERS[_i+1].ΔZ;
+        LAYERS[_i  ].∂θ∂t -= SOIL._q[_i] * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[_i].ΔZ;
+        LAYERS[_i+1].∂θ∂t += SOIL._q[_i] * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[_i+1].ΔZ;
         LAYERS[_i  ].∂e∂t -= SOIL._q_thermal[_i] / LAYERS[_i].ΔZ;
         LAYERS[_i+1].∂e∂t += SOIL._q_thermal[_i] / LAYERS[_i+1].ΔZ;
-        LAYERS[_i  ].∂e∂t -= SOIL._q[_i] * LAYERS[_i].t / LAYERS[_i].ΔZ;
-        LAYERS[_i+1].∂e∂t += SOIL._q[_i] * LAYERS[_i].t / LAYERS[_i+1].ΔZ;
+        LAYERS[_i  ].∂e∂t -= LAYERS[_i].∂θ∂t * LAYERS[_i].t;
+        LAYERS[_i+1].∂e∂t += LAYERS[_i+1].∂θ∂t * LAYERS[_i].t;
     end;
 
     # loop through the roots and compute the source/sink terms
     for _i in eachindex(ROOTS)
-        LAYERS[ROOTS_INDEX[_i]].∂θ∂t -= root_sink(ROOTS[_i]) / SOIL.AREA / LAYERS[ROOTS_INDEX[_i]].ΔZ;
-        LAYERS[ROOTS_INDEX[_i]].∂e∂t -= root_sink(ROOTS[_i]) / SOIL.AREA / LAYERS[ROOTS_INDEX[_i]].ΔZ * LAYERS[_i].t;
+        LAYERS[ROOTS_INDEX[_i]].∂θ∂t -= root_sink(ROOTS[_i]) * M_H₂O(FT) / ρ_H₂O(FT) / SOIL.AREA / LAYERS[ROOTS_INDEX[_i]].ΔZ;
+        LAYERS[ROOTS_INDEX[_i]].∂e∂t -= LAYERS[ROOTS_INDEX[_i]].∂θ∂t * LAYERS[_i].t;
     end;
 
     return nothing
