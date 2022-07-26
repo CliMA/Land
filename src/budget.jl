@@ -38,7 +38,7 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
 
     # update soil k, ψ, and λ_thermal for each soil layer
     for _i in 1:SOIL.DIM_SOIL
-        LAYERS[_i].k          = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
+        LAYERS[_i].k          = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].VC.K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
         LAYERS[_i].ψ          = soil_ψ_25(LAYERS[_i].VC, LAYERS[_i].θ) * relative_surface_tension(LAYERS[_i].t);
         LAYERS[_i]._λ_thermal = (LAYERS[_i].Λ_THERMAL + LAYERS[_i].θ * Λ_THERMAL_H₂O(FT)) / LAYERS[_i].ΔZ;
         LAYERS[_i].∂e∂t       = 0;
