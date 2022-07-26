@@ -96,7 +96,7 @@ using Test
             air = ClimaCache.AirLayer{FT}();
             StomataModels.stomatal_conductance!(lvs, air);
             @test true;
-            StomataModels.stomatal_conductance!(lvs, air, FT(1));
+            StomataModels.stomatal_conductance!(lvs, FT(1));
             @test true;
         end;
     end;
