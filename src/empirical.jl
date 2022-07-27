@@ -43,6 +43,7 @@ Return the stomatal conductance computed from empirical model formulation, given
 - `leaf` `Leaf` type struct
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor for G1 (must be 1 if tuning factor is not based on G1)
+
 """
 empirical_equation(sm::BallBerrySM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
@@ -100,6 +101,7 @@ Return the stomatal conductance computed from empirical model formulation, given
 - `air` `AirLayer` type environmental conditions
 - `ind` Leaf index (1 for sunlit and 2 for shaded)
 - `β` Tuning factor for G1 (must be 1 if tuning factor is not based on G1)
+
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
@@ -155,19 +157,20 @@ Return the stomatal conductance computed from empirical model formulation for th
 - `leaves` `Leaves2D` type struct
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor for G1 (must be 1 if tuning factor is not based on G1)
+
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_shaded * FT(1e-6) / leaves.p_CO₂_s_shaded * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_shaded * FT(1e-6) / leaves._p_CO₂_s_shaded * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * leaves.a_net_shaded * FT(1e-6) / leaves.p_CO₂_i_shaded * P_AIR
+    return G0 + β * G1 * leaves.a_net_shaded * FT(1e-6) / leaves._p_CO₂_i_shaded * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -176,7 +179,7 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; �
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves.p_CO₂_s_shaded - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves._p_CO₂_s_shaded - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -211,19 +214,20 @@ Return the stomatal conductance computed from empirical model formulation for th
 - `air` `AirLayer` type environmental conditions
 - `ind` Sunlit leaf index within the leaf angular distribution
 - `β` Tuning factor for G1 (must be 1 if tuning factor is not based on G1)
+
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves.p_CO₂_s_sunlit[ind] * P_AIR
+    return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves._p_CO₂_s_sunlit[ind] * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + β * G1 * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves.p_CO₂_i_sunlit[ind] * P_AIR
+    return G0 + β * G1 * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves._p_CO₂_i_sunlit[ind] * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
@@ -232,7 +236,7 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, i
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves.p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves._p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (

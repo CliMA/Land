@@ -1,7 +1,7 @@
 name = "StomataModels"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"

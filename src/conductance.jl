@@ -35,6 +35,7 @@ Return the marginal increase of stomatal conductance, given
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaf.SM, leaf, air; β = β, δe = δe);
 
@@ -76,6 +77,7 @@ Return the marginal increase of stomatal conductance, given
 - `ind` Leaf index (1 for sunlit and 2 for shaded)
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
@@ -116,6 +118,7 @@ Return the marginal increase of stomatal conductance, given
 - `air` `AirLayer` type environmental conditions
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air; β = β, δe = δe);
 
@@ -157,6 +160,7 @@ Return the marginal increase of stomatal conductance, given
 - `ind` Sunlit leaf index within the leaf angular distribution
 - `β` Tuning factor (only used for empirical models)
 - `δe` Incremental flow rate to compute ∂E∂P (only used for optimality models)
+
 """
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
@@ -195,6 +199,7 @@ Return the marginal increase of stomatal conductance, given
 Return the marginal increase of stomatal conductance, given
 - `lf` `Leaf`, `Leaves1D`, or `Leaves2D` type struct
 - `air` `AirLayer` type environmental conditions
+
 """
 function ∂gₙ∂t end
 
@@ -290,6 +295,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) w
 #     2022-Jul-07: add new method to update stomatal conductance prognostically
 #     2022-Jul-12: move ∂g∂t to another method
 #     2022-Jul-12: add method to update g for SPAC
+#     2022-Jul-26: limit g in range after updating stomatal conductance
 #
 #######################################################################################################################################################################################################
 """
@@ -320,6 +326,7 @@ stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoM
 
 stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     leaf.g_H₂O_s += leaf.∂g∂t * Δt;
+    stomatal_conductance!(leaf);
 
     return nothing
 );
@@ -327,6 +334,7 @@ stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
 stomatal_conductance!(leaves::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     leaves.g_H₂O_s[1] += leaves.∂g∂t[1] * Δt;
     leaves.g_H₂O_s[2] += leaves.∂g∂t[2] * Δt;
+    stomatal_conductance!(leaves);
 
     return nothing
 );
@@ -336,6 +344,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat} =
     for _i in eachindex(leaves.g_H₂O_s_sunlit)
         leaves.g_H₂O_s_sunlit[_i] += leaves.∂g∂t_sunlit[_i] * Δt;
     end;
+    stomatal_conductance!(leaves);
 
     return nothing
 );
@@ -343,7 +352,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat} =
 stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaf);
 
-    leaf.g_CO₂ = 1 / (1 / leaf.g_CO₂_b + FT(1.6) / leaf.g_H₂O_s);
+    leaf._g_CO₂ = 1 / (1 / leaf.g_CO₂_b + FT(1.6) / leaf.g_H₂O_s);
 
     return nothing
 );
@@ -351,8 +360,8 @@ stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
 stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaves);
 
-    leaves.g_CO₂[1] = 1 / (1 / leaves.g_CO₂_b[1] + FT(1.6) / leaves.g_H₂O_s[1]);
-    leaves.g_CO₂[2] = 1 / (1 / leaves.g_CO₂_b[2] + FT(1.6) / leaves.g_H₂O_s[2]);
+    leaves._g_CO₂[1] = 1 / (1 / leaves.g_CO₂_b[1] + FT(1.6) / leaves.g_H₂O_s[1]);
+    leaves._g_CO₂[2] = 1 / (1 / leaves.g_CO₂_b[2] + FT(1.6) / leaves.g_H₂O_s[2]);
 
     return nothing
 );
@@ -360,9 +369,9 @@ stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
 stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat} = (
     limit_stomatal_conductance!(leaves);
 
-    leaves.g_CO₂_shaded = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_shaded);
+    leaves._g_CO₂_shaded = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_shaded);
     for _i in eachindex(leaves.g_H₂O_s_sunlit)
-        leaves.g_CO₂_sunlit[_i] = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_sunlit[_i]);
+        leaves._g_CO₂_sunlit[_i] = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_sunlit[_i]);
     end;
 
     return nothing
