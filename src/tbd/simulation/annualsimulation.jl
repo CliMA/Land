@@ -43,13 +43,7 @@ function annual_simulation!(
         r_all::FT = (weather).Solar[i]
         wind ::FT = (weather).Wind[i]
         rain ::FT = (weather).Rain[i]
-
-        node.envir.t         = _tair + T_0(FT);
-        node.envir.p_H₂O_sat = saturation_vapor_pressure( node.envir.t );
-        node.envir.p_CO₂     = p_co2;
-        node.envir.p_H₂O     = node.envir.p_H₂O_sat - _dair * 1000;
-        node.envir.rh        = node.envir.p_H₂O / node.envir.p_H₂O_sat;
-        node.envir.wind      = wind;
+        update_environment!(node.envir; p_CO₂ = p_co2, t = _tair + T_0(FT), vpd = FT(_dair) * 1000, wind = wind);
 
         # 2.2 if day time
         zenith = zenith_angle(latitude, day, hour, FT(0));

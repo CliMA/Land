@@ -3,52 +3,17 @@
 CurrentModule = SoilPlantAirContinuum
 ```
 
-## Types
+## Core function
 ```@docs
-SPACContainer1L
-SPACContainer2L
-SPACMono
-SPACSimple
+initialize!
+soil_plant_air_continuum!
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false) where {FT<:AbstractFloat}
+adjusted_time
+time_stepper!
 ```
 
-## Soil
+## Update SPAC
 ```@docs
-soil_moisture_swc!
-soil_moisture_p!
-soil_moisture_p25!
-soil_moisture!
-```
-
-## Planet
-```@docs
-atmospheric_pressure_ratio
-atmospheric_pressure
-ppm_to_Pa
-zenith_angle
-```
-
-## Big-leaf model
-```@docs
-gain_risk_map
-leaf_gas_exchange_nonopt!
-leaf_gas_exchange!
-optimize_flows!
-big_leaf_partition!
-radiative_conductance
-black_body_emittance
-boundary_layer_conductance
-leaf_temperature
-leaf_temperature_sunlit
-leaf_temperature_shaded
-annual_profit
-annual_simulation!
-create_dataframe
-initialize_spac_canopy!
-```
-
-## Optimal investment
-```@docs
-leaf_allocation!
-optimize_leaf!
-optimize_hs!
+update!
+update!(air::AirLayer{FT}; p_CO₂::Union{Number,Nothing} = nothing, p_H₂O::Union{Number,Nothing} = nothing, rh::Union{Number,Nothing} = nothing, t::Union{Number,Nothing} = nothing, vpd::Union{Number,Nothing} = nothing, wind::Union{Number,Nothing} = nothing) where {FT<:AbstractFloat}
 ```

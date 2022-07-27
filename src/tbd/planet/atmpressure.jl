@@ -31,18 +31,3 @@ function atmospheric_pressure(
 ) where {FT<:AbstractFloat}
     return P_ATM(FT) * atmospheric_pressure_ratio(h);
 end
-
-
-
-
-"""
-    ppm_to_Pa(h::FT)
-
-Convert ppm to Pa, given
-- `h` elevation in `[m]`
-"""
-function ppm_to_Pa(
-            h::FT
-) where {FT<:AbstractFloat}
-    return atmospheric_pressure(h) * FT(1e-6)
-end

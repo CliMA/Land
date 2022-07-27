@@ -25,12 +25,16 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1"
-      - name: Install Dependencies for Linux
-        if: runner.os == 'Linux'
-        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
-      - name: Install Dependencies for Windows and Mac-OS
-        if: runner.os != 'Linux'
-        run: julia --project -e 'using Pkg; Pkg.instantiate();'
+      - name: Use Github Registry for Linux and Mac-OS
+        if: runner.os != 'Windows'
+        run: |
+          julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Use Github Registry for Windows
+        if: runner.os == 'Windows'
+        run: |
+          julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
+          julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
       - name: Process Coverage
