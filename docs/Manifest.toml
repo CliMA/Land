@@ -49,9 +49,9 @@ version = "0.1.4"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
-git-tree-sha1 = "8c4ecce24cff25ddf2a6145aafd0a7135baa7eb0"
+git-tree-sha1 = "e98519cbe0111bc9a42452cbaa965e36466cf0a5"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -316,7 +316,7 @@ version = "0.2.0"
 deps = ["ClimaCache", "ConstrainedRootSolvers", "SoilHydraulics", "Statistics", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.4.1"
+version = "0.4.2"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]
@@ -374,9 +374,9 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [[deps.SoilHydraulics]]
 deps = ["ClimaCache", "ConstrainedRootSolvers", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "d2ba3f1694184e50cba5ffb134d5d564bab4b054"
+git-tree-sha1 = "4f222c0af2420b56c9f0e4af8f84c07f3a8b3270"
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
