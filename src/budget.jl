@@ -20,7 +20,7 @@ function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
 
     # make sure each layer does not over-saturate or drain
     _δt = δt;
-    for _i in 1:SOIL.N_LAYER
+    for _i in 1:SOIL.DIM_SOIL
         # if top soil is saturated and there is rain, _δt will not change (the rain will be counted as runoff)
         if (SOIL.LAYERS[_i].∂θ∂t > 0) && (SOIL.LAYERS[_i].θ < SOIL.LAYERS[_i].VC.Θ_SAT)
             _δt_sat = (SOIL.LAYERS[_i].VC.Θ_SAT - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
