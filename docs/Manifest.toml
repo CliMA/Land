@@ -17,12 +17,6 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
-[[deps.BenchmarkTools]]
-deps = ["JSON", "Logging", "Printf", "Statistics", "UUIDs"]
-git-tree-sha1 = "9e62e66db34540a0c919d72172cc2f642ac71260"
-uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-version = "0.5.0"
-
 [[deps.CFTime]]
 deps = ["Dates", "Printf"]
 git-tree-sha1 = "ed2e76c1c3c43fd9d0cb9248674620b29d71f2d1"
@@ -31,9 +25,9 @@ version = "0.1.2"
 
 [[deps.CLIMAParameters]]
 deps = ["Test"]
-git-tree-sha1 = "1d2f657dbc634c69a58d71c619bbf7f51005a0f7"
+git-tree-sha1 = "17ece0add9940728f8120a1561fc3361be6a6f26"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
-version = "0.1.13"
+version = "0.4.3"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
@@ -61,9 +55,9 @@ version = "0.1.4"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
-git-tree-sha1 = "8c4ecce24cff25ddf2a6145aafd0a7135baa7eb0"
+git-tree-sha1 = "e98519cbe0111bc9a42452cbaa965e36466cf0a5"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -324,12 +318,6 @@ git-tree-sha1 = "85f8e6578bf1f9ee0d11e7bb1b1456435479d47c"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.4.1"
 
-[[deps.Parameters]]
-deps = ["OrderedCollections", "UnPack"]
-git-tree-sha1 = "34c0e9ad262e5f7fc75b10a9952ca7692cfc5fbe"
-uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.12.3"
-
 [[deps.Parsers]]
 deps = ["Dates"]
 git-tree-sha1 = "0044b23da09b5608b4ecacb4e5e6c6332f833a7e"
@@ -337,10 +325,10 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.3.2"
 
 [[deps.Photosynthesis]]
-deps = ["BenchmarkTools", "CLIMAParameters", "DocStringExtensions", "Parameters", "Test", "WaterPhysics"]
-git-tree-sha1 = "bd1ead01fc2f2dbe95ea6de45408b34e0bd5edb4"
+deps = ["ClimaCache", "PkgUtility", "Test", "UnPack"]
+git-tree-sha1 = "65fab76de22db6f50f0be7626e1dd68c78ebd1df"
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
-version = "0.1.2"
+version = "0.4.1"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -353,10 +341,10 @@ uuid = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 version = "0.2.0"
 
 [[deps.PlantHydraulics]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Statistics", "Test", "WaterPhysics"]
-git-tree-sha1 = "4e99531f5f30a303de9e8af61fa8bd5a479b8aad"
+deps = ["ClimaCache", "ConstrainedRootSolvers", "SoilHydraulics", "Statistics", "Test", "UnPack", "WaterPhysics"]
+git-tree-sha1 = "a19cbb72911392a734a0a4a7df2f6ba4ff98a251"
 uuid = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
-version = "0.2.1"
+version = "0.4.2"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]
@@ -420,9 +408,9 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [[deps.SoilHydraulics]]
 deps = ["ClimaCache", "ConstrainedRootSolvers", "Test", "UnPack", "WaterPhysics"]
-git-tree-sha1 = "d2ba3f1694184e50cba5ffb134d5d564bab4b054"
+git-tree-sha1 = "4f222c0af2420b56c9f0e4af8f84c07f3a8b3270"
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
-version = "0.2.0"
+version = "0.2.1"
 
 [[deps.SoilPlantAirContinuum]]
 deps = ["CanopyRadiativeTransfer", "ClimaCache", "LeafOptics", "Photosynthesis", "PlantHydraulics", "SoilHydraulics", "StomataModels", "Test", "UnPack", "WaterPhysics"]
@@ -458,15 +446,15 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
+git-tree-sha1 = "0005d75f43ff23688914536c5e9d5ac94f8077f7"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.19"
+version = "0.33.20"
 
 [[deps.StomataModels]]
-deps = ["BenchmarkTools", "CLIMAParameters", "ConstrainedRootSolvers", "DocStringExtensions", "Parameters", "Photosynthesis", "PlantHydraulics", "Test", "WaterPhysics"]
-git-tree-sha1 = "69bfee4847239006ef06310404904089256bb811"
+deps = ["ClimaCache", "Photosynthesis", "PkgUtility", "PlantHydraulics", "SoilHydraulics", "Test", "UnPack", "WaterPhysics"]
+git-tree-sha1 = "228c0a3358c000f7a405b2665d5204dac0b80f55"
 uuid = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
-version = "0.1.2"
+version = "0.3.1"
 
 [[deps.TOML]]
 deps = ["Dates"]
