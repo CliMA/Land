@@ -1,7 +1,7 @@
 name = "CanopyRadiativeTransfer"
 uuid = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"

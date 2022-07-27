@@ -181,7 +181,6 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil:
     # lognwave radiation out from sunlit and shaded leaves
     _shaded_out_solar = BIO.ϵ_LW * K_STEFAN(FT) * leaf.t[1] ^ 4 * shaded_integral_top(RADIATION.k_diffuse, BIO.ϵ_LW);
     _sunlit_out_solar = BIO.ϵ_LW * K_STEFAN(FT) * leaf.t[2] ^ 4 * sunlit_integral_top(RADIATION.k_diffuse, BIO.ϵ_LW);
-    _sunlit_out_soil  = _soil_lw_in_sunlit;
 
     # net radiation in-out for sunlit and shaded leaves for shortwave radation
     RADIATION.r_net_shaded += (_shaded_in_solar + _shaded_in_soil - _shaded_out_solar - _soil_lw_in_shaded) * BIO.ϵ_LW / RADIATION.lai_shaded;
@@ -241,7 +240,6 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 # Changes to this method
 # General
 #     2022-Jun-09: migrate the function from CanopyLayers
-#     2022-Jun-09: clean the function
 #     2022-Jun-10: rename PAR/APAR to APAR/PPAR to be more accurate
 #     2022-Jun-10: add PAR calculation (before absorption)
 #     2022-Jun-10: compute shortwave net radiation
@@ -251,6 +249,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
 # Bug fix:
 #     2022-Jul-15: sum by r_net_sw by the weights of sunlit and shaded fractions
+#     2022-Jul-27: use _ρ_dd, _ρ_sd, _τ_dd, and _τ_sd for leaf energy absorption (typo when refactoring the code)
 #
 #######################################################################################################################################################################################################
 """
@@ -306,17 +305,17 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _p_s_i = view(RADIATION.e_sum_direct  ,:,_i  );     # sum direct radiation
         _p_d_i = view(RADIATION.e_sum_diffuse ,:,_i  );     # sum diffuse radiation
 
-        _r_dd_i = view(OPTICS.ρ_dd,:,_i);   # reflectance of the upper boundary (i)
-        _r_sd_i = view(OPTICS.ρ_sd,:,_i);   # reflectance of the upper boundary (i)
-        _t_dd_i = view(OPTICS.τ_dd,:,_i);   # transmittance of the layer (i)
-        _t_sd_i = view(OPTICS.τ_sd,:,_i);   # transmittance of the layer (i)
+        _r_dd__ = view(OPTICS._ρ_dd,:,_i);  # reflectance of the upper boundary (i)
+        _r_sd__ = view(OPTICS._ρ_sd,:,_i);  # reflectance of the upper boundary (i)
+        _t_dd__ = view(OPTICS._τ_dd,:,_i);  # transmittance of the layer (i)
+        _t_sd__ = view(OPTICS._τ_sd,:,_i);  # transmittance of the layer (i)
         _t_ss__ = OPTICS._τ_ss;             # transmittance for directional->directional
 
         _p_s_i .= _e_s_i;
         _p_d_i .= _e_d_i .+ _e_u_j;
 
-        _a_s_i .= _p_s_i .* (1 .- _t_ss__ .- _t_sd_i .- _r_sd_i);
-        _a_d_i .= _p_d_i .* (1 .- _t_dd_i .- _r_dd_i);
+        _a_s_i .= _p_s_i .* (1 .- _t_ss__ .- _t_sd__ .- _r_sd__);
+        _a_d_i .= _p_d_i .* (1 .- _t_dd__ .- _r_dd__);
     end;
 
     # 3. compute the spectra at the observer direction
@@ -325,7 +324,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _e_u_i = view(RADIATION.e_diffuse_up  ,:,_i);   # upward diffuse radiation at upper boundary
 
         _dob_i = view(OPTICS.σ_dob,:,_i);   # scattering coefficient backward for diffuse->observer
-        _dof_i = view(OPTICS.σ_dob,:,_i);   # scattering coefficient forward for diffuse->observer
+        _dof_i = view(OPTICS.σ_dof,:,_i);   # scattering coefficient forward for diffuse->observer
         _so__i = view(OPTICS.σ_so ,:,_i);   # bidirectional from solar to observer
 
         RADIATION.e_v[:,_i] .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
@@ -333,7 +332,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
     RADIATION.e_v[:,end] .= OPTICS.po[end] .* view(RADIATION.e_diffuse_up,:,DIM_LAYER+1);
 
     for _i in eachindex(RADIATION.e_o)
-        RADIATION.e_o[_i] = sum(view(RADIATION.e_o,_i,:)) / FT(pi);
+        RADIATION.e_o[_i] = sum(view(RADIATION.e_v,_i,:)) / FT(pi);
     end;
 
     RADIATION.albedo .= RADIATION.e_o * FT(pi) ./ (rad.e_direct .+ rad.e_diffuse);
@@ -434,7 +433,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 
     # 4. compute the net longwave radiation per canopy layer and soil
     for _i in 1:DIM_LAYER
-        RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]) - 2* RADIATION.r_lw[_i];
+        RADIATION.r_net_lw[_i] = (RADIATION.r_lw_down[_i] + RADIATION.r_lw_up[_i+1]) * (1 - OPTICS._ρ_lw[_i] - OPTICS._τ_lw[_i]) - 2 * RADIATION.r_lw[_i];
     end;
 
     ALBEDO.r_net_lw = RADIATION.r_lw_down[end] * (1 - ALBEDO.ρ_LW) - _r_lw_soil;
