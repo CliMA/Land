@@ -49,9 +49,9 @@ version = "0.1.4"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
-git-tree-sha1 = "8c4ecce24cff25ddf2a6145aafd0a7135baa7eb0"
+git-tree-sha1 = "80dda20de8e5c0bb139f64dc37eccd9e41ae04a1"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "1.0.0"
+version = "1.1.1"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -116,9 +116,9 @@ version = "0.8.6"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "2498c3704e9cd26bf586a351473417881676bb2d"
+git-tree-sha1 = "ee945ed10767de73cf8b610951b98228cb65af80"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.21"
+version = "0.27.22"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -206,7 +206,7 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 deps = ["ClimaCache", "SpecialFunctions", "Test", "UnPack"]
 path = ".."
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -404,9 +404,9 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
+git-tree-sha1 = "0005d75f43ff23688914536c5e9d5ac94f8077f7"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.19"
+version = "0.33.20"
 
 [[deps.TOML]]
 deps = ["Dates"]

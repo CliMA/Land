@@ -28,6 +28,7 @@ function leaf_spectra! end
 #     2022-Jan-13: use LeafBiophysics directly in the function rather than Leaf
 #     2022-Jun-15: rename LeafBiophysics to HyperspectralLeafBiophysics to be more descriptive
 #     2022-Jul-22: add lwc to function variable list
+#     2022-Jul-28: run leaf_spectra! only if lwc differs from _v_storage
 # Bug fix
 #     2021-Aug-06: If bio.CBC and bio.PRO are not zero, they are accounted for twice in bio.LMA, thus the spectrum from LMA need to subtract the contribution from CBC and PRO
 # To do
@@ -60,6 +61,11 @@ leaf_spectra!(bio, wls, lha, 50.0; APAR_car=false, α=59.0);
 
 """
 leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha::HyperspectralAbsorption{FT}, lwc::FT; APAR_car::Bool = true, α::FT=FT(40)) where {FT<:AbstractFloat} = (
+    # if leaf water content is the same as the historical value, do nothing
+    if lwc == bio._v_storage
+        return nothing
+    end;
+
     @unpack MESOPHYLL_N, NDUB = bio;
     @unpack K_ANT, K_BROWN, K_CAB, K_CAR_V, K_CAR_Z, K_CBC, K_H₂O, K_LMA, K_PRO, K_PS, NR = lha;
     @unpack IΛ_SIF, IΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
@@ -194,6 +200,9 @@ leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, lha:
 
     bio.mat_b = _a .* _mat_b + _b .* _mat_f;
     bio.mat_f = _a .* _mat_f + _b .* _mat_b;
+
+    # store leaf water content
+    bio._v_storage = lwc;
 
     return nothing
 );
