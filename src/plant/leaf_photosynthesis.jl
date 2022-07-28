@@ -117,6 +117,8 @@ Base.@kwdef mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhoto
     _k_q::FT = 0
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _r_d::FT = 0
+    "Last leaf temperature. If different from leaf t, then make temperature correction"
+    _t::FT = 0
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _v_cmax::FT = 0
     "Maximal Cytochrome b₆f activity `[μmol e⁻ m⁻² s⁻¹]`"
@@ -224,6 +226,8 @@ Base.@kwdef mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     _k_o::FT = 0
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _r_d::FT = 0
+    "Last leaf temperature. If different from leaf t, then make temperature correction"
+    _t::FT = 0
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _v_cmax::FT = 0
     "CO₂ compensation point with the absence of Rd `[Pa]`"
@@ -303,6 +307,8 @@ Base.@kwdef mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     _k_pep::FT = 0
     "Respiration rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _r_d::FT = 0
+    "Last leaf temperature. If different from leaf t, then make temperature correction"
+    _t::FT = 0
     "Maximal carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"
     _v_cmax::FT = 0
     "Maximal PEP carboxylation rate at leaf temperature `[μmol m⁻² s⁻¹]`"

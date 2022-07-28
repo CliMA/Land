@@ -36,8 +36,7 @@ abstract type AbstractLeaf{FT<:AbstractFloat} end
 #     2022-Jul-12: add field: ∂g∂t
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 #     2022-Jul-19: remove field p_H₂O_sat
-# To do
-#     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
+#     2022-Jul-28: move field _t to PSM
 #
 #######################################################################################################################################################################################################
 """
@@ -109,8 +108,6 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
     _p_CO₂_i::FT = 0
     "Leaf surface CO₂ partial pressure `[Pa]`"
     _p_CO₂_s::FT = 0
-    "Last leaf temperature. If different from t, then make temperature correction"
-    _t::FT = 0
 end
 
 
@@ -215,8 +212,7 @@ end
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 #     2022-Jul-19: remove field p_H₂O_sat
 #     2022-Jul-19: add dimension control to struct
-# To do
-#     TODO: link leaf water content to BIO_PHYSICS.l_H₂O
+#     2022-Jul-28: move field _t to PSM
 #
 #######################################################################################################################################################################################################
 """
@@ -315,6 +311,4 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     _p_CO₂_s_shaded::FT = 0
     "Leaf surface CO₂ partial pressure for sunlit leaves `[Pa]`"
     _p_CO₂_s_sunlit::Matrix{FT} = zeros(FT, DIM_INCL, DIM_AZI)
-    "Last leaf temperature. If different from t, then make temperature correction"
-    _t::FT = 0
 end
