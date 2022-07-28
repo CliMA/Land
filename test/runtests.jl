@@ -27,7 +27,7 @@ using Test
         end;
     end;
 
-    # file etr.jl, rubisco_limited.jl, light_limited.jl, and product_limited.jl
+    # file etr.jl, rubisco_limited.jl, light_limited.jl, product_limited.jl, and fluorescence.jl
     @testset "ETR and Rates" begin
         for FT in [Float32, Float64]
             air = ClimaCache.AirLayer{FT}();
@@ -42,6 +42,8 @@ using Test
                 Photosynthesis.light_limited_rate!(var.PSM, var.PRC, air, FT(0.1)); @test true;
                 Photosynthesis.product_limited_rate!(var.PSM, FT(20)); @test true;
                 Photosynthesis.product_limited_rate!(var.PSM, air, FT(0.1)); @test true;
+                Photosynthesis.colimit_photosynthesis!(var.PSM); @test true;
+                Photosynthesis.photosystem_coefficients!(var.PSM, var.PRC, FT(1000)); @test true;
             end;
         end;
     end;
