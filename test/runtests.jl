@@ -16,16 +16,12 @@ using Test
             end;
 
             air = ClimaCache.AirLayer{FT}();
-            for var in [ClimaCache.C3VJPModel{FT}(),
-                        ClimaCache.C4VJPModel{FT}(),
-                        ClimaCache.C3CytochromeModel{FT}()]
+            for var in [ClimaCache.C3VJPModel{FT}(), ClimaCache.C4VJPModel{FT}(), ClimaCache.C3CytochromeModel{FT}()]
                 Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
                 Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
             end;
 
-            for var in [ClimaCache.Leaf{FT}(),
-                        ClimaCache.Leaves1D{FT}(),
-                        ClimaCache.Leaves2D{FT}()]
+            for var in [ClimaCache.Leaf{FT}(), ClimaCache.Leaves1D{FT}(), ClimaCache.Leaves2D{FT}()]
                 @test Photosynthesis.∂R∂T(var) > 0;
             end;
         end;
@@ -53,15 +49,11 @@ using Test
     # file colimit.jl
     @testset "Colimitation" begin
         for FT in [Float32, Float64]
-            for var in [ClimaCache.MinimumColimit{FT}(),
-                        ClimaCache.QuadraticColimit{FT}(),
-                        ClimaCache.SerialColimit{FT}()]
+            for var in [ClimaCache.MinimumColimit{FT}(), ClimaCache.QuadraticColimit{FT}(), ClimaCache.SerialColimit{FT}()]
                 @test Photosynthesis.colimited_rate(FT(50), FT(100), var) <= 50;
             end;
 
-            for var in [ClimaCache.C3VJPModel{FT}(),
-                        ClimaCache.C4VJPModel{FT}(),
-                        ClimaCache.C3CytochromeModel{FT}()]
+            for var in [ClimaCache.C3VJPModel{FT}(), ClimaCache.C4VJPModel{FT}(), ClimaCache.C3CytochromeModel{FT}()]
                 Photosynthesis.colimit_photosynthesis!(var); @test true;
             end;
         end;
@@ -71,12 +63,26 @@ using Test
     @testset "Core Model" begin
         for FT in [Float32, Float64]
             air = ClimaCache.AirLayer{FT}();
-            for var in [ClimaCache.Leaf{FT}(),
-                        ClimaCache.Leaves1D{FT}(),
-                        ClimaCache.Leaves2D{FT}()]
-                leaf_photosynthesis!(var, air, FT(0.1), FT(1000), FT(300)); @test true;
-                leaf_photosynthesis!(var, air, ClimaCache.GCO₂Mode()); @test true;
-                leaf_photosynthesis!(var, air, ClimaCache.PCO₂Mode()); @test true;
+            for var in [ClimaCache.Leaf{FT}(), ClimaCache.Leaves1D{FT}(), ClimaCache.Leaves2D{FT}()]
+                for stm in [ClimaCache.AndereggSM{FT}(),
+                            ClimaCache.BallBerrySM{FT}(),
+                            ClimaCache.EllerSM{FT}(),
+                            ClimaCache.GentineSM{FT}(),
+                            ClimaCache.LeuningSM{FT}(),
+                            ClimaCache.MedlynSM{FT}(),
+                            ClimaCache.SperrySM{FT}(),
+                            ClimaCache.WangSM{FT}(),
+                            ClimaCache.Wang2SM{FT}()]
+                    for bfy in [ClimaCache.BetaParameterG1(), ClimaCache.BetaParameterVcmax()]
+                        if stm in [ClimaCache.BallBerrySM{FT}(), ClimaCache.LeuningSM{FT}(), ClimaCache.MedlynSM{FT}()]
+                            stm.β.PARAM_Y = bfy;
+                        end;
+                        var.SM = stm;
+                        leaf_photosynthesis!(var, air, FT(0.1), FT(1000), FT(300)); @test true;
+                        leaf_photosynthesis!(var, air, ClimaCache.GCO₂Mode()); @test true;
+                        leaf_photosynthesis!(var, air, ClimaCache.PCO₂Mode()); @test true;
+                    end;
+                end;
             end;
         end;
     end;

@@ -109,7 +109,7 @@ leaf_photosynthesis!(
             air::AirLayer{FT},
             mode::Union{GCO₂Mode, PCO₂Mode},
             sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}
-) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, sm.Β, sm.Β.PARAM_Y);
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, sm.β, sm.β.PARAM_Y);
 
 leaf_photosynthesis!(
             lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
