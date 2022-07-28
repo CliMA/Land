@@ -3,96 +3,80 @@ using Photosynthesis
 using Test
 
 
-@testset verbose = true "Photosynthesis Test" begin
-    @testset "C3 VJP" begin
+@testset verbose = true "Photosynthesis CI Coverage" begin
+    # file temperature.jl
+    @testset "Temperature" begin
         for FT in [Float32, Float64]
-            leaf   = ClimaCache.Leaf{FT}();
-            air    = ClimaCache.AirLayer{FT}();
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            leaf_photosynthesis!(leaf, air, p_mode);
-            @test true;
-            leaf_photosynthesis!(leaf, air, g_mode);
-            @test true;
-        end;
-    end;
+            for var in [ClimaCache.Arrhenius{FT}(T_REF = 298, VAL_REF = 40, ΔHA = 80000),
+                        ClimaCache.ArrheniusPeak{FT}(T_REF = 298, VAL_REF = 40 , ΔHA = 50000, ΔHD = 400000, ΔSV = 1000),
+                        ClimaCache.Q10{FT}(Q_10 = 1.4, T_REF = 298, VAL_REF = 1)]
+                @test Photosynthesis.temperature_correction(var, FT(300)) > 0;
+                @test Photosynthesis.temperature_corrected_value(var, FT(300)) > 0;
+                @test Photosynthesis.∂R∂T(var, FT(1), FT(300)) > 0;
+            end;
 
-    @testset "C3 Cytochrome" begin
-        for FT in [Float32, Float64]
-            leaf   = ClimaCache.Leaf{FT}(PSM = ClimaCache.C3CytochromeModel{FT}(), PRC = ClimaCache.CytochromeReactionCenter{FT}());
-            air    = ClimaCache.AirLayer{FT}();
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            leaf_photosynthesis!(leaf, air, p_mode);
-            @test true;
-            leaf_photosynthesis!(leaf, air, g_mode);
-            @test true;
-        end;
-    end;
+            air = ClimaCache.AirLayer{FT}();
+            for var in [ClimaCache.C3VJPModel{FT}(),
+                        ClimaCache.C4VJPModel{FT}(),
+                        ClimaCache.C3CytochromeModel{FT}()]
+                Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
+                Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
+            end;
 
-    @testset "C4 VJP" begin
-        for FT in [Float32, Float64]
-            leaf   = ClimaCache.Leaf{FT}(PSM = ClimaCache.C4VJPModel{FT}());
-            air    = ClimaCache.AirLayer{FT}();
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            leaf_photosynthesis!(leaf, air, p_mode);
-            @test true;
-            leaf_photosynthesis!(leaf, air, g_mode);
-            @test true;
-        end;
-    end;
-
-    @testset "1D+2D Leaves" begin
-        for FT in [Float32, Float64]
-            air    = ClimaCache.AirLayer{FT}();
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            leaves_1d = ClimaCache.Leaves1D{FT}();
-            leaves_2d = ClimaCache.Leaves2D{FT}();
-            leaf_photosynthesis!(leaves_1d, air, g_mode);
-            @test true;
-            leaf_photosynthesis!(leaves_1d, air, p_mode);
-            @test true;
-            leaf_photosynthesis!(leaves_2d, air, g_mode);
-            @test true;
-            leaf_photosynthesis!(leaves_2d, air, p_mode);
-            @test true;
-        end;
-    end
-
-    @testset "P&G Modes" begin
-        for FT in [Float32, Float64]
-            air    = ClimaCache.AirLayer{FT}();
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            leaf_1 = ClimaCache.Leaf{FT}();
-            leaf_2 = ClimaCache.Leaf{FT}();
-            for glc in collect(0.05:0.05:0.3)
-                leaf_1._g_CO₂ = glc;
-                leaf_photosynthesis!(leaf_1, air, g_mode);
-                leaf_2._p_CO₂_i = leaf_1._p_CO₂_i;
-                leaf_photosynthesis!(leaf_2, air, p_mode);
-                @test leaf_1.PSM.a_gross ≈ leaf_2.PSM.a_gross;
-                @test leaf_1.PSM._e_to_c ≈ leaf_2.PSM._e_to_c;
-                @test leaf_1.PRC.ϕ_f ≈ leaf_2.PRC.ϕ_f;
+            for var in [ClimaCache.Leaf{FT}(),
+                        ClimaCache.Leaves1D{FT}(),
+                        ClimaCache.Leaves2D{FT}()]
+                @test Photosynthesis.∂R∂T(var) > 0;
             end;
         end;
     end;
 
-    @testset "SPAC" begin
+    # file etr.jl, rubisco_limited.jl, light_limited.jl, and product_limited.jl
+    @testset "ETR and Rates" begin
         for FT in [Float32, Float64]
-            p_mode = ClimaCache.PCO₂Mode();
-            g_mode = ClimaCache.GCO₂Mode();
-            spac1 = ClimaCache.MonoElementSPAC{FT}();
-            spac2 = ClimaCache.MonoMLGrassSPAC{FT}();
-            spac3 = ClimaCache.MonoMLPalmSPAC{FT}();
-            spac4 = ClimaCache.MonoMLTreeSPAC{FT}();
-            for spac in [spac1, spac2, spac3, spac4]
-                leaf_photosynthesis!(spac, g_mode);
-                @test true;
-                leaf_photosynthesis!(spac, p_mode);
-                @test true;
+            air = ClimaCache.AirLayer{FT}();
+            for var in [ClimaCache.Leaf{FT}(),
+                        ClimaCache.Leaf{FT}(PSM = ClimaCache.C4VJPModel{FT}()),
+                        ClimaCache.Leaf{FT}(PSM = ClimaCache.C3CytochromeModel{FT}(), PRC = ClimaCache.CytochromeReactionCenter{FT}())]
+                Photosynthesis.photosystem_temperature_dependence!(var.PSM, air, FT(300)); @test true;
+                Photosynthesis.photosystem_electron_transport!(var.PSM, var.PRC, FT(1000), FT(20)); @test true;
+                Photosynthesis.rubisco_limited_rate!(var.PSM, FT(20)); @test true;
+                Photosynthesis.rubisco_limited_rate!(var.PSM, air, FT(0.1)); @test true;
+                Photosynthesis.light_limited_rate!(var.PSM); @test true;
+                Photosynthesis.light_limited_rate!(var.PSM, var.PRC, air, FT(0.1)); @test true;
+                Photosynthesis.product_limited_rate!(var.PSM, FT(20)); @test true;
+                Photosynthesis.product_limited_rate!(var.PSM, air, FT(0.1)); @test true;
+            end;
+        end;
+    end;
+
+    # file colimit.jl
+    @testset "Colimitation" begin
+        for FT in [Float32, Float64]
+            for var in [ClimaCache.MinimumColimit{FT}(),
+                        ClimaCache.QuadraticColimit{FT}(),
+                        ClimaCache.SerialColimit{FT}()]
+                @test Photosynthesis.colimited_rate(FT(50), FT(100), var) <= 50;
+            end;
+
+            for var in [ClimaCache.C3VJPModel{FT}(),
+                        ClimaCache.C4VJPModel{FT}(),
+                        ClimaCache.C3CytochromeModel{FT}()]
+                Photosynthesis.colimit_photosynthesis!(var); @test true;
+            end;
+        end;
+    end;
+
+    # file model.jl
+    @testset "Core Model" begin
+        for FT in [Float32, Float64]
+            air = ClimaCache.AirLayer{FT}();
+            for var in [ClimaCache.Leaf{FT}(),
+                        ClimaCache.Leaves1D{FT}(),
+                        ClimaCache.Leaves2D{FT}()]
+                leaf_photosynthesis!(var, air, FT(0.1), FT(1000), FT(300)); @test true;
+                leaf_photosynthesis!(var, air, ClimaCache.GCO₂Mode()); @test true;
+                leaf_photosynthesis!(var, air, ClimaCache.PCO₂Mode()); @test true;
             end;
         end;
     end;
