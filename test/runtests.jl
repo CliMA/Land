@@ -3,7 +3,8 @@ using LeafOptics
 using Test
 
 
-@testset verbose = true "LeafOptics Test" begin
+@testset verbose = true "LeafOptics CI Coverage" begin
+    # file spectra.jl
     @testset "Spectra" begin
         for FT in [Float32, Float64]
             wls  = ClimaCache.WaveLengthSet{FT}();
@@ -13,9 +14,9 @@ using Test
 
             leaf_spectra!(bio, wls, lha, FT(50));
             @test true;
-            leaf_spectra!(bio, wls, lha, FT(50); APAR_car=false);
+            leaf_spectra!(bio, wls, lha, FT(50));
             @test true;
-            leaf_spectra!(bio, wls, lha, FT(50); APAR_car=false, α=FT(59));
+            leaf_spectra!(bio, wls, lha, FT(49); APAR_car=false);
             @test true;
             leaf_spectra!(bio, wls, FT(0.1), FT(0.45), FT(0.05), FT(0.25));
             @test true;
@@ -24,6 +25,7 @@ using Test
         end;
     end;
 
+    # file radiation.jl
     @testset "PAR & APAR" begin
         for FT in [Float32, Float64]
             wls = ClimaCache.WaveLengthSet{FT}();
@@ -37,6 +39,7 @@ using Test
         end;
     end;
 
+    # file fluorescence.jl
     @testset "SIF" begin
         for FT in [Float32, Float64]
             wls = ClimaCache.WaveLengthSet{FT}();
@@ -50,6 +53,7 @@ using Test
         end;
     end;
 
+    # file photon.jl
     @testset "Utils" begin
         for FT in [Float32, Float64]
             xs = rand(FT,2);
