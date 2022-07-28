@@ -3,24 +3,13 @@
 # Changes to this function
 # General
 #     2022-Jan-14: rename the function from leaf_ETR! to to photosystem_electron_transport! to be more specific
-#     2022-Jan-14: use apar as an input rather than field from Leaf, and this allows for more modular operations
-#     2022-Jan-14: remove examples from the doc, as this function is not meant to be public
-#     2022-Jan-14: unpack CONSTANT from the input variables only
-#     2022-Jan-18: use apar and p_i as inputs rather than field from Leaf, and this allows for more modular operations
-#     2022-Jan-18: unpack CONSTANT from the input variables only
-#     2022-Jan-18: use apar rather than par as in Johnson and Berry's paper
-#     2022-Jan-24: fix documentation
-#     2022-Feb-07: use correct field names in C3CytochromeModel
-#     2022-Feb-07: remove j_pot and j definitions
+#     2022-Jan-18: use apar(ppar) and p_i as inputs rather than field from Leaf, and this allows for more modular operations
+#     2022-Jan-18: use apar(ppar) rather than par as in Johnson and Berry's paper (they convert par to apar(ppar) later)
 #     2022-Feb-07: add e_to_c calculation
-#     2022-Feb-07: add j_pot calculation back to work with ClimaCache v0.1.2
-#     2022-Feb-07: move e_to_c calculation back to light_limited_rate!
 #     2022-Feb-07: remove duplicated j (using j_pot is enough) for C4VJPModel
-#     2022-Feb-28: move e_to_c calculation back into this function to get aligned with C3CytochromeModel at GCO₂Mode analytically
 #     2022-Mar-01: save PSI J to psm._j_psi
 #     2022-Mar-01: use η_c and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """

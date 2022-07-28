@@ -3,7 +3,6 @@
 # Changes to this function
 # General
 #     2022-Jan-14: refactor the function light_limited_rate!
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -20,15 +19,9 @@ function light_limited_rate! end
 # Changes to this method
 # General
 #     2022-Jan-14: refactor the function light_limited_rate!
-#     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add p_i to input list to make the code more modular
 #     2022-Jan-24: add C3CytochromeModel support in a Union
-#     2022-Jan-24: fix documentation
-#     2022-Feb-07: move C3CytochromeModel support out given different field name
 #     2022-Feb-07: remove duplicated j (using j_pot is enough)
-#     2022-Feb-28: move e_to_c calculation to photosystem_electron_transport!
-#     2022-Feb-28: add C4VJPModel as a Union type of psm
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -51,10 +44,7 @@ light_limited_rate!(psm::C3VJPModel{FT}) where {FT<:AbstractFloat} = (psm._a_j =
 # General
 #     2022-Jan-14: add g_lc to input list to make the code more modular
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
-#     2022-Jan-24: fix field name e_to_c in psm
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: remove duplicated j (using j_pot is enough for C4VJPModel)
-#     2022-Feb-28: move e_to_c calculation to photosystem_electron_transport!
 #     2022-Feb-28: add C3CytochromeModel support
 #     2022-Mar-01: j_psi, η_c, and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
 #     2022-Jun-27: remove apar from input variable list
