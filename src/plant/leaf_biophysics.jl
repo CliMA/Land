@@ -67,6 +67,7 @@ end
 #     2022-Jul-19: add dimension control to struct
 #     2022-Jul-20: remove field: l_H₂O (unit cm)
 #     2022-Jul-20: rename ρ_lw and τ_lw to ρ_LW and τ_LW
+#     2022-Jul-28: add field _v_storage to speed up calculations (run leaf_spectra! only of _v_storage differs from current leaf water content)
 #
 #######################################################################################################################################################################################################
 """
@@ -134,4 +135,8 @@ Base.@kwdef mutable struct HyperspectralLeafBiophysics{FT<:AbstractFloat} <: Abs
     ρ_sw::Vector{FT} = zeros(FT, DIM_WL)
     "Shortwave leaf transmission `[-]`"
     τ_sw::Vector{FT} = zeros(FT, DIM_WL)
+
+    # Cache variables
+    "Leaf water content history used to compute leaf spectra `[mol m⁻²]`"
+    _v_storage::FT = 0
 end

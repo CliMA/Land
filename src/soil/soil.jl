@@ -23,6 +23,7 @@ abstract type AbstractSoilAlbedo{FT<:AbstractFloat} end
 # General
 #     2022-Jun-14: add struct for broadband soil albedo
 #     2022-Jun-14: make soil albedo a two-element vector for PAR and NIR
+#     2022-Jul-27: add field α_CLM
 #
 #######################################################################################################################################################################################################
 """
@@ -40,6 +41,10 @@ Base.@kwdef mutable struct BroadbandSoilAlbedo{FT<:AbstractFloat} <: AbstractSoi
     # Constants
     "Reflectance for longwave radiation"
     ρ_LW::FT = 0.06
+
+    # General model information
+    "Whether to use CLM soil albedo scheme"
+    α_CLM::Bool = false
 
     # Diagnostic variables
     "Net diffuse radiation at top soil `[W m⁻²]`"
@@ -64,6 +69,7 @@ end
 #     2022-Jun-14: add fields to compute soil hyperspectral albedo in CanopyRadiativeTransfer.jl
 #     2022-Jun-14: add wls in constructor function and remove n_λ
 #     2022-Jul-22: rename Ρ (greek) to ρ
+#     2022-Jul-27: add field α_CLM, _θ
 #
 #######################################################################################################################################################################################################
 """
@@ -87,6 +93,10 @@ Base.@kwdef mutable struct HyperspectralSoilAlbedo{FT<:AbstractFloat} <: Abstrac
     DIM_NIR::Int = 79
     "Number of wavelength bins"
     DIM_WL::Int = 114
+
+    # General model information
+    "Whether to use CLM soil albedo scheme"
+    α_CLM::Bool = false
 
     # Constants
     "A matrix of characteristic curves"
@@ -113,6 +123,8 @@ Base.@kwdef mutable struct HyperspectralSoilAlbedo{FT<:AbstractFloat} <: Abstrac
     _weight::Vector{FT} = zeros(FT, 4)
     "Cache variable to store ρ_PAR and ρ_NIR (a segmented curve)"
     _ρ_sw::Vector{FT} = zeros(FT, DIM_WL)
+    "Last soil moisture used to compute albedo"
+    _θ::FT = 0
 end
 
 
