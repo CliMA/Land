@@ -86,6 +86,11 @@ using Test
                     end;
                 end;
             end;
+
+            for var in [ClimaCache.MonoElementSPAC{FT}(), ClimaCache.MonoMLGrassSPAC{FT}(), ClimaCache.MonoMLPalmSPAC{FT}(), ClimaCache.MonoMLTreeSPAC{FT}()]
+                leaf_photosynthesis!(var, ClimaCache.GCO₂Mode()); @test true;
+                leaf_photosynthesis!(var, ClimaCache.PCO₂Mode()); @test true;
+            end;
         end;
     end;
 end;
