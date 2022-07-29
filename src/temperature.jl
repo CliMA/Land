@@ -4,19 +4,18 @@
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
-#     2022-Jan-14: remove examples from doc as this function is not meant to be public
-#     2022-Jan-24: fix documentation
-#     2022-Jan-24: add FT control to r_ref
-#     2022-Jul-13: deflate documentation
+#     2022-Jul-29: add support to Q10Peak
 #
 #######################################################################################################################################################################################################
 """
 
     temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
     temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
+    temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
+    temperature_correction(td::Q10Peak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the correction ratio for a temperature dependent variable, given
-- `td` `Arrhenius`, `ArrheniusPeak`, or `Q10` type temperature dependency struture
+- `td` `Arrhenius`, `ArrheniusPeak`, `Q10`, or `Q10Peak` type temperature dependency struture
 - `t` Target temperature in `K`
 - `t_ref` Reference temperature in `K`, default is `td.T_REF` (298.15 K)
 
@@ -37,6 +36,16 @@ temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where
 
 temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = td.Q_10 ^ ( (t - t_ref) / 10 );
 
+temperature_correction(td::Q10Peak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = (
+    @unpack ΔHD, ΔSV = td;
+
+    # _f_a: activation correction, _f_b: de-activation correction
+    _f_a = td.Q_10 ^ ( (t - t_ref) / 10 );
+    _f_b = (1 + exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * t_ref))) / (1 + exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * t)));
+
+    return _f_a * _f_b
+);
+
 
 #######################################################################################################################################################################################################
 #
@@ -44,21 +53,20 @@ temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:Abst
 # General
 #     2022-Jan-13: use ClimaCache types, which uses ΔHA, ΔHD, and ΔSV directly
 #     2022-Jan-13: add optional input t_ref to allow for manually setting reference temperature
-#     2022-Jan-14: remove examples from doc as this function is not meant to be public
-#     2022-Jan-24: fix documentation
+#     2022-Jul-29: add support to Q10Peak
 #
 #######################################################################################################################################################################################################
 """
 
-    temperature_corrected_value(td::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
+    temperature_corrected_value(td::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}, Q10Peak{FT}}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
 
 Return the temperature corrected value, given
-- `td` `Q10` type temperature dependency struture
+- `td` `Arrhenius`, `ArrheniusPeak`, `Q10`, or `Q10Peak` type temperature dependency struture
 - `t` Target temperature in `K`
 - `t_ref` Reference temperature in `K`, default is `td.T_REF` (298.15 K)
 
 """
-function temperature_corrected_value(td::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
+function temperature_corrected_value(td::Union{Arrhenius{FT}, ArrheniusPeak{FT}, Q10{FT}, Q10Peak{FT}}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat}
     return td.VAL_REF * temperature_correction(td, t; t_ref=t_ref)
 end
 
@@ -148,6 +156,7 @@ photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::F
 # Changes to this function
 # General
 #     2022-Jul-11: add function for StomataModels.jl (for nocturnal transpiration)
+#     2022-Jul-29: add support to Q10Peak
 #
 #######################################################################################################################################################################################################
 """
@@ -188,3 +197,17 @@ function ∂R∂T end
 );
 
 ∂R∂T(td::Q10{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = r_ref * log(td.Q_10) * td.Q_10 ^ ( (t - td.T_REF) / 10) / 10;
+
+∂R∂T(td::Q10Peak{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = (
+    @unpack T_REF, ΔHD, ΔSV = td;
+
+    # _f_a: activation correction, _f_b: de-activation correction
+    _expt = exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * t));
+    _rt²  = GAS_R(FT) * t ^ 2;
+    _f_a  = td.Q_10 ^ ( (t - T_REF) / 10 );
+    _f_b  = (1 + exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * T_REF))) / (1 + _expt);
+    _f_a′ = log(td.Q_10) * td.Q_10 ^ ( (t - td.T_REF) / 10) / 10;
+    _f_b′ = -1 * _f_b / (1 + _expt) * _expt * ΔHD / _rt²;
+
+    return r_ref * (_f_a′ * _f_b + _f_a * _f_b′)
+);

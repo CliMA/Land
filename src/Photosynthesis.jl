@@ -1,7 +1,7 @@
 module Photosynthesis
 
 using ClimaCache: CytochromeReactionCenter, VJPReactionCenter, VanDerTolFluorescenceModel
-using ClimaCache: Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, GCO₂Mode, MinimumColimit, PCO₂Mode, Q10, QuadraticColimit, SerialColimit
+using ClimaCache: Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, GCO₂Mode, MinimumColimit, PCO₂Mode, Q10, Q10Peak, QuadraticColimit, SerialColimit
 using ClimaCache: AndereggSM, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, EllerSM, GentineSM, LeuningSM, MedlynSM, SperrySM, WangSM, Wang2SM
 using ClimaCache: AirLayer, Leaf, Leaves1D, Leaves2D
 using ClimaCache: MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
