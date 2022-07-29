@@ -9,7 +9,8 @@ using Test
         for FT in [Float32, Float64]
             for var in [ClimaCache.Arrhenius{FT}(T_REF = 298, VAL_REF = 40, ΔHA = 80000),
                         ClimaCache.ArrheniusPeak{FT}(T_REF = 298, VAL_REF = 40 , ΔHA = 50000, ΔHD = 400000, ΔSV = 1000),
-                        ClimaCache.Q10{FT}(Q_10 = 1.4, T_REF = 298, VAL_REF = 1)]
+                        ClimaCache.Q10{FT}(Q_10 = 1.4, T_REF = 298, VAL_REF = 1),
+                        ClimaCache.Q10Peak{FT}(Q_10 = 1.4, T_REF = 298, VAL_REF = 1, ΔHD = 400000, ΔSV = 1000)]
                 @test Photosynthesis.temperature_correction(var, FT(300)) > 0;
                 @test Photosynthesis.temperature_corrected_value(var, FT(300)) > 0;
                 @test Photosynthesis.∂R∂T(var, FT(1), FT(300)) > 0;
