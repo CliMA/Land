@@ -3,7 +3,6 @@
 # Changes to this function
 # General
 #     2022-Jan-14: refactor the function product_limited_rate!
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -21,10 +20,7 @@ function product_limited_rate! end
 # General
 #     2022-Jan-14: add input variable p_i to make the code more modular
 #     2022-Jan-18: add support to C3CytochromeModel
-#     2022-Jan-24: fix documentation
-#     2022-Feb-07: add C3CytochromeModel support into Union
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -49,10 +45,8 @@ product_limited_rate!(psm::C4VJPModel{FT}, p_i::FT; β::FT = FT(1)) where {FT<:A
 # General
 #     2022-Jan-14: add this new method to simplify the multiple dispatch of leaf_photosynthesis!
 #     2022-Jan-14: add input variable g_lc to make the code more modular
-#     2022-Jan-24: fix documentation
 #     2022-Feb-28: add C3CytochromeModel support
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """

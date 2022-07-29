@@ -4,11 +4,9 @@
 # General
 #     2022-Jan-14: add colimit function back
 #     2022-Jan-24: use colimit from psm to abstractize the MinimumColimit and QuadraticColimit methods
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: add C3CytochromeModel support
 #     2022-Feb-11: add a wrapper function to step through COLIMIT_CJ and COLIMIT_IP
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """
@@ -44,14 +42,9 @@ colimit_photosynthesis!(
 # Changes to this function
 # General
 #     2022-Jan-14: add colimit function back
-#     2022-Jan-14: unpack CONSTANT from the input variables only
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: add C3Cytochrome to method (colimit j_p680 and j_p700 as well)
-#     2022-Feb-11: refactor this function to return the minimum of two rates for minimum colimit
-#     2022-Feb-11: refactor this function to return the quadratic colimitation of two rates
 #     2022-Feb-11: add colimited_rate for general purpose in ETR as well as a_gross
 #     2022-Mar-01: add colimit method for serial colimitation
-#     2022-Jul-13: deflate documentation
 #
 #######################################################################################################################################################################################################
 """

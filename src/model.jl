@@ -45,9 +45,7 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataMo
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT = lf.t) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = lf;
 
-    if t != lf._t
-        photosystem_temperature_dependence!(PSM, air, t);
-    end;
+    photosystem_temperature_dependence!(PSM, air, t);
     photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
@@ -111,7 +109,7 @@ leaf_photosynthesis!(
             air::AirLayer{FT},
             mode::Union{GCO₂Mode, PCO₂Mode},
             sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}
-) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, sm.Β, sm.Β.PARAM_Y);
+) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, sm.β, sm.β.PARAM_Y);
 
 leaf_photosynthesis!(
             lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
@@ -152,8 +150,7 @@ leaf_photosynthesis!(
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #     2022-Jul-07: save a_net and a_gross to Leaf (as PSM may be used for temporary calculations)
 #     2022-Jul-12: use β as a must have option (and thus this function becomes a core function of the one above)
-# To do
-#     TODO: update leaf T in StomataModels module or higher level
+#     2022-Jul-28: move temperature control to function photosystem_temperature_dependence!
 #
 #######################################################################################################################################################################################################
 """
@@ -176,10 +173,7 @@ Updates leaf photosynthetic rates (this method not meant for public usage, use i
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
 
-    # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
-    if leaf.t != leaf._t
-        photosystem_temperature_dependence!(PSM, air, leaf.t);
-    end;
+    photosystem_temperature_dependence!(PSM, air, leaf.t);
     photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
     rubisco_limited_rate!(PSM, leaf._p_CO₂_i; β = β);
     light_limited_rate!(PSM);
@@ -225,10 +219,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
-    # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
-    if leaves.t != leaves._t
-        photosystem_temperature_dependence!(PSM, air, leaves.t);
-    end;
+    photosystem_temperature_dependence!(PSM, air, leaves.t);
 
     # loop through the ppars for sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
@@ -269,11 +260,8 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaf;
 
-    # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
-    if leaf.t != leaf._t
-        photosystem_temperature_dependence!(PSM, air, leaf.t);
-    end;
+    photosystem_temperature_dependence!(PSM, air, leaf.t);
     photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
     rubisco_limited_rate!(PSM, air, leaf._g_CO₂; β = β);
     light_limited_rate!(PSM, PRC, air, leaf._g_CO₂; β = β);
@@ -331,10 +319,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     @unpack PRC, PSM = leaves;
 
-    # because xylem parameters and vapor pressure are also temperature dependent, do not change leaf._t here!
-    if leaves.t != leaves._t
-        photosystem_temperature_dependence!(PSM, air, leaves.t);
-    end;
+    photosystem_temperature_dependence!(PSM, air, leaves.t);
 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through sunlit leaves
