@@ -64,6 +64,7 @@ AbstractTemperatureDependency
 Arrhenius
 ArrheniusPeak
 Q10
+Q10Peak
 AbstractLeaf
 Leaf
 Leaves1D

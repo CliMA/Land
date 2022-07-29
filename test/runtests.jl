@@ -65,6 +65,7 @@ using Test
                         ClimaCache.ηLTDJohnson(FT),
                         ClimaCache.Q10TDAngiosperm(FT),
                         ClimaCache.Q10TDGymnosperm(FT),
+                        ClimaCache.Q10Peak{FT}(Q_10 = 2, T_REF = 298.15, VAL_REF = 1, ΔHD = 200000, ΔSV = 500),
                         ClimaCache.LogisticVC{FT}(),
                         ClimaCache.PowerVC{FT}(),
                         ClimaCache.WeibullVC{FT}(),
