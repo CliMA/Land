@@ -3,21 +3,17 @@
 # Changes to this function
 # General
 #     2022-Jan-14: rename the function to photosystem_coefficients!
-#     2022-Jan-14: unpack CONSTANT from the input variables only
 #     2022-Jan-14: add function that operates PSM, PRC, and FLM directly so as to be more modular (reduce memory allocations)
-#     2022-Jan-24: fix documentation
 #     2022-Feb-07: remove the wrapper function method
-#     2022-Feb-07: use apar in fluorescence model (not used in this method)
+#     2022-Feb-07: use ppar in fluorescence model (not used in this method)
 #     2022-Feb-07: remove fluorescence model from input variables (in reaction center since ClimaCache v0.1.2)
 #     2022-Feb-07: add support for Johnson and Berry (2021) model
 #     2022-Feb-07: use a_gross and j_pot rather than a series of j_p680 and j_p700
 #     2022-Feb-10: scale fluorescence quantum yield based on F_PSI and reabsorption factor
 #     2022-Feb-10: _q1 needs to be multiply by η
 #     2022-Mar-04: add support to sustained NPQ
-#     2022-Mar-04: reorganize the function orders
 #     2022-Mar-04: use the weighted yield for photosynthesis
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
-#     2022-Jul-13: deflate documentation
 # Bug fix
 #     2022-Feb-24: a typo from "rc.ϕ_f  = rc.f_m′ / (1 - rc.ϕ_p);" to "rc.ϕ_f  = rc.f_m′ * (1 - rc.ϕ_p);"
 #     2022-Feb-28: psm.e_to_c is recalculated based on analytically resolving leaf.p_CO₂_i from leaf.g_CO₂, this psm.e_to_c used to be calculated as psm.a_j / psm.j (a_j here is not p_CO₂_i based)
@@ -28,24 +24,24 @@
 #######################################################################################################################################################################################################
 """
 
-    photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
-    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, apar::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
+    photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, ppar::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
+    photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, ppar::FT; β::FT = FT(1)) where {FT<:AbstractFloat}
 
 Update the rate constants and coefficients in reaction center, given
 - `psm` `C3CytochromeModel`, `C3VJPModel`, or `C4VJPModel` type photosynthesis model
 - `rc` `CytochromeReactionCenter` or `VJPReactionCenter` type photosynthesis system reaction center
-- `apar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
+- `ppar` Absorbed photosynthetically active radiation in `μmol m⁻² s⁻¹`
 - `β` Tuning factor to downregulate effective Vmax, Jmax, and Rd
 
 """
 function photosystem_coefficients! end
 
-photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, apar::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, ppar::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack F_PSI, K_D, K_F, K_PSI, K_PSII, K_U, K_X, Φ_PSI_MAX = rc;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/blob/main/scripts/model_fun.m
-    _ϕ_P1_a = psm.a_gross * psm._η / (psm._e_to_c * apar * F_PSI);
-    _ϕ_P2_a = psm.a_gross / (psm._e_to_c * apar * (1 - F_PSI));
+    _ϕ_P1_a = psm.a_gross * psm._η / (psm._e_to_c * ppar * F_PSI);
+    _ϕ_P2_a = psm.a_gross / (psm._e_to_c * ppar * (1 - F_PSI));
     _q1     = _ϕ_P1_a / Φ_PSI_MAX;
     _q2     = 1 - psm._j_psi / (β * psm._v_qmax);
 
@@ -96,12 +92,12 @@ photosystem_coefficients!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCent
     =#
 );
 
-photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, apar::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
+photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPReactionCenter{FT}, ppar::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack K_0, K_A, K_B = rc.FLM;
     @unpack F_PSII, K_D, K_F, K_P_MAX, Φ_PSII_MAX = rc;
 
     # calculate photochemical yield
-    rc.ϕ_p = psm.a_gross / (psm._e_to_c * F_PSII * apar);
+    rc.ϕ_p = psm.a_gross / (psm._e_to_c * F_PSII * ppar);
 
     # calculate rate constants
     _x            = max(0, 1 - rc.ϕ_p / Φ_PSII_MAX);

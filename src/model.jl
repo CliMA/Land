@@ -134,7 +134,6 @@ leaf_photosynthesis!(
 # General
 #     2022-Jan-14: set a default p_i from leaf to combine two methods
 #     2022-Jan-14: do not update temperature to avoid its impact on plant hydraulics
-#     2022-Jan-14: add examples to docs
 #     2022-Jan-14: use colimit function to compute a_gross and a_net
 #     2022-Jan-14: set a default g_lc from leaf to combine two methods
 #     2022-Jan-18: add p_i to electron transport function input variables
@@ -142,9 +141,7 @@ leaf_photosynthesis!(
 #     2022-Feb-07: use new method of photosystem_coefficients!
 #     2022-Feb-28: use updated light_limited_rate! function
 #     2022-Feb-28: add support to C3CytochromeModel
-#     2022-Jun-27: remove apar from input variable list of light_limited_rate!
-#     2022-Jun-27: use ClimaCache v0.4, where Leaf.apar is renamed to Leaf.ppar
-#     2022-Jun-28: unpack the constant fields
+#     2022-Jun-27: remove ppar from input variable list of light_limited_rate!
 #     2022-Jun-28: add method for Leaves1D
 #     2022-Jun-28: add method for Leaves2D
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
