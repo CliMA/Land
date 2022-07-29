@@ -30,7 +30,7 @@ abstract type AbstractTemperatureDependency{FT<:AbstractFloat} end
 
 $(TYPEDEF)
 
-An [`Arrhenius`](@ref) type struct using
+An `Arrhenius` type struct using
 ```math
 Y_1 = Y_0 \\cdot \\exp \\left( \\dfrac{H_a}{R T_0} - \\dfrac{H_a}{R T_1} \\right)
 ```
@@ -63,7 +63,7 @@ end
 
 $(TYPEDEF)
 
-An [`ArrheniusPeak`](@ref) type struct using
+An `ArrheniusPeak` type struct using
 ```math
 Y_1 = Y_0 \\cdot \\exp \\left( \\dfrac{H_a}{R T_0} - \\dfrac{H_a}{R T_1} \\right)
           \\cdot \\dfrac{ 1 + \\exp \\left( \\dfrac{S_v T_0 - H_d}{R T_0} \\right) }
@@ -102,7 +102,7 @@ end
 
 $(TYPEDEF)
 
-An [`Q10`](@ref) type struct using
+A `Q10` type struct using
 ```math
 Y_1 = Y_0 \\cdot Q_{10} ^ \\dfrac{T_1 - T_0}{10}
 ```
@@ -120,6 +120,44 @@ Base.@kwdef mutable struct Q10{FT<:AbstractFloat} <: AbstractTemperatureDependen
     T_REF::FT
     "Uncorrected vakye at reference temperature"
     VAL_REF::FT
+end
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this struct
+# General
+#     2022-Jul-29: add struct Q10Peak
+#
+#######################################################################################################################################################################################################
+"""
+
+$(TYPEDEF)
+
+A `Q10Peak` type struct using
+```math
+Y_1 = Y_0 \\cdot Q_{10} ^ \\dfrac{T_1 - T_0}{10}
+          \\cdot \\dfrac{ 1 + \\exp \\left( \\dfrac{S_v T_0 - H_d}{R T_0} \\right) }
+                        { 1 + \\exp \\left( \\dfrac{S_v T_1 - H_d}{R T_1} \\right) }
+```
+
+# Fields
+
+$(TYPEDFIELDS)
+
+"""
+Base.@kwdef mutable struct Q10Peak{FT<:AbstractFloat} <: AbstractTemperatureDependency{FT}
+    # General model information
+    "Power of Q10 correction"
+    Q_10::FT
+    "Reference temperature `[K]`"
+    T_REF::FT
+    "Uncorrected vakye at reference temperature"
+    VAL_REF::FT
+    "Deactivation energy"
+    ΔHD::FT
+    "Entropy factor"
+    ΔSV::FT
 end
 
 
