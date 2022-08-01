@@ -7,6 +7,7 @@
 #     2022-Feb-28: add serial colimitation struct
 #     2022-Jan-18: add abstract colimitation type
 #     2022-Jul-13: add shortcut constructors for QuadraticColimit
+#     2022-Aug-01: add square colimitation struct
 #
 #######################################################################################################################################################################################################
 """
@@ -35,6 +36,10 @@ end
 
 """ Empty structure to indicate serial colimitation: `x = 1 / (1/x₁ + 1/x₂)` """
 struct SerialColimit{FT<:AbstractFloat} <:AbstractColimit{FT} end
+
+
+""" Empty structure to indicate square colimitation: `x = x₁⋅x₂ / sqrt(x₁² + x₂²)` """
+struct SquareColimit{FT<:AbstractFloat} <: AbstractColimit{FT} end
 
 
 ColimitCJCLMC3(FT) = QuadraticColimit{FT}(CURVATURE = 0.98);

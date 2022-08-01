@@ -167,6 +167,7 @@ using Test
         for FT in [Float32, Float64]
             for var in [ClimaCache.MinimumColimit{FT}(),
                         ClimaCache.SerialColimit{FT}(),
+                        ClimaCache.SquareColimit{FT}(),
                         ClimaCache.ColimitCJCLMC3(FT),
                         ClimaCache.ColimitCJCLMC4(FT),
                         ClimaCache.ColimitIPCLM(FT),

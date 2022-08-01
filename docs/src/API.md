@@ -133,6 +133,7 @@ AbstractColimit
 MinimumColimit
 QuadraticColimit
 SerialColimit
+SquareColimit
 ```
 
 ### Universal Constants

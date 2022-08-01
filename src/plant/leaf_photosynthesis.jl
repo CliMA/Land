@@ -56,11 +56,11 @@ Base.@kwdef mutable struct C3CytochromeModel{FT<:AbstractFloat} <: AbstractPhoto
 
     # Colimitation methods
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for J"
-    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = SerialColimit{FT}()
+    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = SerialColimit{FT}()
 
     # Temperature dependency structures
     "[`AbstractTemperatureDependency`](@ref) type Kc temperature dependency"
@@ -169,11 +169,11 @@ Base.@kwdef mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
 
     # Colimitation methods
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for J"
-    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
 
     # Temperature dependency structures
     "[`AbstractTemperatureDependency`](@ref) type Jmax temperature dependency"
@@ -264,9 +264,9 @@ $(TYPEDFIELDS)
 Base.@kwdef mutable struct C4VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthesisModel{FT}
     # Colimitation methods
     "[`AbstractColimit`](@ref) type colimitation method for Ac and Aj => Ai"
-    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_CJ::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
-    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
 
     # Temperature dependency structures
     "[`AbstractTemperatureDependency`](@ref) type Kpep temperature dependency"
