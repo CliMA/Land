@@ -52,7 +52,7 @@ using Test
     # file colimit.jl
     @testset "Colimitation" begin
         for FT in [Float32, Float64]
-            for var in [ClimaCache.MinimumColimit{FT}(), ClimaCache.QuadraticColimit{FT}(), ClimaCache.SerialColimit{FT}()]
+            for var in [ClimaCache.MinimumColimit{FT}(), ClimaCache.QuadraticColimit{FT}(), ClimaCache.SerialColimit{FT}(), ClimaCache.SquareColimit{FT}()]
                 @test Photosynthesis.colimited_rate(FT(50), FT(100), var) <= 50;
             end;
 

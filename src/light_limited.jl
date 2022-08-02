@@ -47,7 +47,7 @@ light_limited_rate!(psm::C3VJPModel{FT}) where {FT<:AbstractFloat} = (psm._a_j =
 #     2022-Feb-07: remove duplicated j (using j_pot is enough for C4VJPModel)
 #     2022-Feb-28: add C3CytochromeModel support
 #     2022-Mar-01: j_psi, η_c, and η_l from psm (temperature corrected) rather than constant Η_C and Η_L
-#     2022-Jun-27: remove apar from input variable list
+#     2022-Jun-27: remove ppar from input variable list
 #     2022-Jul-01: add β to variable list to account for Vmax downregulation used in CLM5
 #
 #######################################################################################################################################################################################################
