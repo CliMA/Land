@@ -45,6 +45,7 @@ colimit_photosynthesis!(
 #     2022-Feb-07: add C3Cytochrome to method (colimit j_p680 and j_p700 as well)
 #     2022-Feb-11: add colimited_rate for general purpose in ETR as well as a_gross
 #     2022-Mar-01: add colimit method for serial colimitation
+#     2022-Mar-01: add colimit method for square colimitation
 #
 #######################################################################################################################################################################################################
 """
@@ -52,6 +53,7 @@ colimit_photosynthesis!(
     colimited_rate(a_1::FT, a_2::FT, colim::MinimumColimit{FT}) where {FT<:AbstractFloat}
     colimited_rate(a_1::FT, a_2::FT, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat}
     colimited_rate(a_1::FT, a_2::FT, colim::SerialColimit{FT}) where {FT<:AbstractFloat}
+    colimited_rate(a_1::FT, a_2::FT, colim::SquareColimit{FT}) where {FT<:AbstractFloat}
 
 Return the minimum of two rates, given
 - `a_1` Rate 1
@@ -66,3 +68,5 @@ colimited_rate(a_1::FT, a_2::FT, colim::MinimumColimit{FT}) where {FT<:AbstractF
 colimited_rate(a_1::FT, a_2::FT, colim::QuadraticColimit{FT}) where {FT<:AbstractFloat} = lower_quadratic(colim.CURVATURE, -(a_1 + a_2), a_1 * a_2);
 
 colimited_rate(a_1::FT, a_2::FT, colim::SerialColimit{FT}) where {FT<:AbstractFloat} = a_1 * a_2 / (a_1 + a_2);
+
+colimited_rate(a_1::FT, a_2::FT, colim::SquareColimit{FT}) where {FT<:AbstractFloat} = a_1 * a_2 / sqrt(a_1 ^ 2 + a_2 ^ 2);
