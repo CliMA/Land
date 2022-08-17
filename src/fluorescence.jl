@@ -15,18 +15,18 @@
     leaf_SIF(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}, ϕ::FT = FT(0.01); ϕ_photon::Bool = true) where {FT<:AbstractFloat}
 
 Return the leaf level SIF at backward and forward directions, given
-- `bio` `ClimaCache.HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
-- `wls` `ClimaCache.WaveLengthSet` type struct that contains wave length bins
-- `rad` `ClimaCache.HyperspectralRadiation` type struct that contains incoming radiation information
+- `bio` `HyperspectralLeafBiophysics` type struct that contains leaf biophysical parameters
+- `wls` `WaveLengthSet` type struct that contains wave length bins
+- `rad` `HyperspectralRadiation` type struct that contains incoming radiation information
 - `ϕ` Fluorescence quantum yield
 - `ϕ_photon` If true (default), convert photon to photon when computing SIF; otherwise, convert energy to energy
 
 ---
 # Examples
 ```julia
-wls = WaveLengthSet{Float64}();
-bio = HyperspectralLeafBiophysics{Float64}(wls);
-rad = HyperspectralRadiation{Float64}();
+wls = ClimaCache.WaveLengthSet{Float64}();
+bio = ClimaCache.HyperspectralLeafBiophysics{Float64}();
+rad = ClimaCache.HyperspectralRadiation{Float64}();
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01);
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01; ϕ_photon=false);
 ```
