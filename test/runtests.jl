@@ -16,7 +16,9 @@ using Test
             @test true;
             leaf_spectra!(bio, wls, lha, FT(50));
             @test true;
-            leaf_spectra!(bio, wls, lha, FT(49); APAR_car=false);
+            leaf_spectra!(bio, wls, lha, FT(49); APAR_car = false);
+            @test true;
+            leaf_spectra!(bio, wls, lha, FT(48); reabsorb = false);
             @test true;
             leaf_spectra!(bio, wls, FT(0.1), FT(0.45), FT(0.05), FT(0.25));
             @test true;
@@ -48,7 +50,7 @@ using Test
 
             sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01));
             @test true;
-            sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01); ϕ_photon=false);
+            sif_b,sif_f = leaf_SIF(bio, wls, rad, FT(0.01); ϕ_photon = false);
             @test true;
         end;
     end;
