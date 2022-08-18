@@ -4,6 +4,8 @@
 # General
 #     2022-Jul-12: add function to run soil plant air continuum at a time step
 #     2022-Jul-13: use soil_energy! and soil_water! for soil water and energy budget
+#     2022-Aug-11: run fluorescence model after photosynthesis
+#     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #
 #######################################################################################################################################################################################################
 """
@@ -11,6 +13,7 @@ This function runs the model using the following steps:
 - Run canopy RT model
 - Run hydraulic model
 - Run photosynthesis model
+- Run canopy fluorescence model
 - Run soil water and energy budget (calculate ∂Θ∂t and ∂e∂t only)
 - Run leaf stomatal conductances (calculate ∂g∂t only)
 - Run leaf energy budget (calculate ∂T∂t only)
@@ -26,15 +29,16 @@ function soil_plant_air_continuum! end
 # TODO: add top soil evaporation
 """
 
-    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
 
 Run SPAC model and move forward in time with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step
 - `update` If true, update leaf xylem legacy effect
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
 
 """
-soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false) where {FT<:AbstractFloat} = (
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
 
@@ -44,17 +48,20 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
     # 3. run photosynthesis model
     leaf_photosynthesis!(spac, GCO₂Mode());
 
-    # 4. run soil energy water budget
+    # 4. run canopy fluorescence
+    canopy_fluorescence!(spac);
+
+    # 5. run soil energy water budget
     soil_budget!(spac);
 
-    # 5. run leaf stomatal conductance budget
+    # 6. run leaf stomatal conductance budget
     stomatal_conductance!(spac);
 
-    # 6. run plant energy budget
+    # 7. run plant energy budget
     plant_energy!(spac);
 
-    # 7. update the prognostic variables
-    time_stepper!(spac, δt; update = update);
+    # 8. update the prognostic variables
+    time_stepper!(spac, δt; update = update, θ_on = θ_on);
 
     return nothing
 );

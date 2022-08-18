@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.3"
+julia_version = "1.7.0"
 manifest_format = "2.0"
 
 [[deps.ANSIColoredPrinters]]
@@ -55,9 +55,9 @@ version = "0.1.4"
 
 [[deps.ClimaCache]]
 deps = ["DocStringExtensions", "LazyArtifacts", "NetcdfIO", "PkgUtility", "Test"]
-git-tree-sha1 = "e98519cbe0111bc9a42452cbaa965e36466cf0a5"
+git-tree-sha1 = "e5fa07853a2e86ecafee406f0e50e30978009c60"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
-version = "1.1.0"
+version = "1.1.3"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -133,7 +133,7 @@ uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.27.22"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[deps.FilePathsBase]]
@@ -141,9 +141,6 @@ deps = ["Compat", "Dates", "Mmap", "Printf", "Test", "UUIDs"]
 git-tree-sha1 = "129b104185df66e408edd6625d480b7f9e9823a0"
 uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
 version = "0.9.18"
-
-[[deps.FileWatching]]
-uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.Formatting]]
 deps = ["Printf"]
@@ -216,9 +213,9 @@ uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LeafOptics]]
 deps = ["ClimaCache", "SpecialFunctions", "Test", "UnPack"]
-git-tree-sha1 = "9c5a964b6acaa79295cf2a7dde1beb4247b8e47b"
+git-tree-sha1 = "2465a737e4d032a534042abf83c882ddecf4d060"
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -245,9 +242,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "7c88f63f9f0eb5929f15695af9a4d7d3ed278a91"
+git-tree-sha1 = "361c2b088575b07946508f135ac556751240091c"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.16"
+version = "0.3.17"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -326,9 +323,9 @@ version = "2.3.2"
 
 [[deps.Photosynthesis]]
 deps = ["ClimaCache", "PkgUtility", "Test", "UnPack"]
-git-tree-sha1 = "65fab76de22db6f50f0be7626e1dd68c78ebd1df"
+git-tree-sha1 = "e4583d8ae8706a0dfed0d95a5b40c50b99b3c3ae"
 uuid = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
-version = "0.4.1"
+version = "0.4.4"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -416,7 +413,7 @@ version = "0.2.1"
 deps = ["CanopyRadiativeTransfer", "ClimaCache", "LeafOptics", "Photosynthesis", "PlantHydraulics", "SoilHydraulics", "StomataModels", "Test", "UnPack", "WaterPhysics"]
 path = ".."
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -440,15 +437,15 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "2c11d7290036fe7aac9038ff312d3b3a2a5bf89e"
+git-tree-sha1 = "f9af7f195fb13589dd2e2d57fdb401717d2eb1f6"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.4.0"
+version = "1.5.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "0005d75f43ff23688914536c5e9d5ac94f8077f7"
+git-tree-sha1 = "d1bf48bfcc554a3761a133fe3a9bb01488e06916"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.20"
+version = "0.33.21"
 
 [[deps.StomataModels]]
 deps = ["ClimaCache", "Photosynthesis", "PkgUtility", "PlantHydraulics", "SoilHydraulics", "Test", "UnPack", "WaterPhysics"]
@@ -482,9 +479,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[deps.TranscodingStreams]]
 deps = ["Random", "Test"]
-git-tree-sha1 = "216b95ea110b5972db65aa90f88d8d89dcb8851c"
+git-tree-sha1 = "4ad90ab2bbfdddcae329cba59dab4a8cdfac3832"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.9.6"
+version = "0.9.7"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
