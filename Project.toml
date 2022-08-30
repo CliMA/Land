@@ -1,7 +1,7 @@
 name = "CanopyRadiativeTransfer"
 uuid = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
@@ -14,7 +14,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-ClimaCache = "1.0.0"
+ClimaCache = "1.1.1"
 ConstrainedRootSolvers = "0.1.4"
 LeafOptics = "0.3.0"
 QuadGK = "2.4.2"

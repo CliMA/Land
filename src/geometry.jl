@@ -177,9 +177,9 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves
     # 2. update the transmittance and reflectance for single directions per layer (it was 1 - k*Δx, and we used exp(-k*Δx) as Δx is not infinitesmal)
     OPTICS._τ_ss  = exp(-1 * OPTICS.ks * _ilai);
     OPTICS._τ_dd .= exp.(-1 .* (1 .- OPTICS.σ_ddf) .* _ilai);
-    OPTICS._τ_sd .= OPTICS.σ_sdf .* _ilai;
-    OPTICS._ρ_dd .= OPTICS.σ_ddb .* _ilai;
-    OPTICS._ρ_sd .= OPTICS.σ_sdb .* _ilai;
+    OPTICS._τ_sd .= OPTICS.σ_sdf .* _ilai;  # TODO: use exp for these!
+    OPTICS._ρ_dd .= OPTICS.σ_ddb .* _ilai;  # TODO: use exp for these!
+    OPTICS._ρ_sd .= OPTICS.σ_sdb .* _ilai;  # TODO: use exp for these!
 
     # 3. update the effective reflectance per layer
     canopy_optical_properties!(can, ALBEDO);
