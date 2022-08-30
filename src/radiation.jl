@@ -250,6 +250,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 # Bug fix:
 #     2022-Jul-15: sum by r_net_sw by the weights of sunlit and shaded fractions
 #     2022-Jul-27: use _ρ_dd, _ρ_sd, _τ_dd, and _τ_sd for leaf energy absorption (typo when refactoring the code)
+#     2022-Aug-30: fix par, apar, and ppar issues
 #
 #######################################################################################################################################################################################################
 """
@@ -362,8 +363,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _α_apar = APAR_CAR ? view(leaves[_i].BIO.α_cabcar,WLSET.IΛ_PAR) : view(leaves[_i].BIO.α_cab,WLSET.IΛ_PAR);
 
         # convert energy to quantum unit for APAR and PPAR
-        RADIATION._par_shaded  .= photon.(WLSET.Λ_PAR, view(RADIATION.e_sum_diffuse,WLSET.IΛ_PAR,_i)) .* 1000 ./ _tlai;
-        RADIATION._par_sunlit  .= photon.(WLSET.Λ_PAR, view(RADIATION.e_sum_direct ,WLSET.IΛ_PAR,_i)) .* 1000 ./ _tlai;
+        RADIATION._par_shaded  .= photon.(WLSET.Λ_PAR, view(RADIATION.e_sum_diffuse,WLSET.IΛ_PAR,_i)) .* 1000;
+        RADIATION._par_sunlit  .= photon.(WLSET.Λ_PAR, view(RADIATION.e_sum_direct ,WLSET.IΛ_PAR,_i)) .* 1000;
         RADIATION._apar_shaded .= photon.(WLSET.Λ_PAR, view(RADIATION.e_net_diffuse,WLSET.IΛ_PAR,_i)) .* 1000 ./ _tlai;
         RADIATION._apar_sunlit .= photon.(WLSET.Λ_PAR, view(RADIATION.e_net_direct ,WLSET.IΛ_PAR,_i)) .* 1000 ./ _tlai;
         RADIATION._ppar_shaded .= RADIATION._apar_shaded .* _α_apar;
@@ -384,8 +385,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         RADIATION.apar_sunlit[:,:,_i] .+= _Σ_apar_dif;
 
         # PPAR for leaves
-        _Σ_ppar_dif = RADIATION._apar_shaded' * WLSET.ΔΛ_PAR;
-        _Σ_ppar_dir = RADIATION._apar_sunlit' * WLSET.ΔΛ_PAR * _normi;
+        _Σ_ppar_dif = RADIATION._ppar_shaded' * WLSET.ΔΛ_PAR;
+        _Σ_ppar_dir = RADIATION._ppar_sunlit' * WLSET.ΔΛ_PAR * _normi;
         leaves[_i].ppar_shaded  = _Σ_ppar_dif;
         leaves[_i].ppar_sunlit .= OPTICS._abs_fs_fo .* _Σ_ppar_dir .+ _Σ_ppar_dif;
     end;
@@ -447,6 +448,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 # Changes to this method
 # General
 #     2022-Jun-29: add method for SPAC
+#     2022-Jul-28: update soil albedo at the very first step
 #
 #######################################################################################################################################################################################################
 """
@@ -460,6 +462,7 @@ Updates canopy radiation profiles for shortwave and longwave radiation, given
 canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL = spac;
 
+    soil_albedo!(CANOPY, SOIL);
     canopy_optical_properties!(CANOPY, ANGLES);
     canopy_optical_properties!(CANOPY, LEAVES, SOIL);
     canopy_radiation!(CANOPY, LEAVES, RAD_SW, SOIL; APAR_CAR = LEAVES[1].APAR_CAR);

@@ -14,7 +14,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-ClimaCache = "1.0.0"
+ClimaCache = "1.1.1"
 ConstrainedRootSolvers = "0.1.4"
 LeafOptics = "0.3.0"
 QuadGK = "2.4.2"
