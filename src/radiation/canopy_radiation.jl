@@ -86,8 +86,8 @@ end
 #     2022-Jun-13: add more fields for sif calculations
 #     2022-Jun-15: rename to HyperspectralMLCanopyRadiationProfile
 #     2022-Jun-27: move ppar_sunlit and ppar_shaded to Leaves2D
-#     2022-Jul-19: use kwdef for the constructor
 #     2022-Jul-19: add dimension control to struct
+#     2022-Aug-30: rename sif_obs_ssoil to sif_obs_soil (typo fix, non-breaking)
 #
 #######################################################################################################################################################################################################
 """
@@ -178,7 +178,7 @@ Base.@kwdef mutable struct HyperspectralMLCanopyRadiationProfile{FT<:AbstractFlo
     "SIF at observer direction from scattering"
     sif_obs_scatter::Vector{FT} = zeros(FT, DIM_SIF)
     "SIF at observer direction from soil reflection"
-    sif_obs_ssoil::Vector{FT} = zeros(FT, DIM_SIF)
+    sif_obs_soil::Vector{FT} = zeros(FT, DIM_SIF)
     "SIF at observer direction from sunlit APAR"
     sif_obs_sunlit::Vector{FT} = zeros(FT, DIM_SIF)
     "Upwelling SIF"
