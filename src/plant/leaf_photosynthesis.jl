@@ -173,7 +173,7 @@ Base.@kwdef mutable struct C3VJPModel{FT<:AbstractFloat} <: AbstractPhotosynthes
     "[`AbstractColimit`](@ref) type colimitation method for Ai and Ap => Ag"
     COLIMIT_IP::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
     "[`AbstractColimit`](@ref) type colimitation method for J"
-    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = MinimumColimit{FT}()
+    COLIMIT_J::Union{MinimumColimit{FT}, QuadraticColimit{FT}, SerialColimit{FT}, SquareColimit{FT}} = QuadraticColimit{FT}(CURVATURE = 0.7)
 
     # Temperature dependency structures
     "[`AbstractTemperatureDependency`](@ref) type Jmax temperature dependency"

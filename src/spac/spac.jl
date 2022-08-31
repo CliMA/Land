@@ -72,6 +72,7 @@ end
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
+#     2022-Aug-30: remove LHA and WLSET
 #
 #######################################################################################################################################################################################################
 """
@@ -117,8 +118,6 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Hyperspectral absorption features of different leaf components"
-    LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
     METEO::Meteorology{FT} = Meteorology{FT}()
     "Downwelling longwave radiation `[W m⁻²]`"
@@ -129,8 +128,6 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     ROOTS::Vector{Root{FT}} = Root{FT}[Root{FT}() for _i in 1:DIM_ROOT]
     "Soil component"
     SOIL::Soil{FT} = Soil{FT}()
-    "Wavelength sets to use with hyperspectral radiation"
-    WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
 
     # Cache variables
     "Flow rate per root layer"
@@ -152,6 +149,7 @@ end
 #     2022-Jun-29: rename struct to MonoMLPalmTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
+#     2022-Aug-30: remove LHA and WLSET
 #
 #######################################################################################################################################################################################################
 """
@@ -197,8 +195,6 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Hyperspectral absorption features of different leaf components"
-    LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
     METEO::Meteorology{FT} = Meteorology{FT}()
     "Downwelling longwave radiation `[W m⁻²]`"
@@ -211,8 +207,6 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     SOIL::Soil{FT} = Soil{FT}()
     "Trunk hydraulic system"
     TRUNK::Stem{FT} = Stem{FT}()
-    "Wavelength sets to use with hyperspectral radiation"
-    WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
 
     # Cache variables
     "Flow rate per root layer"
@@ -234,6 +228,7 @@ end
 #     2022-Jun-29: rename struct to MonoMLTreeSPAC, and use Leaves2D
 #     2022-Jun-29: add CANOPY, Z, AIR, WLSET, LHA, ANGLES, SOIL, RAD_LW, RAD_SW, Φ_PHOTON to SPAC
 #     2022-Jul-14: add Meteorology to SPAC
+#     2022-Aug-30: remove LHA and WLSET
 #
 #######################################################################################################################################################################################################
 """
@@ -283,8 +278,6 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
-    "Hyperspectral absorption features of different leaf components"
-    LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Meteorology information"
     METEO::Meteorology{FT} = Meteorology{FT}()
     "Downwelling longwave radiation `[W m⁻²]`"
@@ -297,8 +290,6 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     SOIL::Soil{FT} = Soil{FT}()
     "Trunk hydraulic system"
     TRUNK::Stem{FT} = Stem{FT}()
-    "Wavelength sets to use with hyperspectral radiation"
-    WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
 
     # Cache variables
     "Flow rate per root layer"
