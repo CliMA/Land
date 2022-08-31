@@ -1,6 +1,6 @@
 module SoilPlantAirContinuum
 
-using CanopyRadiativeTransfer: canopy_radiation!
+using CanopyRadiativeTransfer: canopy_fluorescence!, canopy_radiation!, soil_albedo!
 using ClimaCache: AirLayer, GCO₂Mode, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 using ClimaCache: CP_L, CP_L_MOL, ρ_H₂O
 using LeafOptics: leaf_spectra!

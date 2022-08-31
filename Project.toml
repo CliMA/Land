@@ -1,7 +1,7 @@
 name = "SoilPlantAirContinuum"
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 CanopyRadiativeTransfer = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"

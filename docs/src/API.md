@@ -7,7 +7,7 @@ CurrentModule = SoilPlantAirContinuum
 ```@docs
 initialize!
 soil_plant_air_continuum!
-soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false) where {FT<:AbstractFloat}
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
 adjusted_time
 time_stepper!
 ```
