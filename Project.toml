@@ -1,7 +1,7 @@
 name = "LeafOptics"
 uuid = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.2"
+version = "0.3.3"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
