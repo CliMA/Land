@@ -6,6 +6,7 @@
 #     2022-Jun-18: move function from SoilHydraulics.jl to SoilPlantAirContinuum.jl
 #     2022-Jun-18: add controller for soil and leaf temperatures
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
+#     2022-Aug-31: add controller for leaf stomatal conductance
 #
 #######################################################################################################################################################################################################
 """
@@ -47,6 +48,14 @@ function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
     for _i in 1:DIM_LAYER
         _∂T∂t = abs(LEAVES[_i].∂e∂t / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage));
         _δt = min(1 / _∂T∂t, _δt);
+    end;
+
+    # make sure leaf stomatal conductances do not change more than 0.01 mol m⁻² s⁻¹
+    for _i in 1:DIM_LAYER
+        for _∂g∂t in LEAVES[_i].∂g∂t_sunlit
+            _δt = min(FT(0.01) / abs(_∂g∂t), _δt);
+        end;
+        _δt = min(FT(0.01) / abs(LEAVES[_i].∂g∂t_shaded), _δt);
     end;
 
     return _δt
