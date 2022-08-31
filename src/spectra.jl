@@ -285,10 +285,10 @@ Update leaf reflectance and transmittance for SPAC, given
 
 """
 leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, LHA, WLSET = spac;
+    @unpack CANOPY, LEAVES = spac;
 
     for _leaf in LEAVES
-        leaf_spectra!(_leaf.BIO, WLSET, LHA, _leaf.HS.v_storage; APAR_car = _leaf.APAR_CAR);
+        leaf_spectra!(_leaf.BIO, CANOPY.WLSET, CANOPY.LHA, _leaf.HS.v_storage; APAR_car = _leaf.APAR_CAR);
     end;
 
     return nothing
