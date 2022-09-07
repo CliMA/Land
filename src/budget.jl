@@ -7,6 +7,7 @@
 #     2022-Jun-18: add controller for soil and leaf temperatures
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Aug-31: add controller for leaf stomatal conductance
+#     2022-Sep-07: remove soil oversaturation controller, and add a Δθ <= 0.01 controller
 #
 #######################################################################################################################################################################################################
 """
@@ -24,14 +25,11 @@ function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
 
     _δt = δt;
 
-    # make sure each layer does not over-saturate or drain
+    # make sure each layer does not drain (allow for oversaturation), and θ change is less than 0.01
     if θ_on
         for _i in 1:SOIL.DIM_SOIL
-            # if top soil is saturated and there is rain, _δt will not change (the rain will be counted as runoff)
-            if (SOIL.LAYERS[_i].∂θ∂t > 0) && (SOIL.LAYERS[_i].θ < SOIL.LAYERS[_i].VC.Θ_SAT)
-                _δt_sat = (SOIL.LAYERS[_i].VC.Θ_SAT - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
-                _δt = min(_δt_sat, _δt);
-            elseif SOIL.LAYERS[_i].∂θ∂t < 0
+            _δt = min(FT(0.01) / abs(SOIL.LAYERS[_i].∂θ∂t), _δt);
+            if SOIL.LAYERS[_i].∂θ∂t < 0
                 _δt_dra = (SOIL.LAYERS[_i].VC.Θ_RES - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
                 _δt = min(_δt_dra, _δt);
             end;

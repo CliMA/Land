@@ -1,7 +1,7 @@
 name = "SoilPlantAirContinuum"
 uuid = "2d76e174-5bec-4df2-b5ea-844408736dc2"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 CanopyRadiativeTransfer = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
@@ -21,7 +21,7 @@ ClimaCache = "1.1.0"
 LeafOptics = "0.3.0"
 Photosynthesis = "0.4.1"
 PlantHydraulics = "0.4.2"
-SoilHydraulics = "0.2.1"
+SoilHydraulics = "0.2.2"
 StomataModels = "0.3.1"
 UnPack = "1.0.2"
 WaterPhysics = "0.1.4"
