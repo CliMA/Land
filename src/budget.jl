@@ -12,7 +12,8 @@
 #     2022-Jun-15: add controller to make sure soil layers do not over saturate
 #     2022-Jun-15: merge the soil_water! and soil_energy! to soil_budget!
 #     2022-Jun-16: move time stepper controller to SoilPlantAirContinuum.jl
-#     2022-Jun-26: fix the unit of rain, mass flow, and root extraction (all in mol s⁻¹)
+#     2022-Jul-26: fix the unit of rain, mass flow, and root extraction (all in mol s⁻¹)
+#     2022-Sep-07: allow soil water oversaturation
 #
 #######################################################################################################################################################################################################
 """
@@ -39,7 +40,7 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
     # update soil k, ψ, and λ_thermal for each soil layer
     for _i in 1:SOIL.DIM_SOIL
         LAYERS[_i].k          = relative_hydraulic_conductance(LAYERS[_i].VC, LAYERS[_i].θ) * LAYERS[_i].VC.K_MAX * relative_viscosity(LAYERS[_i].t) / LAYERS[_i].ΔZ;
-        LAYERS[_i].ψ          = soil_ψ_25(LAYERS[_i].VC, LAYERS[_i].θ) * relative_surface_tension(LAYERS[_i].t);
+        LAYERS[_i].ψ          = soil_ψ_25(LAYERS[_i].VC, LAYERS[_i].θ; oversaturation = true) * relative_surface_tension(LAYERS[_i].t);
         LAYERS[_i]._λ_thermal = (LAYERS[_i].Λ_THERMAL + LAYERS[_i].θ * Λ_THERMAL_H₂O(FT)) / LAYERS[_i].ΔZ;
         LAYERS[_i].∂e∂t       = 0;
         LAYERS[_i].∂θ∂t       = 0;
@@ -47,7 +48,7 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
 
     # update k, δψ, and flow rate among layers
     LAYERS[1].∂θ∂t += METEO.rain * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[1].ΔZ;
-    LAYERS[1].∂e∂t += LAYERS[1].∂θ∂t * METEO.t_precip;
+    LAYERS[1].∂e∂t += METEO.rain * CP_L_MOL(FT) * METEO.t_precip;
     LAYERS[1].∂e∂t += SOIL.ALBEDO.r_net_lw + SOIL.ALBEDO.r_net_sw;
     for _i in 1:SOIL.DIM_SOIL-1
         SOIL._k[_i]         = 1 / (2 / LAYERS[_i].k + 2 / LAYERS[_i+1].k);
@@ -67,18 +68,23 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
             SOIL._q[_i] = 0;
         end;
 
+        # if both layers are oversaturated, move the oversaturated part from lower layer to upper layer
+        if (SOIL.LAYERS[_i].θ >= SOIL.LAYERS[_i].VC.Θ_SAT) && (SOIL.LAYERS[_i+1].θ > SOIL.LAYERS[_i+1].VC.Θ_SAT)
+            SOIL._q[_i] = (SOIL.LAYERS[_i+1].θ - SOIL.LAYERS[_i+1].VC.Θ_SAT) * LAYERS[_i+1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
+        end;
+
         LAYERS[_i  ].∂θ∂t -= SOIL._q[_i] * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[_i].ΔZ;
         LAYERS[_i+1].∂θ∂t += SOIL._q[_i] * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[_i+1].ΔZ;
-        LAYERS[_i  ].∂e∂t -= SOIL._q_thermal[_i] / LAYERS[_i].ΔZ;
-        LAYERS[_i+1].∂e∂t += SOIL._q_thermal[_i] / LAYERS[_i+1].ΔZ;
-        LAYERS[_i  ].∂e∂t -= LAYERS[_i].∂θ∂t * LAYERS[_i].t;
-        LAYERS[_i+1].∂e∂t += LAYERS[_i+1].∂θ∂t * LAYERS[_i].t;
+        LAYERS[_i  ].∂e∂t -= SOIL._q_thermal[_i];
+        LAYERS[_i+1].∂e∂t += SOIL._q_thermal[_i];
+        LAYERS[_i  ].∂e∂t -= SOIL._q[_i] * CP_L_MOL(FT) * LAYERS[_i].t;
+        LAYERS[_i+1].∂e∂t += SOIL._q[_i] * CP_L_MOL(FT) * LAYERS[_i].t;
     end;
 
     # loop through the roots and compute the source/sink terms
     for _i in eachindex(ROOTS)
         LAYERS[ROOTS_INDEX[_i]].∂θ∂t -= root_sink(ROOTS[_i]) * M_H₂O(FT) / ρ_H₂O(FT) / SOIL.AREA / LAYERS[ROOTS_INDEX[_i]].ΔZ;
-        LAYERS[ROOTS_INDEX[_i]].∂e∂t -= LAYERS[ROOTS_INDEX[_i]].∂θ∂t * LAYERS[_i].t;
+        LAYERS[ROOTS_INDEX[_i]].∂e∂t -= root_sink(ROOTS[_i]) / SOIL.AREA * CP_L_MOL(FT) * LAYERS[_i].t;
     end;
 
     return nothing
@@ -107,11 +113,11 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
     SOIL.runoff = 0;
     if SOIL.LAYERS[1].θ > SOIL.LAYERS[1].VC.Θ_SAT
         # compute top soil temperature and top soil energy out due to runoff
-        _cp = SOIL.LAYERS[1].CP * SOIL.LAYERS[1].ρ + SOIL.LAYERS[1].θ * ρ_H₂O(FT) * CP_L(FT) + SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT);
+        _cp = SOIL.LAYERS[1].CP * SOIL.LAYERS[1].ρ + SOIL.LAYERS[1].θ * ρ_H₂O(FT) * CP_L(FT) + SOIL.runoff / SOIL.LAYERS[1].ΔZ * CP_L_MOL(FT);
         _t  = SOIL.LAYERS[1].e / _cp;
         SOIL.runoff = (SOIL.LAYERS[1].θ - SOIL.LAYERS[1].VC.Θ_SAT) * SOIL.LAYERS[1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
         SOIL.LAYERS[1].θ = SOIL.LAYERS[1].VC.Θ_SAT;
-        SOIL.LAYERS[1].e -= SOIL.runoff / SOIL.LAYERS[1].ΔZ * M_H₂O(FT) * CP_L(FT) * _t;
+        SOIL.LAYERS[1].e -= SOIL.runoff / SOIL.LAYERS[1].ΔZ * CP_L_MOL(FT) * _t;
     end;
 
     # update soil temperature at each layer (top layer t will be same as _t above)
