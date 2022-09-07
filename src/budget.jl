@@ -13,6 +13,7 @@
 #     2022-Jun-15: merge the soil_water! and soil_energy! to soil_budget!
 #     2022-Jun-16: move time stepper controller to SoilPlantAirContinuum.jl
 #     2022-Jul-26: fix the unit of rain, mass flow, and root extraction (all in mol s⁻¹)
+#     2022-Sep-07: allow soil water oversaturation
 #
 #######################################################################################################################################################################################################
 """
@@ -65,6 +66,11 @@ soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC
         # if flow into the lower < 0, but the upper layer is already saturated, set the flow to 0
         if (SOIL._q[_i] < 0) && (SOIL.LAYERS[_i].θ >= SOIL.LAYERS[_i].VC.Θ_SAT)
             SOIL._q[_i] = 0;
+        end;
+
+        # if both layers are oversaturated, move the oversaturated part from lower layer to upper layer
+        if (SOIL.LAYERS[_i].θ >= SOIL.LAYERS[_i].VC.Θ_SAT) && (SOIL.LAYERS[_i+1].θ > SOIL.LAYERS[_i+1].VC.Θ_SAT)
+            SOIL._q[_i] = (SOIL.LAYERS[_i+1].θ - SOIL.LAYERS[_i+1].VC.Θ_SAT) * LAYERS[_i+1].ΔZ * ρ_H₂O(FT) / M_H₂O(FT);
         end;
 
         LAYERS[_i  ].∂θ∂t -= SOIL._q[_i] * M_H₂O(FT) / ρ_H₂O(FT) / LAYERS[_i].ΔZ;
