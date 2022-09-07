@@ -18,7 +18,7 @@ using Test
             @test SoilHydraulics.soil_ψ_25(vg, FT(0.2)) < 0;
             @test SoilHydraulics.soil_ψ_25(bc, FT(0.2)) < 0;
             @test SoilHydraulics.soil_ψ_25(vg, FT(1.0)) == 0;
-            @test SoilHydraulics.soil_ψ_25(bc, FT(1.0)) == 0;
+            @test SoilHydraulics.soil_ψ_25(bc, FT(1.0)) == -bc.Ψ_SAT;
         end;
     end;
 
