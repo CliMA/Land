@@ -67,20 +67,24 @@ end
 #     2022-Jun-18: move function from SoilHydraulics.jl to SoilPlantAirContinuum.jl
 #     2022-Jun-18: make it a separate function
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
+#     2022-Sep-07: add method to solve for steady state solution
 #
 #######################################################################################################################################################################################################
 """
 
     time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Move forward in time for SPAC with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `δt` Time step
+- `δt` Time step (if not given, solve for steady state solution)
 - `update` If true, update leaf xylem legacy effect
 - `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
 
 """
-function time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+function time_stepper! end
+
+time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat} = (
     @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
 
     # run the update function until time elapses
@@ -112,4 +116,42 @@ function time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
     end;
 
     return nothing
-end
+);
+
+time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
+
+    # run the update function until the gpp is stable
+    _count = 0;
+    _gpp_last = -1;
+    while true
+        # compute the dxdt (not shortwave radiation simulation)
+        canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
+        xylem_pressure_profile!(spac; update = update);
+        leaf_photosynthesis!(spac, GCO₂Mode());
+        soil_budget!(spac);
+        stomatal_conductance!(spac);
+        plant_energy!(spac);
+
+        # determine whether to break the while loop
+        _gpp = GPP(spac);
+        _count += 1;
+        if abs(_gpp - _gpp_last) < 1e-6 || _count > 5000
+            break;
+        end;
+        _gpp_last = _gpp;
+
+        # use adjusted time to make sure no numerical issues
+        _δt = adjusted_time(spac, FT(30); θ_on = false);
+
+        # run the budgets for all ∂x∂t (except for soil)
+        stomatal_conductance!(spac, _δt);
+        plant_energy!(spac, _δt);
+        xylem_flow_profile!(spac, _δt);
+    end;
+
+    # run canopy fluorescence
+    canopy_fluorescence!(spac);
+
+    return nothing
+);
