@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Radiative conductance
@@ -189,3 +190,4 @@ function leaf_temperature_shaded(
 
     return leaf_temperature(node, rad, FT(0), epla)
 end
+=#

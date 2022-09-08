@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Calculate annual profit
@@ -104,3 +105,4 @@ function annual_profit(
 
     return gscp
 end
+=#

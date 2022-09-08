@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Calculate annual profit
@@ -145,3 +146,4 @@ function annual_simulation!(
 
     return nothing
 end
+=#
