@@ -134,7 +134,7 @@ time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPA
         plant_energy!(spac);
 
         # determine whether to break the while loop
-        _gpp = GPP(spac);
+        _gpp = gross_primary_productivity(spac);
         _count += 1;
         if abs(_gpp - _gpp_last) < 1e-6 || _count > 5000
             break;

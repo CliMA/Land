@@ -53,6 +53,8 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
     # 4. run canopy fluorescence
     canopy_fluorescence!(spac);
 
+    # save the result at this stage for the results at the beginning of this time step
+
     # 5. run soil energy water budget
     soil_budget!(spac);
 
@@ -74,6 +76,8 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
 
     # 2. update the prognostic variables (except for soil water and temperature)
     time_stepper!(spac; update = update);
+
+    # save the result at this stage for the results at the steady state
 
     return nothing
 );
