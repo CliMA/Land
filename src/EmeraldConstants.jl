@@ -1,0 +1,3 @@
+module EmeraldConstants
+
+end # module
