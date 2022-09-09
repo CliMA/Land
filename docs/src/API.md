@@ -1,0 +1,4 @@
+# EmeraldConstants
+```@meta
+CurrentModule = EmeraldConstants
+```
