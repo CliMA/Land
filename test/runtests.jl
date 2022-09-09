@@ -161,9 +161,6 @@ using Test
 
     # Folder util
     @testset "Utils" begin
-        constants = ClimaCache.UniversalConstants();
-        @test true;
-
         for FT in [Float32, Float64]
             for var in [ClimaCache.MinimumColimit{FT}(),
                         ClimaCache.SerialColimit{FT}(),
@@ -171,39 +168,7 @@ using Test
                         ClimaCache.ColimitCJCLMC3(FT),
                         ClimaCache.ColimitCJCLMC4(FT),
                         ClimaCache.ColimitIPCLM(FT),
-                        ClimaCache.ColimitJCLM(FT),
-                        ClimaCache.AVOGADRO(FT),
-                        ClimaCache.CP_D(FT),
-                        ClimaCache.CP_D_MOL(FT),
-                        ClimaCache.CP_I(FT),
-                        ClimaCache.CP_I_MOL(FT),
-                        ClimaCache.CP_L(FT),
-                        ClimaCache.CP_L_MOL(FT),
-                        ClimaCache.CP_V(FT),
-                        ClimaCache.CP_V_MOL(FT),
-                        ClimaCache.F_O₂(FT),
-                        ClimaCache.GAS_R(FT),
-                        ClimaCache.GRAVITY(FT),
-                        ClimaCache.H_PLANCK(FT),
-                        ClimaCache.K_BOLTZMANN(FT),
-                        ClimaCache.K_STEFAN(FT),
-                        ClimaCache.K_VON_KARMAN(FT),
-                        ClimaCache.LH_V₀(FT),
-                        ClimaCache.LIGHT_SPEED(FT),
-                        ClimaCache.M_DRYAIR(FT),
-                        ClimaCache.M_H₂O(FT),
-                        ClimaCache.P_ATM(FT),
-                        ClimaCache.PRESS_TRIPLE(FT),
-                        ClimaCache.R_V(FT),
-                        ClimaCache.RT₂₅(FT),
-                        ClimaCache.T₀(FT),
-                        ClimaCache.T₂₅(FT),
-                        ClimaCache.T_TRIPLE(FT),
-                        ClimaCache.V_H₂O(FT),
-                        ClimaCache.YEAR_D(FT),
-                        ClimaCache.Λ_THERMAL_H₂O(FT),
-                        ClimaCache.ρ_H₂O(FT),
-                        ClimaCache.ρg_MPa(FT)]
+                        ClimaCache.ColimitJCLM(FT)]
                 @test FT_test(var, FT);
                 @test NaN_test(var);
             end;
