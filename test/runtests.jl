@@ -10,14 +10,12 @@ using Pkg.Artifacts
 using PkgUtility
 using Test
 
+
 ENV["JULIA_LOG_LEVEL"] = "WARN"
 
 
-
-
-include("test_CanopyLayers.jl"   )
-include("test_Photosynthesis.jl" )
-include("test_PlantHydraulics.jl")
-include("test_StomataModels.jl"  )
-include("test_SPAC.jl"           )
-include("test_Land.jl"           )
+println("\nTesting the Land ODE functions...");
+@testset "Land --- Land model" begin
+    # initialize parameters
+    @test true;
+end

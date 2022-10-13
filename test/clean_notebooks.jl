@@ -1,8 +1,6 @@
 using Test
 
 
-
-
 # Use the following command to clean the notebooks if the tests fail
 # jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
 #
