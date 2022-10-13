@@ -1,43 +1,5 @@
 # Git and Julia Tips for CliMA.Land
 
-## Instantiate the project
-1. The Land project
-   - `cd .../Land` to the home directory of the project
-   - `julia --project`
-   - `using Pkg`
-   - `Pkg.instantiate()`
-   - Delete the file `Manifest.toml` when encountering errors
-   - Redo `Pkg.instantiate()`
-
-2. The docs/ project
-   - `cd .../Land/docs`
-   - `julia --project`
-   - `using Pkg`
-   - `Pkg.instantiate()`
-   - Delete the file `Manifest.toml` when encountering erros
-   - Delete the line `Land="*"` in the `Project.toml`
-   - Type `]` in the julia REPL to enter the pkg environment
-   - `dev ..` or `add ..` to add the Land project
-   - Redo `Pkg.instantiate()`
-
-## Run local tests before merging into main
-1. Optional: load the Land project
-   - `cd .../Land` to the home directory of the project
-   - `julia --project`
-   - `using Land` to make sure the project can be loaded
-2. Optional: disable the example to save some time
-   - change `generate_examples = true` to `generate_examples = false` in file `docs/examples.jl`
-   - change the line back to `generate_examples = true` before commiting the changes
-3. Optional: initialize the project
-   - `cd .../Land` to the home directory of the project
-   - `julia --project -e "using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.precompile();"`
-   - `julia --project=docs/ -e "using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.precompile();"`
-4. Test the documentation project
-   - `julia --project=docs/ docs/make.jl`
-   - Fix errors and warnings associated with Land project
-5. Test the Land project
-   - `julia --project -e "using Pkg; Pkg.test();"`
-   - Resolve failed tests
 
 ## Rebase the commits before merging into main
 1. Switch to the feature branch and make sure you have a clean workspace
