@@ -23,9 +23,9 @@ Base.@kwdef mutable struct VerticalLayers{FT}
 
     # CO₂ partial pressure
     "Diffusion coefficient array"
-    d_CO₂::Array{FT,1} = diffusive_coefficient.(T, [TraceGasCO₂()], [TraceGasAir()])
+    d_CO₂::Vector{FT} = diffusive_coefficient.(T, [TraceGasCO₂{FT}()], [TraceGasAir{FT}()])
     "Vertical CO₂ partial pressure"
-    p_CO₂::Array{FT,1} = ones(FT,n_layer) .* 41
+    p_CO₂::Vector{FT} = ones(FT,n_layer) .* 41
     "derivative operator for CO₂ partial pressure"
     Δ_CO₂::DerivativeOperator = CenteredDifference(2, 2, FT(1), n_layer)
 end

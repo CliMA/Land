@@ -9,7 +9,7 @@ This project is supposed to be a community effort, leveraging all the work that 
 
 The entire model will be written in [Julia](https://docs.julialang.org/en/v1/) (Julia: ["Looks like Python, feels like Lisp, runs like Fortran"](https://www.youtube.com/watch?v=8h8rQyEpiZA&t=)), which should make the barrier of entry lower for incoming students, PostDocs, etc). If you want to contribute, please contact us (cfranken@caltech.edu).
 
-![Fluorescence from Space](pics/world_sif.jpg?raw=true "SIF from Space")
+![Fluorescence from Space](docs/src/assets/world_sif.jpg?raw=true "SIF from Space")
 
 
 ## Land model

@@ -1,3 +1,4 @@
+#=
 # TODO Move the constants to CLIMAParameters or LandParameters
 Base.@kwdef struct phys{T<:Number}
     visc_0::T = 13.3e-06;            # Kinematic viscosity at 0C and 1013.25 hPa (m2/s)
@@ -7,3 +8,4 @@ Base.@kwdef struct phys{T<:Number}
     Wtoμmole_s::T = 4.57;            # converts Watts/m2 to μmole/s
     Cdryleaf::T = 1396;              # Specific heat of dry leaf at constant pressure (J/kg/K)
 end
+=#

@@ -2,11 +2,12 @@ using Land
 using Test
 
 
-ENV["JULIA_LOG_LEVEL"] = "WARN"
-
-
-println("\nTesting the Land ODE functions...");
-@testset "Land --- Land model" begin
-    # initialize parameters
-    @test true;
+@testset verbose = true "CliMA Land" begin
+    @testset "Trial" begin
+        for FT in [Float32, Float32]
+            vls = Land.VerticalLayers{FT}();
+            Land.vertical_layers!(vls, FT(1));
+            @test true;
+        end
+    end
 end
