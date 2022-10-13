@@ -5,15 +5,8 @@ using Land
 # define default docs pages
 pages = Any[
     "Home" => "index.md",
+    "APIs" => "API.md"  ,
     "Tips" => "tips.md" ,
-    "APIs" => [
-              "CanopyLayers"    => "submodules/CanopyLayers.md"         ,
-              "Photosynthesis"  => "submodules/Photosynthesis.md"       ,
-              "PlantHydraulics" => "submodules/PlantHydraulics.md"      ,
-              "StomataModels"   => "submodules/StomataModels.md"        ,
-              "SPAC"            => "submodules/SoilPlantAirContinuum.md",
-              "Land"            => "submodules/Land.md"                 ,
-    ],
 ]
 
 
