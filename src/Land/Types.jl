@@ -8,8 +8,6 @@
 
 Struct that store trace gas information along vertical layers.
 
-# Fields
-$(DocStringExtensions.FIELDS)
 """
 Base.@kwdef mutable struct VerticalLayers{FT}
     "Number of layers"
