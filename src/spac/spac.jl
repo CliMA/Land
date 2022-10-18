@@ -123,7 +123,7 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     "Sun sensor geometry"
     ANGLES::SunSensorGeometry{FT} = SunSensorGeometry{FT}()
     "Canopy used for radiation calculations"
-    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
+    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}(DIM_LAYER = DIM_LAYER)
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
     "Meteorology information"
@@ -208,7 +208,7 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     "Sun sensor geometry"
     ANGLES::SunSensorGeometry{FT} = SunSensorGeometry{FT}()
     "Canopy used for radiation calculations"
-    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
+    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}(DIM_LAYER = DIM_LAYER)
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
     "Meteorology information"
@@ -297,7 +297,7 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     "Branch hydraulic system"
     BRANCHES::Vector{Stem{FT}} = Stem{FT}[Stem{FT}() for _i in 1:DIM_LAYER]
     "Canopy used for radiation calculations"
-    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}()
+    CANOPY::HyperspectralMLCanopy{FT} = HyperspectralMLCanopy{FT}(DIM_LAYER = DIM_LAYER)
     "Leaf per layer"
     LEAVES::Vector{Leaves2D{FT}} = Leaves2D{FT}[Leaves2D{FT}() for _i in 1:DIM_LAYER]
     "Meteorology information"

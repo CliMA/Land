@@ -160,12 +160,24 @@ Base.@kwdef mutable struct HyperspectralMLCanopy{FT<:AbstractFloat} <: AbstractC
     LHA::HyperspectralAbsorption{FT} = HyperspectralAbsorption{FT}()
     "Leaf inclination angle distribution function algorithm"
     LIDF::Union{VerhoefLIDF{FT}} = VerhoefLIDF{FT}()
-    "Canopy optical properties"
-    OPTICS::HyperspectralMLCanopyOpticalProperty{FT} = HyperspectralMLCanopyOpticalProperty{FT}()
-    "Canopy radiation profiles"
-    RADIATION::HyperspectralMLCanopyRadiationProfile{FT} = HyperspectralMLCanopyRadiationProfile{FT}()
     "Wave length set used to paramertize other variables"
     WLSET::WaveLengthSet{FT} = WaveLengthSet{FT}()
+    "Canopy optical properties"
+    OPTICS::HyperspectralMLCanopyOpticalProperty{FT} = HyperspectralMLCanopyOpticalProperty{FT}(
+                DIM_AZI = DIM_AZI,
+                DIM_INCL = DIM_INCL,
+                DIM_LAYER = DIM_LAYER,
+                DIM_SIF = WLSET.DIM_SIF,
+                DIM_SIFE = WLSET.DIM_SIFE,
+                DIM_WL = WLSET.DIM_WL)
+    "Canopy radiation profiles"
+    RADIATION::HyperspectralMLCanopyRadiationProfile{FT} = HyperspectralMLCanopyRadiationProfile{FT}(
+                DIM_AZI = DIM_AZI,
+                DIM_INCL = DIM_INCL,
+                DIM_LAYER = DIM_LAYER,
+                DIM_PAR = WLSET.DIM_PAR,
+                DIM_SIF = WLSET.DIM_SIF,
+                DIM_WL = WLSET.DIM_WL)
 
     # Geometry information
     "Inclination angle distribution"
