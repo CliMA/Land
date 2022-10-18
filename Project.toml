@@ -15,10 +15,10 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-ClimaCache = "1.1.5"
+ClimaCache = "1.1.7"
 ConstrainedRootSolvers = "0.1.4"
 EmeraldConstants = "0.1.0"
-LeafOptics = "0.3.0"
+LeafOptics = "0.3.4"
 QuadGK = "2.4.2"
 UnPack = "1.0.2"
 julia = "1.6"
