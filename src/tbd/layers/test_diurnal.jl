@@ -15,7 +15,6 @@
 8. Goto step 1
 
 This function will be splited into many functions later!
-=#
 
 function test_diurnal(
             node::SPACMono{FT},
@@ -185,3 +184,4 @@ function test_diurnal(
 
     return nothing
 end
+=#

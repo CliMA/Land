@@ -6,6 +6,7 @@
 #     2022-Jul-13: use soil_energy! and soil_water! for soil water and energy budget
 #     2022-Aug-11: run fluorescence model after photosynthesis
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
+#     2022-Sep-07: add method to solve for steady state solution
 #
 #######################################################################################################################################################################################################
 """
@@ -30,10 +31,11 @@ function soil_plant_air_continuum! end
 """
 
     soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Run SPAC model and move forward in time with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `δt` Time step
+- `δt` Time step (if not given, solve for steady state solution)
 - `update` If true, update leaf xylem legacy effect
 - `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
 
@@ -51,6 +53,8 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
     # 4. run canopy fluorescence
     canopy_fluorescence!(spac);
 
+    # save the result at this stage for the results at the beginning of this time step
+
     # 5. run soil energy water budget
     soil_budget!(spac);
 
@@ -62,6 +66,18 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
 
     # 8. update the prognostic variables
     time_stepper!(spac, δt; update = update, θ_on = θ_on);
+
+    return nothing
+);
+
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
+    # 1. run canopy RT
+    canopy_radiation!(spac);
+
+    # 2. update the prognostic variables (except for soil water and temperature)
+    time_stepper!(spac; update = update);
+
+    # save the result at this stage for the results at the steady state
 
     return nothing
 );

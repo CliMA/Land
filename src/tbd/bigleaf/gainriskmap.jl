@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # Create a matrix to show the sunlit-shaded partition algorithm
@@ -100,3 +101,4 @@ function gain_risk_map(
     # return the matrix, size(mat)[1] for sunlit, [2] for shaded
     return mat
 end
+=#

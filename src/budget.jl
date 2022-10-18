@@ -7,6 +7,7 @@
 #     2022-Jun-18: add controller for soil and leaf temperatures
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Aug-31: add controller for leaf stomatal conductance
+#     2022-Sep-07: remove soil oversaturation controller, and add a Δθ <= 0.01 controller
 #
 #######################################################################################################################################################################################################
 """
@@ -24,14 +25,11 @@ function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
 
     _δt = δt;
 
-    # make sure each layer does not over-saturate or drain
+    # make sure each layer does not drain (allow for oversaturation), and θ change is less than 0.01
     if θ_on
         for _i in 1:SOIL.DIM_SOIL
-            # if top soil is saturated and there is rain, _δt will not change (the rain will be counted as runoff)
-            if (SOIL.LAYERS[_i].∂θ∂t > 0) && (SOIL.LAYERS[_i].θ < SOIL.LAYERS[_i].VC.Θ_SAT)
-                _δt_sat = (SOIL.LAYERS[_i].VC.Θ_SAT - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
-                _δt = min(_δt_sat, _δt);
-            elseif SOIL.LAYERS[_i].∂θ∂t < 0
+            _δt = min(FT(0.01) / abs(SOIL.LAYERS[_i].∂θ∂t), _δt);
+            if SOIL.LAYERS[_i].∂θ∂t < 0
                 _δt_dra = (SOIL.LAYERS[_i].VC.Θ_RES - SOIL.LAYERS[_i].θ) / SOIL.LAYERS[_i].∂θ∂t;
                 _δt = min(_δt_dra, _δt);
             end;
@@ -69,20 +67,24 @@ end
 #     2022-Jun-18: move function from SoilHydraulics.jl to SoilPlantAirContinuum.jl
 #     2022-Jun-18: make it a separate function
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
+#     2022-Sep-07: add method to solve for steady state solution
 #
 #######################################################################################################################################################################################################
 """
 
     time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Move forward in time for SPAC with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
-- `δt` Time step
+- `δt` Time step (if not given, solve for steady state solution)
 - `update` If true, update leaf xylem legacy effect
 - `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
 
 """
-function time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+function time_stepper! end
+
+time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat} = (
     @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
 
     # run the update function until time elapses
@@ -114,4 +116,42 @@ function time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
     end;
 
     return nothing
-end
+);
+
+time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
+
+    # run the update function until the gpp is stable
+    _count = 0;
+    _gpp_last = -1;
+    while true
+        # compute the dxdt (not shortwave radiation simulation)
+        canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
+        xylem_pressure_profile!(spac; update = update);
+        leaf_photosynthesis!(spac, GCO₂Mode());
+        soil_budget!(spac);
+        stomatal_conductance!(spac);
+        plant_energy!(spac);
+
+        # determine whether to break the while loop
+        _gpp = gross_primary_productivity(spac);
+        _count += 1;
+        if abs(_gpp - _gpp_last) < 1e-6 || _count > 5000
+            break;
+        end;
+        _gpp_last = _gpp;
+
+        # use adjusted time to make sure no numerical issues
+        _δt = adjusted_time(spac, FT(30); θ_on = false);
+
+        # run the budgets for all ∂x∂t (except for soil)
+        stomatal_conductance!(spac, _δt);
+        plant_energy!(spac, _δt);
+        xylem_flow_profile!(spac, _δt);
+    end;
+
+    # run canopy fluorescence
+    canopy_fluorescence!(spac);
+
+    return nothing
+);
