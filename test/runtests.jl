@@ -9,8 +9,8 @@ using Test
         for FT in [Float32, Float64]
             for var in [ClimaCache.AirLayer{FT}(),
                         ClimaCache.Meteorology{FT}()]
-                @test FT_test(var, FT);
-                @test NaN_test(var);
+                @test PkgUtility.FT_test(var, FT);
+                @test PkgUtility.NaN_test(var);
             end;
         end;
     end;
@@ -70,8 +70,8 @@ using Test
                         ClimaCache.PowerVC{FT}(),
                         ClimaCache.WeibullVC{FT}(),
                         ClimaCache.ComplexVC{FT}()]
-                @test FT_test(var, FT);
-                @test NaN_test(var);
+                @test PkgUtility.FT_test(var, FT);
+                @test PkgUtility.NaN_test(var);
             end;
 
             for var in [ClimaCache.C3CytochromeModel{FT}(),
@@ -90,7 +90,7 @@ using Test
                         ClimaCache.VcmaxTDCLM(FT),
                         ClimaCache.VcmaxTDLeuning(FT),
                         ClimaCache.VpmaxTDBoyd(FT)]
-                @test FT_test(var, FT);
+                @test PkgUtility.FT_test(var, FT);
             end;
 
             # test the beta function
@@ -114,8 +114,8 @@ using Test
                         ClimaCache.HyperspectralRadiation{FT}(),
                         ClimaCache.SunSensorGeometry{FT}(),
                         ClimaCache.WaveLengthSet{FT}()]
-                @test FT_test(var, FT);
-                @test NaN_test(var);
+                @test PkgUtility.FT_test(var, FT);
+                @test PkgUtility.NaN_test(var);
             end;
         end;
     end;
@@ -141,8 +141,8 @@ using Test
                         ClimaCache.VanGenuchten{FT}("Silty Clay"),
                         ClimaCache.VanGenuchten{FT}("Clay"),
                         ClimaCache.VanGenuchten{FT}("NA")]
-                @test FT_test(var, FT);
-                @test NaN_test(var);
+                @test PkgUtility.FT_test(var, FT);
+                @test PkgUtility.NaN_test(var);
             end;
         end;
     end;
@@ -154,7 +154,7 @@ using Test
                         ClimaCache.MonoMLGrassSPAC{FT}(),
                         ClimaCache.MonoMLPalmSPAC{FT}(),
                         ClimaCache.MonoMLTreeSPAC{FT}()]
-                @test FT_test(var, FT);
+                @test PkgUtility.FT_test(var, FT);
             end;
         end;
     end;
@@ -169,8 +169,8 @@ using Test
                         ClimaCache.ColimitCJCLMC4(FT),
                         ClimaCache.ColimitIPCLM(FT),
                         ClimaCache.ColimitJCLM(FT)]
-                @test FT_test(var, FT);
-                @test NaN_test(var);
+                @test PkgUtility.FT_test(var, FT);
+                @test PkgUtility.NaN_test(var);
             end;
         end;
     end;
