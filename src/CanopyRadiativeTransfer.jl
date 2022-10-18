@@ -2,8 +2,8 @@ module CanopyRadiativeTransfer
 
 using ClimaCache: BroadbandRadiation, BroadbandSLCanopy, BroadbandSoilAlbedo, HyperspectralMLCanopy, HyperspectralRadiation, HyperspectralSoilAlbedo, Leaves1D, Leaves2D, MonoMLGrassSPAC,
       MonoMLPalmSPAC, MonoMLTreeSPAC, Soil, SunSensorGeometry, VerhoefLIDF
-using ClimaCache: K_STEFAN
-using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
+      using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
+using EmeraldConstants: K_STEFAN
 using LeafOptics: energy!, photon, photon!
 using LinearAlgebra: mul!, pinv
 using QuadGK: quadgk
