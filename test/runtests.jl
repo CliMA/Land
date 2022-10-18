@@ -3,7 +3,7 @@ using Photosynthesis
 using Test
 
 
-@testset verbose = true "Photosynthesis CI Coverage" begin
+@testset verbose = true "Photosynthesis" begin
     # file temperature.jl
     @testset "Temperature" begin
         for FT in [Float32, Float64]
@@ -81,16 +81,16 @@ using Test
                             stm.β.PARAM_Y = bfy;
                         end;
                         var.SM = stm;
-                        leaf_photosynthesis!(var, air, FT(0.1), FT(1000), FT(300)); @test true;
-                        leaf_photosynthesis!(var, air, ClimaCache.GCO₂Mode()); @test true;
-                        leaf_photosynthesis!(var, air, ClimaCache.PCO₂Mode()); @test true;
+                        Photosynthesis.leaf_photosynthesis!(var, air, FT(0.1), FT(1000), FT(300)); @test true;
+                        Photosynthesis.leaf_photosynthesis!(var, air, ClimaCache.GCO₂Mode()); @test true;
+                        Photosynthesis.leaf_photosynthesis!(var, air, ClimaCache.PCO₂Mode()); @test true;
                     end;
                 end;
             end;
 
             for var in [ClimaCache.MonoElementSPAC{FT}(), ClimaCache.MonoMLGrassSPAC{FT}(), ClimaCache.MonoMLPalmSPAC{FT}(), ClimaCache.MonoMLTreeSPAC{FT}()]
-                leaf_photosynthesis!(var, ClimaCache.GCO₂Mode()); @test true;
-                leaf_photosynthesis!(var, ClimaCache.PCO₂Mode()); @test true;
+                Photosynthesis.leaf_photosynthesis!(var, ClimaCache.GCO₂Mode()); @test true;
+                Photosynthesis.leaf_photosynthesis!(var, ClimaCache.PCO₂Mode()); @test true;
             end;
         end;
     end;

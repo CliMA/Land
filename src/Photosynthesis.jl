@@ -6,16 +6,11 @@ using ClimaCache: MinimumColimit, QuadraticColimit, SerialColimit, SquareColimit
 using ClimaCache: AndereggSM, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, EllerSM, GentineSM, LeuningSM, MedlynSM, SperrySM, WangSM, Wang2SM
 using ClimaCache: AirLayer, Leaf, Leaves1D, Leaves2D
 using ClimaCache: MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
-using ClimaCache: F_O₂, GAS_R
+using EmeraldConstants: F_O₂, GAS_R
 using PkgUtility: lower_quadratic, upper_quadratic
 using UnPack: @unpack
 
 
-# export function from this module
-export leaf_photosynthesis!
-
-
-# include the functions
 include("colimit.jl"        )
 include("etr.jl"            )
 include("fluorescence.jl"   )
