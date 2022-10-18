@@ -14,8 +14,8 @@
 [st-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/JuliaStable/badge.svg?branch=main
 [st-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"main"++workflow%3A"JuliaStable"
 
-[min-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.3/badge.svg?branch=main
-[min-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.3"
+[min-img]: https://github.com/Yujie-W/WaterPhysics.jl/workflows/Julia-1.6/badge.svg?branch=main
+[min-url]: https://github.com/Yujie-W/WaterPhysics.jl/actions?query=branch%3A"main"++workflow%3A"Julia-1.6"
 
 [cov-img]: https://codecov.io/gh/Yujie-W/WaterPhysics.jl/branch/main/graph/badge.svg
 [cov-url]: https://codecov.io/gh/Yujie-W/WaterPhysics.jl
@@ -25,7 +25,7 @@
 
 ## About
 
-[`WaterPhysics.jl`][wp-url] includes a collection of temperature dependencies of physical properties of water. [`WaterPhysics.jl`][wp-url] only supports Julia 1.3 and above.
+[`WaterPhysics.jl`][wp-url] includes a collection of temperature dependencies of physical properties of water. [`WaterPhysics.jl`][wp-url] only supports Julia 1.6 and above.
 
 | Documentation                                   | CI Status             | Compatibility           | Code Coverage           |
 |:------------------------------------------------|:----------------------|:------------------------|:------------------------|
