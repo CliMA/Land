@@ -7,10 +7,6 @@ using SpecialFunctions: expint
 using UnPack: @unpack
 
 
-# export public functions
-export leaf_PAR, leaf_SIF, leaf_spectra!
-
-
 include("fluorescence.jl" )
 include("photon.jl"       )
 include("radiation.jl"    )
