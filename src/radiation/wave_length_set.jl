@@ -29,7 +29,7 @@ Base.@kwdef struct WaveLengthSet{FT<:AbstractFloat}
     "Wavelength limits for NIR `[nm]`"
     WL_NIR::Vector{FT} = FT[700, 2500]
     "Wavelength limits for PAR `[nm]`"
-    WL_PAR::Vector{FT} = FT[400, 700]
+    WL_PAR::Vector{FT} = FT[400, 750]
     "Wavelength limits for SIF emission `[nm]`"
     WL_SIF::Vector{FT} = FT[640, 850]
     "Wavelength limits for SIF excitation `[nm]`"

@@ -17,6 +17,7 @@ module ClimaCache
 using LazyArtifacts
 
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
+using EmeraldConstants: CP_D_MOL, CP_L, CP_L_MOL, CP_V_MOL, GAS_R, M_H₂O, P_ATM, T₀, T₂₅, ρ_H₂O, ρg_MPa
 using NetcdfIO: read_nc
 
 
@@ -34,8 +35,7 @@ const LAND_2021 = artifact"land_model_spectrum_V2" * "/clima_land_spectra_2021.n
 
 
 # include the utility types and structures
-include("util/colimit.jl"  )
-include("util/constants.jl")
+include("util/colimit.jl")
 
 # include the air types and structures
 include("air/air_layer.jl"  )
