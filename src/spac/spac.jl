@@ -99,6 +99,14 @@ Base.@kwdef mutable struct MonoMLGrassSPAC{FT<:AbstractFloat} <: AbstractSPACSys
     "Whether to convert energy to photons when computing fluorescence"
     Φ_PHOTON::Bool = true
 
+    # Geographical information
+    "Elevation"
+    ELEVATION::FT = 32.0
+    "Latitude"
+    LATITUDE::FT = 33.173
+    "Longitude"
+    LONGITUDE::FT = 115.4494
+
     # Geometry information
     "Corresponding air layer per canopy layer"
     LEAVES_INDEX::Vector{Int} = collect(Int, 1:DIM_LAYER)
@@ -175,6 +183,14 @@ Base.@kwdef mutable struct MonoMLPalmSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     # General model information
     "Whether to convert energy to photons when computing fluorescence"
     Φ_PHOTON::Bool = true
+
+    # Geographical information
+    "Elevation"
+    ELEVATION::FT = 32.0
+    "Latitude"
+    LATITUDE::FT = 33.173
+    "Longitude"
+    LONGITUDE::FT = 115.4494
 
     # Geometry information
     "Corresponding air layer per canopy layer"
@@ -265,9 +281,15 @@ Base.@kwdef mutable struct MonoMLTreeSPAC{FT<:AbstractFloat} <: AbstractSPACSyst
     "Air boundaries `[m]`"
     Z_AIR::Vector{FT} = collect(FT, 0:0.2:13)
 
-    # Embedded structures
+    # Geographical information
+    "Elevation"
+    ELEVATION::FT = 32.0
+    "Latitude"
+    LATITUDE::FT = 33.173
+    "Longitude"
+    LONGITUDE::FT = 115.4494
 
-    # parameters that do not change with time
+    # Embedded structures
     "Air for each layer (more than canopy layer)"
     AIR::Vector{AirLayer{FT}} = AirLayer{FT}[AirLayer{FT}() for _i in 1:DIM_AIR]
     "Sun sensor geometry"
