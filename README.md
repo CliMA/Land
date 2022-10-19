@@ -63,7 +63,7 @@ $ julia --project -e 'using Pkg; Pkg.instantiate();'
 $ julia --project example.jl
 ```
 
-7. you should get a file named `debug.out.nc` after a few minutes
+4. time to run each step will be logged, and you should get a file named `debug.out.nc` after a few minutes
 
 You will need to edit the functions we provided if you need to change more parameters, or output more results. Feel free to contact us through email or Github Issues (if this tutorial does not work).
 
