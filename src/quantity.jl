@@ -2,6 +2,37 @@
 #
 # Changes to this function
 # General
+#     2022-Oct-19: add function to compute canopy net primary productivity
+#
+#######################################################################################################################################################################################################
+"""
+
+    canopy_net_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Return the canopy net primary productivity per ground area, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+
+"""
+function canopy_net_primary_productivity end
+
+canopy_net_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+
+    # compute GPP
+    _cnpp::FT = 0;
+    for _i in 1:DIM_LAYER
+        _cnpp += CANOPY.OPTICS.p_sunlit[_i] * mean(LEAVES[_i].a_net_sunlit) + (1 - CANOPY.OPTICS.p_sunlit[_i]) * LEAVES[_i].a_net_shaded;
+    end;
+    _cnpp *= spac.CANOPY.lai / spac.CANOPY.DIM_LAYER;
+
+    return _cnpp
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Sep-07: add function to add up GPP for SPAC
 #
 #######################################################################################################################################################################################################

@@ -69,3 +69,83 @@ update!(air::AirLayer{FT};
 
     return nothing
 );
+
+
+
+update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}};
+        cab::Union{Number,Nothing} = nothing,
+        car::Union{Number,Nothing} = nothing,
+        lai::Union{Number,Nothing} = nothing,
+        swcs::Union{Tuple,Nothing} = nothing,
+        t_clm::Union{Number,Nothing} = nothing,
+        t_leaf::Union{Number,Nothing} = nothing,
+        vcmax::Union{Number,Nothing} = nothing,
+        vcmax_expo::Union{Number,Nothing} = nothing
+) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, DIM_LAYER, LEAVES, SOIL = spac;
+
+    # update chlorophyll and carotenoid contents (and )
+    if !isnothing(cab)
+        for _leaf in LEAVES
+            _leaf.BIO.cab = cab;
+            _leaf.BIO._v_storage = 0;
+        end;
+    end;
+    if !isnothing(car)
+        for _leaf in LEAVES
+            _leaf.BIO.car = car;
+            _leaf.BIO._v_storage = 0;
+        end;
+    end;
+    if !isnothing(cab) || !isnothing(car)
+        leaf_spectra!(spac);
+    end;
+
+    # update LAI
+    if !isnothing(lai)
+        CANOPY.lai = lai;
+        for _i in 1:DIM_LAYER
+            LEAVES[_i].HS.AREA = SOIL.AREA * CANOPY.lai / DIM_LAYER;
+        end;
+    end;
+
+    # prescribe soil water content
+    if !isnothing(swcs)
+        for _i in eachindex(swcs)
+            SOIL.LAYERS[_i] = swcs[_i];
+        end;
+    end;
+
+    # update Vcmax and Jmax TD
+    if !isnothing(t_clm)
+        for _leaf in LEAVES
+            _leaf.PSM.TD_VCMAX = 668.39 - 1.07 * (t_clm - T₀());
+            _leaf.PSM.TD_JMAX = 659.70 - 0.75 * (t_clm - T₀());
+        end;
+    end;
+
+    # prescribe leaf temperature
+    if !isnothing(t_leaf)
+        for _leaf in LEAVES
+            _leaf.t = t_leaf;
+        end;
+    end;
+
+    # update Vcmax at the top layer
+    if !isnothing(vcmax)
+        LEAVES[1].PSM.v_cmax25 = vcmax;
+    end;
+
+    # update Vcmax profile if lai or vcmax is given
+    if !isnothing(vcmax) || !isnothing(lai)
+        for _i in 1:DIM_LAYER
+            _scaling = isnothing(vcmax_expo) ? 1 : exp(-vcmax_expo * CANOPY.lai * (1 - _i / DIM_LAYER));
+            LEAVES[_i].PSM.v_cmax25 = LEAVES[1].PSM.v_cmax25 * _scaling;
+            LEAVES[_i].PSM.j_max25 = LEAVES[1].PSM.v_cmax25 * 1.67 * _scaling;
+            LEAVES[_i].PSM.r_d25 = LEAVES[1].PSM.v_cmax25 * 0.015 * _scaling;
+            LEAVES[_i].PSM._t = 0;
+        end;
+    end;
+
+    return nothing
+);
