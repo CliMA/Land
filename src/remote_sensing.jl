@@ -92,8 +92,27 @@ read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) 
 #     2022-Jun-13: add function to compute TROPOMI SIF @ 740.0 nm
 #     2022-Jun-13: add function to compute TROPOMI SIF @ 746.5 nm
 #     2022-Jun-13: add function to compute TROPOMI SIF @ 750.5 nm
+#     2022-Oct-19: add function to compute MODIS BLUE
+#     2022-Oct-19: add function to compute MODIS NIR
+#     2022-Oct-19: add function to compute MODIS RED
+#     2022-Oct-19: add function to compute MODIS NIRv radiance
 #
 #######################################################################################################################################################################################################
+"""
+
+    MODIS_BLUE(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return blue band reflectance for MODIS setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+
+"""
+function MODIS_BLUE(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_3[1]), FT(MODIS_BAND_3[2]); steps=4)
+end
+
+
 """
 
     MODIS_EVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
@@ -105,9 +124,9 @@ Return EVI for MODIS setup, given
 function MODIS_EVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    _blue = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_3[1]), FT(MODIS_BAND_3[2]); steps=4);
-    _red  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6);
-    _nir  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
+    _blue = MODIS_BLUE(can);
+    _red  = MODIS_RED(can);
+    _nir  = MODIS_NIR(can);
 
     return FT(2.5) * (_nir - _red) / (_nir + 6 * _red - FT(7.5) * _blue + 1)
 end
@@ -124,8 +143,8 @@ Return EVI2 for MODIS setup, given
 function MODIS_EVI2(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    _red  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6);
-    _nir  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
+    _red = MODIS_RED(can);
+    _nir = MODIS_NIR(can);
 
     return FT(2.5) * (_nir - _red) / (_nir + FT(2.4) * _red + 1)
 end
@@ -142,7 +161,7 @@ Return LSWI for MODIS setup, given
 function MODIS_LSWI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    _nir  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=5);
+    _nir  = MODIS_NIR(can);
     _swir = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_7[1]), FT(MODIS_BAND_7[2]); steps=5);
 
     return (_nir - _swir) / (_nir + _swir)
@@ -160,10 +179,25 @@ Return NDVI for MODIS setup, given
 function MODIS_NDVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    _red  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6);
-    _nir  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
+    _red = MODIS_RED(can);
+    _nir = MODIS_NIR(can);
 
     return (_nir - _red) / (_nir + _red)
+end
+
+
+"""
+
+    MODIS_NIR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return near infrared band reflectance for MODIS setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+
+"""
+function MODIS_NIR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6)
 end
 
 
@@ -178,10 +212,42 @@ Return NIRv for MODIS setup, given
 function MODIS_NIRv(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
     @unpack RADIATION, WLSET = can;
 
-    _red  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6);
-    _nir  = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
+    _red = MODIS_RED(can);
+    _nir = MODIS_NIR(can);
 
     return (_nir - _red) / (_nir + _red) * _nir
+end
+
+
+"""
+
+    MODIS_NIRvR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return NIRv radiance for MODIS setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+
+"""
+function MODIS_NIRvR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    _nir_rad = read_spectrum(WLSET.Λ, RADIATION.e_o, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
+
+    return MODIS_NDVI(can) * _nir_rad
+end
+
+
+"""
+
+    MODIS_RED(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+
+Return red band reflectance for MODIS setup, given
+- `can` `HyperspectralMLCanopy` type canopy
+
+"""
+function MODIS_RED(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
+    @unpack RADIATION, WLSET = can;
+
+    return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6)
 end
 
 
