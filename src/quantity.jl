@@ -7,15 +7,15 @@
 #######################################################################################################################################################################################################
 """
 
-    canopy_net_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+    CNPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
 
 Return the canopy net primary productivity per ground area, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 
 """
-function canopy_net_primary_productivity end
+function CNPP end
 
-canopy_net_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+CNPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack CANOPY, DIM_LAYER, LEAVES = spac;
 
     # compute GPP
@@ -38,15 +38,15 @@ canopy_net_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{
 #######################################################################################################################################################################################################
 """
 
-    gross_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+    GPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
 
 Return the gross primary productivity per ground area, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 
 """
-function gross_primary_productivity end
+function GPP end
 
-gross_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+GPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack CANOPY, DIM_LAYER, LEAVES = spac;
 
     # compute GPP
@@ -64,20 +64,51 @@ gross_primary_productivity(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, 
 #
 # Changes to this function
 # General
+#     2022-Oct-19: add function to compute canopy integrated PPAR
+#
+#######################################################################################################################################################################################################
+"""
+
+    PPAR(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Return the canopy integrated PPAR per ground area, given
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+
+"""
+function PPAR end
+
+PPAR(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+
+    # compute GPP
+    _ppar::FT = 0;
+    for _i in 1:DIM_LAYER
+        _ppar += CANOPY.OPTICS.p_sunlit[_i] * mean(LEAVES[_i].ppar_sunlit) + (1 - CANOPY.OPTICS.p_sunlit[_i]) * LEAVES[_i].ppar_shaded;
+    end;
+    _ppar *= spac.CANOPY.lai / spac.CANOPY.DIM_LAYER;
+
+    return _ppar
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Sep-08: add function to add up transpiration rate for SPAC
 #
 #######################################################################################################################################################################################################
 """
 
-    transpiration_rate(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+    T_VEG(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
 
 Return the transpiration rate per ground area, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 
 """
-function transpiration_rate end
+function T_VEG end
 
-transpiration_rate(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+T_VEG(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
     @unpack CANOPY, DIM_LAYER, LEAVES = spac;
 
     # compute transpiration rate
