@@ -40,6 +40,7 @@ function β_factor end
 #     2022-Jul-12: add function to update beta factor for empirical models
 #     2022-Jul-12: add methods for MonoElementSPAC
 #     2022-Jul-15: rename xylem_flow to flow_in to be more descriptive
+#     2022-Oct-19: fix sm.Β to sm.β
 #
 #######################################################################################################################################################################################################
 """
@@ -64,7 +65,7 @@ Update the beta factor for the LEAF component in SPAC, given
 
 β_factor!(spac::MonoElementSPAC{FT}, sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = nothing;
 
-β_factor!(spac::MonoElementSPAC{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = β_factor!(spac, sm.Β);
+β_factor!(spac::MonoElementSPAC{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = β_factor!(spac, sm.β);
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}) where {FT<:AbstractFloat} = β_factor!(spac, β, β.PARAM_X);
 
@@ -142,7 +143,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 
 β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = nothing;
 
-β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = β_factor!(roots, leaves, sm.Β);
+β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = β_factor!(roots, leaves, sm.β);
 
 β_factor!(roots::Vector{Root{FT}}, leaves::Leaves2D{FT}, β::BetaFunction{FT}) where {FT<:AbstractFloat} = (roots, leaves, β, β.PARAM_X);
 
