@@ -24,6 +24,7 @@ function update! end
 #     2022-Apr-19: update docs and history log
 #     2022-Jul-12: rename function to update!
 #     2022-Jul-12: remove FT control to options
+#     2022-Oct-19: add method to update or prescribe cab, car, lai, swcs, Vcmax and Jmax TD, t_leaf, vcmax profile
 #
 #######################################################################################################################################################################################################
 """
@@ -71,7 +72,31 @@ update!(air::AirLayer{FT};
 );
 
 
+"""
 
+    update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}};
+            cab::Union{Number,Nothing} = nothing,
+            car::Union{Number,Nothing} = nothing,
+            lai::Union{Number,Nothing} = nothing,
+            swcs::Union{Tuple,Nothing} = nothing,
+            t_clm::Union{Number,Nothing} = nothing,
+            t_leaf::Union{Number,Nothing} = nothing,
+            vcmax::Union{Number,Nothing} = nothing,
+            vcmax_expo::Union{Number,Nothing} = nothing
+    ) where {FT<:AbstractFloat}
+
+Update the physiological parameters of the SPAC, given
+- `spac` Soil plant air continuum
+- `cab` Chlorophyll content. Optional, default is nothing
+- `car` Carotenoid content. Optional, default is nothing
+- `lai` Leaf area index. Optional, default is nothing
+- `swcs` Soil water contents. Optional, default is nothing
+- `t_clm` Moving average temperature to update Vcmax and Jmax temperature dependencies. Optional, default is nothing
+- `t_leaf` Leaf temperature. Optional, default is nothing
+- `vcmax` Vcmax25 at the top of canopy. Optional, default is nothing
+-`vcmax_expo` Exponential tuning factor to adjust Vcmax25. Optional, default is nothing
+
+"""
 update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}};
         cab::Union{Number,Nothing} = nothing,
         car::Union{Number,Nothing} = nothing,
@@ -119,8 +144,8 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
     # update Vcmax and Jmax TD
     if !isnothing(t_clm)
         for _leaf in LEAVES
-            _leaf.PSM.TD_VCMAX = 668.39 - 1.07 * (t_clm - T₀());
-            _leaf.PSM.TD_JMAX = 659.70 - 0.75 * (t_clm - T₀());
+            _leaf.PSM.TD_VCMAX.ΔSV = 668.39 - 1.07 * (t_clm - T₀());
+            _leaf.PSM.TD_JMAX.ΔSV = 659.70 - 0.75 * (t_clm - T₀());
         end;
     end;
 
