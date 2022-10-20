@@ -42,6 +42,8 @@ function β_factor end
 #     2022-Jul-15: rename xylem_flow to flow_in to be more descriptive
 #     2022-Oct-19: fix sm.Β to sm.β
 #     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
+# Bug fixes
+#     2022-Oct-20: fix the issue related to β_factor!(roots, soil, leaves, β, β.PARAM_X) as I forgot to write β_factor! before `()`
 #
 #######################################################################################################################################################################################################
 """
@@ -147,7 +149,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} =
     β_factor!(roots, soil, leaves, sm.β);
 
-β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}) where {FT<:AbstractFloat} = (roots, soil, leaves, β, β.PARAM_X);
+β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}) where {FT<:AbstractFloat} = β_factor!(roots, soil, leaves, β, β.PARAM_X);
 
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterKleaf) where {FT<:AbstractFloat} = (
     _f_st = relative_surface_tension(leaves.t);
