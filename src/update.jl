@@ -112,7 +112,7 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
     # prescribe soil water content
     if !isnothing(swcs)
         for _i in eachindex(swcs)
-            SOIL.LAYERS[_i] = swcs[_i];
+            SOIL.LAYERS[_i].θ = swcs[_i];
         end;
     end;
 
