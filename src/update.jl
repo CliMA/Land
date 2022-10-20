@@ -25,6 +25,7 @@ function update! end
 #     2022-Jul-12: rename function to update!
 #     2022-Jul-12: remove FT control to options
 #     2022-Oct-19: add method to update or prescribe cab, car, lai, swcs, Vcmax and Jmax TD, t_leaf, vcmax profile
+#     2022-Oct-19: air.rh and air.p_H₂O_sat have been removed in an earlier version ClimaCache
 #
 #######################################################################################################################################################################################################
 """
@@ -56,17 +57,12 @@ update!(air::AirLayer{FT};
         vpd::Union{Number,Nothing} = nothing,
         wind::Union{Number,Nothing} = nothing
 ) where {FT<:AbstractFloat} = (
-    if !isnothing(t)     air.t = t;         end;
+    if !isnothing(t) air.t = t; end;
+    if !isnothing(wind) air.wind = wind; end;
     if !isnothing(p_CO₂) air.p_CO₂ = p_CO₂; end;
-    if !isnothing(wind)  air.wind = wind;   end;
     if !isnothing(p_H₂O) air.p_H₂O = p_H₂O; end;
-
-    air.p_H₂O_sat = saturation_vapor_pressure(air.t);
-
-    if !isnothing(rh)  air.p_H₂O = air.p_H₂O_sat * rh;  end;
-    if !isnothing(vpd) air.p_H₂O = air.p_H₂O_sat - vpd; end;
-
-    air.rh = air.p_H₂O / air.p_H₂O_sat;
+    if !isnothing(rh) air.p_H₂O = saturation_vapor_pressure(air.t) * rh; end;
+    if !isnothing(vpd) air.p_H₂O = max(0, saturation_vapor_pressure(air.t) - vpd); end;
 
     return nothing
 );
