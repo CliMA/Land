@@ -14,7 +14,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-ClimaCache = "1.0.0"
+ClimaCache = "1.1.8"
 ConstrainedRootSolvers = "0.1.4"
 EmeraldConstants = "0.1.0"
 SoilHydraulics = "0.2.3"

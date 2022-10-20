@@ -92,9 +92,8 @@ flow_out(mode::NonSteadyStateFlow{FT}) where {FT<:AbstractFloat} = mode.f_out;
 #     2022-May-27: add method for steady flow mode
 #     2022-May-27: add method for non-steady flow mode
 #     2022-May-27: add method for root hydraulic system
-#     2022-May-31: add documentation
 #     2022-Jul-08: add method for root organ
-#     2022-Jul-08: deflate documentations
+#     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
 #
 #######################################################################################################################################################################################################
 """
@@ -107,12 +106,12 @@ Return the root end pressure and total hydraulic conductance to find solution of
 """
 function root_pk end
 
-root_pk(root::Root{FT}) where {FT<:AbstractFloat} = root_pk(root.HS, root.t);
+root_pk(root::Root{FT}, slayer::SoilLayer{FT}) where {FT<:AbstractFloat} = root_pk(root.HS, slayer, root.t);
 
-root_pk(hs::RootHydraulics{FT}, T::FT) where {FT<:AbstractFloat} = root_pk(hs, hs.FLOW, T);
+root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, T::FT) where {FT<:AbstractFloat} = root_pk(hs, slayer, hs.FLOW, T);
 
-root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
+root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -125,7 +124,7 @@ root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:Abs
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
     for _i in 1:10
-        _k = relative_hydraulic_conductance(SH, true, _p_25) * K_RHIZ * 10 / _f_vis;
+        _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.flow / _k;
         _r_all += 1 / _k;
     end;
@@ -153,8 +152,8 @@ root_pk(hs::RootHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:Abs
     return _p_end, 1/_r_all
 );
 
-root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, SH, VC, ΔH = hs;
+root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
+    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -167,7 +166,7 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
     for _i in 1:10
-        _k = relative_hydraulic_conductance(SH, true, _p_25) * K_RHIZ * 10 / _f_vis;
+        _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.f_in / _k;
         _r_all += 1 / _k;
     end;
@@ -211,7 +210,6 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 #     2022-May-27: add method for leaf, root, and stem organ at steady and non-steady state mode (for dispatching purpose)
 #     2022-May-27: add method to solve root flow rate partition at both steady and non-steady state modes
 #     2022-May-27: add method for MonoElementSPAC (blank)
-#     2022-May-31: add documentation
 #     2022-May-31: remove hydraulic system from input variables, thus supporting leaf and stem
 #     2022-May-31: use reformulate methods for setting up flow rate
 #     2022-May-31: set up the flow rate profile using the network
@@ -221,9 +219,9 @@ root_pk(hs::RootHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:
 #     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #     2022-Jun-30: add support to Leaves2D
 #     2022-Jun-30: add method for Leaves1D
-#     2022-Jun-30: fix documentation
 #     2022-Jul-08: deflate documentations
 #     2022-Jul-12: add method to update leaf hydraulic flow rates per canopy layer based on stomatal conductance
+#     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
 #
 #######################################################################################################################################################################################################
 """
@@ -315,10 +313,12 @@ xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::Non
 
 """
 
-    xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
+    xylem_flow_profile!(roots::Vector{Root{FT}}, soil::Soil{FT}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
 
 Partition root flow rates at different layers for known total flow rate out, given
 - `roots` Vector of `Root` in a multiple roots system
+- `roots_index` Vector to match roots to soil layers
+- `soil` Soil of companion roots
 - `cache_f` Flow rate cache into each root
 - `cache_k` Total conductance cache of each root
 - `cache_p` Root xylem end pressure cache of each root
@@ -326,7 +326,7 @@ Partition root flow rates at different layers for known total flow rate out, giv
 - `Δt` Time step length
 
 """
-xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat} = (
+xylem_flow_profile!(roots::Vector{Root{FT}}, roots_index::Vector{Int}, soil::Soil{FT}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat} = (
     # update root buffer rates to get an initial guess (flow rate not changing now as time step is set to 0)
     xylem_flow_profile!.(roots, FT(0));
 
@@ -334,10 +334,11 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vecto
     _count = 0;
     while _count < 20
         # sync the values to ks, ps, and qs
-        for _i in eachindex(roots)
+        for _i in eachindex(roots_index)
             _root = roots[_i];
+            _slayer = soil.LAYERS[roots_index[_i]];
             xylem_flow_profile!(roots[_i].HS.FLOW, cache_f[_i]);
-            cache_p[_i],cache_k[_i] = root_pk(_root);
+            cache_p[_i],cache_k[_i] = root_pk(_root, _slayer);
         end;
 
         # use ps and ks to compute the Δf to adjust
@@ -398,13 +399,13 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 
     # 3. set up root flow rate and profile
     xylem_flow_profile!(ROOT.HS.FLOW, flow_in(STEM));
-    xylem_flow_profile!(STEM, Δt);
+    xylem_flow_profile!(ROOT, Δt);
 
     return nothing
 );
 
 xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, ROOTS = spac;
+    @unpack LEAVES, ROOTS, ROOTS_INDEX, SOIL = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -414,13 +415,13 @@ xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 
     # 2. set up root flow rate and profile
     _f_sum = flow_in(LEAVES);
-    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, _f_sum, Δt);
+    xylem_flow_profile!(ROOTS, ROOTS_INDEX, SOIL, spac._fs, spac._ks, spac._ps, _f_sum, Δt);
 
     return nothing
 );
 
 xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, ROOTS, TRUNK = spac;
+    @unpack LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -433,13 +434,13 @@ xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
     xylem_flow_profile!(TRUNK, Δt);
 
     # 3. set up root flow rate and profile
-    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
+    xylem_flow_profile!(ROOTS, ROOTS_INDEX, SOIL, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
 
     return nothing
 );
 
 xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, LEAVES, ROOTS, TRUNK = spac;
+    @unpack BRANCHES, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -458,7 +459,7 @@ xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
     xylem_flow_profile!(TRUNK, Δt);
 
     # 4. set up root flow rate and profile
-    xylem_flow_profile!(ROOTS, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
+    xylem_flow_profile!(ROOTS, ROOTS_INDEX, SOIL, spac._fs, spac._ks, spac._ps, flow_in(TRUNK), Δt);
 
     return nothing
 );

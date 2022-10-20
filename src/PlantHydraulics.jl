@@ -2,7 +2,7 @@ module PlantHydraulics
 
 using ClimaCache: AbstractSoilVC, AbstractXylemVC, AndereggSM, BallBerrySM, BetaFunction, BetaParameterKleaf, BetaParameterKsoil, BetaParameterPleaf, BetaParameterPsoil, BetaParameterΘ, ComplexVC,
       EllerSM, GentineSM, Leaf, LeafHydraulics, Leaves1D, Leaves2D, LeuningSM, LinearPVCurve, LogisticVC, MedlynSM, MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC,
-      NonSteadyStateFlow, PowerVC, Root, RootHydraulics, SegmentedPVCurve, SperrySM, SteadyStateFlow, Stem, StemHydraulics, WangSM, Wang2SM, WeibullVC
+      NonSteadyStateFlow, PowerVC, Root, RootHydraulics, SegmentedPVCurve, Soil, SoilLayer, SperrySM, SteadyStateFlow, Stem, StemHydraulics, WangSM, Wang2SM, WeibullVC
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using EmeraldConstants: CP_D_MOL, CP_L_MOL, GAS_R, M_H₂O, T₂₅, ρg_MPa
 using SoilHydraulics: soil_θ, soil_ψ_25
