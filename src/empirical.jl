@@ -4,7 +4,6 @@
 # General
 #     2022-Jul-01: migrate function from older version
 #     2022-Jul-01: rename the function from stomatal_conductance to empirical_equation
-#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -26,7 +25,7 @@ function empirical_equation end
 #     2022-Jul-07: add method for GentineSM
 #     2022-Jul-07: add method for LeuningSM
 #     2022-Jul-07: add method for MedlynSM
-#     2022-Jul-11: deflate documentations
+#     2022-Oct-20: add a max controller to make sure vpd is at least 1 Pa
 # Bug fix:
 #     2022-Jul-07: add the factor 1.6 for Medlyn model
 #
@@ -65,15 +64,18 @@ empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT 
     @unpack P_AIR = air;
 
     _γ_s = (typeof(PSM) <: C4VJPModel) ? 0 : PSM._γ_star;
+    _vpd = max(1, saturation_vapor_pressure(leaf.t) - air.p_H₂O);
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaf.t) - air.p_H₂O) / D0) * leaf.a_net * FT(1e-6) / (leaf._p_CO₂_s - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + _vpd / D0) * leaf.a_net * FT(1e-6) / (leaf._p_CO₂_s - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaf.t) - air.p_H₂O)) * leaf.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
+    _vpd = max(1, saturation_vapor_pressure(leaf.t) - air.p_H₂O);
+
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(_vpd)) * leaf.a_net * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -85,7 +87,7 @@ empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT =
 #     2022-Jul-07: add method for GentineSM using Leaves1D
 #     2022-Jul-07: add method for LeuningSM using Leaves1D
 #     2022-Jul-07: add method for MedlynSM using Leaves1D
-#     2022-Jul-11: deflate documentations
+#     2022-Oct-20: add a max controller to make sure vpd is at least 1 Pa
 #
 #######################################################################################################################################################################################################
 """
@@ -122,15 +124,18 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, i
     @unpack P_AIR = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
+    _vpd = max(1, saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O);
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O) / D0) * leaves.a_net[ind] * FT(1e-6) / (leaves._p_CO₂_s[ind] - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + _vpd / D0) * leaves.a_net[ind] * FT(1e-6) / (leaves._p_CO₂_s[ind] - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O)) * leaves.a_net[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
+    _vpd = max(1, saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O);
+
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(_vpd)) * leaves.a_net[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -142,7 +147,7 @@ empirical_equation(sm::MedlynSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, in
 #     2022-Jul-07: add method for GentineSM using Leaves2D for shaded leaves
 #     2022-Jul-07: add method for LeuningSM using Leaves2D for shaded leaves
 #     2022-Jul-07: add method for MedlynSM using Leaves2D for shaded leaves
-#     2022-Jul-11: deflate documentations
+#     2022-Oct-20: add a max controller to make sure vpd is at least 1 Pa
 #
 #######################################################################################################################################################################################################
 """
@@ -178,15 +183,18 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; �
     @unpack P_AIR = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
+    _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves._p_CO₂_s_shaded - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + _vpd / D0) * leaves.a_net_shaded * FT(1e-6) / (leaves._p_CO₂_s_shaded - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t) - air.p_H₂O)) * leaves.a_net_shaded * FT(1e-6) / air.p_CO₂ * P_AIR
+    _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
+
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(_vpd)) * leaves.a_net_shaded * FT(1e-6) / air.p_CO₂ * P_AIR
 );
 
 
@@ -198,7 +206,7 @@ empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β
 #     2022-Jul-07: add method for GentineSM using Leaves2D for sunlit leaves
 #     2022-Jul-07: add method for LeuningSM using Leaves2D for sunlit leaves
 #     2022-Jul-07: add method for MedlynSM using Leaves2D for sunlit leaves
-#     2022-Jul-11: deflate documentations
+#     2022-Oct-20: add a max controller to make sure vpd is at least 1 Pa
 #
 #######################################################################################################################################################################################################
 """
@@ -235,13 +243,16 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, i
     @unpack P_AIR = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
+    _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
 
-    return G0 + β * G1 / (1 + (saturation_vapor_pressure(leaves.t) - air.p_H₂O) / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves._p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
+    return G0 + β * G1 / (1 + _vpd / D0) * leaves.a_net_sunlit[ind] * FT(1e-6) / (leaves._p_CO₂_s_sunlit[ind] - _γ_s) * P_AIR
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     @unpack G0, G1 = sm;
     @unpack P_AIR = air;
 
-    return G0 + FT(1.6) * (1 + β * G1 / sqrt(saturation_vapor_pressure(leaves.t) - air.p_H₂O)) * leaves.a_net_sunlit[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
+    _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
+
+    return G0 + FT(1.6) * (1 + β * G1 / sqrt(_vpd)) * leaves.a_net_sunlit[ind] * FT(1e-6) / air.p_CO₂ * P_AIR
 );
