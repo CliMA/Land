@@ -123,7 +123,7 @@ root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::SteadyStateFlow{FT}
     _p_25 = _p_end / _f_st;
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
-    for _i in 1:10
+    for _ in 1:10
         _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.flow / _k;
         _r_all += 1 / _k;
@@ -165,7 +165,7 @@ root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{
     _p_25 = _p_end / _f_st;
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
-    for _i in 1:10
+    for _ in 1:10
         _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.f_in / _k;
         _r_all += 1 / _k;
@@ -219,9 +219,9 @@ root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{
 #     2022-Jun-29: rename SPAC to ML*SPAC to be more accurate
 #     2022-Jun-30: add support to Leaves2D
 #     2022-Jun-30: add method for Leaves1D
-#     2022-Jul-08: deflate documentations
 #     2022-Jul-12: add method to update leaf hydraulic flow rates per canopy layer based on stomatal conductance
 #     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
+#     2022-Oct-20: fix a bug in flow profile counter (does not impact simulation)
 #
 #######################################################################################################################################################################################################
 """
@@ -331,8 +331,7 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, roots_index::Vector{Int}, soil::Soi
     xylem_flow_profile!.(roots, FT(0));
 
     # recalculate the flow profiles to make sure sum are the same as f_sum
-    _count = 0;
-    while _count < 20
+    for _ in 1:20
         # sync the values to ks, ps, and qs
         for _i in eachindex(roots_index)
             _root = roots[_i];
@@ -356,6 +355,8 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, roots_index::Vector{Int}, soil::Soi
         for _i in eachindex(roots)
             cache_f[_i] -= _f_diff * cache_k[1] / _k_sum;
         end;
+
+        # @info "Debugging Info" _f_diff cache_p cache_f;
     end;
 
     # update root buffer rates again

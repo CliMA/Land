@@ -80,7 +80,7 @@ xylem_end_pressure(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, flow::FT, T::F
     _p_25 = _p_end / _f_st;
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
-    for _i in 1:10
+    for _ in 1:10
         _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= flow / _k;
     end;
@@ -344,7 +344,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Ste
     _p_25 = _p_end / _f_st;
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
-    for _i in 1:10
+    for _ in 1:10
         _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.flow / _k;
     end;
@@ -392,7 +392,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Non
     _p_25 = _p_end / _f_st;
 
     # divide the rhizosphere component based on the conductance (each ring has the same maximum conductance)
-    for _i in 1:10
+    for _ in 1:10
         _k = relative_hydraulic_conductance(slayer.VC, true, _p_25) * K_RHIZ * 10 / _f_vis;
         _p_25 -= mode.f_in / _k;
     end;
@@ -539,7 +539,7 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
     @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL = spac;
 
     # update water potential from SOIL
-    for _i in 1:DIM_ROOT
+    for _i in eachindex(ROOTS_INDEX)
         ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
@@ -569,7 +569,7 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
     @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
     # update water potential from SOIL
-    for _i in 1:DIM_ROOT
+    for _i in eachindex(ROOTS_INDEX)
         ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
@@ -603,7 +603,7 @@ xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT
     @unpack BRANCHES, DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
 
     # update water potential from SOIL
-    for _i in 1:DIM_ROOT
+    for _i in eachindex(ROOTS_INDEX)
         ROOTS[_i].HS.p_ups = soil_ψ_25(SOIL.LAYERS[ROOTS_INDEX[_i]].VC, SOIL.LAYERS[ROOTS_INDEX[_i]].θ) * relative_surface_tension(SOIL.LAYERS[ROOTS_INDEX[_i]].t);
     end;
 
