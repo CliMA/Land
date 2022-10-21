@@ -165,7 +165,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _beta = β_factor(β.FUNC, soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
+        _beta = β_factor(β.FUNC, soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st);
         _flow = flow_in(roots[_i]);
         if _flow >= 0
             _βs += _beta * _flow;
@@ -197,7 +197,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _beta = β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
+        _beta = β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st);
         _flow = flow_in(roots[_i]);
         if _flow >= 0
             _βs += _beta * _flow;
@@ -221,7 +221,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
-        _beta = β_factor(β.FUNC, soil_θ(soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st)) * flow_in(roots[_i]);
+        _beta = β_factor(β.FUNC, soil_θ(soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st));
         _flow = flow_in(roots[_i]);
         if _flow >= 0
             _βs += _beta * _flow;
