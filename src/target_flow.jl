@@ -5,7 +5,7 @@
 #     2022-Jun-01: migrate the function
 #     2022-Jun-01: add method for LeafHydraulics
 #     2022-Jun-01: add method for MonoElementSPAC
-#     2022-Jul-08: deflate documentations
+#     2022-Oct-21: add a p_ups if statement
 #
 #######################################################################################################################################################################################################
 """
@@ -35,6 +35,11 @@ critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.00
     _f_vis = relative_viscosity(T);
     _p_crt = critical_pressure(VC, kr) * _f_st;
 
+    # add a judgement to make sure p_ups is higher than _p_crt
+    if hs.p_ups < _p_crt
+        return eps(FT)
+    end;
+
     # set up method to calculate critical flow
     _fh = (hs.p_ups - _p_crt) * K_SLA / _f_vis;
     _fl = FT(0);
@@ -50,7 +55,6 @@ critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.00
 
     # warning if the solution is NaN
     if isnan(_solut)
-        _solut = eps(FT);
         @warn "E_crit is NaN, please check the settings..." hs.p_ups;
     end;
 
@@ -79,6 +83,11 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
     # compute leaf critical pressure
     _p_crt = critical_pressure(LEAF.HS.VC, kr) * relative_surface_tension(LEAF.t);
 
+    # add a judgement to make sure p_ups is higher than _p_crt
+    if (ROOT.HS.p_ups < _p_crt)
+        return eps(FT)
+    end;
+
     # set up method to calculate critical flow
     _fh = -_p_crt * _kt;
     _fl = FT(0);
@@ -94,7 +103,6 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
 
     # warning if the solution is NaN
     if isnan(_solut)
-        _solut = eps(FT);
         @warn "E_crit is NaN, please check the settings..." ROOT.HS.p_ups;
     end;
 

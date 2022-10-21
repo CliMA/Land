@@ -222,6 +222,7 @@ root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{
 #     2022-Jul-12: add method to update leaf hydraulic flow rates per canopy layer based on stomatal conductance
 #     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
 #     2022-Oct-20: fix a bug in flow profile counter (does not impact simulation)
+#     2022-Oct-21: add a second solver to fix the case when root_pk does not work
 #
 #######################################################################################################################################################################################################
 """
