@@ -162,8 +162,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterKsoil) where {FT<:AbstractFloat} = (
     _ws = 0;
     _βs = 0;
-    _ys = 0;
-    _ns = 0;
+    _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
@@ -171,13 +170,12 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
         if _flow >= 0
             _βs += _beta * _flow;
             _ws += _flow;
-            _ys += _beta;
-            _ns += 1;
         end;
+        _βm = max(_βm, _beta);
     end;
 
     if _ws == 0
-        β.β₁ = _ys / _ns;
+        β.β₁ = _βm;
     else
         β.β₁ = _βs / _ws;
     end;
@@ -196,8 +194,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterPsoil) where {FT<:AbstractFloat} = (
     _ws = 0;
     _βs = 0;
-    _ys = 0;
-    _ns = 0;
+    _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st) * flow_in(roots[_i]);
@@ -205,13 +202,12 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
         if _flow >= 0
             _βs += _beta * _flow;
             _ws += _flow;
-            _ys += _beta;
-            _ns += 1;
         end;
+        _βm = max(_βm, _beta);
     end;
 
     if _ws == 0
-        β.β₁ = _ys / _ns;
+        β.β₁ = _βm;
     else
         β.β₁ = _βs / _ws;
     end;
@@ -222,8 +218,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterΘ) where {FT<:AbstractFloat} = (
     _ws = 0;
     _βs = 0;
-    _ys = 0;
-    _ns = 0;
+    _βm = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, soil_θ(soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st)) * flow_in(roots[_i]);
@@ -231,13 +226,12 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
         if _flow >= 0
             _βs += _beta * _flow;
             _ws += _flow;
-            _ys += _beta;
-            _ns += 1;
         end;
+        _βm = max(_βm, _beta);
     end;
 
     if _ws == 0
-        β.β₁ = _ys / _ns;
+        β.β₁ = _βm;
     else
         β.β₁ = _βs / _ws;
     end;
