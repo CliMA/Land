@@ -331,7 +331,8 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, roots_index::Vector{Int}, soil::Soi
     xylem_flow_profile!.(roots, FT(0));
 
     # recalculate the flow profiles to make sure sum are the same as f_sum
-    for _ in 1:20
+    _use_second_solver = false;
+    for _count in 1:20
         # sync the values to ks, ps, and qs
         for _i in eachindex(roots_index)
             _root = roots[_i];
@@ -356,7 +357,50 @@ xylem_flow_profile!(roots::Vector{Root{FT}}, roots_index::Vector{Int}, soil::Soi
             cache_f[_i] -= _f_diff * cache_k[1] / _k_sum;
         end;
 
-        # @info "Debugging Info" _f_diff cache_p cache_f;
+        if _count == 20
+            _use_second_solver = true
+        end;
+    end;
+
+    # use second solver to solve for the flow rates (when SWC differs alot among layers)
+    if _use_second_solver
+        @inline diff_p_root(ind::Int, e::FT, p::FT) where {FT<:AbstractFloat} = (
+            _root = roots[ind];
+            _slayer = soil.LAYERS[roots_index[ind]];
+            xylem_flow_profile!(roots[ind].HS.FLOW, e);
+            (_p,_) = root_pk(_root, _slayer);
+
+            return _p - p
+        );
+
+        @inline diff_e_root(p::FT) where {FT<:AbstractFloat} = (
+            _sum::FT = 0;
+            for _i in eachindex(roots_index)
+                _f(e) = diff_p_root(_i, e, p);
+                _tol = SolutionTolerance{FT}(1e-8, 50);
+                _met = NewtonBisectionMethod{FT}(x_min = -1000, x_max = 1000, x_ini = 0);
+                _sol = find_zero(_f, _met, _tol);
+                _sum += _sol;
+            end;
+
+            return _sum - f_sum
+        );
+
+        _tol = SolutionTolerance{FT}(1e-8, 50);
+        _met = NewtonBisectionMethod{FT}(x_min = -1000, x_max = 1000, x_ini = 0);
+        _p_r = find_zero(diff_e_root, _met, _tol);
+
+        for _i in eachindex(roots_index)
+            _f(e) = diff_p_root(_i, e, _p_r);
+            _tol = SolutionTolerance{FT}(1e-8, 50);
+            _met = NewtonBisectionMethod{FT}(x_min = -1000, x_max = 1000, x_ini = 0);
+            cache_f[_i] = find_zero(_f, _met, _tol);
+
+            _root = roots[_i];
+            _slayer = soil.LAYERS[roots_index[_i]];
+            xylem_flow_profile!(roots[_i].HS.FLOW, cache_f[_i]);
+            cache_p[_i],cache_k[_i] = root_pk(_root, _slayer);
+        end;
     end;
 
     # update root buffer rates again
