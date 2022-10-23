@@ -8,19 +8,21 @@
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Aug-31: add controller for leaf stomatal conductance
 #     2022-Sep-07: remove soil oversaturation controller, and add a Δθ <= 0.01 controller
+#     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
 #
 #######################################################################################################################################################################################################
 """
 
-    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true) where {FT<:AbstractFloat}
+    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
 
 Return adjusted time that soil does not over saturate or drain, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step
-- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
+- `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
 
 """
-function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true) where {FT<:AbstractFloat}
+function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
     @unpack DIM_LAYER, LEAVES, SOIL = spac;
 
     _δt = δt;
@@ -37,15 +39,19 @@ function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, Mono
     end;
 
     # make sure soil temperatures do not change more than 1 K per time step
-    for _i in 1:SOIL.DIM_SOIL
-        _∂T∂t = abs(SOIL.LAYERS[_i].∂e∂t / (SOIL.LAYERS[_i].CP * SOIL.LAYERS[_i].ρ + SOIL.LAYERS[_i].θ * ρ_H₂O(FT) * CP_L(FT)));
-        _δt = min(1 / _∂T∂t, _δt);
+    if t_on
+        for _i in 1:SOIL.DIM_SOIL
+            _∂T∂t = abs(SOIL.LAYERS[_i].∂e∂t / (SOIL.LAYERS[_i].CP * SOIL.LAYERS[_i].ρ + SOIL.LAYERS[_i].θ * ρ_H₂O(FT) * CP_L(FT)));
+            _δt = min(1 / _∂T∂t, _δt);
+        end;
     end;
 
     # make sure leaf temperatures do not change more than 1 K per time step
-    for _i in 1:DIM_LAYER
-        _∂T∂t = abs(LEAVES[_i].∂e∂t / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage));
-        _δt = min(1 / _∂T∂t, _δt);
+    if t_on
+        for _i in 1:DIM_LAYER
+            _∂T∂t = abs(LEAVES[_i].∂e∂t / (LEAVES[_i].CP * LEAVES[_i].BIO.lma * 10 + CP_L_MOL(FT) * LEAVES[_i].HS.v_storage));
+            _δt = min(1 / _∂T∂t, _δt);
+        end;
     end;
 
     # make sure leaf stomatal conductances do not change more than 0.01 mol m⁻² s⁻¹
@@ -72,32 +78,31 @@ end
 #######################################################################################################################################################################################################
 """
 
-    time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
     time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Move forward in time for SPAC with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step (if not given, solve for steady state solution)
 - `update` If true, update leaf xylem legacy effect
-- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
+- `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
 
 """
 function time_stepper! end
 
-time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat} = (
+time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat} = (
     @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
 
     # run the update function until time elapses
     _t_res = δt;
     while true
-        _δt = adjusted_time(spac, _t_res; θ_on = θ_on);
+        _δt = adjusted_time(spac, _t_res; θ_on = θ_on, t_on = t_on);
 
         # run the budgets for all ∂x∂t
-        if θ_on
-            soil_budget!(spac, _δt);
-        end;
+        if θ_on soil_budget!(spac, _δt); end;
         stomatal_conductance!(spac, _δt);
-        plant_energy!(spac, _δt);
+        if t_on plant_energy!(spac, _δt); end;
         xylem_flow_profile!(spac, _δt);
 
         _t_res -= _δt;
@@ -107,9 +112,9 @@ time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPA
             canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
             xylem_pressure_profile!(spac; update = update);
             leaf_photosynthesis!(spac, GCO₂Mode());
-            soil_budget!(spac);
+            if θ_on soil_budget!(spac); end;
             stomatal_conductance!(spac);
-            plant_energy!(spac);
+            if t_on plant_energy!(spac); end;
         else
             break;
         end;
