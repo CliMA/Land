@@ -67,7 +67,7 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
     plant_energy!(spac);
 
     # 8. update the prognostic variables
-    time_stepper!(spac, δt; update = update, θ_on = θ_on);
+    time_stepper!(spac, δt; update = update, θ_on = θ_on, t_on = t_on);
 
     return nothing
 );
