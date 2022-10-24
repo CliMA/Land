@@ -7,6 +7,7 @@
 #     2022-Aug-11: run fluorescence model after photosynthesis
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Sep-07: add method to solve for steady state solution
+#     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
 #
 #######################################################################################################################################################################################################
 """
@@ -30,17 +31,18 @@ function soil_plant_air_continuum! end
 # TODO: add top soil evaporation
 """
 
-    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
     soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Run SPAC model and move forward in time with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step (if not given, solve for steady state solution)
 - `update` If true, update leaf xylem legacy effect
-- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis)
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
+- `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
 
 """
-soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat} = (
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
 
