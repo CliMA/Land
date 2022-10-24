@@ -26,6 +26,7 @@ function update! end
 #     2022-Jul-12: remove FT control to options
 #     2022-Oct-19: add method to update or prescribe cab, car, lai, swcs, Vcmax and Jmax TD, t_leaf, vcmax profile
 #     2022-Oct-19: air.rh and air.p_H₂O_sat have been removed in an earlier version ClimaCache
+#     2022-Oct-19: add method to prescribe t_soil profile
 #
 #######################################################################################################################################################################################################
 """
@@ -77,6 +78,7 @@ update!(air::AirLayer{FT};
             swcs::Union{Tuple,Nothing} = nothing,
             t_clm::Union{Number,Nothing} = nothing,
             t_leaf::Union{Number,Nothing} = nothing,
+            t_soils::Union{Tuple,Nothing} = nothing,
             vcmax::Union{Number,Nothing} = nothing,
             vcmax_expo::Union{Number,Nothing} = nothing
     ) where {FT<:AbstractFloat}
@@ -86,9 +88,10 @@ Update the physiological parameters of the SPAC, given
 - `cab` Chlorophyll content. Optional, default is nothing
 - `car` Carotenoid content. Optional, default is nothing
 - `lai` Leaf area index. Optional, default is nothing
-- `swcs` Soil water contents. Optional, default is nothing
+- `swcs` Soil water content at different layers. Optional, default is nothing
 - `t_clm` Moving average temperature to update Vcmax and Jmax temperature dependencies. Optional, default is nothing
 - `t_leaf` Leaf temperature. Optional, default is nothing
+- `t_soils` Soil temperature at different layers. Optional, default is nothing
 - `vcmax` Vcmax25 at the top of canopy. Optional, default is nothing
 -`vcmax_expo` Exponential tuning factor to adjust Vcmax25. Optional, default is nothing
 
@@ -100,6 +103,7 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
         swcs::Union{Tuple,Nothing} = nothing,
         t_clm::Union{Number,Nothing} = nothing,
         t_leaf::Union{Number,Nothing} = nothing,
+        t_soils::Union{Tuple,Nothing} = nothing,
         vcmax::Union{Number,Nothing} = nothing,
         vcmax_expo::Union{Number,Nothing} = nothing
 ) where {FT<:AbstractFloat} = (
@@ -134,6 +138,13 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
     if !isnothing(swcs)
         for _i in eachindex(swcs)
             SOIL.LAYERS[_i].θ = swcs[_i];
+        end;
+    end;
+
+    # prescribe soil temperature
+    if !isnothing(swcs)
+        for _i in eachindex(swcs)
+            SOIL.LAYERS[_i].t = t_soils[_i];
         end;
     end;
 

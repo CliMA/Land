@@ -74,6 +74,7 @@ end
 #     2022-Jun-18: make it a separate function
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Sep-07: add method to solve for steady state solution
+#     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
 #
 #######################################################################################################################################################################################################
 """
