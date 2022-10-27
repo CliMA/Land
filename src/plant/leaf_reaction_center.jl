@@ -5,6 +5,7 @@
 #     2022-Jan-14: add van der Tol model struct
 #     2022-Feb-07: remove the Hierarchy from abstract fluorescence model
 #     2022-Feb-07: move struct definition as a field of VJPReactionCenter
+#     2022-Oct-27: make VanDerTolFluorescenceModel struct mutable
 # To do
 #     TODO: examine why van der Tol et al has the nonstressed parameter set that are so far away from the stressed one
 # Sources
@@ -22,7 +23,7 @@ Structure that stores van der Tol et al. (2014) fluorescence model parameters.
 $(TYPEDFIELDS)
 
 """
-Base.@kwdef struct VanDerTolFluorescenceModel{FT<:AbstractFloat}
+Base.@kwdef mutable struct VanDerTolFluorescenceModel{FT<:AbstractFloat}
     # General model information
     "Fitting parameter K_0"
     K_0::FT = 5.01
