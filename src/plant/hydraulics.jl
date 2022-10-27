@@ -98,6 +98,7 @@ end
 #     2022-May-27: move flow rates to a field FLOW
 #     2022-Jun-13: use Union instead of Abstract... for type definition
 #     2022-Jul-19: add dimension control to struct
+#     2022-Oct-20: remove field SH (use that in SOIL in the future)
 #
 #######################################################################################################################################################################################################
 """
@@ -135,8 +136,6 @@ Base.@kwdef mutable struct RootHydraulics{FT<:AbstractFloat} <: AbstractHydrauli
     FLOW::Union{SteadyStateFlow{FT}, NonSteadyStateFlow{FT}} = SteadyStateFlow{FT}()
     "Pressure volume curve for storage"
     PVC::Union{LinearPVCurve{FT}, SegmentedPVCurve{FT}} = LinearPVCurve{FT}()
-    "Soil hydraulics"
-    SH::Union{BrooksCorey{FT}, VanGenuchten{FT}} = VanGenuchten{FT}("Loam")
     "Vulnerability curve"
     VC::Union{LogisticVC{FT}, PowerVC{FT}, WeibullVC{FT}, ComplexVC{FT}} = WeibullVC{FT}()
 
