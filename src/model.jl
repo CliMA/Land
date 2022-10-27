@@ -85,15 +85,6 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure or CO₂ condu
 - `air` `AirLayer` structure for environmental conditions like O₂ partial pressure
 - `mode` `GCO₂Mode` or `PCO₂Mode` that uses CO₂ conductance or partial pressure to compute photosynthetic rates
 
----
-# Examples
-```julia
-leaf = Leaf{Float64}("C3");
-air  = AirLayer{Float64}();
-mode = PCO₂Mode();
-leaf_photosynthesis!(leaf, air, mode);
-```
-
 """
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, lf.SM);
 
