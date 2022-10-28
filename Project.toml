@@ -1,7 +1,7 @@
 name = "SoilHydraulics"
 uuid = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "0.2.3"
+version = "0.2.4"
 
 [deps]
 ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
@@ -12,7 +12,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-ClimaCache = "1.1.0"
+ClimaCache = "1.1.8"
 ConstrainedRootSolvers = "0.1.4"
 EmeraldConstants = "0.1.0"
 UnPack = "1.0.2"
