@@ -1,0 +1,8 @@
+Manifest.toml
+
+data/*
+docs/build/*
+
+*.csv
+*.mem
+*.txt
