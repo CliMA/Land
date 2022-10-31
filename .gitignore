@@ -16,8 +16,8 @@ docs/src/tutorials/
 docs/src/generated/
 
 # Deps
-Manifest.toml
-!docs/src/Manifest.toml
+#Manifest.toml
+#!docs/Manifest.toml
 
 # Data
 *.csv
