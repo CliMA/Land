@@ -2,8 +2,6 @@ using Documenter
 using Land
 
 
-
-
 # define default docs pages
 pages = Any[
     "Home" => "index.md",
@@ -17,18 +15,6 @@ pages = Any[
               "Land"            => "submodules/Land.md"                 ,
     ],
 ]
-
-
-
-
-# add example pages
-#=
-generated_dir = joinpath(@__DIR__, "src", "generated")
-rm(generated_dir, force = true, recursive = true)
-mkpath(generated_dir)
-include("examples.jl")
-=#
-
 
 
 # format the docs
@@ -47,8 +33,6 @@ format = Documenter.HTML(
 )
 
 
-
-
 # build the docs
 makedocs(
     sitename = "Land",
@@ -57,8 +41,6 @@ makedocs(
     modules = [Land],
     pages = pages,
 )
-
-
 
 
 # deploy the docs to Github gh-pages
