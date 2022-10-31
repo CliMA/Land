@@ -351,6 +351,25 @@ end
 
 
 """
+    SIF_683(can_rad::CanopyRads{FT},
+            wls::WaveLengths{FT}
+    ) where {FT<:AbstractFloat}
+
+Return the SIF @ 682.5 nm, given
+- `can_rad` [`CanopyRads`](@ref) type struct
+- `wls` [`WaveLengths`](@ref) type struct
+"""
+function SIF_683(
+            can_rad::CanopyRads{FT},
+            wls::WaveLengths{FT}
+) where {FT<:AbstractFloat}
+    return SIF_WL(can_rad, wls, FT(682.5))
+end
+
+
+
+
+"""
     SIF_740(can_rad::CanopyRads{FT},
             wls::WaveLengths{FT}
     ) where {FT<:AbstractFloat}
@@ -371,18 +390,26 @@ end
 
 """
     SIF_757(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
+            wls::WaveLengths{FT};
+            oco::Int = 2
     ) where {FT<:AbstractFloat}
 
-Return the SIF @ 757 nm, given
+Return the SIF @ 758.68 (OCO2) or 758.77 (OCO3) nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
+- `oco` Integer to indentify OCO2 or OCO3
 """
 function SIF_757(
             can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
+            wls::WaveLengths{FT};
+            oco::Int = 2
 ) where {FT<:AbstractFloat}
-    return SIF_WL(can_rad, wls, FT(757))
+    @assert 2 <= oco <= 3;
+    if oco == 2
+        return SIF_WL(can_rad, wls, FT(758.68))
+    else
+        return SIF_WL(can_rad, wls, FT(758.77))
+    end
 end
 
 
@@ -390,16 +417,24 @@ end
 
 """
     SIF_771(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
+            wls::WaveLengths{FT};
+            oco::Int = 2
     ) where {FT<:AbstractFloat}
 
-Return the SIF @ 771 nm, given
+Return the SIF @ 769.94 (OCO2) or 770.005 (OCO3) nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
+- `oco` Integer to indentify OCO2 or OCO3
 """
 function SIF_771(
             can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
+            wls::WaveLengths{FT};
+            oco::Int = 2
 ) where {FT<:AbstractFloat}
-    return SIF_WL(can_rad, wls, FT(771))
+    @assert 2 <= oco <= 3;
+    if oco == 2
+        return SIF_WL(can_rad, wls, FT(769.94))
+    else
+        return SIF_WL(can_rad, wls, FT(770.005))
+    end
 end

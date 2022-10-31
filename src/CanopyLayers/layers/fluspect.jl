@@ -38,16 +38,18 @@ function fluspect!(
 
     @unpack N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx, ndub = leaf;
     @unpack iWLE, iWLF, optis, WLE, WLF = wls;
-    @unpack Kab, Kant, KBrown, Kcar, KcaV, KcaZ, Km, Kw, nr, phi = optis;
+    @unpack Kab, Kant, KBrown, KcaV, KcaZ, Km, Kw, nr, phi = optis;
 
     #println(N, " ", Cab, " ", Car," ",  Ant, " ", Cs, " ", Cw, " ", Cm)
-    Kcaro = (1 -Cx)* KcaV + Cx * KcaZ;
+    Kcaro = (1 - Cx) * KcaV .+ Cx * KcaZ;
 
-    Kall    = (Cab*Kab.+Car*Kcar.+Ant*Kant.+Cs*KBrown.+Cw*Kw.+Cm*Km)/N
+    # TODO figure out what Cs and Kbrown mean
+    Kall = (Cab*Kab .+ Car*Kcaro .+ Ant*Kant .+ Cs*KBrown .+ Cw*Kw .+ Cm*Km) ./ N
 
     # Relative absorption by Chlorophyll and Carotenoids only (drives SIF and GPP eventually)
     if APAR_car
-        leaf.kChlrel = (Cab*Kab+Car*Kcar)./(Kall*N.+eps(FT));
+        leaf.kChlrel = (Cab*Kab .+ Car*Kcaro) ./ (Kall*N .+ eps(FT));
+        # TODO in the future, maybe just use KcaV/KcaZ as queneching state? a correction for Car and Kcaro
     else
         leaf.kChlrel = (Cab*Kab)./(Kall*N.+eps(FT));
     end

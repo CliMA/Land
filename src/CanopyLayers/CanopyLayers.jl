@@ -2,15 +2,14 @@ module CanopyLayers
 
 using LazyArtifacts
 
-using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND,
-      find_peak
+using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: TYPEDFIELDS, TYPEDEF
+using EmeraldConstants: AVOGADRO, H_PLANCK, K_STEFAN, LIGHT_SPEED, T₂₅
 using LinearAlgebra: mul!, pinv
 using MAT: matread
-using PkgUtility: AVOGADRO, H_PLANCK, K_STEFAN, LIGHT_SPEED, T_25, numerical∫,
-      read_csv
-using Polynomials: Polynomial
+using PkgUtility: numerical∫, read_csv
 using QuadGK: quadgk
+using SpecialFunctions: expint
 using Statistics: mean
 using UnPack: @unpack
 
@@ -52,8 +51,8 @@ export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!,
        thermal_fluxes!
 
 # Vegetation indices
-export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_740,
-       SIF_757, SIF_771, SIF_WL, SWIR
+export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_683,
+       SIF_740, SIF_757, SIF_771, SIF_WL, SWIR
 
 
 
@@ -61,7 +60,6 @@ export BLUE, EVI, EVI2, LSWI, NDVI, NIR, NIRv, NIRvES, RED, REF_WL, SIF_740,
 include("utils/calctav.jl"    )
 include("utils/dladgen.jl"    )
 include("utils/e2phot.jl"     )
-include("utils/expint.jl"     )
 include("utils/psofunction.jl")
 include("utils/volscatt.jl"   )
 

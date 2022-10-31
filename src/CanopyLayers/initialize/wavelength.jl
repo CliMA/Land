@@ -4,23 +4,24 @@
 #
 ###############################################################################
 """
-    create_wave_length(
-                FT,
-                sWLs = [collect(400.0:10.0: 650.1);
-                        collect(655.0: 5.0: 770.1);
-                        collect(780.0:25.0:2400.1)])
+
+    create_wave_length(FT, sWLs = [collect(400.0:10.0: 650.1); collect(655.0: 5.0: 770.1); collect(780.0:25.0:2400.1)];
+                       max_NIR::Number = 2500, max_PAR::Number = 700, min_NIR::Number = 700, min_PAR::Number = 400, opti_file::String = OPTI_2021)
 
 Create [`WaveLengths`](@ref) type struct, given
 - `FT` Floating number type
-"""
-function create_wave_length(
-            FT,
-            sWLs = [collect(400.0:10.0: 650.1);
-                    collect(655.0: 5.0: 770.1);
-                    collect(780.0:25.0:2400.1)]
-)
-    sWL   = FT.(sWLs);
-    optis = create_leaf_opticals(sWL, OPTI_2021);
+- `sWLs` Shortwave wavelength bins
+- `max_NIR` Maximal NIR wavelength
+- `max_PAR` Maximal PAR wavelength
+- `min_NIR` Minimal NIR wavelength
+- `min_PAR` Minimal PAR wavelength
+- `opti_file` Input reference optical file path
 
-    return WaveLengths{FT}(sWL=sWL, optis=optis)
+"""
+function create_wave_length(FT, sWLs = [collect(400.0:10.0: 650.1); collect(655.0: 5.0: 770.1); collect(780.0:25.0:2400.1)];
+                            max_NIR::Number = 2500, max_PAR::Number = 700, min_NIR::Number = 700, min_PAR::Number = 400, opti_file::String = OPTI_2021)
+    sWL   = FT.(sWLs);
+    optis = create_leaf_opticals(sWL, opti_file);
+
+    return WaveLengths{FT}(minwlPAR = min_PAR, maxwlPAR = max_PAR, minwlNIR = min_NIR, maxwlNIR = max_NIR, sWL = sWL, optis = optis)
 end

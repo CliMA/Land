@@ -106,7 +106,7 @@ mutable struct SoilOpticals{FT}
         _wet_nir = mean( _raw_2[31:end,2] );
         _wet_par = mean( _raw_2[1:31,2]   );
 
-        return new(T_25(FT), 1, FT(0.2), FT(0.2), ones(FT,nWL)*FT(0.2),
+        return new(T₂₅(FT), 1, FT(0.2), FT(0.2), ones(FT,nWL)*FT(0.2),
                    ones(FT,nWLF)*FT(0.2), ones(FT,nWL)*FT(0.8), _raw_4, _raw_2,
                    _res_4, _res_2, ones(FT,4), ones(FT,2), ones(FT,211),
                    FT[0.1], _dry_nir, _dry_par, _wet_nir, _wet_par)
