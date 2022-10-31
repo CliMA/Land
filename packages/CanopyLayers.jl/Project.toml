@@ -1,0 +1,10 @@
+name = "CanopyLayers"
+uuid = "677f5362-5107-42e4-8e81-51d9c4a1f96c"
+authors = ["Yujie Wang <jesiner@gmail.com>"]
+version = "0.1.15"
+
+[deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.6"
