@@ -22,15 +22,12 @@ function optimize_hs!(
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize
     @inline f(x) = (tmp_node = deepcopy(node);
-                    tmp_node.hs.root.k_max = tmp_node.containerKS[1] * x[1];
-                    tmp_node.hs.stem.k_max = tmp_node.containerKS[2] * x[1];
-                    tmp_node.hs.leaf.k_sla = tmp_node.containerKS[3] * x[1];
-                    tmp_node.hs.root.k_element .= tmp_node.hs.root.k_max *
-                                                  tmp_node.hs.root.N;
-                    tmp_node.hs.stem.k_element .= tmp_node.hs.stem.k_max *
-                                                  tmp_node.hs.stem.N;
-                    tmp_node.hs.leaf.k_element .= tmp_node.hs.leaf.k_sla *
-                                                  tmp_node.hs.leaf.N;
+                    (tmp_node).hs.root.k_max = (tmp_node).containerKS[1] * x[1];
+                    (tmp_node).hs.stem.k_max = (tmp_node).containerKS[2] * x[1];
+                    (tmp_node).hs.leaf.k_sla = (tmp_node).containerKS[3] * x[1];
+                    (tmp_node).hs.root.k_element .= (tmp_node).hs.root.k_max * (tmp_node).hs.root.N;
+                    (tmp_node).hs.stem.k_element .= (tmp_node).hs.stem.k_max * (tmp_node).hs.stem.N;
+                    (tmp_node).hs.leaf.k_element .= (tmp_node).hs.leaf.k_sla * (tmp_node).hs.leaf.N;
                     leaf_allocation!(tmp_node, photo_set, x[2], x[3]);
                     tmp_prof = annual_profit(tmp_node, photo_set, weather);
                     return tmp_prof);
