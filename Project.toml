@@ -1,16 +1,31 @@
 name = "Land"
 uuid = "27e3c115-2cb8-4114-b7a5-cd9f011f9dcc"
-authors = ["Charles Kawczynski <kawczynski.charles@gmail.com>"]
-version = "0.1.0"
+authors = ["Yujie Wang <jesiner@gmail.com>", "Christian Frankenberg <fronge@gmail.com>", "Charles Kawczynski <kawczynski.charles@gmail.com>"]
+version = "0.2.0"
 
 [deps]
-DiffEqOperators = "9fdde737-9c7f-55bf-ade8-46b3f136cc48"
-OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+CanopyRadiativeTransfer = "7d47ec4b-9a51-4ee3-9fcc-f90243bd7361"
+ClimaCache = "781d2db2-48ae-11ec-81d3-0242ac130003"
+EmeraldConstants = "f1e47f7f-56cf-4a63-9b2b-695e95ad7a29"
+LeafOptics = "d155caf3-1b17-4a40-bb30-7fbeaeeea502"
+Photosynthesis = "537ec7c9-aaee-45d0-8af0-4b77892958a6"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+PlantHydraulics = "d6acb6ec-f7e4-548d-b108-f8a3d9a6ce13"
+SoilHydraulics = "a476b75e-cbd8-4dc1-9f75-18b781368c48"
+SoilPlantAirContinuum = "2d76e174-5bec-4df2-b5ea-844408736dc2"
+StomataModels = "5fa394f2-99ce-4e3a-9704-be7b3526889d"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 WaterPhysics = "20dd5ee6-61da-454b-ac5d-c09c2977e03a"
 
 [compat]
-DiffEqOperators = "4.34.0"
-OrdinaryDiffEq = "6.28.1"
-WaterPhysics = "0.1.3"
+CanopyRadiativeTransfer = "0.2.3"
+ClimaCache = "1.1.8"
+EmeraldConstants = "0.1.0"
+LeafOptics = "0.3.4"
+Photosynthesis = "0.4.6"
+PlantHydraulics = "0.4.3"
+SoilHydraulics = "0.2.4"
+SoilPlantAirContinuum = "0.3.2"
+StomataModels = "0.3.2"
+WaterPhysics = "0.1.5"
 julia = "1.7"

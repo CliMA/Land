@@ -1,14 +1,27 @@
 module Land
 
-using DiffEqOperators
-using OrdinaryDiffEq
+# import the modules
+import CanopyRadiativeTransfer
+import ClimaCache
+import EmeraldConstants
+import LeafOptics
+import Photosynthesis
+import PlantHydraulics
+import SoilHydraulics
+import SoilPlantAirContinuum
+import StomataModels
+import WaterPhysics
 
-using WaterPhysics: TraceGasAir, TraceGasCO₂, diffusive_coefficient
-
-
-# include types
-include("Land/Types.jl"    )
-include("Land/AirLayers.jl")
-
+# export the modules
+export CanopyRadiativeTransfer
+export ClimaCache
+export EmeraldConstants
+export LeafOptics
+export Photosynthesis
+export PlantHydraulics
+export SoilHydraulics
+export SoilPlantAirContinuum
+export StomataModels
+export WaterPhysics
 
 end # module

@@ -1,13 +1,21 @@
 using Land
+using Pkg
 using Test
 
 
 @testset verbose = true "CliMA Land" begin
-    @testset "Trial" begin
-        for FT in [Float32, Float32]
-            vls = Land.VerticalLayers{FT}();
-            Land.vertical_layers!(vls, FT(1));
-            @test true;
-        end
-    end
-end
+    for pkgname in [
+                "EmeraldConstants",
+                "WaterPhysics",
+                "ClimaCache",
+                "LeafOptics",
+                "CanopyRadiativeTransfer",
+                "Photosynthesis",
+                "SoilHydraulics",
+                "PlantHydraulics",
+                "StomataModels",
+                "SoilPlantAirContinuum"]
+        Pkg.test(pkgname);
+        @test true;
+    end;
+end;
