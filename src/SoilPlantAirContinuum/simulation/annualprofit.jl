@@ -57,7 +57,7 @@ function annual_profit(
             wind  = weather[i,6 ]
             rain  = weather[i,5 ]
 
-            node.envir.t_air = _tair + T_0(FT);
+            node.envir.t_air = _tair + T₀(FT);
             node.envir.p_sat = saturation_vapor_pressure( node.envir.t_air );
             node.envir.p_a   = p_co2;
             node.envir.vpd   = _dair * 1000;

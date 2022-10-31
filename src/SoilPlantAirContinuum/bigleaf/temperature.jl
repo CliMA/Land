@@ -15,7 +15,7 @@ function radiative_conductance(
     _A0::FT = 0.1579;
     _A1::FT = 0.0017;
     _A2::FT = 7.17E-6;
-    _T ::FT = T - T_0(FT);
+    _T ::FT = T - T₀(FT);
 
     return _A0 + _A1*T + _A2*T^2
 end

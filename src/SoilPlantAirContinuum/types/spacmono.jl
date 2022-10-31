@@ -23,15 +23,13 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     z_canopy::FT = FT(10)
 
     "Plant hydraulic system"
-    plant_hs::AbstractPlantOrganism{FT} = create_grass(z_root, z_canopy,
-                                                       soil_bounds, air_bounds)
+    plant_hs::Union{GrassLikeOrganism{FT}, PalmLikeOrganism{FT}, TreeLikeOrganism{FT}} = create_grass(z_root, z_canopy,soil_bounds, air_bounds)
     "Number of canopy layers"
     n_canopy::Int = length(plant_hs.canopy_index_in_air)
     "Number of root layers"
     n_root  ::Int = length(plant_hs.root_index_in_soil)
     "Plant photosynthesis systems"
-    plant_ps::Array{CanopyLayer{FT},1} = [CanopyLayer{FT}() for
-                                          i in 1:n_canopy]
+    plant_ps::Array{CanopyLayer{FT},1} = [CanopyLayer{FT}() for i in 1:n_canopy]
     "Basal area `[m²]`"
     ba::FT = sum( [plant_hs.roots[i].area for i in 1:n_root] )
     "Ground area `[m²]`"
@@ -49,8 +47,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Zero plane displacement `[m]`"
     wind_d ::FT = z_canopy * 2/3
     "Mean layer height `[m]`"
-    wind_zs::Array{FT,1} = [(air_bounds[i]+air_bounds[i+1])/2 for
-                            i in 1:length(air_bounds)-1]
+    wind_zs::Array{FT,1} = [(air_bounds[i]+air_bounds[i+1])/2 for i in 1:length(air_bounds)-1]
     "Wind speed per layer `[m s⁻¹]`"
     winds::Array{FT,1} = [FT(1) for i in 1:length(air_bounds)-1]
 
@@ -75,9 +72,9 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
 
     # photosynthesis mode and stomatal model scheme
     "Photosynthesis parameter set"
-    photo_set::AbstractPhotoModelParaSet{FT} = C3CLM(FT)
+    photo_set::Union{C3ParaSet{FT}, C4ParaSet{FT}} = C3CLM(FT)
     "Stomatal behavior scheme"
-    stomata_model::AbstractStomatalModel{FT} = ESMBallBerry{FT}()
+    stomata_model::Union{EmpiricalStomatalModel{FT}, OptimizationStomatalModel{FT}} = ESMBallBerry{FT}()
 
     # For CanopyLayers module
     "Solar angle container"
@@ -93,8 +90,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "CanopyOpticals container"
     can_opt::CanopyOpticals{FT} = create_canopy_opticals(FT, rt_dim)
     "Array of LeafBios container"
-    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for
-                                         i in 1:n_canopy]
+    leaves_rt::Array{LeafBios{FT},1} = [create_leaf_bios(FT, rt_dim) for i in 1:n_canopy]
     "SoilOpticals container"
     soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set)
     "Incoming radiation container"
@@ -102,8 +98,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "RT container"
     rt_con::RTCache{FT} = create_rt_cache(FT, rt_dim)
     "Container for sunlit leaf area fraction in each layer"
-    f_SL::Array{FT,1} = repeat(canopy_rt.lidf, outer=[ canopy_rt.nAzi ]) /
-                        canopy_rt.nAzi;
+    f_SL::Array{FT,1} = repeat(canopy_rt.lidf, outer=[ canopy_rt.nAzi ]) / canopy_rt.nAzi;
 
     # local storage for canopy GPP and NPP
     "Canopy GPP per ground area"
