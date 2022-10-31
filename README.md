@@ -46,26 +46,7 @@ The entire model will be written in [Julia](https://docs.julialang.org/en/v1/) (
 
 ### Run CliMA Land for a single site (v0.1)
 
-1. download and unpack the example files in a folder, e.g.
-```shell
-$ wget https://github.com/CliMA/Land/raw/wyujie/examples/clima_land_example_v0.1.zip
-$ unzip clima_land_example_v0.1.zip -d clima_land_example
-$ cd clima_land_example
-```
-
-2. initialize the project using Julia (version 1.8 recommended)
-```shell
-$ julia --project -e 'using Pkg; Pkg.instantiate();'
-```
-
-3. run the model for a site (weather driver file `debug.nc`)
-```shell
-$ julia --project example.jl
-```
-
-4. time to run each step will be logged, and you should get a file named `debug.out.nc` after a few minutes
-
-You will need to edit the functions we provided if you need to change more parameters, or output more results. Feel free to contact us through email or Github Issues (if this tutorial does not work).
+See https://github.com/CliMA/Land/tree/v0.1 for examples of CliMA Land v0.1.
 
 
 ## References
