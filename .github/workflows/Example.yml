@@ -15,8 +15,9 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1"
-      - name: Use Github Registry for Linux and Mac-OS
+      - name: Use Github Registry
         run: |
+          cd examples
           julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
           julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
       - name: Run Tests
