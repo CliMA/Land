@@ -40,9 +40,10 @@ function leaf_ETR!(
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
     @unpack APAR, maxPSII, Jmax, PSII_frac = leaf;
+    @unpack Θ_J = photo_set;
 
     _Jp = PSII_frac * maxPSII * APAR;
-    _J  = min(_Jp, Jmax);
+    _J  = lower_quadratic(Θ_J, -(_Jp + Jmax), _Jp * Jmax);
 
     leaf.J_pot = _Jp;
     leaf.J     = _J;

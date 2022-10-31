@@ -66,6 +66,8 @@ mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     Eff_1::FT
     "Coefficient 8.0/10.5 for NADPH/ATP requirement stochiometry, respectively"
     Eff_2::FT
+    "Smoothing factor for J"
+    Θ_J::FT
 end
 
 

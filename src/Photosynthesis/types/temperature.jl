@@ -30,7 +30,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 # Fields
 $(TYPEDFIELDS)
 """
-struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
+mutable struct ArrheniusTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Uncorrected value at 298.15 K"
     VAL_25::FT
     "Ratio between ΔHa and R `[K]`"
@@ -56,7 +56,7 @@ corr = \\exp \\left( \\dfrac{ΔHa}{R T_0} - \\dfrac{ΔHa}{R T_1} \\right)
 # Fields
 $(TYPEDFIELDS)
 """
-struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
+mutable struct ArrheniusPeakTD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Ratio between ΔHa and R*K_25"
     ΔHa_to_RT25::FT
     "Ratio between ΔHd and R"
@@ -81,7 +81,7 @@ VAL = VAL_{REF} \\left( \\dfrac{T_1 - T_{REF}}}{10} \\right)^{Q_{10}}
 # Fields
 $(TYPEDFIELDS)
 """
-struct Q10TD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
+mutable struct Q10TD{FT<:AbstractFloat} <: AbstractTDParameterSet{FT}
     "Uncorrected value at reference temperature"
     VAL_REF::FT
     "Reference temperature `[K]`"
