@@ -1,0 +1,25 @@
+name: Julia-1.6
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - trying
+  pull_request:
+
+jobs:
+  version-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Actions
+        uses: actions/checkout@v1
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.6"
+      - name: Use Github Registry
+        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+      - name: Install Dependencies
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        uses: julia-actions/julia-runtest@latest
