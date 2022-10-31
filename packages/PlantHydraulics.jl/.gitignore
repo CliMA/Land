@@ -1,0 +1,5 @@
+Manifest.toml
+
+docs/build/*
+
+*.mem
