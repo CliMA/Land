@@ -246,7 +246,7 @@ function xylem_flow(
             pressure::FT,
             ini::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    _fh = (root.p_ups + root.p_osm * root.T_sap / T_25(FT) - pressure) *
+    _fh = (root.p_ups + root.p_osm * root.T_sap / T₂₅(FT) - pressure) *
           root.k_max / root.f_vis;
     _fl = -_fh;
     _fx = min(_fh, ini);

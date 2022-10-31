@@ -71,9 +71,9 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = T_25(FT)
+    T_old::FT = T₂₅(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = T_25(FT)
+    T_sap::FT = T₂₅(FT)
 
     # capacitance
     "Pressure volume curve for storage"
@@ -121,7 +121,7 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Rhizosphere  conductance `[mol s⁻¹ MPa⁻¹]`"
     k_rhiz   ::FT     = FT(5e14)
     "Soil hydraulics"
-    sh::AbstractSoilVC{FT} = BrooksCorey{FT}()
+    sh::Union{BrooksCorey{FT}, VanGenuchten{FT}} = BrooksCorey{FT}()
 
     # flows and pressures (need to be updated with time)
     "Flow rate in the xylem `[mol s⁻¹]`"
@@ -153,9 +153,9 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = T_25(FT)
+    T_old::FT = T₂₅(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = T_25(FT)
+    T_sap::FT = T₂₅(FT)
 
     # capacitance
     "Pressure volume curve for storage"
@@ -231,9 +231,9 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Relative viscosity"
     f_vis::FT = FT(1)
     "Temperature memory `[K]`"
-    T_old::FT = T_25(FT)
+    T_old::FT = T₂₅(FT)
     "Upstream sap temperature `[K]`"
-    T_sap::FT = T_25(FT)
+    T_sap::FT = T₂₅(FT)
 
     # capacitance
     "Pressure volume curve for storage"

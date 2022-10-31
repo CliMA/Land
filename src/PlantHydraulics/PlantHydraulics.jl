@@ -4,8 +4,9 @@ using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
       ResidualTolerance, SolutionTolerance, SolutionToleranceND, find_peak,
       find_zero
 using DocStringExtensions: TYPEDEF, TYPEDFIELDS
+using EmeraldConstants: GAS_R, T₂₅, ρg_MPa
 using HypergeometricFunctions: _₂F₁
-using PkgUtility: GAS_R, T_25, twarn, ρg_MPa
+using PkgUtility: twarn
 using SpecialFunctions: gamma
 using Statistics: mean
 using UnPack: @unpack

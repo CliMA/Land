@@ -94,7 +94,7 @@ function root_pk(
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end
-    p_end = p_25 * f_st + p_osm * T_sap / T_25(FT);
+    p_end = p_25 * f_st + p_osm * T_sap / T₂₅(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
@@ -140,7 +140,7 @@ function root_pk(
         p_25  -= _dp / _f;
         r_all += _dr / _f;
     end
-    p_end = p_25 * f_st + p_osm * T_sap / T_25(FT);
+    p_end = p_25 * f_st + p_osm * T_sap / T₂₅(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph, _fl) in zip(k_element, k_history, p_gravity,
@@ -186,7 +186,7 @@ function xylem_risk(
     @unpack f_st, f_vis, vc = hs;
 
     p_25 = end_pressure(hs, flow) / hs.f_st;
-    T_25 = xylem_k_ratio(vc, p_25, f_vis);
+    θ_25 = xylem_k_ratio(vc, p_25, f_vis);
 
-    return T_25
+    return θ_25
 end

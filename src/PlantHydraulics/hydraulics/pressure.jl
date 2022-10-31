@@ -86,7 +86,7 @@ function end_pressure(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st + p_osm * T_sap / T_25(FT);
+    p_end = p_25 * f_st + p_osm * T_sap / T₂₅(FT);
 
     # compute k from temperature and history, then update pressure
     for (_k, _kh, _pg, _ph) in zip(k_element, k_history, p_gravity, p_history)
@@ -309,7 +309,7 @@ function pressure_profile!(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st + p_osm * T_sap / T_25(FT);
+    p_end = p_25 * f_st + p_osm * T_sap / T₂₅(FT);
     root.p_rhiz = p_end;
 
     # compute k from temperature and history, then update pressure
@@ -364,7 +364,7 @@ function pressure_profile!(
         _f    = soil_k_ratio_rwc(sh, _rwc);
         p_25 -= _dp / _f;
     end
-    p_end = p_25 * f_st + p_osm * T_sap / T_25(FT);
+    p_end = p_25 * f_st + p_osm * T_sap / T₂₅(FT);
     root.p_rhiz = p_end;
 
     # compute k from temperature and history, then update pressure
