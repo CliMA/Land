@@ -68,7 +68,7 @@ function solution_diff!(
 
     # calculate g_sw from stomatal model
     g_sc = 1 / (1/x - 1/g_bc - 1/g_m);
-    g_sw = g_sc * 1.6;
+    g_sw = g_sc * FT(1.6);
     g_lw = 1 / (1/g_sw + FT(1.35)/g_bc);
     e    = g_lw * (canopyi.p_sat - envir.p_H₂O) / envir.p_atm;
     p    = end_pressure(hs, e);
@@ -109,7 +109,7 @@ function solution_diff!(
 
     # make beta correction over the photosynthesis system
     g_sc = 1 / (1/x - 1/g_bc - 1/g_m);
-    g_sw = g_sc * 1.6;
+    g_sw = g_sc * FT(1.6);
     g_lw = 1 / (1/g_sw + FT(1.35)/g_bc);
     e    = g_lw * (canopyi.p_sat - envir.p_H₂O) / envir.p_atm;
     p    = end_pressure(hs, e);

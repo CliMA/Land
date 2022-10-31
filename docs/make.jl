@@ -22,11 +22,12 @@ pages = Any[
 
 
 # add example pages
+#=
 generated_dir = joinpath(@__DIR__, "src", "generated")
 rm(generated_dir, force = true, recursive = true)
 mkpath(generated_dir)
 include("examples.jl")
-
+=#
 
 
 

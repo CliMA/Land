@@ -107,7 +107,6 @@ dcum
 dladgen
 e2phot
 e2phot!
-expint
 psofunction
 volscatt!
 ```

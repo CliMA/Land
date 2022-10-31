@@ -16,8 +16,8 @@ println("\nTesting the structures...")
 
         # Test the struct
         for data_set in [ leaf, root, stem, grass, palm, tree, treet, _vc1, _vc2, _sh1, _sh2]
-            @test FT_test(data_set, FT)
-            @test NaN_test(data_set)
+            @test PkgUtility.FT_test(data_set, FT)
+            @test PkgUtility.NaN_test(data_set)
         end
 
         # Test Soil types
@@ -61,8 +61,8 @@ println("\nTesting the soil VC functions...")
                         soil_p_25_rwc(_sh2, _rwc),
                         soil_p_25_swc(_sh1, _rwc*_sh1.Θs),
                         soil_p_25_swc(_sh2, _rwc*_sh2.Θs) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
 
         # test if the soil_p_25 and soil_rwc converge
@@ -104,8 +104,8 @@ println("\nTesting the xylem VC functions...")
         f_st = FT(1)
         for result in [ xylem_p_crit(_vc1, f_st),
                         xylem_p_crit(_vc2, f_st) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
 
         # test the xylem_k_ratio
@@ -113,8 +113,8 @@ println("\nTesting the xylem VC functions...")
                         xylem_k_ratio(_vc2, _p, _v),
                         xylem_k_ratio(_vc1, FT(1), _v),
                         xylem_k_ratio(_vc2, FT(1), _v) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -133,8 +133,8 @@ println("\nTesting the leaf functions...")
         _ec = critical_flow(leaf);
 
         for result in [_lr, _ec]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -157,27 +157,27 @@ println("\nTesting the legacy functions...")
         tree  = create_tree(FT(-2.1), FT(5.5), FT(6), FT[0,-1,-2,-3], collect(FT,0:1:20));
         treet = TreeSimple{FT}();
         pressure_profile!(treet, _ps, _ft);
-        @test FT_test(treet, FT);
-        @test NaN_test(treet);
+        @test PkgUtility.FT_test(treet, FT);
+        @test PkgUtility.NaN_test(treet);
 
         treet = TreeSimple{FT}();
         pressure_profile!(treet, _ps, _fsl, _fsh, _rsl);
-        @test FT_test(treet, FT);
-        @test NaN_test(treet);
+        @test PkgUtility.FT_test(treet, FT);
+        @test PkgUtility.NaN_test(treet);
 
         for _plant in [grass, palm, tree]
             flow_profile!(_plant);
             pressure_profile!(_plant, SteadyStateMode(); update=true);
-            @test FT_test(_plant, FT);
-            @test NaN_test(_plant);
+            @test PkgUtility.FT_test(_plant, FT);
+            @test PkgUtility.NaN_test(_plant);
         end
 
         inititialize_legacy!(grass);
         inititialize_legacy!(palm);
         inititialize_legacy!(tree);
         inititialize_legacy!(treet);
-        @test FT_test(treet, FT);
-        @test NaN_test(treet);
+        @test PkgUtility.FT_test(treet, FT);
+        @test PkgUtility.NaN_test(treet);
     end
 end
 
@@ -204,8 +204,8 @@ println("\nTesting the temperature functions...")
         temperature_effects!(root, T);
 
         for dataset in [leaf, root, treet, grass, palm, tree]
-            @test FT_test(dataset, FT);
-            @test NaN_test(dataset);
+            @test PkgUtility.FT_test(dataset, FT);
+            @test PkgUtility.NaN_test(dataset);
         end
     end
 end
@@ -226,8 +226,8 @@ println("\nTesting the root-related functions...")
         for result in [ xylem_flow(root, _p1),
                         xylem_flow(root, _p2),
                         xylem_flow(root, _p3) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
 
         # test the root qs from q functions
@@ -239,8 +239,8 @@ println("\nTesting the root-related functions...")
         _qs = zeros(FT, 5);
         for _f in [_f0, _f1, _f2]
             roots_flow!(grass.roots, _ks, _ps, _qs, _f);
-            @test FT_test(grass, FT);
-            @test NaN_test(grass);
+            @test PkgUtility.FT_test(grass, FT);
+            @test PkgUtility.NaN_test(grass);
         end
 
         # test the recalculate_roots_flow function
@@ -249,7 +249,7 @@ println("\nTesting the root-related functions...")
         _qs = zeros(FT, 5);
         roots_flow!(grass.roots, _ks, _ps, _qs, FT(0.5));
         roots_flow!(grass, FT(0.5));
-        @test NaN_test(grass);
+        @test PkgUtility.NaN_test(grass);
     end
 end
 
@@ -276,16 +276,16 @@ println("\nTesting the pressure functions...")
                         end_pressure(root, _f_2),
                         end_pressure(stem, _f_1),
                         end_pressure(stem, _f_2) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
 
         # test the end_pressure function for plants
         for result in [ end_pressure(treet, _f_1),
                         end_pressure(treet, _f_2),
                         end_pressure(treet, _f_1, _f_1, FT(0.5)) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -303,8 +303,8 @@ println("\nTesting the plant-level functions...")
 
         # test the critical_flow function
         for result in [ critical_flow(treet) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
 
         # test the plant conductances

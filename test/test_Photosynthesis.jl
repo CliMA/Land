@@ -22,8 +22,8 @@
                           C3Bernacchi(FT),
                           Photosynthesis.Q10TDAngiosperm(FT),
                           Photosynthesis.Q10TDGymnosperm(FT) ]
-            @test FT_test(data_set, FT);
-            @test NaN_test(data_set);
+            @test PkgUtility.FT_test(data_set, FT);
+            @test PkgUtility.NaN_test(data_set);
         end
     end
 end
@@ -54,46 +54,46 @@ println();
         # rubisco limited rates
         Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3);
         Photosynthesis.rubisco_limited_rate!(c4_set, leaf_4);
-        @test NaN_test(leaf_3);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_4);
         Photosynthesis.rubisco_limited_rate!(c3_set, leaf_3, envir);
-        @test NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_3);
 
         # light limited rates
         Photosynthesis.leaf_ETR!(c3_set, leaf_3);
         Photosynthesis.leaf_ETR!(c4_set, leaf_4);
         Photosynthesis.light_limited_rate!(c3_set, leaf_3);
         Photosynthesis.light_limited_rate!(c4_set, leaf_4);
-        @test NaN_test(leaf_3);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_4);
         Photosynthesis.light_limited_rate!(c3_set, leaf_3, envir);
-        @test NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_3);
 
         # product limited rates
         Photosynthesis.product_limited_rate!(c3_set, leaf_3);
         Photosynthesis.product_limited_rate!(c4_set, leaf_4);
-        @test NaN_test(leaf_3);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_4);
         Photosynthesis.product_limited_rate!(c4_set, leaf_4, envir);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_4);
 
         # fluorescence
         leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), FT(2));
         leaf_fluorescence!(fluo_set, leaf_3);
         leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode());
         leaf_fluorescence!(fluo_set, leaf_3);
-        @test NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_3);
 
         # leaf photo from glc
         leaf_photosynthesis!(c3_set, leaf_3, envir, GCO₂Mode(), glc);
         leaf_photosynthesis!(c4_set, leaf_4, envir, GCO₂Mode(), glc);
-        @test NaN_test(leaf_3);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_4);
 
         # leaf photo from p_i
         leaf_photosynthesis!(c3_set, leaf_3, envir, PCO₂Mode(), p_i);
         leaf_photosynthesis!(c4_set, leaf_4, envir, PCO₂Mode(), p_i);
-        @test NaN_test(leaf_3);
-        @test NaN_test(leaf_4);
+        @test PkgUtility.NaN_test(leaf_3);
+        @test PkgUtility.NaN_test(leaf_4);
     end
 end

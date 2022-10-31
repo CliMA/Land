@@ -5,8 +5,8 @@
         for result in [ big_leaf_partition(FT(3.0), FT(30.0), FT(1000.0)),
                         big_leaf_partition(FT(2.0), FT(30.0), FT(1000.0)),
                         big_leaf_partition(FT(1.0), FT(30.0), FT(1000.0)) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -22,8 +22,8 @@ println();
         collections = initialize_rt_module(FT; nLayer=20, LAI=3);
         angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls = collections;
         for data_set in collections
-            @test FT_test(data_set, FT);
-            @test NaN_test(data_set);
+            @test PkgUtility.FT_test(data_set, FT);
+            @test PkgUtility.NaN_test(data_set);
         end
 
         # add more tests
@@ -99,8 +99,8 @@ println();
                     SIF_740(can_rad, wls),
                     SIF_757(can_rad, wls),
                     SIF_771(can_rad, wls)];
-        @test NaN_test(_indices);
-        @test FT_test(_indices, FT);
+        @test PkgUtility.NaN_test(_indices);
+        @test PkgUtility.FT_test(_indices, FT);
 
         # out bounds warnings
         @info "Expect warnings here!";

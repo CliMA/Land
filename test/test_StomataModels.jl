@@ -15,8 +15,8 @@
 
         # test the structures
         for result in [ can_3, esm_1, esm_2, esm_3, esm_4, osm_4, osm_5 ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -50,30 +50,30 @@ println();
         # test the refresh functions
         update_leaf_TP!(mod_3, can_3, hs, envir);
         update_leaf_TP!(mod_4, can_4, hs, envir);
-        @test NaN_test(can_3);
-        @test NaN_test(can_4);
+        @test PkgUtility.NaN_test(can_3);
+        @test PkgUtility.NaN_test(can_4);
 
         update_leaf_AK!(mod_3, can_3, hs, envir);
         update_leaf_AK!(mod_4, can_4, hs, envir);
-        @test NaN_test(can_3);
-        @test NaN_test(can_4);
+        @test PkgUtility.NaN_test(can_3);
+        @test PkgUtility.NaN_test(can_4);
 
         gas_exchange!(mod_3, can_3, envir, GlcDrive(), 1, FT(0.1));
         gas_exchange!(mod_4, can_4, envir, GlcDrive(), 1, FT(0.1));
-        @test NaN_test(can_3);
-        @test NaN_test(can_4);
+        @test PkgUtility.NaN_test(can_3);
+        @test PkgUtility.NaN_test(can_4);
 
         gas_exchange!(mod_3, can_3, envir, GswDrive(), 1, FT(0.05));
         gas_exchange!(mod_4, can_4, envir, GswDrive(), 1, FT(0.05));
-        @test NaN_test(can_3);
-        @test NaN_test(can_4);
+        @test PkgUtility.NaN_test(can_3);
+        @test PkgUtility.NaN_test(can_4);
 
         can_3.g_sw[2] = 0;
         can_4.g_sw[2] = 0;
         gsw_control!(mod_3, can_3, envir, 2);
         gsw_control!(mod_4, can_4, envir, 2);
-        @test NaN_test(can_3);
-        @test NaN_test(can_4);
+        @test PkgUtility.NaN_test(can_3);
+        @test PkgUtility.NaN_test(can_4);
     end
 end
 
@@ -116,8 +116,8 @@ println();
                         stomatal_conductance(esm_2, can_3, envir, FT(1), 1),
                         stomatal_conductance(esm_3, can_3, envir, FT(1), 1),
                         stomatal_conductance(esm_4, can_3, envir, FT(1), 1) ]
-            @test FT_test(result, FT);
-            @test NaN_test(result);
+            @test PkgUtility.FT_test(result, FT);
+            @test PkgUtility.NaN_test(result);
         end
     end
 end
@@ -159,14 +159,14 @@ println();
                                 solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), GlcDrive(), 1),
                                 solution_diff!(FT(0.1), mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), GlcDrive(), 1),
                                 ]
-                    @test FT_test(result, FT);
-                    @test NaN_test(result);
+                    @test PkgUtility.FT_test(result, FT);
+                    @test PkgUtility.NaN_test(result);
                 end
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
                 result = solution_diff!(FT(0.1), mod, can, hs, envir, sm, GlcDrive(), 1);
-                @test FT_test(result, FT);
-                @test NaN_test(result);
+                @test PkgUtility.FT_test(result, FT);
+                @test PkgUtility.NaN_test(result);
             end
         end
 
@@ -174,60 +174,60 @@ println();
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKsoil{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKsoil{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}(), 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
                 gas_exchange!(mod, can, hs, envir, sm, 1);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
             end
             gas_exchange!(mod, can, TreeSimple{FT}(), envir, osm_3);
-            @test NaN_test(can);
+            @test PkgUtility.NaN_test(can);
         end
 
         for (mod,can) in zip([mod_3, mod_4], [can_3, can_4])
             for sm in [esm_1, esm_2, esm_3, esm_4]
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKleaf{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearKsoil{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPleaf{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearPsoil{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaGLinearSWC{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKleaf{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearKsoil{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPleaf{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearPsoil{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
                 gas_exchange!(mod, can, hs, svc, FT(-1), FT(0.4), envir, sm, BetaVLinearSWC{FT}());
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
             end
             for sm in [osm_1, osm_2, osm_3, osm_4, osm_5]
                 gas_exchange!(mod, can, hs, envir, sm);
-                @test NaN_test(can);
+                @test PkgUtility.NaN_test(can);
             end
         end
 

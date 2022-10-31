@@ -1,5 +1,3 @@
-using CSV
-using DataFrames
 using Land
 using Land.CanopyLayers
 using Land.Photosynthesis
@@ -9,10 +7,10 @@ using Land.StomataModels
 using Pkg.Artifacts
 using PkgUtility
 using Test
+using TextIO: read_csv
+
 
 ENV["JULIA_LOG_LEVEL"] = "WARN"
-
-
 
 
 include("test_CanopyLayers.jl"   )
