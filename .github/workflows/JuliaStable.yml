@@ -37,6 +37,3 @@ jobs:
           julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
-      - name: Process Coverage
-        if: runner.os == 'Linux'
-        uses: julia-actions/julia-processcoverage@v1
