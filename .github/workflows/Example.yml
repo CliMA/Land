@@ -1,0 +1,25 @@
+name: Example
+on:
+  pull_request:
+    branches:
+      - v0.1
+
+jobs:
+  test:
+    name: Example
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Actions
+        uses: actions/checkout@v1
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: "1"
+      - name: Use Github Registry for Linux and Mac-OS
+        run: |
+          julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+      - name: Run Tests
+        run: |
+          cd examples
+          julia --project example.jl
