@@ -57,7 +57,7 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMBallBerry{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
-    g0::FT = FT(0.025)
+    g0::FT = FT(0.005)
     "slope of conductance-photosynthesis correlation `[unitless]`"
     g1::FT = FT(9.0  )
 end
@@ -82,7 +82,7 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMGentine{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
-    g0::FT = FT(0.025)
+    g0::FT = FT(0.005)
     "slope of conductance-photosynthesis correlation `[unitless]`"
     g1::FT = FT(9.0  )
 end
@@ -104,7 +104,7 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMLeuning{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
-    g0::FT = FT(0.025 )
+    g0::FT = FT(0.005 )
     "slope of conductance-photosynthesis correlation `[unitless]`"
     g1::FT = FT(8.0   )
     "fitting parameter of d/d0 below the fraction, same unit as vpd `[Pa]`"
@@ -128,7 +128,7 @@ $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct ESMMedlyn{FT} <: EmpiricalStomatalModel{FT}
     "minimal stomatal conductance g0 `[mol m⁻² s⁻¹]`"
-    g0::FT = FT(0.025)
+    g0::FT = FT(0.005)
     "slope of conductance-photosynthesis correlation `[Pa⁽⁵⁾]`"
     g1::FT = FT(125.0)
 end

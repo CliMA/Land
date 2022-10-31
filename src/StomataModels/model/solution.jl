@@ -29,8 +29,7 @@
     ) where {FT<:AbstractFloat}
 
 Calculate the difference to be minimized for a given
-- `x` Assumed leaf diffusive conductance or stomatal conductance, depending on
-    `mode`
+- `x` Assumed leaf diffusive conductance or stomatal conductance, depending on `mode`
 - `photo_set`[`C3ParaSet`] or [`C4ParaSet`] type parameter set
 - `canopyi`[`CanopyLayer`](@ref) type struct
 - `hs` Leaf hydraulic system
@@ -68,7 +67,12 @@ function solution_diff!(
     leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # calculate g_sw from stomatal model
-    β    = β_factor(hs, svc, bt, hs.p_element[end], psoil, swc);
+    g_sc = 1 / (1/x - 1/g_bc - 1/g_m);
+    g_sw = g_sc * 1.6;
+    g_lw = 1 / (1/g_sw + FT(1.35)/g_bc);
+    e    = g_lw * (canopyi.p_sat - envir.p_H₂O) / envir.p_atm;
+    p    = end_pressure(hs, e);
+    β    = β_factor(hs, svc, bt, p, psoil, swc);
     g_md = stomatal_conductance(sm, ps, envir, β);
     g_md = min(canopyi.g_max, g_md);
 
@@ -104,7 +108,12 @@ function solution_diff!(
     leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
 
     # make beta correction over the photosynthesis system
-    β    = β_factor(hs, svc, bt, hs.p_element[end], psoil, swc);
+    g_sc = 1 / (1/x - 1/g_bc - 1/g_m);
+    g_sw = g_sc * 1.6;
+    g_lw = 1 / (1/g_sw + FT(1.35)/g_bc);
+    e    = g_lw * (canopyi.p_sat - envir.p_H₂O) / envir.p_atm;
+    p    = end_pressure(hs, e);
+    β    = β_factor(hs, svc, bt, p, psoil, swc);
     _rat = ps.Vcmax25WW * β / ps.Vcmax25;
     if _rat != 1
         ps.Jmax25  *= _rat;

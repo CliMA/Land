@@ -25,8 +25,7 @@ function dRdE(
     @unpack ps, T = clayer;
     @unpack Rd = ps;
 
-    return dTdE(clayer, envir) * Rd * photo_set.ReT.ΔHa_to_RT25 * T_25(FT) /
-           T^2
+    return dTdE(clayer, envir) * Rd * photo_set.ReT.ΔHa_to_RT25 * T₂₅(FT) / T^2
 end
 
 

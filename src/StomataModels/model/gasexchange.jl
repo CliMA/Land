@@ -137,8 +137,7 @@ function gas_exchange!(
     for ind in eachindex(canopyi.APAR)
         canopyi.ps.APAR = canopyi.APAR[ind];
         leaf_ETR!(photo_set, canopyi.ps);
-        gas_exchange!(photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt,
-                      ind);
+        gas_exchange!(photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt, ind);
     end
 end
 
@@ -170,8 +169,7 @@ function gas_exchange!(
         _gl = 1 / (1/_g_bc + FT(1.6)/g_min + 1/_g_m);
         _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
         _st = SolutionTolerance{FT}(1e-4, 50);
-        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, svc, psoil,
-                                      swc, envir, sm, bt, GlcDrive(), ind);
+        @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, svc, psoil, swc, envir, sm, bt, GlcDrive(), ind);
         _solut = find_zero(f, _sm, _st);
 
         # update leaf conductances and rates
@@ -241,15 +239,14 @@ function gas_exchange!(
 
         # if _g_sw is higher than g_min
         elseif canopyi.a_max[ind] < 0.05
-                canopyi.g_sw[ind] = FT(0);
+            canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
             _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline fd(x) = solution_diff!(x, photo_set, canopyi, hs, envir,
-                                           sm, GlcDrive(), ind);
+            @inline fd(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm, GlcDrive(), ind);
             _sl = find_zero(fd, _sm, _st);
 
             #= used for debugging
@@ -315,15 +312,14 @@ function gas_exchange!(
 
         # if _g_sw is higher than g_min
         elseif canopyi.a_max[ind] < 0.05
-                canopyi.g_sw[ind] = FT(0);
+            canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
             _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          GlcDrive(), ind);
+            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm, GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -381,15 +377,14 @@ function gas_exchange!(
 
         # if _g_sw is higher than g_min
         elseif canopyi.a_max[ind] < 0.05
-                canopyi.g_sw[ind] = FT(0);
+            canopyi.g_sw[ind] = FT(0);
         else
             # solve for optimal g_lc, A and g_sw updated here
             _gh = 1 / (1/_g_bc + FT(1.6)/_g_max + 1/_g_m);
             _gl = 1 / (1/_g_bc + FT(1.6)/g_min  + 1/_g_m);
             _sm = NewtonBisectionMethod{FT}(x_min=_gl, x_max=_gh);
             _st = SolutionTolerance{FT}(1e-4, 50);
-            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm,
-                                          GlcDrive(), ind);
+            @inline f(x) = solution_diff!(x, photo_set, canopyi, hs, envir, sm, GlcDrive(), ind);
             _solut = find_zero(f, _sm, _st);
 
             #= used for debugging
@@ -468,17 +463,13 @@ function gas_exchange!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # update the conductances
-    canopyi.g_sc[ind] = 1 / ( 1 / canopyi.g_lc[ind] -
-                              1 / canopyi.g_m[ind] -
-                              1 / canopyi.g_bc[ind] );
+    canopyi.g_sc[ind] = 1 / ( 1 / canopyi.g_lc[ind] - 1 / canopyi.g_m[ind] - 1 / canopyi.g_bc[ind] );
     canopyi.g_sw[ind] = canopyi.g_sc[ind] * FT(1.6);
-    canopyi.g_lw[ind] = 1 / ( 1 / canopyi.g_sw[ind] +
-                              1 / canopyi.g_bw[ind] );
+    canopyi.g_lw[ind] = 1 / ( 1 / canopyi.g_sw[ind] + 1 / canopyi.g_bw[ind] );
 
     # update the photosynthetic rates
     if canopyi.g_lc[ind] != canopyi.ps.g_lc
-        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
-                             canopyi.g_lc[ind]);
+        leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(), canopyi.g_lc[ind]);
         #
         #
         #
@@ -564,16 +555,12 @@ function gas_exchange!(
         canopyi.g_sw[ind] = g_min;
     end
 
-    canopyi.g_lw[ind] = 1 / ( 1 / canopyi.g_sw[ind] +
-                              1 / canopyi.g_bw[ind] );
+    canopyi.g_lw[ind] = 1 / ( 1 / canopyi.g_sw[ind] + 1 / canopyi.g_bw[ind] );
     canopyi.g_sc[ind] = canopyi.g_sw[ind] / FT(1.6);
-    canopyi.g_lc[ind] = 1 / ( FT(1.6) / canopyi.g_sw[ind] +
-                              1 / canopyi.g_m[ind] +
-                              1 / canopyi.g_bc[ind] );
+    canopyi.g_lc[ind] = 1 / ( FT(1.6) / canopyi.g_sw[ind] + 1 / canopyi.g_m[ind] + 1 / canopyi.g_bc[ind] );
 
     # update the photosynthetic rates
-    leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(),
-                         canopyi.g_lc[ind]);
+    leaf_photosynthesis!(photo_set, canopyi.ps, envir, GCO₂Mode(), canopyi.g_lc[ind]);
     #
     #
     #

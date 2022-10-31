@@ -41,9 +41,9 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Tempearture related, same for all leaves
     "Latent Heat of evaporation `[J mol⁻¹]`"
-    LV   ::FT = latent_heat_vapor(T_25(FT)) * M_H₂O(FT)
+    LV   ::FT = latent_heat_vapor(T₂₅(FT)) * M_H₂O(FT)
     "Temperature `[K]`"
-    T    ::FT = T_25(FT)
+    T    ::FT = T₂₅(FT)
     "Old temperature `[K]`"
     T_old::FT = FT(0)
     "Leaf width `[m]`"
@@ -77,9 +77,9 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     "Maximal leaf diffusive conductance at 298.15 K `[mol m⁻² s⁻¹]`"
     g_max25::FT = FT(0.8)
     "Minimal leaf diffusive conductance `[mol m⁻² s⁻¹]`"
-    g_min  ::FT = FT(0.025)
+    g_min  ::FT = FT(0.001)
     "Minimal leaf diffusive conductance at 298.15 K `[mol m⁻² s⁻¹]`"
-    g_min25::FT = FT(0.025)
+    g_min25::FT = FT(0.001)
 
     # CO₂ and H₂O pressures, different for each leaf
     "Leaf internal CO₂ partial pressure `[Pa]`"
