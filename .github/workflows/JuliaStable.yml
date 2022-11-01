@@ -29,12 +29,12 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.update();'
       - name: Use Github Registry for Windows
         if: runner.os == 'Windows'
         run: |
           julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
-          julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
+          julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.update();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
       - name: Process Coverage

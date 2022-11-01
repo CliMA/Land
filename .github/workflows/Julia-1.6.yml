@@ -20,6 +20,6 @@ jobs:
       - name: Use Github Registry
         run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Install Dependencies
-        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.update();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
