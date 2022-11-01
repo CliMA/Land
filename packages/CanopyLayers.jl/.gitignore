@@ -1,9 +1,0 @@
-Manifest.toml
-!docs/Manifest.toml
-
-.vscode/*
-docs/build/*
-docs/src/generated/*
-
-*.csv
-*.mem
