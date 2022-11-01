@@ -22,7 +22,7 @@ docs/src/tutorials/*
 docs/src/generated/*
 
 # Manifest.toml
-Manifest.toml
+packages/*/Manifest.toml
 
 # Exceptions
 !docs/src/assets/*
