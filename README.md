@@ -25,6 +25,7 @@ The entire model will be written in [Julia](https://docs.julialang.org/en/v1/) (
 | **Unit Test**      | [![unit test][st-img]][st-url]              |
 | **Code Coverage**  | [![codecov][codecov-img]][codecov-url]      |
 | **Bors**           | [![Bors enabled][bors-img]][bors-url]       |
+|||
 
 [docs-bld-img]: https://github.com/CliMA/Land/workflows/Documentation/badge.svg
 [docs-bld-url]: https://github.com/CliMA/Land/actions?query=workflow%3ADocumentation
