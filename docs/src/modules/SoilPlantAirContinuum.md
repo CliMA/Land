@@ -17,3 +17,11 @@ time_stepper!
 update!
 update!(air::AirLayer{FT}; p_CO₂::Union{Number,Nothing} = nothing, p_H₂O::Union{Number,Nothing} = nothing, rh::Union{Number,Nothing} = nothing, t::Union{Number,Nothing} = nothing, vpd::Union{Number,Nothing} = nothing, wind::Union{Number,Nothing} = nothing) where {FT<:AbstractFloat}
 ```
+
+## Measures
+```@docs
+CNPP
+GPP
+PPAR
+T_VEG
+```

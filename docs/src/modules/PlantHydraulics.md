@@ -52,7 +52,7 @@ Similarly, one can use `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, and `MonoElementSPAC
 
 ## Vulnerability curve
 ```@docs
-relative_hydraulic_conductance
+relative_hydraulic_conductance(vc::ComplexVC{FT}, p_25::FT) where {FT<:AbstractFloat}
 critical_pressure
 ```
 
@@ -74,7 +74,6 @@ flow_out
 root_pk
 xylem_flow_profile!
 xylem_flow_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat}
-xylem_flow_profile!(roots::Vector{Root{FT}}, cache_f::Vector{FT}, cache_k::Vector{FT}, cache_p::Vector{FT}, f_sum::FT, Δt::FT) where {FT<:AbstractFloat}
 xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 ```
 
@@ -82,7 +81,6 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 ```@docs
 xylem_end_pressure
 xylem_pressure_profile!
-xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat}
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat}
 ∂E∂P
 ```

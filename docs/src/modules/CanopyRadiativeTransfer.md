@@ -42,11 +42,15 @@ canopy_fluorescence!
 read_spectrum
 read_spectrum(x::Vector{FT}, y::Vector{FT}, target::FT) where {FT<:AbstractFloat}
 read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) where {FT<:AbstractFloat}
+MODIS_BLUE
 MODIS_EVI
 MODIS_EVI2
 MODIS_LSWI
 MODIS_NDVI
+MODIS_NIR
 MODIS_NIRv
+MODIS_NIRvR
+MODIS_RED
 OCO2_SIF759
 OCO2_SIF770
 OCO3_SIF759
