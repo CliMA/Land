@@ -1,6 +1,5 @@
 status = [
     "docs-build",
-    "macos-latest",
     "ubuntu-latest",
     "windows-latest"
 ]
