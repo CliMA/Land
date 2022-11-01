@@ -14,8 +14,12 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: "1"
+      - name: Use Github Registry
+        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Install Dependencies
-        run: julia --project=docs/ -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate(); Pkg.add("CompatHelper");'
+        run: julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.update();'
+      - name: Install CompatHelper
+        run: julia -e 'using Pkg; Pkg.add("CompatHelper");'
       - name: Run CompatHelper
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

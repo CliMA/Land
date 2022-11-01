@@ -1,23 +1,12 @@
-using CSV
-using DataFrames
 using Land
-using Land.CanopyLayers
-using Land.Photosynthesis
-using Land.PlantHydraulics
-using Land.SoilPlantAirContinuum
-using Land.StomataModels
-using Pkg.Artifacts
-using PkgUtility
 using Test
 
-ENV["JULIA_LOG_LEVEL"] = "WARN"
 
+pkgs = ["EmeraldConstants", "WaterPhysics", "ClimaCache", "LeafOptics", "CanopyRadiativeTransfer", "Photosynthesis", "SoilHydraulics", "PlantHydraulics", "StomataModels", "SoilPlantAirContinuum"];
 
-
-
-include("test_CanopyLayers.jl"   )
-include("test_Photosynthesis.jl" )
-include("test_PlantHydraulics.jl")
-include("test_StomataModels.jl"  )
-include("test_SPAC.jl"           )
-include("test_Land.jl"           )
+@testset verbose = true "CliMA Land Modules" begin
+    for pkg in pkgs
+        @info "Testing package $(pkg).jl...";
+        include("../packages/$(pkg).jl/test/runtests.jl");
+    end;
+end;

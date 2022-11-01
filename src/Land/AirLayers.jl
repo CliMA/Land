@@ -1,3 +1,4 @@
+#=
 ###############################################################################
 #
 # run ODE on vertical layered trace gasses
@@ -10,14 +11,11 @@ Update vertical trace gas information with time, given
 - `vls` [`VerticalLayers`](@ref) type struct
 - `t` Time since last update
 """
-function vertical_layers!(
-            vls::VerticalLayers{FT},
-            t::FT
-) where {FT<:AbstractFloat}
+function vertical_layers!(vls::VerticalLayers{FT}, t::FT) where {FT<:AbstractFloat}
     # unpack parameters
-    @unpack d_CO₂, d_layer, p_CO₂, x_layer, Δ_CO₂ = vls;
+    (; d_CO₂, d_layer, p_CO₂, x_layer, Δ_CO₂) = vls;
     bc = DirichletBC(FT(50), FT(30));
-    u0 = vls.p_CO₂;
+    u0 = p_CO₂;
 
     # define step function, move out later
     # very memory extensive for now
@@ -30,3 +28,4 @@ function vertical_layers!(
 
     return nothing
 end
+=#
