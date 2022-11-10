@@ -46,7 +46,7 @@ makedocs(
     sitename = "Land",
     format = format,
     clean = false,
-    modules = [Land, EmeraldConstants, WaterPhysics, ClimaCache, LeafOptics, CanopyRadiativeTransfer, Photosynthesis, SoilHydraulics, PlantHydraulics, StomataModels, SoilPlantAirContinuum],
+    modules = [Land],
     pages = pages
 );
 
