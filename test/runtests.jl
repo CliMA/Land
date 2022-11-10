@@ -1,4 +1,5 @@
 using Land
+using PkgUtility
 using Test
 
 
@@ -7,6 +8,6 @@ pkgs = ["EmeraldConstants", "WaterPhysics", "ClimaCache", "LeafOptics", "CanopyR
 @testset verbose = true "CliMA Land Modules" begin
     for pkg in pkgs
         @info "Testing package $(pkg).jl...";
-        include("../packages/$(pkg).jl/test/runtests.jl");
+        include("../packages/$(pkg).jl/test/tests.jl");
     end;
 end;
