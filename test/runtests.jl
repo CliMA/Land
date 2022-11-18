@@ -3,7 +3,17 @@ using PkgUtility
 using Test
 
 
-pkgs = ["EmeraldConstants", "WaterPhysics", "ClimaCache", "LeafOptics", "CanopyRadiativeTransfer", "Photosynthesis", "SoilHydraulics", "PlantHydraulics", "StomataModels", "SoilPlantAirContinuum"];
+pkgs = ["EmeraldConstants",
+        "EarthSurface",
+        "WaterPhysics",
+        "ClimaCache",
+        "LeafOptics",
+        "CanopyRadiativeTransfer",
+        "Photosynthesis",
+        "SoilHydraulics",
+        "PlantHydraulics",
+        "StomataModels",
+        "SoilPlantAirContinuum"];
 
 @testset verbose = true "CliMA Land Modules" begin
     for pkg in pkgs

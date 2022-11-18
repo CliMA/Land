@@ -17,6 +17,7 @@ module Land
 
 # import the modules
 include("modules/EmeraldConstants.jl"       )
+include("modules/EarthSurface.jl"           )
 include("modules/WaterPhysics.jl"           )
 include("modules/ClimaCache.jl"             )
 include("modules/LeafOptics.jl"             )
@@ -29,6 +30,7 @@ include("modules/SoilPlantAirContinuum.jl"  )
 
 
 # export the modules
+export EarthSurface
 export EmeraldConstants
 export WaterPhysics
 export ClimaCache

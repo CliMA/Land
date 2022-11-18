@@ -7,6 +7,7 @@ pages = Any[
     "Home" => "index.md",
     "APIs" => [
         "EmeraldConstants"        => "modules/EmeraldConstants.md",
+        "EarthSurface"            => "modules/EarthSurface.md",
         "WaterPhysics"            => "modules/WaterPhysics.md",
         "ClimaCache"              => "modules/ClimaCache.md",
         "LeafOptics"              => "modules/LeafOptics.md",
