@@ -7,7 +7,7 @@ using ..EmeraldConstants: F_O₂, GAS_R
 using ..ClimaCache: CytochromeReactionCenter, VJPReactionCenter, VanDerTolFluorescenceModel
 using ..ClimaCache: Arrhenius, ArrheniusPeak, C3VJPModel, C3CytochromeModel, C4VJPModel, GCO₂Mode, PCO₂Mode, Q10, Q10Peak
 using ..ClimaCache: MinimumColimit, QuadraticColimit, SerialColimit, SquareColimit
-using ..ClimaCache: AndereggSM, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, EllerSM, GentineSM, LeuningSM, MedlynSM, SperrySM, WangSM, Wang2SM
+using ..ClimaCache: AbstractStomataModel, BallBerrySM, BetaFunction, BetaParameterG1, BetaParameterVcmax, GentineSM, LeuningSM, MedlynSM
 using ..ClimaCache: AirLayer, Leaf, Leaves1D, Leaves2D
 using ..ClimaCache: MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 

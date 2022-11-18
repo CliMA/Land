@@ -71,7 +71,7 @@ Update the beta factor for the LEAF component in SPAC, given
 """
 β_factor!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = β_factor!(spac, spac.LEAF.SM);
 
-β_factor!(spac::MonoElementSPAC{FT}, sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = nothing;
+β_factor!(spac::MonoElementSPAC{FT}, sm::AbstractStomataModel{FT}) where {FT<:AbstractFloat} = nothing;
 
 β_factor!(spac::MonoElementSPAC{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = β_factor!(spac, sm.β);
 
@@ -149,7 +149,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
     return nothing
 );
 
-β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = nothing;
+β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, sm::AbstractStomataModel{FT}) where {FT<:AbstractFloat} = nothing;
 
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} =
     β_factor!(roots, soil, leaves, sm.β);

@@ -92,7 +92,7 @@ leaf_photosynthesis!(
             lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}},
             air::AirLayer{FT},
             mode::Union{GCO₂Mode, PCO₂Mode},
-            sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}
+            sm::AbstractStomataModel{FT}
 ) where {FT<:AbstractFloat} = leaf_photosynthesis!(lf, air, mode, FT(1));
 
 leaf_photosynthesis!(
