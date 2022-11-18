@@ -7,8 +7,8 @@
 #     2022-Jul-01: add method to tune stomatal opening based on relative hydraulic conductance of the soil
 #     2022-Jul-01: add method to tune stomatal opening based on soil potential or leaf pressure
 #     2022-Jul-01: fix a typo in function call
-#     2022-Jul-11: deflate documentations
 #     2022-Jul-12: move function from StomataModels.jl to PlantHydraulics.jl
+#     2022-Nov-18: force the beta to be within (0,1]
 #
 #######################################################################################################################################################################################################
 """
@@ -26,11 +26,11 @@ Return the β factor based on relative conductance or soil potential/pressure, g
 """
 function β_factor end
 
-β_factor(f::Function, vc::AbstractXylemVC{FT}, x_25::FT) where {FT<:AbstractFloat} = FT(f(relative_hydraulic_conductance(vc, x_25)));
+β_factor(f::Function, vc::AbstractXylemVC{FT}, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(relative_hydraulic_conductance(vc, x_25)))));
 
-β_factor(f::Function, vc::AbstractSoilVC{FT}, x_25::FT) where {FT<:AbstractFloat} = FT(f(relative_hydraulic_conductance(vc, true, x_25)));
+β_factor(f::Function, vc::AbstractSoilVC{FT}, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(relative_hydraulic_conductance(vc, true, x_25)))));
 
-β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = FT(f(x_25));
+β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(x_25))));
 
 
 #######################################################################################################################################################################################################
@@ -42,6 +42,7 @@ function β_factor end
 #     2022-Jul-15: rename xylem_flow to flow_in to be more descriptive
 #     2022-Oct-19: fix sm.Β to sm.β
 #     2022-Oct-20: use add SoilLayer to function variables, because of the removal of SH from RootHydraulics
+#     2022-Nov-18: use root K to weigh the beta among root layers
 # Bug fixes
 #     2022-Oct-20: fix the issue related to β_factor!(roots, soil, leaves, β, β.PARAM_X) as I forgot to write β_factor! before `()`
 #
@@ -160,25 +161,16 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 );
 
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterKsoil) where {FT<:AbstractFloat} = (
-    _ws = 0;
-    _βs = 0;
-    _βm = 0;
+    _norm = 0;
+    _deno = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st);
-        _flow = flow_in(roots[_i]);
-        if _flow >= 0
-            _βs += _beta * _flow;
-            _ws += _flow;
-        end;
-        _βm = max(_βm, _beta);
+        _kmax = roots[_i].HS.AREA * roots[_i].HS.K_X / roots[_i].HS.L;
+        _norm += _beta * _kmax;
+        _deno += _kmax;
     end;
-
-    if _ws == 0
-        β.β₁ = _βm;
-    else
-        β.β₁ = _βs / _ws;
-    end;
+    β.β₁ = _norm / _deno;
 
     return nothing
 );
@@ -192,49 +184,31 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 );
 
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterPsoil) where {FT<:AbstractFloat} = (
-    _ws = 0;
-    _βs = 0;
-    _βm = 0;
+    _norm = 0;
+    _deno = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, roots[_i].HS.p_ups / _f_st);
-        _flow = flow_in(roots[_i]);
-        if _flow >= 0
-            _βs += _beta * _flow;
-            _ws += _flow;
-        end;
-        _βm = max(_βm, _beta);
+        _kmax = roots[_i].HS.AREA * roots[_i].HS.K_X / roots[_i].HS.L;
+        _norm += _beta * _kmax;
+        _deno += _kmax;
     end;
-
-    if _ws == 0
-        β.β₁ = _βm;
-    else
-        β.β₁ = _βs / _ws;
-    end;
+    β.β₁ = _norm / _deno;
 
     return nothing
 );
 
 β_factor!(roots::Vector{Root{FT}}, soil::Soil{FT}, leaves::Leaves2D{FT}, β::BetaFunction{FT}, param_x::BetaParameterΘ) where {FT<:AbstractFloat} = (
-    _ws = 0;
-    _βs = 0;
-    _βm = 0;
+    _norm = 0;
+    _deno = 0;
     for _i in eachindex(roots)
         _f_st = relative_surface_tension(roots[_i].t);
         _beta = β_factor(β.FUNC, soil_θ(soil.LAYERS[_i].VC, roots[_i].HS.p_ups / _f_st));
-        _flow = flow_in(roots[_i]);
-        if _flow >= 0
-            _βs += _beta * _flow;
-            _ws += _flow;
-        end;
-        _βm = max(_βm, _beta);
+        _kmax = roots[_i].HS.AREA * roots[_i].HS.K_X / roots[_i].HS.L;
+        _norm += _beta * _kmax;
+        _deno += _kmax;
     end;
-
-    if _ws == 0
-        β.β₁ = _βm;
-    else
-        β.β₁ = _βs / _ws;
-    end;
+    β.β₁ = _norm / _deno;
 
     return nothing
 );

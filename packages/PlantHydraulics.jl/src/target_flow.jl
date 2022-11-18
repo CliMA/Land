@@ -26,6 +26,7 @@ Return the critical flow rate that triggers a given amount of loss of conductanc
 - `T` Liquid temperature
 - `ini` Initial guess
 - `kr` Reference conductance, default is 0.001
+
 """
 critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat} = (
     @unpack K_SLA, VC = hs;
@@ -56,6 +57,7 @@ critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.00
     # warning if the solution is NaN
     if isnan(_solut)
         @warn "E_crit is NaN, please check the settings..." hs.p_ups;
+        _solut = eps(FT);
     end;
 
     return _solut
@@ -84,16 +86,16 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
     _p_crt = critical_pressure(LEAF.HS.VC, kr) * relative_surface_tension(LEAF.t);
 
     # add a judgement to make sure p_ups is higher than _p_crt
-    if (ROOT.HS.p_ups < _p_crt)
+    if (ROOT.HS.p_ups <= _p_crt)
         return eps(FT)
     end;
 
     # set up method to calculate critical flow
     _fh = -_p_crt * _kt;
     _fl = FT(0);
-    _fx = min((_fh+_fl)/2, ini);
-    _ms = NewtonBisectionMethod{FT}(x_min=_fl, x_max=_fh, x_ini=_fx);
-    _st = SolutionTolerance{FT}(eps(FT)*100, 50);
+    _fx = min((_fh + _fl) / 2, ini);
+    _ms = NewtonBisectionMethod{FT}(x_min = _fl, x_max = _fh, x_ini = _fx);
+    _st = SolutionTolerance{FT}(eps(FT) * 100, 50);
 
     # define the target function
     @inline f(x) = xylem_end_pressure(spac, x) - _p_crt;
@@ -104,6 +106,7 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
     # warning if the solution is NaN
     if isnan(_solut)
         @warn "E_crit is NaN, please check the settings..." ROOT.HS.p_ups;
+        _solut = eps(FT);
     end;
 
     return _solut
