@@ -32,7 +32,7 @@ function β_factor end
 
 β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(x_25))));
 
-β_factor(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = FT(NaN);
+β_factor(sm::AbstractStomataModel{FT}) where {FT<:AbstractFloat} = FT(NaN);
 
 β_factor(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = sm.β.β₁;
 
