@@ -13,16 +13,16 @@
 #######################################################################################################################################################################################################
 """
 
-    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
+    adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; t_on::Bool = true, θ_on::Bool = true) where {FT<:AbstractFloat}
 
 Return adjusted time that soil does not over saturate or drain, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step
-- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
 - `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
 
 """
-function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
+function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; t_on::Bool = true, θ_on::Bool = true) where {FT<:AbstractFloat}
     @unpack DIM_LAYER, LEAVES, SOIL = spac;
 
     _δt = δt;
@@ -75,6 +75,7 @@ end
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Sep-07: add method to solve for steady state solution
 #     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
+#     2022-Nov-18: add option p_on to enable/disable plant flow and pressure profiles
 #
 #######################################################################################################################################################################################################
 """
@@ -85,14 +86,22 @@ end
 Move forward in time for SPAC with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step (if not given, solve for steady state solution)
+- `p_on` If true, plant hydraulic flow and pressure profiles will be updated
+- `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
 - `update` If true, update leaf xylem legacy effect
 - `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
-- `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
 
 """
 function time_stepper! end
 
-time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat} = (
+time_stepper!(
+            spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}},
+            δt::FT;
+            p_on::Bool = true,
+            t_on::Bool = true,
+            update::Bool = false,
+            θ_on::Bool = true
+) where {FT<:AbstractFloat} = (
     @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
 
     # run the update function until time elapses
@@ -104,14 +113,14 @@ time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPA
         if θ_on soil_budget!(spac, _δt); end;
         stomatal_conductance!(spac, _δt);
         if t_on plant_energy!(spac, _δt); end;
-        xylem_flow_profile!(spac, _δt);
+        if p_on xylem_flow_profile!(spac, _δt); end;
 
         _t_res -= _δt;
 
         # if _t_res > 0 rerun the budget functions (shortwave radiation not included) and etc., else break
         if _t_res > 0
             canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
-            xylem_pressure_profile!(spac; update = update);
+            if p_on xylem_pressure_profile!(spac; update = update); end;
             leaf_photosynthesis!(spac, GCO₂Mode());
             if θ_on soil_budget!(spac); end;
             stomatal_conductance!(spac);

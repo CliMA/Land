@@ -8,6 +8,7 @@
 #     2022-Aug-18: add option θ_on to enable/disable soil water budget
 #     2022-Sep-07: add method to solve for steady state solution
 #     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
+#     2022-Nov-18: add option p_on to enable/disable plant flow and pressure profiles
 #
 #######################################################################################################################################################################################################
 """
@@ -37,17 +38,25 @@ function soil_plant_air_continuum! end
 Run SPAC model and move forward in time with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
 - `δt` Time step (if not given, solve for steady state solution)
-- `update` If true, update leaf xylem legacy effect
-- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
+- `p_on` If true, plant hydraulic flow and pressure profiles will be updated
 - `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
+- `θ_on` If true, soil water budget is on (set false to run sensitivity analysis or prescribing mode)
+- `update` If true, update leaf xylem legacy effect
 
 """
-soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat} = (
+soil_plant_air_continuum!(
+            spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}},
+            δt::FT;
+            p_on::Bool = true,
+            t_on::Bool = true,
+            update::Bool = false,
+            θ_on::Bool = true
+) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
 
     # 2. run plant hydraulic model (must be run before leaf_photosynthesis! as the latter may need β for empirical models)
-    xylem_pressure_profile!(spac; update = update);
+    if p_on xylem_pressure_profile!(spac; update = update); end;
 
     # 3. run photosynthesis model
     leaf_photosynthesis!(spac, GCO₂Mode());
@@ -67,7 +76,7 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTre
     plant_energy!(spac);
 
     # 8. update the prognostic variables
-    time_stepper!(spac, δt; update = update, θ_on = θ_on, t_on = t_on);
+    time_stepper!(spac, δt; p_on = p_on, t_on = t_on, update = update, θ_on = θ_on);
 
     return nothing
 );
