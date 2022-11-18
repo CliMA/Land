@@ -10,7 +10,7 @@ using ..LeafOptics: leaf_spectra!
 using ..CanopyRadiativeTransfer: canopy_fluorescence!, canopy_radiation!, soil_albedo!
 using ..Photosynthesis: leaf_photosynthesis!
 using ..SoilHydraulics: soil_budget!
-using ..PlantHydraulics: flow_out, plant_energy!, xylem_flow_profile!, xylem_pressure_profile!
+using ..PlantHydraulics: flow_out, plant_energy!, xylem_flow_profile!, xylem_pressure_profile!, β_factor
 using ..StomataModels: stomatal_conductance!
 
 

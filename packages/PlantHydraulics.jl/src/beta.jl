@@ -21,7 +21,7 @@ Return the β factor based on relative conductance or soil potential/pressure, g
 - `f` Function to translate relative k to β, for example f(x) = x, f(x) = x², and f(x) = sqrt(x) for x in [0,1]
 - `vc` Leaf vulnerability curve or soil vulnerability curve (moisture retention curve)
 - `x_25` Leaf xylem pressure corrected to 25 °C, soil water potential corrected to 25 °C (forcing on roots, note that this function may not be useful for plants with salt stress), or soil water
-    content
+    content.
 
 """
 function β_factor end
@@ -31,6 +31,10 @@ function β_factor end
 β_factor(f::Function, vc::AbstractSoilVC{FT}, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(relative_hydraulic_conductance(vc, true, x_25)))));
 
 β_factor(f::Function, x_25::FT) where {FT<:AbstractFloat} = FT(max(eps(FT), min(1, f(x_25))));
+
+β_factor(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}) where {FT<:AbstractFloat} = FT(NaN);
+
+β_factor(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}) where {FT<:AbstractFloat} = sm.β.β₁;
 
 
 #######################################################################################################################################################################################################

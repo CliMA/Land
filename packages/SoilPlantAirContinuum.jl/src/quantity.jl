@@ -2,6 +2,36 @@
 #
 # Changes to this function
 # General
+#     2022-Nov-18: add function to read beta from spac
+#
+#######################################################################################################################################################################################################
+"""
+
+    BETA(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Return the average beta factor for
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+
+"""
+function BETA end
+
+BETA(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    @unpack DIM_LAYER, LEAVES = spac;
+
+    # compute the mean beta
+    _βs = 0;
+    for _leaves in LEAVES
+        _βs += β_factor(_leaves.SM);
+    end;
+
+    return _βs / DIM_LAYER
+);
+
+
+#######################################################################################################################################################################################################
+#
+# Changes to this function
+# General
 #     2022-Oct-19: add function to compute canopy net primary productivity
 #
 #######################################################################################################################################################################################################
