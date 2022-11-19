@@ -37,6 +37,7 @@ abstract type AbstractLeaf{FT<:AbstractFloat} end
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 #     2022-Jul-19: remove field p_H₂O_sat
 #     2022-Jul-28: move field _t to PSM
+#     2022-Nov-18: use Union type for SM
 #
 #######################################################################################################################################################################################################
 """
@@ -73,7 +74,7 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    SM::Union{AndereggSM{FT}, BallBerrySM{FT}, EllerSM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}} = WangSM{FT}()
 
     # Prognostic variables (not used for ∂y∂t)
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -125,6 +126,7 @@ end
 #     2022-Jul-12: add field: ∂g∂t
 #     2022-Jul-14: add field: CP, e, cp, and ∂e∂t
 #     2022-Jul-19: remove field p_H₂O_sat
+#     2022-Nov-18: use Union type for SM
 #
 #######################################################################################################################################################################################################
 """
@@ -159,7 +161,7 @@ Base.@kwdef mutable struct Leaves1D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    SM::Union{AndereggSM{FT}, BallBerrySM{FT}, EllerSM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}} = WangSM{FT}()
 
     # Prognostic variables (not used for ∂y∂t)
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"
@@ -213,6 +215,7 @@ end
 #     2022-Jul-19: remove field p_H₂O_sat
 #     2022-Jul-19: add dimension control to struct
 #     2022-Jul-28: move field _t to PSM
+#     2022-Nov-18: use Union type for SM
 #
 #######################################################################################################################################################################################################
 """
@@ -256,7 +259,7 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "[`AbstractPhotosynthesisModel`](@ref) type photosynthesis model"
     PSM::Union{C3VJPModel{FT}, C4VJPModel{FT}, C3CytochromeModel{FT}} = C3VJPModel{FT}()
     "Stomatal model"
-    SM::AbstractStomataModel{FT} = WangSM{FT}()
+    SM::Union{AndereggSM{FT}, BallBerrySM{FT}, EllerSM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}} = WangSM{FT}()
 
     # Prognostic variables (not used for ∂y∂t)
     "Boundary leaf diffusive conductance to CO₂ `[mol m⁻² s⁻¹]`"

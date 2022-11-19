@@ -294,7 +294,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _e_u_i .= _r_sd_i .* _e_s_i .+ _r_dd_i .* _e_d_i;
     end;
 
-    RADIATION.e_diffuse_up[:,end] = view(OPTICS.ρ_sd,:,DIM_LAYER+1) .* view(RADIATION.e_direct,:,DIM_LAYER+1) .+ view(OPTICS.ρ_dd,:,DIM_LAYER+1) .* view(RADIATION.e_diffuse_down,:,DIM_LAYER+1);
+    RADIATION.e_diffuse_up[:,end] .= view(OPTICS.ρ_sd,:,DIM_LAYER+1) .* view(RADIATION.e_direct,:,DIM_LAYER+1) .+ view(OPTICS.ρ_dd,:,DIM_LAYER+1) .* view(RADIATION.e_diffuse_down,:,DIM_LAYER+1);
 
     # 2. update the sunlit and shaded sum radiation and total absorbed radiation per layer and for soil
     for _i in 1:DIM_LAYER
@@ -323,12 +323,17 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
     for _i in 1:DIM_LAYER
         _e_d_i = view(RADIATION.e_diffuse_down,:,_i);   # downward diffuse radiation at upper boundary
         _e_u_i = view(RADIATION.e_diffuse_up  ,:,_i);   # upward diffuse radiation at upper boundary
+        _e_v_i = view(RADIATION.e_v,:,_i);
 
         _dob_i = view(OPTICS.σ_dob,:,_i);   # scattering coefficient backward for diffuse->observer
         _dof_i = view(OPTICS.σ_dof,:,_i);   # scattering coefficient forward for diffuse->observer
         _so__i = view(OPTICS.σ_so ,:,_i);   # bidirectional from solar to observer
 
-        RADIATION.e_v[:,_i] .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
+        # _e_v_i .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
+        _e_v_i .= OPTICS.po[_i] .* _dob_i .* _e_d_i;
+        _e_v_i .+= OPTICS.po[_i] .* _dof_i .* _e_u_i;
+        _e_v_i .+= OPTICS.pso[_i] .* _so__i .* rad.e_direct;
+        _e_v_i .*= _ilai;
     end;
     RADIATION.e_v[:,end] .= OPTICS.po[end] .* view(RADIATION.e_diffuse_up,:,DIM_LAYER+1);
 

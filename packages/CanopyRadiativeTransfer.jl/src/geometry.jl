@@ -73,8 +73,8 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
     # 3. update the viewing fraction ps, po, pso, and p_sunlit
     _fac_s = (1 - exp(-OPTICS.ks * can.ci * can.lai / DIM_LAYER)) / (OPTICS.ks * can.ci * can.lai / DIM_LAYER);
     _fac_o = (1 - exp(-OPTICS.ko * can.ci * can.lai / DIM_LAYER)) / (OPTICS.ko * can.ci * can.lai / DIM_LAYER);
-    OPTICS.po .= exp.(can._x_bnds * OPTICS.ko * can.ci * can.lai) * _fac_o;
-    OPTICS.ps .= exp.(can._x_bnds * OPTICS.ks * can.ci * can.lai) * _fac_s;
+    OPTICS.po .= exp.(can._x_bnds .* OPTICS.ko .* can.ci .* can.lai) .* _fac_o;
+    OPTICS.ps .= exp.(can._x_bnds .* OPTICS.ks .* can.ci .* can.lai) .* _fac_s;
     OPTICS.p_sunlit .= (view(OPTICS.ps,1:DIM_LAYER) .+ view(OPTICS.ps,2:DIM_LAYER+1)) ./ 2;
 
     _dso = sqrt( tand(angles.sza) ^ 2 + tand(angles.vza) ^ 2 - 2 * tand(angles.sza) * tand(angles.vza) * cosd(angles.vaa - angles.saa) );
