@@ -68,10 +68,14 @@ Return the spectrum value at target wavelength bin, given
 
 """
 read_spectrum(x::Vector{FT}, y::Vector{FT}, x₁::FT, x₂::FT; steps::Int = 2) where {FT<:AbstractFloat} = (
-    _xs = collect(FT,range(x₁, x₂; length=steps+1));
-    _ys = read_spectrum.([x], [y], _xs);
+    _ys = 0;
+    _δx = (x₂ - x₁) / steps;
+    for _i in 1:(steps+1)
+        _x = x₁ + (_i - 1) * _δx;
+        _ys += read_spectrum(x, y, _x);
+    end;
 
-    return mean(_ys)
+    return _ys / (steps + 1)
 );
 
 
