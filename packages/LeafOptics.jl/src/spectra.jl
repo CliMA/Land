@@ -34,7 +34,6 @@ function leaf_spectra! end
 #     2021-Aug-06: If bio.CBC and bio.PRO are not zero, they are accounted for twice in bio.LMA, thus the spectrum from LMA need to subtract the contribution from CBC and PRO
 # To do
 #     TODO: add References for this methods
-#     TODO: speed up this function by preallocate memories using a cache structure
 #
 #######################################################################################################################################################################################################
 """
@@ -102,121 +101,140 @@ leaf_spectra!(
     bio.α_cabcar .= (K_CAB .* bio.cab .+ K_CAR_V .* bio.car .* (1 - bio.f_zeax) .+ K_CAR_Z .* bio.car .* bio.f_zeax) ./ bio.k_all ./ MESOPHYLL_N;
 
     # calculate the reflectance and transmittance at the interfaces of one layer
-    _τ   = (1 .- bio.k_all) .* exp.(-bio.k_all) .+ bio.k_all .^ 2 .* expint.(bio.k_all .+ eps(FT));
-    _τ_α = average_transmittance.(α, NR);
-    _ρ_α = 1 .- _τ_α;
-    _τ₁₂ = average_transmittance.(FT(90), NR);
-    _ρ₁₂ = 1 .- _τ₁₂;
-    _τ₂₁ = _τ₁₂ ./ (NR .^ 2);
-    _ρ₂₁ = 1 .- _τ₂₁;
+    bio._τ   .= (1 .- bio.k_all) .* exp.(-bio.k_all) .+ bio.k_all .^ 2 .* expint.(bio.k_all .+ eps(FT));
+    bio._τ_α .= average_transmittance.(α, NR);
+    bio._ρ_α .= 1 .- bio._τ_α;
+    bio._τ₁₂ .= average_transmittance.(FT(90), NR);
+    bio._ρ₁₂ .= 1 .- bio._τ₁₂;
+    bio._τ₂₁ .= bio._τ₁₂ ./ (NR .^ 2);
+    bio._ρ₂₁ .= 1 .- bio._τ₂₁;
 
     # top surface side
-    _denom = 1 .- (_τ .* _ρ₂₁) .^ 2;
-    _τ_top = _τ_α .* _τ .* _τ₂₁ ./ _denom;
-    _ρ_top = _ρ_α .+ _ρ₂₁ .* _τ .* _τ_top;
+    bio._denom .= 1 .- (bio._τ .* bio._ρ₂₁) .^ 2;
+    bio._τ_top .= bio._τ_α .* bio._τ .* bio._τ₂₁ ./ bio._denom;
+    bio._ρ_top .= bio._ρ_α .+ bio._ρ₂₁ .* bio._τ .* bio._τ_top;
 
     # bottom surface side
-    _τ_bottom = _τ₁₂ .* _τ .* _τ₂₁ ./ _denom;
-    _ρ_bottom = _ρ₁₂ .+ _ρ₂₁ .* _τ .* _τ_bottom;
+    bio._τ_bottom .= bio._τ₁₂ .* bio._τ .* bio._τ₂₁ ./ bio._denom;
+    bio._ρ_bottom .= bio._ρ₁₂ .+ bio._ρ₂₁ .* bio._τ .* bio._τ_bottom;
 
     # calculate the reflectance and transmittance at the interfaces of N layer
-    _d     = sqrt.((1 .+ _ρ_bottom .+ _τ_bottom) .* (1 .+ _ρ_bottom .- _τ_bottom) .* (1 .- _ρ_bottom .+ _τ_bottom) .* (1 .- _ρ_bottom .- _τ_bottom));
-    _ρ²    = _ρ_bottom .^ 2;
-    _τ²    = _τ_bottom .^ 2;
-    _a     = (1 .+ _ρ² .- _τ² .+ _d) ./ (2 .* _ρ_bottom);
-    _b     = (1 .- _ρ² .+ _τ² .+ _d) ./ (2 .* _τ_bottom);
-    _bⁿ⁻¹  = _b .^ (MESOPHYLL_N - 1);
-    _b²ⁿ⁻² = _bⁿ⁻¹ .^ 2;
-    _a²    = _a .^ 2;
-    _denom = _a² .* _b²ⁿ⁻² .- 1;
-    _ρ_sub = _a .* (_b²ⁿ⁻² .- 1) ./ _denom;
-    _τ_sub = _bⁿ⁻¹ .* (_a² .- 1) ./ _denom;
+    bio._d     .= sqrt.((1 .+ bio._ρ_bottom .+ bio._τ_bottom) .* (1 .+ bio._ρ_bottom .- bio._τ_bottom) .* (1 .- bio._ρ_bottom .+ bio._τ_bottom) .* (1 .- bio._ρ_bottom .- bio._τ_bottom));
+    bio._ρ²    .= bio._ρ_bottom .^ 2;
+    bio._τ²    .= bio._τ_bottom .^ 2;
+    bio._a     .= (1 .+ bio._ρ² .- bio._τ² .+ bio._d) ./ (2 .* bio._ρ_bottom);
+    bio._b     .= (1 .- bio._ρ² .+ bio._τ² .+ bio._d) ./ (2 .* bio._τ_bottom);
+    bio._bⁿ⁻¹  .= bio._b .^ (MESOPHYLL_N - 1);
+    bio._b²ⁿ⁻² .= bio._bⁿ⁻¹ .^ 2;
+    bio._a²    .= bio._a .^ 2;
+    bio._denom .= bio._a² .* bio._b²ⁿ⁻² .- 1;
+    bio._ρ_sub .= bio._a .* (bio._b²ⁿ⁻² .- 1) ./ bio._denom;
+    bio._τ_sub .= bio._bⁿ⁻¹ .* (bio._a² .- 1) ./ bio._denom;
 
     # avoid case of zero absorption
-    _j = findall(_ρ_bottom .+ _τ_bottom .>= 1);
-    _τ_sub[_j] = _τ_bottom[_j] ./ (_τ_bottom[_j] + (1 .- _τ_bottom[_j]) * (MESOPHYLL_N - 1));
-    _ρ_sub[_j] = 1 .- _τ_sub[_j];
+    for _i in eachindex(bio._ρ_bottom)
+        if bio._ρ_bottom[_i] + bio._τ_bottom[_i] >= 1
+            bio._τ_sub[_i] = bio._τ_bottom[_i] / (bio._τ_bottom[_i] + (1 - bio._τ_bottom[_i]) * (MESOPHYLL_N - 1));
+            bio._ρ_sub[_i] = 1 - bio._τ_sub[_i];
+        end;
+    end;
 
     # reflectance & transmittance of the leaf: combine top layer with next N-1 layers
-    _denom   = 1 .- _ρ_sub .* _ρ_bottom;
-    bio.τ_sw = _τ_top .* _τ_sub ./ _denom;
-    bio.ρ_sw = _ρ_top .+ _τ_top .* _ρ_sub .* _τ_bottom ./ _denom;
-    bio.α_sw = 1 .- bio.τ_sw .- bio.ρ_sw;
+    bio._denom .= 1 .- bio._ρ_sub .* bio._ρ_bottom;
+    bio.τ_sw   .= bio._τ_top .* bio._τ_sub ./ bio._denom;
+    bio.ρ_sw   .= bio._ρ_top .+ bio._τ_top .* bio._ρ_sub .* bio._τ_bottom ./ bio._denom;
+    bio.α_sw   .= 1 .- bio.τ_sw .- bio.ρ_sw;
 
     # Doubling method used to calculate fluoresence is now only applied to the part of the leaf where absorption takes place, that is, the part exclusive of the leaf-air interfaces.
     # The reflectance (rho) and transmittance (tau) of this part of the leaf are now determined by "subtracting" the interfaces.
     # CF Note: All of the below takes about 10 times more time than the RT above. Need to rething speed and accuracy. (10nm is bringing it down a lot!)
-    _ρ_b = (bio.ρ_sw .- _ρ_α) ./ (_τ_α .* _τ₂₁ .+ (bio.ρ_sw - _ρ_α) .* _ρ₂₁);
-    _tt1 = _τ_α .* _τ₂₁;
-    _tt2 = bio.τ_sw .* (1 .- _ρ_b .* _ρ₂₁);
-    _z   = _tt2 ./ _tt1;
-    _tt1 = _ρ_b - _ρ₂₁ .* _z .^ 2;
-    _tt2 = 1 .- (_ρ₂₁.* _z) .^ 2;
-    _ρ   = max.(0, _tt1 ./ _tt2);
-    _tt1 = 1 .- _ρ_b .* _ρ₂₁;
-    _τ   = _tt1 ./ _tt2 .* _z;
+    bio._ρ_b .= (bio.ρ_sw .- bio._ρ_α) ./ (bio._τ_α .* bio._τ₂₁ .+ (bio.ρ_sw - bio._ρ_α) .* bio._ρ₂₁);
+    bio._tt1 .= bio._τ_α .* bio._τ₂₁;
+    bio._tt2 .= bio.τ_sw .* (1 .- bio._ρ_b .* bio._ρ₂₁);
+    bio._z   .= bio._tt2 ./ bio._tt1;
+    bio._tt1 .= bio._ρ_b .- bio._ρ₂₁ .* bio._z .^ 2;
+    bio._tt2 .= 1 .- (bio._ρ₂₁.* bio._z) .^ 2;
+    bio._ρ   .= max.(0, bio._tt1 ./ bio._tt2);
+    bio._tt1 .= 1 .- bio._ρ_b .* bio._ρ₂₁;
+    bio._τ   .= bio._tt1 ./ bio._tt2 .* bio._z;
 
     # Derive Kubelka-Munk s and k
-    _i      = findall((_ρ .+ _τ) .< 1);
-    _j      = findall((_ρ .+ _τ) .> 1);
-    _d[_i] .= sqrt.((1 .+ _ρ[_i] .+ _τ[_i]) .* (1 .+ _ρ[_i] .- _τ[_i]) .* (1 .- _ρ[_i] .+ _τ[_i]) .*  (1 .- _ρ[_i] .- _τ[_i]));
-    _a[_i] .= (1 .+ _ρ[_i] .^ 2 .- _τ[_i] .^ 2 .+ _d[_i]) ./ (2 .* _ρ[_i]);
-    _b[_i] .= (1 .- _ρ[_i] .^ 2 .+ _τ[_i] .^ 2 .+ _d[_i]) ./ (2 .* _τ[_i]);
-    _a[_j] .= 1;
-    _b[_j] .= 1;
+    for _i in eachindex(bio._ρ)
+        if bio._ρ[_i] + bio._τ[_i] < 1
+            bio._a[_i] = (1 + bio._ρ[_i] ^ 2 - bio._τ[_i] ^ 2 + bio._d[_i]) / (2 * bio._ρ[_i]);
+            bio._b[_i] = (1 - bio._ρ[_i] ^ 2 + bio._τ[_i] ^ 2 + bio._d[_i]) / (2 * bio._τ[_i]);
+            bio._d[_i] = sqrt((1 + bio._ρ[_i] + bio._τ[_i]) * (1 + bio._ρ[_i] - bio._τ[_i]) * (1 - bio._ρ[_i] + bio._τ[_i]) *  (1 - bio._ρ[_i] - bio._τ[_i]));
+        else
+            bio._a[_i] = 1;
+            bio._b[_i] = 1;
+        end;
+    end;
 
-    _i      = findall((_a .> 1) .& (_a .!= Inf));
-    _s      = _ρ ./ _τ;
-    _k      = log.(_b);
-    _s[_i] .= 2 .* _a[_i] ./ (_a[_i] .^ 2 .- 1) .* log.(_b[_i]);
-    _k[_i] .= (_a[_i] .- 1) ./ (_a[_i] .+ 1) .* log.(_b[_i]);
-    _k_chl  = (APAR_car ? bio.α_cabcar : bio.α_cab) .* _k;
+    bio._s     .= bio._ρ ./ bio._τ;
+    bio._k     .= log.(bio._b);
+    for _i in eachindex(bio._a)
+        if 1 < bio._a[_i] < Inf
+            bio._s[_i] = 2 * bio._a[_i] / (bio._a[_i] ^ 2 - 1) * log(bio._b[_i]);
+            bio._k[_i] = (bio._a[_i] - 1) / (bio._a[_i] + 1) * log(bio._b[_i]);
+        end;
+    end;
+    bio._k_chl .= (APAR_car ? bio.α_cabcar : bio.α_cab) .* bio._k;
 
     # indices of WLE and WLF within wlp
-    _ϵ       = FT(2) ^ -NDUB;
-    _τ_e     = 1 .- (_k[IΛ_SIFE] .+ _s[IΛ_SIFE]) * _ϵ;
-    _τ_f     = reabsorb ? 1 .- (_k[IΛ_SIF] .+ _s[IΛ_SIF]) * _ϵ : 1 .- _s[IΛ_SIF] * _ϵ;
-    _ρ_e     = _s[IΛ_SIFE] * _ϵ;
-    _ρ_f     = _s[IΛ_SIF] * _ϵ;
-    _sigmoid = 1 ./ (1 .+ exp.(-Λ_SIF ./ 10) .* exp.(Λ_SIFE' ./ 10));
-    _mat_f   = K_PS[IΛ_SIF] .* _ϵ ./ 2 .* _k_chl[IΛ_SIFE]' .* _sigmoid;
-    _mat_b   = K_PS[IΛ_SIF] .* _ϵ ./ 2 .* _k_chl[IΛ_SIFE]' .* _sigmoid;
+    _ϵ = FT(2) ^ -NDUB;
+    bio._ρ_e     .= view(bio._s,IΛ_SIFE) .* _ϵ;
+    bio._ρ_f     .= view(bio._s,IΛ_SIF) * _ϵ;
+    bio._sigmoid .= 1 ./ (1 .+ exp.(-Λ_SIF ./ 10) .* exp.(Λ_SIFE' ./ 10));
+    bio._mat_f   .= K_PS[IΛ_SIF] .* _ϵ ./ 2 .* bio._k_chl[IΛ_SIFE]' .* bio._sigmoid;
+    bio._mat_b   .= K_PS[IΛ_SIF] .* _ϵ ./ 2 .* bio._k_chl[IΛ_SIFE]' .* bio._sigmoid;
+    bio._τ_e     .= 1 .- (view(bio._k,IΛ_SIFE) .+ view(bio._s,IΛ_SIFE)) .* _ϵ;
+    if reabsorb
+        bio._τ_f .= 1 .- (view(bio._k,IΛ_SIF) .+ view(bio._s,IΛ_SIF)) .* _ϵ;
+    else
+        bio._τ_f .= 1 .- view(bio._s,IΛ_SIF) .* _ϵ;
+    end;
 
     # Doubling adding routine
-    _1_h = ones(FT, 1, length(_τ_e));
-    _1_v = ones(FT, length(_τ_f), 1);
-    for i in 1:NDUB
-        _x_e     = _τ_e ./ (1 .- _ρ_e .^ 2);
-        _x_f     = _τ_f ./ (1 .- _ρ_f .^ 2);
-        _τ_e_n   = _τ_e .* _x_e;
-        _τ_f_n   = _τ_f .* _x_f;
-        _ρ_e_n   = _ρ_e .* (1 .+ _τ_e_n);
-        _ρ_f_n   = _ρ_f .* (1 .+ _τ_f_n);
-        _a₁₁     = _x_f * _1_h .+ _1_v * _x_e';
-        _a₁₂     = (_x_f * _x_e') .* (_ρ_f * _1_h .+ _1_v * _ρ_e');
-        _a₂₁     = 1 .+ (_x_f * _x_e') .* (1 .+ _ρ_f * _ρ_e');
-        _a₂₂     = (_x_f .* _ρ_f) * _1_h .+ _1_v * (_x_e.*_ρ_e)';
-        _mat_f_n = _mat_f .* _a₁₁ .+ _mat_b .* _a₁₂;
-        _mat_b_n = _mat_b .* _a₂₁ .+ _mat_f .* _a₂₂;
-        _τ_e     = _τ_e_n;
-        _ρ_e     = _ρ_e_n;
-        _τ_f     = _τ_f_n;
-        _ρ_f     = _ρ_f_n;
-        _mat_f   = _mat_f_n;
-        _mat_b   = _mat_b_n;
+    for _ in 1:NDUB
+        bio._x_e     .= bio._τ_e ./ (1 .- bio._ρ_e .^ 2);
+        bio._x_f     .= bio._τ_f ./ (1 .- bio._ρ_f .^ 2);
+        bio._τ_e_n   .= bio._τ_e .* bio._x_e;
+        bio._τ_f_n   .= bio._τ_f .* bio._x_f;
+        bio._ρ_e_n   .= bio._ρ_e .* (1 .+ bio._τ_e_n);
+        bio._ρ_f_n   .= bio._ρ_f .* (1 .+ bio._τ_f_n);
+        #bio._a₁₁     .= bio._x_f * bio._1_e .+ bio._1_f * bio._x_e';
+        #bio._a₁₂     .= (bio._x_f * bio._x_e') .* (bio._ρ_f * bio._1_e .+ bio._1_f * bio._ρ_e');
+        #bio._a₂₁     .= 1 .+ (bio._x_f * bio._x_e') .* (1 .+ bio._ρ_f * bio._ρ_e');
+        #bio._a₂₂     .= (bio._x_f .* bio._ρ_f) * bio._1_e .+ bio._1_f * (bio._x_e.*bio._ρ_e)';
+        bio._a₁₁     .= bio._x_f .* bio._1_e .+ bio._1_f .* bio._x_e';
+        bio._a₁₂     .= (bio._x_f .* bio._x_e') .* (bio._ρ_f .* bio._1_e .+ bio._1_f .* bio._ρ_e');
+        bio._a₂₁     .= 1 .+ (bio._x_f * bio._x_e') .* (1 .+ bio._ρ_f * bio._ρ_e');
+        bio._z_e     .= bio._x_e .* bio._ρ_e;
+        bio._z_f     .= bio._x_f .* bio._ρ_f;
+        bio._a₂₂     .= bio._z_f .* bio._1_e .+ bio._1_f .* bio._z_e';
+        bio._mat_f_n .= bio._mat_f .* bio._a₁₁ .+ bio._mat_b .* bio._a₁₂;
+        bio._mat_b_n .= bio._mat_b .* bio._a₂₁ .+ bio._mat_f .* bio._a₂₂;
+        bio._τ_e     .= bio._τ_e_n;
+        bio._ρ_e     .= bio._ρ_e_n;
+        bio._τ_f     .= bio._τ_f_n;
+        bio._ρ_f     .= bio._ρ_f_n;
+        bio._mat_f   .= bio._mat_f_n;
+        bio._mat_b   .= bio._mat_b_n;
     end;
 
     # This reduced red SIF quite a bit in backscatter, not sure why.
-    _ρ_b = _ρ .+ _τ .^ 2 .* _ρ₂₁ ./ (1 .- _ρ .* _ρ₂₁);
-    _x_e = _1_v * (_τ_α[IΛ_SIFE] ./ (1 .- _ρ₂₁[IΛ_SIFE] .* _ρ_b[IΛ_SIFE]))';
-    _x_f = _τ₂₁[IΛ_SIF] ./ (1 .- _ρ₂₁[IΛ_SIF] .* _ρ_b[IΛ_SIF]) * _1_h;
-    _y_e = _1_v * (_τ[IΛ_SIFE] .* _ρ₂₁[IΛ_SIFE] ./ (1 .- _ρ[IΛ_SIFE] .* _ρ₂₁[IΛ_SIFE]))';
-    _y_f = _τ[IΛ_SIF] .* _ρ₂₁[IΛ_SIF] ./ (1 .- _ρ[IΛ_SIF] .* _ρ₂₁[IΛ_SIF]) * _1_h;
-    _a   = _x_e .* (1 .+ _y_e .* _y_f) .* _x_f;
-    _b   = _x_e .* (_y_e .+ _y_f) .* _x_f;
+    bio._ρ_b  .= bio._ρ .+ bio._τ .^ 2 .* bio._ρ₂₁ ./ (1 .- bio._ρ .* bio._ρ₂₁);
+    bio._z_e  .= view(bio._τ_α,IΛ_SIFE) ./ (1 .- view(bio._ρ₂₁,IΛ_SIFE) .* view(bio._ρ_b,IΛ_SIFE));
+    bio._m_xe .= bio._1_f .* bio._z_e';
+    bio._m_xf .= view(bio._τ₂₁,IΛ_SIF) ./ (1 .- view(bio._ρ₂₁,IΛ_SIF) .* view(bio._ρ_b,IΛ_SIF)) .* bio._1_e;
+    bio._z_e  .= view(bio._τ,IΛ_SIFE) .* view(bio._ρ₂₁,IΛ_SIFE) ./ (1 .- view(bio._ρ,IΛ_SIFE) .* view(bio._ρ₂₁,IΛ_SIFE));
+    bio._m_ye .= bio._1_f .* bio._z_e';
+    bio._m_yf .= view(bio._τ,IΛ_SIF) .* view(bio._ρ₂₁,IΛ_SIF) ./ (1 .- view(bio._ρ,IΛ_SIF) .* view(bio._ρ₂₁,IΛ_SIF)) .* bio._1_e;
+    bio._ma   .= bio._m_xe .* (1 .+ bio._m_ye .* bio._m_yf) .* bio._m_xf;
+    bio._mb   .= bio._m_xe .* (bio._m_ye .+ bio._m_yf) .* bio._m_xf;
 
-    bio.mat_b = _a .* _mat_b + _b .* _mat_f;
-    bio.mat_f = _a .* _mat_f + _b .* _mat_b;
+    bio.mat_b .= bio._ma .* bio._mat_b .+ bio._mb .* bio._mat_f;
+    bio.mat_f .= bio._ma .* bio._mat_f .+ bio._mb .* bio._mat_b;
 
     # store leaf water content
     bio._v_storage = lwc;
