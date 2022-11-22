@@ -27,6 +27,7 @@ function update! end
 #     2022-Oct-19: add method to update or prescribe cab, car, lai, swcs, Vcmax and Jmax TD, t_leaf, vcmax profile
 #     2022-Oct-19: air.rh and air.p_H₂O_sat have been removed in an earlier version ClimaCache
 #     2022-Oct-19: add method to prescribe t_soil profile
+#     2022-Nov-21: fix a bug related to Vcmax profile (no global simulations are impacted)
 #
 #######################################################################################################################################################################################################
 """
@@ -170,8 +171,8 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
 
     # update Vcmax profile if lai or vcmax is given
     if !isnothing(vcmax) || !isnothing(lai)
-        for _i in 1:DIM_LAYER
-            _scaling = isnothing(vcmax_expo) ? 1 : exp(-vcmax_expo * CANOPY.lai * (1 - _i / DIM_LAYER));
+        for _i in 2:DIM_LAYER
+            _scaling = isnothing(vcmax_expo) ? 1 : exp(-vcmax_expo * CANOPY.lai * ((_i - 1) / DIM_LAYER));
             LEAVES[_i].PSM.v_cmax25 = LEAVES[1].PSM.v_cmax25 * _scaling;
             LEAVES[_i].PSM.j_max25 = LEAVES[1].PSM.v_cmax25 * 1.67 * _scaling;
             LEAVES[_i].PSM.r_d25 = LEAVES[1].PSM.v_cmax25 * 0.015 * _scaling;
