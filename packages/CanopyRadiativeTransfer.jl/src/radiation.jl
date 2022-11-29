@@ -251,6 +251,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 #     2022-Jul-15: sum by r_net_sw by the weights of sunlit and shaded fractions
 #     2022-Jul-27: use _ρ_dd, _ρ_sd, _τ_dd, and _τ_sd for leaf energy absorption (typo when refactoring the code)
 #     2022-Aug-30: fix par, apar, and ppar issues
+#     2022-Nov-29: ppar for sunlit leaves should be scaled based on sunlit fraction
 #
 #######################################################################################################################################################################################################
 """
@@ -330,7 +331,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _so__i = view(OPTICS.σ_so ,:,_i);   # bidirectional from solar to observer
 
         # _e_v_i .= (OPTICS.po[_i] .* _dob_i .* _e_d_i .+ OPTICS.po[_i] .* _dof_i .* _e_u_i .+ OPTICS.pso[_i] .* _so__i .* rad.e_direct) * _ilai;
-        _e_v_i .= OPTICS.po[_i] .* _dob_i .* _e_d_i;
+        _e_v_i  .= OPTICS.po[_i] .* _dob_i .* _e_d_i;
         _e_v_i .+= OPTICS.po[_i] .* _dof_i .* _e_u_i;
         _e_v_i .+= OPTICS.pso[_i] .* _so__i .* rad.e_direct;
         _e_v_i .*= _ilai;
@@ -393,7 +394,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
         _Σ_ppar_dif = RADIATION._ppar_shaded' * WLSET.ΔΛ_PAR;
         _Σ_ppar_dir = RADIATION._ppar_sunlit' * WLSET.ΔΛ_PAR * _normi;
         leaves[_i].ppar_shaded  = _Σ_ppar_dif;
-        leaves[_i].ppar_sunlit .= OPTICS._abs_fs_fo .* _Σ_ppar_dir .+ _Σ_ppar_dif;
+        leaves[_i].ppar_sunlit .= OPTICS._abs_fs_fo .* _Σ_ppar_dir ./ OPTICS.p_sunlit[_i] .+ _Σ_ppar_dif;
     end;
 
     return nothing
