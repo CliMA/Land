@@ -54,9 +54,9 @@ soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::Hyperspectr
     end;
 
     # use CLM method or Yujie's method
-    _rwc = LAYERS[1].θ / LAYERS[1].VC.Θ_SAT;
-    _par = SOIL_ALBEDOS[COLOR,1] * (1 - _rwc) + _rwc * SOIL_ALBEDOS[COLOR,3];
-    _nir = SOIL_ALBEDOS[COLOR,2] * (1 - _rwc) + _rwc * SOIL_ALBEDOS[COLOR,4];
+    _rwc::FT = LAYERS[1].θ / LAYERS[1].VC.Θ_SAT;
+    _par::FT = SOIL_ALBEDOS[COLOR,1] * (1 - _rwc) + _rwc * SOIL_ALBEDOS[COLOR,3];
+    _nir::FT = SOIL_ALBEDOS[COLOR,2] * (1 - _rwc) + _rwc * SOIL_ALBEDOS[COLOR,4];
 
     if albedo.α_CLM
         _delta = max(0, FT(0.11) - FT(0.4) * LAYERS[1].θ);

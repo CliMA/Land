@@ -1,3 +1,4 @@
+#=
 module Photosynthesis
 
 using PkgUtility: lower_quadratic, upper_quadratic
@@ -23,3 +24,4 @@ include("temperature.jl"    )
 
 
 end # module
+=#

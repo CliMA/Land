@@ -119,7 +119,7 @@ time_stepper!(
 
         # if _t_res > 0 rerun the budget functions (shortwave radiation not included) and etc., else break
         if _t_res > 0
-            canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
+            if t_on canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL); end;
             if p_on xylem_pressure_profile!(spac; update = update); end;
             leaf_photosynthesis!(spac, GCO₂Mode());
             if θ_on soil_budget!(spac); end;
