@@ -62,8 +62,7 @@ function canopy_fluxes!(
     #    Direct PAR is normalized by layer Ps value
     mul!(cf_con.absfs_lidf, adjoint(can_opt.absfs), can.lidf);
     normi       = 1 / mean(cf_con.absfs_lidf);
-    cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+
-                   view(can_opt.Ps, 2:nLayer+1)) ./ 2;
+    cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+ view(can_opt.Ps, 2:nLayer+1)) ./ 2;
     @unpack lPs = cf_con;
 
     @inbounds for j in 1:nLayer
@@ -97,7 +96,7 @@ function canopy_fluxes!(
         _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
         _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
         can_rad.absPAR_shadeCab[j] = _difCab;
-        can_rad.absPAR_sunCab[:,:,j]  .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j]  .= can_opt.absfs .* _dirCab / lPs[j];
         can_rad.absPAR_sunCab[:,:,j] .+= _difCab;
     end
 
@@ -116,9 +115,7 @@ function canopy_fluxes!(
         cf_con.E_all .= view(can_rad.netSW_shade, :, i);
         can_rad.intNetSW_shade[i]  = numerical∫(cf_con.E_all, dWL) * fac / tLAI;
         cf_con.E_all .= view(can_rad.netSW_sunlit, :, i);
-        can_rad.intNetSW_sunlit[i] = numerical∫(cf_con.E_all, dWL) *
-                                     fac / tLAI / lPs[i] +
-                                     can_rad.intNetSW_shade[i];
+        can_rad.intNetSW_sunlit[i] = numerical∫(cf_con.E_all, dWL) * fac / tLAI / lPs[i] + can_rad.intNetSW_shade[i];
     end
 
     return nothing
