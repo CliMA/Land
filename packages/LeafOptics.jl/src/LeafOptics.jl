@@ -1,4 +1,3 @@
-#=
 module LeafOptics
 
 using SpecialFunctions: expint
@@ -17,4 +16,3 @@ include("transmittance.jl")
 
 
 end # module
-=#

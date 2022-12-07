@@ -1,4 +1,3 @@
-#=
 module SoilPlantAirContinuum
 
 using Statistics: mean
@@ -23,4 +22,3 @@ include("update.jl"    )
 
 
 end # module
-=#
