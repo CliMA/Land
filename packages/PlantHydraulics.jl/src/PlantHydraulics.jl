@@ -13,7 +13,7 @@ using ClimaCache: Leaf, LeafHydraulics, Leaves1D, Leaves2D, NonSteadyStateFlow, 
 using ClimaCache: MonoElementSPAC, MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 using SoilHydraulics: soil_θ, soil_ψ_25
 
-import ..SoilHydraulics: relative_hydraulic_conductance
+import SoilHydraulics: relative_hydraulic_conductance
 
 
 # include functions

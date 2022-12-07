@@ -25,6 +25,9 @@ for pkg_name in pkg_names
                 if length(_line) > 8 && _line[1:8] == "using .."
                     _line = replace(_line, ".." => "");
                 end;
+                if length(_line) > 9 && _line[1:9] == "import .."
+                    _line = replace(_line, ".." => "");
+                end;
 
                 # write line to file
                 write(_wfile, _line * "\n");
