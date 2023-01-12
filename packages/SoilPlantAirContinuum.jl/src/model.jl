@@ -22,7 +22,7 @@ This function runs the model using the following steps:
 - Run leaf energy budget (calculate ∂T∂t only)
 - Run time stepper (using ∂X∂t * δt, and make sure δt is not too high)
 
-This function is supposed to have the highest hierarchy, and should support all SPAC types defined in ClimaCache.jl. Note to update the water flow profile when initializing the SPAC.
+This function is supposed to have the highest hierarchy, and should support all SPAC types defined in EmeraldNamespace.jl. Note to update the water flow profile when initializing the SPAC.
 
 """
 function soil_plant_air_continuum! end

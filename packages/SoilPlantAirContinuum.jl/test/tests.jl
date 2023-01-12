@@ -1,7 +1,7 @@
 @testset verbose = true "SoilPlantAirContinuum Test" begin
     @testset "Core Function" begin
         for FT in [Float32, Float64]
-            for spac in [ClimaCache.MonoMLGrassSPAC{FT}(), ClimaCache.MonoMLPalmSPAC{FT}(), ClimaCache.MonoMLTreeSPAC{FT}()]
+            for spac in [EmeraldNamespace.MonoMLGrassSPAC{FT}(), EmeraldNamespace.MonoMLPalmSPAC{FT}(), EmeraldNamespace.MonoMLTreeSPAC{FT}()]
                 SoilPlantAirContinuum.initialize!(spac);
                 @test true;
                 SoilPlantAirContinuum.soil_plant_air_continuum!(spac, FT(1));
@@ -14,7 +14,7 @@
 
     @testset "Quantities" begin
         for FT in [Float32, Float64]
-            for spac in [ClimaCache.MonoMLGrassSPAC{FT}(), ClimaCache.MonoMLPalmSPAC{FT}(), ClimaCache.MonoMLTreeSPAC{FT}()]
+            for spac in [EmeraldNamespace.MonoMLGrassSPAC{FT}(), EmeraldNamespace.MonoMLPalmSPAC{FT}(), EmeraldNamespace.MonoMLTreeSPAC{FT}()]
                 SoilPlantAirContinuum.initialize!(spac);
                 SoilPlantAirContinuum.soil_plant_air_continuum!(spac, FT(1));
                 @test !isnan(SoilPlantAirContinuum.CNPP(spac));

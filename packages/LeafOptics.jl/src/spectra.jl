@@ -59,9 +59,9 @@ Update leaf reflectance and transmittance spectra, and fluorescence spectrum mat
 
 # Examples
 ```julia
-wls = ClimaCache.WaveLengthSet{Float64}();
-bio = ClimaCache.HyperspectralLeafBiophysics{Float64}();
-lha = ClimaCache.HyperspectralAbsorption{Float64}();
+wls = EmeraldNamespace.WaveLengthSet{Float64}();
+bio = EmeraldNamespace.HyperspectralLeafBiophysics{Float64}();
+lha = EmeraldNamespace.HyperspectralAbsorption{Float64}();
 leaf_spectra!(bio, wls, lha, 50.0);
 leaf_spectra!(bio, wls, lha, 50.0; APAR_car=false);
 leaf_spectra!(bio, wls, lha, 50.0; APAR_car=false, α=59.0);
@@ -267,8 +267,8 @@ Update leaf reflectance and transmittance (e.g., prescribe broadband PAR and NIR
 
 # Examples
 ```julia
-wls = ClimaCache.WaveLengthSet{Float64}();
-bio = ClimaCache.HyperspectralLeafBiophysics{Float64}();
+wls = EmeraldNamespace.WaveLengthSet{Float64}();
+bio = EmeraldNamespace.HyperspectralLeafBiophysics{Float64}();
 leaf_spectra!(bio, wls, 0.1, 0.45, 0.05, 0.25);
 ```
 

@@ -21,9 +21,9 @@ Return leaf level PAR, APAR, and PPAR, given
 ---
 # Examples
 ```julia
-wls = ClimaCache.WaveLengthSet{Float64}();
-bio = ClimaCache.HyperspectralLeafBiophysics{Float64}();
-rad = ClimaCache.HyperspectralRadiation{Float64}();
+wls = EmeraldNamespace.WaveLengthSet{Float64}();
+bio = EmeraldNamespace.HyperspectralLeafBiophysics{Float64}();
+rad = EmeraldNamespace.HyperspectralRadiation{Float64}();
 par,apar,ppar = leaf_PAR(bio, wls, rad);
 par,apar,ppar = leaf_PAR(bio, wls, rad; APAR_car=false);
 ```

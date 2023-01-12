@@ -20,6 +20,7 @@ update!(air::AirLayer{FT}; p_CO₂::Union{Number,Nothing} = nothing, p_H₂O::Un
 
 ## Measures
 ```@docs
+BETA
 CNPP
 GPP
 PPAR

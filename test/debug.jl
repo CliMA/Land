@@ -9,8 +9,8 @@ using Profile
 
 
 # create a spac to work on
-d_spac = ClimaCache.MonoMLTreeSPAC{Float64}();
-d_spac.SOIL.ALBEDO = ClimaCache.BroadbandSoilAlbedo{Float64}();
+d_spac = EmeraldNamespace.MonoMLTreeSPAC{Float64}();
+d_spac.SOIL.ALBEDO = EmeraldNamespace.BroadbandSoilAlbedo{Float64}();
 
 
 # clear the memory allocation

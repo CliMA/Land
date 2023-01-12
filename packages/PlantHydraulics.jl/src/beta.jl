@@ -52,7 +52,7 @@ function β_factor end
 #
 #######################################################################################################################################################################################################
 """
-This function updates the beta factor for SPAC if empirical models are used. The method is meant to support all SPAC defined in ClimaCache.jl:
+This function updates the beta factor for SPAC if empirical models are used. The method is meant to support all SPAC defined in EmeraldNamespace.jl:
 - `MonoElementSPAC`
 - `MonoMLGrassSPAC`
 - `MonoMLPalmSPAC`

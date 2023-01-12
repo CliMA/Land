@@ -1,8 +1,8 @@
 @testset verbose = true "CanopyRadiativeTransfer Test" begin
     @testset "Leaf Inclination Angles" begin
         for FT in [Float32, Float64]
-            can1 = ClimaCache.HyperspectralMLCanopy{FT}();
-            can2 = ClimaCache.BroadbandSLCanopy{FT}();
+            can1 = EmeraldNamespace.HyperspectralMLCanopy{FT}();
+            can2 = EmeraldNamespace.BroadbandSLCanopy{FT}();
             CanopyRadiativeTransfer.inclination_angles!(can1, can1.LIDF);
             CanopyRadiativeTransfer.inclination_angles!(can2, can2.LIDF);
             @test true;
@@ -11,8 +11,8 @@
 
     @testset "Clumping Index" begin
         for FT in [Float32, Float64]
-            can = ClimaCache.HyperspectralMLCanopy{FT}();
-            angles = ClimaCache.SunSensorGeometry{FT}();
+            can = EmeraldNamespace.HyperspectralMLCanopy{FT}();
+            angles = EmeraldNamespace.SunSensorGeometry{FT}();
             CanopyRadiativeTransfer.clumping_index!(can, angles);
             @test true;
         end;
@@ -20,17 +20,17 @@
 
     @testset "Canopy RT" begin
         for FT in [Float32, Float64]
-            hcan = ClimaCache.HyperspectralMLCanopy{FT}();
-            bcan = ClimaCache.BroadbandSLCanopy{FT}();
-            angles = ClimaCache.SunSensorGeometry{FT}();
-            hleaf = ClimaCache.Leaves2D{FT}();
-            bleaf = ClimaCache.Leaves1D{FT}();
+            hcan = EmeraldNamespace.HyperspectralMLCanopy{FT}();
+            bcan = EmeraldNamespace.BroadbandSLCanopy{FT}();
+            angles = EmeraldNamespace.SunSensorGeometry{FT}();
+            hleaf = EmeraldNamespace.Leaves2D{FT}();
+            bleaf = EmeraldNamespace.Leaves1D{FT}();
             leaves = [deepcopy(hleaf) for i in 1:20];
-            hsoil = ClimaCache.Soil{FT}();
-            bsoil = ClimaCache.Soil{FT}(ZS = FT[0,-1], ALBEDO = ClimaCache.BroadbandSoilAlbedo{FT}());
-            hrad = ClimaCache.HyperspectralRadiation{FT}();
-            brad = ClimaCache.BroadbandRadiation{FT}();
-            spac = ClimaCache.MonoMLTreeSPAC{FT}();
+            hsoil = EmeraldNamespace.Soil{FT}();
+            bsoil = EmeraldNamespace.Soil{FT}(ZS = FT[0,-1], ALBEDO = EmeraldNamespace.BroadbandSoilAlbedo{FT}());
+            hrad = EmeraldNamespace.HyperspectralRadiation{FT}();
+            brad = EmeraldNamespace.BroadbandRadiation{FT}();
+            spac = EmeraldNamespace.MonoMLTreeSPAC{FT}();
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, angles);
             @test true;
             CanopyRadiativeTransfer.canopy_optical_properties!(hcan, leaves, hsoil);
@@ -64,7 +64,7 @@
 
     @testset "Remote Sensing" begin
         for FT in [Float32, Float64]
-            can = ClimaCache.HyperspectralMLCanopy{FT}();
+            can = EmeraldNamespace.HyperspectralMLCanopy{FT}();
             for var in [CanopyRadiativeTransfer.MODIS_EVI(can),
                         CanopyRadiativeTransfer.MODIS_EVI2(can),
                         CanopyRadiativeTransfer.MODIS_LSWI(can),

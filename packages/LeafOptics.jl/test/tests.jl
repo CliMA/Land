@@ -2,10 +2,10 @@
     # file spectra.jl
     @testset "Spectra" begin
         for FT in [Float32, Float64]
-            wls  = ClimaCache.WaveLengthSet{FT}();
-            bio  = ClimaCache.HyperspectralLeafBiophysics{FT}();
-            lha  = ClimaCache.HyperspectralAbsorption{FT}();
-            spac = ClimaCache.MonoMLTreeSPAC{FT}();
+            wls  = EmeraldNamespace.WaveLengthSet{FT}();
+            bio  = EmeraldNamespace.HyperspectralLeafBiophysics{FT}();
+            lha  = EmeraldNamespace.HyperspectralAbsorption{FT}();
+            spac = EmeraldNamespace.MonoMLTreeSPAC{FT}();
 
             LeafOptics.leaf_spectra!(bio, wls, lha, FT(50));
             @test true;
@@ -25,9 +25,9 @@
     # file radiation.jl
     @testset "PAR & APAR" begin
         for FT in [Float32, Float64]
-            wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}();
-            rad = ClimaCache.HyperspectralRadiation{FT}();
+            wls = EmeraldNamespace.WaveLengthSet{FT}();
+            bio = EmeraldNamespace.HyperspectralLeafBiophysics{FT}();
+            rad = EmeraldNamespace.HyperspectralRadiation{FT}();
 
             par,apar,ppar = LeafOptics.leaf_PAR(bio, wls, rad);
             @test true;
@@ -39,9 +39,9 @@
     # file fluorescence.jl
     @testset "SIF" begin
         for FT in [Float32, Float64]
-            wls = ClimaCache.WaveLengthSet{FT}();
-            bio = ClimaCache.HyperspectralLeafBiophysics{FT}();
-            rad = ClimaCache.HyperspectralRadiation{FT}();
+            wls = EmeraldNamespace.WaveLengthSet{FT}();
+            bio = EmeraldNamespace.HyperspectralLeafBiophysics{FT}();
+            rad = EmeraldNamespace.HyperspectralRadiation{FT}();
 
             sif_b,sif_f = LeafOptics.leaf_SIF(bio, wls, rad, FT(0.01));
             @test true;

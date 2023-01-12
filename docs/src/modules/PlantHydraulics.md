@@ -20,14 +20,14 @@ Root, Stem, and Leaf organs differ in the following:
 
 For example in a Leaf, to simulate the flow and pressure profiles, what you need to do are
 ```julia
-using ClimaCache
+using EmeraldNamespace
 using PlantHydraulics
 FT = Float64;
 
-leaf = ClimaCache.Leaf{FT}();
-stem = ClimaCache.Stem{FT}();
-root = ClimaCache.Root{FT}();
-soil = ClimaCache.SoilLayer{FT}();
+leaf = EmeraldNamespace.Leaf{FT}();
+stem = EmeraldNamespace.Stem{FT}();
+root = EmeraldNamespace.Root{FT}();
+soil = EmeraldNamespace.SoilLayer{FT}();
 PlantHydraulics.xylem_flow_profile!(leaf, FT(1));
 PlantHydraulics.xylem_flow_profile!(stem, FT(1));
 PlantHydraulics.xylem_flow_profile!(root, FT(1));
@@ -42,7 +42,7 @@ Note the second parameter `FT(1)` is the time step in second to use with non-ste
 ## Plant Level Simulation
 While one can always customize the hydraulic system using functions `xylem_flow_profile!` and `xylem_pressure_profile!`, we provide shortcut functions to soil-plant-air continuum where soil layers, plant, and air layers are aligned. For example, a spac of a tree (`MonoMLTreeSPAC`).
 ```julia
-spac = ClimaCache.MonoMLTreeSPAC{FT}();
+spac = EmeraldNamespace.MonoMLTreeSPAC{FT}();
 PlantHydraulics.xylem_flow_profile!(spac, FT(1));
 PlantHydraulics.xylem_pressure_profile!(spac);
 ```

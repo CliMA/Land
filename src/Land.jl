@@ -19,7 +19,7 @@ module Land
 include("modules/EmeraldConstants.jl"       )
 include("modules/EarthSurface.jl"           )
 include("modules/WaterPhysics.jl"           )
-include("modules/ClimaCache.jl"             )
+include("modules/EmeraldNamespace.jl"       )
 include("modules/LeafOptics.jl"             )
 include("modules/CanopyRadiativeTransfer.jl")
 include("modules/Photosynthesis.jl"         )
@@ -33,7 +33,7 @@ include("modules/SoilPlantAirContinuum.jl"  )
 export EarthSurface
 export EmeraldConstants
 export WaterPhysics
-export ClimaCache
+export EmeraldNamespace
 export LeafOptics
 export CanopyRadiativeTransfer
 export Photosynthesis

@@ -19,7 +19,7 @@ julia> Pkg.add(PackageSpec(url="https://github.com/CliMA/Land.git", rev="v0.1"))
 using Pkg;
 Pkg.add("EmeraldConstants");
 Pkg.add("WaterPhysics");
-Pkg.add("ClimaCache");
+Pkg.add("EmeraldNamespace");
 Pkg.add("LeafOptics");
 Pkg.add("CanopyRadiativeTransfer");
 Pkg.add("Photosynthesis");

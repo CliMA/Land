@@ -6,8 +6,8 @@
 #
 #######################################################################################################################################################################################################
 """
-Per refactored Photosynthesis module, the only things one need to know is the public function `leaf_photosynthesis!` and some construtors from `ClimaCache`. See the examples in the methods below for
-    details about how to use the function. The steps for computing photosynthetic rates are
+Per refactored Photosynthesis module, the only things one need to know is the public function `leaf_photosynthesis!` and some construtors from `EmeraldNamespace`. See the examples in the methods
+    below for details about how to use the function. The steps for computing photosynthetic rates are
 
 - Update temperature dependent variables using [`photosystem_temperature_dependence!`](@ref)
 - Calculate electron transport rate using [`photosystem_electron_transport!`](@ref)

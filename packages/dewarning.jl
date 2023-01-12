@@ -4,7 +4,7 @@
 #     julia remove_warning.jl
 #
 
-pkg_names = ["CanopyRadiativeTransfer", "ClimaCache", "EarthSurface", "EmeraldConstants", "LeafOptics", "Photosynthesis", "PlantHydraulics", "SoilHydraulics", "SoilPlantAirContinuum",
+pkg_names = ["CanopyRadiativeTransfer", "EarthSurface", "EmeraldConstants", "EmeraldNamespace", "LeafOptics", "Photosynthesis", "PlantHydraulics", "SoilHydraulics", "SoilPlantAirContinuum",
              "StomataModels", "WaterPhysics"];
 
 for pkg_name in pkg_names

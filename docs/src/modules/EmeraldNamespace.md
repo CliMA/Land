@@ -1,7 +1,7 @@
-# ClimaCache
+# EmeraldNamespace
 
 ```@meta
-CurrentModule = ClimaCache
+CurrentModule = EmeraldNamespace
 ```
 
 

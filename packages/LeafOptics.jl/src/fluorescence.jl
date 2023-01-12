@@ -24,9 +24,9 @@ Return the leaf level SIF at backward and forward directions, given
 ---
 # Examples
 ```julia
-wls = ClimaCache.WaveLengthSet{Float64}();
-bio = ClimaCache.HyperspectralLeafBiophysics{Float64}();
-rad = ClimaCache.HyperspectralRadiation{Float64}();
+wls = EmeraldNamespace.WaveLengthSet{Float64}();
+bio = EmeraldNamespace.HyperspectralLeafBiophysics{Float64}();
+rad = EmeraldNamespace.HyperspectralRadiation{Float64}();
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01);
 sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01; ϕ_photon=false);
 ```

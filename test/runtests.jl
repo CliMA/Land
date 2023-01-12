@@ -6,7 +6,7 @@ using Test
 pkgs = ["EmeraldConstants",
         "EarthSurface",
         "WaterPhysics",
-        "ClimaCache",
+        "EmeraldNamespace",
         "LeafOptics",
         "CanopyRadiativeTransfer",
         "Photosynthesis",

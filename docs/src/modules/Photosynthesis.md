@@ -20,7 +20,7 @@ We aim to make Photosynthesis.jl a standalone package rather than just part of t
 
 
 ## Model Selection
-Starting from v0.3, photosynthesis and fluorescence model selection is done by setting up the fields of a leaf. There are three types of leaf in Photosynthesis (all the structures are defined in ClimaCache.jl and shared among all CliMA Land submodules), and they are
+Starting from v0.3, photosynthesis and fluorescence model selection is done by setting up the fields of a leaf. There are three types of leaf in Photosynthesis (all the structures are defined in EmeraldNamespace.jl and shared among all CliMA Land submodules), and they are
 - `Leaf` for a single leaf to use in leaf level research
 - `Leaves1D` for a vector of leaves to use in big leaf models
 - `Leaves2D` for a matrix of sunlit fractions and a shaded fraction to use along with canopy with leaf angular distribution
@@ -31,20 +31,20 @@ For all of the three leaf structs, there are two fields named
 
 A `C3VJPModel` type `PSM` along with a `VJPReactionCenter` type `PRC` defines the C3VJP model; a `C4VJPModel` type `PSM` along with a `VJPReactionCenter` type `PRC` defines the C4VJP model; and a `C3CytochromeModel` type `PSM` along with a `CytochromeReactionCenter` type `PRC` defines the C3Cytochrome model. For instance, `leaf_c3`, `leaf_c4`, and `leaf_cy` each defines a model to use the three predefined photosynthesis models:
 ```julia
-using ClimaCache;
+using EmeraldNamespace;
 FT = Float64;
 
-leaf_c3 = ClimaCache.Leaf{FT}();
-leaf_c4 = ClimaCache.Leaf{FT}(PSM = ClimaCache.C4VJPModel{FT}());
-leaf_cy = ClimaCache.Leaf{FT}(PSM = ClimaCache.C3CytochromeModel{FT}(), PRC = ClimaCache.CytochromeReactionCenter{FT}());
+leaf_c3 = EmeraldNamespace.Leaf{FT}();
+leaf_c4 = EmeraldNamespace.Leaf{FT}(PSM = EmeraldNamespace.C4VJPModel{FT}());
+leaf_cy = EmeraldNamespace.Leaf{FT}(PSM = EmeraldNamespace.C3CytochromeModel{FT}(), PRC = EmeraldNamespace.CytochromeReactionCenter{FT}());
 
 # users can define the same fields for Leaves1D and Leaves2D to custoimize photosynthesis model
-leaf_d3 = ClimaCache.Leaves1D{FT}();
-leaf_d4 = ClimaCache.Leaves1D{FT}(PSM = ClimaCache.C4VJPModel{FT}());
-leaf_dy = ClimaCache.Leaves1D{FT}(PSM = ClimaCache.C3CytochromeModel{FT}(), PRC = ClimaCache.CytochromeReactionCenter{FT}());
-leaf_e3 = ClimaCache.Leaves2D{FT}();
-leaf_e4 = ClimaCache.Leaves2D{FT}(PSM = ClimaCache.C4VJPModel{FT}());
-leaf_ey = ClimaCache.Leaves2D{FT}(PSM = ClimaCache.C3CytochromeModel{FT}(), PRC = ClimaCache.CytochromeReactionCenter{FT}());
+leaf_d3 = EmeraldNamespace.Leaves1D{FT}();
+leaf_d4 = EmeraldNamespace.Leaves1D{FT}(PSM = EmeraldNamespace.C4VJPModel{FT}());
+leaf_dy = EmeraldNamespace.Leaves1D{FT}(PSM = EmeraldNamespace.C3CytochromeModel{FT}(), PRC = EmeraldNamespace.CytochromeReactionCenter{FT}());
+leaf_e3 = EmeraldNamespace.Leaves2D{FT}();
+leaf_e4 = EmeraldNamespace.Leaves2D{FT}(PSM = EmeraldNamespace.C4VJPModel{FT}());
+leaf_ey = EmeraldNamespace.Leaves2D{FT}(PSM = EmeraldNamespace.C3CytochromeModel{FT}(), PRC = EmeraldNamespace.CytochromeReactionCenter{FT}());
 ```
 
 
@@ -62,9 +62,9 @@ Yet, for convenience, all the listed steps are combined in one function `leaf_ph
 ```julia
 using Photosynthesis
 
-air    = ClimaCache.AirLayer{FT}();
-g_mode = ClimaCache.GCO₂Mode();
-p_mode = ClimaCache.PCO₂Mode();
+air    = EmeraldNamespace.AirLayer{FT}();
+g_mode = EmeraldNamespace.GCO₂Mode();
+p_mode = EmeraldNamespace.PCO₂Mode();
 Photosynthesis.leaf_photosynthesis!(leaf_c3, air, g_mode);
 Photosynthesis.leaf_photosynthesis!(leaf_cy, air, p_mode);
 ```
