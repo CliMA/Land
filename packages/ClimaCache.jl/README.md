@@ -2,4 +2,4 @@
 
 
 ## About
-ClimaCache.jl is designed to share information among different CliMA Land modules. All public types and structs are supposed to live here.
+ClimaCache.jl is renamed to EmeraldNamespace to be more accurate, and thus is deprecated till we use it for another purpose.

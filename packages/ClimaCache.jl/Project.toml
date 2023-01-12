@@ -1,19 +1,10 @@
 name = "ClimaCache"
 uuid = "781d2db2-48ae-11ec-81d3-0242ac130003"
 authors = ["Yujie Wang <jesiner@gmail.com>"]
-version = "1.1.8"
+version = "2.0.0"
 
 [deps]
-DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-EmeraldConstants = "f1e47f7f-56cf-4a63-9b2b-695e95ad7a29"
-LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
-NetcdfIO = "6a36f34d-89cf-423a-87c4-84549e82f670"
-PkgUtility = "0d262f2c-28e9-492c-8e19-d7a5c4f11611"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-DocStringExtensions = "0.8.6, 0.9.0"
-EmeraldConstants = "0.1.0"
-NetcdfIO = "0.2.4"
-PkgUtility = "0.1.13, 0.2.0"
 julia = "1.6"
