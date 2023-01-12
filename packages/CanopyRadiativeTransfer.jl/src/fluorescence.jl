@@ -51,14 +51,14 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}
         OPTICS._tmp_vec_sife_2 .= view(RADIATION.e_diffuse_down,WLSET.IΛ_SIFE,_i) .* WLSET.ΔΛ_SIFE;
         OPTICS._tmp_vec_sife_3 .= view(RADIATION.e_diffuse_up  ,WLSET.IΛ_SIFE,_i) .* WLSET.ΔΛ_SIFE;
 
-        _e_dir, _e_dif_down, _e_dif_up = OPTICS._tmp_vec_sife_1, OPTICS._tmp_vec_sife_2, OPTICS._tmp_vec_sife_3;
-
         # determine which ones to use depending on ϕ_photon
         if ϕ_photon
             photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_1);
             photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_2);
             photon!(WLSET.Λ_SIFE, OPTICS._tmp_vec_sife_3);
         end;
+
+        _e_dir, _e_dif_down, _e_dif_up = OPTICS._tmp_vec_sife_1, OPTICS._tmp_vec_sife_2, OPTICS._tmp_vec_sife_3;
 
         # convert the excitation radiation to fluorescence components
         mul!(OPTICS._tmp_vec_sif_1, OPTICS._mat⁺, _e_dir);          # SIF component from direct light (before scaling)
