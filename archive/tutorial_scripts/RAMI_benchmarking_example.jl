@@ -1,21 +1,22 @@
-# # # RAMI Benchmarking 
-#  The goal of the RAMI4PILPS experiment[^1] is to evaluate different approaches by which Land Surface Models in larger Earth System Models quantify the radiation transfer within vegetation canopies. The RAMI4PILPS can be interpreted as a quality control mechanism used to: 
-# 
+#=
+# # # RAMI Benchmarking
+#  The goal of the RAMI4PILPS experiment[^1] is to evaluate different approaches by which Land Surface Models in larger Earth System Models quantify the radiation transfer within vegetation canopies. The RAMI4PILPS can be interpreted as a quality control mechanism used to:
+#
 # 1) quantify the errors in the radiative transfer scheme;
-# 
-# 2) identify the impact that structural and spectral sub-grid variability may have on radiative transfer; and 
-# 
-# 3) verify the conservation of energy at the level of the surface, as well as inconsistencies arising from different levels of assumptions/simplifications. 
-# 
-# This approach involves direct comparison with reference solutions obtained from highly accurate 3D models identified during the third phase of the RAMI benchmarking exercise[^2]. 
-# 
+#
+# 2) identify the impact that structural and spectral sub-grid variability may have on radiative transfer; and
+#
+# 3) verify the conservation of energy at the level of the surface, as well as inconsistencies arising from different levels of assumptions/simplifications.
+#
+# This approach involves direct comparison with reference solutions obtained from highly accurate 3D models identified during the third phase of the RAMI benchmarking exercise[^2].
+#
 # A set of 3D experiments compares the partitioning of incident solar energy into an absorbed (A) flux, a transmitted (T) flux component and the surface reflectance (R). The overall canopy structure for these test cases is reminiscent of open forest canopies with randomly oriented foliage, confined to spherical volumes located at varying heights above the ground.
-# In here, we use a total of 36 test cases including various canopy density, soil brightness, and illumination conditions for the visible (VIS) (400-700nm) and near infra-red (NIR) (700-3000nm) spectral ranges. 
-# 
+# In here, we use a total of 36 test cases including various canopy density, soil brightness, and illumination conditions for the visible (VIS) (400-700nm) and near infra-red (NIR) (700-3000nm) spectral ranges.
+#
 #  [^1]: J.L. Widlowski, B. Pinty, M. Clerici, Y. Dai, M. De Kauwe, K. de Ridder, A. Kallel, H. Kobayashi, T. Lavergne, W. Ni-Meister, A. Olchev, T. Quaife, S. Wang, W. Yang, Y. Yang, and H. Yuan (2011), RAMI4PILPS: An intercomparison of formulations for the partitioning of solar radiation in land surface models, Journal of Geophysical Research, 116, G02019, 25, DOI: 10.1029/2010JG001511.
-#  
-#  [^2]: Widlowski, J-L., M. Taberner, B. Pinty, V. Bruniquel-Pinel, M. Disney, R. Fernandes, J.-P. Gastellu-Etchegorry, N. Gobron, A. Kuusk, T. Lavergne, S. Leblanc, P. Lewis, E. Martin, M. Mottus, P. J. R. North, W. Qin, M.Robustelli, N. Rochdi, R.Ruiloba, C.Soler, R.Thompson, W. Verhoef, M. M.Verstraete, and D. Xie (2007), 'The third RAdiation transfer Model Intercomparison (RAMI) exercise: Documenting progress in canopy reflectance modelling', Journal of Geophysical Research, 112, D09111, 28, DOI: 10.1029/2006JD007821. 
-# 
+#
+#  [^2]: Widlowski, J-L., M. Taberner, B. Pinty, V. Bruniquel-Pinel, M. Disney, R. Fernandes, J.-P. Gastellu-Etchegorry, N. Gobron, A. Kuusk, T. Lavergne, S. Leblanc, P. Lewis, E. Martin, M. Mottus, P. J. R. North, W. Qin, M.Robustelli, N. Rochdi, R.Ruiloba, C.Soler, R.Thompson, W. Verhoef, M. M.Verstraete, and D. Xie (2007), 'The third RAdiation transfer Model Intercomparison (RAMI) exercise: Documenting progress in canopy reflectance modelling', Journal of Geophysical Research, 112, D09111, 28, DOI: 10.1029/2006JD007821.
+#
 
 
 #### Use Julia Plots package and switch to plotly js option:
@@ -35,7 +36,7 @@ using Land
 using Land.CanopyRT
 ##----------------------------------------------------------------------------
 
-##Defining all reference values for the Sparse case 
+##Defining all reference values for the Sparse case
 
 #----------------------------------------------------------------------------
 
@@ -88,7 +89,7 @@ function RAMI_case(LAI, soil_albedo, clumping_index)
   transRed_SZA = []
 
   for SZA=0.0:1:85
-    angles.tts=SZA  
+    angles.tts=SZA
 
     fluspect!(leaf, wl_set);
     compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
@@ -97,11 +98,11 @@ function RAMI_case(LAI, soil_albedo, clumping_index)
    ## leaf reflectance RED
    leaf.ρ_SW[28] = 0.0735
    ## leaf transmittance
-   leaf.τ_SW[28]= 0.0566 
-    
+   leaf.τ_SW[28]= 0.0566
+
     ##Setting all diffuse to zero
     sunRad_rt.E_diffuse[28] = 0.0
-    
+
     simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
     push!(reflRed_SZA, canRad_rt.alb_direct[28])
     push!(absRed_SZA, (sum(canRad_rt.netSW_shade,dims=2)[28,1].+sum(canRad_rt.netSW_sunlit,dims=2)[28,1])./(sunRad_rt.E_diffuse[28].+sunRad_rt.E_direct[28]))
@@ -119,21 +120,21 @@ function RAMI_case(LAI, soil_albedo, clumping_index)
   canopy_rt.Ω = clumping_index
 
   for SZA=0.0:1:85
-    angles.tts=SZA  
+    angles.tts=SZA
 
     fluspect!(leaf, wl_set);
     compute_canopy_geometry!(canopy_rt, angles, canOpt_rt)
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
-    
+
     simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
     push!(reflRed_clump_SZA, canRad_rt.alb_direct[28])
     push!(absRed_clump_SZA, (sum(canRad_rt.netSW_shade,dims=2)[28,1].+sum(canRad_rt.netSW_sunlit,dims=2)[28,1])./(sunRad_rt.E_diffuse[28].+sunRad_rt.E_direct[28]))
     push!(transRed_clump_SZA,  (canOpt_rt.Es_[28,end] .+ canRad_rt.E_down[28,end])./(sunRad_rt.E_diffuse[28].+sunRad_rt.E_direct[28]))
 
   end
-    
+
   return reflRed_SZA,absRed_SZA,transRed_SZA,reflRed_clump_SZA,absRed_clump_SZA,transRed_clump_SZA
-    
+
 end;
 
 #----------------------------------------------------------------------------
@@ -273,7 +274,7 @@ gcf()
 
 #----------------------------------------------------------------------------
 
-##Defining all reference values for the Medium case 
+##Defining all reference values for the Medium case
 
 RAMI_SZA = [27.,60.,83.]
 
@@ -423,7 +424,7 @@ gcf()
 
 #----------------------------------------------------------------------------
 
-##Defining all reference values for the Dense case 
+##Defining all reference values for the Dense case
 
 RAMI_SZA = [27.,60.,83.]
 
@@ -602,11 +603,11 @@ angles.tts=27.
 #### Set 0 azimuth (principal plane)
 angles.psi=0
 
-##Adding clumping 
+##Adding clumping
 canopy_rt.Ω = 1.0
 #### LAI of 3:
 canopy_rt.LAI = 2.5007
-#### Define VZA 
+#### Define VZA
 VZA=collect(-89.5:0.5:89.5)
 
 for VZA_ in VZA
@@ -615,7 +616,7 @@ for VZA_ in VZA
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
     simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
     computeSIF_Fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
-    #### Handpicked indices in 
+    #### Handpicked indices in
     push!(reflVIS, canRad_rt.alb_obs[ind_red])
     push!(reflNIR, canRad_rt.alb_obs[ind_NIR])
     push!(SIF_R , canRad_rt.SIF_obs[ind_wlf_R])
@@ -623,7 +624,7 @@ for VZA_ in VZA
 end
 
 
-##Adding clumping 
+##Adding clumping
 canopy_rt.Ω = 0.45946608
 
 SIF_FR_clump = Float32[]
@@ -638,7 +639,7 @@ for VZA_ in VZA
     compute_canopy_matrices!(arrayOfLeaves, canOpt_rt);
     simulate_short_wave!(canopy_rt, canOpt_rt, canRad_rt, sunRad_rt, soil);
     computeSIF_Fluxes!(arrayOfLeaves, canOpt_rt, canRad_rt, canopy_rt, soil, wl_set);
-    #### Handpicked indices in 
+    #### Handpicked indices in
     push!(reflVIS_clump, canRad_rt.alb_obs[ind_red])
     push!(reflNIR_clump, canRad_rt.alb_obs[ind_NIR])
     push!(SIF_R_clump , canRad_rt.SIF_obs[ind_wlf_R])
@@ -646,7 +647,7 @@ for VZA_ in VZA
 end
 #----------------------------------------------------------------------------
 
-#### Plots Visible 
+#### Plots Visible
 figure()
 plot(VZA, reflVIS, color=:black,label="Red Reflectance", lw=2)
 plot(VZA, SIF_R/30, color=:orange,label="Red SIF (/30)", lw=2)
@@ -657,7 +658,7 @@ legend()
 gcf()
 #----------------------------------------------------------------------------
 
-#### Plots Visible 
+#### Plots Visible
 figure()
 plot(VZA, reflNIR, color=:black,label="NIR Reflectance", lw=2)
 plot(VZA, SIF_FR/6, color=:orange,label="Far Red SIF (/6)", lw=2)
@@ -669,9 +670,9 @@ gcf()
 #----------------------------------------------------------------------------
 
 # # ## BRDF sampling
-# 
+#
 # By going through viewing and azimuth angles, we can construct a full BRDF for reflectance and SIF emissions at different wavelengths:
-# 
+#
 
 reflVIS = Float32[]
 reflNIR = Float32[]
@@ -700,7 +701,7 @@ for psi=0:360
     end
 end
 
-##Adding clumping 
+##Adding clumping
 canopy_rt.Ω = 0.45946608
 
 SIF_FR_clump = Float32[]
@@ -808,3 +809,4 @@ gcf()
 
 
 #----------------------------------------------------------------------------
+=#

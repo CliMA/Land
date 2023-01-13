@@ -1,4 +1,4 @@
-
+#=
 #using Revise
 
 # Add PATH
@@ -131,7 +131,7 @@ let
     l.psi_l    = psi_s;
     l.Cc       = 0.6*met.Ca;
     #println("Tair1=",met.T_air," Tleaf1=",l.T," psi_leaf1=",l.psi_l)
-        
+
     for i=1:N
         met.S_down = Sdown_t[i];
         met.L_down = eps_air*physcon.σ*(Tair_t[i])^4;
@@ -152,44 +152,44 @@ let
             #f_ode!(du,u,p,t,dummy);
             #println("du_outside = $(du), u_outside = $(u)")
             # Rn_t[i] = dummy[3]; H_t[i] = dummy[4]; LE_t[i] = dummy[5];
-            
-            
+
+
 #             du   = zeros(size(u));
 #             f_ode!(du,u,p,t);
 #             (l.T,l.psi_l,l.Cc) = du*dt+u;
-            
+
             u0   = [l.T;l.psi_l;l.Cc];
             prob = ODEProblem(f_ode!,u0,tspan,p);
-            sol  = solve(prob);            
+            sol  = solve(prob);
             # save values
             met = p.met;
             f   = p.f;
             l   = p.l;
             (l.T,l.psi_l,l.Cc) = sol[1:3,end];
-            
+
             #println("Cc_out=",l.Cc)
-            Rn_t[i] = p.f.Rn; H_t[i] = p.f.H; LE_t[i] = p.f.LE; 
-            rs_t[i] = 1.0/(p.l.gs/p.f.g_m_s_to_mol_m2_s); 
-            ra_t[i] = p.f.ra; 
-            GPP_t[i]= p.f.An_biochemistry; 
-            GPP_diffusion_t[i]= p.f.An_diffusion; 
-            LUE_t[i]= p.f.An_biochemistry/f.APAR; 
-            
+            Rn_t[i] = p.f.Rn; H_t[i] = p.f.H; LE_t[i] = p.f.LE;
+            rs_t[i] = 1.0/(p.l.gs/p.f.g_m_s_to_mol_m2_s);
+            ra_t[i] = p.f.ra;
+            GPP_t[i]= p.f.An_biochemistry;
+            GPP_diffusion_t[i]= p.f.An_diffusion;
+            LUE_t[i]= p.f.An_biochemistry/f.APAR;
+
             #T_old   = l.T;
             #(l.T,l.psi_l) = du*dt+u;
-            T_t[i]    = l.T ; #  = T_old; 
+            T_t[i]    = l.T ; #  = T_old;
             psil_t[i] = l.psi_l;
             Cc_t[i]   = l.Cc;
-            
+
             if(abs(H_t[i])>500)
                 println("index ($i) ($j)")
             end
-            
-            
-#             (dumb,l.psi_l) = du*dt+u;
-#             T_t[i]  = dumb ; #  = T_old; 
 
-            
+
+#             (dumb,l.psi_l) = du*dt+u;
+#             T_t[i]  = dumb ; #  = T_old;
+
+
         end
     end
 
@@ -213,7 +213,7 @@ let
 #         #l.T        = l.T + Deltat*dT_dt;
 #     end
 
-   
+
 end
 
 
@@ -247,21 +247,4 @@ savefig(joinpath(output_dir, "GPP_step_t.png"))
 plot(t/3600, LUE_t,xlabel = "t (hr)",ylabel = "LUE (-)",label="LUE",ylim=0:100)
 
 savefig(joinpath(output_dir, "LUE_step_t.png"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+=#

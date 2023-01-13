@@ -1,4 +1,4 @@
-
+#=
 #using Revise
 
 # Add PATH
@@ -20,7 +20,7 @@ output_dir = joinpath(@__DIR__,"output")
 using DelimitedFiles
 PAR  = readdlm("/Users/cfranken/PAR.dat");
 size(PAR)
-# use just a subset 
+# use just a subset
 #PAR = PAR[1:1000,:];
 
 tmax = length(PAR) # Time in seconds here
@@ -44,7 +44,7 @@ end
 
 f.Je   = 100; f.gbc  = 100; f.gbv  = 100; f.ceair= 1500; f.eair = 1500;  f.H=0;f.LE=0; # leaf should not have eair
 l.Kn = 2.44; l.α=0.2; l.ε=0.98; l.LMA=100e-3; l.RWC=80/100;l.psi_l=-1e6;l.psi_l50 = -2e6;l.ck=3;met.zscreen = 2.0;
-l.height   = 1.0; 
+l.height   = 1.0;
 met.stab_type_stable = 2;
 psi_s      = -0.3e6 ; # soil water potential (Pa)
 U          =  1.0;
@@ -81,8 +81,8 @@ for c = 2:1:tmax
        met.e_air  = RH*SatVap(met.T_air)[1];
        met.PAR    = PAR[c];
        met.U      = 1.0;
-    
-       f.APAR = PAR[c]*0.5 
+
+       f.APAR = PAR[c]*0.5
        f.APAR = max(10,f.APAR)
        #l.gs = uu[c-1,2]
        l.Kn = uu[c-1,1]
@@ -122,9 +122,9 @@ for c = 2:1:tmax
 #             f_ode!(du,u,p,t);
 #             (l.T,l.psi_l,l.Cc) = du*dt+u;
 
-       
-            
-    
+
+
+
        #LeafPhotosynthesis!(f,l,met)
     if (l.Kn_ss-l.Kn) > 0
         tau_k = 1
@@ -149,13 +149,4 @@ plot!(t/3600, uu[:,12],label="H",ylim=-50:500)
 plot!(t/3600, uu[:,13],label="LE",ylim=-50:500)
 
 plot(t/3600, uu[:,14]/met.Ca,label="Cc/Ca")
-
-
-
-
-
-
-
-
-
-
+=#

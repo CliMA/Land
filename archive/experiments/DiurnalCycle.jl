@@ -1,4 +1,4 @@
-
+#=
 #using Revise
 #----------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ let
     l.psi_l    = psi_s;
     l.Cc       = 0.6*met.Ca;
     ##println("Tair1=",met.T_air," Tleaf1=",l.T," psi_leaf1=",l.psi_l)
-        
+
     for i=1:N
         met.S_down = Sdown_t[i];
         met.L_down = eps_air*physcon.σ*(Tair_t[i])^4;
@@ -130,8 +130,8 @@ let
             ##f_ode!(du,u,p,t,dummy);
             ##println("du_outside = $(du), u_outside = $(u)")
             ## Rn_t[i] = dummy[3]; H_t[i] = dummy[4]; LE_t[i] = dummy[5];
-            
-            
+
+
             du   = zeros(size(u));
             f_ode!(du,u,p,t);
             ##@show du
@@ -139,27 +139,26 @@ let
             (l.T,l.psi_l,l.gs) = du*dt+u;
             ##@show p.l.gs
             ##println("Cc_out=",l.Cc)
-            Rn_t[i] = p.l.Rn; H_t[i] = p.l.H; LE_t[i] = p.l.LE; 
+            Rn_t[i] = p.l.Rn; H_t[i] = p.l.H; LE_t[i] = p.l.LE;
             gs_t[i] = p.l.gs;
             φ_t[i] = p.l.φ;
             sif_yield[i] = l.ϕs
-            rs_t[i] = 1.0/(p.l.gs/p.met.g_m_s_to_mol_m2_s); 
-            ra_t[i] = p.met.ra; 
-            GPP_t[i]= p.l.An; 
-            GPP_diffusion_t[i]= p.l.An; 
-            LUE_t[i]= p.l.An/l.APAR; 
+            rs_t[i] = 1.0/(p.l.gs/p.met.g_m_s_to_mol_m2_s);
+            ra_t[i] = p.met.ra;
+            GPP_t[i]= p.l.An;
+            GPP_diffusion_t[i]= p.l.An;
+            LUE_t[i]= p.l.An/l.APAR;
             apar[i]=l.APAR;
             ##T_old   = l.T;
             ##(l.T,l.psi_l) = du*dt+u;
-            T_t[i]    = l.T ; ##  = T_old; 
+            T_t[i]    = l.T ; ##  = T_old;
             psil_t[i] = l.psi_l;
             Cc_t[i]   = l.Cc;
-            
+
             if(abs(H_t[i])>500)
                 println("index ($i) ($j)")
-            end         
+            end
         end
     end
 end
-
-
+=#

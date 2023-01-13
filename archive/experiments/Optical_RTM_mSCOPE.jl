@@ -1,4 +1,4 @@
-
+#=
 # Add PATH (adapt!)
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/");
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Utils/");
@@ -115,5 +115,4 @@ plot(wl[CanopyRTMod.iPAR], arrayOfLeaves[1].kChlrel_old[CanopyRTMod.iPAR], label
 nwl2,nl2 = size(canOpt.R_dd)
 
 nwl2
-
-
+=#

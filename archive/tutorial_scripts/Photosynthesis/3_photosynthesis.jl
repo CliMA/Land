@@ -1,22 +1,23 @@
-# # Leaf Level Photosynthesis 
-# 
+#=
+# # Leaf Level Photosynthesis
+#
 # Here, we will go one step further and look at the entire leaf-level response to different environmental conditions, including the impact of leaf diffusive conductance here. See next tutorial for how stomatal conductance responds to the environment.
 
 # ## Leaf Diffusive Conductance and Stomatal Conductance
-# Before, we focussed mainly on the demand-driven constraints through Rubisco and RuBP regeneration. Leaf diffusive conductance is highly important as it drives the suppy-side of photosynthesis and interacts with the energy balance and leaf temperature as latent heat fluxes are a major factor in surface cooling. 
-# 
+# Before, we focussed mainly on the demand-driven constraints through Rubisco and RuBP regeneration. Leaf diffusive conductance is highly important as it drives the suppy-side of photosynthesis and interacts with the energy balance and leaf temperature as latent heat fluxes are a major factor in surface cooling.
+#
 # Before, we have derived net rates of photosynthesis $A_n$, which have to be matched with the supply side through CO₂ diffusion:
-# 
+#
 # $$A_n^{diff} = g_{leaf,C}(C_a-C_c) = g_{leaf,C}\frac{P_a-P_c}{P_{atm}}$$
-# 
+#
 # which can be separated into diffusion from the air to the leaf surface with a boundary layer conductance $g_{b,C}$, diffusion from the surface to the interstitial air-space with stomatal conductance $g_{s,C}$ and diffusion from the  interstitial air-space to the chloroplast with mesophyll conductance $g_{m,C}$ (the letter C stands for CO₂ here, as the diffusion constants vary with species, e.g. H$_2$O stomatal conductance is a factor 1.6 higher than those for CO₂):
-# 
+#
 # $$A_n^{diff} = g_{b,C}(C_a-C_s) = g_{s,C}(C_s-C_i) = g_{m,C}(C_i-C_c) = g_{leaf,C}(C_a-C_c)$$
-# 
+#
 # $$g_{leaf,C} = \left(\frac{1}{g_{b,C}}+\frac{1}{g_{s,C}}+\frac{1}{g_{m,C}}\right)^{-1}$$
-# 
-# The importance of diffusive conductance and its interplay with photosynthesis here is that the supply and demand rates determine $C_c$. A reduction in $C_c$ reduces the demand-limited rates while it increase the diffusion rates (at a given $g$). Most models run internal so-called A-$C_c$ iterations to ensure both rates are balanced and in steady-state ($\partial C_c/\partial t=0$). We implement this option but also opt to run stomatal conductance prognostically, as stomata don't open and close instantanously but have a response time of around 15 minutes.  
-# 
+#
+# The importance of diffusive conductance and its interplay with photosynthesis here is that the supply and demand rates determine $C_c$. A reduction in $C_c$ reduces the demand-limited rates while it increase the diffusion rates (at a given $g$). Most models run internal so-called A-$C_c$ iterations to ensure both rates are balanced and in steady-state ($\partial C_c/\partial t=0$). We implement this option but also opt to run stomatal conductance prognostically, as stomata don't open and close instantanously but have a response time of around 15 minutes.
+#
 # Below, we show simple examples of how the environmental conditions and the leaf diffusive conductance impact leaf photosynthesis.
 #
 
@@ -185,3 +186,4 @@ xlabel("Temperature (K)"                   , fontsize=16);
 legend(loc="upper left")
 gcf()
 #----------------------------------------------------------------------------
+=#

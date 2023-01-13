@@ -1,6 +1,6 @@
 # CliMA Land Modules
 
-- `CanopyLayers` was the canopy radiative transfer module for CliMA Land v0.1. Since CliMA Land v0.2, the core functions have been moved to `EmeraldOptics`, `LeafOptics`, and `CanopyRadiativeTransfer`, and thus `CanopyLayers` module has been deprecated.
+- `CanopyLayers` was the canopy radiative transfer module for CliMA Land v0.1. Since CliMA Land v0.2, the core functions have been moved to new packages, and thus this module has been deprecated.
 - `CanopyRadiativeTransfer` supports multiple canopy radiative transfer schemes, including multiple layered hyperspectral RT and single/multiple layered broadband RT.
 - `ClimaCache` was meant to host all types and structs of CliMA Land v0.2. It has been renamed to `EmeraldNamespace` to be more accurate, and thus is deprecated till we use it for another purpose.
 - `EarthSurface` contains pack of functions to compute or read constants, angles, elevations, and pressures etc at the earth surface.

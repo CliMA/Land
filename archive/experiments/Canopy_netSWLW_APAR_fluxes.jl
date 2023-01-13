@@ -1,4 +1,4 @@
-
+#=
 # Add PATH (adapt!)
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/");
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Utils/");
@@ -95,5 +95,4 @@ plot!(Float32(1.0e6) * canRad.absPAR_shadeCab[:], Ashade, seriestype = :scatter,
 
 
 f
-
-
+=#

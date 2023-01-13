@@ -1,4 +1,4 @@
-
+#=
 # Add PATH (adapt!)
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/Land/src/");
 #push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/Land/src/Utils/");
@@ -218,5 +218,4 @@ plot(CanopyRTMod.litab, cumsum(canopy.lidf))
 litab_bnd  = FT[[0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.] [10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88., 90.] ];
 
 cumsum(canopy.lidf)
-
-
+=#

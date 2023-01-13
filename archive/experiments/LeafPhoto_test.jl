@@ -1,4 +1,4 @@
-
+#=
 # Add PATH (adapt!)
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/");
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Utils/");
@@ -28,7 +28,7 @@ f.APAR = 500;
 l.Kn = 2.44
 LeafPhotosynthesis.LeafPhotosynthesis(f,l,298.0,f.APAR);
 
-# Test speed 
+# Test speed
 @benchmark LeafPhotosynthesis.LeafPhotosynthesis(f,l,rand(Float32,1)[1]+300, 1000)
 
 apar = Float32[]
@@ -120,7 +120,7 @@ t = range(1,tmax,step=1)
 
 
 
-# Compute steady state solution 
+# Compute steady state solution
 l2.vcmax25 = 90
 l2.jmax25 = 90*1.9
 l2.gstyp=0
@@ -172,9 +172,9 @@ l.rdleaf = 0.0
 #apar[501:100]=0
 for c = 2:1:tmax
     #println(apar[c])
-    f.APAR = PAR[c]*0.5 
+    f.APAR = PAR[c]*0.5
     f.APAR = max(10,f.APAR)
-    
+
        l.gs = uu[c-1,2]
        l.Kn = uu[c-1,1]
 
@@ -232,7 +232,7 @@ l.rdleaf = 0.0
 #apar[501:100]=0
 for c = 2:1:tmax
     #println(apar[c])
-    f.APAR = PAR[c]*0.5 
+    f.APAR = PAR[c]*0.5
     f.APAR = max(10,f.APAR)
     LeafPhotosynthesis.LeafPhotosynthesis(f,l,298.0,f.APAR)
     uus[c,2]=l.gs
@@ -245,13 +245,13 @@ for c = 2:1:tmax
     uus[c,8]=f.an
     uus[c,9]=l.Fm′
     uus[c,7]=f.APAR
-    
+
 end
 
 step = 30
 xl = (60*750,60*1400)
 ranger = xl[1]:step:xl[2]
- 
+
 p1 = plot(t[ranger]/60,uus[ranger,1],ylabel="Kn",lw=3, title="Kn", legend=false) # Make a line plot
 p2 = plot(t[ranger]/60,uus[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
 p3 = plot(t[ranger]/60,uus[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
@@ -260,26 +260,26 @@ p5 = plot(t[ranger]/60,uus[ranger,7],ylabel="PAR",lw=3, title="PAR", legend=fals
 p6 = plot(t[ranger]/60,uus[ranger,8],ylabel="An",lw=3, title="An", legend=false)# Four histograms each with 10 points? Why not!
 p7 = plot(t[ranger]/60,uus[ranger,2],ylabel="gs'",lw=3, title="gs", legend=false)
 p8 = plot(t[ranger]/60,uus[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
- 
+
 plot(p1,p2,p3,p4,p5,p6,p7,p8,layout=(4,2))
- 
+
 
 step = 30
 xl = (60*750,60*1400)
 ranger = xl[1]:step:xl[2]
- 
+
 p1 = plot(t[ranger]/60,uus[ranger,1],ylabel="Kn",lw=3, title="Kn", legend=false) # Make a line plot
 p1 = plot!(t[ranger]/60,uu[ranger,1],ylabel="Kn",lw=3, title="Kn", legend=false) # Make a line plot
- 
- 
+
+
 p2 = plot(t[ranger]/60,uus[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
 p2 = plot!(t[ranger]/60,uu[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
- 
- 
+
+
 p3 = plot(t[ranger]/60,uus[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
 p3 = plot!(t[ranger]/60,uu[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
- 
- 
+
+
 p4 = plot(t[ranger]/60,uus[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
 p4 = plot!(t[ranger]/60,uu[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
 #
@@ -294,8 +294,8 @@ p7 = plot!(t[ranger]/60,uu[ranger,2],ylabel="gs'",lw=3, title="gs", legend=false
 #
 p8 = plot(t[ranger]/60,uus[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
 p8 = plot!(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
- 
- 
+
+
 #p2 = plot(t[ranger]/60,uu[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
 #p3 = plot(t[ranger]/60,uu[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
 #p4 = plot(t[ranger]/60,uu[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
@@ -303,8 +303,8 @@ p8 = plot!(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield
 #p6 = plot(t[ranger]/60,uu[ranger,8],ylabel="An",lw=3, title="An", legend=false)# Four histograms each with 10 points? Why not!
 #p7 = plot(t[ranger]/60,uu[ranger,2],ylabel="gs'",lw=3, title="gs", legend=false)
 #p8 = plot(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
- 
- 
+
+
 plot(p1,p2,p3,p4,p5,p6,p7,p8,layout=(4,2))
 
 tmax = 6100 # Time in seconds here
@@ -335,8 +335,8 @@ end
 #apar[501:100]=0
 for c = 2:1:tmax
     #println(apar[c])
-    f.APAR = apar[c] 
-    
+    f.APAR = apar[c]
+
        l.gs = uu[c-1,2]
        l.Kn = uu[c-1,1]
 
@@ -376,7 +376,7 @@ PAR2 = PAR;
 wind = 60*10
 
 for i in 1:length(PAR2)
-    
+
     mini = max(1,i-wind)
     maxi = min(length(PAR2),i+wind)
     PAR2[i] = mean(PAR[mini:maxi])
@@ -403,9 +403,9 @@ l.rdleaf = 0.0
 #apar[501:100]=0
 for c = 2:1:tmax
     #println(apar[c])
-    f.APAR = PAR2[c]*0.5 
+    f.APAR = PAR2[c]*0.5
     f.APAR = max(10,f.APAR)
-    
+
        l.gs = uu[c-1,2]
        l.Kn = uu[c-1,1]
 
@@ -448,7 +448,7 @@ l.rdleaf = 0.0
 #apar[501:100]=0
 for c = 2:1:tmax
     #println(apar[c])
-    f.APAR = PAR2[c]*0.5 
+    f.APAR = PAR2[c]*0.5
     f.APAR = max(10,f.APAR)
     LeafPhotosynthesis.LeafPhotosynthesis(f,l,298.0,f.APAR )
     uus[c,2]=l.gs
@@ -461,25 +461,25 @@ for c = 2:1:tmax
     uus[c,8]=f.an
     uus[c,9]=l.Fm′
     uus[c,7]=f.APAR
-    
+
 end
 
 step = 30
 xl = (60*750,60*1400)
 ranger = xl[1]:step:xl[2]
- 
+
 p1 = plot(t[ranger]/60,uus[ranger,1],ylabel="Kn",lw=3, title="Kn", legend=false) # Make a line plot
 p1 = plot!(t[ranger]/60,uu[ranger,1],ylabel="Kn",lw=3, title="Kn", legend=false) # Make a line plot
- 
- 
+
+
 p2 = plot(t[ranger]/60,uus[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
 p2 = plot!(t[ranger]/60,uu[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
- 
- 
+
+
 p3 = plot(t[ranger]/60,uus[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
 p3 = plot!(t[ranger]/60,uu[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
- 
- 
+
+
 p4 = plot(t[ranger]/60,uus[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
 p4 = plot!(t[ranger]/60,uu[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
 #
@@ -494,8 +494,8 @@ p7 = plot!(t[ranger]/60,uu[ranger,2],ylabel="gs'",lw=3, title="gs", legend=false
 #
 p8 = plot(t[ranger]/60,uus[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
 p8 = plot!(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
- 
- 
+
+
 #p2 = plot(t[ranger]/60,uu[ranger,6],ylabel="Kp",lw=3, title="Kp", legend=false) # Make a scatter plot
 #p3 = plot(t[ranger]/60,uu[ranger,3],ylabel="Fs Yield",lw=3, title="Fs Yield", legend=false)
 #p4 = plot(t[ranger]/60,uu[ranger,4],ylabel="Ci",lw=3, title="Ci", legend=false,  ylim=(220,330))
@@ -503,10 +503,7 @@ p8 = plot!(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield
 #p6 = plot(t[ranger]/60,uu[ranger,8],ylabel="An",lw=3, title="An", legend=false)# Four histograms each with 10 points? Why not!
 #p7 = plot(t[ranger]/60,uu[ranger,2],ylabel="gs'",lw=3, title="gs", legend=false)
 #p8 = plot(t[ranger]/60,uu[ranger,5],ylabel="PSII yield",lw=3, title="PSII yield", legend=false)
- 
- 
+
+
 plot(p1,p2,p3,p4,p5,p6,p7,p8,layout=(4,2))
-
-
-
-
+=#

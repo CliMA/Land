@@ -1,31 +1,32 @@
+#=
 # # Stomatal conductance
-# 
+#
 # Here, we will go one step further and look at the entire leaf-level response to different environmental conditions, including the impact of stomatal responses to the environment here.
-# 
+#
 # ## Empirical Stomatal Conductance models
-# 
-# Currently, we can choose between the widely used Ball-Berry model[^1] or the Medlyn approach[^2]. 
-# 
+#
+# Currently, we can choose between the widely used Ball-Berry model[^1] or the Medlyn approach[^2].
+#
 # Ball and Berry derived the following empirical formulation based on leaf level data (RH is relative humidity):
-# 
+#
 # $$g_{s,w} = g_0 + g_1  \frac{A_n \cdot RH}{C_s}$$
-# 
+#
 # Medlyn derived the following equations based on stomatal optimization theory but in a similar form as the BB model:
-# 
+#
 # $$g_{s,w} = g_0 + \left(1 + \frac{g_1}{\sqrt{VPD}}\right) \frac{A_n}{C_s}$$
-# 
-# Both models are proportional to $A_n$ and inversely proportional to $C_s$, with the main difference in the dependence on either relative humidity in the Ball-Berry model vs. vapor pressure deficit (VPD) in Medlyn et al. In both cases, $g_0$ is the residual conductivity even if stomata are fully closed and $g_1$ is related to the marginal water cost of plant carbon gain. Importantly, $g_1$ can't be inter-changed between the formulations, underlining again that parameters have to be optimized with respect to the model that is eventually being used. 
-# 
+#
+# Both models are proportional to $A_n$ and inversely proportional to $C_s$, with the main difference in the dependence on either relative humidity in the Ball-Berry model vs. vapor pressure deficit (VPD) in Medlyn et al. In both cases, $g_0$ is the residual conductivity even if stomata are fully closed and $g_1$ is related to the marginal water cost of plant carbon gain. Importantly, $g_1$ can't be inter-changed between the formulations, underlining again that parameters have to be optimized with respect to the model that is eventually being used.
+#
 # ## Stomatal Optimization Theories
-# 
+#
 # The empirical formulations only hold in well-watered soil and our main goal is to implement stomatal optimization models to take the entire soil-plant-atmosphere continuum into account[^3]. Here, we will just use the empirical models and steady-state photosynthesis to show the underlying principles.
-# 
+#
 # [^1]: Ball, J.T., Woodrow, I.E. and Berry, J.A., 1987. A model predicting stomatal conductance and its contribution to the control of photosynthesis under different environmental conditions. In Progress in photosynthesis research (pp. 221-224). Springer, Dordrecht.
-# 
+#
 # [^2]: Medlyn, B.E., Duursma, R.A., Eamus, D., Ellsworth, D.S., Prentice, I.C., Barton, C.V., Crous, K.Y., De Angelis, P., Freeman, M. and Wingate, L., 2011. Reconciling the optimal and empirical approaches to modelling stomatal conductance. Global Change Biology, 17(6), pp.2134-2144.
-# 
+#
 # [^3]: Wang, Y., Sperry, J.S., Anderegg, W.R., Venturas, M.D. and Trugman, A.T., 2020. A theoretical and empirical assessment of stomatal optimization modeling. New Phytologist.
-# 
+#
 
 ## add usual tools
 using BenchmarkTools
@@ -195,3 +196,4 @@ gcf()
 
 ##@btime get_empirical_gsw_pi(c3_set, leaf_3, envir, sto_c3);
 ##@btime get_empirical_gsw_pi(c4_set, leaf_4, envir, sto_c4);
+=#

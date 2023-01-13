@@ -1,11 +1,12 @@
+#=
 # # # GSV: a general model for hyperspectral soil reflectance simulation
-# 
-# Soil reflectance is crucial for canopy radiative transfer modeling. Spectral vector models are more flexible than typical soil albedo models, because they can ingest observed data and significantly improves hyperspectral soil reflectance modeling in terms of accuracy and robustness. 
-# 
-# We demonstrate the usage of the general spectral vectors (GSV) model[^1] developed to employ three dry spectral vectors and one humid spectral vector derived from global dry and humid soil reflectance databases including 23,871 soil spectra (400–2500 nm). The GSV model accurately simulates global soil reflectance with an R2 of 0.99 and RMSE of 0.01. The GSV model is highly suitable to be coupled with the CliMA model for vegetation remote sensing studies. 
-# 
+#
+# Soil reflectance is crucial for canopy radiative transfer modeling. Spectral vector models are more flexible than typical soil albedo models, because they can ingest observed data and significantly improves hyperspectral soil reflectance modeling in terms of accuracy and robustness.
+#
+# We demonstrate the usage of the general spectral vectors (GSV) model[^1] developed to employ three dry spectral vectors and one humid spectral vector derived from global dry and humid soil reflectance databases including 23,871 soil spectra (400–2500 nm). The GSV model accurately simulates global soil reflectance with an R2 of 0.99 and RMSE of 0.01. The GSV model is highly suitable to be coupled with the CliMA model for vegetation remote sensing studies.
+#
 #  [^1]: Jiang, C., & Fang, H. (2019). GSV: a general model for hyperspectral soil reflectance simulation. International Journal of Applied Earth Observation and Geoinformation, 83(July), 101932. https://doi.org/10.1016/j.jag.2019.101932
-# 
+#
 
 # # Load used packages
 
@@ -43,7 +44,7 @@ indices = []
 
 for i in wvl
     push!(indices, findall(x -> x==i, WVL)[1])
-end 
+end
 
 multi = hyper[:,indices]
 
@@ -91,3 +92,4 @@ ylabel!("Soil albedo")
 xlabel!("wl (nm)")
 
 #----------------------------------------------------------------------------
+=#

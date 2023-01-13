@@ -1,4 +1,4 @@
-
+#=
 # Add PATH (adapt!)
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Leaf/");
 push!(LOAD_PATH, "/Volumes/cfranken/code/gitHub/LSM-SPAM/src/Utils/");
@@ -134,3 +134,4 @@ plot!(1 .+Emin2',-sumLAI2, label="Downwelling Thermal fine")
 plot!(1 .+Eplu2',-sumLAI2, label="Upwelling Thermal fine")
 xlabel!("W/m2")
 ylabel!("-Cum LAI")
+=#
