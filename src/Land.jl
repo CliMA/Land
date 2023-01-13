@@ -17,8 +17,10 @@ module Land
 
 # import the modules
 include("modules/EmeraldConstants.jl"       )
+include("modules/EmeraldOptics.jl"          )
 include("modules/EarthSurface.jl"           )
 include("modules/WaterPhysics.jl"           )
+
 include("modules/EmeraldNamespace.jl"       )
 include("modules/LeafOptics.jl"             )
 include("modules/CanopyRadiativeTransfer.jl")
@@ -30,17 +32,18 @@ include("modules/SoilPlantAirContinuum.jl"  )
 
 
 # export the modules
+export CanopyRadiativeTransfer
 export EarthSurface
 export EmeraldConstants
-export WaterPhysics
 export EmeraldNamespace
+export EmeraldOptics
 export LeafOptics
-export CanopyRadiativeTransfer
 export Photosynthesis
-export SoilHydraulics
 export PlantHydraulics
-export StomataModels
+export SoilHydraulics
 export SoilPlantAirContinuum
+export StomataModels
+export WaterPhysics
 
 
 end # module

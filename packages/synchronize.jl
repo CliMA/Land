@@ -4,8 +4,20 @@
 #     julia synchronize.jl
 #
 
-pkg_names = ["CanopyRadiativeTransfer", "EarthSurface", "EmeraldConstants", "EmeraldNamespace", "LeafOptics", "Photosynthesis", "PlantHydraulics", "SoilHydraulics", "SoilPlantAirContinuum",
-             "StomataModels", "WaterPhysics"];
+pkg_names = [
+            "CanopyRadiativeTransfer",
+            "EarthSurface",
+            "EmeraldConstants",
+            "EmeraldNamespace",
+            "EmeraldOptics",
+            "LeafOptics",
+            "Photosynthesis",
+            "PlantHydraulics",
+            "SoilHydraulics",
+            "SoilPlantAirContinuum",
+            "StomataModels",
+            "WaterPhysics"
+];
 
 for pkg_name in pkg_names
     _file_in = "$(@__DIR__)/../src/modules/$(pkg_name).jl";
@@ -13,7 +25,11 @@ for pkg_name in pkg_names
 
     # synchronize files if both files exist
     @info pkg_name;
-    if isfile(_file_in) && isfile(_file_out)
+    if isfile(_file_in)
+        if !isfile(_file_out)
+            cp(_file_in, _file_out; force = true);
+        end;
+
         open(_file_out, "w") do _wfile
             for _line in readlines(_file_in);
                 # resolve the relative path

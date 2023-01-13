@@ -11,7 +11,7 @@ using ..EmeraldNamespace: BroadbandRadiation, BroadbandSLCanopy, BroadbandSoilAl
 using ..EmeraldNamespace: HyperspectralMLCanopy, HyperspectralRadiation, HyperspectralSoilAlbedo
 using ..EmeraldNamespace: Leaves1D, Leaves2D, Soil, SunSensorGeometry, VerhoefLIDF
 using ..EmeraldNamespace: MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
-using ..LeafOptics: energy!, photon, photon!
+using ..EmeraldOptics: energy!, photon, photon!
 
 
 include("../../packages/CanopyRadiativeTransfer.jl/src/constants.jl"        )
