@@ -30,7 +30,7 @@ par,apar,ppar = leaf_PAR(bio, wls, rad; APAR_car=false);
 
 """
 function leaf_PAR(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
-    @unpack IΛ_PAR, ΔΛ_PAR, Λ_PAR = wls;
+    (; IΛ_PAR, ΔΛ_PAR, Λ_PAR) = wls;
 
     # PPAR absorption feature (after APAR is computed)
     _α_ppar = (APAR_car ? view(bio.α_cabcar, IΛ_PAR) : view(bio.α_cab, IΛ_PAR));

@@ -16,7 +16,7 @@ Return the average beta factor for
 function BETA end
 
 BETA(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, LEAVES = spac;
+    (; DIM_LAYER, LEAVES) = spac;
 
     # compute the mean beta
     _βs = 0;
@@ -46,7 +46,7 @@ Return the canopy net primary productivity per ground area, given
 function CNPP end
 
 CNPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+    (; CANOPY, DIM_LAYER, LEAVES) = spac;
 
     # compute GPP
     _cnpp::FT = 0;
@@ -77,7 +77,7 @@ Return the gross primary productivity per ground area, given
 function GPP end
 
 GPP(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+    (; CANOPY, DIM_LAYER, LEAVES) = spac;
 
     # compute GPP
     _gpp::FT = 0;
@@ -108,7 +108,7 @@ Return the canopy integrated PPAR per ground area, given
 function PPAR end
 
 PPAR(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+    (; CANOPY, DIM_LAYER, LEAVES) = spac;
 
     # compute GPP
     _ppar::FT = 0;
@@ -139,7 +139,7 @@ Return the transpiration rate per ground area, given
 function T_VEG end
 
 T_VEG(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES = spac;
+    (; CANOPY, DIM_LAYER, LEAVES) = spac;
 
     # compute transpiration rate
     _tran::FT = 0;

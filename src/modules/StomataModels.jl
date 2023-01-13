@@ -1,7 +1,5 @@
 module StomataModels
 
-using UnPack: @unpack
-
 using ..EmeraldConstants: CP_D_MOL, K_STEFAN, M_H₂O
 using ..WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient, relative_surface_tension, relative_viscosity, saturation_vapor_pressure
 using ..EmeraldNamespace: AbstractSoilVC, AbstractXylemVC

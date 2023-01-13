@@ -44,9 +44,9 @@ Updates shortwave or longwave radiation profiles, given
 
 """
 canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::BroadbandRadiation{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
-    @unpack RADIATION = can;
-    @unpack BIO = leaf;
-    @unpack ALBEDO = soil;
+    (; RADIATION) = can;
+    (; BIO) = leaf;
+    (; ALBEDO) = soil;
 
     # compute the sunlit and shaded leaf area index of the entire canopy (adapted from Campbell 1998 equation 15.23, with clumping index)
     RADIATION.lai_sunlit = (1 - exp(-RADIATION.k_direct * can.lai * can.ci)) / RADIATION.k_direct;
@@ -134,9 +134,9 @@ canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::Broadband
 );
 
 canopy_radiation!(can::BroadbandSLCanopy{FT}, leaf::Leaves1D{FT}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
-    @unpack RADIATION = can;
-    @unpack BIO = leaf;
-    @unpack ALBEDO, LAYERS = soil;
+    (; RADIATION) = can;
+    (; BIO) = leaf;
+    (; ALBEDO, LAYERS) = soil;
 
     # theory for longwave radiation reaching soil
     #     soil_lw_in_solar = rad * τ_diffuse(LAI)
@@ -209,7 +209,7 @@ Updates soil shortwave radiation profiles, given
 
 """
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, OPTICS, RADIATION, WLSET = can;
+    (; DIM_LAYER, OPTICS, RADIATION, WLSET) = can;
 
     OPTICS._tmp_vec_λ[WLSET.IΛ_PAR] .= view(RADIATION.e_direct,WLSET.IΛ_PAR,DIM_LAYER+1) .* (1 .- albedo.ρ_sw[1]);
     OPTICS._tmp_vec_λ[WLSET.IΛ_NIR] .= view(RADIATION.e_direct,WLSET.IΛ_NIR,DIM_LAYER+1) .* (1 .- albedo.ρ_sw[2]);
@@ -225,7 +225,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT
 );
 
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, RADIATION, WLSET = can;
+    (; DIM_LAYER, RADIATION, WLSET) = can;
 
     albedo.e_net_direct .= view(RADIATION.e_direct,:,DIM_LAYER+1) .* (1 .- albedo.ρ_sw);
     albedo.e_net_diffuse .= view(RADIATION.e_diffuse_down,:,DIM_LAYER+1) .* (1 .- albedo.ρ_sw);
@@ -268,8 +268,8 @@ Updates canopy radiation profiles for shortwave or longwave radiation, given
 
 """
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}; APAR_CAR::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
-    @unpack ALBEDO = soil;
+    (; DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET) = can;
+    (; ALBEDO) = soil;
     _ilai = can.lai * can.ci / DIM_LAYER;
     _tlai = can.lai / DIM_LAYER;
 
@@ -401,8 +401,8 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 );
 
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::FT, soil::Soil{FT}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, OPTICS, RADIATION = can;
-    @unpack ALBEDO, LAYERS = soil;
+    (; DIM_LAYER, OPTICS, RADIATION) = can;
+    (; ALBEDO, LAYERS) = soil;
 
     # 1. compute longwave radiation out from the leaves and soil
     for _i in eachindex(leaves)
@@ -466,7 +466,7 @@ Updates canopy radiation profiles for shortwave and longwave radiation, given
 
 """
 canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL = spac;
+    (; ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL) = spac;
 
     soil_albedo!(CANOPY, SOIL);
     canopy_optical_properties!(CANOPY, ANGLES);

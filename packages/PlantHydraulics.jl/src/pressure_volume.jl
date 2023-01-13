@@ -25,7 +25,7 @@ function xylem_pressure end
 xylem_pressure(pv::LinearPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFloat} = (rvol - 1) / pv.SLOPE;
 
 xylem_pressure(pv::SegmentedPVCurve{FT}, rvol::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack C_ALL, RWC_APO, RWC_TLP, ϵ_BULK = pv;
+    (; C_ALL, RWC_APO, RWC_TLP, ϵ_BULK) = pv;
 
     if rvol > RWC_TLP
         return -C_ALL * GAS_R(FT) * T / (rvol - RWC_APO) * FT(1e-6) + ϵ_BULK * (rvol - RWC_TLP)

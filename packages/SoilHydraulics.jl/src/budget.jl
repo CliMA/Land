@@ -34,7 +34,7 @@ Update the marginal increase of soil water content and energy per layer, given
 
 """
 soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack METEO, ROOTS, ROOTS_INDEX, SOIL = spac;
+    (; METEO, ROOTS, ROOTS_INDEX, SOIL) = spac;
     LAYERS = SOIL.LAYERS;
 
     # update soil k, ψ, and λ_thermal for each soil layer
@@ -101,7 +101,7 @@ Run soil water and energy budget, given
 
 """
 soil_budget!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT) where {FT<:AbstractFloat} = (
-    @unpack SOIL = spac;
+    (; SOIL) = spac;
 
     # run the time step
     for _i in 1:SOIL.DIM_SOIL

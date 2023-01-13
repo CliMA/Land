@@ -172,7 +172,7 @@ Update the extinction and scattering coefficients, given
 
 """
 extinction_scattering_coefficients!(can::BroadbandSLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
-    @unpack P_INCL, RADIATION, Θ_INCL = can;
+    (; P_INCL, RADIATION, Θ_INCL) = can;
 
     # the extinction coefficients for direct radiation at different inclination angles
     RADIATION._k_diffuse .= extinction_coefficient.(Θ_INCL);
@@ -204,7 +204,7 @@ Update the extinction and scattering coefficients, given
 
 """
 extinction_scattering_coefficients!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
-    @unpack OPTICS, Θ_INCL = can;
+    (; OPTICS, Θ_INCL) = can;
 
     for _i in eachindex(Θ_INCL)
         OPTICS._ks[_i], OPTICS._ko[_i], OPTICS._sb[_i], OPTICS._sf[_i], OPTICS._Co[_i], OPTICS._Cs[_i], OPTICS._So[_i], OPTICS._Ss[_i] =

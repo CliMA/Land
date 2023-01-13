@@ -16,7 +16,7 @@ Update the clumping index, given
 
 """
 function clumping_index!(can::HyperspectralMLCanopy, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat}
-    @unpack Ω_A, Ω_B = can;
+    (; Ω_A, Ω_B) = can;
 
     can.ci = Ω_A + Ω_B * (1 - cosd(angles.sza));
 

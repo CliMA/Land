@@ -30,7 +30,7 @@ Return the xylem end water pressure in MPa, given
 function xylem_end_pressure end
 
 xylem_end_pressure(spac::MonoElementSPAC{FT}, flow::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, SOIL, STEM = spac;
+    (; LEAF, ROOT, SOIL, STEM) = spac;
 
     # calculate the p_dos for root and stem
     STEM.HS.p_ups = xylem_end_pressure(ROOT, SOIL.LAYERS[1], flow);
@@ -44,7 +44,7 @@ xylem_end_pressure(organ::Union{Leaf{FT}, Stem{FT}}, flow::FT) where {FT<:Abstra
 xylem_end_pressure(organ::Root{FT}, slayer::SoilLayer{FT}, flow::FT) where {FT<:AbstractFloat} = xylem_end_pressure(organ.HS, slayer, flow, organ.t);
 
 xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack DIM_XYLEM, K_SLA, VC = hs;
+    (; DIM_XYLEM, K_SLA, VC) = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
@@ -57,7 +57,7 @@ xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * K_SLA * DIM_XYLEM;
+            _k = relative_hydraulic_conductance(VC, _p_25) / _f_vis * K_SLA * DIM_XYLEM;
         else
             _k = _k_mem / _f_vis * K_SLA * DIM_XYLEM;
         end;
@@ -69,7 +69,7 @@ xylem_end_pressure(hs::LeafHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
 );
 
 xylem_end_pressure(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -95,7 +95,7 @@ xylem_end_pressure(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, flow::FT, T::F
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
+            _k = relative_hydraulic_conductance(VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
         else
             _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
@@ -107,7 +107,7 @@ xylem_end_pressure(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, flow::FT, T::F
 );
 
 xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -121,7 +121,7 @@ xylem_end_pressure(hs::StemHydraulics{FT}, flow::FT, T::FT) where {FT<:AbstractF
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _k = relative_hydraulic_conductance(hs.VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
+            _k = relative_hydraulic_conductance(VC, _p_25) / _f_vis * _k_max * DIM_XYLEM;
         else
             _k = _k_mem / _f_vis * _k_max * DIM_XYLEM;
         end;
@@ -155,7 +155,7 @@ Return the xylem end water pressure in MPa for sunlit and shaded leaves, given
 - `r_sl` Sunlit leaves fraction
 """
 xylem_end_pressure(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    (; LEAF, ROOT, STEM) = spac;
 
     # calculate the p_dos for root and stem
     STEM.HS.p_ups = xylem_end_pressure(ROOT, f_sl + f_sh;);
@@ -221,7 +221,7 @@ Update xylem pressure profile (flow profile needs to be updated a priori), given
 
 """
 xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Stem{FT}}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack HS = organ;
+    (; HS) = organ;
 
     xylem_pressure_profile!(HS, HS.FLOW, organ.t; update = update);
 
@@ -229,7 +229,7 @@ xylem_pressure_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Stem{FT}}; update::
 );
 
 xylem_pressure_profile!(organ::Root{FT}, slayer::SoilLayer{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack HS = organ;
+    (; HS) = organ;
 
     xylem_pressure_profile!(HS, slayer, HS.FLOW, organ.t; update = update);
 
@@ -237,7 +237,7 @@ xylem_pressure_profile!(organ::Root{FT}, slayer::SoilLayer{FT}; update::Bool = t
 );
 
 xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = organ;
+    (; HS, HS2) = organ;
 
     xylem_pressure_profile!(HS, HS.FLOW, organ.t[1]; update = update);
     HS2._k_history .= HS._k_history;
@@ -251,7 +251,7 @@ xylem_pressure_profile!(organ::Leaves1D{FT}; update::Bool = true) where {FT<:Abs
 );
 
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_XYLEM, K_SLA, VC = hs;
+    (; DIM_XYLEM, K_SLA, VC) = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
@@ -264,7 +264,7 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * K_SLA * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -292,7 +292,7 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
 );
 
 xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_XYLEM, K_SLA, VC = hs;
+    (; DIM_XYLEM, K_SLA, VC) = hs;
 
     _f_st = relative_surface_tension(T);
     _f_vis = relative_viscosity(T);
@@ -305,7 +305,7 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * K_SLA * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -333,7 +333,7 @@ xylem_pressure_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 );
 
 xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -359,7 +359,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Ste
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -381,7 +381,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Ste
 );
 
 xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -408,7 +408,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Non
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -430,7 +430,7 @@ xylem_pressure_profile!(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::Non
 );
 
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -444,7 +444,7 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -466,7 +466,7 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::SteadyStateFlow{FT}, T::FT
 );
 
 xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -480,7 +480,7 @@ xylem_pressure_profile!(hs::StemHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T:
 
         _p_25 = _p_end / _f_st;
         if _p_25 < _p_mem
-            _kr = relative_hydraulic_conductance(hs.VC, _p_25);
+            _kr = relative_hydraulic_conductance(VC, _p_25);
             _k = _kr / _f_vis * _k_max * DIM_XYLEM;
             if update
                 hs.p_history[_i] = _p_25;
@@ -517,7 +517,7 @@ Update xylem pressure profile (flow profile needs to be updated a priori), given
 
 """
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, SOIL, STEM = spac;
+    (; LEAF, ROOT, SOIL, STEM) = spac;
 
     # update water potential from SOIL
     ROOT.HS.p_ups = soil_ψ_25(SOIL.LAYERS[1].VC, SOIL.LAYERS[1].θ) * relative_surface_tension(SOIL.LAYERS[1].t);
@@ -536,7 +536,7 @@ xylem_pressure_profile!(spac::MonoElementSPAC{FT}; update::Bool = true) where {F
 );
 
 xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL = spac;
+    (; DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL) = spac;
 
     # update water potential from SOIL
     for _i in eachindex(ROOTS_INDEX)
@@ -566,7 +566,7 @@ xylem_pressure_profile!(spac::MonoMLGrassSPAC{FT}; update::Bool = true) where {F
 );
 
 xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # update water potential from SOIL
     for _i in eachindex(ROOTS_INDEX)
@@ -600,7 +600,7 @@ xylem_pressure_profile!(spac::MonoMLPalmSPAC{FT}; update::Bool = true) where {FT
 );
 
 xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; BRANCHES, DIM_ROOT, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # update water potential from SOIL
     for _i in eachindex(ROOTS_INDEX)
@@ -641,7 +641,7 @@ xylem_pressure_profile!(spac::MonoMLTreeSPAC{FT}; update::Bool = true) where {FT
 # TODO: f_sl and f_sh are not saved correctly here, a change over Leaf structure may be required
 #=
 xylem_pressure_profile!(spac::MonoElementSPAC{FT}, f_sl::FT, f_sh::FT, r_sl::FT; update::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    (; LEAF, ROOT, STEM) = spac;
 
     xylem_pressure_profile!(ROOT, f_sl + f_sh; update = update);
     STEM.HS.p_ups = ROOT.HS.p_dos;

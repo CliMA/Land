@@ -29,7 +29,7 @@ Return the partial derivative of A per E, given
 function ∂A∂E end
 
 ∂A∂E(leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack P_AIR = air;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs1 = leaf.g_H₂O_s;
@@ -49,7 +49,7 @@ function ∂A∂E end
 );
 
 ∂A∂E(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat} = (
-    @unpack P_AIR = air;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs1 = leaves.g_H₂O_s[ind];
@@ -69,7 +69,7 @@ function ∂A∂E end
 );
 
 ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack P_AIR = air;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs1 = leaves.g_H₂O_s_shaded;
@@ -89,7 +89,7 @@ function ∂A∂E end
 );
 
 ∂A∂E(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int) where {FT<:AbstractFloat} = (
-    @unpack P_AIR = air;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs1 = leaves.g_H₂O_s_sunlit[ind];
@@ -220,9 +220,9 @@ Return the marginal risk for stomatal opening, given
 
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A, B = sm;
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; A, B) = sm;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -235,8 +235,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::EllerSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -251,8 +251,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::SperrySM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -275,8 +275,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::WangSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -287,9 +287,9 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::Wang2SM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A = sm;
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; A) = sm;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -330,9 +330,9 @@ Return the marginal risk for stomatal opening, given
 
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A, B = sm;
-    @unpack HS, HS2 = leaves;
-    @unpack P_AIR = air;
+    (; A, B) = sm;
+    (; HS, HS2) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s[ind];
@@ -347,8 +347,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::EllerSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = leaves;
-    @unpack P_AIR = air;
+    (; HS, HS2) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s[ind];
@@ -363,8 +363,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = leaves;
-    @unpack P_AIR = air;
+    (; HS, HS2) = leaves;
+    (; P_AIR) = air;
 
     _hs = (ind == 1 ? HS : HS2);
 
@@ -389,8 +389,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::WangSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = leaves;
-    @unpack P_AIR = air;
+    (; HS, HS2) = leaves;
+    (; P_AIR) = air;
 
     _hs = (ind == 1 ? HS : HS2);
 
@@ -403,9 +403,9 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::Wang2SM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A = sm;
-    @unpack HS, HS2 = leaves;
-    @unpack P_AIR = air;
+    (; A) = sm;
+    (; HS, HS2) = leaves;
+    (; P_AIR) = air;
 
     _hs = (ind == 1 ? HS : HS2);
 
@@ -447,9 +447,9 @@ Return the marginal risk for stomatal opening, given
 
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A, B = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; A, B) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_shaded;
@@ -462,8 +462,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::EllerSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_shaded;
@@ -478,8 +478,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_shaded;
@@ -502,8 +502,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaves.g_H₂O_s_shaded;
@@ -514,9 +514,9 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::Wang2SM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; A) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_shaded;
@@ -556,9 +556,9 @@ Return the marginal risk for stomatal opening, given
 
 """
 ∂Θ∂E(sm::AndereggSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A, B = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; A, B) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_sunlit[ind];
@@ -571,8 +571,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::EllerSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_sunlit[ind];
@@ -587,8 +587,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::SperrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_sunlit[ind];
@@ -611,8 +611,8 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaves.g_H₂O_s_sunlit[ind];
@@ -623,9 +623,9 @@ Return the marginal risk for stomatal opening, given
 );
 
 ∂Θ∂E(sm::Wang2SM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    @unpack A = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; A) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the E at the current setting
     _gs = leaves.g_H₂O_s_sunlit[ind];
@@ -674,9 +674,9 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
 ∂Θₙ∂E(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂Θₙ∂E(lf.SM, lf, air);
 
 ∂Θₙ∂E(sm::WangSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack F_FITNESS = sm;
-    @unpack HS = leaf;
-    @unpack P_AIR = air;
+    (; F_FITNESS) = sm;
+    (; HS) = leaf;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaf.g_H₂O_s;
@@ -690,9 +690,9 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
 );
 
 ∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack F_FITNESS = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; F_FITNESS) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaves.g_H₂O_s[1];
@@ -706,9 +706,9 @@ Return the ∂Θ∂E for nocturnal stomatal opening, given
 );
 
 ∂Θₙ∂E(sm::WangSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}) where {FT<:AbstractFloat} = (
-    @unpack F_FITNESS = sm;
-    @unpack HS = leaves;
-    @unpack P_AIR = air;
+    (; F_FITNESS) = sm;
+    (; HS) = leaves;
+    (; P_AIR) = air;
 
     # compute the A and E at the current setting
     _gs = leaves.g_H₂O_s_shaded;

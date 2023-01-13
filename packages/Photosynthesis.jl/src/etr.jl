@@ -29,8 +29,8 @@ Update the electron transport rates, given
 function photosystem_electron_transport! end
 
 photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, ppar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSI, Φ_PSI_MAX = rc;
+    (; EFF_1, EFF_2) = psm;
+    (; F_PSI, Φ_PSI_MAX) = rc;
 
     psm._e_to_c = (p_i - psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star);
     psm._j_psi  = colimited_rate(β * psm._v_qmax, ppar * F_PSI * Φ_PSI_MAX, psm.COLIMIT_J);
@@ -41,8 +41,8 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
 );
 
 photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, ppar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSII, Φ_PSII_MAX = rc;
+    (; EFF_1, EFF_2) = psm;
+    (; F_PSII, Φ_PSII_MAX) = rc;
 
     psm._e_to_c = (p_i - psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star);
     psm._j_pot  = F_PSII * Φ_PSII_MAX * ppar;
@@ -52,7 +52,7 @@ photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, 
 );
 
 photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, ppar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack F_PSII, Φ_PSII_MAX = rc;
+    (; F_PSII, Φ_PSII_MAX) = rc;
 
     psm._e_to_c = 1 / 6;
     psm._j_pot  = F_PSII * Φ_PSII_MAX * ppar;

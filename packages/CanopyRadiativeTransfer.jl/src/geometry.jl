@@ -35,7 +35,7 @@ Updates canopy optical properties (extinction coefficients for direct and diffus
 
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, HOT_SPOT, OPTICS, P_INCL, Θ_AZI = can;
+    (; DIM_LAYER, HOT_SPOT, OPTICS, P_INCL, Θ_AZI) = can;
 
     # 1. update the canopy optical properties related to extinction and scattering coefficients
     extinction_scattering_coefficients!(can, angles);
@@ -118,7 +118,7 @@ Updates lower soil boundary reflectance, given
 
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack OPTICS, WLSET = can;
+    (; OPTICS, WLSET) = can;
 
     OPTICS.ρ_dd[WLSET.IΛ_PAR,end] .= albedo.ρ_sw[1];
     OPTICS.ρ_sd[WLSET.IΛ_NIR,end] .= albedo.ρ_sw[2];
@@ -127,7 +127,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoil
 );
 
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack OPTICS = can;
+    (; OPTICS) = can;
 
     OPTICS.ρ_dd[:,end] .= albedo.ρ_sw;
     OPTICS.ρ_sd[:,end] .= albedo.ρ_sw;
@@ -158,8 +158,8 @@ Updates canopy optical properties (scattering coefficient matrices), given
 
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, soil::Soil{FT}) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, OPTICS = can;
-    @unpack ALBEDO = soil;
+    (; DIM_LAYER, OPTICS) = can;
+    (; ALBEDO) = soil;
     @assert length(leaves) == DIM_LAYER "Number of leaves must be equal to the canopy layers!";
     _ilai = can.lai * can.ci / DIM_LAYER;
 

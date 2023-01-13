@@ -2,7 +2,6 @@ module PlantHydraulics
 
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using Statistics: mean
-using UnPack: @unpack
 
 using ..EmeraldConstants: CP_D_MOL, CP_L_MOL, GAS_R, M_H₂O, T₂₅, ρg_MPa
 using ..WaterPhysics: latent_heat_vapor, relative_surface_tension, relative_viscosity, saturation_vapor_pressure

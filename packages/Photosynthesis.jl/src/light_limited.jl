@@ -66,8 +66,7 @@ Update the electron transport limited photosynthetic rate in conductance mode, g
 
 """
 light_limited_rate!(psm::C3CytochromeModel{FT}, rc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, g_lc::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack EFF_1, EFF_2 = psm;
-    @unpack F_PSI, Φ_PSI_MAX = rc;
+    (; EFF_1, EFF_2) = psm;
 
     _eff_a = 1 - psm._η_l / psm._η_c;
     _eff_b = 1 / psm._η_c;

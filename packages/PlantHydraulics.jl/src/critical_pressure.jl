@@ -34,7 +34,7 @@ critical_pressure(vc::PowerVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat}
 critical_pressure(vc::WeibullVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = -1 * (-1 * log(1 - kr)) ^ (1 / vc.C) * vc.B;
 
 critical_pressure(vc::ComplexVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = (
-    @unpack VCS = vc;
+    (; VCS) = vc;
 
     _p_crit::FT = 0;
     for _vc in VCS

@@ -111,7 +111,7 @@ Return blue band reflectance for MODIS setup, given
 
 """
 function MODIS_BLUE(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_3[1]), FT(MODIS_BAND_3[2]); steps=4)
 end
@@ -126,8 +126,6 @@ Return EVI for MODIS setup, given
 
 """
 function MODIS_EVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
-
     _blue = MODIS_BLUE(can);
     _red  = MODIS_RED(can);
     _nir  = MODIS_NIR(can);
@@ -145,8 +143,6 @@ Return EVI2 for MODIS setup, given
 
 """
 function MODIS_EVI2(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
-
     _red = MODIS_RED(can);
     _nir = MODIS_NIR(can);
 
@@ -163,7 +159,7 @@ Return LSWI for MODIS setup, given
 
 """
 function MODIS_LSWI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     _nir  = MODIS_NIR(can);
     _swir = read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_7[1]), FT(MODIS_BAND_7[2]); steps=5);
@@ -181,8 +177,6 @@ Return NDVI for MODIS setup, given
 
 """
 function MODIS_NDVI(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
-
     _red = MODIS_RED(can);
     _nir = MODIS_NIR(can);
 
@@ -199,7 +193,7 @@ Return near infrared band reflectance for MODIS setup, given
 
 """
 function MODIS_NIR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6)
 end
@@ -214,8 +208,6 @@ Return NIRv for MODIS setup, given
 
 """
 function MODIS_NIRv(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
-
     _red = MODIS_RED(can);
     _nir = MODIS_NIR(can);
 
@@ -232,7 +224,7 @@ Return NIRv radiance for MODIS setup, given
 
 """
 function MODIS_NIRvR(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     _nir_rad = read_spectrum(WLSET.Λ, RADIATION.e_o, FT(MODIS_BAND_2[1]), FT(MODIS_BAND_2[2]); steps=6);
 
@@ -249,7 +241,7 @@ Return red band reflectance for MODIS setup, given
 
 """
 function MODIS_RED(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ, RADIATION.albedo, FT(MODIS_BAND_1[1]), FT(MODIS_BAND_1[2]); steps=6)
 end
@@ -264,7 +256,7 @@ Return SIF @ 759 nm for OCO2 setup, given
 
 """
 function OCO2_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO2_SIF_759[1]), FT(OCO2_SIF_759[2]); steps=4)
 end
@@ -279,7 +271,7 @@ Return SIF @ 770 nm for OCO2 setup, given
 
 """
 function OCO2_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO2_SIF_770[1]), FT(OCO2_SIF_770[2]); steps=4)
 end
@@ -294,7 +286,7 @@ Return SIF @ 759 nm for OCO3 setup, given
 
 """
 function OCO3_SIF759(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO3_SIF_759[1]), FT(OCO3_SIF_759[2]); steps=4)
 end
@@ -309,7 +301,7 @@ Return SIF @ 770 nm for OCO3 setup, given
 
 """
 function OCO3_SIF770(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(OCO3_SIF_770[1]), FT(OCO3_SIF_770[2]); steps=4)
 end
@@ -324,7 +316,7 @@ Return SIF @ 682.5 nm for TROPOMI setup, given
 
 """
 function TROPOMI_SIF683(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_683[1]), FT(TROPOMI_SIF_683[2]); steps=5)
 end
@@ -339,7 +331,7 @@ Return SIF @ 740 nm for TROPOMI setup, given
 
 """
 function TROPOMI_SIF740(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(740))
 end
@@ -354,7 +346,7 @@ Return SIF @ 746.5 nm for TROPOMI setup, given
 
 """
 function TROPOMI_SIF747(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_747[1]), FT(TROPOMI_SIF_747[2]); steps=8)
 end
@@ -369,7 +361,7 @@ Return SIF @ 750.5 nm for TROPOMI setup, given
 
 """
 function TROPOMI_SIF751(can::HyperspectralMLCanopy{FT}) where {FT<:AbstractFloat}
-    @unpack RADIATION, WLSET = can;
+    (; RADIATION, WLSET) = can;
 
     return read_spectrum(WLSET.Λ_SIF, RADIATION.sif_obs, FT(TROPOMI_SIF_751[1]), FT(TROPOMI_SIF_751[2]); steps=5)
 end

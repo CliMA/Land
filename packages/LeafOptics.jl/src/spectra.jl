@@ -82,9 +82,9 @@ leaf_spectra!(
         return nothing
     end;
 
-    @unpack MESOPHYLL_N, NDUB = bio;
-    @unpack K_ANT, K_BROWN, K_CAB, K_CAR_V, K_CAR_Z, K_CBC, K_H₂O, K_LMA, K_PRO, K_PS, NR = lha;
-    @unpack IΛ_SIF, IΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
+    (; MESOPHYLL_N, NDUB) = bio;
+    (; K_ANT, K_BROWN, K_CAB, K_CAR_V, K_CAR_Z, K_CBC, K_H₂O, K_LMA, K_PRO, K_PS, NR) = lha;
+    (; IΛ_SIF, IΛ_SIFE, Λ_SIF, Λ_SIFE) = wls;
 
     # calculate the average absorption feature and relative Cab and Car partitions
     bio.k_all    .= (K_CAB   .* bio.cab .+                          # chlorophyll absorption
@@ -274,7 +274,7 @@ leaf_spectra!(bio, wls, 0.1, 0.45, 0.05, 0.25);
 
 """
 leaf_spectra!(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, ρ_par::FT, ρ_nir::FT, τ_par::FT, τ_nir::FT) where {FT<:AbstractFloat} = (
-    @unpack IΛ_NIR, IΛ_PAR = wls;
+    (; IΛ_NIR, IΛ_PAR) = wls;
 
     bio.ρ_sw[IΛ_PAR] .= ρ_par;
     bio.ρ_sw[IΛ_NIR] .= ρ_nir;
@@ -303,7 +303,7 @@ Update leaf reflectance and transmittance for SPAC, given
 
 """
 leaf_spectra!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, LEAVES = spac;
+    (; CANOPY, LEAVES) = spac;
 
     for _leaf in LEAVES
         leaf_spectra!(_leaf.BIO, CANOPY.WLSET, CANOPY.LHA, _leaf.HS.v_storage; APAR_car = _leaf.APAR_CAR);

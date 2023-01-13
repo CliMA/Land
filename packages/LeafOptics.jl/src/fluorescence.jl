@@ -33,7 +33,7 @@ sif_b,sif_f = leaf_SIF(bio, wls, rad, 0.01; ϕ_photon=false);
 
 """
 function leaf_SIF(bio::HyperspectralLeafBiophysics{FT}, wls::WaveLengthSet{FT}, rad::HyperspectralRadiation{FT}, ϕ::FT = FT(0.01); ϕ_photon::Bool = true) where {FT<:AbstractFloat}
-    @unpack IΛ_SIFE, ΔΛ_SIFE, Λ_SIF, Λ_SIFE = wls;
+    (; IΛ_SIFE, ΔΛ_SIFE, Λ_SIF, Λ_SIFE) = wls;
 
     # calculate the excitation energy and photons
     _e_excitation = (view(rad.e_direct, IΛ_SIFE) .+ view(rad.e_diffuse, IΛ_SIFE)) .* ΔΛ_SIFE;

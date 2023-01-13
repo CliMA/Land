@@ -33,7 +33,7 @@ Compute the marginal energy increase in spac, given
 
 """
 plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL = spac;
+    (; AIR, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL) = spac;
 
     # loop through the roots and compute the total energy out
     for _i in DIM_ROOT
@@ -103,7 +103,7 @@ plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
 );
 
 plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; AIR, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # loop through the roots
     TRUNK.∂e∂t = 0;
@@ -133,7 +133,7 @@ plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
 );
 
 plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, BRANCHES, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; AIR, BRANCHES, CANOPY, DIM_LAYER, DIM_ROOT, LEAVES, LEAVES_INDEX, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # loop through the roots
     TRUNK.∂e∂t = 0;
@@ -182,7 +182,7 @@ Compute the marginal energy increase in spac, given
 
 """
 plant_energy!(spac::MonoMLGrassSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, DIM_ROOT, LEAVES, ROOTS = spac;
+    (; DIM_LAYER, DIM_ROOT, LEAVES, ROOTS) = spac;
 
     # update the temperature for roots
     for _i in 1:DIM_ROOT
@@ -200,7 +200,7 @@ plant_energy!(spac::MonoMLGrassSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
 );
 
 plant_energy!(spac::MonoMLPalmSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, DIM_ROOT, LEAVES, ROOTS, TRUNK = spac;
+    (; DIM_LAYER, DIM_ROOT, LEAVES, ROOTS, TRUNK) = spac;
 
     # update the temperature for roots
     for _i in 1:DIM_ROOT
@@ -222,7 +222,7 @@ plant_energy!(spac::MonoMLPalmSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
 );
 
 plant_energy!(spac::MonoMLTreeSPAC{FT}, δt::FT) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, DIM_LAYER, DIM_ROOT, LEAVES, ROOTS, TRUNK = spac;
+    (; BRANCHES, DIM_LAYER, DIM_ROOT, LEAVES, ROOTS, TRUNK) = spac;
 
     # update the temperature for roots
     for _i in 1:DIM_ROOT

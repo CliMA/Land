@@ -17,7 +17,7 @@ Initialize the SPAC, given
 function initialize! end
 
 initialize!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES, SOIL = spac;
+    (; CANOPY, DIM_LAYER, LEAVES, SOIL) = spac;
 
     # make sure leaf area index setup is correct
     for _i in 1:DIM_LAYER

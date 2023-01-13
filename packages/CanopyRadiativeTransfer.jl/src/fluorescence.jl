@@ -22,7 +22,7 @@ Updates canopy fluorescence, given
 function canopy_fluorescence! end
 
 canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, LEAVES, Φ_PHOTON = spac;
+    (; CANOPY, LEAVES, Φ_PHOTON) = spac;
 
     canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
 
@@ -30,7 +30,7 @@ canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoML
 );
 
 canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat} = (
-    @unpack DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET = can;
+    (; DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET) = can;
     _ilai = can.lai * can.ci / DIM_LAYER;
 
     # function to weight matrices by inclination angles

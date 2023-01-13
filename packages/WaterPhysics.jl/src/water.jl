@@ -252,7 +252,7 @@ function diffusive_coefficient end
 diffusive_coefficient(T::FT, mol::Union{TraceGasCO₂{FT}, TraceGasH₂O{FT}, TraceGasO₂{FT}}, med::TraceGasAir{FT}) where {FT<:AbstractFloat} = mol.d_air * relative_diffusive_coefficient(T, mol, med);
 
 diffusive_coefficient(T::FT, mol::Union{TraceGasCO₂{FT}, TraceGasN₂{FT}}, med::TraceLiquidH₂O{FT}) where {FT<:AbstractFloat} = (
-    @unpack a_298, a_a = mol;
+    (; a_298, a_a) = mol;
     _a = a_298 * (1 + a_a *  (T-298));
 
     return K_BOLTZMANN(FT) * T / (4 * FT(pi) * viscosity(T, med) * _a)
@@ -435,7 +435,7 @@ Surface tension of trace liquid in `[N m⁻¹]`, given
 function surface_tension end
 
 surface_tension(T::FT, med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()) where {FT<:AbstractFloat} = (
-    @unpack γ_cor, γ_exp, γ_k, γ_T_c = med;
+    (; γ_cor, γ_exp, γ_k, γ_T_c) = med;
     _γ_T_r_diff = 1 - T / γ_T_c;
 
     return γ_k * _γ_T_r_diff^γ_exp * (1 - γ_cor*_γ_T_r_diff)
@@ -509,7 +509,7 @@ Viscosity relative to 298.15 K, given
 function relative_viscosity end
 
 relative_viscosity(T::FT, med::TraceLiquidH₂O{FT} = TraceLiquidH₂O{FT}()) where {FT<:AbstractFloat} = (
-    @unpack υ_B, υ_C, υ_D = med;
+    (; υ_B, υ_C, υ_D) = med;
     _K = T₂₅(FT);
 
     return exp( υ_B * ( 1/T - 1/_K) + υ_C * (T - _K) + υ_D * (T^2 - _K^2) )

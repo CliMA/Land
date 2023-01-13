@@ -23,7 +23,7 @@ Return adjusted time that soil does not over saturate or drain, given
 
 """
 function adjusted_time(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; t_on::Bool = true, θ_on::Bool = true) where {FT<:AbstractFloat}
-    @unpack DIM_LAYER, LEAVES, SOIL = spac;
+    (; DIM_LAYER, LEAVES, SOIL) = spac;
 
     _δt = δt;
 
@@ -102,7 +102,7 @@ time_stepper!(
             update::Bool = false,
             θ_on::Bool = true
 ) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
+    (; CANOPY, LEAVES, RAD_LW, SOIL) = spac;
 
     # run the update function until time elapses
     _t_res = δt;
@@ -134,7 +134,7 @@ time_stepper!(
 );
 
 time_stepper!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, LEAVES, RAD_LW, SOIL = spac;
+    (; CANOPY, LEAVES, RAD_LW, SOIL) = spac;
 
     # run the update function until the gpp is stable
     _count = 0;

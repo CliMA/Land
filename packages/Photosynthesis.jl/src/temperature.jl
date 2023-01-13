@@ -25,7 +25,7 @@ function temperature_correction end
 temperature_correction(td::Arrhenius{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = exp( td.ΔHA / GAS_R(FT) * (1/t_ref - 1/t) );
 
 temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = (
-    @unpack ΔHA, ΔHD, ΔSV = td;
+    (; ΔHA, ΔHD, ΔSV) = td;
 
     # _f_a: activation correction, _f_b: de-activation correction
     _f_a = exp( ΔHA / GAS_R(FT) * (1 / t_ref - 1 / t) );
@@ -37,7 +37,7 @@ temperature_correction(td::ArrheniusPeak{FT}, t::FT; t_ref::FT = td.T_REF) where
 temperature_correction(td::Q10{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = td.Q_10 ^ ( (t - t_ref) / 10 );
 
 temperature_correction(td::Q10Peak{FT}, t::FT; t_ref::FT = td.T_REF) where {FT<:AbstractFloat} = (
-    @unpack ΔHD, ΔSV = td;
+    (; ΔHD, ΔSV) = td;
 
     # _f_a: activation correction, _f_b: de-activation correction
     _f_a = td.Q_10 ^ ( (t - t_ref) / 10 );
@@ -183,7 +183,7 @@ function ∂R∂T end
 ∂R∂T(td::Arrhenius{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = r_ref * exp(td.ΔHA / GAS_R(FT) * (1/td.T_REF - 1/t)) * td.ΔHA / (GAS_R(FT) * t ^ 2);
 
 ∂R∂T(td::ArrheniusPeak{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = (
-    @unpack T_REF, ΔHA, ΔHD, ΔSV = td;
+    (; T_REF, ΔHA, ΔHD, ΔSV) = td;
 
     # _f_a: activation correction, _f_b: de-activation correction
     _expt = exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * t));
@@ -199,7 +199,7 @@ function ∂R∂T end
 ∂R∂T(td::Q10{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = r_ref * log(td.Q_10) * td.Q_10 ^ ( (t - td.T_REF) / 10) / 10;
 
 ∂R∂T(td::Q10Peak{FT}, r_ref::FT, t::FT) where {FT<:AbstractFloat} = (
-    @unpack T_REF, ΔHD, ΔSV = td;
+    (; T_REF, ΔHD, ΔSV) = td;
 
     # _f_a: activation correction, _f_b: de-activation correction
     _expt = exp(ΔSV / GAS_R(FT) - ΔHD / (GAS_R(FT) * t));

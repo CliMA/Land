@@ -4,7 +4,6 @@ using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using LinearAlgebra: mul!, pinv
 using QuadGK: quadgk
 using Statistics: mean
-using UnPack: @unpack
 
 using ..EmeraldConstants: K_STEFAN
 using ..EmeraldNamespace: BroadbandRadiation, BroadbandSLCanopy, BroadbandSoilAlbedo

@@ -111,7 +111,7 @@ root_pk(root::Root{FT}, slayer::SoilLayer{FT}) where {FT<:AbstractFloat} = root_
 root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, T::FT) where {FT<:AbstractFloat} = root_pk(hs, slayer, hs.FLOW, T);
 
 root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::SteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -153,7 +153,7 @@ root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::SteadyStateFlow{FT}
 );
 
 root_pk(hs::RootHydraulics{FT}, slayer::SoilLayer{FT}, mode::NonSteadyStateFlow{FT}, T::FT) where {FT<:AbstractFloat} = (
-    @unpack AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH = hs;
+    (; AREA, DIM_XYLEM, K_RHIZ, K_X, L, VC, ΔH) = hs;
 
     _k_max = AREA * K_X / L;
     _f_st = relative_surface_tension(T);
@@ -248,7 +248,7 @@ Update organ flow rate profile after setting up the flow rate out, given
 xylem_flow_profile!(organ::Union{Leaf{FT}, Leaves2D{FT}, Root{FT}, Stem{FT}}, Δt::FT) where {FT<:AbstractFloat} = xylem_flow_profile!(organ.HS, organ.t, Δt);
 
 xylem_flow_profile!(organ::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack HS, HS2 = organ;
+    (; HS, HS2) = organ;
 
     xylem_flow_profile!(HS, organ.t[1], Δt);
     xylem_flow_profile!(HS2, organ.t[2], Δt);
@@ -261,7 +261,7 @@ xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydrau
 xylem_flow_profile!(hs::Union{LeafHydraulics{FT}, RootHydraulics{FT}, StemHydraulics{FT}}, mode::SteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = nothing;
 
 xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack PVC, V_MAXIMUM = hs;
+    (; PVC, V_MAXIMUM) = hs;
 
     _f_vis = relative_viscosity(T);
 
@@ -284,7 +284,7 @@ xylem_flow_profile!(hs::LeafHydraulics{FT}, mode::NonSteadyStateFlow{FT}, T::FT,
 );
 
 xylem_flow_profile!(hs::Union{RootHydraulics{FT}, StemHydraulics{FT}}, mode::NonSteadyStateFlow{FT}, T::FT, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack DIM_XYLEM, PVC, V_MAXIMUM = hs;
+    (; DIM_XYLEM, PVC, V_MAXIMUM) = hs;
 
     _f_vis = relative_viscosity(T);
 
@@ -431,7 +431,7 @@ Update flow profiles for the soil-plant-air continuum (set up leaf flow rate fro
 
 """
 xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    (; LEAF, ROOT, STEM) = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -451,7 +451,7 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 );
 
 xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, ROOTS, ROOTS_INDEX, SOIL = spac;
+    (; LEAVES, ROOTS, ROOTS_INDEX, SOIL) = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -467,7 +467,7 @@ xylem_flow_profile!(spac::MonoMLGrassSPAC{FT}, Δt::FT) where {FT<:AbstractFloat
 );
 
 xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -486,7 +486,7 @@ xylem_flow_profile!(spac::MonoMLPalmSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 );
 
 xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack BRANCHES, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK = spac;
+    (; BRANCHES, LEAVES, ROOTS, ROOTS_INDEX, SOIL, TRUNK) = spac;
 
     # 0. update leaf flow or f_out from stomatal conductance
     xylem_flow_profile!(spac);
@@ -511,7 +511,7 @@ xylem_flow_profile!(spac::MonoMLTreeSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
 );
 
 xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
-    @unpack AIR, LEAF = spac;
+    (; AIR, LEAF) = spac;
 
     # update the
     _g = 1 / (1 / LEAF.g_H₂O_s + 1 / (FT(1.35) * LEAF.g_CO₂_b));
@@ -523,7 +523,7 @@ xylem_flow_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
 );
 
 xylem_flow_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack AIR, CANOPY, DIM_LAYER, LEAVES, LEAVES_INDEX = spac;
+    (; AIR, CANOPY, DIM_LAYER, LEAVES, LEAVES_INDEX) = spac;
 
     for _i in eachindex(LEAVES)
         _p_sl = CANOPY.OPTICS.p_sunlit[DIM_LAYER + 1 - _i];

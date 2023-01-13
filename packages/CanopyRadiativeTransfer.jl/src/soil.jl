@@ -23,7 +23,7 @@ function soil_albedo! end
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}) where {FT<:AbstractFloat} = soil_albedo!(can, soil, soil.ALBEDO);
 
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack COLOR, LAYERS = soil;
+    (; COLOR, LAYERS) = soil;
     @assert 1 <= COLOR <=20;
 
     # use CLM method
@@ -44,8 +44,8 @@ soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::BroadbandSo
 );
 
 soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::HyperspectralSoilAlbedo{FT}) where {FT<:AbstractFloat} = (
-    @unpack WLSET = can;
-    @unpack COLOR, LAYERS = soil;
+    (; WLSET) = can;
+    (; COLOR, LAYERS) = soil;
     @assert 1 <= COLOR <=20;
 
     # if the change of swc is lower than 0.01, do nothing

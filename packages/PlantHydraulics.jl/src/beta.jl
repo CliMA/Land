@@ -78,7 +78,7 @@ Update the beta factor for the LEAF component in SPAC, given
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}) where {FT<:AbstractFloat} = β_factor!(spac, β, β.PARAM_X);
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}, param_x::BetaParameterKleaf) where {FT<:AbstractFloat} = (
-    @unpack LEAF = spac;
+    (; LEAF) = spac;
 
     _f_st = relative_surface_tension(LEAF.t);
 
@@ -88,7 +88,7 @@ Update the beta factor for the LEAF component in SPAC, given
 );
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}, param_x::BetaParameterKsoil) where {FT<:AbstractFloat} = (
-    @unpack ROOT, SOIL = spac;
+    (; ROOT, SOIL) = spac;
 
     _f_st = relative_surface_tension(ROOT.t);
 
@@ -98,7 +98,7 @@ Update the beta factor for the LEAF component in SPAC, given
 );
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}, param_x::BetaParameterPleaf) where {FT<:AbstractFloat} = (
-    @unpack LEAF = spac;
+    (; LEAF) = spac;
 
     _f_st = relative_surface_tension(LEAF.t);
 
@@ -108,7 +108,7 @@ Update the beta factor for the LEAF component in SPAC, given
 );
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}, param_x::BetaParameterPsoil) where {FT<:AbstractFloat} = (
-    @unpack ROOT = spac;
+    (; ROOT) = spac;
 
     _f_st = relative_surface_tension(ROOT.t);
 
@@ -118,7 +118,7 @@ Update the beta factor for the LEAF component in SPAC, given
 );
 
 β_factor!(spac::MonoElementSPAC{FT}, β::BetaFunction{FT}, param_x::BetaParameterΘ) where {FT<:AbstractFloat} = (
-    @unpack ROOT, SOIL = spac;
+    (; ROOT, SOIL) = spac;
 
     _f_st = relative_surface_tension(ROOT.t);
 
@@ -140,7 +140,7 @@ Note that if the β function is based on Kleaf or Pleaf, β factor is taken as t
 
 """
 β_factor!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    @unpack LEAVES, ROOTS, SOIL = spac;
+    (; LEAVES, ROOTS, SOIL) = spac;
 
     for _i in eachindex(LEAVES)
         β_factor!(ROOTS, SOIL, LEAVES[_i], LEAVES[_i].SM);

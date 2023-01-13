@@ -108,7 +108,7 @@ update!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}
         vcmax::Union{Number,Nothing} = nothing,
         vcmax_expo::Union{Number,Nothing} = nothing
 ) where {FT<:AbstractFloat} = (
-    @unpack CANOPY, DIM_LAYER, LEAVES, SOIL = spac;
+    (; CANOPY, DIM_LAYER, LEAVES, SOIL) = spac;
 
     # update chlorophyll and carotenoid contents (and )
     if !isnothing(cab)

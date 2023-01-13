@@ -247,7 +247,7 @@ Update marginal stomatal conductance, given
 
 """
 stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack AIR, LEAF = spac;
+    (; AIR, LEAF) = spac;
 
     stomatal_conductance!(LEAF, AIR; β = β);
 
@@ -255,7 +255,7 @@ stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:Abst
 );
 
 stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack AIR, LEAVES, LEAVES_INDEX = spac;
+    (; AIR, LEAVES, LEAVES_INDEX) = spac;
 
     for _i in eachindex(LEAVES_INDEX)
         stomatal_conductance!(LEAVES[_i], AIR[LEAVES_INDEX[_i]]; β = β);
@@ -309,7 +309,7 @@ Update marginal stomatal conductance, given
 
 """
 stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAF = spac;
+    (; LEAF) = spac;
 
     stomatal_conductance!(LEAF, Δt);
 
@@ -317,7 +317,7 @@ stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFlo
 );
 
 stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, Δt::FT) where {FT<:AbstractFloat} = (
-    @unpack LEAVES = spac;
+    (; LEAVES) = spac;
 
     for _leaves in LEAVES
         stomatal_conductance!(_leaves, Δt);

@@ -1,7 +1,6 @@
 module SoilPlantAirContinuum
 
 using Statistics: mean
-using UnPack: @unpack
 
 using ..EmeraldConstants: CP_L, CP_L_MOL, T₀, ρ_H₂O
 using ..WaterPhysics: saturation_vapor_pressure

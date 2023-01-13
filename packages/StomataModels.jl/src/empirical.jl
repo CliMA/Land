@@ -45,23 +45,23 @@ Return the stomatal conductance computed from empirical model formulation, given
 
 """
 empirical_equation(sm::BallBerrySM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaf.a_net * FT(1e-6) / leaf._p_CO₂_s * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * leaf.a_net * FT(1e-6) / leaf._p_CO₂_i * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack D0, G0, G1 = sm;
-    @unpack PSM = leaf;
-    @unpack P_AIR = air;
+    (; D0, G0, G1) = sm;
+    (; PSM) = leaf;
+    (; P_AIR) = air;
 
     _γ_s = (typeof(PSM) <: C4VJPModel) ? 0 : PSM._γ_star;
     _vpd = max(1, saturation_vapor_pressure(leaf.t) - air.p_H₂O);
@@ -70,8 +70,8 @@ empirical_equation(sm::LeuningSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT 
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     _vpd = max(1, saturation_vapor_pressure(leaf.t) - air.p_H₂O);
 
@@ -106,22 +106,22 @@ Return the stomatal conductance computed from empirical model formulation, given
 
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net[ind] * FT(1e-6) / leaves._p_CO₂_s[ind] * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * leaves.a_net[ind] * FT(1e-6) / leaves._p_CO₂_i[ind] * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack D0, G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; D0, G0, G1) = sm;
+    (; P_AIR) = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
     _vpd = max(1, saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O);
@@ -130,8 +130,8 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, i
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     _vpd = max(1, saturation_vapor_pressure(leaves.t[ind]) - air.p_H₂O);
 
@@ -165,22 +165,22 @@ Return the stomatal conductance computed from empirical model formulation for th
 
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_shaded * FT(1e-6) / leaves._p_CO₂_s_shaded * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * leaves.a_net_shaded * FT(1e-6) / leaves._p_CO₂_i_shaded * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack D0, G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; D0, G0, G1) = sm;
+    (; P_AIR) = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
     _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
@@ -189,8 +189,8 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; �
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
 
@@ -225,22 +225,22 @@ Return the stomatal conductance computed from empirical model formulation for th
 
 """
 empirical_equation(sm::BallBerrySM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * air.p_H₂O / saturation_vapor_pressure(air.t) * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves._p_CO₂_s_sunlit[ind] * P_AIR
 );
 
 empirical_equation(sm::GentineSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     return G0 + β * G1 * leaves.a_net_sunlit[ind] * FT(1e-6) / leaves._p_CO₂_i_sunlit[ind] * P_AIR
 );
 
 empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack D0, G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; D0, G0, G1) = sm;
+    (; P_AIR) = air;
 
     _γ_s = (typeof(leaves.PSM) <: C4VJPModel) ? 0 : leaves.PSM._γ_star;
     _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
@@ -249,8 +249,8 @@ empirical_equation(sm::LeuningSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, i
 );
 
 empirical_equation(sm::MedlynSM{FT}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    @unpack G0, G1 = sm;
-    @unpack P_AIR = air;
+    (; G0, G1) = sm;
+    (; P_AIR) = air;
 
     _vpd = max(1, saturation_vapor_pressure(leaves.t) - air.p_H₂O);
 

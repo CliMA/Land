@@ -43,7 +43,7 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataMo
 
 """
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT = lf.t) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = lf;
+    (; PRC, PSM) = lf;
 
     photosystem_temperature_dependence!(PSM, air, t);
     photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
@@ -56,7 +56,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc:
 );
 
 leaf_photosynthesis!(lf::Leaves1D{FT}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = lf;
+    (; PRC, PSM) = lf;
 
     photosystem_temperature_dependence!(PSM, air, t);
     photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
@@ -159,7 +159,7 @@ Updates leaf photosynthetic rates (this method not meant for public usage, use i
 
 """
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaf;
+    (; PRC, PSM) = leaf;
 
     photosystem_temperature_dependence!(PSM, air, leaf.t);
     photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
@@ -179,7 +179,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT
 );
 
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaves;
+    (; PRC, PSM) = leaves;
 
     # loop through the ppars
     for _i in eachindex(leaves.ppar)
@@ -205,7 +205,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
 );
 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaves;
+    (; PRC, PSM) = leaves;
 
     photosystem_temperature_dependence!(PSM, air, leaves.t);
 
@@ -246,7 +246,7 @@ leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
 );
 
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaf;
+    (; PRC, PSM) = leaf;
 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     photosystem_temperature_dependence!(PSM, air, leaf.t);
@@ -274,7 +274,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT
 );
 
 leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaves;
+    (; PRC, PSM) = leaves;
 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through the leaves.ppar
@@ -305,7 +305,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
 );
 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
-    @unpack PRC, PSM = leaves;
+    (; PRC, PSM) = leaves;
 
     photosystem_temperature_dependence!(PSM, air, leaves.t);
 
@@ -383,7 +383,7 @@ Updates leaf photosynthetic rates for SPAC, given
 leaf_photosynthesis!(spac::MonoElementSPAC{FT}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = leaf_photosynthesis!(spac.LEAF, spac.AIR, mode);
 
 leaf_photosynthesis!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, mode::Union{GCO₂Mode, PCO₂Mode}) where {FT<:AbstractFloat} = (
-    @unpack AIR, LEAVES, LEAVES_INDEX = spac;
+    (; AIR, LEAVES, LEAVES_INDEX) = spac;
 
     for _i in eachindex(LEAVES)
         leaf_photosynthesis!(LEAVES[_i], AIR[LEAVES_INDEX[_i]], mode);

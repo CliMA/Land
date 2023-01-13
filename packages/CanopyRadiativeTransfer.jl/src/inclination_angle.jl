@@ -17,7 +17,7 @@ Return the cumulative distribution frequency, given
 function lidf_cdf end
 
 lidf_cdf(lidf::VerhoefLIDF{FT}, θ::FT) where {FT<:AbstractFloat} = (
-    @unpack A, B = lidf;
+    (; A, B) = lidf;
 
     if A >= 1
         return 1 - cosd(θ)
@@ -61,7 +61,7 @@ Update the frequency of leaf inclination angles, given
 function inclination_angles! end
 
 inclination_angles!(can::Union{BroadbandSLCanopy{FT}, HyperspectralMLCanopy{FT}}, lidf::VerhoefLIDF{FT}) where {FT<:AbstractFloat} = (
-    @unpack Θ_INCL_BNDS = can;
+    (; Θ_INCL_BNDS) = can;
 
     for _i in eachindex(can.P_INCL)
         can.P_INCL[_i] = lidf_cdf(lidf, Θ_INCL_BNDS[_i,2]) - lidf_cdf(lidf, Θ_INCL_BNDS[_i,1]);

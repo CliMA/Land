@@ -1,7 +1,6 @@
 module Photosynthesis
 
 using PkgUtility: lower_quadratic, upper_quadratic
-using UnPack: @unpack
 
 using ..EmeraldConstants: F_O₂, GAS_R
 using ..EmeraldNamespace: CytochromeReactionCenter, VJPReactionCenter, VanDerTolFluorescenceModel

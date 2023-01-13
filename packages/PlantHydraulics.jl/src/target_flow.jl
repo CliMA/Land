@@ -29,7 +29,7 @@ Return the critical flow rate that triggers a given amount of loss of conductanc
 
 """
 critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat} = (
-    @unpack K_SLA, VC = hs;
+    (; K_SLA, VC) = hs;
 
     # compute the misc variables
     _f_st = relative_surface_tension(T);
@@ -74,7 +74,7 @@ Return the critical flow rate that triggers a given amount of loss of conductanc
 - `kr` Reference conductance, default is 0.001
 """
 critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) where {FT<:AbstractFloat} = (
-    @unpack LEAF, ROOT, STEM = spac;
+    (; LEAF, ROOT, STEM) = spac;
 
     # read out the conductances
     _kr = ROOT.HS.AREA * ROOT.HS.K_X / ROOT.HS.L / relative_viscosity(ROOT.t);
