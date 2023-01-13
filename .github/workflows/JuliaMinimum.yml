@@ -1,4 +1,4 @@
-name: Julia-1.6
+name: JuliaMinimum
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: "1.6"
+          version: "1.7"
       - name: Use Github Registry
         run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
       - name: Install Dependencies
