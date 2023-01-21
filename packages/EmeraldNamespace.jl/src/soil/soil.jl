@@ -97,6 +97,8 @@ Base.@kwdef mutable struct HyperspectralSoilAlbedo{FT<:AbstractFloat} <: Abstrac
     # General model information
     "Whether to use CLM soil albedo scheme"
     α_CLM::Bool = false
+    "Whether to fit the data from broadband to hyperspectral"
+    FITTING::Bool = true
 
     # Constants
     "A matrix of characteristic curves"

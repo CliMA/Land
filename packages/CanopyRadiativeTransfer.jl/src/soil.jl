@@ -64,6 +64,14 @@ soil_albedo!(can::HyperspectralMLCanopy{FT}, soil::Soil{FT}, albedo::Hyperspectr
         _nir = max(SOIL_ALBEDOS[COLOR,2], SOIL_ALBEDOS[COLOR,4] + _delta);
     end;
 
+    # if fitting is disabled, use broadband directly
+    if !albedo.FITTING
+        albedo.ρ_sw[WLSET.IΛ_PAR] .= _par;
+        albedo.ρ_sw[WLSET.IΛ_NIR] .= _nir;
+
+        return nothing
+    end;
+
     # make an initial guess of the weights
     albedo._ρ_sw[WLSET.IΛ_PAR] .= _par;
     albedo._ρ_sw[WLSET.IΛ_NIR] .= _nir;
