@@ -105,12 +105,21 @@ photosystem_coefficients!(psm::Union{C3VJPModel{FT}, C4VJPModel{FT}}, rc::VJPRea
     rc._k_npq_rev = K_0 * (1 + K_B) * _xᵅ / (K_B + _xᵅ);
     rc._k_p       = max(0, rc.ϕ_p * (K_F + K_D + rc._k_npq_rev + rc.k_npq_sus) / (1 - rc.ϕ_p) );
 
+    # TODO: whether to consider sustained K_N in the calculations of f_o and f_m
+    # rc._f_o  = K_F / (K_F + K_P_MAX + K_D + rc.k_npq_sus);
+    # rc._f_o′ = K_F / (K_F + K_P_MAX + K_D + rc.k_npq_sus + rc._k_npq_rev);
+    # rc._f_m  = K_F / (K_F + K_D + rc.k_npq_sus);
+    # rc._f_m′ = K_F / (K_F + K_D + rc.k_npq_sus + rc._k_npq_rev);
+
     # calculate fluorescence quantum yield
     rc._f_o  = K_F / (K_F + K_P_MAX + K_D);
     rc._f_o′ = K_F / (K_F + K_P_MAX + K_D + rc._k_npq_rev + rc.k_npq_sus);
     rc._f_m  = K_F / (K_F + K_D);
     rc._f_m′ = K_F / (K_F + K_D + rc._k_npq_rev + rc.k_npq_sus);
     rc.ϕ_f   = rc._f_m′ * (1 - rc.ϕ_p);
+
+    # TODO: if K_N is used above, do we need to recalculate _npq
+    # rc._npq = (rc._k_npq_rev + rc.k_npq_sus) / (K_F + K_D + rc.k_npq_sus);
 
     # calculate quenching rates
     rc._q_e = 1 - (rc._f_m - rc._f_o′) / (rc._f_m′ - rc._f_o);

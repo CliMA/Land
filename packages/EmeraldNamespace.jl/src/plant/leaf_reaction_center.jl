@@ -70,6 +70,7 @@ abstract type AbstractReactionCenter{FT<:AbstractFloat} end
 #     2022-Jan-15: isolate the reaction center from Leaf in Photosynthesis.jl
 #     2022-Feb-07: add fluorescence model as a field
 #     2022-Jul-20: rename quite some cache variables
+#     2023-Jan-27: set default K_D to 0.95 instead of 0.85
 #
 #######################################################################################################################################################################################################
 """
@@ -88,7 +89,7 @@ Base.@kwdef mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReacti
     "Fraction of absorbed light used by PSII ETR"
     F_PSII::FT = 0.5
     "Rate constant for thermal dissipation"
-    K_D::FT = 0.85
+    K_D::FT = 0.95
     "Rate constant for fluorescence"
     K_F::FT = 0.05
     "Maximal rate constant for photochemistry"
