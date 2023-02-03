@@ -42,20 +42,20 @@ photosystem_electron_transport!(psm::C3CytochromeModel{FT}, rc::CytochromeReacti
 
 photosystem_electron_transport!(psm::C3VJPModel{FT}, rc::VJPReactionCenter{FT}, ppar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     (; EFF_1, EFF_2) = psm;
-    (; F_PSII, Φ_PSII_MAX) = rc;
+    (; F_PSII) = rc;
 
     psm._e_to_c = (p_i - psm._γ_star) / (EFF_1*p_i + EFF_2*psm._γ_star);
-    psm._j_pot  = F_PSII * Φ_PSII_MAX * ppar;
+    psm._j_pot  = F_PSII * rc._ϕ_psii_max * ppar;
     psm._j      = colimited_rate(psm._j_pot, β * psm._j_max, psm.COLIMIT_J);
 
     return nothing
 );
 
 photosystem_electron_transport!(psm::C4VJPModel{FT}, rc::VJPReactionCenter{FT}, ppar::FT, p_i::FT; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    (; F_PSII, Φ_PSII_MAX) = rc;
+    (; F_PSII) = rc;
 
     psm._e_to_c = 1 / 6;
-    psm._j_pot  = F_PSII * Φ_PSII_MAX * ppar;
+    psm._j_pot  = F_PSII * rc._ϕ_psii_max * ppar;
 
     return nothing
 );

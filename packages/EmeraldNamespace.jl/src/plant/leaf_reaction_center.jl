@@ -88,14 +88,10 @@ Base.@kwdef mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReacti
     # Constant coefficients
     "Fraction of absorbed light used by PSII ETR"
     F_PSII::FT = 0.5
-    "Rate constant for thermal dissipation"
-    K_D::FT = 0.95
     "Rate constant for fluorescence"
     K_F::FT = 0.05
     "Maximal rate constant for photochemistry"
     K_P_MAX::FT = 4
-    "max PSII yield (k_npq_r=0, all RC open)"
-    Φ_PSII_MAX::FT = K_P_MAX / (K_D + K_F + K_P_MAX)
 
     # Embedded structures
     "Fluorescence model"
@@ -120,6 +116,8 @@ Base.@kwdef mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReacti
     _f_o::FT = 0
     "Light-adapted fluorescence yield in the dark (`Kp=max`)"
     _f_o′::FT = 0
+    "Rate constant for thermal dissipation"
+    _k_d::FT = 0.95
     "Reversible NPQ rate constant (initially zero)"
     _k_npq_rev::FT = 0
     "Rate constant for photochemistry"
@@ -130,6 +128,8 @@ Base.@kwdef mutable struct VJPReactionCenter{FT<:AbstractFloat} <:AbstractReacti
     _q_e::FT = 0
     "Photochemical quenching"
     _q_p::FT = 0
+    "max PSII yield (_k_npq_rev = 0, all RC open)"
+    _ϕ_psii_max::FT = K_P_MAX / (_k_d + K_F + K_P_MAX)
 end
 
 

@@ -96,7 +96,7 @@ Update the temperature dependencies of C3 photosynthesis model, given
 """
 function photosystem_temperature_dependence! end
 
-photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, prc::CytochromeReactionCenter{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
     if psm._t == t
         return nothing
     end;
@@ -117,7 +117,7 @@ photosystem_temperature_dependence!(psm::C3CytochromeModel{FT}, air::AirLayer{FT
     return nothing
 );
 
-photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+photosystem_temperature_dependence!(psm::C3VJPModel{FT}, prc::VJPReactionCenter{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
     if psm._t == t
         return nothing
     end;
@@ -130,12 +130,17 @@ photosystem_temperature_dependence!(psm::C3VJPModel{FT}, air::AirLayer{FT}, t::F
     psm._j_max  = psm.j_max25  * temperature_correction(psm.TD_JMAX, t);
     psm._k_m    = psm._k_c * (1 + air.P_AIR * F_O₂(FT) / psm._k_o);
 
+    # TODO: add a TD_KD in the model in the future like psd.TD_KC
+    (; K_F, K_P_MAX) = prc;
+    prc._k_d         = max(0.8738, 0.0301 * (t - 273.15) + 0.0773);
+    prc._ϕ_psii_max  = K_P_MAX / (prc._k_d + K_F + K_P_MAX);
+
     psm._t = t;
 
     return nothing
 );
 
-photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
+photosystem_temperature_dependence!(psm::C4VJPModel{FT}, prc::VJPReactionCenter{FT}, air::AirLayer{FT}, t::FT) where {FT<:AbstractFloat} = (
     if psm._t == t
         return nothing
     end;
@@ -144,6 +149,11 @@ photosystem_temperature_dependence!(psm::C4VJPModel{FT}, air::AirLayer{FT}, t::F
     psm._r_d    = psm.r_d25    * temperature_correction(psm.TD_R, t);
     psm._v_cmax = psm.v_cmax25 * temperature_correction(psm.TD_VCMAX, t);
     psm._v_pmax = psm.v_pmax25 * temperature_correction(psm.TD_VPMAX, t);
+
+    # TODO: add a TD_KD in the model in the future like psd.TD_KC
+    (; K_F, K_P_MAX) = prc;
+    prc._k_d         = max(0.8738, 0.0301 * (t - 273.15) + 0.0773);
+    prc._ϕ_psii_max  = K_P_MAX / (prc._k_d + K_F + K_P_MAX);
 
     psm._t = t;
 

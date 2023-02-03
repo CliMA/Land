@@ -13,8 +13,9 @@
 
             air = EmeraldNamespace.AirLayer{FT}();
             for var in [EmeraldNamespace.C3VJPModel{FT}(), EmeraldNamespace.C4VJPModel{FT}(), EmeraldNamespace.C3CytochromeModel{FT}()]
-                Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
-                Photosynthesis.photosystem_temperature_dependence!(var, air, FT(300)); @test true;
+                prc = (var isa EmeraldNamespace.C3CytochromeModel ? EmeraldNamespace.CytochromeReactionCenter{FT}() : EmeraldNamespace.VJPReactionCenter{FT}();)
+                Photosynthesis.photosystem_temperature_dependence!(var, prc, air, FT(300)); @test true;
+                Photosynthesis.photosystem_temperature_dependence!(var, prc, air, FT(300)); @test true;
             end;
 
             for var in [EmeraldNamespace.Leaf{FT}(), EmeraldNamespace.Leaves1D{FT}(), EmeraldNamespace.Leaves2D{FT}()]
@@ -30,7 +31,7 @@
             for var in [EmeraldNamespace.Leaf{FT}(),
                         EmeraldNamespace.Leaf{FT}(PSM = EmeraldNamespace.C4VJPModel{FT}()),
                         EmeraldNamespace.Leaf{FT}(PSM = EmeraldNamespace.C3CytochromeModel{FT}(), PRC = EmeraldNamespace.CytochromeReactionCenter{FT}())]
-                Photosynthesis.photosystem_temperature_dependence!(var.PSM, air, FT(300)); @test true;
+                Photosynthesis.photosystem_temperature_dependence!(var.PSM, var.PRC, air, FT(300)); @test true;
                 Photosynthesis.photosystem_electron_transport!(var.PSM, var.PRC, FT(1000), FT(20)); @test true;
                 Photosynthesis.rubisco_limited_rate!(var.PSM, FT(20)); @test true;
                 Photosynthesis.rubisco_limited_rate!(var.PSM, air, FT(0.1)); @test true;

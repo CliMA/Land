@@ -45,7 +45,7 @@ Updates leaf photosynthetic rates based on CO₂ partial pressure (for StomataMo
 leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT = lf.t) where {FT<:AbstractFloat} = (
     (; PRC, PSM) = lf;
 
-    photosystem_temperature_dependence!(PSM, air, t);
+    photosystem_temperature_dependence!(PSM, PRC, air, t);
     photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
@@ -58,7 +58,7 @@ leaf_photosynthesis!(lf::Union{Leaf{FT}, Leaves2D{FT}}, air::AirLayer{FT}, g_lc:
 leaf_photosynthesis!(lf::Leaves1D{FT}, air::AirLayer{FT}, g_lc::FT, ppar::FT, t::FT) where {FT<:AbstractFloat} = (
     (; PRC, PSM) = lf;
 
-    photosystem_temperature_dependence!(PSM, air, t);
+    photosystem_temperature_dependence!(PSM, PRC, air, t);
     photosystem_electron_transport!(PSM, PRC, ppar, FT(20); β = FT(1));
     rubisco_limited_rate!(PSM, air, g_lc; β = FT(1));
     light_limited_rate!(PSM, PRC, air, g_lc; β = FT(1));
@@ -161,7 +161,7 @@ Updates leaf photosynthetic rates (this method not meant for public usage, use i
 leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     (; PRC, PSM) = leaf;
 
-    photosystem_temperature_dependence!(PSM, air, leaf.t);
+    photosystem_temperature_dependence!(PSM, PRC, air, leaf.t);
     photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
     rubisco_limited_rate!(PSM, leaf._p_CO₂_i; β = β);
     light_limited_rate!(PSM);
@@ -184,7 +184,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
     # loop through the ppars
     for _i in eachindex(leaves.ppar)
         # update TD parameters everytime for sunlit and shaded leaves
-        photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
+        photosystem_temperature_dependence!(PSM, PRC, air, leaves.t[_i]);
 
         # calculate the photosynthetic rates
         photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves._p_CO₂_i[_i]; β = β);
@@ -207,7 +207,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::PCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     (; PRC, PSM) = leaves;
 
-    photosystem_temperature_dependence!(PSM, air, leaves.t);
+    photosystem_temperature_dependence!(PSM, PRC, air, leaves.t);
 
     # loop through the ppars for sunlit leaves
     for _i in eachindex(leaves.ppar_sunlit)
@@ -249,7 +249,7 @@ leaf_photosynthesis!(leaf::Leaf{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT
     (; PRC, PSM) = leaf;
 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
-    photosystem_temperature_dependence!(PSM, air, leaf.t);
+    photosystem_temperature_dependence!(PSM, PRC, air, leaf.t);
     photosystem_electron_transport!(PSM, PRC, leaf.ppar, leaf._p_CO₂_i; β = β);
     rubisco_limited_rate!(PSM, air, leaf._g_CO₂; β = β);
     light_limited_rate!(PSM, PRC, air, leaf._g_CO₂; β = β);
@@ -279,7 +279,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through the leaves.ppar
     for _i in eachindex(leaves.ppar)
-        photosystem_temperature_dependence!(PSM, air, leaves.t[_i]);
+        photosystem_temperature_dependence!(PSM, PRC, air, leaves.t[_i]);
         photosystem_electron_transport!(PSM, PRC, leaves.ppar[_i], leaves._p_CO₂_i[_i]; β = β);
         rubisco_limited_rate!(PSM, air, leaves._g_CO₂[_i]; β = β);
         light_limited_rate!(PSM, PRC, air, leaves._g_CO₂[_i]; β = β);
@@ -307,7 +307,7 @@ leaf_photosynthesis!(leaves::Leaves1D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, 
 leaf_photosynthesis!(leaves::Leaves2D{FT}, air::AirLayer{FT}, mode::GCO₂Mode, β::FT) where {FT<:AbstractFloat} = (
     (; PRC, PSM) = leaves;
 
-    photosystem_temperature_dependence!(PSM, air, leaves.t);
+    photosystem_temperature_dependence!(PSM, PRC, air, leaves.t);
 
     # leaf._p_CO₂_i is not accurate here in the first call, thus need a second call after p_CO₂_i is analytically resolved
     # loop through sunlit leaves

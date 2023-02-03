@@ -1,7 +1,7 @@
 name = "Land"
 uuid = "27e3c115-2cb8-4114-b7a5-cd9f011f9dcc"
 authors = ["Yujie Wang <jesiner@gmail.com>", "Christian Frankenberg <fronge@gmail.com>", "Charles Kawczynski <kawczynski.charles@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ConstrainedRootSolvers = "7e2492bd-0955-4089-8696-9df2af57a479"
