@@ -60,7 +60,7 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
     CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
+    G_LIMITS::Vector{FT} = FT[1e-4, 0.3]
     "Leaf width `[m]`"
     WIDTH::FT = 0.05
 
@@ -145,7 +145,7 @@ Base.@kwdef mutable struct Leaves1D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
     CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
+    G_LIMITS::Vector{FT} = FT[1e-4, 0.3]
     "Leaf width `[m]`"
     WIDTH::FT = 0.05
 
@@ -245,7 +245,7 @@ Base.@kwdef mutable struct Leaves2D{FT<:AbstractFloat} <: AbstractLeaf{FT}
     "Specific heat capacity of leaf `[J K⁻¹ kg⁻¹]`"
     CP::FT = 1780
     "Minimal and maximum stomatal conductance for H₂O at 25 °C `[mol m⁻² s⁻¹]`"
-    G_LIMITS::Vector{FT} = FT[0.01, 0.3]
+    G_LIMITS::Vector{FT} = FT[1e-4, 0.3]
     "Leaf width `[m]`"
     WIDTH::FT = 0.05
 
