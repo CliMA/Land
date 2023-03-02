@@ -32,8 +32,8 @@ function soil_plant_air_continuum! end
 # TODO: add top soil evaporation
 """
 
-    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
-    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
 
 Run SPAC model and move forward in time with time stepper controller, given
 - `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
@@ -45,7 +45,7 @@ Run SPAC model and move forward in time with time stepper controller, given
 
 """
 soil_plant_air_continuum!(
-            spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}},
+            spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}},
             δt::FT;
             p_on::Bool = true,
             t_on::Bool = true,
@@ -81,7 +81,7 @@ soil_plant_air_continuum!(
     return nothing
 );
 
-soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
+soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
 

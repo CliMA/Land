@@ -10,7 +10,8 @@
 #     2022-Feb-02: add method for ComplexVC
 #     2022-Feb-02: add a reference kr for more customized calculations
 #     2022-May-25: iterate through VCS rather than its indices for ComplexVC
-#     2022-Jul-08: deflate documentations
+# Bug fixes
+#     2023-Mar-02: fix an issue with Weibull function critical pressure
 #
 #######################################################################################################################################################################################################
 """
@@ -31,7 +32,7 @@ critical_pressure(vc::LogisticVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFlo
 
 critical_pressure(vc::PowerVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = -1 * ((1 - kr) / (kr * vc.A)) ^ (1 / vc.B);
 
-critical_pressure(vc::WeibullVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = -1 * (-1 * log(1 - kr)) ^ (1 / vc.C) * vc.B;
+critical_pressure(vc::WeibullVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = -1 * (-1 * log(kr)) ^ (1 / vc.C) * vc.B;
 
 critical_pressure(vc::ComplexVC{FT}, kr::FT = FT(0.001)) where {FT<:AbstractFloat} = (
     (; VCS) = vc;
