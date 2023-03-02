@@ -22,8 +22,8 @@ function ∂g∂t end;
 # General
 #     2022-Jul-07: add general method for empirical models
 #     2022-Jul-07: clarify that this method is only for Leaf and shaded leaves of Leaves2D
-#     2022-Jul-11: deflate documentations
 #     2022-Jul-11: make this method specific for Leaf
+#     2023-Mar-01: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -40,7 +40,7 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaf.SM, leaf, air; β = β, δe = δe);
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return sm.K * (∂A∂E(leaf, air) - ∂Θ∂E(sm, leaf, air; δe = δe))
+    return max(-0.001, min(FT(0.001), sm.K * (∂A∂E(leaf, air) - ∂Θ∂E(sm, leaf, air; δe = δe))))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -50,7 +50,7 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = β);
 
-    return (_gsw - leaf.g_H₂O_s) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaf.g_H₂O_s) / sm.τ))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
