@@ -56,7 +56,7 @@ critical_flow(hs::LeafHydraulics{FT}, T::FT, ini::FT = FT(0.5); kr::FT = FT(0.00
 
     # warning if the solution is NaN
     if isnan(_solut)
-        @warn "E_crit is NaN, please check the settings..." hs.p_ups;
+        # @warn "E_crit is NaN, please check the settings..." hs.p_ups;
         _solut = eps(FT);
     end;
 
@@ -105,7 +105,7 @@ critical_flow(spac::MonoElementSPAC{FT}, ini::FT = FT(0.5); kr::FT = FT(0.001)) 
 
     # warning if the solution is NaN
     if isnan(_solut)
-        @warn "E_crit is NaN, please check the settings..." ROOT.HS.p_ups;
+        # @warn "E_crit is NaN, please check the settings..." ROOT.HS.p_ups;
         _solut = eps(FT);
     end;
 

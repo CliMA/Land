@@ -62,15 +62,21 @@ plant_energy!(spac::MonoMLGrassSPAC{FT}) where {FT<:AbstractFloat} = (
     end;
 
     # loop through the leaves
-    for _i in 1:DIM_LAYER
-        _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
+    if CANOPY.lai == 0
+        for _i in 1:DIM_LAYER
+            LEAVES[_i].∂e∂t  = 0;
+        end;
+    else
+        for _i in 1:DIM_LAYER
+            _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
 
-        LEAVES[_i].∂e∂t  = 0;
-        LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
-        LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
-        LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+            LEAVES[_i].∂e∂t  = 0;
+            LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
+            LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
+            LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+        end;
     end;
 
     # compute the energy into the leaves
@@ -118,15 +124,21 @@ plant_energy!(spac::MonoMLPalmSPAC{FT}) where {FT<:AbstractFloat} = (
     TRUNK.∂e∂t -= flow_out(TRUNK) * CP_L_MOL(FT) * TRUNK.t;
 
     # loop through the leaves
-    for _i in 1:DIM_LAYER
-        _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
+    if CANOPY.lai == 0
+        for _i in 1:DIM_LAYER
+            LEAVES[_i].∂e∂t  = 0;
+        end;
+    else
+        for _i in 1:DIM_LAYER
+            _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
 
-        LEAVES[_i].∂e∂t  = 0;
-        LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
-        LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * TRUNK.t;
-        LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+            LEAVES[_i].∂e∂t  = 0;
+            LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
+            LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * TRUNK.t;
+            LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+        end;
     end;
 
     return nothing
@@ -155,15 +167,21 @@ plant_energy!(spac::MonoMLTreeSPAC{FT}) where {FT<:AbstractFloat} = (
     end;
 
     # loop through the leaves
-    for _i in 1:DIM_LAYER
-        _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
+    if CANOPY.lai == 0
+        for _i in 1:DIM_LAYER
+            LEAVES[_i].∂e∂t  = 0;
+        end;
+    else
+        for _i in 1:DIM_LAYER
+            _g_be = FT(1.4) * FT(0.135) * sqrt(AIR[LEAVES_INDEX[_i]].wind / (FT(0.72) * LEAVES[_i].WIDTH));
 
-        LEAVES[_i].∂e∂t  = 0;
-        LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
-        LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
-        LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * BRANCHES[_i].t;
-        LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+            LEAVES[_i].∂e∂t  = 0;
+            LEAVES[_i].∂e∂t += (CANOPY.RADIATION.r_net_sw[DIM_LAYER+1-_i] + CANOPY.RADIATION.r_net_lw[DIM_LAYER+1-_i]) / (CANOPY.lai / DIM_LAYER);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * M_H₂O(FT) * latent_heat_vapor(LEAVES[_i].t);
+            LEAVES[_i].∂e∂t -= flow_out(LEAVES[_i]) * CP_L_MOL(FT) * LEAVES[_i].t;
+            LEAVES[_i].∂e∂t += flow_in(LEAVES[_i]) * CP_L_MOL(FT) * BRANCHES[_i].t;
+            LEAVES[_i].∂e∂t -= 2 * _g_be * CP_D_MOL(FT) * (LEAVES[_i].t - AIR[LEAVES_INDEX[_i]].t);
+        end;
     end;
 
     return nothing
