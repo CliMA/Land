@@ -9,6 +9,7 @@
 #     2022-Jul-13: remove fields p_H₂O_sat and rh to avoid update issues
 #     2022-Jul-20: remove fields P_O₂ to avoid update issues
 #     2022-Jul-20: add fields: Z, ΔZ, e, n_CO₂, n_H₂O, ∂e∂t, ∂CO₂∂t, and ∂H₂O∂t
+#     2023-Mar-11: add field f_CO₂ for CO₂ concentration
 #
 #######################################################################################################################################################################################################
 """
@@ -34,8 +35,10 @@ Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
     P_AIR::FT = P_ATM()
 
     # Prognostic variables (not used for ∂y∂t)
+    "CO₂ concentration `[ppm]`"
+    f_CO₂::FT = 400
     "CO₂ partial pressure `[Pa]`"
-    p_CO₂::FT = 40
+    p_CO₂::FT = P_AIR * f_CO₂ * 1e-6
     "H₂O partial pressure `[Pa]`"
     p_H₂O::FT = 1500
     "Temperature `[K]`"
