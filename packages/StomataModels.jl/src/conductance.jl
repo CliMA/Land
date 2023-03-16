@@ -3,7 +3,6 @@
 # Changes to this function
 # General
 #     2022-Jul-07: add new function
-#     2022-Jul-11: deflate documentations
 #
 #######################################################################################################################################################################################################
 """
@@ -24,6 +23,7 @@ function ∂g∂t end;
 #     2022-Jul-07: clarify that this method is only for Leaf and shaded leaves of Leaves2D
 #     2022-Jul-11: make this method specific for Leaf
 #     2023-Mar-01: limit ∂g∂t within (-0.001, 0.001)
+#     2023-Mar-11: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -56,7 +56,7 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaf::Leaf{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaf, air; β = FT(1));
 
-    return (_gsw - leaf.g_H₂O_s) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaf.g_H₂O_s) / sm.τ))
 );
 
 
@@ -65,6 +65,7 @@ Return the marginal increase of stomatal conductance, given
 # Changes to this method
 # General
 #     2022-Jul-11: add method for Leaves1D
+#     2023-Mar-11: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -82,7 +83,7 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return sm.K * (∂A∂E(leaves, air, ind) - ∂Θ∂E(sm, leaves, air, ind; δe = δe))
+    return max(-0.001, min(0.001, sm.K * (∂A∂E(leaves, air, ind) - ∂Θ∂E(sm, leaves, air, ind; δe = δe))))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -92,13 +93,13 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = β);
 
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s[ind]) / sm.τ))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves1D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s[ind]) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s[ind]) / sm.τ))
 );
 
 
@@ -107,6 +108,7 @@ Return the marginal increase of stomatal conductance, given
 # Changes to this method
 # General
 #     2022-Jul-11: add method for Leaves2D shaded leaves
+#     2023-Mar-11: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -123,7 +125,7 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air; β = β, δe = δe);
 
 ∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
-    return sm.K * (∂A∂E(leaves, air) - ∂Θ∂E(sm, leaves, air; δe = δe))
+    return max(-0.001, min(0.001, sm.K * (∂A∂E(leaves, air) - ∂Θ∂E(sm, leaves, air; δe = δe))))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
@@ -133,13 +135,13 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air; β = β);
 
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s_shaded) / sm.τ))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s_shaded) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s_shaded) / sm.τ))
 );
 
 
@@ -148,6 +150,7 @@ Return the marginal increase of stomatal conductance, given
 # Changes to this method
 # General
 #     2022-Jul-11: add method for Leaves2D sunlit leaves
+#     2023-Mar-11: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -164,8 +167,9 @@ Return the marginal increase of stomatal conductance, given
 """
 ∂g∂t(leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = ∂g∂t(leaves.SM, leaves, air, ind; β = β, δe = δe);
 
-∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} =
-    sm.K * (∂A∂E(leaves, air, ind) - ∂Θ∂E(sm, leaves, air, ind; δe = δe));
+∂g∂t(sm::Union{AndereggSM{FT}, EllerSM{FT}, SperrySM{FT}, WangSM{FT}, Wang2SM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
+    return max(-0.001, min(0.001, sm.K * (∂A∂E(leaves, air, ind) - ∂Θ∂E(sm, leaves, air, ind; δe = δe))))
+);
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, ind::Int; β::FT = FT(1), δe::FT = FT(1e-7)) where {FT<:AbstractFloat} = (
     return ∂g∂t(sm, leaves, air, sm.β.PARAM_Y, ind; β = β)
@@ -174,13 +178,13 @@ Return the marginal increase of stomatal conductance, given
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterG1, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = β);
 
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ))
 );
 
 ∂g∂t(sm::Union{BallBerrySM{FT}, GentineSM{FT}, LeuningSM{FT}, MedlynSM{FT}}, leaves::Leaves2D{FT}, air::AirLayer{FT}, βt::BetaParameterVcmax, ind::Int; β::FT = FT(1)) where {FT<:AbstractFloat} = (
     _gsw = empirical_equation(sm, leaves, air, ind; β = FT(1));
 
-    return (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ
+    return max(-0.001, min(0.001, (_gsw - leaves.g_H₂O_s_sunlit[ind]) / sm.τ))
 );
 
 
@@ -190,6 +194,7 @@ Return the marginal increase of stomatal conductance, given
 # General
 #     2022-Jul-11: add method for nocturnal transpiration for WangSM model
 #     2022-Jul-11: rename function to ∂gₙ∂t
+#     2023-Mar-11: limit ∂g∂t within (-0.001, 0.001)
 #
 #######################################################################################################################################################################################################
 """
@@ -205,7 +210,7 @@ function ∂gₙ∂t end
 
 ∂gₙ∂t(lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = ∂gₙ∂t(lf.SM, lf, air);
 
-∂gₙ∂t(sm::WangSM{FT}, lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = sm.K * (∂R∂E(lf, air) - ∂Θₙ∂E(lf, air));
+∂gₙ∂t(sm::WangSM{FT}, lf::Union{Leaf{FT}, Leaves1D{FT}, Leaves2D{FT}}, air::AirLayer{FT}) where {FT<:AbstractFloat} = max(-0.001, min(0.001, sm.K * (∂R∂E(lf, air) - ∂Θₙ∂E(lf, air))));
 
 
 #######################################################################################################################################################################################################
@@ -255,7 +260,11 @@ stomatal_conductance!(spac::MonoElementSPAC{FT}; β::FT = FT(1)) where {FT<:Abst
 );
 
 stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; β::FT = FT(1)) where {FT<:AbstractFloat} = (
-    (; AIR, LEAVES, LEAVES_INDEX) = spac;
+    (; AIR, CANOPY, LEAVES, LEAVES_INDEX) = spac;
+
+    if CANOPY.lai == 0
+        return nothing
+    end;
 
     for _i in eachindex(LEAVES_INDEX)
         stomatal_conductance!(LEAVES[_i], AIR[LEAVES_INDEX[_i]]; β = β);
@@ -296,6 +305,8 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) w
 #     2022-Jul-12: move ∂g∂t to another method
 #     2022-Jul-12: add method to update g for SPAC
 #     2022-Jul-26: limit g in range after updating stomatal conductance
+#     2023-Mar-11: do nothing if LAI == 0
+#     2023-Mar-13: move some methods as stomatal_conductance_profile!
 #
 #######################################################################################################################################################################################################
 """
@@ -303,7 +314,7 @@ stomatal_conductance!(leaves::Leaves2D{FT}, air::AirLayer{FT}; β::FT = FT(1)) w
     stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFloat}
     stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, Δt::FT) where {FT<:AbstractFloat}
 
-Update marginal stomatal conductance, given
+Update stomatal conductance for H₂O based on computed ∂g∂t, given
 - `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type struct
 - `Δt` Time step length `[s]`
 
@@ -317,7 +328,11 @@ stomatal_conductance!(spac::MonoElementSPAC{FT}, Δt::FT) where {FT<:AbstractFlo
 );
 
 stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, Δt::FT) where {FT<:AbstractFloat} = (
-    (; LEAVES) = spac;
+    (; CANOPY, LEAVES) = spac;
+
+    if CANOPY.lai == 0
+        return nothing
+    end;
 
     for _leaves in LEAVES
         stomatal_conductance!(_leaves, Δt);
@@ -328,7 +343,8 @@ stomatal_conductance!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoM
 
 stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     leaf.g_H₂O_s += leaf.∂g∂t * Δt;
-    stomatal_conductance!(leaf);
+    limit_stomatal_conductance!(leaf);
+    stomatal_conductance_profile!(leaf);
 
     return nothing
 );
@@ -336,7 +352,8 @@ stomatal_conductance!(leaf::Leaf{FT}, Δt::FT) where {FT<:AbstractFloat} = (
 stomatal_conductance!(leaves::Leaves1D{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     leaves.g_H₂O_s[1] += leaves.∂g∂t[1] * Δt;
     leaves.g_H₂O_s[2] += leaves.∂g∂t[2] * Δt;
-    stomatal_conductance!(leaves);
+    limit_stomatal_conductance!(leaves);
+    stomatal_conductance_profile!(leaves);
 
     return nothing
 );
@@ -346,31 +363,67 @@ stomatal_conductance!(leaves::Leaves2D{FT}, Δt::FT) where {FT<:AbstractFloat} =
     for _i in eachindex(leaves.g_H₂O_s_sunlit)
         leaves.g_H₂O_s_sunlit[_i] += leaves.∂g∂t_sunlit[_i] * Δt;
     end;
-    stomatal_conductance!(leaves);
+    limit_stomatal_conductance!(leaves);
+    stomatal_conductance_profile!(leaves);
 
     return nothing
 );
 
-stomatal_conductance!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
-    limit_stomatal_conductance!(leaf);
 
+#######################################################################################################################################################################################################
+#
+# Changes to this method
+# General
+#     2023-Mar-13: add function to update stomatal conductance profile based on gs and gb
+#
+#######################################################################################################################################################################################################
+"""
+
+    stomatal_conductance_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat}
+    stomatal_conductance_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat}
+
+Update stomatal conductance for CO₂ based on that for H₂O, given
+- `spac` `MonoElementSPAC`, `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` type struct
+
+"""
+function stomatal_conductance_profile! end
+
+stomatal_conductance_profile!(spac::MonoElementSPAC{FT}) where {FT<:AbstractFloat} = (
+    (; LEAF) = spac;
+
+    stomatal_conductance_profile!(LEAF);
+
+    return nothing
+);
+
+stomatal_conductance_profile!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
+    (; CANOPY, LEAVES) = spac;
+
+    if CANOPY.lai == 0
+        return nothing
+    end;
+
+    for _leaves in LEAVES
+        stomatal_conductance_profile!(_leaves);
+    end;
+
+    return nothing
+);
+
+stomatal_conductance_profile!(leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
     leaf._g_CO₂ = 1 / (1 / leaf.g_CO₂_b + FT(1.6) / leaf.g_H₂O_s);
 
     return nothing
 );
 
-stomatal_conductance!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
-    limit_stomatal_conductance!(leaves);
-
+stomatal_conductance_profile!(leaves::Leaves1D{FT}) where {FT<:AbstractFloat} = (
     leaves._g_CO₂[1] = 1 / (1 / leaves.g_CO₂_b[1] + FT(1.6) / leaves.g_H₂O_s[1]);
     leaves._g_CO₂[2] = 1 / (1 / leaves.g_CO₂_b[2] + FT(1.6) / leaves.g_H₂O_s[2]);
 
     return nothing
 );
 
-stomatal_conductance!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat} = (
-    limit_stomatal_conductance!(leaves);
-
+stomatal_conductance_profile!(leaves::Leaves2D{FT}) where {FT<:AbstractFloat} = (
     leaves._g_CO₂_shaded = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_shaded);
     for _i in eachindex(leaves.g_H₂O_s_sunlit)
         leaves._g_CO₂_sunlit[_i] = 1 / (1 / leaves.g_CO₂_b + FT(1.6) / leaves.g_H₂O_s_sunlit[_i]);
