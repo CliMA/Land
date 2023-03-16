@@ -23,6 +23,7 @@ function canopy_optical_properties! end
 #     2022-Jun-07: migrate the function from CanopyLayers
 #     2022-Jun-09: rename function to canopy_optical_properties!
 #     2022-Jun-09: update p_sunlit
+#     2023-Mar-11: add code to account for the case of LAI == 0
 #
 #######################################################################################################################################################################################################
 """
@@ -36,6 +37,10 @@ Updates canopy optical properties (extinction coefficients for direct and diffus
 """
 canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeometry{FT}) where {FT<:AbstractFloat} = (
     (; DIM_LAYER, HOT_SPOT, OPTICS, P_INCL, Θ_AZI) = can;
+
+    if can.lai == 0
+        return nothing
+    end;
 
     # 1. update the canopy optical properties related to extinction and scattering coefficients
     extinction_scattering_coefficients!(can, angles);
@@ -145,6 +150,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::Hyperspectral
 #     2022-Jun-09: move part of the short_wave! code into canopy_optical_properties!
 #     2022-Jun-10: add function to compute longwave reflectance, transmittance, and emissivity
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
+#     2023-Mar-11: add code to account for the case of LAI == 0
 #
 #######################################################################################################################################################################################################
 """
@@ -161,6 +167,21 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves
     (; DIM_LAYER, OPTICS) = can;
     (; ALBEDO) = soil;
     @assert length(leaves) == DIM_LAYER "Number of leaves must be equal to the canopy layers!";
+
+    if can.lai == 0
+        OPTICS.ρ_dd .= 0;
+        OPTICS.ρ_lw .= 0;
+        OPTICS.ρ_sd .= 0;
+        OPTICS.τ_dd .= 0;
+        OPTICS.τ_lw .= 0;
+        OPTICS.τ_sd .= 0;
+        OPTICS._τ_ss = 0;
+        canopy_optical_properties!(can, ALBEDO);
+        OPTICS.ρ_lw[end] = ALBEDO.ρ_LW;
+
+        return nothing
+    end;
+
     _ilai = can.lai * can.ci / DIM_LAYER;
 
     # 1. update the scattering coefficients for different layers

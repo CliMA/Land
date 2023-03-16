@@ -13,15 +13,14 @@ using ..EmeraldNamespace: MonoMLGrassSPAC, MonoMLPalmSPAC, MonoMLTreeSPAC
 using ..EmeraldOptics: energy!, photon, photon!
 
 
-include("../../packages/CanopyRadiativeTransfer.jl/src/constants.jl"        )
-include("../../packages/CanopyRadiativeTransfer.jl/src/clumping.jl"         )
-include("../../packages/CanopyRadiativeTransfer.jl/src/coefficients.jl"     )
-include("../../packages/CanopyRadiativeTransfer.jl/src/fluorescence.jl"     )
-include("../../packages/CanopyRadiativeTransfer.jl/src/geometry.jl"         )
-include("../../packages/CanopyRadiativeTransfer.jl/src/inclination_angle.jl")
-include("../../packages/CanopyRadiativeTransfer.jl/src/radiation.jl"        )
-include("../../packages/CanopyRadiativeTransfer.jl/src/remote_sensing.jl"   )
-include("../../packages/CanopyRadiativeTransfer.jl/src/soil.jl"             )
+include("../../packages/CanopyRadiativeTransfer.jl/src/clumping.jl"      )
+include("../../packages/CanopyRadiativeTransfer.jl/src/coefficients.jl"  )
+include("../../packages/CanopyRadiativeTransfer.jl/src/fluorescence.jl"  )
+include("../../packages/CanopyRadiativeTransfer.jl/src/geometry.jl"      )
+include("../../packages/CanopyRadiativeTransfer.jl/src/inclination.jl"   )
+include("../../packages/CanopyRadiativeTransfer.jl/src/radiation.jl"     )
+include("../../packages/CanopyRadiativeTransfer.jl/src/remote_sensing.jl")
+include("../../packages/CanopyRadiativeTransfer.jl/src/soil.jl"          )
 
 
 end # module

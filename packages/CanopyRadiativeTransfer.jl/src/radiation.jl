@@ -247,6 +247,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, albedo::HyperspectralSoilAlbed
 #     2022-Jun-10: update net lw radiation for leaves and soil
 #     2022-Jun-13: use DIM_LAYER instead of _end
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
+#     2023-Mar-11: add code to account for the case of LAI == 0
 # Bug fix:
 #     2022-Jul-15: sum by r_net_sw by the weights of sunlit and shaded fractions
 #     2022-Jul-27: use _ρ_dd, _ρ_sd, _τ_dd, and _τ_sd for leaf energy absorption (typo when refactoring the code)
@@ -270,6 +271,22 @@ Updates canopy radiation profiles for shortwave or longwave radiation, given
 canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, rad::HyperspectralRadiation{FT}, soil::Soil{FT}; APAR_CAR::Bool = true) where {FT<:AbstractFloat} = (
     (; DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET) = can;
     (; ALBEDO) = soil;
+
+    if can.lai == 0
+        for _i in 1:(DIM_LAYER+1)
+            RADIATION.e_direct[:,_i] .= rad.e_direct;
+            RADIATION.e_diffuse_down[:,_i] .= rad.e_diffuse;
+            RADIATION.e_diffuse_up[:,_i] .= 0;
+            RADIATION.e_v[:,_i] .= 0;
+        end;
+        RADIATION.e_diffuse_up[:,end] .= view(OPTICS.ρ_sd,:,DIM_LAYER+1) .* view(RADIATION.e_direct,:,DIM_LAYER+1) .+ view(OPTICS.ρ_dd,:,DIM_LAYER+1) .* view(RADIATION.e_diffuse_down,:,DIM_LAYER+1);
+        RADIATION.e_v[:,end] .= view(RADIATION.e_diffuse_up,:,DIM_LAYER+1);
+        RADIATION.e_o .= view(RADIATION.e_diffuse_up,:,DIM_LAYER+1) ./ FT(pi);
+        RADIATION.albedo .= RADIATION.e_o * FT(pi) ./ (rad.e_direct .+ rad.e_diffuse);
+
+        return nothing
+    end;
+
     _ilai = can.lai * can.ci / DIM_LAYER;
     _tlai = can.lai / DIM_LAYER;
 
@@ -404,6 +421,16 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
     (; DIM_LAYER, OPTICS, RADIATION) = can;
     (; ALBEDO, LAYERS) = soil;
 
+    if can.lai == 0
+        _r_lw_soil = K_STEFAN(FT) * (1 - ALBEDO.ρ_LW) * LAYERS[1].t ^ 4;
+        RADIATION.r_lw .= 0;
+        RADIATION.r_net_lw .= 0;
+        RADIATION.r_lw_up .= rad * ALBEDO.ρ_LW + _r_lw_soil;
+        ALBEDO.r_net_lw = rad * (1 - ALBEDO.ρ_LW) - _r_lw_soil;
+
+        return nothing
+    end;
+
     # 1. compute longwave radiation out from the leaves and soil
     for _i in eachindex(leaves)
         RADIATION.r_lw[_i] = K_STEFAN(FT) * OPTICS.ϵ[_i] * leaves[_i].t ^ 4;
@@ -455,6 +482,7 @@ canopy_radiation!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}, 
 # General
 #     2022-Jun-29: add method for SPAC
 #     2022-Jul-28: update soil albedo at the very first step
+#     2023-Mar-11: run canopy optical properties and shortwave radiation only if solar zenith angle is lower than 89
 #
 #######################################################################################################################################################################################################
 """
@@ -466,12 +494,30 @@ Updates canopy radiation profiles for shortwave and longwave radiation, given
 
 """
 canopy_radiation!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    (; ANGLES, CANOPY, LEAVES, RAD_LW, RAD_SW, SOIL) = spac;
+    (; ANGLES, CANOPY, DIM_LAYER, LEAVES, RAD_LW, RAD_SW, SOIL) = spac;
 
     soil_albedo!(CANOPY, SOIL);
-    canopy_optical_properties!(CANOPY, ANGLES);
-    canopy_optical_properties!(CANOPY, LEAVES, SOIL);
-    canopy_radiation!(CANOPY, LEAVES, RAD_SW, SOIL; APAR_CAR = LEAVES[1].APAR_CAR);
+    if ANGLES.sza < 89
+        canopy_optical_properties!(CANOPY, ANGLES);
+        canopy_optical_properties!(CANOPY, LEAVES, SOIL);
+        canopy_radiation!(CANOPY, LEAVES, RAD_SW, SOIL; APAR_CAR = LEAVES[1].APAR_CAR);
+    else
+        CANOPY.RADIATION.r_net_sw .= 0;
+        SOIL.ALBEDO.r_net_sw = 0;
+        CANOPY.RADIATION.par_in_diffuse = 0;
+        CANOPY.RADIATION.par_in_direct = 0;
+        CANOPY.RADIATION.par_in = 0;
+        CANOPY.RADIATION.par_shaded .= 0;
+        CANOPY.RADIATION.par_sunlit .= 0;
+        CANOPY.RADIATION.apar_shaded .= 0;
+        CANOPY.RADIATION.apar_sunlit .= 0;
+
+        for _i in 1:DIM_LAYER
+            # PPAR for leaves
+            LEAVES[_i].ppar_shaded = 0;
+            LEAVES[_i].ppar_sunlit .= 0;
+        end;
+    end;
     canopy_radiation!(CANOPY, LEAVES, RAD_LW, SOIL);
 
     return nothing

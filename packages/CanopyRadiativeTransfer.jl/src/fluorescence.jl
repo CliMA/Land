@@ -9,6 +9,8 @@
 #     2022-Jun-29: use Leaves2D for the hyperspectral RT
 #     2022-Jun-29: use ϕ_f in Leaves2D
 #     2022-Jun-29: add method for SPAC
+#     2023-Mar-11: compute fluorescence only if solar zenith angle < 89
+#     2023-Mar-11: add code to account for the case of LAI == 0
 #
 #######################################################################################################################################################################################################
 """
@@ -22,15 +24,24 @@ Updates canopy fluorescence, given
 function canopy_fluorescence! end
 
 canopy_fluorescence!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}) where {FT<:AbstractFloat} = (
-    (; CANOPY, LEAVES, Φ_PHOTON) = spac;
+    (; ANGLES, CANOPY, LEAVES, Φ_PHOTON) = spac;
 
-    canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
+    if (ANGLES.sza < 89)
+        canopy_fluorescence!(CANOPY, LEAVES; ϕ_photon = Φ_PHOTON);
+    else
+        CANOPY.RADIATION.sif_obs .= 0;
+    end;
 
     return nothing
 );
 
 canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}}; ϕ_photon::Bool = true) where {FT<:AbstractFloat} = (
     (; DIM_LAYER, OPTICS, P_INCL, RADIATION, WLSET) = can;
+
+    if can.lai == 0
+        RADIATION.sif_obs .= 0;
+    end;
+
     _ilai = can.lai * can.ci / DIM_LAYER;
 
     # function to weight matrices by inclination angles
