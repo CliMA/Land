@@ -9,6 +9,7 @@
 #     2022-Sep-07: add method to solve for steady state solution
 #     2022-Oct-22: add option t_on to enable/disable soil and leaf energy budgets
 #     2022-Nov-18: add option p_on to enable/disable plant flow and pressure profiles
+#     2023-Mar-11: add method for a SPAC == nothing
 #
 #######################################################################################################################################################################################################
 """
@@ -24,19 +25,19 @@ This function runs the model using the following steps:
 
 This function is supposed to have the highest hierarchy, and should support all SPAC types defined in EmeraldNamespace.jl. Note to update the water flow profile when initializing the SPAC.
 
-"""
-function soil_plant_air_continuum! end
-
-
-# TODO: add lite mode later to update energy balance (only longwave radiation and soil+leaf energy budgets)? Or use shorter time steps (will be time consuming, but more accurate)
-# TODO: add top soil evaporation
-"""
-
-    soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}, δt::FT; update::Bool = false, θ_on::Bool = true, t_on::Bool = true) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(
+                spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}},
+                δt::Number;
+                p_on::Bool = true,
+                t_on::Bool = true,
+                update::Bool = false,
+                θ_on::Bool = true) where {FT<:AbstractFloat}
     soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Nothing, δt::Number; p_on::Bool = true, t_on::Bool = true, update::Bool = false, θ_on::Bool = true) where {FT<:AbstractFloat}
+    soil_plant_air_continuum!(spac::Nothing; update::Bool = false) where {FT<:AbstractFloat}
 
 Run SPAC model and move forward in time with time stepper controller, given
-- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC
+- `spac` `MonoMLGrassSPAC`, `MonoMLPalmSPAC`, or `MonoMLTreeSPAC` SPAC, or nothing
 - `δt` Time step (if not given, solve for steady state solution)
 - `p_on` If true, plant hydraulic flow and pressure profiles will be updated
 - `t_on` If true, plant energy budget is on (set false to run sensitivity analysis or prescribing mode)
@@ -44,9 +45,13 @@ Run SPAC model and move forward in time with time stepper controller, given
 - `update` If true, update leaf xylem legacy effect
 
 """
+function soil_plant_air_continuum! end
+
+# TODO: add lite mode later to update energy balance (only longwave radiation and soil+leaf energy budgets)? Or use shorter time steps (will be time consuming, but more accurate)
+# TODO: add top soil evaporation
 soil_plant_air_continuum!(
             spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}},
-            δt::FT;
+            δt::Number;
             p_on::Bool = true,
             t_on::Bool = true,
             update::Bool = false,
@@ -56,7 +61,9 @@ soil_plant_air_continuum!(
     canopy_radiation!(spac);
 
     # 2. run plant hydraulic model (must be run before leaf_photosynthesis! as the latter may need β for empirical models)
-    if p_on xylem_pressure_profile!(spac; update = update); end;
+    xylem_flow_profile!(spac);
+    xylem_pressure_profile!(spac; update = update);
+    stomatal_conductance_profile!(spac);
 
     # 3. run photosynthesis model
     leaf_photosynthesis!(spac, GCO₂Mode());
@@ -81,6 +88,8 @@ soil_plant_air_continuum!(
     return nothing
 );
 
+soil_plant_air_continuum!(spac::Nothing, δt::Number; p_on::Bool = true, t_on::Bool = true, update::Bool = false, θ_on::Bool = true) = nothing;
+
 soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, MonoMLTreeSPAC{FT}}; update::Bool = false) where {FT<:AbstractFloat} = (
     # 1. run canopy RT
     canopy_radiation!(spac);
@@ -92,3 +101,9 @@ soil_plant_air_continuum!(spac::Union{MonoMLGrassSPAC{FT}, MonoMLPalmSPAC{FT}, M
 
     return nothing
 );
+
+soil_plant_air_continuum!(spac::Nothing; update::Bool = false) = nothing;
+
+
+# add an alias for soil_plant_air_continuum!
+spac! = soil_plant_air_continuum!;

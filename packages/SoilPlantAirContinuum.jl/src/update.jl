@@ -28,6 +28,7 @@ function update! end
 #     2022-Oct-19: air.rh and air.p_H₂O_sat have been removed in an earlier version ClimaCache
 #     2022-Oct-19: add method to prescribe t_soil profile
 #     2022-Nov-21: fix a bug related to Vcmax profile (no global simulations are impacted)
+#     2022-Nov-22: add option to change CO₂ partial pressure through ppm
 #
 #######################################################################################################################################################################################################
 """
@@ -43,6 +44,7 @@ function update! end
 
 Update the environmental conditions (such as saturated vapor pressure and relative humidity) of the air surrounding the leaf, given
 - `air` `AirLayer` type structure
+- `f_CO₂` CO₂ concentration in `ppm`. Optional, default is nothing
 - `p_CO₂` CO₂ partial pressure in `Pa`. Optional, default is nothing
 - `p_H₂O` Vapor pressure in `Pa`. Optional, default is nothing
 - `rh` Relatibe humidity (fraction). Optional, default is nothing
@@ -52,6 +54,7 @@ Update the environmental conditions (such as saturated vapor pressure and relati
 
 """
 update!(air::AirLayer{FT};
+        f_CO₂::Union{Number,Nothing} = nothing,
         p_CO₂::Union{Number,Nothing} = nothing,
         p_H₂O::Union{Number,Nothing} = nothing,
         rh::Union{Number,Nothing} = nothing,
@@ -61,7 +64,8 @@ update!(air::AirLayer{FT};
 ) where {FT<:AbstractFloat} = (
     if !isnothing(t) air.t = t; end;
     if !isnothing(wind) air.wind = wind; end;
-    if !isnothing(p_CO₂) air.p_CO₂ = p_CO₂; end;
+    if !isnothing(f_CO₂) air.f_CO₂ = f_CO₂; air.p_CO₂ = air.f_CO₂ * air.P_AIR * 1e-6; end;
+    if !isnothing(p_CO₂) air.p_CO₂ = p_CO₂; air.f_CO₂ = air.p_CO₂ / air.P_AIR * 1e6; end;
     if !isnothing(p_H₂O) air.p_H₂O = p_H₂O; end;
     if !isnothing(rh) air.p_H₂O = saturation_vapor_pressure(air.t) * rh; end;
     if !isnothing(vpd) air.p_H₂O = max(0, saturation_vapor_pressure(air.t) - vpd); end;
