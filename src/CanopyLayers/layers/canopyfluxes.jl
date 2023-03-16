@@ -62,7 +62,7 @@ function canopy_fluxes!(
     #    Direct PAR is normalized by layer Ps value
     mul!(cf_con.absfs_lidf, adjoint(can_opt.absfs), can.lidf);
     normi       = 1 / mean(cf_con.absfs_lidf);
-    cf_con.lPs .= (view(can_opt.Ps, 1:nLayer  ) .+ view(can_opt.Ps, 2:nLayer+1)) ./ 2;
+    cf_con.lPs .= (view(can_opt.Ps, 1:nLayer) .+ view(can_opt.Ps, 2:nLayer+1)) ./ 2;
     @unpack lPs = cf_con;
 
     @inbounds for j in 1:nLayer

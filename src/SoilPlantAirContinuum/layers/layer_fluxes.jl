@@ -15,13 +15,9 @@ Run carbon, water, energy, and SIF fluxes for all canopy layers, given
 - `node` [`SPACMono`](@ref) type struct
 - `updating` If true, update cavitation history
 """
-function layer_fluxes!(
-            node::SPACMono{FT};
-            updating::Bool = false
-) where {FT<:AbstractFloat}
+function layer_fluxes!(node::SPACMono{FT}; updating::Bool = false) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set,
-            plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;
@@ -31,8 +27,7 @@ function layer_fluxes!(
     canopy_geometry!(canopy_rt, angles, can_opt, rt_con);
     canopy_matrices!(leaves_rt, can_opt);
     short_wave!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, rt_con);
-    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, leaves_rt,
-                   wl_set, rt_con);
+    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, leaves_rt, wl_set, rt_con);
 
     #
     f_H₂O = 0;
@@ -78,8 +73,7 @@ function layer_fluxes!(
                 #
                 prognostic_gsw!(iPS, iEN, stomata_model, FT(1), FT(120));
             else
-                prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model,
-                                FT(120));
+                prognostic_gsw!(photo_set, iPS, iHS, iEN, stomata_model, FT(120));
             end
 
             # update flow and pressure profile (except for history)
@@ -89,8 +83,7 @@ function layer_fluxes!(
                 iEN = envirs[i_can];
                 iLF = plant_hs.leaves[i_can];
                 iPS = plant_ps[i_can];
-                iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                           (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+                iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
             end
             flow_profile!(plant_hs);
             pressure_profile!(plant_hs, SteadyStateMode(); update=false);
@@ -115,22 +108,19 @@ function layer_fluxes!(
         end
 
         # update the fluorescence quantum yield from leaf level calculation
-        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl,
-                                          canopy_rt.nAzi);
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl, canopy_rt.nAzi);
         can_rad.ϕ_shade[iRT] = iPS.φs[end];
 
         # update the flow rates
         for iLF in 1:(nSL+1)
             f_GPP += iPS.Ag[iLF] * iPS.LAIx[iLF] * iPS.LA;
             f_NPP += iPS.An[iLF] * iPS.LAIx[iLF] * iPS.LA;
-            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm *
-                     iPS.LAIx[iLF] * iPS.LA;
+            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm * iPS.LAIx[iLF] * iPS.LA;
         end
     end
 
     # do SIF simulation
-    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set,
-                rt_con, rt_dim);
+    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set, rt_con, rt_dim);
 
     # update flow profile and pressure history along the tree
     if updating
@@ -138,8 +128,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
@@ -160,25 +149,16 @@ end
 
 
 """
-    layer_fluxes!(
-                node::SPACMono{FT},
-                Δt::FT;
-                updating::Bool = false
-    ) where {FT<:AbstractFloat}
+    layer_fluxes!(node::SPACMono{FT}, Δt::FT; updating::Bool = false) where {FT<:AbstractFloat}
 
 Run carbon, water, energy, and SIF fluxes for all canopy layers, given
 - `node` [`SPACMono`](@ref) type struct
 - `Δt` Time step to forward in time
 - `updating` If true, update cavitation history
 """
-function layer_fluxes!(
-            node::SPACMono{FT},
-            Δt::FT;
-            updating::Bool = false
-) where {FT<:AbstractFloat}
+function layer_fluxes!(node::SPACMono{FT}, Δt::FT; updating::Bool = false) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set,
-            plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;
@@ -188,8 +168,7 @@ function layer_fluxes!(
     canopy_geometry!(canopy_rt, angles, can_opt, rt_con);
     canopy_matrices!(leaves_rt, can_opt);
     short_wave!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, rt_con);
-    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, leaves_rt,
-                   wl_set, rt_con);
+    canopy_fluxes!(canopy_rt, can_opt, can_rad, in_rad, soil_opt, leaves_rt, wl_set, rt_con);
 
     #
     f_H₂O = 0;
@@ -240,8 +219,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=false);
@@ -255,22 +233,19 @@ function layer_fluxes!(
         end;
 
         # update the fluorescence quantum yield from leaf level calculation
-        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl,
-                                          canopy_rt.nAzi);
+        can_rad.ϕ_sun[:,:,iRT] .= reshape(view(iPS.φs,1:nSL), canopy_rt.nIncl, canopy_rt.nAzi);
         can_rad.ϕ_shade[iRT] = iPS.φs[end];
 
         # update the flow rates
         for iLF in 1:(nSL+1)
             f_GPP += iPS.Ag[iLF] * iPS.LAIx[iLF] * iPS.LA;
             f_NPP += iPS.An[iLF] * iPS.LAIx[iLF] * iPS.LA;
-            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm *
-                     iPS.LAIx[iLF] * iPS.LA;
+            f_H₂O += iPS.g_lw[iLF] * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm * iPS.LAIx[iLF] * iPS.LA;
         end
     end
 
     # do SIF simulation
-    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set,
-                rt_con, rt_dim);
+    SIF_fluxes!(leaves_rt, can_opt, can_rad, canopy_rt, soil_opt, wl_set, rt_con, rt_dim);
 
     # update flow profile and pressure history along the tree
     if updating
@@ -278,8 +253,7 @@ function layer_fluxes!(
             iEN = envirs[i_can];
             iLF = plant_hs.leaves[i_can];
             iPS = plant_ps[i_can];
-            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) *
-                       (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
+            iLF.flow = sum(iPS.g_lw .* iPS.LAIx) * (iPS.p_sat - iEN.p_H₂O) / iEN.p_atm;
         end
         flow_profile!(plant_hs);
         pressure_profile!(plant_hs, SteadyStateMode(); update=true);
