@@ -110,6 +110,7 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, angles::SunSensorGeom
 # General
 #     2022-Jun-14: add method to use broadband PAR and NIR soil albedo for canopy_optical_properties!
 #     2022-Jun-14: add method to use hyperspectral soil albedo for canopy_optical_properties!
+#     2023-Mar-16: update both dd and sd from broadband values
 #
 #######################################################################################################################################################################################################
 """
@@ -126,6 +127,8 @@ canopy_optical_properties!(can::HyperspectralMLCanopy{FT}, albedo::BroadbandSoil
     (; OPTICS, WLSET) = can;
 
     OPTICS.ρ_dd[WLSET.IΛ_PAR,end] .= albedo.ρ_sw[1];
+    OPTICS.ρ_dd[WLSET.IΛ_NIR,end] .= albedo.ρ_sw[2];
+    OPTICS.ρ_sd[WLSET.IΛ_PAR,end] .= albedo.ρ_sw[1];
     OPTICS.ρ_sd[WLSET.IΛ_NIR,end] .= albedo.ρ_sw[2];
 
     return nothing

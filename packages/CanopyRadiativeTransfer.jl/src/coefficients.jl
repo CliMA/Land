@@ -78,6 +78,8 @@ extinction_coefficient(lia::FT) where {FT<:AbstractFloat} = (
 #     2022-Jun-07: add relative azimuth angle control
 #     2022-Jun-07: return _Co, _Cs, _So, _Ss as well
 #     2022-Jun-16: make this a method for extinction_coefficient
+# Bug fixes:
+#     2023-Mar-16: adjust _sb and _sf if negative value appears
 # Sources
 #     Verhoef (1998) Theory of radiative transfer models applied in optical remote sensing of vegetation canopies. Chapter 7
 #
@@ -126,14 +128,14 @@ extinction_coefficient(sza::FT, vza::FT, raa::FT, lia::FT) where {FT<:AbstractFl
     _Ds = (_βs < pi ? _Ss : _Cs);
     _Do = (0 < _βo < pi ? _So : -_Co/cos(_βo));
     _so = cosd(sza) * cosd(vza);
-    _T₁ = 2 * _Cs * _Co + _Ss * _So * cosd(raa);
+    _T₁ = 2 * _Cs * _Co + _Ss * _So * cosd(_ψ);
     _T₂ = sin(_β₂) * (2 * _Ds * _Do + _Ss * _So * cos(_β₁) * cos(_β₃));
-    _F₁ = ((_π - _β₂) * _T₁ + _T₂) / _so;
-    _F₂ = (-_β₂ * _T₁ + _T₂) / _so;
+    _F₁ = ((_π - _β₂) * _T₁ + _T₂) / abs(_so);
+    _F₂ = (-_β₂ * _T₁ + _T₂) / abs(_so);
 
     # 2.3 compute the area scattering coefficient fractions (_sb for backward and _sf for forward)
-    _sb = _F₁ / (2 * _π);
-    _sf = _F₂ / (2 * _π);
+    _sb = (_F₂ >= 0 ? _F₁ : abs(_F₂)) / (2 * _π);
+    _sf = (_F₂ >= 0 ? _F₂ : abs(_F₁)) / (2 * _π);
 
     return _ks, _ko, _sb, _sf, _Co, _Cs, _So, _Ss
 );

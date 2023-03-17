@@ -11,6 +11,8 @@
 #     2022-Jun-29: add method for SPAC
 #     2023-Mar-11: compute fluorescence only if solar zenith angle < 89
 #     2023-Mar-11: add code to account for the case of LAI == 0
+# Bug fix
+#     2023-Mar-16: ddb ddf to dob and dof for observed SIF
 #
 #######################################################################################################################################################################################################
 """
@@ -178,7 +180,7 @@ canopy_fluorescence!(can::HyperspectralMLCanopy{FT}, leaves::Vector{Leaves2D{FT}
     OPTICS._tmp_vec_layer .= (view(OPTICS.po,1:DIM_LAYER) .+ view(OPTICS.po,2:DIM_LAYER+1) .- view(OPTICS.pso,1:DIM_LAYER) .- view(OPTICS.pso,2:DIM_LAYER+1)) ./ 2 .* _ilai ./ FT(pi);
     mul!(RADIATION.sif_obs_shaded, RADIATION._sif_obs_shaded, OPTICS._tmp_vec_layer);
 
-    RADIATION._sif_obs_scatter .= view(OPTICS.σ_ddb,WLSET.IΛ_SIF,:) .* view(RADIATION.sif_down,:,1:DIM_LAYER) .+ view(OPTICS.σ_ddf,WLSET.IΛ_SIF,:) .* view(RADIATION.sif_up,:,1:DIM_LAYER);
+    RADIATION._sif_obs_scatter .= view(OPTICS.σ_dob,WLSET.IΛ_SIF,:) .* view(RADIATION.sif_down,:,1:DIM_LAYER) .+ view(OPTICS.σ_dof,WLSET.IΛ_SIF,:) .* view(RADIATION.sif_up,:,1:DIM_LAYER);
     OPTICS._tmp_vec_layer .= (view(OPTICS.po,1:DIM_LAYER) .+ view(OPTICS.po,2:DIM_LAYER+1)) ./ 2 .* _ilai ./ FT(pi);
     mul!(RADIATION.sif_obs_scatter, RADIATION._sif_obs_scatter, OPTICS._tmp_vec_layer);
 
