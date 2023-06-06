@@ -116,7 +116,7 @@ Update leaf heat dissipation rate constant and maximal PSII yield, given
 function leaf_kd!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
     if leaf.Kd_TD
         leaf.Kd = max(0.8738, 0.0301 * (leaf.T - T₀()) + 0.0773);
-        leaf.maxPSII = leaf.Kp/(leaf.Kp + leaf.Kf + leaf.Kd);
+        leaf.maxPSII = leaf.Kp_max / (leaf.Kp_max + leaf.Kf + leaf.Kd);
     end;
 
     return nothing
