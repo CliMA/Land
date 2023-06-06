@@ -131,8 +131,7 @@ function SIF_fluxes!(
         mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fsfo = mean(sf_con.ϕ_cosΘ_lidf);
 
-        sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+
-                       _mean_fsfo    .* sf_con.M⁻_sun;
+        sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+ _mean_fsfo .* sf_con.M⁻_sun;
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfs;
         mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
@@ -217,7 +216,7 @@ function SIF_fluxes!(
     # 7. SIF from scattered internally and soil contribution
     sf_con.tmp_2d_nWlF_nLayer .= view(vb, iWLF, :) .* view(sf_con.F⁻, :, 1:nLayer) .+ view(vf, iWLF, :) .* view(sf_con.F⁺, :, 1:nLayer);
     mul!(can_rad.SIF_obs_scattered, sf_con.tmp_2d_nWlF_nLayer, Qo);
-    can_rad.SIF_obs_scattered .= can_rad.SIF_obs_scattered .* _iLAI_pi;
+    can_rad.SIF_obs_scattered .*= _iLAI_pi;
     can_rad.SIF_obs_soil .= ( ρ_SW_SIF .* view(sf_con.F⁻, :, nLayer+1) ) .* Po[end] ./ FT(pi);
 
     can_rad.SIF_hemi .= view(sf_con.F⁺, :, 1);
@@ -228,6 +227,10 @@ function SIF_fluxes!(
     end
 
     if photon
+        can_rad.SIF_obs_sunlit ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_shaded ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_scattered ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_soil ./= WLF .* _FAC(FT);
         can_rad.SIF_obs ./= WLF .* _FAC(FT);
     end;
 

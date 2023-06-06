@@ -108,6 +108,24 @@ end
 
 
 """
+    leaf_kd!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+
+Update leaf heat dissipation rate constant and maximal PSII yield, given
+- `leaf` [`Leaf`](@ref) type struct
+"""
+function leaf_kd!(leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    if leaf.Kd_TD
+        leaf.Kd = max(0.8738, 0.0301 * (leaf.T - T₀()) + 0.0773);
+        leaf.maxPSII = leaf.Kp/(leaf.Kp + leaf.Kf + leaf.Kd);
+    end;
+
+    return nothing
+end
+
+
+
+
+"""
     leaf_km!(photo_set::C3ParaSet{FT},
              leaf::Leaf{FT},
              envir::AirLayer{FT}
@@ -298,6 +316,7 @@ function leaf_temperature_dependence!(
         leaf_ko!(photo_set.KoT, leaf);
         leaf_km!(photo_set, leaf, envir);
         leaf_Γstar!(photo_set.ΓsT, leaf);
+        leaf_kd!(leaf);
     end
 
     return nothing
@@ -318,6 +337,7 @@ function leaf_temperature_dependence!(
         leaf_vcmax!(photo_set.VcT, leaf);
         leaf_vpmax!(photo_set.VpT, leaf);
         leaf_kpep!(photo_set.KpT, leaf);
+        leaf_kd!(leaf);
     end
 
     return nothing

@@ -92,8 +92,7 @@ function diffusive_S!(
             rt_dim::RTDimensions
 ) where {FT<:AbstractFloat}
     # 1. unpack values from sf_con
-    @unpack dnorm,  F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd,
-            τ_dd = sf_con;
+    @unpack dnorm, F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd, τ_dd = sf_con;
     @unpack ρ_SW_SIF = soil;
     @unpack nLayer, nLevel = rt_dim;
 
