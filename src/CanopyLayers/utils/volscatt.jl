@@ -4,12 +4,7 @@
 #
 ###############################################################################
 """
-    volscatt!(cache::Array{FT,1},
-              sza::FT,
-              vza::FT,
-              raa::FT,
-              ttl::FT
-    ) where {FT<:AbstractFloat}
+    volscatt!(cache::Array{FT,1}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
     multiplier (`frho`) and transmittance multiplier (`ftau`), given
@@ -19,13 +14,7 @@ Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
 - `raa` Relative azimuth angle
 - `ttl` Leaf inclination angle
 """
-function volscatt!(
-            cache::Array{FT,1},
-            sza::FT,
-            vza::FT,
-            raa::FT,
-            ttl::FT
-) where {FT<:AbstractFloat}
+function volscatt!(cache::Array{FT,1}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
     psi_rad = deg2rad(raa);
     cos_raa = cosd(raa);
     cos_ttl = cosd(ttl);
@@ -34,10 +23,10 @@ function volscatt!(
     sin_sza = sind(sza);
     cos_vza = cosd(vza);
     sin_vza = sind(vza);
-    Cs      = cos_ttl*cos_sza;
-    Ss      = sin_ttl*sin_sza;
-    Co      = cos_ttl*cos_vza;
-    So      = sin_ttl*sin_vza;
+    Cs = cos_ttl*cos_sza;
+    Ss = sin_ttl*sin_sza;
+    Co = cos_ttl*cos_vza;
+    So = sin_ttl*sin_vza;
 
     cosbts = FT(1.0);
     cosbto = FT(1.0);

@@ -22,26 +22,24 @@ Base.@kwdef mutable struct WaveLengths{FT}
     "Maximal WL for NIR `[nm]`"
     maxwlNIR::FT = FT(2500.0)
     "Minimal WL for SIF excitation `[nm]`"
-    minwle  ::FT = FT(400.0)
+    minwle::FT = FT(400.0)
     "Maximal WL for SIF excitation `[nm]`"
-    maxwle  ::FT = FT(750.0)
+    maxwle::FT = FT(750.0)
     "Minimal WL for SIF emission/fluorescence `[nm]`"
-    minwlf  ::FT = FT(640.0)
+    minwlf::FT = FT(640.0)
     "Maximal WL for SIF emission/fluorescence `[nm]` "
-    maxwlf  ::FT = FT(850.0)
+    maxwlf::FT = FT(850.0)
 
     # Wave length lists
     "Standard wave length `[nm]`"
-    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
-                        collect(FT(655.0):FT( 5.0):FT( 770.1));
-                        collect(FT(780.0):FT(25.0):FT(2400.1))]
+    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1)); collect(FT(655.0):FT( 5.0):FT( 770.1)); collect(FT(780.0):FT(25.0):FT(2400.1))]
     "Differential wavelength"
     dWL::Array{FT,1} = diff(sWL)
 
     "Leaf optical parameter set"
     optis::LeafOpticals = LeafOpticals{FT}()
     "Wave length `[nm]`"
-    WL  ::Array{FT,1}  = optis.lambda
+    WL::Array{FT,1}  = optis.lambda
 
     "Index of WLE in WL"
     iWLE::Array{Int,1} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
@@ -53,11 +51,11 @@ Base.@kwdef mutable struct WaveLengths{FT}
     iNIR::Array{Int,1} = findall( (WL .>= minwlNIR) .& (WL .<= maxwlNIR) )
 
     "excitation wave length `[nm]`"
-    WLE     ::Array{FT,1} = WL[iWLE]
+    WLE::Array{FT,1} = WL[iWLE]
     "Fluorescence wave length `[nm]`"
-    WLF     ::Array{FT,1} = WL[iWLF]
+    WLF::Array{FT,1} = WL[iWLF]
     "Wave length for PAR"
-    WL_iPAR ::Array{FT,1} = WL[iPAR];
+    WL_iPAR::Array{FT,1} = WL[iPAR];
     "Differential wave length for PAR"
     dWL_iPAR::Array{FT,1} = dWL[iPAR];
     "Differential wave length for iWLE"
@@ -67,7 +65,7 @@ Base.@kwdef mutable struct WaveLengths{FT}
     "Length of WL_iPAR"
     nPAR::Int = length(iPAR)
     "Length of WL"
-    nWL ::Int = length(WL)
+    nWL::Int = length(WL)
     "length of WLE"
     nWLE::Int = length(iWLE)
     "length of WLF"

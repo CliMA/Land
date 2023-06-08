@@ -4,19 +4,13 @@
 #
 ###############################################################################
 """
-    clumping_factor!(
-                can::Canopy4RT{FT},
-                angles::SolarAngles{FT}
-    ) where {FT<:AbstractFloat}
+    clumping_factor!(can::Canopy4RT{FT}, angles::SolarAngles{FT}) where {FT<:AbstractFloat}
 
 Calculate the clumping factor, given
 - `can` [`Canopy4RT`](@ref) type struct
 - `angles` [`SolarAngles`](@ref) type struct
 """
-function clumping_factor!(
-            can::Canopy4RT{FT},
-            angles::SolarAngles{FT}
-) where {FT<:AbstractFloat}
+function clumping_factor!(can::Canopy4RT{FT}, angles::SolarAngles{FT}) where {FT<:AbstractFloat}
     @unpack clump_a, clump_b = can;
     @unpack sza = angles;
 
@@ -28,24 +22,13 @@ function clumping_factor!(
 end
 
 
-
-
-
-
-
-
 ###############################################################################
 #
 # Update canopy geometry
 #
 ###############################################################################
 """
-    canopy_geometry!(
-                can::Canopy4RT{FT},
-                angles::SolarAngles{FT},
-                can_opt::CanopyOpticals{FT},
-                rt_con::RTCache{FT}
-    ) where {FT<:AbstractFloat}
+    canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::CanopyOpticals{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
 
 Computes canopy optical properties (extinction coefficients for direct and
     diffuse light) based on the SAIL model. Most important input parameters are
@@ -56,12 +39,7 @@ Computes canopy optical properties (extinction coefficients for direct and
 - `can_opt` [`CanopyOpticals`](@ref) type struct
 - `rt_con` [`RTCache`](@ref) type cache
 """
-function canopy_geometry!(
-            can::Canopy4RT{FT},
-            angles::SolarAngles{FT},
-            can_opt::CanopyOpticals{FT},
-            rt_con::RTCache{FT}
-) where {FT<:AbstractFloat}
+function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::CanopyOpticals{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
     # 1. update clumping factor from zenith angle
     clumping_factor!(can, angles);
 

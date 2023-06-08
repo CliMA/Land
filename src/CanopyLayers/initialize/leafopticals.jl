@@ -4,19 +4,13 @@
 #
 ###############################################################################
 """
-    create_leaf_opticals(
-                sWL::Array{FT,1},
-                file::String = OPTI_2021
-    ) where {FT<:AbstractFloat}
+    create_leaf_opticals(sWL::Array{FT,1}, opfn::String = OPTI_2021) where {FT<:AbstractFloat}
 
 Create an `AbstractLeafOptiPara` struct, given
 - `sWL` Standard wave length
 - `opfn` File that saves optical parameters
 """
-function create_leaf_opticals(
-            sWL::Array{FT,1},
-            opfn::String = OPTI_2021
-) where {FT<:AbstractFloat}
+function create_leaf_opticals(sWL::Array{FT,1}, opfn::String = OPTI_2021) where {FT<:AbstractFloat}
     N = length(sWL) - 1;
 
     # reading data
@@ -68,15 +62,5 @@ function create_leaf_opticals(
     end
 
     # return the created struct
-    return LeafOpticals{FT}(nr,
-                            Km,
-                            Kab,
-                            Kant,
-                            Kcar,
-                            Kw,
-                            KBrown,
-                            phi,
-                            KcaV,
-                            KcaZ,
-                            lambda)
+    return LeafOpticals{FT}(nr, Km, Kab, Kant, Kcar, Kw, KBrown, phi, KcaV, KcaZ, lambda)
 end

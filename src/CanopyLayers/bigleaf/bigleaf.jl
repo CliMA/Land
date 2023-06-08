@@ -1,8 +1,3 @@
-###############################################################################
-#
-# Big leaf canopy model
-#
-###############################################################################
 const _K_D         = 0.7
 const _ALPAR       = 0.8
 const _ALNIR       = 0.2
@@ -12,12 +7,7 @@ const _ALPAR_SQ_KD = _ALPAR_SQ * _K_D
 const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
 
 """
-    big_leaf_partition(
-                lai::FT,
-                zenith::FT,
-                r_all::FT,
-                r_dir::FT = FT(0.8)
-    ) where {FT<:AbstractFloat}
+    big_leaf_partition(lai::FT, zenith::FT, r_all::FT, r_dir::FT = FT(0.8)) where {FT <:AbstractFloat}
 
 Partition the big-leaf canopy into sunlit and shaded layers, given
 - `lai` Leaf area index
@@ -32,16 +22,11 @@ The function returns
 - `e_sl` Mean sunlit layer absorbed total energy
 - `e_sh` Mean shaded layer absorbed total energy
 """
-function big_leaf_partition(
-            lai::FT,
-            zenith::FT,
-            r_all::FT,
-            r_dir::FT = FT(0.8)
-) where {FT <:AbstractFloat}
+function big_leaf_partition(lai::FT, zenith::FT, r_all::FT, r_dir::FT = FT(0.8)) where {FT <:AbstractFloat}
     # 1. assume 50%-50% PAR and NIR
     par_tot = r_all / 2 / FT(0.235);
-    q_ob    = par_tot * r_dir;
-    q_od    = par_tot * (1 - r_dir);
+    q_ob = par_tot * r_dir;
+    q_od = par_tot * (1 - r_dir);
 
     # 2. calculate the LAI
     shape = FT(1.0);
@@ -49,8 +34,7 @@ function big_leaf_partition(
 
     # 3. calculate the mean sunlit layer PAR
     # For vertical leaves k_be = 2.0 * tand(zenith) / pi
-    k_be  = sqrt( shape^2+tand(zenith)^2 ) /
-              ( shape + FT(1.774) * (shape+FT(1.182))^FT(-0.733) );
+    k_be  = sqrt( shape^2+tand(zenith)^2 ) / ( shape + FT(1.774) * (shape+FT(1.182))^FT(-0.733) );
     q_btp = q_ob * exp( -FT(_ALPAR_SQ) * k_be * lai );
     q_btn = q_ob * exp( -FT(_ALNIR_SQ) * k_be * lai );
     q_b   = q_ob * exp( -k_be*lai );

@@ -238,16 +238,8 @@ function SIF_fluxes!(
 end
 
 
-
-
 """
-    SIF_fluxes!(leaf::LeafBios{FT},
-                in_rad::IncomingRadiation{FT},
-                wls::WaveLengths{FT},
-                rt_con::RTCache{FT},
-                fqe::FT = FT(0.01);
-                photon::Bool = true
-    ) where {FT<:AbstractFloat}
+    SIF_fluxes!(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}, fqe::FT = FT(0.01); photon::Bool = true) where {FT<:AbstractFloat}
 
 Leaf level SIF, given
 - `leaf` [`LeafBios`](@ref) type struct
@@ -261,14 +253,7 @@ Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
     angle correction needs to be made before passing it to this function. The
     up- and down-ward SIF are stored in `sf_con` as `M⁻_sun` and `M⁺_sun`.
 """
-function SIF_fluxes!(
-            leaf::LeafBios{FT},
-            in_rad::IncomingRadiation{FT},
-            wls::WaveLengths{FT},
-            rt_con::RTCache{FT},
-            fqe::FT = FT(0.01);
-            photon::Bool = true
-) where {FT<:AbstractFloat}
+function SIF_fluxes!(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}, fqe::FT = FT(0.01); photon::Bool = true) where {FT<:AbstractFloat}
     # unpack the values
     @unpack Mb, Mf = leaf;
     @unpack dWL_iWLE, iWLE, WLE, WLF = wls;

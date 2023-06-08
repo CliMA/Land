@@ -17,16 +17,12 @@ Hierachy of AbstractAlbedoFitting
 abstract type AbstractAlbedoFitting end
 
 
-
-
 """
 $(TYPEDEF)
 
 Method to use all four GSV PCA bands to fit two flat lines
 """
 struct FourBandsFittingCurve <: AbstractAlbedoFitting end
-
-
 
 
 """
@@ -37,16 +33,12 @@ Method to use all four GSV PCA bands to fit a mean and a flat curve
 struct FourBandsFittingHybrid <: AbstractAlbedoFitting end
 
 
-
-
 """
 $(TYPEDEF)
 
 Method to use all four GSV PCA bands to fit 2 mean values
 """
 struct FourBandsFittingPoint <: AbstractAlbedoFitting end
-
-
 
 
 """
@@ -57,8 +49,6 @@ Method to use 2 GSV PCA bands to fit two flat lines
 struct TwoBandsFittingCurve <: AbstractAlbedoFitting end
 
 
-
-
 """
 $(TYPEDEF)
 
@@ -67,20 +57,12 @@ Method to use 2 GSV PCA bands to fit a mean and a flat curve
 struct TwoBandsFittingHybrid <: AbstractAlbedoFitting end
 
 
-
-
 """
 $(TYPEDEF)
 
 Method to use 2 GSV PCA bands to fit 2 mean values
 """
 struct TwoBandsFittingPoint <: AbstractAlbedoFitting end
-
-
-
-
-
-
 
 
 ###############################################################################
@@ -100,7 +82,7 @@ function soil_albedos(color::Int, swc::FT) where {FT<:AbstractFloat}
     @assert 1 <= color <=20;
 
     # calculate albedos for PAR and NIR
-    _delta   = max(0, FT(0.11) - FT(0.4) * swc);
+    _delta = max(0, FT(0.11) - FT(0.4) * swc);
     _alb_par::FT = max(SOIL_BNDS[color,1], SOIL_BNDS[color,3] + _delta);
     _alb_nir::FT = max(SOIL_BNDS[color,2], SOIL_BNDS[color,4] + _delta);
 
@@ -108,13 +90,7 @@ function soil_albedos(color::Int, swc::FT) where {FT<:AbstractFloat}
 end
 
 
-
-
-function soil_albedos(
-            color::Int,
-            rswc::FT,
-            rel::Bool
-) where {FT<:AbstractFloat}
+function soil_albedos(color::Int, rswc::FT, rel::Bool) where {FT<:AbstractFloat}
     # soil class must be from 1 to 20
     @assert 1 <= color <=20;
 
@@ -129,13 +105,7 @@ end
 
 
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                swc::FT,
-                method::AbstractAlbedoFitting;
-                clm::Bool = false
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, swc::FT, method::AbstractAlbedoFitting; clm::Bool = false) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -144,13 +114,7 @@ Fit soil albedo bands parameters, given
 - `method` [`AbstractAlbedoFitting`](@ref) type fitting method
 - `clm` If true, use CLM method, else use new method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            swc::FT,
-            method::AbstractAlbedoFitting;
-            clm::Bool = false
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, swc::FT, method::AbstractAlbedoFitting; clm::Bool = false) where {FT<:AbstractFloat}
     @unpack iWLF = wls;
 
     # fit the curve only if the values mismatch
@@ -171,16 +135,8 @@ function fit_soil_mat!(
 end
 
 
-
-
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::FourBandsFittingCurve
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingCurve) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -189,13 +145,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingCurve`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::FourBandsFittingCurve
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingCurve) where {FT<:AbstractFloat}
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
@@ -212,16 +162,8 @@ function fit_soil_mat!(
 end
 
 
-
-
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::FourBandsFittingHybrid
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingHybrid) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -230,13 +172,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingHybrid`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::FourBandsFittingHybrid
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingHybrid) where {FT<:AbstractFloat}
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
@@ -249,15 +185,11 @@ function fit_soil_mat!(
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_4, x);
-        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
-                mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 + mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
         return -_diff
     );
 
-    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2,-2,-2],
-                                 x_maxs = FT[2,2,2,2],
-                                 x_inis = soil.SW_vec_4,
-                                 Δ_inis = FT[0.1,0.1,0.1,0.1]);
+    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2,-2,-2], x_maxs = FT[2,2,2,2], x_inis = soil.SW_vec_4, Δ_inis = FT[0.1,0.1,0.1,0.1]);
     _tol = SolutionToleranceND{FT}(FT[0.001,0.001,0.001,0.001], 50);
     _sol = find_peak(_fit, _ms, _tol);
     soil.SW_vec_4 .= _sol;
@@ -272,13 +204,7 @@ end
 
 
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::FourBandsFittingPoint
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingPoint) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -287,13 +213,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`FourBandsFittingPoint`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::FourBandsFittingPoint
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::FourBandsFittingPoint) where {FT<:AbstractFloat}
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
@@ -306,15 +226,11 @@ function fit_soil_mat!(
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_4, x);
-        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
-                ( mean(soil.ρ_SW_raw[32:end]) - ref_NIR ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 + ( mean(soil.ρ_SW_raw[32:end]) - ref_NIR ) ^ 2;
         return -_diff
     );
 
-    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2,-2,-2],
-                                 x_maxs = FT[2,2,2,2],
-                                 x_inis = soil.SW_vec_4,
-                                 Δ_inis = FT[0.1,0.1,0.1,0.1]);
+    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2,-2,-2], x_maxs = FT[2,2,2,2], x_inis = soil.SW_vec_4, Δ_inis = FT[0.1,0.1,0.1,0.1]);
     _tol = SolutionToleranceND{FT}(FT[0.001,0.001,0.001,0.001], 50);
     _sol = find_peak(_fit, _ms, _tol);
     soil.SW_vec_4 .= _sol;
@@ -329,13 +245,7 @@ end
 
 
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::TwoBandsFittingCurve
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingCurve) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -344,13 +254,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingCurve`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::TwoBandsFittingCurve
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingCurve) where {FT<:AbstractFloat}
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
@@ -370,13 +274,7 @@ end
 
 
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::TwoBandsFittingHybrid
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingHybrid) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -385,13 +283,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingHybrid`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::TwoBandsFittingHybrid
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingHybrid) where {FT<:AbstractFloat}
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;
     soil.ρ_NIR = ref_NIR;
@@ -404,15 +296,11 @@ function fit_soil_mat!(
     # solve for weights
     @inline _fit(x::Vector{FT}) where {FT<:AbstractFloat} = (
         mul!(soil.ρ_SW_raw, soil.SW_mat_raw_2, x);
-        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 +
-                mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
+        _diff = ( mean(soil.ρ_SW_raw[1:31]) - ref_PAR ) ^ 2 + mean( abs.(soil.ρ_SW_raw[32:end] .- ref_NIR) ) ^ 2;
         return -_diff
     );
 
-    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2],
-                                 x_maxs = FT[2,2],
-                                 x_inis = soil.SW_vec_2,
-                                 Δ_inis = FT[0.1,0.1]);
+    _ms = ReduceStepMethodND{FT}(x_mins = FT[-2,-2], x_maxs = FT[2,2], x_inis = soil.SW_vec_2, Δ_inis = FT[0.1,0.1]);
     _tol = SolutionToleranceND{FT}(FT[0.001,0.001], 50);
     _sol = find_peak(_fit, _ms, _tol);
     soil.SW_vec_2 .= _sol;
@@ -427,13 +315,7 @@ end
 
 
 """
-    fit_soil_mat!(
-                soil::SoilOpticals{FT},
-                wls::WaveLengths{FT},
-                ref_PAR::FT,
-                ref_NIR::FT,
-                method::TwoBandsFittingPoint
-    ) where {FT<:AbstractFloat}
+    fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingPoint) where {FT<:AbstractFloat}
 
 Fit soil albedo bands parameters, given
 - `soil` [`SoilOpticals`](@ref) type structure
@@ -442,13 +324,7 @@ Fit soil albedo bands parameters, given
 - `ref_NIR` Target albedo for NIR
 - `method` [`TwoBandsFittingPoint`](@ref) type fitting method
 """
-function fit_soil_mat!(
-            soil::SoilOpticals{FT},
-            wls::WaveLengths{FT},
-            ref_PAR::FT,
-            ref_NIR::FT,
-            method::TwoBandsFittingPoint
-) where {FT<:AbstractFloat}
+function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingPoint) where {FT<:AbstractFloat}
     @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
 
     # update soil PAR and NIR albedo
@@ -456,10 +332,8 @@ function fit_soil_mat!(
     soil.ρ_NIR = ref_NIR;
 
     # solve for weights
-    soil.SW_vec_2[1] = (ref_PAR * wet_NIR - ref_NIR * wet_PAR) /
-                       (wet_NIR * dry_PAR - wet_PAR * dry_NIR);
-    soil.SW_vec_2[2] = (ref_PAR * dry_NIR - ref_NIR * dry_PAR) /
-                       (dry_NIR * wet_PAR - dry_PAR * wet_NIR);
+    soil.SW_vec_2[1] = (ref_PAR * wet_NIR - ref_NIR * wet_PAR) / (wet_NIR * dry_PAR - wet_PAR * dry_NIR);
+    soil.SW_vec_2[2] = (ref_PAR * dry_NIR - ref_NIR * dry_PAR) / (dry_NIR * wet_PAR - dry_PAR * wet_NIR);
 
     # update vectors in soil
     mul!(soil.ρ_SW, soil.SW_mat_2, soil.SW_vec_2);

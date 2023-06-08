@@ -1,22 +1,11 @@
-###############################################################################
-#
-# Create IncomingRadiation
-#
-###############################################################################
 """
-    create_incoming_radiation(
-                wls::WaveLengths{FT},
-                wlfn::String = FILE_SUN
-    ) where {FT<:AbstractFloat}
+    create_incoming_radiation(wls::WaveLengths{FT}, wlfn::String = FILE_SUN) where {FT<:AbstractFloat}
 
 Create an `AbstractIncomingRadiation` struct, given
 - `wls` [`WaveLengths`](@ref) type struct
 - `wlfn` File that saves incoming wave information
 """
-function create_incoming_radiation(
-            wls::WaveLengths{FT},
-            wlfn::String = FILE_SUN
-) where {FT<:AbstractFloat}
+function create_incoming_radiation(wls::WaveLengths{FT}, wlfn::String = FILE_SUN) where {FT<:AbstractFloat}
     @unpack sWL, nWL = wls;
 
     # Read data

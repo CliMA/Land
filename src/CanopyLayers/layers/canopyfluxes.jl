@@ -1,8 +1,3 @@
-###############################################################################
-#
-# Update canopy fluxes
-#
-###############################################################################
 """
     canopy_fluxes!(
                 can::Canopy4RT{FT},
@@ -96,7 +91,7 @@ function canopy_fluxes!(
         _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
         _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
         can_rad.absPAR_shadeCab[j] = _difCab;
-        can_rad.absPAR_sunCab[:,:,j]  .= can_opt.absfs .* _dirCab;
+        can_rad.absPAR_sunCab[:,:,j] .= can_opt.absfs .* _dirCab;
         can_rad.absPAR_sunCab[:,:,j] .+= _difCab;
     end
 
@@ -107,12 +102,12 @@ function canopy_fluxes!(
     e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_dir);
     cf_con.E_iPAR .= view(in_rad.E_diffuse, iPAR);
     e2phot!(WL_iPAR, cf_con.E_iPAR, cf_con.PAR_diff);
-    can_rad.incomingPAR_direct  = fac * numerical∫(cf_con.PAR_dir , dWL_iPAR);
+    can_rad.incomingPAR_direct = fac * numerical∫(cf_con.PAR_dir , dWL_iPAR);
     can_rad.incomingPAR_diffuse = fac * numerical∫(cf_con.PAR_diff, dWL_iPAR);
-    can_rad.incomingPAR         = can_rad.incomingPAR_diffuse + can_rad.incomingPAR_direct;
+    can_rad.incomingPAR = can_rad.incomingPAR_diffuse + can_rad.incomingPAR_direct;
     @inbounds for i in 1:nLayer
         cf_con.E_all .= view(can_rad.netSW_shade, :, i);
-        can_rad.intNetSW_shade[i]  = numerical∫(cf_con.E_all, dWL) * fac / tLAI;
+        can_rad.intNetSW_shade[i] = numerical∫(cf_con.E_all, dWL) * fac / tLAI;
         cf_con.E_all .= view(can_rad.netSW_sunlit, :, i);
         can_rad.intNetSW_sunlit[i] = numerical∫(cf_con.E_all, dWL) * fac / tLAI / lPs[i] + can_rad.intNetSW_shade[i];
     end
