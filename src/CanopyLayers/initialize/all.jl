@@ -18,24 +18,24 @@ This function initializes and returns
 - `soil` [`SoilOpticals`](@ref)
 - `wls` [`WaveLengths`](@ref)
 """
-function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
+function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = 3)
     # 1. create wls and can, which are rt_dims independent
-    can = create_canopy_rt(FT, nLayer=nLayer, LAI=LAI);
-    wls = create_wave_length(FT);
+    can = Canopy4RT{FT}(nLayer = nLayer, LAI = LAI);
+    wls = WaveLengths{FT}();
 
     # 2. create rt_dims from wls and can
-    rt_dim = create_rt_dims(can, wls);
+    rt_dim = RTDimensions(can, wls);
 
     # 3. create can_rad, can_opt, and etc from rt_dim and wls
-    can_rad = create_canopy_rads(FT, rt_dim);
+    can_rad = CanopyRads{FT}(rt_dim);
     can_opt = CanopyOpticals{FT}(rt_dim);
-    in_rad  = create_incoming_radiation(wls);
+    in_rad  = IncomingRadiation{FT}(wls);
     soil    = SoilOpticals{FT}(wls);
     angles  = SolarAngles{FT}();
     rt_con  = RTCache{FT}(rt_dim);
 
     # Create an array of standard leaves
-    leaves = [create_leaf_bios(FT, rt_dim) for i in 1:nLayer];
+    leaves = [LeafBios{FT}(rt_dim) for i in 1:nLayer];
     for i in 1:nLayer
         fluspect!(leaves[i], wls);
     end
@@ -48,7 +48,7 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = FT(3))
     SIF_fluxes!(leaves, can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
 
     # # Compute Long Wave (Last term is LW incoming in W m^-2)
-    thermal_fluxes!(leaves, can_opt, can_rad, can, soil, [FT(400.0)], wls);
+    thermal_fluxes!(leaves, can_opt, can_rad, can, soil, [FT(400)], wls);
 
     return angles, can, can_opt, can_rad, in_rad, leaves, rt_con, rt_dim, soil, wls
 end

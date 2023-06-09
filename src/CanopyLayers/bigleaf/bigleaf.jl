@@ -29,8 +29,8 @@ function big_leaf_partition(lai::FT, zenith::FT, r_all::FT, r_dir::FT = FT(0.8))
     q_od = par_tot * (1 - r_dir);
 
     # 2. calculate the LAI
-    shape = FT(1.0);
-    shapa = FT(2.0);
+    shape = FT(1);
+    shapa = FT(2);
 
     # 3. calculate the mean sunlit layer PAR
     # For vertical leaves k_be = 2.0 * tand(zenith) / pi

@@ -18,35 +18,35 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
 
     # canopy information
     "Leaf Area Index"
-    LAI::FT = FT(3.0 )
+    LAI::FT = 3
     "Clumping factor"
-    Ω::FT = FT(1.0 )
+    Ω::FT = 1
     "Structure factor a"
-    clump_a::FT = FT(1.0 )
+    clump_a::FT = 1
     "Structure factor b"
-    clump_b::FT = FT(0.0 )
+    clump_b::FT = 0
     "Leaf width"
-    leaf_width::FT = FT(0.1 )
+    leaf_width::FT = 0.1
     "Vegetation height"
-    hc::FT = FT(2.0 )
+    hc::FT = 2
     "Leaf Inclination"
-    LIDFa::FT = FT(0.0 )
+    LIDFa::FT = FT(0)
     "Variation in leaf inclination"
-    LIDFb::FT = FT(0.0 )
+    LIDFb::FT = FT(0)
     "HotSpot parameter (still need to check!)"
-    hot::FT = FT(0.05)
+    hot::FT = 0.05
 
     # tree/canopy/leaf traits
     "Canopy height `[m]`"
-    height::FT = FT(20.0  )
+    height::FT = 20
     "Canopy roughness `[m]`"
-    z0m::FT = FT(1.0   )
+    z0m::FT = 1
     "Tree roughtnes `[m]`"
-    z0h::FT = FT(-999.0)
+    z0h::FT = -999
     "Canopy displacement height `[m]`"
-    d::FT = FT(-999.0)
+    d::FT = -999
     "m/sqrt(s) turbulent transfer coefficient"
-    Cd::FT = FT(0.01  )
+    Cd::FT = 0.01
 
     # Some more derived parameters:
     "List of mean inclination angles `[°]`"
@@ -74,7 +74,7 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     "List of level location (level = layer + 1)"
     xl::Vector{FT} = collect(FT, 0:-1.0/nLayer:-1)
     "1/nLayer"
-    dx::FT = FT(1)/nLayer
+    dx::FT = 1 / nLayer
 
     # local storage of dimension information
     "Number of azimuth angles"

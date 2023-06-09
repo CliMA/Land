@@ -80,21 +80,21 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Solar angle container"
     angles::SolarAngles{FT} = SolarAngles{FT}()
     "Canopy4RT container"
-    canopy_rt::Canopy4RT{FT} = create_canopy_rt(FT, nLayer=n_canopy, LAI=la/ga)
+    canopy_rt::Canopy4RT{FT} = Canopy4RT{FT}(nLayer = n_canopy, LAI = la/ga)
     "Wave length container"
-    wl_set::WaveLengths{FT} = create_wave_length(FT)
+    wl_set::WaveLengths{FT} = WaveLengths{FT}()
     "RT dimensions"
-    rt_dim::RTDimensions = create_rt_dims(canopy_rt, wl_set);
+    rt_dim::RTDimensions = RTDimensions(canopy_rt, wl_set)
     "CanopyRads container"
-    can_rad::CanopyRads{FT} = create_canopy_rads(FT, rt_dim)
+    can_rad::CanopyRads{FT} = CanopyRads{FT}(rt_dim)
     "CanopyOpticals container"
     can_opt::CanopyOpticals{FT} = CanopyOpticals{FT}(rt_dim)
     "Array of LeafBios container"
-    leaves_rt::Vector{LeafBios{FT}} = [create_leaf_bios(FT, rt_dim) for i in 1:n_canopy]
+    leaves_rt::Vector{LeafBios{FT}} = [LeafBios{FT}(rt_dim) for i in 1:n_canopy]
     "SoilOpticals container"
     soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set)
     "Incoming radiation container"
-    in_rad::IncomingRadiation{FT} = create_incoming_radiation(wl_set)
+    in_rad::IncomingRadiation{FT} = IncomingRadiation{FT}(wl_set)
     "RT container"
     rt_con::RTCache{FT} = RTCache{FT}(rt_dim)
     "Container for sunlit leaf area fraction in each layer"

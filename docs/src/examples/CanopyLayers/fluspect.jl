@@ -10,10 +10,10 @@ FT = Float32;
 
 
 # ## Excitation wavelength
-wls    = create_wave_length(FT);
-can    = create_canopy_rt(FT);
-rt_dim = create_rt_dims(can, wls);
-leaf   = create_leaf_bios(FT, rt_dim);
+wls    = WaveLengths{FT}();
+can    = Canopy4RT{FT}();
+rt_dim = RTDimensions(can, wls);
+leaf   = LeafBios{FT}(rt_dim);
 fluspect!(leaf, wls);
 
 _fig,_axes = create_canvas("Fluspect example"; ncol=3);

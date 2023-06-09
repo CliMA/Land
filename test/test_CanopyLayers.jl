@@ -2,9 +2,9 @@
 @info "Testing the big leaf model...";
 @testset "CanopyLayers --- big leaf model" begin
     for FT in [Float32, Float64]
-        for result in [ big_leaf_partition(FT(3.0), FT(30.0), FT(1000.0)),
-                        big_leaf_partition(FT(2.0), FT(30.0), FT(1000.0)),
-                        big_leaf_partition(FT(1.0), FT(30.0), FT(1000.0)) ]
+        for result in [ big_leaf_partition(FT(3), FT(30), FT(1000)),
+                        big_leaf_partition(FT(2), FT(30), FT(1000)),
+                        big_leaf_partition(FT(1), FT(30), FT(1000)) ]
             @test PkgUtility.FT_test(result, FT);
             @test PkgUtility.NaN_test(result);
         end
@@ -57,8 +57,8 @@ println();
 
         # test warnings
         @info "Expect warnings here!";
-        warn_wls   = create_wave_length(FT, collect(FT,2100:100:2600));
-        warn_inrad = create_incoming_radiation(warn_wls);
+        warn_wls   = WaveLengths{FT}(sWL = collect(FT,2100:100:2600));
+        warn_inrad = IncomingRadiation{FT}(warn_wls);
         @test true;
 
         # add more tests that has not been used
@@ -68,8 +68,8 @@ println();
         canopy_fluxes!(can, can_opt, can_rad, in_rad, soil, leaves[1:1], wls, rt_con);
         canopy_matrices!(leaves[1:1], can_opt);
         SIF_fluxes!(leaves[1:1], can_opt, can_rad, can, soil, wls, rt_con, rt_dim);
-        thermal_fluxes!(leaves[1:1], can_opt, can_rad, can, soil, [FT(400.0)], wls);
-        thermal_fluxes!(leaves[1:2], can_opt, can_rad, can, soil, [FT(400.0)], wls);
+        thermal_fluxes!(leaves[1:1], can_opt, can_rad, can, soil, [FT(400)], wls);
+        thermal_fluxes!(leaves[1:2], can_opt, can_rad, can, soil, [FT(400)], wls);
         @test true;
 
         # utility functions

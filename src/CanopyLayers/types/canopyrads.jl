@@ -58,11 +58,11 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "Spectrally integrated net absorbed diffuse radiation in each layer per leaf area `[W m⁻²]`"
     intNetLW_shade::Vector{FT} = zeros(FT, nLayer)
     "Leaf temperature (sunlit) `[K]`"
-    T_sun::Vector{FT} = zeros(FT, nLayer) .+ FT(298.15)
+    T_sun::Vector{FT} = zeros(FT, nLayer) .+ 298.15
     "Leaf temperature (shaded) `[K]`"
-    T_shade::Vector{FT} = zeros(FT, nLayer) .+ FT(298.15)
+    T_shade::Vector{FT} = zeros(FT, nLayer) .+ 298.15
     "Fluorescence yield for shaded leaves"
-    ϕ_shade::Vector{FT} =  ones(FT, nLayer) .* FT(0.01)
+    ϕ_shade::Vector{FT} =  ones(FT, nLayer) .* 0.01
     "Sensible Heat flux H of shaded leaves `[W m⁻²]`"
     H_shade::Vector{FT} = zeros(FT, nLayer)
     "Latent Heat flux LE of shaded leaves `[W m⁻²]`"
@@ -111,9 +111,9 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "net PAR by Cab+Car of sunlit leaves `[mol m⁻² s⁻¹]`"
     absPAR_sunCab::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayer))
     "Leaf temperature (sunlit) `[K]`"
-    T_sun3D::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayer)) .+ FT(298.15)
+    T_sun3D::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayer)) .+ 298.15
     "Fluorescence yield for sunlit leaves"
-    ϕ_sun::Array{FT,3} =  ones(FT, (nIncl,nAzi,nLayer)) .* FT(0.01)
+    ϕ_sun::Array{FT,3} =  ones(FT, (nIncl,nAzi,nLayer)) .* 0.01
     "Sensible Heat flux H of sunlit leaves `[W m⁻²]`"
     H_sun::Array{FT,3} = zeros(FT, (nIncl,nAzi,nLayer))
     "Latent Heat flux LE of sunlit leaves `[W m⁻²]`"
@@ -148,3 +148,9 @@ Base.@kwdef mutable struct CanopyRads{FT}
     "Total SIF sum of layer sources  `[mW m⁻² nm⁻¹]`)"
     SIF_sum::Vector{FT} = zeros(FT, nWLF)
 end
+
+CanopyRads{FT}(rt_dim::RTDimensions) where {FT} = (
+    (; nAzi, nIncl, nLayer, nLevel, nWL, nWLF) = rt_dim;
+
+    return CanopyRads{FT}(nAzi = nAzi, nIncl = nIncl, nLayer = nLayer, nLevel = nLevel, nWL = nWL, nWLF = nWLF)
+);

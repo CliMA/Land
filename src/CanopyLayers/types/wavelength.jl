@@ -12,32 +12,34 @@ Struct for pre-set wave length parameters
 $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WaveLengths{FT}
+    opti_file::String = OPTI_2021
+
     # Wave length (WL) boundaries
     "Minimal WL for PAR `[nm]`"
-    minwlPAR::FT = FT(400.0)
+    minwlPAR::FT = 400
     "Maximal WL for PAR `[nm]`"
-    maxwlPAR::FT = FT(700.0)
+    maxwlPAR::FT = 750
     "Minimal WL for NIR `[nm]`"
-    minwlNIR::FT = FT(700.0)
+    minwlNIR::FT = 700
     "Maximal WL for NIR `[nm]`"
-    maxwlNIR::FT = FT(2500.0)
+    maxwlNIR::FT = 2500
     "Minimal WL for SIF excitation `[nm]`"
-    minwle::FT = FT(400.0)
+    minwle::FT = 400
     "Maximal WL for SIF excitation `[nm]`"
-    maxwle::FT = FT(750.0)
+    maxwle::FT = 750
     "Minimal WL for SIF emission/fluorescence `[nm]`"
-    minwlf::FT = FT(640.0)
+    minwlf::FT = 640
     "Maximal WL for SIF emission/fluorescence `[nm]` "
-    maxwlf::FT = FT(850.0)
+    maxwlf::FT = 850
 
     # Wave length lists
     "Standard wave length `[nm]`"
-    sWL::Vector{FT} = [collect(FT(400.0):FT(10.0):FT( 650.1)); collect(FT(655.0):FT( 5.0):FT( 770.1)); collect(FT(780.0):FT(25.0):FT(2400.1))]
+    sWL::Vector{FT} = FT[collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)]
     "Differential wavelength"
     dWL::Vector{FT} = diff(sWL)
 
     "Leaf optical parameter set"
-    optis::LeafOpticals = LeafOpticals{FT}()
+    optis::LeafOpticals = LeafOpticals{FT}(sWL, opti_file)
     "Wave length `[nm]`"
     WL::Vector{FT}  = optis.lambda
 

@@ -29,3 +29,10 @@ Base.@kwdef mutable struct RTDimensions
     "Number of wave lengths for SIF"
     nWLF::Int = 10
 end
+
+RTDimensions(can::Canopy4RT, wls::WaveLengths) = (
+    (; nAzi, nIncl, nLayer) = can;
+    (; nPAR, nWL, nWLE, nWLF) = wls;
+
+    return RTDimensions(nAzi = nAzi, nIncl = nIncl, nLayer = nLayer, nPAR = nPAR, nWL = nWL, nWLE = nWLE, nWLF = nWLF)
+);

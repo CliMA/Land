@@ -24,28 +24,28 @@ Base.@kwdef mutable struct CanopyOpticals{FT}
 
     # Single value
     "Solar -> Diffuse backscatter weight"
-    sdb::FT = FT(0.0)
+    sdb::FT = 0
     "Solar -> Diffuse forward scatter weight"
-    sdf::FT = FT(0.0)
+    sdf::FT = 0
     "Diffuse -> Directional backscatter weight"
-    dob::FT = FT(0.0)
+    dob::FT = 0
     "Diffuse -> Directional forward scatter weight"
-    dof::FT = FT(0.0)
+    dof::FT = 0
     "Diffuse -> Diffuse backscatter weight"
-    ddb::FT = FT(0.0)
+    ddb::FT = 0
     "Diffuse -> Diffuse forward scatter weight"
-    ddf::FT = FT(0.0)
+    ddf::FT = 0
     "Solar beam extinction coefficient weight"
-    ks::FT = FT(0.0)
+    ks::FT = 0
     "Outgoing beam extinction coefficient weight"
-    ko::FT = FT(0.0)
+    ko::FT = 0
     # TODO What is this?
     "?"
-    bf::FT = FT(0.0)
+    bf::FT = 0
     "Weight of specular2directional backscatter coefficient"
-    sob::FT = FT(0.0)
+    sob::FT = 0
     "Weight of specular2directional forward coefficient"
-    sof::FT = FT(0.0)
+    sof::FT = 0
 
     # dimension of nLevel
     "Probability of directly viewing a leaf in solar direction"
