@@ -8,7 +8,7 @@ using PkgUtility: numerical∫, tinfo
 using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient, saturation_vapor_pressure
 
 using ..CanopyLayers: Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation, LeafBios, RTCache, RTDimensions, SIF_fluxes!, SoilOpticals, SolarAngles, WaveLengths, big_leaf_partition, canopy_fluxes!,
-      canopy_geometry!, canopy_matrices!, create_canopy_opticals, create_canopy_rads, create_canopy_rt, create_incoming_radiation, create_leaf_bios, create_rt_cache, create_rt_dims,
+      canopy_geometry!, canopy_matrices!, create_canopy_rads, create_canopy_rt, create_incoming_radiation, create_leaf_bios, create_rt_cache, create_rt_dims,
       create_wave_length, fluspect!, short_wave!, thermal_fluxes!
 using ..Photosynthesis: AbstractPhotoModelParaSet, AirLayer, C3CLM, C3ParaSet, C4ParaSet, GCO₂Mode, Leaf, leaf_photosynthesis!, leaf_rd!, leaf_temperature_dependence!
 using ..PlantHydraulics: GrassLikeOrganism, PalmLikeOrganism, SteadyStateMode, TreeLikeOrganism, TreeSimple, create_grass, critical_flow, end_pressure, flow_profile!,

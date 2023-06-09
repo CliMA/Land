@@ -1,8 +1,8 @@
-const _K_D         = 0.7
-const _ALPAR       = 0.8
-const _ALNIR       = 0.2
-const _ALPAR_SQ    = sqrt(_ALPAR)
-const _ALNIR_SQ    = sqrt(_ALNIR)
+const _K_D = 0.7
+const _ALPAR = 0.8
+const _ALNIR = 0.2
+const _ALPAR_SQ = sqrt(_ALPAR)
+const _ALNIR_SQ = sqrt(_ALNIR)
 const _ALPAR_SQ_KD = _ALPAR_SQ * _K_D
 const _ALNIR_SQ_KD = _ALNIR_SQ * _K_D
 

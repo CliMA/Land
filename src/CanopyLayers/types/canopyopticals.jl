@@ -105,3 +105,9 @@ Base.@kwdef mutable struct CanopyOpticals{FT}
     "Solar direct radiation per layer)"
     Es_::Array{FT,2}  = zeros(FT, (nWL, nLayer+1))
 end
+
+CanopyOpticals{FT}(rt_dim::RTDimensions) where {FT} = (
+    (; nAzi, nIncl, nLayer, nWL) = rt_dim;
+
+    return CanopyOpticals{FT}(nAzi = nAzi, nIncl = nIncl, nLayer = nLayer, nWL = nWL)
+);

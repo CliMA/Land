@@ -40,7 +40,6 @@ create_rt_cache
 
 ## Initialization of Structures
 ```@docs
-create_canopy_opticals
 create_canopy_rads
 create_canopy_rt
 create_incoming_radiation

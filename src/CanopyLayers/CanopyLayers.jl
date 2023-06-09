@@ -35,7 +35,7 @@ const SOIL_GSV  = artifact"land_model_spectrum_V1" * "/GSV.csv";
 export Canopy4RT, CanopyOpticals, CanopyRads, IncomingRadiation, LeafBios, LeafOpticals, RTCache, RTDimensions, SoilOpticals, SolarAngles, WaveLengths
 
 # export public functions
-export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, create_canopy_opticals, create_canopy_rads, create_canopy_rt, create_incoming_radiation, create_leaf_bios,
+export big_leaf_partition, canopy_fluxes!, canopy_geometry!, canopy_matrices!, create_canopy_rads, create_canopy_rt, create_incoming_radiation, create_leaf_bios,
        create_leaf_opticals, create_rt_cache, create_rt_dims, create_wave_length, diffusive_S, fluspect!, initialize_rt_module, leaf_fluxes, short_wave!, SIF_fluxes!, thermal_fluxes!
 
 # Vegetation indices
@@ -48,6 +48,9 @@ include("utils/e2phot.jl");
 include("utils/psofunction.jl");
 include("utils/volscatt.jl");
 
+
+include("types/rtdims.jl");
+
 include("types/canopy4rt.jl");
 include("types/canopyopticals.jl");
 include("types/canopyrads.jl");
@@ -55,14 +58,12 @@ include("types/caches.jl");
 include("types/incomingrad.jl");
 include("types/leafbios.jl");
 include("types/leafopticals.jl");
-include("types/rtdims.jl");
 include("types/solarangles.jl");
 include("types/wavelength.jl");
 include("types/soilopticals.jl");
 
 include("initialize/all.jl");
 include("initialize/canopy4rt.jl");
-include("initialize/canopyopticals.jl");
 include("initialize/canopyrads.jl");
 include("initialize/caches.jl");
 include("initialize/incomingrad.jl");

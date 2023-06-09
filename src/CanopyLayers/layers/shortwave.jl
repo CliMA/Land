@@ -19,7 +19,7 @@ function short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals{FT}, can_rad::C
     (; LAI, nLayer, Ω) = can;
     (; ks, sb, sf, sigb) = can_opt;
     (; ρ_SW) = soil;
-    (; sw_con) = rt_con.sw_con;
+    sw_con = rt_con.sw_con;
 
     # 1. define some useful parameters
     iLAI = LAI * Ω / nLayer;

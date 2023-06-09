@@ -48,7 +48,7 @@ function SIF_fluxes!(
     (; E_down, E_up, ϕ_shade, ϕ_sun) = can_rad;
     (; ρ_SW_SIF) = soil;
     (; dWL_iWLE, iWLE, iWLF, WLE, WLF) = wls;
-    (; sf_con) = rt_con.sf_con;
+    sf_con = rt_con.sf_con;
 
     # 1. define some useful parameters
     iLAI = LAI * Ω / nLayer;

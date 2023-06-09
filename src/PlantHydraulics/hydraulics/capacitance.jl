@@ -247,7 +247,7 @@ function update_PVF!(
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, cache_k, cache_p, cache_q, trunk.q_in, Δt);
+    update_PVF!(roots, cache_k, cache_p, cache_q, (trunk).q_in, Δt);
 
     # 4. update pressure profiles
     pressure_profile!(tree, NonSteadyStateMode(); update=false);
