@@ -44,19 +44,19 @@ Base.@kwdef mutable struct LeafBios{FT}
     τ_LW::FT = FT(0.01 )
 
     "Shortwave leaf reflectance"
-    ρ_SW::Array{FT,1} = zeros(FT, nWL)
+    ρ_SW::Vector{FT} = zeros(FT, nWL)
     "Shortwave leaf transmission"
-    τ_SW::Array{FT,1} = zeros(FT, nWL)
+    τ_SW::Vector{FT} = zeros(FT, nWL)
     "Shortwave absorption"
     α_SW::Vector{FT}  = zeros(FT, nWL)
     "Relative absorbtion by Chlorophyll+Car"
-    kChlrel::Array{FT,1} = zeros(FT, nWL)
+    kChlrel::Vector{FT} = zeros(FT, nWL)
     "Relative absorbtion by Chlorophyll"
-    kChlrel_old::Array{FT,1} = zeros(FT, nWL)
+    kChlrel_old::Vector{FT} = zeros(FT, nWL)
     "Fluorescence excitation matrix backwards"
-    Mb::Array{FT,2} = zeros(FT,(nWLF,nWLE))
+    Mb::Matrix{FT} = zeros(FT,(nWLF,nWLE))
     "Fluorescence excitation matrix forwards"
-    Mf::Array{FT,2} = zeros(FT,(nWLF,nWLE))
+    Mf::Matrix{FT} = zeros(FT,(nWLF,nWLE))
     "Doubling adding layers"
     ndub::Int = 10
 end

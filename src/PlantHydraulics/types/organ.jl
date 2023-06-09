@@ -57,13 +57,13 @@ Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
 
     # pressure, k, and p_history profile
     "List of leaf k_max per element `[mol s⁻¹ MPa⁻¹ m⁻²]`"
-    k_element::Array{FT,1} =  ones(FT,N) .* N .* k_sla
+    k_element::Vector{FT} =  ones(FT,N) .* N .* k_sla
     "List of leaf kr history per element"
-    k_history::Array{FT,1} =  ones(FT,N)
+    k_history::Vector{FT} =  ones(FT,N)
     "List of xylem water pressure `[MPa]`"
-    p_element::Array{FT,1} = zeros(FT,N)
+    p_element::Vector{FT} = zeros(FT,N)
     "List of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
-    p_history::Array{FT,1} = zeros(FT,N)
+    p_history::Vector{FT} = zeros(FT,N)
 
     # temperature related (uniform leaf temperature), update with time
     "Relative surface tension"
@@ -137,15 +137,15 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
 
     # pressure, k, and p_history profile
     "List of k_max per element `[mol s⁻¹ MPa⁻¹ m⁻²]`"
-    k_element::Array{FT,1} =  ones(FT,N) .* N .* k_max
+    k_element::Vector{FT} =  ones(FT,N) .* N .* k_max
     "List of kr history per element"
-    k_history::Array{FT,1} =  ones(FT,N)
+    k_history::Vector{FT} =  ones(FT,N)
     "List of xylem water pressure `[MPa]`"
-    p_element::Array{FT,1} = zeros(FT,N)
+    p_element::Vector{FT} = zeros(FT,N)
     "List of pressure drop caused by gravity `[MPa]`"
-    p_gravity::Array{FT,1} = zeros(FT,N) .+ ρg_MPa(FT) .* Δh ./ N;
+    p_gravity::Vector{FT} = zeros(FT,N) .+ ρg_MPa(FT) .* Δh ./ N;
     "List of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
-    p_history::Array{FT,1} = zeros(FT,N)
+    p_history::Vector{FT} = zeros(FT,N)
 
     # temperature related (uniform temperature), update with time
     "Relative surface tension"
@@ -161,17 +161,17 @@ Base.@kwdef mutable struct RootHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Pressure volume curve for storage"
     pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
     "Pressure of storage per element"
-    p_storage::Array{FT,1} = zeros(FT,N)
+    p_storage::Vector{FT} = zeros(FT,N)
     "Maximal storage per element `[mol]`"
-    v_maximum::Array{FT,1} = area * Δh / N * 6000 * ones(FT,N)
+    v_maximum::Vector{FT} = area * Δh / N * 6000 * ones(FT,N)
     "Storage per element `[mol]`"
-    v_storage::Array{FT,1} = area * Δh / N * 6000 * ones(FT,N)
+    v_storage::Vector{FT} = area * Δh / N * 6000 * ones(FT,N)
     "List of xylem water flow `[mol m⁻²]`"
-    q_element::Array{FT,1} = zeros(FT,N)
+    q_element::Vector{FT} = zeros(FT,N)
     "List of buffer water flow `[mol m⁻²]`"
-    q_buffer ::Array{FT,1} = zeros(FT,N)
+    q_buffer ::Vector{FT} = zeros(FT,N)
     "List of diiferntial water flow `[mol m⁻²]`"
-    q_diff   ::Array{FT,1} = zeros(FT,N)
+    q_diff   ::Vector{FT} = zeros(FT,N)
     "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
     q_in ::FT = 0
     "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"
@@ -215,15 +215,15 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
 
     # pressure, k, and p_history profile
     "List of k_max per element `[mol s⁻¹ MPa⁻¹ m⁻²]`"
-    k_element::Array{FT,1} =  ones(FT,N) .* N .* k_max
+    k_element::Vector{FT} =  ones(FT,N) .* N .* k_max
     "List of kr history per element"
-    k_history::Array{FT,1} =  ones(FT,N)
+    k_history::Vector{FT} =  ones(FT,N)
     "List of xylem water pressure `[MPa]`"
-    p_element::Array{FT,1} = zeros(FT,N)
+    p_element::Vector{FT} = zeros(FT,N)
     "List of pressure drop caused by gravity `[MPa]`"
-    p_gravity::Array{FT,1} = zeros(FT,N) .+ ρg_MPa(FT) .* Δh ./ N;
+    p_gravity::Vector{FT} = zeros(FT,N) .+ ρg_MPa(FT) .* Δh ./ N;
     "List of xylem water pressure history (normalized to 298.15 K) `[MPa]`"
-    p_history::Array{FT,1} = zeros(FT,N)
+    p_history::Vector{FT} = zeros(FT,N)
 
     # temperature related (uniform temperature), update with time
     "Relative surface tension"
@@ -239,13 +239,13 @@ Base.@kwdef mutable struct StemHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     "Pressure volume curve for storage"
     pv::AbstractCapacity{FT} = PVCurveLinear{FT}()
     "Pressure of storage per element"
-    p_storage::Array{FT,1} = zeros(FT,N)
+    p_storage::Vector{FT} = zeros(FT,N)
     "Maximal storage per element `[mol]`"
-    v_maximum::Array{FT,1} = area * Δh / N * 6000 * ones(FT,N)
+    v_maximum::Vector{FT} = area * Δh / N * 6000 * ones(FT,N)
     "Storage per element `[mol]`"
-    v_storage::Array{FT,1} = area * Δh / N * 6000 * ones(FT,N)
+    v_storage::Vector{FT} = area * Δh / N * 6000 * ones(FT,N)
     "List of xylem water flow `[mol m⁻²]`"
-    q_element::Array{FT,1} = zeros(FT,N)
+    q_element::Vector{FT} = zeros(FT,N)
     "Flow rate into the tissue (used for non-steady state) `[mol s⁻¹]`"
     q_in ::FT = 0
     "Flow rate out of the tissue (used for non-steady state) `[mol s⁻¹]`"

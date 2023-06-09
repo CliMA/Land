@@ -46,64 +46,64 @@ Base.@kwdef mutable struct CanopyRads{FT}
 
     # Dim of nLayer
     "Net PAR of shaded leaves `[mol m⁻² s⁻¹]`"
-    absPAR_shade::Array{FT,1} = zeros(FT, nLayer)
+    absPAR_shade::Vector{FT} = zeros(FT, nLayer)
     "Net PAR by Cab+Car of shaded leaves `[moles m⁻² s⁻¹]`"
-    absPAR_shadeCab::Array{FT,1} = zeros(FT, nLayer)
+    absPAR_shadeCab::Vector{FT} = zeros(FT, nLayer)
     "Spectrally integrated net absorbed direct radiation in each layer per leaf area `[W m⁻²]`"
-    intNetSW_sunlit::Array{FT,1} = zeros(FT, nLayer)
+    intNetSW_sunlit::Vector{FT} = zeros(FT, nLayer)
     "Spectrally integrated net absorbed diffuse radiation in each layer per leaf area `[W m⁻²]`"
-    intNetSW_shade::Array{FT,1} = zeros(FT, nLayer)
+    intNetSW_shade::Vector{FT} = zeros(FT, nLayer)
     "Spectrally integrated net absorbed direct radiation in each layer per leaf area `[W m⁻²]`"
-    intNetLW_sunlit::Array{FT,1} = zeros(FT, nLayer)
+    intNetLW_sunlit::Vector{FT} = zeros(FT, nLayer)
     "Spectrally integrated net absorbed diffuse radiation in each layer per leaf area `[W m⁻²]`"
-    intNetLW_shade::Array{FT,1} = zeros(FT, nLayer)
+    intNetLW_shade::Vector{FT} = zeros(FT, nLayer)
     "Leaf temperature (sunlit) `[K]`"
-    T_sun::Array{FT,1} = zeros(FT, nLayer) .+ FT(298.15)
+    T_sun::Vector{FT} = zeros(FT, nLayer) .+ FT(298.15)
     "Leaf temperature (shaded) `[K]`"
-    T_shade::Array{FT,1} = zeros(FT, nLayer) .+ FT(298.15)
+    T_shade::Vector{FT} = zeros(FT, nLayer) .+ FT(298.15)
     "Fluorescence yield for shaded leaves"
-    ϕ_shade::Array{FT,1} =  ones(FT, nLayer) .* FT(0.01)
+    ϕ_shade::Vector{FT} =  ones(FT, nLayer) .* FT(0.01)
     "Sensible Heat flux H of shaded leaves `[W m⁻²]`"
-    H_shade::Array{FT,1} = zeros(FT, nLayer)
+    H_shade::Vector{FT} = zeros(FT, nLayer)
     "Latent Heat flux LE of shaded leaves `[W m⁻²]`"
-    LE_shade::Array{FT,1} = zeros(FT, nLayer)
+    LE_shade::Vector{FT} = zeros(FT, nLayer)
     "NPQ of shaded leaves"
-    NPQ_shade::Array{FT,1} = zeros(FT, nLayer)
+    NPQ_shade::Vector{FT} = zeros(FT, nLayer)
     # TODO remove these?
     "GPP of shaded leaves `[μmol m⁻² s⁻¹]`"
-    GPP_shade::Array{FT,1} = zeros(FT, nLayer)
+    GPP_shade::Vector{FT} = zeros(FT, nLayer)
     "gs of shaded leaves `[mol m⁻² s⁻¹]`"
-    gs_shade::Array{FT,1} = zeros(FT, nLayer)
+    gs_shade::Vector{FT} = zeros(FT, nLayer)
     "Leaf water potential of shaded leaves `[MPa]`"
-    ψl_shade::Array{FT,1} = zeros(FT, nLayer)
+    ψl_shade::Vector{FT} = zeros(FT, nLayer)
     "Cc of shaded leaves `[µmol/mol]`"
-    Cc_shade::Array{FT,1} = zeros(FT, nLayer)
+    Cc_shade::Vector{FT} = zeros(FT, nLayer)
     "internal CO₂ concentration of shaded leaves `[µmol/mol]`"
-    Pi_shade::Array{FT,1} = zeros(FT, nLayer)
+    Pi_shade::Vector{FT} = zeros(FT, nLayer)
 
     # Dimension of wavelength
     "Short-wave TOC outgoing radiance in observation direction `[mW m⁻² nm⁻¹ sr⁻¹]`"
-    Lo::Array{FT,1} = zeros(FT, nWL)
+    Lo::Vector{FT} = zeros(FT, nWL)
     "Short-wave TOC outgoing radiation `[mW m⁻² nm⁻¹]`"
-    Eout::Array{FT,1} = zeros(FT, nWL)
+    Eout::Vector{FT} = zeros(FT, nWL)
     "Short-wave Albedo in viewing direction"
-    alb_obs::Array{FT,1} = zeros(FT, nWL)
+    alb_obs::Vector{FT} = zeros(FT, nWL)
     "Short-wave Albedo for direct incoming radiation"
-    alb_direct::Array{FT,1} = zeros(FT, nWL)
+    alb_direct::Vector{FT} = zeros(FT, nWL)
     "Short-wave Albedo for diffuse incoming radiation"
-    alb_diffuse::Array{FT,1} = zeros(FT, nWL)
+    alb_diffuse::Vector{FT} = zeros(FT, nWL)
 
     # Dimension of nLevel * nWavelengths
     "Upwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
-    E_up::Array{FT,2} = zeros(FT, (nWL,nLevel))
+    E_up::Matrix{FT} = zeros(FT, (nWL,nLevel))
     "Downwelling diffuse short-wave radiation within canopy `[mW m⁻² nm⁻¹]`"
-    E_down::Array{FT,2} = zeros(FT, (nWL,nLevel))
+    E_down::Matrix{FT} = zeros(FT, (nWL,nLevel))
 
     # Dimension of nLayer * nWavelengths
     "Net absorbed direct radiation in each layer `[mW m⁻² nm⁻¹]`"
-    netSW_sunlit::Array{FT,2} = zeros(FT, (nWL,nLayer))
+    netSW_sunlit::Matrix{FT} = zeros(FT, (nWL,nLayer))
     "net absorbed diffuse radiation in each layer `[mW m⁻² nm⁻¹]`"
-    netSW_shade::Array{FT,2} = zeros(FT, (nWL,nLayer))
+    netSW_shade::Matrix{FT} = zeros(FT, (nWL,nLayer))
 
     # Dimension of nLeafInclination * nLeafAzimuth * nLayer
     "net PAR of sunlit leaves `[mol m⁻² s⁻¹]`"
@@ -134,17 +134,17 @@ Base.@kwdef mutable struct CanopyRads{FT}
 
     # Fluorescence Output:
     "Hemispheric total outgoing SIF flux `[mW m⁻² nm⁻¹]`)"
-    SIF_hemi::Array{FT,1} = zeros(FT, nWLF)
+    SIF_hemi::Vector{FT} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance (mW m⁻² nm⁻¹ sr⁻¹))"
-    SIF_obs::Array{FT,1} = zeros(FT, nWLF)
+    SIF_obs::Vector{FT} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, sunlit leaves (mW m⁻² nm⁻¹ sr⁻¹)"
-    SIF_obs_sunlit::Array{FT,1} = zeros(FT, nWLF)
+    SIF_obs_sunlit::Vector{FT} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, shaded leaves (mW m⁻² nm⁻¹ sr⁻¹)"
-    SIF_obs_shaded::Array{FT,1} = zeros(FT, nWLF)
+    SIF_obs_shaded::Vector{FT} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, scattered (mW m⁻² nm⁻¹ sr⁻¹)"
-    SIF_obs_scattered::Array{FT,1} = zeros(FT, nWLF)
+    SIF_obs_scattered::Vector{FT} = zeros(FT, nWLF)
     "Observer-direction outgoing SIF radiance, soil-reflected (mW m⁻² nm⁻¹ sr⁻¹)"
-    SIF_obs_soil::Array{FT,1} = zeros(FT, nWLF)
+    SIF_obs_soil::Vector{FT} = zeros(FT, nWLF)
     "Total SIF sum of layer sources  `[mW m⁻² nm⁻¹]`)"
-    SIF_sum::Array{FT,1} = zeros(FT, nWLF)
+    SIF_sum::Vector{FT} = zeros(FT, nWLF)
 end

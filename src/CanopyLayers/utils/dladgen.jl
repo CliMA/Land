@@ -34,11 +34,11 @@ end
 
 
 """
-    dladgen(a::FT, b::FT, litab_bnd::Array{FT,2}) where {FT<:AbstractFloat}
+    dladgen(a::FT, b::FT, litab_bnd::Matrix{FT}) where {FT<:AbstractFloat}
 
 TODO Calculate the freqency of WHAT?
 """
-function dladgen(a::FT, b::FT, litab_bnd::Array{FT,2}) where {FT<:AbstractFloat}
+function dladgen(a::FT, b::FT, litab_bnd::Matrix{FT}) where {FT<:AbstractFloat}
     @assert a + b <= 1;
     freq = similar(litab_bnd[:,1]);
     for i in eachindex(freq)

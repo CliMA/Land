@@ -111,17 +111,17 @@ end
 #
 ###############################################################################
 """
-    roots_flow!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
+    roots_flow!(roots::Vector{RootHydraulics{FT}},
+                ks::Vector{FT},
+                ps::Vector{FT},
+                qs::Vector{FT},
                 flow::FT,
                 recalculate::Bool
     ) where {FT<:AbstractFloat}
-    roots_flow!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
+    roots_flow!(roots::Vector{RootHydraulics{FT}},
+                ks::Vector{FT},
+                ps::Vector{FT},
+                qs::Vector{FT},
                 flow::FT
     ) where {FT<:AbstractFloat}
     roots_flow!(plant::Union{GrassLikeOrganism{FT},
@@ -141,10 +141,10 @@ Recalculate the flow rates in the root from the pressure and conductance
 - `plant` [`AbstractPlantOrganism`](@ref) type struct
 """
 function roots_flow!(
-            roots::Array{RootHydraulics{FT},1},
-            ks::Array{FT,1},
-            ps::Array{FT,1},
-            qs::Array{FT,1},
+            roots::Vector{RootHydraulics{FT}},
+            ks::Vector{FT},
+            ps::Vector{FT},
+            qs::Vector{FT},
             flow::FT,
             recalculate::Bool
 ) where {FT<:AbstractFloat}
@@ -177,10 +177,10 @@ end
 
 
 function roots_flow!(
-            roots::Array{RootHydraulics{FT},1},
-            ks::Array{FT,1},
-            ps::Array{FT,1},
-            qs::Array{FT,1},
+            roots::Vector{RootHydraulics{FT}},
+            ks::Vector{FT},
+            ps::Vector{FT},
+            qs::Vector{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
     count = 0

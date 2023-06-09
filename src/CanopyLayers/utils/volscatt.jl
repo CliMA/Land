@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    volscatt!(cache::Array{FT,1}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
+    volscatt!(cache::Vector{FT}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
 
 Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
     multiplier (`frho`) and transmittance multiplier (`ftau`), given
@@ -14,7 +14,7 @@ Calculate interception parameters (`chi_s` and `chi_s`) and leaf reflectance
 - `raa` Relative azimuth angle
 - `ttl` Leaf inclination angle
 """
-function volscatt!(cache::Array{FT,1}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
+function volscatt!(cache::Vector{FT}, sza::FT, vza::FT, raa::FT, ttl::FT) where {FT<:AbstractFloat}
     psi_rad = deg2rad(raa);
     cos_raa = cosd(raa);
     cos_ttl = cosd(ttl);

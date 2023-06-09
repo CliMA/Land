@@ -7,7 +7,7 @@
     optimize_hs!(
                 node::SPACSimple{FT},
                 photo_set::AbstractPhotoModelParaSet{FT},
-                weather::Array{FT,2}
+                weather::Matrix{FT}
     ) where {FT<:AbstractFloat}
 
 Optimize hydraulic conductance and leaf investment, given
@@ -18,7 +18,7 @@ Optimize hydraulic conductance and leaf investment, given
 function optimize_hs!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weather::Array{FT,2}
+            weather::Matrix{FT}
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize
     @inline f(x) = (tmp_node = deepcopy(node);

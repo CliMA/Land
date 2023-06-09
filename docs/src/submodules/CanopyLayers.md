@@ -26,15 +26,10 @@ WaveLengths
 ## Caches
 ```@docs
 CFCache
-create_cf_cache
 CGCache
-create_cg_cache
 SFCache
-create_sf_cache
 SWCache
-create_sw_cache
 RTCache
-create_rt_cache
 ```
 
 

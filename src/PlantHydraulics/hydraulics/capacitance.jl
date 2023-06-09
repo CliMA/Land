@@ -11,10 +11,10 @@
                 Δt::FT,
                 nss::Bool
     ) where {FT<:AbstractFloat}
-    update_PVF!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
+    update_PVF!(roots::Vector{RootHydraulics{FT}},
+                ks::Vector{FT},
+                ps::Vector{FT},
+                qs::Vector{FT},
                 q_sum::FT,
                 Δt::FT
     ) where {FT<:AbstractFloat}
@@ -139,10 +139,10 @@ end
 
 
 function update_PVF!(
-            roots::Array{RootHydraulics{FT},1},
-            cache_k::Array{FT,1},
-            cache_p::Array{FT,1},
-            cache_q::Array{FT,1},
+            roots::Vector{RootHydraulics{FT}},
+            cache_k::Vector{FT},
+            cache_p::Vector{FT},
+            cache_q::Vector{FT},
             q_sum::FT,
             Δt::FT
 ) where {FT<:AbstractFloat}

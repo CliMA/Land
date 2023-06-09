@@ -61,7 +61,7 @@ end
     ) where {FT<:AbstractFloat}
     root_pk(root::RootHydraulics{FT},
             q_in::FT,
-            flow::Array{FT,1}
+            flow::Vector{FT}
     ) where {FT<:AbstractFloat}
 
 Return root xylem end pressure and root hydraulic conductance (reverse of
@@ -118,7 +118,7 @@ end
 function root_pk(
             root::RootHydraulics{FT},
             q_in::FT,
-            flow::Array{FT,1}
+            flow::Vector{FT}
 ) where {FT<:AbstractFloat}
     (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 

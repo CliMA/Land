@@ -7,7 +7,7 @@
     optimize_leaf!(
                 node::SPACSimple{FT},
                 photo_set::AbstractPhotoModelParaSet{FT},
-                weather::Array{FT,2},
+                weather::Matrix{FT},
                 printing::Bool
     ) where {FT<:AbstractFloat}
 
@@ -21,7 +21,7 @@ Optimize leaf area (LAI within 0-20) and photosynthetic capacity (within
 function optimize_leaf!(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weather::Array{FT,2},
+            weather::Matrix{FT},
             printing::Bool = false
 ) where {FT<:AbstractFloat}
     # 1. use the opt_laba and opt_vmax to initialize

@@ -24,7 +24,7 @@ function test_diurnal(
     # 0.1 create variables required
     (; n_canopy, wl_set) = node;
     canopy_rt = node.canopy_rt;
-    fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[ length(canopy_rt.lazitab) ]) / length(canopy_rt.lazitab);
+    fraction_sl::Vector{FT} = repeat(canopy_rt.lidf, outer=[ length(canopy_rt.lazitab) ]) / length(canopy_rt.lazitab);
     n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
 
 

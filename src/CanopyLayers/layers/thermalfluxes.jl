@@ -5,7 +5,7 @@
 ###############################################################################
 """
     thermal_fluxes!(
-                leaves::Array{LeafBios{FT},1},
+                leaves::Vector{LeafBios{FT}},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 can::Canopy4RT{FT},
@@ -29,7 +29,7 @@ Computes 2-stream diffusive radiation transport for thermal radiation (calls
 - `wls` [`WaveLengths`](@ref) type struct
 """
 function thermal_fluxes!(
-            leaves::Array{LeafBios{FT},1},
+            leaves::Vector{LeafBios{FT}},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},

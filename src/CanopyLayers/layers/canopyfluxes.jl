@@ -5,7 +5,7 @@
                 can_rad::CanopyRads{FT},
                 in_rad::IncomingRadiation{FT},
                 soil::SoilOpticals{FT},
-                leaves::Array{LeafBios{FT},1},
+                leaves::Vector{LeafBios{FT}},
                 wls::WaveLengths{FT},
                 rt_con::RTCache{FT}
     ) where {FT<:AbstractFloat}
@@ -29,7 +29,7 @@ function canopy_fluxes!(
             can_rad::CanopyRads{FT},
             in_rad::IncomingRadiation{FT},
             soil::SoilOpticals{FT},
-            leaves::Array{LeafBios{FT},1},
+            leaves::Vector{LeafBios{FT}},
             wls::WaveLengths{FT},
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}

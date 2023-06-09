@@ -35,7 +35,7 @@ Base.@kwdef mutable struct SPACSimple{FT<:AbstractFloat}
     "Container for gas exchange of sunlit and shaded layers"
     container2L::SPACContainer2L{FT} = SPACContainer2L{FT}()
     "Container for default hydraulic conductance"
-    containerKS::Array{FT,1} = FT[hs.root.k_max, hs.stem.k_max, hs.leaf.k_sla]
+    containerKS::Vector{FT} = FT[hs.root.k_max, hs.stem.k_max, hs.leaf.k_sla]
     "Container for optimizer"
     containerOP::FT = FT(0)
     "Container for optimal sunlit layer flow rate"

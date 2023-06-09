@@ -141,7 +141,7 @@ end
 #
 ###############################################################################
 
-function fit_xylem_VC(xs::Array{FT,1}, ys::Array{FT,1}; label="TPLC") where {FT<:AbstractFloat}
+function fit_xylem_VC(xs::Vector{FT}, ys::Vector{FT}; label="TPLC") where {FT<:AbstractFloat}
     _ps = xs;
     _ks = ys;
 

@@ -7,7 +7,7 @@
     annual_profit(
                 node::SPACSimple{FT},
                 photo_set::AbstractPhotoModelParaSet{FT},
-                weather::Array{FT,2}
+                weather::Matrix{FT}
     ) where {FT<:AbstractFloat}
 
 Calculate the profit in the growing season so as to optimize leaf investment,
@@ -19,7 +19,7 @@ Calculate the profit in the growing season so as to optimize leaf investment,
 function annual_profit(
             node::SPACSimple{FT},
             photo_set::AbstractPhotoModelParaSet{FT},
-            weather::Array{FT,2}
+            weather::Matrix{FT}
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     #    make sure construction cost must be postive

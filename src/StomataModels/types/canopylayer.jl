@@ -33,11 +33,11 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Temperature related, different for each leaf
     "Sensible Heat Flux `[W m⁻²]`"
-    H ::Array{FT,1} = zeros(FT, n_leaf)
+    H ::Vector{FT} = zeros(FT, n_leaf)
     "Latent Heat Flux `[W m⁻²]`"
-    LE::Array{FT,1} = zeros(FT, n_leaf)
+    LE::Vector{FT} = zeros(FT, n_leaf)
     "Net Radiation Balance `[W m⁻²]`"
-    Rn::Array{FT,1} = zeros(FT, n_leaf)
+    Rn::Vector{FT} = zeros(FT, n_leaf)
 
     # Tempearture related, same for all leaves
     "Latent Heat of evaporation `[J mol⁻¹]`"
@@ -51,21 +51,21 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Diffusive conductances, same for all leaves
     "Boundary layer conductance to CO₂ `[mol m⁻² s⁻¹]`"
-    g_bc::Array{FT,1} = zeros(FT, n_leaf) .+ FT(3/1.35)
+    g_bc::Vector{FT} = zeros(FT, n_leaf) .+ FT(3/1.35)
     "Boundary layer conductance to heat `[mol m⁻² s⁻¹]`"
-    g_bh::Array{FT,1} = zeros(FT, n_leaf) .+ FT(3)
+    g_bh::Vector{FT} = zeros(FT, n_leaf) .+ FT(3)
     "Boundary layer conductance to H₂O `[mol m⁻² s⁻¹]`"
-    g_bw::Array{FT,1} = zeros(FT, n_leaf) .+ FT(3)
+    g_bw::Vector{FT} = zeros(FT, n_leaf) .+ FT(3)
     "Leaf diffusive conductance to water CO₂ `[mol m⁻² s⁻¹]`"
-    g_lc::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.08032)
+    g_lc::Vector{FT} = zeros(FT, n_leaf) .+ FT(0.08032)
     "Leaf diffusive conductance to water H₂O `[mol m⁻² s⁻¹]`"
-    g_lw::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.1519)
+    g_lw::Vector{FT} = zeros(FT, n_leaf) .+ FT(0.1519)
     "Mesophyll conductance for CO₂ `[mol m⁻² s⁻¹]`"
-    g_m ::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.5)
+    g_m ::Vector{FT} = zeros(FT, n_leaf) .+ FT(0.5)
     "Stomatal conductance to water CO₂ `[mol m⁻² s⁻¹]`"
-    g_sc::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.1)
+    g_sc::Vector{FT} = zeros(FT, n_leaf) .+ FT(0.1)
     "Stomatal conductance to water H₂O `[mol m⁻² s⁻¹]`"
-    g_sw::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.16)
+    g_sw::Vector{FT} = zeros(FT, n_leaf) .+ FT(0.16)
 
     # Diffusive conductances, same for all leaves
     "Gias correction constant"
@@ -83,9 +83,9 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # CO₂ and H₂O pressures, different for each leaf
     "Leaf internal CO₂ partial pressure `[Pa]`"
-    p_i::Array{FT,1} = zeros(FT, n_leaf) .+ FT(10)
+    p_i::Vector{FT} = zeros(FT, n_leaf) .+ FT(10)
     "Leaf surface CO₂ partial pressure `[Pa]`"
-    p_s::Array{FT,1} = zeros(FT, n_leaf) .+ FT(40)
+    p_s::Vector{FT} = zeros(FT, n_leaf) .+ FT(40)
 
     # CO₂ and H₂O pressures, same for all leaves
     "Leaf saturation vapor pressure `[Pa]`"
@@ -93,39 +93,39 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Photosynthesis related, different for each leaf
     "RubisCO limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    Ac   ::Array{FT,1} = zeros(FT, n_leaf)
+    Ac   ::Vector{FT} = zeros(FT, n_leaf)
     "Light limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    Aj   ::Array{FT,1} = zeros(FT, n_leaf)
+    Aj   ::Vector{FT} = zeros(FT, n_leaf)
     "Gross photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    Ag   ::Array{FT,1} = zeros(FT, n_leaf)
+    Ag   ::Vector{FT} = zeros(FT, n_leaf)
     "Net photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    An   ::Array{FT,1} = zeros(FT, n_leaf)
+    An   ::Vector{FT} = zeros(FT, n_leaf)
     "Product limited photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    Ap   ::Array{FT,1} = zeros(FT, n_leaf)
+    Ap   ::Vector{FT} = zeros(FT, n_leaf)
     "Electron transport `[μmol m⁻² s⁻¹]`"
-    J    ::Array{FT,1} = zeros(FT, n_leaf)
+    J    ::Vector{FT} = zeros(FT, n_leaf)
     "Potential Electron Transport Rate `[μmol m⁻² s⁻¹]`"
-    J_pot::Array{FT,1} = zeros(FT, n_leaf)
+    J_pot::Vector{FT} = zeros(FT, n_leaf)
 
     # Fluorescence related, different for each leaf
     "Total efficiency, incl. photorespiration `[mol CO₂ mol⁻¹ e-]`"
-    e2c::Array{FT,1} = zeros(FT, n_leaf) .+ FT(1/6)
+    e2c::Vector{FT} = zeros(FT, n_leaf) .+ FT(1/6)
     "light adapted yield (`Kp=0`)"
-    Fm′::Array{FT,1} = zeros(FT, n_leaf)
+    Fm′::Vector{FT} = zeros(FT, n_leaf)
     "light-adapted fluorescence yield in the dark (`Kp=max`)"
-    Fo′::Array{FT,1} = zeros(FT, n_leaf)
+    Fo′::Vector{FT} = zeros(FT, n_leaf)
     "Actual electron transport rate `[μmol m⁻² s⁻¹]`"
-    Ja ::Array{FT,1} = zeros(FT, n_leaf)
+    Ja ::Vector{FT} = zeros(FT, n_leaf)
     "Non-Photochemical quenching "
-    NPQ::Array{FT,1} = zeros(FT, n_leaf)
+    NPQ::Vector{FT} = zeros(FT, n_leaf)
     "Photochemical quenching"
-    qQ ::Array{FT,1} = zeros(FT, n_leaf)
+    qQ ::Vector{FT} = zeros(FT, n_leaf)
     "energy quenching"
-    qE ::Array{FT,1} = zeros(FT, n_leaf)
+    qE ::Vector{FT} = zeros(FT, n_leaf)
     "PSII yield"
-    φ  ::Array{FT,1} = zeros(FT, n_leaf)
+    φ  ::Vector{FT} = zeros(FT, n_leaf)
     "Steady-state (light-adapted) yield (aka Fs)"
-    φs ::Array{FT,1} = zeros(FT, n_leaf)
+    φs ::Vector{FT} = zeros(FT, n_leaf)
 
     # Fluorescence related, same for all leaves
     "dark adapted yield (`Kp=0`)"
@@ -135,15 +135,15 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
 
     # Environment related, different for each leaf
     "Absorbed photosynthetic active radiation `[μmol m⁻² s⁻¹]`"
-    APAR::Array{FT,1} = zeros(FT, n_leaf) .+ 100
+    APAR::Vector{FT} = zeros(FT, n_leaf) .+ 100
     "Leaf area fractions"
-    LAIx::Array{FT,1} = ones(FT, n_leaf) ./ n_leaf;
+    LAIx::Vector{FT} = ones(FT, n_leaf) ./ n_leaf;
 
     # Stomtal optimization related, different for each leaf
     "Maximal photosynthetic rate `[μmol m⁻² s⁻¹]`"
-    a_max::Array{FT,1} = zeros(FT, n_leaf)
+    a_max::Vector{FT} = zeros(FT, n_leaf)
     "Flow rate `[mol m⁻² s⁻¹]`"
-    e    ::Array{FT,1} = zeros(FT, n_leaf)
+    e    ::Vector{FT} = zeros(FT, n_leaf)
 
     # Stomtal optimization related, same for all leaves
     "Critical flow rate `[mol m⁻² s⁻¹]`"

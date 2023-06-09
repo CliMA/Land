@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    SIF_fluxes!(leaves::Array{LeafBios{FT},1},
+    SIF_fluxes!(leaves::Vector{LeafBios{FT}},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 can::Canopy4RT{FT},
@@ -32,7 +32,7 @@ Computes 2-stream diffusive radiation transport for SIF radiation (calls
 
 """
 function SIF_fluxes!(
-            leaves::Array{LeafBios{FT},1},
+            leaves::Vector{LeafBios{FT}},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},

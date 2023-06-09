@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    canopy_matrices!(leaves::Array{LeafBios{FT},1}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
+    canopy_matrices!(leaves::Vector{LeafBios{FT}}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
 
 Compute scattering coefficient matrices for direct and diffuse light given
     geometry dependent overall extinction coefficients and pigment dependent
@@ -13,7 +13,7 @@ Compute scattering coefficient matrices for direct and diffuse light given
 - `leaves` Array of [`LeafBios`](@ref) type struct
 - `can_opt` [`CanopyOpticals`](@ref) type struct
 """
-function canopy_matrices!(leaves::Array{LeafBios{FT},1}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
+function canopy_matrices!(leaves::Vector{LeafBios{FT}}, can_opt::CanopyOpticals{FT}) where {FT<:AbstractFloat}
     # 1. unpack values
     (; ddb, ddf, dob, dof, sdb, sdf, sob, sof) = can_opt;
 

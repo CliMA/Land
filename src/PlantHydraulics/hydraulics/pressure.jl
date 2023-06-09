@@ -199,7 +199,7 @@ end
     pressure_profile!(
                 root::RootHydraulics{FT},
                 q_in::FT,
-                flow::Array{FT,1};
+                flow::Vector{FT};
                 update::Bool = true
     ) where {FT<:AbstractFloat}
     pressure_profile!(
@@ -209,7 +209,7 @@ end
     ) where {FT<:AbstractFloat}
     pressure_profile!(
                 stem::StemHydraulics{FT},
-                flow::Array{FT,1};
+                flow::Vector{FT};
                 update::Bool = true
     ) where {FT<:AbstractFloat}
     pressure_profile!(
@@ -342,7 +342,7 @@ end
 function pressure_profile!(
             root::RootHydraulics{FT},
             q_in::FT,
-            flow::Array{FT,1};
+            flow::Vector{FT};
             update::Bool = true
 ) where {FT<:AbstractFloat}
     (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
@@ -437,7 +437,7 @@ end
 
 function pressure_profile!(
             stem::StemHydraulics{FT},
-            flow::Array{FT,1};
+            flow::Vector{FT};
             update::Bool = true
 ) where {FT<:AbstractFloat}
     (; f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups, vc) = stem;

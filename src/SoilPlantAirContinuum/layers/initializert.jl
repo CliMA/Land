@@ -16,7 +16,7 @@ function initialize_spac_canopy!(node::SPACMono{FT}) where {FT<:AbstractFloat}
     can_opt = node.can_opt;
     can_rad = node.can_rad;
     plant_hs = node.plant_hs;
-    fraction_sl::Array{FT,1} = repeat(canopy_rt.lidf, outer=[canopy_rt.nAzi]) / length(canopy_rt.lazitab);
+    fraction_sl::Vector{FT} = repeat(canopy_rt.lidf, outer=[canopy_rt.nAzi]) / length(canopy_rt.lazitab);
     n_sl = length(canopy_rt.lidf) * length(canopy_rt.lazitab);
 
     # fluspect the canopy layers

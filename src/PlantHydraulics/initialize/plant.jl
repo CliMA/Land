@@ -7,8 +7,8 @@
     create_grass(
                 z_root::FT,
                 z_canopy::FT,
-                soil_bounds::Array{FT,1},
-                air_bounds::Array{FT,1}
+                soil_bounds::Vector{FT},
+                air_bounds::Vector{FT}
     ) where {FT<:AbstractFloat}
 
 Create a [`GrassLikeOrganism`](@ref), given
@@ -20,8 +20,8 @@ Create a [`GrassLikeOrganism`](@ref), given
 function create_grass(
             z_root::FT,
             z_canopy::FT,
-            soil_bounds::Array{FT,1},
-            air_bounds::Array{FT,1}
+            soil_bounds::Vector{FT},
+            air_bounds::Vector{FT}
 ) where {FT<:AbstractFloat}
     # determine how many layers in roots and canopy
     _n_root  = 0;
@@ -82,8 +82,8 @@ end
     create_palm(z_root::FT,
                 z_trunk::FT,
                 z_canopy::FT,
-                soil_bounds::Array{FT,1},
-                air_bounds::Array{FT,1}
+                soil_bounds::Vector{FT},
+                air_bounds::Vector{FT}
     ) where {FT<:AbstractFloat}
 
 Create a [`PalmLikeOrganism`](@ref), given
@@ -97,8 +97,8 @@ function create_palm(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,
-            soil_bounds::Array{FT,1},
-            air_bounds::Array{FT,1}
+            soil_bounds::Vector{FT},
+            air_bounds::Vector{FT}
 ) where {FT<:AbstractFloat}
     # determine how many layers in roots and canopy
     _n_root  = 0;
@@ -177,8 +177,8 @@ end
     create_tree(z_root::FT,
                 z_trunk::FT,
                 z_canopy::FT,
-                soil_bounds::Array{FT,1},
-                air_bounds::Array{FT,1}
+                soil_bounds::Vector{FT},
+                air_bounds::Vector{FT}
     ) where {FT<:AbstractFloat}
 
 Create a [`TreeLikeOrganism`](@ref), given
@@ -192,8 +192,8 @@ function create_tree(
             z_root::FT,
             z_trunk::FT,
             z_canopy::FT,
-            soil_bounds::Array{FT,1},
-            air_bounds::Array{FT,1}
+            soil_bounds::Vector{FT},
+            air_bounds::Vector{FT}
 ) where {FT<:AbstractFloat}
     # determine how many layers in roots and canopy
     _n_root  = 0;
