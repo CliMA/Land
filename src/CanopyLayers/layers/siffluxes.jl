@@ -43,12 +43,12 @@ function SIF_fluxes!(
             photon::Bool = true
 ) where {FT<:AbstractFloat}
     # unpack variables from structures
-    @unpack LAI, lidf, nLayer, Ω = can;
-    @unpack a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps, Pso, sigb, vb, vf = can_opt;
-    @unpack E_down, E_up, ϕ_shade, ϕ_sun = can_rad;
-    @unpack ρ_SW_SIF = soil;
-    @unpack dWL_iWLE, iWLE, iWLF, WLE, WLF = wls;
-    sf_con = rt_con.sf_con;
+    (; LAI, lidf, nLayer, Ω) = can;
+    (; a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps, Pso, sigb, vb, vf) = can_opt;
+    (; E_down, E_up, ϕ_shade, ϕ_sun) = can_rad;
+    (; ρ_SW_SIF) = soil;
+    (; dWL_iWLE, iWLE, iWLF, WLE, WLF) = wls;
+    (; sf_con) = rt_con.sf_con;
 
     # 1. define some useful parameters
     iLAI = LAI * Ω / nLayer;
@@ -255,8 +255,8 @@ Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
 """
 function SIF_fluxes!(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}, fqe::FT = FT(0.01); photon::Bool = true) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack Mb, Mf = leaf;
-    @unpack dWL_iWLE, iWLE, WLE, WLF = wls;
+    (; Mb, Mf) = leaf;
+    (; dWL_iWLE, iWLE, WLE, WLF) = wls;
     sf_con = rt_con.sf_con;
     sf_con.tmp_dwl_iWlE  .= (view(in_rad.E_direct , iWLE, 1) .+ view(in_rad.E_diffuse, iWLE, 1)) .* dWL_iWLE;
     if photon

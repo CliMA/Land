@@ -16,10 +16,10 @@ Simulate the short wave radiation through the canopy, given
 """
 function short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals{FT}, can_rad::CanopyRads{FT}, in_rad::IncomingRadiation{FT}, soil::SoilOpticals{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
     # unpack values from can and soil
-    @unpack LAI, nLayer, Ω = can;
-    @unpack ks, sb, sf, sigb = can_opt;
-    @unpack ρ_SW = soil;
-    sw_con = rt_con.sw_con;
+    (; LAI, nLayer, Ω) = can;
+    (; ks, sb, sf, sigb) = can_opt;
+    (; ρ_SW) = soil;
+    (; sw_con) = rt_con.sw_con;
 
     # 1. define some useful parameters
     iLAI = LAI * Ω / nLayer;
@@ -33,7 +33,7 @@ function short_wave!(can::Canopy4RT{FT}, can_opt::CanopyOpticals{FT}, can_rad::C
     sw_con.τ_sd .= sf   .* iLAI;
     sw_con.ρ_dd .= sigb .* iLAI;
     sw_con.ρ_sd .= sb   .* iLAI;
-    @unpack ρ_dd, ρ_sd, τ_dd, τ_sd = sw_con;
+    (; ρ_dd, ρ_sd, τ_dd, τ_sd) = sw_con;
 
     # 3. reflectance calculation
     # 3.1 Eq. 18 in mSCOPE paper

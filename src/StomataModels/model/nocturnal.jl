@@ -22,8 +22,8 @@ function dRdE(
             clayer::CanopyLayer{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack ps, T = clayer;
-    @unpack Rd = ps;
+    (; ps, T) = clayer;
+    (; Rd) = ps;
 
     return dTdE(clayer, envir) * Rd * photo_set.ReT.ΔHa_to_RT25 * T₂₅(FT) / T^2
 end
@@ -45,8 +45,8 @@ function dTdE(
             clayer::CanopyLayer{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack T, tLAI, width = clayer;
-    @unpack wind = envir;
+    (; T, tLAI, width) = clayer;
+    (; wind) = envir;
 
     lambda = latent_heat_vapor(T) * M_H₂O(FT);
     gbe    = FT(0.189 * sqrt(wind/(0.72*width)));
@@ -80,8 +80,8 @@ function dΘdE(
             sm::OSMWang{FT},
             g_sw::FT
 ) where {FT<:AbstractFloat}
-    @unpack APAR_m, ec, envir_m, ff, ps_m = clayer;
-    @unpack p_atm, p_H₂O = envir_m
+    (; APAR_m, ec, envir_m, ff, ps_m) = clayer;
+    (; p_atm, p_H₂O) = envir_m;
     ps_m.APAR = APAR_m;
 
     # calculate g_lc and a_net using memory clayer and envir

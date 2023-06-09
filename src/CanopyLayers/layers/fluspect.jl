@@ -29,9 +29,9 @@ function fluspect!(leaf::LeafBios{FT}, wls::WaveLengths{FT}; APAR_car::Bool = tr
     # & used with his autorization.
     # ***********************************************************************
 
-    @unpack N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx, ndub = leaf;
-    @unpack iWLE, iWLF, optis, WLE, WLF = wls;
-    @unpack Kab, Kant, KBrown, KcaV, KcaZ, Km, Kw, nr, phi = optis;
+    (; N, Cab, Car, Ant, Cs, Cw, Cm, ρ_SW, τ_SW, Cx, ndub) = leaf;
+    (; iWLE, iWLF, optis, WLE, WLF) = wls;
+    (; Kab, Kant, KBrown, KcaV, KcaZ, Km, Kw, nr, phi) = optis;
 
     #println(N, " ", Cab, " ", Car," ",  Ant, " ", Cs, " ", Cw, " ", Cm)
     Kcaro = (1 - Cx) * KcaV .+ Cx * KcaZ;

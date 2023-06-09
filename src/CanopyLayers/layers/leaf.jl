@@ -17,7 +17,7 @@ Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
 """
 function leaf_fluxes(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack dWL_iPAR, iPAR, WL_iPAR = wls;
+    (; dWL_iPAR, iPAR, WL_iPAR) = wls;
     cf_con = rt_con.cf_con;
     cf_con.kChlrel .= view(leaf.kChlrel, iPAR);
 

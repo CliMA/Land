@@ -11,8 +11,8 @@ Calculate the clumping factor, given
 - `angles` [`SolarAngles`](@ref) type struct
 """
 function clumping_factor!(can::Canopy4RT{FT}, angles::SolarAngles{FT}) where {FT<:AbstractFloat}
-    @unpack clump_a, clump_b = can;
-    @unpack sza = angles;
+    (; clump_a, clump_b) = can;
+    (; sza) = angles;
 
     if clump_b > 0
         can.Ω = clump_a + clump_b * (1 - cosd(sza));
@@ -44,7 +44,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     clumping_factor!(can, angles);
 
     # 2. update solor angle dependent variables
-    @unpack sza, vza, raa = angles;
+    (; sza, vza, raa) = angles;
     cos_vza = cosd(vza);
     tan_vza = tand(vza);
     cos_raa = cosd(raa);
@@ -57,11 +57,11 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     psi_vol = abs( raa - 360*round(raa/360) );
 
     # 3. unpack canopy parameters
-    @unpack dx, hot, LAI, lazitab, lidf, litab, nLayer, xl, Ω = can;
+    (; dx, hot, LAI, lazitab, lidf, litab, xl, Ω) = can;
 
     # 4. update the RTCache
     can.cos_philo .= cosd.(lazitab .- raa);
-    @unpack cos_philo, cos_ttli, cos_ttlo, sin_ttli = can;
+    (; cos_philo, cos_ttli, cos_ttlo, sin_ttli) = can;
 
     # 5. calculate geometric factors associated with extinction and scattering
     can_opt.ks  = 0;
@@ -69,7 +69,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     can_opt.bf  = 0;
     can_opt.sob = 0;
     can_opt.sof = 0;
-    @inbounds for i=1:length(litab)
+    @inbounds for i in eachindex(litab)
         _lit = litab[i];
         _lid = lidf[i];
         _ctl = cos_ttli[i];
@@ -100,7 +100,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     end
 
     # 6. geometric factors to be used later with rho and tau
-    @unpack bf, ko, ks = can_opt;
+    (; bf, ko, ks) = can_opt;
     can_opt.sdb = (ks + bf) / 2;
     can_opt.sdf = (ks - bf) / 2;
     can_opt.dob = (ko + bf) / 2;
@@ -114,7 +114,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     cg_con._Ss .= sin_ttli .* sin_sza; # [nli]
     cg_con._Co .= cos_ttli .* cos_vza; # [nli]
     cg_con._So .= sin_ttli .* sin_vza; # [nli]
-    @unpack _Co, _Cs, _So, _Ss, _1s = cg_con;
+    (; _Co, _Cs, _So, _Ss, _1s) = cg_con;
     # cg_con._cds .= _Cs * _1s .+ _Ss * cos_ttlo' ; # [nli, nlazi]
     # cg_con._cdo .= _Co * _1s .+ _So * cos_philo'; # [nli, nlazi]
     mul!(cg_con._cds, _Cs, _1s       );
@@ -123,7 +123,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
     mul!(cg_con._cdo, _Co, _1s       );
     mul!(cg_con._2d , _So, cos_philo');
     cg_con._cdo .+= cg_con._2d;
-    @unpack _cdo, _cds = cg_con;
+    (; _cdo, _cds) = cg_con;
 
     # 8. update fs and fo
     # This is basically equivalent to Kb in Bonan, eq. 14.21
@@ -146,7 +146,7 @@ function canopy_geometry!(can::Canopy4RT{FT}, angles::SolarAngles{FT}, can_opt::
 
     # TODO minimize the allocations here
     # length(xl) * 7 allocations here!
-    @inbounds for j=1:length(xl)
+    @inbounds for j in eachindex(xl)
         can_opt.Pso[j] = quadgk(f, xl[j]-dx, xl[j], rtol=1e-2)[1] / dx;
     end
 

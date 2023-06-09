@@ -37,11 +37,11 @@ function thermal_fluxes!(
             incLW::Array{FT},
             wls::WaveLengths{FT}
 ) where {FT<:AbstractFloat}
-    @unpack Ps, Po, Pso,ddf,ddb = can_opt
-    @unpack T_sun, T_shade = can_rad
-    @unpack LAI, nLayer, lidf, Ω = can
-    @unpack ρ_LW, T = soil
-    @unpack nWL = wls
+    (; Ps, Po, Pso, ddf, ddb) = can_opt
+    (; T_sun, T_shade) = can_rad
+    (; LAI, nLayer, lidf, Ω) = can
+    (; ρ_LW, T) = soil
+    (; nWL) = wls
 
     # 1. define some useful parameters
     iLAI = LAI * Ω / nLayer;

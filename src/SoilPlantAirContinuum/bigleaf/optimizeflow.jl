@@ -19,7 +19,7 @@ function optimize_flows!(
             photo_set::AbstractPhotoModelParaSet{FT}
 ) where {FT<:AbstractFloat}
     # unpack required parameters
-    @unpack frac_sh, frac_sl = node.container2L;
+    (; frac_sh, frac_sl) = node.container2L;
 
     # calculate the ecrit
     node.ec = critical_flow(node.hs, node.ec);

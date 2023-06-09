@@ -6,8 +6,8 @@ Create [`RTDimensions`](@ref), given
 - `wls` [`WaveLengths`](@ref) type struct
 """
 function create_rt_dims(can::Canopy4RT{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
-    @unpack nAzi, nIncl, nLayer = can;
-    @unpack nPAR, nWL, nWLE, nWLF = wls;
+    (; nAzi, nIncl, nLayer) = can;
+    (; nPAR, nWL, nWLE, nWLF) = wls;
 
     return RTDimensions(nAzi = nAzi, nIncl = nIncl, nLayer = nLayer, nPAR = nPAR, nWL = nWL, nWLE = nWLE, nWLF = nWLF)
 end

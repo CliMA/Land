@@ -45,7 +45,7 @@ function end_pressure(
             leaf::LeafHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, p_history, p_ups, vc = leaf;
+    (; f_st, f_vis, k_element, k_history, p_history, p_ups, vc) = leaf;
 
     p_end::FT = p_ups;
 
@@ -70,8 +70,7 @@ function end_pressure(
             root::RootHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_osm, p_ups, sh, T_sap, vc = root;
+    (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -109,8 +108,7 @@ function end_pressure(
             stem::StemHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
-            vc = stem;
+    (; f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups, vc) = stem;
 
     p_end::FT = p_ups;
 
@@ -250,7 +248,7 @@ function pressure_profile!(
     # update leaf flow
     leaf.flow = flow;
 
-    @unpack k_element, k_history, p_history, p_ups, f_st, f_vis, vc = leaf;
+    (; k_element, k_history, p_history, p_ups, f_st, f_vis, vc) = leaf;
 
     p_end::FT = p_ups;
 
@@ -293,8 +291,7 @@ function pressure_profile!(
     # update root flow rate
     root.flow = flow;
 
-    @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_osm, p_ups, sh, T_sap, vc = root;
+    (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -348,8 +345,7 @@ function pressure_profile!(
             flow::Array{FT,1};
             update::Bool = true
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_osm, p_ups, sh, T_sap, vc = root;
+    (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -405,8 +401,7 @@ function pressure_profile!(
     # update stem flow
     stem.flow = flow;
 
-    @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
-            vc = stem;
+    (; f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups, vc) = stem;
 
     p_end::FT = p_ups;
 
@@ -445,8 +440,7 @@ function pressure_profile!(
             flow::Array{FT,1};
             update::Bool = true
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups,
-            vc = stem;
+    (; f_st, f_vis, k_element, k_history, p_gravity, p_history, p_ups, vc) = stem;
 
     p_end::FT = p_ups;
 
@@ -662,9 +656,7 @@ function pressure_profile!(
             mode::NonSteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack branch, leaves = tree;
-    roots = tree.roots;
-    trunk = tree.trunk;
+    (; branch, leaves, roots, trunk) = tree;
 
     # update the profile in roots
     p_mean::FT = 0;
@@ -675,14 +667,14 @@ function pressure_profile!(
     p_mean /= length(roots);
 
     # update the profile in trunk
-    trunk.p_ups = p_mean;
-    pressure_profile!(trunk, trunk.q_element; update=update);
+    (trunk).p_ups = p_mean;
+    pressure_profile!(trunk, (trunk).q_element; update=update);
 
     # update the profile in leaf
     for i in eachindex(leaves)
         stem = branch[i];
         leaf = leaves[i];
-        stem.p_ups = trunk.p_dos;
+        stem.p_ups = (trunk).p_dos;
         pressure_profile!(stem, stem.q_element; update=update);
         leaf.p_ups = stem.p_dos;
         pressure_profile!(leaf, leaf.q_in; update=update);
@@ -699,7 +691,7 @@ function pressure_profile!(
             mode::SteadyStateMode;
             update::Bool = false
 ) where {FT<:AbstractFloat}
-    @unpack branch, leaves = tree;
+    (; branch, leaves) = tree;
     roots = tree.roots;
     trunk = tree.trunk;
 

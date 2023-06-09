@@ -27,8 +27,8 @@ function light_limited_rate!(
             photo_set::Union{C3Cytochrome{FT},C3ParaSet{FT}},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    @unpack J, p_i, Γ_star = leaf;
-    @unpack Eff_1, Eff_2 = photo_set;
+    (; J, p_i, Γ_star) = leaf;
+    (; Eff_1, Eff_2) = photo_set;
 
     leaf.e2c = (p_i - Γ_star) / ( Eff_1*p_i + Eff_2*Γ_star );
     leaf.Aj  = J * leaf.e2c;
@@ -57,9 +57,9 @@ function light_limited_rate!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack g_lc, J, Rd, Γ_star = leaf;
-    @unpack p_a, p_atm = envir;
-    @unpack Eff_1, Eff_2 = photo_set;
+    (; g_lc, J, Rd, Γ_star) = leaf;
+    (; p_a, p_atm) = envir;
+    (; Eff_1, Eff_2) = photo_set;
 
     _a = J;
     _b = J * Γ_star;

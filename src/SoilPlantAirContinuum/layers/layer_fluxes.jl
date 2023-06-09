@@ -17,7 +17,7 @@ Run carbon, water, energy, and SIF fluxes for all canopy layers, given
 """
 function layer_fluxes!(node::SPACMono{FT}; updating::Bool = false) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    (; angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set) = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;
@@ -158,7 +158,7 @@ Run carbon, water, energy, and SIF fluxes for all canopy layers, given
 """
 function layer_fluxes!(node::SPACMono{FT}, Δt::FT; updating::Bool = false) where {FT<:AbstractFloat}
     # 0.1 unpack data
-    @unpack angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set = node;
+    (; angles, envirs, f_SL, ga, in_rad, leaves_rt, n_canopy, photo_set, plant_ps, rt_con, rt_dim, soil_opt, stomata_model, wl_set) = node;
     canopy_rt = node.canopy_rt;
     can_rad = node.can_rad;
     can_opt = node.can_opt;

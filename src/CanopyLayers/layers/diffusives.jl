@@ -67,9 +67,9 @@ Computes 2-stream diffusive radiation transport (used for thermal and SIF),
 """
 function diffusive_S!(sf_con::SFCache{FT}, soil::SoilOpticals{FT}, rt_dim::RTDimensions) where {FT<:AbstractFloat}
     # 1. unpack values from sf_con
-    @unpack dnorm, F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd, τ_dd = sf_con;
-    @unpack ρ_SW_SIF = soil;
-    @unpack nLayer, nLevel = rt_dim;
+    (; dnorm, F⁻, F⁺, net_diffuse, Rdd, S⁻, S⁺, U, Xdd, Y, zeroB, ρ_dd, τ_dd) = sf_con;
+    (; ρ_SW_SIF) = soil;
+    (; nLayer, nLevel) = rt_dim;
 
     # Get dimensions (1st is wavelength, 2nd is layers), for Stefan Boltzmann
     # just one effective wavelength

@@ -34,9 +34,9 @@ function canopy_fluxes!(
             rt_con::RTCache{FT}
 ) where {FT<:AbstractFloat}
     # 1. unpack variables from structures
-    @unpack LAI, nLayer, Ω = can;
-    @unpack ρ_SW, ε_SW = soil;
-    @unpack dWL, dWL_iPAR, iPAR, WL, WL_iPAR = wls;
+    (; LAI, nLayer) = can;
+    (; ε_SW) = soil;
+    (; dWL, dWL_iPAR, iPAR, WL, WL_iPAR) = wls;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
@@ -58,7 +58,7 @@ function canopy_fluxes!(
     mul!(cf_con.absfs_lidf, adjoint(can_opt.absfs), can.lidf);
     normi       = 1 / mean(cf_con.absfs_lidf);
     cf_con.lPs .= (view(can_opt.Ps, 1:nLayer) .+ view(can_opt.Ps, 2:nLayer+1)) ./ 2;
-    @unpack lPs = cf_con;
+    (; lPs) = cf_con;
 
     @inbounds for j in 1:nLayer
         if length(leaves)>1

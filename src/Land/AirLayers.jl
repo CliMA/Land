@@ -16,7 +16,7 @@ function vertical_layers!(
             t::FT
 ) where {FT<:AbstractFloat}
     # unpack parameters
-    @unpack d_CO₂, d_layer, p_CO₂, x_layer, Δ_CO₂ = vls;
+    (; d_CO₂, d_layer, p_CO₂, x_layer, Δ_CO₂) = vls;
     bc = DirichletBC(FT(50), FT(30));
     u0 = vls.p_CO₂;
 

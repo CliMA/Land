@@ -11,7 +11,7 @@ Initialize the RT parameters for a given
 """
 function initialize_spac_canopy!(node::SPACMono{FT}) where {FT<:AbstractFloat}
     # 0.1 create variables required
-    @unpack angles, envirs, in_rad, leaves_rt, n_canopy, plant_ps, photo_set, rt_con, soil_opt, wl_set = node;
+    (; angles, envirs, in_rad, leaves_rt, n_canopy, plant_ps, photo_set, rt_con, soil_opt, wl_set) = node;
     canopy_rt = node.canopy_rt;
     can_opt = node.can_opt;
     can_rad = node.can_rad;

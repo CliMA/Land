@@ -27,8 +27,8 @@ function product_limited_rate!(
             photo_set::C3Cytochrome{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    @unpack p_i, Vcmax, Γ_star = leaf;
-    @unpack Eff_1, Eff_2 = photo_set;
+    (; p_i, Vcmax, Γ_star) = leaf;
+    (; Eff_1, Eff_2) = photo_set;
 
     leaf.Ap = leaf.Vcmax / 2;
     leaf.J_P680_p = leaf.Ac * (Eff_1*p_i + Eff_2*Γ_star) / (p_i - Γ_star);
@@ -69,8 +69,8 @@ function product_limited_rate!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack g_lc, Kpep, Rd, Vpmax = leaf;
-    @unpack p_a, p_atm = envir;
+    (; g_lc, Kpep, Rd, Vpmax) = leaf;
+    (; p_a, p_atm) = envir;
 
     _a = Vpmax;
     _d = Kpep;

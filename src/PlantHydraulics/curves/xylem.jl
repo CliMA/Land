@@ -25,7 +25,7 @@ function xylem_k_ratio(
         return 1 / vis
     end
 
-    @unpack a,b = vc;
+    (; a, b) = vc;
     return max( FT(1e-4), (1 - 1/(1 + a * exp(b * p_25))) * (a+1)/a ) / vis
 end
 
@@ -41,7 +41,7 @@ function xylem_k_ratio(
         return 1 / vis
     end
 
-    @unpack a,b = vc;
+    (; a, b) = vc;
     return max( FT(1e-4), 1 / (1 + a*(-p_25)^b) ) / vis
 end
 
@@ -53,7 +53,7 @@ function xylem_k_ratio(
             p_25::FT,
             vis::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    @unpack b,c = vc;
+    (; b, c) = vc;
 
     if p_25<0
         kr = max( FT(1e-4), exp( -1 * (-p_25 / b) ^ c ) ) / vis;
@@ -72,7 +72,7 @@ function xylem_k_ratio(
             p_25::FT,
             vis::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    @unpack b1,c1,f1,b2,c2,f2 = vc;
+    (; b1, c1, f1, b2, c2, f2) = vc;
 
     if p_25<0
         k1 = exp( -1 * (-p_25 / b1) ^ c1 ) * f1;
@@ -108,7 +108,7 @@ function xylem_p_crit(
             vc::WeibullSingle{FT},
             f_st::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    @unpack b,c = vc;
+    (; b, c) = vc;
 
     return -b * log( FT(1000) ) ^ (1 / c) * f_st
 end
@@ -120,7 +120,7 @@ function xylem_p_crit(
             vc::WeibullDual{FT},
             f_st::FT = FT(1)
 ) where {FT<:AbstractFloat}
-    @unpack b1,c1,b2,c2 = vc;
+    (; b1, c1, b2, c2) = vc;
 
     p1 = -b1 * log( FT(1000) ) ^ (1 / c1) * f_st
     p2 = -b2 * log( FT(1000) ) ^ (1 / c2) * f_st

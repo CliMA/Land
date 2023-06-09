@@ -28,7 +28,7 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, vc = hs;
+    (; f_st, f_vis, vc) = hs;
 
     return xylem_k_ratio(vc, p_leaf/f_st, f_vis)
 end
@@ -58,7 +58,7 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack p_max, p_min = bt;
+    (; p_max, p_min) = bt;
 
     if p_leaf >= p_max
         return FT(1)
@@ -80,7 +80,7 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack p_max, p_min = bt;
+    (; p_max, p_min) = bt;
 
     if p_soil >= p_max
         return FT(1)
@@ -102,7 +102,7 @@ function β_factor(
             p_soil::FT,
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack swc_max, swc_min = bt;
+    (; swc_max, swc_min) = bt;
 
     if swc >= swc_max
         return FT(1)

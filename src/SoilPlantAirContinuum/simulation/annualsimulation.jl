@@ -24,7 +24,7 @@ function annual_simulation!(
             output::DataFrame
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
-    @unpack elevation, gaba, laba, latitude, vtoj = node;
+    (; elevation, gaba, laba, latitude, vtoj) = node;
 
     # 1. update the environmental constants based on the node geographycal info
     ratio            = atmospheric_pressure_ratio(elevation);
@@ -57,14 +57,13 @@ function annual_simulation!(
         if (r_all>0) & (zenith<=85)
             # 2.2.1 update the leaf partitioning
             big_leaf_partition!(node, zenith, r_all)
-            @unpack frac_sh, frac_sl = node.container2L;
+            (; frac_sh, frac_sl) = node.container2L;
 
             # 2.2.2 optimize flows in each layer
             optimize_flows!(node, photo_set);
             leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
             flow = node.opt_f_sl + node.opt_f_sh;
-            anet = frac_sl * node.container2L.cont_sl.an +
-                   frac_sh * node.container2L.cont_sh.an;
+            anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
             # 2.2.3 update drought history
             pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,

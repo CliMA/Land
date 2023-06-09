@@ -142,8 +142,8 @@ Return the Reflectance, given
 - `twl` Target wave length in nm
 """
 function REF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
-    @unpack WL,nWL = wls;
-    @unpack alb_obs = can_rad;
+    (; WL, nWL) = wls;
+    (; alb_obs) = can_rad;
 
     # find the index where twl nm is
     ind = 0;
@@ -173,7 +173,7 @@ Return the Reflectance, given
 - `twl` Target wave length in nm
 """
 function SPECTRUM_WL(spectrum::Vector{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
-    @unpack WL,nWL = wls;
+    (; WL, nWL) = wls;
 
     # find the index where twl nm is
     ind = 0;
@@ -220,8 +220,8 @@ Return the SIF, given
 - `twl` Target SIF wave length in nm
 """
 function SIF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
-    @unpack WLF,nWLF = wls;
-    @unpack SIF_obs = can_rad;
+    (; WLF, nWLF) = wls;
+    (; SIF_obs) = can_rad;
 
     # find the index where twl nm is
     ind = 0;

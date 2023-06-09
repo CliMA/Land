@@ -13,7 +13,7 @@ Compute fluorescence yield, Kr, Ks, and Kp for leaf, given
 """
 function leaf_fluorescence! end
 leaf_fluorescence!(fluo_set::CytoFluoParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
-    @unpack APAR, C_b₆f, J_P680_a, J_P700_a, J_P700_j, K_D1, K_F1, K_N1, K_P1, K_P2, K_U2, k_q, φ_P1_max, α_1, α_2, ϵ_1, ϵ_2 = leaf;
+    (; APAR, C_b₆f, J_P680_a, J_P700_a, J_P700_j, K_D1, K_F1, K_N1, K_P1, K_P2, K_U2, k_q, φ_P1_max, α_1, α_2, ϵ_1, ϵ_2) = leaf;
 
     # adapted from https://github.com/jenjohnson/johnson-berry-2021-pres/
     #                      scripts/model_fun.m
@@ -81,22 +81,22 @@ leaf_fluorescence!(fluo_set::CytoFluoParaSet{FT}, leaf::Leaf{FT}) where {FT<:Abs
 );
 
 leaf_fluorescence!(fluo_set::FluoParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
-    @unpack Ag, Kd, Kf, Kp_max, maxPSII = leaf;
-    @unpack Kr1, Kr2, Kr3 = fluo_set;
+    (; Ag, Kd, Kf, Kp_max, maxPSII) = leaf;
+    (; Kr1, Kr2, Kr3) = fluo_set;
 
     # Actual effective ETR:
     leaf.Ja  = max(0, Ag / leaf.e2c);
 
     # Effective photochemical yield:
     if leaf.Ja <= 0
-        _φ   = maxPSII;
+        _φ = maxPSII;
     else
-        _φ   = maxPSII*leaf.Ja/leaf.J_pot;
+        _φ = maxPSII*leaf.Ja/leaf.J_pot;
     end;
 
-    leaf.φ   = min(1/maxPSII, _φ);
+    leaf.φ = min(1/maxPSII, _φ);
     # degree of light saturation: 'x' (van der Tol e.Ap. 2014)
-    x        = max(0,  1-leaf.φ/maxPSII);
+    x = max(0,  1-leaf.φ/maxPSII);
 
     # Max PSII rate constant, x_α = exp(log(x)*Kr2);
     x_α      = x ^ Kr2;

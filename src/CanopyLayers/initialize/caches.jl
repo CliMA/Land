@@ -11,7 +11,7 @@ Create a [`CFCache`](@ref) type struct, given
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_cf_cache(FT, rt_dim::RTDimensions)
-    @unpack nAzi, nLayer, nPAR, nWL = rt_dim;
+    (; nAzi, nLayer, nPAR, nWL) = rt_dim;
 
     abs_wave    = zeros(FT, nWL   );
     absfs_lidf  = zeros(FT, nAzi  );
@@ -50,7 +50,7 @@ Create a [`CGCache`](@ref) type struct, given
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_cg_cache(FT, rt_dim::RTDimensions)
-    @unpack nAzi, nIncl = rt_dim;
+    (; nAzi, nIncl) = rt_dim;
 
     _Co  = zeros(FT, nIncl);
     _Cs  = zeros(FT, nIncl);
@@ -86,7 +86,7 @@ Create a [`SFCache`](@ref) type struct, given
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_sf_cache(FT, rt_dim::RTDimensions)
-    @unpack nAzi, nIncl, nLayer, nLevel, nWLE, nWLF = rt_dim;
+    (; nAzi, nIncl, nLayer, nLevel, nWLE, nWLF) = rt_dim;
 
     τ_dd           = zeros(FT, (nWLF,nLayer));
     Xdd            = zeros(FT, (nWLF,nLayer));
@@ -207,7 +207,7 @@ Create a [`CGCache`](@ref) type struct, given
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_sw_cache(FT, rt_dim::RTDimensions)
-    @unpack nLayer, nWL = rt_dim;
+    (; nLayer, nWL) = rt_dim;
 
     dnorm  = zeros(FT, nWL);
     piLo   = zeros(FT, nWL);

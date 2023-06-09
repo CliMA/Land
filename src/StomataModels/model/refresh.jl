@@ -25,7 +25,7 @@ function update_leaf_TP!(
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # unpack required variables
-    @unpack g_max25, g_min25, p_ups, p_old, T, T_old = canopyi;
+    (; g_max25, g_min25, p_ups, p_old, T, T_old) = canopyi;
 
     # if T changes, update TD and ec, then T_old
     if T != T_old
@@ -60,7 +60,7 @@ function update_leaf_TP!(
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # unpack required variables
-    @unpack g_max25, g_min25, p_ups, p_old, T, T_old = canopyi;
+    (; g_max25, g_min25, p_ups, p_old, T, T_old) = canopyi;
 
     # note that canopyi.p_ups is not used here
     # if T changes, update TD and ec, then T_old
@@ -118,8 +118,8 @@ function update_leaf_AK!(
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
     # unpack required variables
-    @unpack APAR, ec, g_bc, g_bw, g_m, g_max, g_min, p_sat = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; APAR, ec, g_bc, g_bw, g_m, g_max, g_min, p_sat) = canopyi;
+    (; p_atm, p_H₂O) = envir;
 
     # calculate the physiological maximal g_sw
     _g_crit = ec / (p_sat - p_H₂O) * p_atm;

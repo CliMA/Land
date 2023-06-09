@@ -115,7 +115,7 @@ Fit soil albedo bands parameters, given
 - `clm` If true, use CLM method, else use new method
 """
 function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, swc::FT, method::AbstractAlbedoFitting; clm::Bool = false) where {FT<:AbstractFloat}
-    @unpack iWLF = wls;
+    (; iWLF) = wls;
 
     # fit the curve only if the values mismatch
     if clm
@@ -325,7 +325,7 @@ Fit soil albedo bands parameters, given
 - `method` [`TwoBandsFittingPoint`](@ref) type fitting method
 """
 function fit_soil_mat!(soil::SoilOpticals{FT}, wls::WaveLengths{FT}, ref_PAR::FT, ref_NIR::FT, method::TwoBandsFittingPoint) where {FT<:AbstractFloat}
-    @unpack dry_NIR, dry_PAR, wet_NIR, wet_PAR = soil;
+    (; dry_NIR, dry_PAR, wet_NIR, wet_PAR) = soil;
 
     # update soil PAR and NIR albedo
     soil.ρ_PAR = ref_PAR;

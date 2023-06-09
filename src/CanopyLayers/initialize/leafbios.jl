@@ -6,7 +6,7 @@ Create a [`LeafBios`](@ref) type struct, given
 - `rt_dim` [`RTDimensions`](@ref) type struct
 """
 function create_leaf_bios(FT, rt_dim::RTDimensions)
-    @unpack nWL, nWLE, nWLF = rt_dim;
+    (; nWL, nWLE, nWLF) = rt_dim;
 
     return LeafBios{FT}(nWL = nWL, nWLE = nWLE, nWLF = nWLF)
 end

@@ -21,7 +21,7 @@ function big_leaf_partition!(
             r_all::FT
 ) where {FT <:AbstractFloat}
     # unpack values
-    @unpack laba, lai = node;
+    (; laba, lai) = node;
 
     # 1. use big_leaf_partition function from CanopyLayers module
     ratio, q_slm, q_shm, e_sl, e_sh = big_leaf_partition(lai, zenith, r_all);

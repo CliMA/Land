@@ -59,7 +59,7 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack ps = canopyi;
+    (; ps) = canopyi;
     g_bc  = canopyi.g_bc[ind];
     g_m   = canopyi.g_m[ind];
 
@@ -150,8 +150,8 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; g_max, g_min, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     g_bc = canopyi.g_bc[ind];
     g_bw = canopyi.g_bw[ind];
     g_m  = canopyi.g_m[ind];
@@ -223,8 +223,8 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, kr_max, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; g_max, g_min, kr_max, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     a_max = canopyi.a_max[ind];
     g_bc  = canopyi.g_bc[ind];
     g_bw  = canopyi.g_bw[ind];
@@ -297,8 +297,8 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack ec, g_max, g_min, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; ec, g_max, g_min, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     g_bc  = canopyi.g_bc[ind];
     g_bw  = canopyi.g_bw[ind];
     g_m   = canopyi.g_m[ind];
@@ -368,8 +368,8 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; g_max, g_min, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     g_bc = canopyi.g_bc[ind];
     g_bw = canopyi.g_bw[ind];
     g_m  = canopyi.g_m[ind];
@@ -441,8 +441,8 @@ function solution_diff!(
             ind::Int
 ) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack g_max, g_min, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; g_max, g_min, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     g_bc = canopyi.g_bc[ind];
     g_bw = canopyi.g_bw[ind];
     g_m  = canopyi.g_m[ind];
@@ -515,8 +515,8 @@ function solution_diff!(
 ) where {FT<:AbstractFloat}
     # gsw has already been guaranteed to be in the range
     # unpack variables
-    @unpack ec, g_max, g_min, p_sat, ps = canopyi;
-    @unpack p_atm, p_H₂O = envir;
+    (; ec, g_max, g_min, p_sat, ps) = canopyi;
+    (; p_atm, p_H₂O) = envir;
     g_bc = canopyi.g_bc[ind];
     g_bw = canopyi.g_bw[ind];
     g_m  = canopyi.g_m[ind];

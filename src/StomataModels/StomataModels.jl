@@ -3,7 +3,6 @@ module StomataModels
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: TYPEDFIELDS
 using EmeraldConstants: CP_D_MOL, K_STEFAN, M_H₂O, T₂₅
-using UnPack: @unpack
 using WaterPhysics: latent_heat_vapor, relative_diffusive_coefficient, saturation_vapor_pressure
 
 using ..Photosynthesis: AbstractPhotoModelParaSet, AirLayer, GCO₂Mode, Leaf, leaf_ETR!, leaf_fluorescence!, leaf_photosynthesis!, leaf_temperature_dependence!

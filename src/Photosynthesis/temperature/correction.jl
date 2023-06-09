@@ -45,7 +45,7 @@ function temperature_correction(
             td_set::ArrheniusPeakTD{FT},
             T::FT
 ) where {FT<:AbstractFloat}
-    @unpack C, ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R = td_set;
+    (; C, ΔHa_to_RT25, ΔHd_to_R, ΔSv_to_R) = td_set;
 
     # _f_a: activation correction, C/_f_b: de-activation correction
     _f_a::FT = exp( ΔHa_to_RT25 * (1 - T₂₅(FT)/T) );

@@ -19,7 +19,7 @@ function gain_risk_map(
             photo_set::AbstractPhotoModelParaSet{FT}
 ) where {FT<:AbstractFloat}
     # 0. unpack required variables
-    @unpack frac_sh, frac_sl = node.container2L;
+    (; frac_sh, frac_sl) = node.container2L;
 
     # 1. calculate the critical flow rate
     node.ec = critical_flow(node.hs, node.ec);

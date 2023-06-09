@@ -53,8 +53,8 @@ function leaf_gas_exchange_nonopt!(
     # if flow >= 0
     else
         # 0. unpack required variables
-        @unpack envir, g_max, width = node;
-        @unpack p_atm, p_H₂O, t_air, wind = envir;
+        (; envir, g_max, width) = node;
+        (; p_atm, p_H₂O, t_air, wind) = envir;
 
         # 1. calculate leaf temperature from the flow rate
         t_leaf = max(200, leaf_temperature(node, rad, flow));
@@ -112,14 +112,12 @@ function leaf_gas_exchange_nonopt!(
             flow::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh,
-            rad_sl = node.container2L;
+    (; frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl) = node.container2L;
 
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange_nonopt!(node, photo_set, flow, par_mean, rad_mean,
-                              node.laba, node.container1L);
+    leaf_gas_exchange_nonopt!(node, photo_set, flow, par_mean, rad_mean, node.laba, node.container1L);
 
     node.containerOP = (node.ec - flow) * (node.container1L).an;
 
@@ -136,17 +134,13 @@ function leaf_gas_exchange_nonopt!(
             f_sh::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh,
-            rad_sl = node.container2L;
+    (; frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh, rad_sl) = node.container2L;
 
     # calculate gas exchangr for sunlit and shaded layers
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, par_sl, rad_sl, la_sl,
-                              node.container2L.cont_sl);
-    leaf_gas_exchange_nonopt!(node, photo_set, f_sh, par_sh, rad_sh, la_sh,
-                              node.container2L.cont_sh);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sl, par_sl, rad_sl, la_sl, node.container2L.cont_sl);
+    leaf_gas_exchange_nonopt!(node, photo_set, f_sh, par_sh, rad_sh, la_sh, node.container2L.cont_sh);
 
-    a_sum = frac_sl * node.container2L.cont_sl.an +
-            frac_sh * node.container2L.cont_sh.an;
+    a_sum = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
     e_sum = f_sl + f_sh;
     node.containerOP = (node.ec - e_sum) * a_sum;
 
@@ -209,8 +203,8 @@ function leaf_gas_exchange!(
             container::SPACContainer1L{FT}
 ) where {FT<:AbstractFloat}
     # 0. unpack required variables
-    @unpack envir = node;
-    @unpack p_atm, p_H₂O = envir;
+    (; envir) = node;
+    (; p_atm, p_H₂O) = envir;
 
     # 1. calculate leaf temperature from the flow rate
     t_leaf = max(200, leaf_temperature(node, rad, flow));
@@ -250,14 +244,13 @@ function leaf_gas_exchange!(
             flow::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack container2L, laba = node;
-    @unpack frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl = container2L;
+    (; container2L, laba) = node;
+    (; frac_sh, frac_sl, par_sh, par_sl, rad_sh, rad_sl) = container2L;
 
     # calculate mean par and rad per leaf area, then gas exchange rate
     par_mean = par_sl * frac_sl + par_sh * frac_sh;
     rad_mean = rad_sl * frac_sl + rad_sh * frac_sh;
-    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, laba,
-                       node.container1L);
+    leaf_gas_exchange!(node, photo_set, flow, par_mean, rad_mean, laba, node.container1L);
 
     return nothing
 end
@@ -272,8 +265,7 @@ function leaf_gas_exchange!(
             f_sh::FT
 ) where {FT<:AbstractFloat}
     # unpack the data
-    @unpack frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh,
-            rad_sl = node.container2L;
+    (; frac_sh, frac_sl, la_sh, la_sl, par_sh, par_sl, rad_sh, rad_sl) = node.container2L;
 
     # calculate gas exchangr for sunlit and shaded layers
     leaf_gas_exchange!(node, photo_set, f_sl, par_sl, rad_sl, la_sl,

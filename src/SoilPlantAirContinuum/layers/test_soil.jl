@@ -9,7 +9,7 @@ function test_soil_from_psoil(
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack n_canopy = node;
+    (; n_canopy) = node;
     n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer
@@ -68,7 +68,7 @@ function test_soil_from_swc(
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack n_canopy = node;
+    (; n_canopy) = node;
     n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer

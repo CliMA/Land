@@ -6,7 +6,7 @@ Create an `AbstractIncomingRadiation` struct, given
 - `wlfn` File that saves incoming wave information
 """
 function create_incoming_radiation(wls::WaveLengths{FT}, wlfn::String = FILE_SUN) where {FT<:AbstractFloat}
-    @unpack sWL, nWL = wls;
+    (; sWL, nWL) = wls;
 
     # Read data
     _suni  = matread(wlfn)["sun"]

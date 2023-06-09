@@ -63,7 +63,7 @@ mutable struct SoilOpticals{FT}
 
     # constructor
     function SoilOpticals{FT}(wls::WaveLengths{FT}) where {FT<:AbstractFloat}
-        @unpack nWL, nWLF, sWL = wls;
+        (; nWL, nWLF, sWL) = wls;
 
         # read data that has a 10 nm stepping
         _dat = read_csv(SOIL_GSV);

@@ -23,7 +23,7 @@ function annual_profit(
 ) where {FT<:AbstractFloat}
     # 0. unpack required values
     #    make sure construction cost must be postive
-    @unpack c_cons, c_vmax, elevation, gaba, laba, latitude, vtoj = node;
+    (; c_cons, c_vmax, elevation, gaba, laba, latitude, vtoj) = node;
     cons = laba * (c_cons + node.ps.Vcmax25 * c_vmax);
 
     # if cons > 0
@@ -70,14 +70,13 @@ function annual_profit(
             if (r_all>0) & (zenith<=85)
                 # 2.2.1 update the leaf partitioning
                 big_leaf_partition!(node, zenith, r_all);
-                @unpack frac_sh, frac_sl = node.container2L;
+                (; frac_sh, frac_sl) = node.container2L;
 
                 # 2.2.2 optimize flows in each layer
                 optimize_flows!(node, photo_set);
                 leaf_gas_exchange!(node, photo_set, node.opt_f_sl, node.opt_f_sh);
                 flow = node.opt_f_sl + node.opt_f_sh;
-                anet = frac_sl * node.container2L.cont_sl.an +
-                       frac_sh * node.container2L.cont_sh.an;
+                anet = frac_sl * node.container2L.cont_sl.an + frac_sh * node.container2L.cont_sh.an;
 
                 # 2.2.3 update drought history
                 pressure_profile!(node.hs, node.p_soil, node.opt_f_sl,
