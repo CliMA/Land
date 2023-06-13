@@ -107,6 +107,23 @@ end
 
 
 """
+    update_Kf!(node::SPACMono{FT}, Kf::FT) where {FT<:AbstractFloat}
+
+Update Kf and PSII_max
+"""
+function update_Kf!(node::SPACMono{FT}, Kf::FT) where {FT<:AbstractFloat}
+    for _iPS in node.plant_ps
+        _iPS.ps.Kf = Kf;
+        _iPS.ps.maxPSII = _iPS.ps.Kp_max / (_iPS.ps.Kp_max + _iPS.ps.Kf + _iPS.ps.Kd);
+    end;
+
+    return nothing
+end
+
+
+
+
+"""
     update_Kmax!(node::SPACMono{FT}, kmax::FT) where {FT<:AbstractFloat}
 
 Update the maximal hydraulic conductance for SPAC
