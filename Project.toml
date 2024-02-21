@@ -1,6 +1,6 @@
 name = "Land"
-uuid = "a4d78162-daa3-41d7-a3fe-155b9207f750"
-authors = ["Yujie Wang <jesiner@gmail.com>"]
+uuid = "27e3c115-2cb8-4114-b7a5-cd9f011f9dcc"
+authors = ["CliMA Land Team"]
 version = "0.1.1"
 
 [deps]

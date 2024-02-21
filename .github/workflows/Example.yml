@@ -16,11 +16,8 @@ jobs:
         with:
           version: "1"
       - name: Use Github Registry
-        run: |
-          cd examples
-          julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-          julia --project -e 'using Pkg; Pkg.instantiate();'
+        run: julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
+      - name: Install Dependencies
+        run: julia --project=examples/ -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate();'
       - name: Run Tests
-        run: |
-          cd examples
-          julia --project example.jl
+        run: julia --project=examples/ examples/example.jl

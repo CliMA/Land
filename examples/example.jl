@@ -363,7 +363,7 @@ function run_model!(spac::SPACMono{FT}, df::DataFrame, nc_out::String) where {FT
 end
 
 
-@time dict = load("debug.jld2");
-@time wddf = prepare_wd(dict, "debug.nc");
+@time dict = load("$(@__DIR__)/debug.jld2");
+@time wddf = prepare_wd(dict, "$(@__DIR__)/debug.nc");
 @time spac = prepare_spac(dict);
-@time run_model!(spac, wddf, "debug.output.nc");
+@time run_model!(spac, wddf, "$(@__DIR__)/debug.output.nc");

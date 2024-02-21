@@ -41,14 +41,6 @@ initialize_rt_module
 
 
 
-## Big Leaf Model
-```@docs
-big_leaf_partition
-```
-
-
-
-
 ## SCOPE Model
 ```@docs
 canopy_fluxes!
