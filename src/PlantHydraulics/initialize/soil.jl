@@ -85,6 +85,18 @@ function create_soil_VC(
             vc::AbstractSoilVC{FT},
             name::String
 ) where {FT<:AbstractFloat}
+    @assert name in ["Sand",
+                     "Loamy Sand",
+                     "Sandy Loam",
+                     "Loam",
+                     "Sandy Clay Loam",
+                     "Silt Loam",
+                     "Silt",
+                     "Clay Loam",
+                     "Silty Clay Loam",
+                     "Sandy Clay",
+                     "Silty Clay",
+                     "Clay"] "Soil type $(name) not recognized!";
     # Parameters from Silt soil
     paras = [ 163.2656, 1.37, 0.46, 0.034];
 
@@ -112,9 +124,7 @@ function create_soil_VC(
         paras = [  51.0205, 1.09, 0.36, 0.070];
     elseif name=="Clay"
         paras = [  81.6328, 1.09, 0.38, 0.068];
-    else
-        @warn twarn("Soil type $(name) not recognized, use Silt instead.");
-    end
+    end;
 
     return create_soil_VC(vc, name, paras...)
 end

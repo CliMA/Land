@@ -61,7 +61,7 @@ end
     ) where {FT<:AbstractFloat}
     root_pk(root::RootHydraulics{FT},
             q_in::FT,
-            flow::Array{FT,1}
+            flow::Vector{FT}
     ) where {FT<:AbstractFloat}
 
 Return root xylem end pressure and root hydraulic conductance (reverse of
@@ -75,8 +75,7 @@ function root_pk(
             root::RootHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_osm, p_ups, sh, T_sap, vc = root;
+    (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -119,10 +118,9 @@ end
 function root_pk(
             root::RootHydraulics{FT},
             q_in::FT,
-            flow::Array{FT,1}
+            flow::Vector{FT}
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history,
-            p_osm, p_ups, sh, T_sap, vc = root;
+    (; f_st, f_vis, k_element, k_history, k_rhiz, p_gravity, p_history, p_osm, p_ups, sh, T_sap, vc) = root;
 
     # make sure that p_ups is not p_25 and then convert
     p_end::FT = p_ups;
@@ -183,7 +181,7 @@ function xylem_risk(
             hs::LeafHydraulics{FT},
             flow::FT
 ) where {FT<:AbstractFloat}
-    @unpack f_st, f_vis, vc = hs;
+    (; f_st, f_vis, vc) = hs;
 
     p_25 = end_pressure(hs, flow) / hs.f_st;
     θ_25 = xylem_k_ratio(vc, p_25, f_vis);

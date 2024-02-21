@@ -12,33 +12,20 @@ Calculates the number of moles of photons, given
 - `λ` An array of wave length in `[nm]`, converted to `[m]` by _FAC
 - `E` Joules of energy
 """
-function e2phot(
-            λ::Array{FT},
-            E::Array{FT}
-) where {FT<:AbstractFloat}
+function e2phot(λ::Array{FT}, E::Array{FT}) where {FT<:AbstractFloat}
     return (E .* λ) .* _FAC(FT)
 end
 
 
-
-
 """
-    e2phot!(
-                λ::Array{FT,1},
-                E::Array{FT,1},
-                cache::Array{FT,1}
-    ) where {FT<:AbstractFloat}
+    e2phot!(λ::Vector{FT}, E::Vector{FT}, cache::Vector{FT}) where {FT<:AbstractFloat}
 
 Calculates the number of moles of photons, given
 - `λ` An array of wave length in `[nm]`, converted to `[m]` by _FAC
 - `E` Joules of energy
 - `cache` Cache to avoid memory allocations
 """
-function e2phot!(
-            λ::Array{FT,1},
-            E::Array{FT,1},
-            cache::Array{FT,1}
-) where {FT<:AbstractFloat}
+function e2phot!(λ::Vector{FT}, E::Vector{FT}, cache::Vector{FT}) where {FT<:AbstractFloat}
     cache .= (E .* λ) .* _FAC(FT);
 
     return nothing

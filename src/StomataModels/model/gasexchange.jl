@@ -158,8 +158,8 @@ function gas_exchange!(
 ) where {FT<:AbstractFloat}
     if canopyi.APAR[ind] > 1
         # unpack required variables
-        @unpack ec, g_max, g_min, p_sat = canopyi;
-        @unpack p_atm, p_H₂O = envir;
+        (; ec, g_max, g_min, p_sat) = canopyi;
+        (; p_atm, p_H₂O) = envir;
         _g_bc = canopyi.g_bc[ind];
         _g_bw = canopyi.g_bw[ind];
         _g_m  = canopyi.g_m[ind];
@@ -222,8 +222,8 @@ function gas_exchange!(
     # if there is light
     if canopyi.APAR[ind] > 1
         # unpack required variables
-        @unpack ec, g_max, g_min, p_sat = canopyi;
-        @unpack p_atm, p_H₂O = envir;
+        (; ec, g_max, g_min, p_sat) = canopyi;
+        (; p_atm, p_H₂O) = envir;
         _g_bc   = canopyi.g_bc[ind];
         _g_bw   = canopyi.g_bw[ind];
         _g_m    = canopyi.g_m[ind];
@@ -263,8 +263,8 @@ function gas_exchange!(
 
     # if there is no light, use nighttime mode
     else
-        @unpack ec, g_max, g_min, p_sat = canopyi;
-        @unpack p_atm, p_H₂O = envir;
+        (; ec, g_max, g_min, p_sat) = canopyi;
+        (; p_atm, p_H₂O) = envir;
         _sm = NewtonBisectionMethod{FT}(x_min=g_min, x_max=g_max);
         _st = SolutionTolerance{FT}(1e-4, 50);
         @inline fn(x) = nocturnal_diff!(x, photo_set, canopyi, envir, sm);
@@ -294,8 +294,8 @@ function gas_exchange!(
     # if there is light
     if canopyi.APAR[ind] > 1
         # unpack required variables
-        @unpack ec, g_max, g_min, p_sat = canopyi;
-        @unpack p_atm, p_H₂O = envir;
+        (; ec, g_max, g_min, p_sat) = canopyi;
+        (; p_atm, p_H₂O) = envir;
         _g_bc   = canopyi.g_bc[ind];
         _g_bw   = canopyi.g_bw[ind];
         _g_m    = canopyi.g_m[ind];
@@ -359,8 +359,8 @@ function gas_exchange!(
     # if there is light
     if canopyi.APAR[ind] > 1
         # unpack required variables
-        @unpack ec, g_max, g_min, p_sat = canopyi;
-        @unpack p_atm, p_H₂O = envir;
+        (; ec, g_max, g_min, p_sat) = canopyi;
+        (; p_atm, p_H₂O) = envir;
         _g_bc   = canopyi.g_bc[ind];
         _g_bw   = canopyi.g_bw[ind];
         _g_m    = canopyi.g_m[ind];
@@ -544,7 +544,7 @@ function gas_exchange!(
             drive::GswDrive,
             ind::Int
 ) where {FT<:AbstractFloat}
-    @unpack g_max, g_min = canopyi;
+    (; g_max, g_min) = canopyi;
 
     # update the conductances
     if canopyi.g_sw[ind] > g_max

@@ -113,7 +113,7 @@ function wind_speed!(
             spac::SPACMono{FT},
             us::FT
 ) where {FT<:AbstractFloat}
-    @unpack air_bounds, n_canopy, wind_d, wind_z0, wind_zs = spac;
+    (; air_bounds, n_canopy, wind_d, wind_z0, wind_zs) = spac;
     spac.winds .= wind_speed.(us, wind_z0, wind_d, wind_zs);
 
     return nothing
@@ -127,7 +127,7 @@ function wind_speed!(
             wr::FT,
             zr::FT
 ) where {FT<:AbstractFloat}
-    @unpack air_bounds, n_canopy, wind_d, wind_z0, wind_zs = spac;
+    (; air_bounds, n_canopy, wind_d, wind_z0, wind_zs) = spac;
     spac.winds .= wind_speed.(wr, zr, wind_z0, wind_d, wind_zs);
 
     return nothing

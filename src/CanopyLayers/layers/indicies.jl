@@ -4,37 +4,25 @@
 #
 ###############################################################################
 """
-    BLUE(can_rad::CanopyRads{FT},
-         wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    BLUE(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the BLUE @ 469 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function BLUE(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function BLUE(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return REF_WL(can_rad, wls, FT(469))
 end
 
 
-
-
 """
-    EVI(can_rad::CanopyRads{FT},
-        wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    EVI(can_rad::CanopyRads{FT},wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the EVI, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function EVI(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function EVI(can_rad::CanopyRads{FT},wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _BLUE = BLUE(can_rad, wls);
     _NIR  = NIR(can_rad, wls);
     _RED  = RED(can_rad, wls);
@@ -43,21 +31,14 @@ function EVI(
 end
 
 
-
-
 """
-    EVI2(can_rad::CanopyRads{FT},
-        wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    EVI2(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the EVI2, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function EVI2(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function EVI2(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _BLUE = BLUE(can_rad, wls);
     _NIR  = NIR(can_rad, wls);
     _RED  = RED(can_rad, wls);
@@ -66,46 +47,31 @@ function EVI2(
 end
 
 
-
-
 """
-    LSWI(can_rad::CanopyRads{FT},
-         wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    LSWI(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the LSWI, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function LSWI(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function LSWI(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _BLUE = BLUE(can_rad, wls);
     _NIR  = NIR(can_rad, wls);
     _RED  = RED(can_rad, wls);
     _SWIR = SWIR(can_rad, wls);
 
-
     return (_NIR - _SWIR) / (_NIR + _SWIR)
 end
 
 
-
-
 """
-    NDVI(can_rad::CanopyRads{FT},
-         wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    NDVI(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the NDVI, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function NDVI(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function NDVI(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _NIR = NIR(can_rad, wls);
     _RED = RED(can_rad, wls);
 
@@ -113,40 +79,26 @@ function NDVI(
 end
 
 
-
-
 """
-    NIR(can_rad::CanopyRads{FT},
-        wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    NIR(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the NIR @ 858.5 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function NIR(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function NIR(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return REF_WL(can_rad, wls, FT(858.5))
 end
 
 
-
-
 """
-    NIRv(can_rad::CanopyRads{FT},
-         wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    NIRv(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the NIRv, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function NIRv(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function NIRv(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _NIR = NIR(can_rad, wls);
     _RED = RED(can_rad, wls);
 
@@ -154,21 +106,14 @@ function NIRv(
 end
 
 
-
-
 """
-    NIRvES(can_rad::CanopyRads{FT},
-           wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    NIRvES(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the NIRv from the energy spectrum, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function NIRvES(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function NIRvES(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     _NIR = SPECTRUM_WL(can_rad.Lo, wls, FT(858.5));
     _RED = SPECTRUM_WL(can_rad.Lo, wls, FT(645));
 
@@ -176,46 +121,29 @@ function NIRvES(
 end
 
 
-
-
 """
-    RED(can_rad::CanopyRads{FT},
-        wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    RED(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the RED @ 645 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function RED(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function RED(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return REF_WL(can_rad, wls, FT(645))
 end
 
 
-
-
 """
-    REF_WL(wls::WaveLengths{FT},
-           can_rad::CanopyRads{FT}
-           wls::WaveLengths{FT},
-           twl::FT
-    ) where {FT<:AbstractFloat}
+    REF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
 
 Return the Reflectance, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `twl` Target wave length in nm
 """
-function REF_WL(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT},
-            twl::FT
-) where {FT<:AbstractFloat}
-    @unpack WL,nWL = wls;
-    @unpack alb_obs = can_rad;
+function REF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
+    (; WL, nWL) = wls;
+    (; alb_obs) = can_rad;
 
     # find the index where twl nm is
     ind = 0;
@@ -231,32 +159,21 @@ function REF_WL(
         @warn "target wave length out of bounds, please check the set up!";
         return FT(NaN)
     else
-        return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * alb_obs[ind] +
-               (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * alb_obs[ind+1]
+        return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * alb_obs[ind] + (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * alb_obs[ind+1]
     end
 end
 
 
-
-
 """
-    SPECTRUM_WL(wls::WaveLengths{FT},
-           can_rad::CanopyRads{FT}
-           wls::WaveLengths{FT},
-           twl::FT
-    ) where {FT<:AbstractFloat}
+    SPECTRUM_WL(spectrum::Vector{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
 
 Return the Reflectance, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `twl` Target wave length in nm
 """
-function SPECTRUM_WL(
-            spectrum::Vector{FT},
-            wls::WaveLengths{FT},
-            twl::FT
-) where {FT<:AbstractFloat}
-    @unpack WL,nWL = wls;
+function SPECTRUM_WL(spectrum::Vector{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
+    (; WL, nWL) = wls;
 
     # find the index where twl nm is
     ind = 0;
@@ -272,35 +189,21 @@ function SPECTRUM_WL(
         @warn "target wave length out of bounds, please check the set up!";
         return FT(NaN)
     else
-        return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * spectrum[ind] +
-               (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * spectrum[ind+1]
+        return (WL[ind+1] - twl) / (WL[ind+1] - WL[ind]) * spectrum[ind] + (twl - WL[ind]) / (WL[ind+1] - WL[ind]) * spectrum[ind+1]
     end
 end
 
 
-
-
 """
-    SWIR(can_rad::CanopyRads{FT},
-        wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    SWIR(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the SWIR @ 2130 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function SWIR(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function SWIR(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return REF_WL(can_rad, wls, FT(2130))
 end
-
-
-
-
-
-
 
 
 ###############################################################################
@@ -309,24 +212,16 @@ end
 #
 ###############################################################################
 """
-    SIF_WL(wls::WaveLengths{FT},
-           can_rad::CanopyRads{FT}
-           wls::WaveLengths{FT},
-           twl::FT
-    ) where {FT<:AbstractFloat}
+    SIF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
 
 Return the SIF, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `twl` Target SIF wave length in nm
 """
-function SIF_WL(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT},
-            twl::FT
-) where {FT<:AbstractFloat}
-    @unpack WLF,nWLF = wls;
-    @unpack SIF_obs = can_rad;
+function SIF_WL(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}, twl::FT) where {FT<:AbstractFloat}
+    (; WLF, nWLF) = wls;
+    (; SIF_obs) = can_rad;
 
     # find the index where twl nm is
     ind = 0;
@@ -342,68 +237,44 @@ function SIF_WL(
         @warn "target wave length out of bounds, please check the set up!";
         return FT(NaN)
     else
-        return (WLF[ind+1] - twl) / (WLF[ind+1] - WLF[ind]) * SIF_obs[ind] +
-               (twl - WLF[ind]) / (WLF[ind+1] - WLF[ind]) * SIF_obs[ind+1]
+        return (WLF[ind+1] - twl) / (WLF[ind+1] - WLF[ind]) * SIF_obs[ind] + (twl - WLF[ind]) / (WLF[ind+1] - WLF[ind]) * SIF_obs[ind+1]
     end
 end
 
 
-
-
 """
-    SIF_683(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    SIF_683(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the SIF @ 682.5 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function SIF_683(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function SIF_683(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return SIF_WL(can_rad, wls, FT(682.5))
 end
 
 
-
-
 """
-    SIF_740(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-    ) where {FT<:AbstractFloat}
+    SIF_740(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
 
 Return the SIF @ 740 nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 """
-function SIF_740(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT}
-) where {FT<:AbstractFloat}
+function SIF_740(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}) where {FT<:AbstractFloat}
     return SIF_WL(can_rad, wls, FT(740))
 end
 
 
-
-
 """
-    SIF_757(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT};
-            oco::Int = 2
-    ) where {FT<:AbstractFloat}
+    SIF_757(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}; oco::Int = 2) where {FT<:AbstractFloat}
 
 Return the SIF @ 758.68 (OCO2) or 758.77 (OCO3) nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `oco` Integer to indentify OCO2 or OCO3
 """
-function SIF_757(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT};
-            oco::Int = 2
-) where {FT<:AbstractFloat}
+function SIF_757(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}; oco::Int = 2) where {FT<:AbstractFloat}
     @assert 2 <= oco <= 3;
     if oco == 2
         return SIF_WL(can_rad, wls, FT(758.68))
@@ -413,24 +284,15 @@ function SIF_757(
 end
 
 
-
-
 """
-    SIF_771(can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT};
-            oco::Int = 2
-    ) where {FT<:AbstractFloat}
+    SIF_771(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}; oco::Int = 2) where {FT<:AbstractFloat}
 
 Return the SIF @ 769.94 (OCO2) or 770.005 (OCO3) nm, given
 - `can_rad` [`CanopyRads`](@ref) type struct
 - `wls` [`WaveLengths`](@ref) type struct
 - `oco` Integer to indentify OCO2 or OCO3
 """
-function SIF_771(
-            can_rad::CanopyRads{FT},
-            wls::WaveLengths{FT};
-            oco::Int = 2
-) where {FT<:AbstractFloat}
+function SIF_771(can_rad::CanopyRads{FT}, wls::WaveLengths{FT}; oco::Int = 2) where {FT<:AbstractFloat}
     @assert 2 <= oco <= 3;
     if oco == 2
         return SIF_WL(can_rad, wls, FT(769.94))

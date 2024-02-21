@@ -4,7 +4,7 @@
 #
 ###############################################################################
 """
-    SIF_fluxes!(leaves::Array{LeafBios{FT},1},
+    SIF_fluxes!(leaves::Vector{LeafBios{FT}},
                 can_opt::CanopyOpticals{FT},
                 can_rad::CanopyRads{FT},
                 can::Canopy4RT{FT},
@@ -32,7 +32,7 @@ Computes 2-stream diffusive radiation transport for SIF radiation (calls
 
 """
 function SIF_fluxes!(
-            leaves::Array{LeafBios{FT},1},
+            leaves::Vector{LeafBios{FT}},
             can_opt::CanopyOpticals{FT},
             can_rad::CanopyRads{FT},
             can::Canopy4RT{FT},
@@ -43,11 +43,11 @@ function SIF_fluxes!(
             photon::Bool = true
 ) where {FT<:AbstractFloat}
     # unpack variables from structures
-    @unpack LAI, lidf, nLayer, Ω = can;
-    @unpack a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps, Pso, sigb, vb, vf = can_opt;
-    @unpack E_down, E_up, ϕ_shade, ϕ_sun = can_rad;
-    @unpack ρ_SW_SIF = soil;
-    @unpack dWL_iWLE, iWLE, iWLF, WLE, WLF = wls;
+    (; LAI, lidf, nLayer, Ω) = can;
+    (; a, absfo, absfs, absfsfo, cosΘ_l, cos2Θ_l, fo, fs, fsfo, Po, Ps, Pso, sigb, vb, vf) = can_opt;
+    (; E_down, E_up, ϕ_shade, ϕ_sun) = can_rad;
+    (; ρ_SW_SIF) = soil;
+    (; dWL_iWLE, iWLE, iWLF, WLE, WLF) = wls;
     sf_con = rt_con.sf_con;
 
     # 1. define some useful parameters
@@ -131,8 +131,7 @@ function SIF_fluxes!(
         mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
         _mean_fsfo = mean(sf_con.ϕ_cosΘ_lidf);
 
-        sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+
-                       _mean_fsfo    .* sf_con.M⁻_sun;
+        sf_con.wfEs .= _mean_absfsfo .* sf_con.M⁺_sun .+ _mean_fsfo .* sf_con.M⁻_sun;
 
         sf_con.ϕ_cosΘ .= view(ϕ_sun, :, :, i) .* absfs;
         mul!(sf_con.ϕ_cosΘ_lidf, adjoint(sf_con.ϕ_cosΘ), lidf);
@@ -217,7 +216,7 @@ function SIF_fluxes!(
     # 7. SIF from scattered internally and soil contribution
     sf_con.tmp_2d_nWlF_nLayer .= view(vb, iWLF, :) .* view(sf_con.F⁻, :, 1:nLayer) .+ view(vf, iWLF, :) .* view(sf_con.F⁺, :, 1:nLayer);
     mul!(can_rad.SIF_obs_scattered, sf_con.tmp_2d_nWlF_nLayer, Qo);
-    can_rad.SIF_obs_scattered .= can_rad.SIF_obs_scattered .* _iLAI_pi;
+    can_rad.SIF_obs_scattered .*= _iLAI_pi;
     can_rad.SIF_obs_soil .= ( ρ_SW_SIF .* view(sf_con.F⁻, :, nLayer+1) ) .* Po[end] ./ FT(pi);
 
     can_rad.SIF_hemi .= view(sf_con.F⁺, :, 1);
@@ -228,6 +227,10 @@ function SIF_fluxes!(
     end
 
     if photon
+        can_rad.SIF_obs_sunlit ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_shaded ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_scattered ./= WLF .* _FAC(FT);
+        can_rad.SIF_obs_soil ./= WLF .* _FAC(FT);
         can_rad.SIF_obs ./= WLF .* _FAC(FT);
     end;
 
@@ -235,16 +238,8 @@ function SIF_fluxes!(
 end
 
 
-
-
 """
-    SIF_fluxes!(leaf::LeafBios{FT},
-                in_rad::IncomingRadiation{FT},
-                wls::WaveLengths{FT},
-                rt_con::RTCache{FT},
-                fqe::FT = FT(0.01);
-                photon::Bool = true
-    ) where {FT<:AbstractFloat}
+    SIF_fluxes!(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}, fqe::FT = FT(0.01); photon::Bool = true) where {FT<:AbstractFloat}
 
 Leaf level SIF, given
 - `leaf` [`LeafBios`](@ref) type struct
@@ -258,17 +253,10 @@ Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
     angle correction needs to be made before passing it to this function. The
     up- and down-ward SIF are stored in `sf_con` as `M⁻_sun` and `M⁺_sun`.
 """
-function SIF_fluxes!(
-            leaf::LeafBios{FT},
-            in_rad::IncomingRadiation{FT},
-            wls::WaveLengths{FT},
-            rt_con::RTCache{FT},
-            fqe::FT = FT(0.01);
-            photon::Bool = true
-) where {FT<:AbstractFloat}
+function SIF_fluxes!(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}, fqe::FT = FT(0.01); photon::Bool = true) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack Mb, Mf = leaf;
-    @unpack dWL_iWLE, iWLE, WLE, WLF = wls;
+    (; Mb, Mf) = leaf;
+    (; dWL_iWLE, iWLE, WLE, WLF) = wls;
     sf_con = rt_con.sf_con;
     sf_con.tmp_dwl_iWlE  .= (view(in_rad.E_direct , iWLE, 1) .+ view(in_rad.E_diffuse, iWLE, 1)) .* dWL_iWLE;
     if photon

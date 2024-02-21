@@ -6,7 +6,7 @@ function vc_integral(
     @assert p_ups <= 0 && p_dos <= 0;
 
     # unpack data from VC
-    @unpack a,b = vc;
+    (; a, b) = vc;
     _t_dos = log(a * exp(b*p_dos) + 1);
     _t_ups = log(a * exp(b*p_ups) + 1);
 
@@ -27,7 +27,7 @@ function vc_integral(
     @assert p_ups <= 0 && p_dos <= 0;
 
     # unpack data from VC
-    @unpack a,b = vc;
+    (; a, b) = vc;
     _krghe = Kmax * ρg_MPa(FT) * h * (a+1) / a + E;
     _lower = b * _krghe;
     _multi = Kmax * (a+1) / a * E;
@@ -48,7 +48,7 @@ function vc_integral(
     @assert p_ups <= 0 && p_dos <= 0;
 
     # unpack data from vc
-    @unpack a,b = vc;
+    (; a, b) = vc;
     _f_dos = p_dos * _₂F₁(1, 1/b, 1+1/b, -a*(-p_dos)^b);
     _f_ups = p_ups * _₂F₁(1, 1/b, 1+1/b, -a*(-p_ups)^b);
 
@@ -69,7 +69,7 @@ function vc_integral(
     @assert p_ups <= 0 && p_dos <= 0;
 
     # unpack data from VC
-    @unpack a,b = vc;
+    (; a, b) = vc;
     _krghe = Kmax * ρg_MPa(FT) * h + E;
     _multi = Kmax * E / _krghe;
     _f_dos = p_dos * _₂F₁(1, 1/b, 1+1/b, -E * a * (-p_dos)^b / _krghe);
@@ -89,7 +89,7 @@ function vc_integral(
     @assert p_ups <= 0 && p_dos <= 0;
 
     # unpack data from VC
-    @unpack b,c = vc;
+    (; b, c) = vc;
 
     # compute the incomplete gamma function
     _Γ_dos = gamma(1/c, (-p_dos/b)^c);

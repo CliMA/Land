@@ -1,11 +1,8 @@
 name: JuliaStable
 on:
-  push:
-    branches:
-      - main
-      - staging
-      - trying
+  merge_group:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -29,11 +26,11 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+          julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Use Github Registry for Windows
         if: runner.os == 'Windows'
         run: |
           julia -e 'using Pkg; Pkg.Registry.rm(\"General\"); Pkg.Registry.add(RegistrySpec(url=\"https://github.com/JuliaRegistries/General\"))'
-          julia --project -e 'ENV[\"PYTHON\"]=\"\"; using Pkg; Pkg.instantiate();'
+          julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest

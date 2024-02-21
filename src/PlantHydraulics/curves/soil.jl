@@ -17,7 +17,7 @@ function soil_erwc(
             p_25::FT
 ) where {FT<:AbstractFloat}
     if p_25 < 0
-        @unpack b, ϕs = sh;
+        (; b, ϕs) = sh;
 
         return (-ϕs/p_25) ^ (1/b)
     else
@@ -33,7 +33,7 @@ function soil_erwc(
             p_25::FT
 ) where {FT<:AbstractFloat}
     if p_25 < 0
-        @unpack m, n, α = sh;
+        (; m, n, α) = sh;
 
         return ( 1 / ( 1 + (-p_25 * α) ^ n ) ) ^ m
     else
@@ -56,7 +56,7 @@ function soil_rwc(
             sh::BrooksCorey{FT},
             p_25::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θs = sh;
+    (; Θs) = sh;
 
     return soil_swc(sh, p_25) / Θs
 end
@@ -68,7 +68,7 @@ function soil_rwc(
             sh::VanGenuchten{FT},
             p_25::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θs = sh;
+(; Θs) = sh;
 
     return soil_swc(sh, p_25) / Θs
 end
@@ -88,7 +88,7 @@ function soil_swc(
             sh::BrooksCorey{FT},
             p_25::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     return soil_erwc(sh, p_25) * (Θs - Θr) + Θr
 end
@@ -100,7 +100,7 @@ function soil_swc(
             sh::VanGenuchten{FT},
             p_25::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     return soil_erwc(sh, p_25) * (Θs - Θr) + Θr
 end
@@ -143,7 +143,7 @@ function soil_k_ratio_erwc(
             sh::VanGenuchten{FT},
             erwc::FT
 ) where {FT<:AbstractFloat}
-    @unpack m = sh;
+    (; m) = sh;
     k_ratio = sqrt(erwc) * (1 - (1 - erwc^(1/m)) ^ m)^2;
 
     return max(k_ratio, FT(1e-20))
@@ -163,7 +163,7 @@ function soil_k_ratio_rwc(
             sh::BrooksCorey{FT},
             rwc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
@@ -177,7 +177,7 @@ function soil_k_ratio_rwc(
             sh::VanGenuchten{FT},
             rwc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
@@ -198,7 +198,7 @@ function soil_k_ratio_swc(
             sh::BrooksCorey{FT},
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
@@ -212,7 +212,7 @@ function soil_k_ratio_swc(
             sh::VanGenuchten{FT},
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
@@ -278,7 +278,7 @@ function soil_p_25_erwc(
             erwc::FT
 ) where {FT<:AbstractFloat}
     if erwc < 1
-        @unpack b, ϕs = sh;
+        (; b, ϕs) = sh;
 
         return -ϕs / (erwc ^ b)
     else
@@ -294,7 +294,7 @@ function soil_p_25_erwc(
             erwc::FT
 ) where {FT<:AbstractFloat}
     if erwc < 1
-        @unpack m, n, α = sh;
+        (; m, n, α) = sh;
 
         return -1 * (erwc ^ (-1/m) - 1) ^ (1/n) / α
     else
@@ -320,7 +320,7 @@ function soil_p_25_rwc(
             sh::BrooksCorey{FT},
             rwc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
@@ -334,7 +334,7 @@ function soil_p_25_rwc(
             sh::VanGenuchten{FT},
             rwc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (rwc * Θs - Θr) / (Θs - Θr)));
 
@@ -359,7 +359,7 @@ function soil_p_25_swc(
             sh::BrooksCorey{FT},
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 
@@ -373,7 +373,7 @@ function soil_p_25_swc(
             sh::VanGenuchten{FT},
             swc::FT
 ) where {FT<:AbstractFloat}
-    @unpack Θr, Θs = sh;
+    (; Θr, Θs) = sh;
 
     erwc = min(1, max(0, (swc - Θr) / (Θs - Θr)));
 

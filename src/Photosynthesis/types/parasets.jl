@@ -241,7 +241,7 @@ function C3Bernacchi(FT)
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
-    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2, 1)
+    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2, 0.7)
 end
 
 """ [`C3ParaSet`](@ref) type C3 photosynthesis using CLM5's data """
@@ -256,7 +256,7 @@ function C3CLM(FT)
     VR  = VtoRDefault(FT);
     E1  = FT(4);
     E2  = FT(8);
-    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2, 1)
+    return C3ParaSet{FT}(JT, KcT, KoT, ReT, VcT, ΓsT, Flu, VR, E1, E2, 0.7)
 end
 
 """ [`C4ParaSet`](@ref) type C4 photosynthesis using CLM5's data """

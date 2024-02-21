@@ -4,18 +4,20 @@ using Land.Photosynthesis
 using Land.PlantHydraulics
 using Land.SoilPlantAirContinuum
 using Land.StomataModels
-using Pkg.Artifacts
 using PkgUtility
 using Test
-using TextIO: read_csv
 
 
 ENV["JULIA_LOG_LEVEL"] = "WARN"
 
+@testset verbose = true "CliMA Land v0.1" begin
+    include("modules/CanopyLayers.jl");
+    include("modules/Photosynthesis.jl");
+    include("modules/PlantHydraulics.jl");
+    include("modules/StomataModels.jl");
+    include("modules/SPAC.jl");
+end;
 
-include("test_CanopyLayers.jl"   )
-include("test_Photosynthesis.jl" )
-include("test_PlantHydraulics.jl")
-include("test_StomataModels.jl"  )
-include("test_SPAC.jl"           )
-include("test_Land.jl"           )
+@testset verbose = true "CliMA Land Features" begin
+    include("features/clm5_mode.jl");
+end;

@@ -4,20 +4,19 @@
 #
 ###############################################################################
 """
-    leaf_ETR!(photo_set::AbstractPhotoModelParaSet{FT},
-              leaf::Leaf{FT}
-    ) where {FT<:AbstractFloat}
+    leaf_ETR!(photo_set::C3Cytochrome{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    leaf_ETR!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
+    leaf_ETR!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat}
 
 Update the electron transport variables in the leaf struct, given
-- `photo_set` [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
+- `photo_set` [`C3Cytochrome`](@ref), [`C3ParaSet`](@ref) or [`C4ParaSet`](@ref) type struct
 - `leaf` [`Leaf`](@ref) type struct
 """
-function leaf_ETR!(
-            photo_set::C3Cytochrome{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack APAR, K_P1, Vqmax, n_C, n_L, p_i, α_1, Γ_star, φ_P1_max = leaf;
-    @unpack Eff_1, Eff_2 = photo_set;
+function leaf_ETR! end
+
+leaf_ETR!(photo_set::C3Cytochrome{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
+    (; APAR, K_P1, Vqmax, n_C, n_L, p_i, α_1, Γ_star, φ_P1_max) = leaf;
+    (; Eff_1, Eff_2) = photo_set;
 
     # TODO note to run this function before rubisco_limited_rate!
     # TODO Is Vqmax necessary here, or we use Jmax as well
@@ -30,17 +29,11 @@ function leaf_ETR!(
     leaf.J = leaf.J_P680_j;
 
     return nothing
-end
+);
 
-
-
-
-function leaf_ETR!(
-            photo_set::C3ParaSet{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack APAR, maxPSII, Jmax, PSII_frac = leaf;
-    @unpack Θ_J = photo_set;
+leaf_ETR!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
+    (; APAR, maxPSII, Jmax, PSII_frac) = leaf;
+    (; Θ_J) = photo_set;
 
     _Jp = PSII_frac * maxPSII * APAR;
     _J  = lower_quadratic(Θ_J, -(_Jp + Jmax), _Jp * Jmax);
@@ -49,16 +42,10 @@ function leaf_ETR!(
     leaf.J     = _J;
 
     return nothing
-end
+);
 
-
-
-
-function leaf_ETR!(
-            photo_set::C4ParaSet{FT},
-            leaf::Leaf{FT}
-) where {FT<:AbstractFloat}
-    @unpack APAR, maxPSII, PSII_frac = leaf
+leaf_ETR!(photo_set::C4ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = (
+    (; APAR, maxPSII, PSII_frac) = leaf;
 
     _Jp = PSII_frac * maxPSII * APAR;
 
@@ -66,4 +53,4 @@ function leaf_ETR!(
     leaf.J     = _Jp;
 
     return nothing
-end
+);

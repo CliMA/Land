@@ -27,8 +27,8 @@ function rubisco_limited_rate!(
             photo_set::C3Cytochrome{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    @unpack Km, p_i, Vcmax, Γ_star = leaf;
-    @unpack Eff_1, Eff_2 = photo_set;
+    (; Km, p_i, Vcmax, Γ_star) = leaf;
+    (; Eff_1, Eff_2) = photo_set;
 
     leaf.Ac = Vcmax * (p_i - Γ_star) / (p_i + Km);
     leaf.J_P680_c = leaf.Ac * (Eff_1*p_i + Eff_2*Γ_star) / (p_i - Γ_star);
@@ -44,7 +44,7 @@ function rubisco_limited_rate!(
             photo_set::C3ParaSet{FT},
             leaf::Leaf{FT}
 ) where {FT<:AbstractFloat}
-    @unpack Km, p_i, Vcmax, Γ_star = leaf;
+    (; Km, p_i, Vcmax, Γ_star) = leaf;
 
     leaf.Ac = Vcmax * (p_i - Γ_star) / (p_i + Km);
 
@@ -71,8 +71,8 @@ function rubisco_limited_rate!(
             leaf::Leaf{FT},
             envir::AirLayer{FT}
 ) where {FT<:AbstractFloat}
-    @unpack g_lc, Km, Rd, Vcmax, Γ_star = leaf;
-    @unpack p_a, p_atm = envir;
+    (; g_lc, Km, Rd, Vcmax, Γ_star) = leaf;
+    (; p_a, p_atm) = envir;
 
     _a = Vcmax;
     _b = Vcmax * Γ_star;

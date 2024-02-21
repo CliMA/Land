@@ -34,23 +34,23 @@ mutable struct GrassLikeOrganism{FT} <: AbstractPlantOrganism{FT}
 
     # Arrays of roots and leaves
     "Roots system"
-    roots ::Array{RootHydraulics{FT},1}
+    roots ::Vector{RootHydraulics{FT}}
     "Leaves"
-    leaves::Array{LeafHydraulics{FT},1}
+    leaves::Vector{LeafHydraulics{FT}}
 
     # Root and canopy index in Soil and Atmosphere
     "Corresponding soil layer per root layer"
-    root_index_in_soil ::Array{Int,1}
+    root_index_in_soil ::Vector{Int}
     "Corresponding air layer per canopy layer"
-    canopy_index_in_air::Array{Int,1}
+    canopy_index_in_air::Vector{Int}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    cache_k::Array{FT,1}
+    cache_k::Vector{FT}
     "Pressure for each layer at given flow"
-    cache_p::Array{FT,1}
+    cache_p::Vector{FT}
     "Flow rate"
-    cache_q::Array{FT,1}
+    cache_q::Vector{FT}
 end
 
 
@@ -74,25 +74,25 @@ mutable struct PalmLikeOrganism{FT} <: AbstractPlantOrganism{FT}
 
     # Arrays of roots and leaves
     "Roots system"
-    roots ::Array{RootHydraulics{FT},1}
+    roots ::Vector{RootHydraulics{FT}}
     "Trunk"
     trunk ::StemHydraulics{FT}
     "Leaves"
-    leaves::Array{LeafHydraulics{FT},1}
+    leaves::Vector{LeafHydraulics{FT}}
 
     # Root and canopy index in Soil and Atmosphere
     "Corresponding soil layer per root layer"
-    root_index_in_soil ::Array{Int,1}
+    root_index_in_soil ::Vector{Int}
     "Corresponding air layer per canopy layer"
-    canopy_index_in_air::Array{Int,1}
+    canopy_index_in_air::Vector{Int}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    cache_k::Array{FT,1}
+    cache_k::Vector{FT}
     "Pressure for each layer at given flow"
-    cache_p::Array{FT,1}
+    cache_p::Vector{FT}
     "Flow rate"
-    cache_q::Array{FT,1}
+    cache_q::Vector{FT}
 end
 
 
@@ -116,27 +116,27 @@ mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
 
     # Arrays of roots and leaves
     "Roots system"
-    roots ::Array{RootHydraulics{FT},1}
+    roots ::Vector{RootHydraulics{FT}}
     "Trunk"
     trunk ::StemHydraulics{FT}
     "Branch system"
-    branch::Array{StemHydraulics{FT},1}
+    branch::Vector{StemHydraulics{FT}}
     "Leaves"
-    leaves::Array{LeafHydraulics{FT},1}
+    leaves::Vector{LeafHydraulics{FT}}
 
     # Root and canopy index in Soil and Atmosphere
     "Corresponding soil layer per root layer"
-    root_index_in_soil ::Array{Int,1}
+    root_index_in_soil ::Vector{Int}
     "Corresponding air layer per canopy layer"
-    canopy_index_in_air::Array{Int,1}
+    canopy_index_in_air::Vector{Int}
 
     # containers for root flows
     "Conductances for each layer at given flow"
-    cache_k::Array{FT,1}
+    cache_k::Vector{FT}
     "Pressure for each layer at given flow"
-    cache_p::Array{FT,1}
+    cache_p::Vector{FT}
     "Flow rate"
-    cache_q::Array{FT,1}
+    cache_q::Vector{FT}
 end
 
 
@@ -162,5 +162,5 @@ Base.@kwdef mutable struct TreeSimple{FT} <: AbstractPlantOrganism{FT}
 
     # Local container for tree information
     "Relative hydraulic conductance"
-    krs::Array{FT,1} = ones(FT,4)
+    krs::Vector{FT} = ones(FT,4)
 end

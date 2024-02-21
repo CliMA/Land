@@ -5,11 +5,11 @@
 #=
 function test_soil_from_psoil(
             node::SPACMono{FT},
-            psoils::Array{FT,1},
+            psoils::Vector{FT},
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack n_canopy = node;
+    (; n_canopy) = node;
     n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer
@@ -64,11 +64,11 @@ end
 
 function test_soil_from_swc(
             node::SPACMono{FT},
-            swcs::Array{FT,1},
+            swcs::Vector{FT},
             Δt::FT=FT(10)
 ) where {FT<:AbstractFloat}
     # unpack the values
-    @unpack n_canopy = node;
+    (; n_canopy) = node;
     n_sl = node.canopy_rt.nAzi * node.canopy_rt.nIncl;
 
     # update the soil water contents and potential in each layer
@@ -128,7 +128,7 @@ end
 
 function test_soil_from_psoil!(
             node::SPACMono{FT},
-            psoils::Array{FT,1},
+            psoils::Vector{FT},
             e_sum::FT
 ) where {FT<:AbstractFloat}
     # update the soil water contents and potential in each layer
@@ -151,7 +151,7 @@ end
 
 function test_soil_from_swc!(
             node::SPACMono{FT},
-            swcs::Array{FT,1},
+            swcs::Vector{FT},
             e_sum::FT
 ) where {FT<:AbstractFloat}
     # update the soil water contents and potential in each layer

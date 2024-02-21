@@ -34,7 +34,7 @@ function prognostic_gsw! end
 
 prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStomatalModel{FT}, β::FT, Δt::FT) where {FT<:AbstractFloat} = (
     # unpack values
-    @unpack g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf = clayer;
+    (; g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf) = clayer;
 
     # update g_sw
     for iLF in 1:n_leaf
@@ -52,7 +52,7 @@ prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStoma
 
 prognostic_gsw!(photo_set::AbstractPhotoModelParaSet{FT}, clayer::CanopyLayer{FT}, hs::LeafHydraulics{FT}, envir::AirLayer{FT}, sm::OSMWang{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     # unpack values
-    @unpack APAR, g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf = clayer;
+    (; APAR, g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf) = clayer;
 
     # update g_sw
     for iLF in 1:n_leaf

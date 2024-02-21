@@ -11,10 +11,10 @@
                 Δt::FT,
                 nss::Bool
     ) where {FT<:AbstractFloat}
-    update_PVF!(roots::Array{RootHydraulics{FT},1},
-                ks::Array{FT,1},
-                ps::Array{FT,1},
-                qs::Array{FT,1},
+    update_PVF!(roots::Vector{RootHydraulics{FT}},
+                ks::Vector{FT},
+                ps::Vector{FT},
+                qs::Vector{FT},
                 q_sum::FT,
                 Δt::FT
     ) where {FT<:AbstractFloat}
@@ -40,8 +40,7 @@ Note that this function only updates the equilibrium pressure in the tissue,
 """
 function update_PVF!(hs::LeafHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack f_vis, p_element, p_leaf, q_out, pv, T_sap, v_maximum,
-            v_storage = hs;
+    (; f_vis, p_element, p_leaf, q_out, pv, T_sap, v_maximum, v_storage) = hs;
 
     # calculate the flow rate out of the capacitance
     # use buffer_rate here to avoid alloaction issues
@@ -63,8 +62,7 @@ end
 
 function update_PVF!(hs::StemHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack f_vis, N, q_element, p_element, p_storage, pv, q_out, T_sap,
-            v_maximum, v_storage = hs;
+    (; f_vis, N, q_element, p_element, p_storage, pv, q_out, T_sap, v_maximum, v_storage) = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
@@ -89,8 +87,7 @@ end
 
 function update_PVF!(hs::RootHydraulics{FT}, Δt::FT) where {FT<:AbstractFloat}
     # unpack values
-    @unpack f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element,
-            q_out, T_sap, v_maximum, v_storage = hs;
+    (; f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out, T_sap, v_maximum, v_storage) = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
@@ -121,14 +118,12 @@ function update_PVF!(
             nss::Bool
 ) where {FT<:AbstractFloat}
     # unpack values
-    @unpack f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element,
-            q_out, v_maximum, v_storage = hs;
+    (; f_vis, N, p_element, p_storage, pv, q_buffer, q_diff, q_element, q_out, v_maximum, v_storage) = hs;
 
     # update flow rate in, storage volume and pressure per slice
     f_sum::FT = 0;
     for i in N:-1:1
-        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) /f_vis *
-                v_maximum[i];
+        f_cap = (p_storage[i] - p_element[i]) * buffer_rate(pv) /f_vis * v_maximum[i];
         if (f_cap > 0) && (v_storage[i] <= f_cap * Δt)
             f_cap = v_storage[i] / Δt;
         end
@@ -144,10 +139,10 @@ end
 
 
 function update_PVF!(
-            roots::Array{RootHydraulics{FT},1},
-            cache_k::Array{FT,1},
-            cache_p::Array{FT,1},
-            cache_q::Array{FT,1},
+            roots::Vector{RootHydraulics{FT}},
+            cache_k::Vector{FT},
+            cache_p::Vector{FT},
+            cache_q::Vector{FT},
             q_sum::FT,
             Δt::FT
 ) where {FT<:AbstractFloat}
@@ -211,8 +206,7 @@ function update_PVF!(
             tree::GrassLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack cache_k, cache_p, cache_q, roots = tree;
-    leaves = tree.leaves;
+    (; cache_k, cache_p, cache_q, leaves, roots) = tree;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf PVF for each layer
@@ -238,9 +232,7 @@ function update_PVF!(
             tree::PalmLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack cache_k, cache_p, cache_q, roots = tree;
-    leaves = tree.leaves;
-    trunk = tree.trunk;
+    (; cache_k, cache_p, cache_q, leaves, roots, trunk) = tree;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf PVF for each layer
@@ -251,11 +243,11 @@ function update_PVF!(
     end
 
     # 2. update PVF for trunk
-    trunk.q_out = f_sum;
+    (trunk).q_out = f_sum;
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, cache_k, cache_p, cache_q, trunk.q_in, Δt);
+    update_PVF!(roots, cache_k, cache_p, cache_q, (trunk).q_in, Δt);
 
     # 4. update pressure profiles
     pressure_profile!(tree, NonSteadyStateMode(); update=false);
@@ -270,8 +262,7 @@ function update_PVF!(
             tree::TreeLikeOrganism{FT},
             Δt::FT
 ) where {FT<:AbstractFloat}
-    @unpack branch, cache_k, cache_p, cache_q, leaves, roots = tree;
-    trunk = tree.trunk;
+    (; branch, cache_k, cache_p, cache_q, leaves, roots, trunk) = tree;
 
     # 0. note that leaf flow rates need to be updated outside this function
     # 1. update leaf and stem PVF for each layer
@@ -286,11 +277,11 @@ function update_PVF!(
     end
 
     # 2. update PVF for trunk
-    trunk.q_out = f_sum;
+    (trunk).q_out = f_sum;
     update_PVF!(trunk, Δt);
 
     # 3. update flow rate for roots, partition total flow rates into roots
-    update_PVF!(roots, cache_k, cache_p, cache_q, trunk.q_in, Δt);
+    update_PVF!(roots, cache_k, cache_p, cache_q, (trunk).q_in, Δt);
 
     # 4. update pressure profiles
     pressure_profile!(tree, NonSteadyStateMode(); update=false);

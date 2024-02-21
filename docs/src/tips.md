@@ -1,4 +1,4 @@
-# Git and Julia Tips for CliMA.Land
+# Git and Julia Tips for CliMA Land v0.1
 
 ## Instantiate the project
 1. The Land project

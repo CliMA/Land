@@ -4,11 +4,7 @@
 #
 ###############################################################################
 """
-    leaf_fluxes(leaf::LeafBios{FT},
-                in_rad::IncomingRadiation{FT},
-                wls::WaveLengths{FT},
-                rt_con::RTCache{FT}
-    ) where {FT<:AbstractFloat}
+    leaf_fluxes(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
 
 Return leaf PAR and APAR, given
 - `leaf` [`LeafBios`](@ref) type struct
@@ -19,14 +15,9 @@ Return leaf PAR and APAR, given
 Note that `in_rad` assumes direct light with zenith angle of 0, and a zenith
     angle correction needs to be made before passing it to this function.
 """
-function leaf_fluxes(
-            leaf::LeafBios{FT},
-            in_rad::IncomingRadiation{FT},
-            wls::WaveLengths{FT},
-            rt_con::RTCache{FT}
-) where {FT<:AbstractFloat}
+function leaf_fluxes(leaf::LeafBios{FT}, in_rad::IncomingRadiation{FT}, wls::WaveLengths{FT}, rt_con::RTCache{FT}) where {FT<:AbstractFloat}
     # unpack variables
-    @unpack dWL_iPAR, iPAR, WL_iPAR = wls;
+    (; dWL_iPAR, iPAR, WL_iPAR) = wls;
     cf_con = rt_con.cf_con;
     cf_con.kChlrel .= view(leaf.kChlrel, iPAR);
 
@@ -43,8 +34,8 @@ function leaf_fluxes(
     cf_con.PAR_dirCab  .= cf_con.kChlrel .* cf_con.PAR_dir;
 
     # toral PAR and APAR
-    _dif    = numerical∫(cf_con.PAR_diff   , dWL_iPAR);
-    _dir    = numerical∫(cf_con.PAR_dir    , dWL_iPAR);
+    _dif = numerical∫(cf_con.PAR_diff, dWL_iPAR);
+    _dir = numerical∫(cf_con.PAR_dir , dWL_iPAR);
     _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
     _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR);
 

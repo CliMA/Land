@@ -86,27 +86,27 @@ Base.@kwdef mutable struct SPACGrid{FT}
     "Total number of vertical layers below ground"
     n_below::Int = 10
     "A list of upper z for the veritical layers above ground `[m]`"
-    zl_above    ::Array{FT,1} = collect(FT,  1.0: 1.0:20.0)
+    zl_above    ::Vector{FT} = collect(FT,  1.0: 1.0:20.0)
     "A list of lower z for the veritical layers below ground `[m]`"
-    al_below    ::Array{FT,1} = collect(FT, -0.2:-0.2:-2.0)
+    al_below    ::Vector{FT} = collect(FT, -0.2:-0.2:-2.0)
     "An array of CO₂ partial pressure along the vertical layers `[Pa]`"
-    p_CO₂_array ::Array{FT,1} = zeros(FT, n_above) + 40
+    p_CO₂_array ::Vector{FT} = zeros(FT, n_above) + 40
     "An array of H₂O partial pressure along the vertical layers `[Pa]`"
-    p_H₂O_array ::Array{FT,1} = zeros(FT, n_above) + 1500
+    p_H₂O_array ::Vector{FT} = zeros(FT, n_above) + 1500
     "An array of soil water potential `[MPa]`"
-    p_soil_array::Array{FT,1} = zeros(FT, n_above) + FT(-0.5)
+    p_soil_array::Vector{FT} = zeros(FT, n_above) + FT(-0.5)
     "An array of soil water content"
-    swc_array   ::Array{FT,1} = zeros(FT, n_above) + FT(0.4)
+    swc_array   ::Vector{FT} = zeros(FT, n_above) + FT(0.4)
     "An array of air temperature `[K]`"
-    t_air_array ::Array{FT,1} = zeros(FT, n_above) + FT(298.15)
+    t_air_array ::Vector{FT} = zeros(FT, n_above) + FT(298.15)
     "An array of soil temperature `[K]`"
-    t_soil_array::Array{FT,1} = zeros(FT, n_above) + FT(298.15)
+    t_soil_array::Vector{FT} = zeros(FT, n_above) + FT(298.15)
 
     # Plant information
     "An array of trees in the grid"
     tree_array::Array = []
     "An array of tree density in the grid"
-    density_array::Array{FT,1} = []
+    density_array::Vector{FT} = []
 end
 
 

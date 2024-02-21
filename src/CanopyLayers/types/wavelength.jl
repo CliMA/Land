@@ -12,62 +12,64 @@ Struct for pre-set wave length parameters
 $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WaveLengths{FT}
+    opti_file::String = LAND_2021
+
     # Wave length (WL) boundaries
     "Minimal WL for PAR `[nm]`"
-    minwlPAR::FT = FT(400.0)
+    minwlPAR::FT = 300
     "Maximal WL for PAR `[nm]`"
-    maxwlPAR::FT = FT(700.0)
+    maxwlPAR::FT = 750
     "Minimal WL for NIR `[nm]`"
-    minwlNIR::FT = FT(700.0)
+    minwlNIR::FT = 700
     "Maximal WL for NIR `[nm]`"
-    maxwlNIR::FT = FT(2500.0)
+    maxwlNIR::FT = 2500
     "Minimal WL for SIF excitation `[nm]`"
-    minwle  ::FT = FT(400.0)
+    minwle::FT = 300
     "Maximal WL for SIF excitation `[nm]`"
-    maxwle  ::FT = FT(750.0)
+    maxwle::FT = 750
     "Minimal WL for SIF emission/fluorescence `[nm]`"
-    minwlf  ::FT = FT(640.0)
+    minwlf::FT = 640
     "Maximal WL for SIF emission/fluorescence `[nm]` "
-    maxwlf  ::FT = FT(850.0)
+    maxwlf::FT = 850
 
     # Wave length lists
-    "Standard wave length `[nm]`"
-    sWL::Array{FT,1} = [collect(FT(400.0):FT(10.0):FT( 650.1));
-                        collect(FT(655.0):FT( 5.0):FT( 770.1));
-                        collect(FT(780.0):FT(25.0):FT(2400.1))]
     "Differential wavelength"
-    dWL::Array{FT,1} = diff(sWL)
+    dWL::Vector{FT} = read_nc(opti_file, "WL_UPPER") .- read_nc(opti_file, "WL_LOWER")
 
     "Leaf optical parameter set"
-    optis::LeafOpticals = LeafOpticals{FT}()
+    optis::LeafOpticals = LeafOpticals{FT}(opti_file = opti_file)
     "Wave length `[nm]`"
-    WL  ::Array{FT,1}  = optis.lambda
+    WL::Vector{FT} = read_nc(opti_file, "WL")
 
     "Index of WLE in WL"
-    iWLE::Array{Int,1} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
+    iWLE::Vector{Int} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
     "Index of WLF in WL"
-    iWLF::Array{Int,1} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
+    iWLF::Vector{Int} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
     "index of wlPAR in WL"
-    iPAR::Array{Int,1} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
+    iPAR::Vector{Int} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
+    "index of wlPAR in WL for 700 nm (regular definition)"
+    iPAR_700::Vector{Int} = findall( (WL .>= minwlPAR) .& (WL .<= 700) )
     "index of wlNIR in WL"
-    iNIR::Array{Int,1} = findall( (WL .>= minwlNIR) .& (WL .<= maxwlNIR) )
+    iNIR::Vector{Int} = findall( (WL .>= minwlNIR) .& (WL .<= maxwlNIR) )
 
     "excitation wave length `[nm]`"
-    WLE     ::Array{FT,1} = WL[iWLE]
+    WLE::Vector{FT} = WL[iWLE]
     "Fluorescence wave length `[nm]`"
-    WLF     ::Array{FT,1} = WL[iWLF]
+    WLF::Vector{FT} = WL[iWLF]
     "Wave length for PAR"
-    WL_iPAR ::Array{FT,1} = WL[iPAR];
+    WL_iPAR::Vector{FT} = WL[iPAR];
     "Differential wave length for PAR"
-    dWL_iPAR::Array{FT,1} = dWL[iPAR];
+    dWL_iPAR::Vector{FT} = dWL[iPAR];
+    "Differential wave length for PAR"
+    dWL_iPAR_700::Vector{FT} = dWL[iPAR_700];
     "Differential wave length for iWLE"
-    dWL_iWLE::Array{FT,1} = dWL[iWLE];
+    dWL_iWLE::Vector{FT} = dWL[iWLE];
 
     # local storage of dimension information
     "Length of WL_iPAR"
     nPAR::Int = length(iPAR)
     "Length of WL"
-    nWL ::Int = length(WL)
+    nWL::Int = length(WL)
     "length of WLE"
     nWLE::Int = length(iWLE)
     "length of WLF"

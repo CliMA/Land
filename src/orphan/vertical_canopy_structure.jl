@@ -16,7 +16,7 @@ end
 
 # Bonan ML canopy distribution (Beta function):
 function convert_z_to_dLAI!(mod::BetaCanopyStructure, canopy, z)
-    @unpack LAI, nlayers, h = canopy
+    (; LAI, nlayers, h) = canopy
     # LAI = Leaf Area Index
     # h = Canopy height
     LAI * cdf.(mod.B,z/h)

@@ -9,10 +9,7 @@ using HypergeometricFunctions: _₂F₁
 using PkgUtility: twarn
 using SpecialFunctions: gamma
 using Statistics: mean
-using UnPack: @unpack
 using WaterPhysics: relative_surface_tension, relative_viscosity
-
-
 
 
 # export public types --- soil vulnerability
@@ -48,8 +45,6 @@ export flow_profile!, pressure_profile!, inititialize_legacy!, critical_flow,
        temperature_effects!, end_pressure, fit_xylem_VC
 
 
-
-
 include("types/curves.jl")
 include("types/flow.jl"  )
 include("types/organ.jl" )
@@ -70,8 +65,6 @@ include("hydraulics/pressure.jl"   )
 include("hydraulics/temperature.jl")
 
 include("hydraulics/capacitance.jl")
-
-
 
 
 end # module

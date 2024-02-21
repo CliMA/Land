@@ -3,7 +3,6 @@ module Photosynthesis
 using DocStringExtensions: TYPEDFIELDS
 using EmeraldConstants: GAS_R, RT₂₅, T₀, T₂₅
 using PkgUtility: lower_quadratic
-using UnPack: @unpack
 using WaterPhysics: saturation_vapor_pressure
 
 

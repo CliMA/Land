@@ -21,3 +21,51 @@ lazy = true
     [[land_model_spectrum_V1.download]]
     sha256 = "ee0ee97c013317d5535868db08a0929e4f5dbaef2d2003ed61485003e5302386"
     url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V1.tar.gz"
+
+[land_model_spectrum_V2]
+git-tree-sha1 = "1f4166dcc30f0cc923ec2889bad8461ef56ec02c"
+lazy = true
+
+    [[land_model_spectrum_V2.download]]
+    sha256 = "d749c1f39a3faf8c403aac2652e7d0643e9386ee36c0dde3ce14f4f003c14113"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V2.tar.gz"
+
+[land_model_spectrum_V3]
+git-tree-sha1 = "dbe65e9a8b34c1a0275dfd59e49212f8c634c11c"
+lazy = true
+
+    [[land_model_spectrum_V3.download]]
+    sha256 = "44b04f7ed12f6bf26079cf5357906ea0a209c32858d0e155e195b9843e7a3ed5"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V3.tar.gz"
+
+[land_model_spectrum_V4]
+git-tree-sha1 = "140b1602b17415a91305c17d2b413069fc0e7bb3"
+lazy = true
+
+    [[land_model_spectrum_V4.download]]
+    sha256 = "5610ba5463f0fece3829809a1b0ac13eb42eafbae10ef067ed4991a1a775ef10"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V4.tar.gz"
+
+[land_model_spectrum_V5]
+git-tree-sha1 = "2ade9a49cc8cab3824956ab0f82642b313dea34b"
+lazy = true
+
+    [[land_model_spectrum_V5.download]]
+    sha256 = "5ef71ae8d69aeebe0a556dfdceace7a05090f835a8e825087f7f2fef9a7b879c"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V5.tar.gz"
+
+[land_model_spectrum_V6]
+git-tree-sha1 = "ec3c0df7002c8ddaaa9c6918420b0328a0b10b58"
+lazy = true
+
+    [[land_model_spectrum_V6.download]]
+    sha256 = "9586eeb10323499a76d090a927c9ff618e9f305508ff34973f4bc6392df2df94"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V6.tar.gz"
+
+[land_model_spectrum_V7]
+git-tree-sha1 = "d22e6384201ef24aa6c627a9415db891a12fc470"
+lazy = true
+
+    [[land_model_spectrum_V7.download]]
+    sha256 = "ef6ef737e43c4a1ca6106c6a7883f2833ca2770b7f9c4644ec7b5fafb1cf3b26"
+    url = "https://github.com/Yujie-W/ResearchArtifacts/raw/wyujie/LandModel/land_model_spectrum_V7.tar.gz"

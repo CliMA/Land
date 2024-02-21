@@ -32,9 +32,11 @@ Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
     "Maximal Kp"
     Kp_max::FT = 4
     "max PSII yield (Kr=0, all RC open)"
-    maxPSII::FT = Kp/(Kp+Kf+Kd)
+    maxPSII::FT = Kp_max/(Kp_max+Kf+Kd)
     "Fraction of absorbed light used by PSII ETR"
     PSII_frac::FT = 0.5
+    "Whether Kd is temperature dependent"
+    Kd_TD::Bool = false
 
     # CO₂ pressures
     "Leaf internal CO₂ partial pressure `[Pa]`"
