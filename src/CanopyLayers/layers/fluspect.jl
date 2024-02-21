@@ -15,7 +15,7 @@ Computes leaf optical properties (reflectance and transittance) based on
 - `wls` [`WaveLengths`](@ref) type struct
 - `APAR_car` If true, include Car absorption in APAR for photosynthesis
 """
-function fluspect!(leaf::LeafBios{FT}, wls::WaveLengths{FT}; APAR_car::Bool = true) where {FT<:AbstractFloat}
+function fluspect!(leaf::LeafBios{FT}, wls::WaveLengths{FT}; APAR_car::Bool = false) where {FT<:AbstractFloat}
     # ***********************************************************************
     # Jacquemoud S., Baret F. (1990), PROSPECT: a model of leaf optical
     # properties spectra; Remote Sens. Environ.; 34:75-91.
@@ -46,7 +46,6 @@ function fluspect!(leaf::LeafBios{FT}, wls::WaveLengths{FT}; APAR_car::Bool = tr
     else
         leaf.kChlrel = (Cab*Kab)./(Kall*N.+eps(FT));
     end
-    leaf.kChlrel_old = (Cab*Kab)./(Kall*N.+eps(FT));
     #println(typeof(Kall))
     # Adding eps() here to keep it stable and NOT set to 1 manually when Kall=0 (ForwardDiff won't work otherwise)
     tau = (1 .-Kall).*exp.(-Kall) .+ Kall.^2 .*real.(expint.(Kall.+eps(FT)))
@@ -220,6 +219,17 @@ function fluspect!(leaf::LeafBios{FT}, wls::WaveLengths{FT}; APAR_car::Bool = tr
 
     leaf.Mb = gn;
     leaf.Mf = fn;
+
+    # use the prescribed leaf reflectance at PAR and NIR ranges
+    # we changed it here rather than at the beginning because we need to use the SIF matrices
+    if leaf.prescribe
+        leaf.ρ_SW[wls.iPAR] .= leaf.ρs[1];
+        leaf.τ_SW[wls.iPAR] .= leaf.τs[1];
+        leaf.ρ_SW[wls.iNIR] .= leaf.ρs[2];
+        leaf.τ_SW[wls.iNIR] .= leaf.τs[2];
+        leaf.α_SW .= 1 .- leaf.τ_SW .- leaf.ρ_SW;
+        leaf.kChlrel .= 1;
+    end;
 
     return nothing
 end

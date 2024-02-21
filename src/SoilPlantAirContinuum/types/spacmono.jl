@@ -12,6 +12,9 @@ Struct that mono species SoilPlantAirContinuum system.
 $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
+    "Input file for SPAC spectra used in wl_set and soil_opt"
+    opti_file::String = LAND_2021
+
     "Soil layers bounds `[m]`"
     soil_bounds::Vector{FT} = FT[0,-0.1,-0.2,-0.3,-0.5,-0.8,-1.2,-2.0]
     "Air layers bounds `[m]`"
@@ -82,7 +85,7 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Canopy4RT container"
     canopy_rt::Canopy4RT{FT} = Canopy4RT{FT}(nLayer = n_canopy, LAI = la/ga)
     "Wave length container"
-    wl_set::WaveLengths{FT} = WaveLengths{FT}()
+    wl_set::WaveLengths{FT} = WaveLengths{FT}(opti_file = opti_file)
     "RT dimensions"
     rt_dim::RTDimensions = RTDimensions(canopy_rt, wl_set)
     "CanopyRads container"
@@ -92,9 +95,9 @@ Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
     "Array of LeafBios container"
     leaves_rt::Vector{LeafBios{FT}} = [LeafBios{FT}(rt_dim) for i in 1:n_canopy]
     "SoilOpticals container"
-    soil_opt::SoilOpticals{FT} = SoilOpticals{FT}(wl_set)
+    soil_opt::SoilOpticals{FT} = SoilOpticals(wl_set)
     "Incoming radiation container"
-    in_rad::IncomingRadiation{FT} = IncomingRadiation{FT}(wl_set)
+    in_rad::IncomingRadiation{FT} = IncomingRadiation(wl_set)
     "RT container"
     rt_con::RTCache{FT} = RTCache{FT}(rt_dim)
     "Container for sunlit leaf area fraction in each layer"

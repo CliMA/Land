@@ -18,10 +18,10 @@ This function initializes and returns
 - `soil` [`SoilOpticals`](@ref)
 - `wls` [`WaveLengths`](@ref)
 """
-function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = 3)
+function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = 3, opti_file::String = LAND_2021)
     # 1. create wls and can, which are rt_dims independent
     can = Canopy4RT{FT}(nLayer = nLayer, LAI = LAI);
-    wls = WaveLengths{FT}();
+    wls = WaveLengths{FT}(opti_file = opti_file);
 
     # 2. create rt_dims from wls and can
     rt_dim = RTDimensions(can, wls);
@@ -29,8 +29,8 @@ function initialize_rt_module(FT; nLayer::Int = 20, LAI::Number = 3)
     # 3. create can_rad, can_opt, and etc from rt_dim and wls
     can_rad = CanopyRads{FT}(rt_dim);
     can_opt = CanopyOpticals{FT}(rt_dim);
-    in_rad  = IncomingRadiation{FT}(wls);
-    soil    = SoilOpticals{FT}(wls);
+    in_rad  = IncomingRadiation(wls);
+    soil    = SoilOpticals(wls);
     angles  = SolarAngles{FT}();
     rt_con  = RTCache{FT}(rt_dim);
 

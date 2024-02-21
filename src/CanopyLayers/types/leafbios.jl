@@ -12,6 +12,14 @@ A struct of leaf biological parameters
 $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct LeafBios{FT}
+    # whether to prescribe the leaf reflectance and transmission
+    "Prescribe leaf reflectance and transmission"
+    prescribe::Bool = false
+    "Prescribed leaf reflectance at PAR and NIR ranges"
+    ρs::Vector{FT} = [0.07, 0.35]
+    "Prescribed leaf transmission at PAR and NIR ranges"
+    τs::Vector{FT} = [0.05, 0.10]
+
     # local storage of dimension information
     "Number of wave length"
     nWL::Int = 10
@@ -51,8 +59,6 @@ Base.@kwdef mutable struct LeafBios{FT}
     α_SW::Vector{FT}  = zeros(FT, nWL)
     "Relative absorbtion by Chlorophyll+Car"
     kChlrel::Vector{FT} = zeros(FT, nWL)
-    "Relative absorbtion by Chlorophyll"
-    kChlrel_old::Vector{FT} = zeros(FT, nWL)
     "Fluorescence excitation matrix backwards"
     Mb::Matrix{FT} = zeros(FT,(nWLF,nWLE))
     "Fluorescence excitation matrix forwards"

@@ -36,7 +36,7 @@ function canopy_fluxes!(
     # 1. unpack variables from structures
     (; LAI, nLayer) = can;
     (; ε_SW) = soil;
-    (; dWL, dWL_iPAR, iPAR, WL, WL_iPAR) = wls;
+    (; dWL, dWL_iPAR, dWL_iPAR_700, iPAR, iPAR_700, WL_iPAR) = wls;
     cf_con = rt_con.cf_con;
 
     # 2. compute some useful variables
@@ -87,9 +87,13 @@ function canopy_fluxes!(
         can_rad.absPAR_shade[j] = _dif;
         can_rad.absPAR_sun[:,:,j] .= can_opt.absfs .* _dir;
 
-        # absorbed PAR for photosynthesis
-        _difCab = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
-        _dirCab = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
+        # absorbed PAR for photosynthesis (set it to be the lower of 2*X_700 or X_750)
+        _difCab_700 = numerical∫(cf_con.PAR_diffCab[iPAR_700], dWL_iPAR_700);
+        _dirCab_700 = numerical∫(cf_con.PAR_dirCab[iPAR_700] , dWL_iPAR_700) * normi;
+        _difCab_750 = numerical∫(cf_con.PAR_diffCab, dWL_iPAR);
+        _dirCab_750 = numerical∫(cf_con.PAR_dirCab , dWL_iPAR) * normi;
+        _difCab = min(2*_difCab_700, _difCab_750);
+        _dirCab = min(2*_dirCab_700, _dirCab_750);
         can_rad.absPAR_shadeCab[j] = _difCab;
         can_rad.absPAR_sunCab[:,:,j] .= can_opt.absfs .* _dirCab;
         can_rad.absPAR_sunCab[:,:,j] .+= _difCab;

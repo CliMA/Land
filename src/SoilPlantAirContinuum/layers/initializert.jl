@@ -428,6 +428,7 @@ Prescribe environmental conditions, given
 function prescribe_air!(spac::SPACMono{FT}, co2::FT, p_atm::FT, t_air::FT, vpd::FT, wind::FT) where {FT<:AbstractFloat}
     for _i_can in 1:spac.n_canopy
         _iEN = spac.envirs[_i_can];
+        _iPS = spac.plant_ps[_i_can];
 
         # update environmental conditions
         _iEN.t_air = t_air;
@@ -439,6 +440,10 @@ function prescribe_air!(spac::SPACMono{FT}, co2::FT, p_atm::FT, t_air::FT, vpd::
         _iEN.p_H₂O = _iEN.p_sat - _iEN.vpd;
         _iEN.RH    = _iEN.p_H₂O / _iEN.p_sat;
         _iEN.wind  = wind;
+
+        # update leaf boundary layer conductance for photosynthesis (no energy balance in CliMA Land v0.1)
+        _iPS.g_bh .= boundary_layer_conductance(wind, _iPS.width);
+        _iPS.g_bc .= _iPS.g_bh / FT(1.35);
     end;
 
     return nothing

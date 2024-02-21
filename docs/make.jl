@@ -14,7 +14,7 @@ pages = Any[
               "SPAC"            => "submodules/SoilPlantAirContinuum.md",
               "Land"            => "submodules/Land.md"                 ,
     ],
-]
+];
 
 
 # format the docs
@@ -23,29 +23,29 @@ mathengine = MathJax(Dict(
         :equationNumbers => Dict(:autoNumber => "AMS"),
         :Macros => Dict(),
     ),
-))
+));
 
 format = Documenter.HTML(
     prettyurls = get(ENV, "CI", nothing) == "true",
     mathengine = mathengine,
     collapselevel = 1,
     assets = ["assets/favicon.ico"]
-)
+);
 
 
 # build the docs
 makedocs(
-    sitename = "Land",
+    sitename = "clima-land-v0.1",
     format = format,
     clean = false,
-    modules = [Land],
+    # modules = [Land],
     pages = pages,
 )
 
 
 # deploy the docs to Github gh-pages
 deploydocs(
-    repo = "github.com/CliMA/Land.git",
+    repo = "github.com/silicormosia/clima-land-v0.1.git",
     target = "build",
     devbranch = "main",
     push_preview = true,

@@ -12,11 +12,11 @@ Struct for pre-set wave length parameters
 $(TYPEDFIELDS)
 """
 Base.@kwdef mutable struct WaveLengths{FT}
-    opti_file::String = OPTI_2021
+    opti_file::String = LAND_2021
 
     # Wave length (WL) boundaries
     "Minimal WL for PAR `[nm]`"
-    minwlPAR::FT = 400
+    minwlPAR::FT = 300
     "Maximal WL for PAR `[nm]`"
     maxwlPAR::FT = 750
     "Minimal WL for NIR `[nm]`"
@@ -24,7 +24,7 @@ Base.@kwdef mutable struct WaveLengths{FT}
     "Maximal WL for NIR `[nm]`"
     maxwlNIR::FT = 2500
     "Minimal WL for SIF excitation `[nm]`"
-    minwle::FT = 400
+    minwle::FT = 300
     "Maximal WL for SIF excitation `[nm]`"
     maxwle::FT = 750
     "Minimal WL for SIF emission/fluorescence `[nm]`"
@@ -33,15 +33,13 @@ Base.@kwdef mutable struct WaveLengths{FT}
     maxwlf::FT = 850
 
     # Wave length lists
-    "Standard wave length `[nm]`"
-    sWL::Vector{FT} = FT[collect(400:10:650.1); collect(655:5:770.1); collect(780:25:2400.1)]
     "Differential wavelength"
-    dWL::Vector{FT} = diff(sWL)
+    dWL::Vector{FT} = read_nc(opti_file, "WL_UPPER") .- read_nc(opti_file, "WL_LOWER")
 
     "Leaf optical parameter set"
-    optis::LeafOpticals = LeafOpticals{FT}(sWL, opti_file)
+    optis::LeafOpticals = LeafOpticals{FT}(opti_file = opti_file)
     "Wave length `[nm]`"
-    WL::Vector{FT}  = optis.lambda
+    WL::Vector{FT} = read_nc(opti_file, "WL")
 
     "Index of WLE in WL"
     iWLE::Vector{Int} = findall( (WL .>= minwle) .& (WL .<= maxwle) )
@@ -49,6 +47,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     iWLF::Vector{Int} = findall( (WL .>= minwlf) .& (WL .<= maxwlf) )
     "index of wlPAR in WL"
     iPAR::Vector{Int} = findall( (WL .>= minwlPAR) .& (WL .<= maxwlPAR) )
+    "index of wlPAR in WL for 700 nm (regular definition)"
+    iPAR_700::Vector{Int} = findall( (WL .>= minwlPAR) .& (WL .<= 700) )
     "index of wlNIR in WL"
     iNIR::Vector{Int} = findall( (WL .>= minwlNIR) .& (WL .<= maxwlNIR) )
 
@@ -60,6 +60,8 @@ Base.@kwdef mutable struct WaveLengths{FT}
     WL_iPAR::Vector{FT} = WL[iPAR];
     "Differential wave length for PAR"
     dWL_iPAR::Vector{FT} = dWL[iPAR];
+    "Differential wave length for PAR"
+    dWL_iPAR_700::Vector{FT} = dWL[iPAR_700];
     "Differential wave length for iWLE"
     dWL_iWLE::Vector{FT} = dWL[iWLE];
 

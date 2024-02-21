@@ -1,8 +1,8 @@
 name: Example
 on:
+  merge_group:
   pull_request:
-    branches:
-      - v0.1
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,7 +19,7 @@ jobs:
         run: |
           cd examples
           julia -e 'using Pkg; Pkg.Registry.rm("General"); Pkg.Registry.add(RegistrySpec(url="https://github.com/JuliaRegistries/General"))'
-          julia --project -e 'ENV["PYTHON"]=""; using Pkg; Pkg.instantiate();'
+          julia --project -e 'using Pkg; Pkg.instantiate();'
       - name: Run Tests
         run: |
           cd examples

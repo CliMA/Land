@@ -25,10 +25,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     clump_a::FT = 1
     "Structure factor b"
     clump_b::FT = 0
-    "Leaf width"
-    leaf_width::FT = 0.1
-    "Vegetation height"
-    hc::FT = 2
     "Leaf Inclination"
     LIDFa::FT = FT(0)
     "Variation in leaf inclination"
@@ -37,8 +33,6 @@ Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
     hot::FT = 0.05
 
     # tree/canopy/leaf traits
-    "Canopy height `[m]`"
-    height::FT = 20
     "Canopy roughness `[m]`"
     z0m::FT = 1
     "Tree roughtnes `[m]`"

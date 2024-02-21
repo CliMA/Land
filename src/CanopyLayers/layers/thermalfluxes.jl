@@ -89,7 +89,6 @@ function thermal_fluxes!(
             ϵ[i]    = (1 - τ_dd[i] - ρ_dd[i]);
         end
     else
-        @warn "Array of leaves is neither 1 nor nLayer, use fist leaf here!";
         le = leaves[1]
         for i=1:nLayer
             sigf    = ddf*le.ρ_LW + ddb*le.τ_LW

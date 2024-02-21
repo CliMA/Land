@@ -1,6 +1,6 @@
 #
 #
-# This file is meant for CliMA Land example
+# This file is meant for CliMA Land v0.1 example
 #
 #
 using DataFrames: DataFrame, DataFrameRow
