@@ -8,13 +8,14 @@ permissions:
   pull-requests: write
 
 on:
+  merge_group:
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
-      - staging
       - main
+      - master
 
 jobs:
   cla:
-    uses: ec-intl/workflow-templates/.github/workflows/cla_template.yml@main
+    uses: clima/.github/.github/workflows/cla_template.yml@main
     secrets: inherit
